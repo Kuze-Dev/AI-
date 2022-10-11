@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Auth\Model;
 
 use BaconQrCode\Renderer\Color\Rgb;
@@ -13,6 +15,7 @@ use Domain\Auth\Contracts\TwoFactorAuthenticationProvider;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Eloquent;
 
 /**
  * Domain\Auth\Model\TwoFactorAuthentication
@@ -24,7 +27,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property mixed|null $secret
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read Model|\Eloquent $authenticatable
+ * @property-read Model|Eloquent $authenticatable
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Auth\Model\RecoveryCode[] $recoveryCodes
  * @property-read int|null $recovery_codes_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Auth\Model\SafeDevice[] $safeDevices
@@ -72,7 +75,7 @@ class TwoFactorAuthentication extends Model
         $svg = (new Writer(
             new ImageRenderer(
                 new RendererStyle(192, 0, null, null, Fill::uniformColor(new Rgb(255, 255, 255), new Rgb(45, 55, 72))),
-                new SvgImageBackEnd
+                new SvgImageBackEnd()
             )
         ))->writeString($this->qrCodeUrl());
 

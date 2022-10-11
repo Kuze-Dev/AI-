@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Auth\Actions\ForgotPasswordAction;
 use Domain\Auth\Enums\PasswordResetResult;
 use Illuminate\Auth\Passwords\PasswordBroker;

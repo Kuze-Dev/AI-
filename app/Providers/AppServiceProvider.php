@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+
     }
 
     /**
@@ -27,8 +29,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Model::preventLazyLoading(! $this->app->isProduction());
-        Model::preventSilentlyDiscardingAttributes(! $this->app->isProduction());
+        Model::preventLazyLoading( ! $this->app->isProduction());
+        Model::preventSilentlyDiscardingAttributes( ! $this->app->isProduction());
 
         Relation::enforceMorphMap([
             'admin' => \Domain\Admin\Models\Admin::class,

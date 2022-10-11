@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 use Database\Factories\AdminFactory;
 use Domain\Admin\Actions\DeleteAdminAction;
 use Domain\Admin\Exceptions\CantDeleteSuperAdminException;
+
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Laravel\assertSoftDeleted;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Livewire\Admin\Auth;
 
 use Domain\Auth\Actions\ConfirmPasswordAction;
@@ -29,7 +31,7 @@ class ConfirmPassword extends Component implements HasForms
     {
         $confirmed = app(ConfirmPasswordAction::class)->execute($this->password, 'admin');
 
-        if (! $confirmed) {
+        if ( ! $confirmed) {
             throw ValidationException::withMessages([
                 'password' => trans('auth.failed'),
             ]);

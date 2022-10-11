@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Admin\Actions\CreateAdminAction;
 use Domain\Admin\DataTransferObjects\AdminData;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Event;
-use function Pest\Laravel\assertModelExists;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+
+use function Pest\Laravel\assertModelExists;
 
 it('can create admin', function () {
     $role = Role::create(['name' => 'Admin']);

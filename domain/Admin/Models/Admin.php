@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Admin\Models;
 
 use Filament\Models\Contracts\HasName;
@@ -68,10 +70,10 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class Admin extends Authenticatable implements MustVerifyEmail, HasName
 {
-    use HasApiTokens,
-        HasRoles,
-        Notifiable,
-        SoftDeletes;
+    use HasApiTokens;
+    use HasRoles;
+    use Notifiable;
+    use SoftDeletes;
 
     protected $fillable = [
         'first_name',

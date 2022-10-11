@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Auth\Pipes\Login;
 
 use Domain\Auth\Actions\CheckIfOnSafeDeviceAction;
@@ -15,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
 
 class CheckForTwoFactorAuthentication
 {
@@ -28,7 +31,7 @@ class CheckForTwoFactorAuthentication
     {
         $user = $this->validateCredentials($loginData);
 
-        if (! $user instanceof TwoFactorAuthenticatable || ! $user->hasEnabledTwoFactorAuthentication()) {
+        if ( ! $user instanceof TwoFactorAuthenticatable || ! $user->hasEnabledTwoFactorAuthentication()) {
             return $next($loginData);
         }
 
@@ -50,8 +53,8 @@ class CheckForTwoFactorAuthentication
     {
         $userProvider = Auth::createUserProvider(config("auth.guard.{$loginData->guard}.provider"));
 
-        if (! $userProvider instanceof EloquentUserProvider) {
-            throw new \InvalidArgumentException("`auth.guard.{$loginData->guard}.provider` must be set to `eloquent`");
+        if ( ! $userProvider instanceof EloquentUserProvider) {
+            throw new InvalidArgumentException("`auth.guard.{$loginData->guard}.provider` must be set to `eloquent`");
         }
 
         $user = $userProvider->retrieveByCredentials(['email' => $loginData->email]);

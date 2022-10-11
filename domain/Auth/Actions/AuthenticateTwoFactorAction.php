@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Auth\Actions;
 
 use Domain\Auth\Contracts\TwoFactorAuthenticatable;
@@ -11,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\UnauthorizedException;
+use LogicException;
+use InvalidArgumentException;
 
 class AuthenticateTwoFactorAction
 {
@@ -25,8 +29,8 @@ class AuthenticateTwoFactorAction
     {
         $user = $this->getChallengedUser($twoFactorData);
 
-        if (! $twoFactorData->recovery_code && ! $twoFactorData->code) {
-            throw new \LogicException('`$twoFactorData` must provide either `$recovery_code` or `$code`.');
+        if ( ! $twoFactorData->recovery_code && ! $twoFactorData->code) {
+            throw new LogicException('`$twoFactorData` must provide either `$recovery_code` or `$code`.');
         }
 
         if ($twoFactorData->recovery_code && ! $this->recoveryCodeValidator->execute($user, $twoFactorData->recovery_code)) {
@@ -52,17 +56,17 @@ class AuthenticateTwoFactorAction
     {
         $userProvider = Auth::createUserProvider(config("auth.guard.{$twoFactorData->guard}.provider"));
 
-        if (! $userProvider instanceof EloquentUserProvider) {
-            throw new \InvalidArgumentException("`auth.guard.{$twoFactorData->guard}.provider` must be set to `eloquent`");
+        if ( ! $userProvider instanceof EloquentUserProvider) {
+            throw new InvalidArgumentException("`auth.guard.{$twoFactorData->guard}.provider` must be set to `eloquent`");
         }
 
         $user = $userProvider->retrieveById(Session::get('login.id'));
 
-        if (! $user) {
+        if ( ! $user) {
             throw new AuthenticationException();
         }
 
-        if (! $user instanceof TwoFactorAuthenticatable || ! $user->hasEnabledTwoFactorAuthentication()) {
+        if ( ! $user instanceof TwoFactorAuthenticatable || ! $user->hasEnabledTwoFactorAuthentication()) {
             throw new UnauthorizedException();
         }
 

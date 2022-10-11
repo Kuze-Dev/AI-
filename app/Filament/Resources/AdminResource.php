@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AdminResource\Pages;
@@ -23,7 +25,7 @@ class AdminResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
 
-    protected static string | array $middlewares = ['password.confirm:admin.password.confirm'];
+    protected static string|array $middlewares = ['password.confirm:admin.password.confirm'];
 
     public static function form(Form $form): Form
     {

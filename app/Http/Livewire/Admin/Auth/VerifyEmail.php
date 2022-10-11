@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Livewire\Admin\Auth;
 
 use App\Http\Requests\Admin\Auth\VerifyEmailRequest;
@@ -15,7 +17,7 @@ class VerifyEmail extends Component
     {
         $user = $request->user();
 
-        if (! $user instanceof MustVerifyEmail) {
+        if ( ! $user instanceof MustVerifyEmail) {
             redirect()->intended(Filament::getUrl());
 
             return;

@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Auth\Actions\GenerateRecoveryCodesAction;
 use Domain\Auth\Events\RecoveryCodesGenerated;
 use Illuminate\Support\Facades\Event;
-use function Pest\Laravel\assertDatabaseCount;
 use Tests\Fixtures\User;
+
+use function Pest\Laravel\assertDatabaseCount;
 
 beforeEach(function () {
     Event::fake();

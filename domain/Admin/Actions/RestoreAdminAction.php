@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Admin\Actions;
 
 use Domain\Admin\Models\Admin;
@@ -8,7 +10,7 @@ class RestoreAdminAction
 {
     public function execute(Admin $admin): ?bool
     {
-        if (! $admin->trashed()) {
+        if ( ! $admin->trashed()) {
             return null;
         }
 

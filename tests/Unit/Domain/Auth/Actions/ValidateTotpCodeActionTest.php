@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Auth\Actions\ValidateTotpCodeAction;
 use Domain\Auth\Contracts\TwoFactorAuthenticationProvider;
 use Illuminate\Support\Facades\Event;
