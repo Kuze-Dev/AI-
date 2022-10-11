@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Auth\Actions\EnableTwoFactorAuthenticationAction;
 use Domain\Auth\Actions\ValidateTotpCodeAction;
 use Domain\Auth\Events\TwoFactorAuthenticationEnabled;
 use Illuminate\Support\Facades\Event;
 use Mockery\MockInterface;
-use function Pest\Laravel\assertDatabaseCount;
 use Tests\Fixtures\User;
+
+use function Pest\Laravel\assertDatabaseCount;
 
 beforeEach(function () {
     Event::fake();

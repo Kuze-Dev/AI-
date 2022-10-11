@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 use Database\Factories\AdminFactory;
 use Domain\Admin\Actions\DeleteRoleAction;
 use Domain\Admin\Exceptions\CantDeleteRoleWithAssociatedUsersException;
 use Domain\Admin\Exceptions\CantDeleteSuperAdminRoleException;
-use function Pest\Laravel\assertModelMissing;
 use Spatie\Permission\Models\Role;
+
+use function Pest\Laravel\assertModelMissing;
 
 it('can delete role', function () {
     $role = Role::create(['name' => 'Admin']);

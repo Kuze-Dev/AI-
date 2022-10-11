@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Auth\DataTransferObjects\LoginData;
 use Domain\Auth\Enums\LoginResult;
 use Domain\Auth\Pipes\Login\AttemptToAuthenticate;

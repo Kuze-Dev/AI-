@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Auth\Actions\CheckIfOnSafeDeviceAction;
 use Domain\Auth\DataTransferObjects\LoginData;
 use Domain\Auth\Enums\LoginResult;

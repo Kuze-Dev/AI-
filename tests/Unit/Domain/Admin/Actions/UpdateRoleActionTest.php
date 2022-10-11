@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Admin\Actions\UpdateRoleAction;
 use Domain\Admin\DataTransferObjects\RoleData;
 use Domain\Admin\Exceptions\CantModifySuperAdminRoleException;
-use function Pest\Laravel\assertDatabaseHas;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+
+use function Pest\Laravel\assertDatabaseHas;
 
 it('can update role', function () {
     $role = Role::create(['name' => 'Admin']);

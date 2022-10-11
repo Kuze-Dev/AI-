@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Auth\Actions\ResetPasswordAction;
 use Domain\Auth\DataTransferObjects\ResetPasswordData;
 use Domain\Auth\Enums\PasswordResetResult;

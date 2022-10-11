@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Auth\Actions\FlushSafeDevicesAction;
 use Domain\Auth\Events\SafeDevicesFlushed;
 use Illuminate\Support\Facades\Event;
-use function Pest\Laravel\assertDatabaseCount;
 use Tests\Fixtures\User;
+
+use function Pest\Laravel\assertDatabaseCount;
 
 it('can flush safe devices', function () {
     Event::fake();

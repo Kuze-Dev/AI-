@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Auth\Actions\SetupTwoFactorAuthenticationAction;
 use Domain\Auth\Contracts\TwoFactorAuthenticationProvider;
 use Mockery\MockInterface;
-use function Pest\Laravel\assertDatabaseCount;
 use Tests\Fixtures\User;
+
+use function Pest\Laravel\assertDatabaseCount;
 
 beforeEach(function () {
     $this->user = User::create(['email' => 'test@user']);

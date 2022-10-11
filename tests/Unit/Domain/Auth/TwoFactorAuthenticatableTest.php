@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Tests\Fixtures\User;
 
 it('can get two factor holder name', function () {
