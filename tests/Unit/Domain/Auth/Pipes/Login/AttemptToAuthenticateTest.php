@@ -43,9 +43,8 @@ it('hits throttle with invalid credentials', function () {
 
     $this->mock(
         RateLimiter::class,
-        fn (MockInterface $mock) => $mock->shouldReceive('hit')
-            ->once()
-            ->andReturn(null)
+        fn (MockInterface $mock) => $mock->expects('hit')
+            ->andReturns(null)
     );
 
     app(AttemptToAuthenticate::class)->handle(
@@ -54,7 +53,7 @@ it('hits throttle with invalid credentials', function () {
     );
 })->throws(ValidationException::class);
 
-function mockAuthAttempt(bool $return)
+function mockAuthAttempt(bool $return): void
 {
     $guard = mock(StatefulGuard::class)
         ->expect(attempt: fn () => $return);

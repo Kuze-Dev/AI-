@@ -40,7 +40,7 @@ it('can authenticate via totp code', function () {
         ->andReturn($userProvider);
     $this->mock(
         ValidateTotpCodeAction::class,
-        fn (MockInterface $mock) => $mock->shouldReceive('execute')->andReturn(true)
+        fn (MockInterface $mock) => $mock->allows('execute')->andReturns(true)
     );
 
     $result = app(AuthenticateTwoFactorAction::class)->execute(new TwoFactorData(code: 'secret'));

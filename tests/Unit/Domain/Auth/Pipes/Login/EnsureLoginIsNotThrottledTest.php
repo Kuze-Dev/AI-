@@ -14,7 +14,7 @@ it('proceeds when not throttled', function () {
     $this->mock(
         RateLimiter::class,
         function (MockInterface $mock) {
-            $mock->shouldReceive('tooManyAttempts')->once()->andReturn(false);
+            $mock->expects('tooManyAttempts')->andReturns(false);
         }
     );
 
@@ -31,8 +31,8 @@ it('throttles on multiple invalid attempts', function () {
     $this->mock(
         RateLimiter::class,
         function (MockInterface $mock) {
-            $mock->shouldReceive('tooManyAttempts')->once()->andReturn(true);
-            $mock->shouldReceive('availableIn')->once()->andReturn(60);
+            $mock->expects('tooManyAttempts')->andReturns(true);
+            $mock->expects('availableIn')->andReturns(60);
         }
     );
 

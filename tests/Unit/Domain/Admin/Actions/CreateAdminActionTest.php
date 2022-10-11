@@ -27,7 +27,7 @@ it('can create admin', function () {
     ));
 
     assertModelExists($admin);
-    expect($admin->hasRole($role))->toBeTrue();
-    expect($admin->hasPermissionTo($permission))->toBeTrue();
+    expect($admin->hasRole($role))->toBeTrue()
+        ->and($admin->hasPermissionTo($permission))->toBeTrue();
     Event::assertDispatched(Registered::class);
 });
