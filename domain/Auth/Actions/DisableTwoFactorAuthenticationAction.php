@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Auth\Actions;
 
 use Domain\Auth\Contracts\TwoFactorAuthenticatable;
@@ -12,7 +14,7 @@ class DisableTwoFactorAuthenticationAction
 {
     public function execute(User&TwoFactorAuthenticatable $authenticatable): ?bool
     {
-        if (! $authenticatable->hasEnabledTwoFactorAuthentication()) {
+        if ( ! $authenticatable->hasEnabledTwoFactorAuthentication()) {
             return null;
         }
 

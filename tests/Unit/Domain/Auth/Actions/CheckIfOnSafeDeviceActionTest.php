@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Auth\Actions\CheckIfOnSafeDeviceAction;
 use Domain\Auth\Model\SafeDevice;
 use Illuminate\Http\Request;

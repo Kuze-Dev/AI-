@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Auth\Actions;
 
 use Domain\Auth\Contracts\TwoFactorAuthenticatable;
@@ -20,7 +22,7 @@ class EnableTwoFactorAuthenticationAction
             return null;
         }
 
-        if (! $this->validator->execute($authenticatable, $code)) {
+        if ( ! $this->validator->execute($authenticatable, $code)) {
             return false;
         }
 

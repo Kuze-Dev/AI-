@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders\Auth;
 
 use Illuminate\Database\Seeder;
@@ -8,7 +10,7 @@ use Spatie\Permission\Models\Permission;
 
 class PermissionSeeder extends Seeder
 {
-    const FILAMENT_ABILITIES = [
+    public const FILAMENT_ABILITIES = [
         'viewAny',
         'view',
         'create',
@@ -17,7 +19,7 @@ class PermissionSeeder extends Seeder
         'delete',
     ];
 
-    const FILAMENT_SOFT_DELETES_ABILITIES = [
+    public const FILAMENT_SOFT_DELETES_ABILITIES = [
         'restoreAny',
         'restore',
         'forceDeleteAny',

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Auth\Actions;
 
 use Domain\Auth\Contracts\TwoFactorAuthenticatable;
@@ -13,7 +15,7 @@ class AddSafeDeviceAction
 {
     public function execute(TwoFactorAuthenticatable $authenticatable, Request $request): TwoFactorAuthenticatable
     {
-        if (! $authenticatable->hasEnabledTwoFactorAuthentication()) {
+        if ( ! $authenticatable->hasEnabledTwoFactorAuthentication()) {
             return $authenticatable;
         }
 

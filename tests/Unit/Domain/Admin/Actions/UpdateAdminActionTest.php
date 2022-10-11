@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 use Database\Factories\AdminFactory;
 use Domain\Admin\Actions\UpdateAdminAction;
 use Domain\Admin\DataTransferObjects\AdminData;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Contracts\Notifications\Dispatcher;
 use Mockery\MockInterface;
-use function Pest\Laravel\assertDatabaseHas;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+
+use function Pest\Laravel\assertDatabaseHas;
 
 it('can update admin', function () {
     $admin = AdminFactory::new()->create();

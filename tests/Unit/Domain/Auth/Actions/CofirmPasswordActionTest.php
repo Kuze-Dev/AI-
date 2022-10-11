@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Auth\Actions\ConfirmPasswordAction;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;

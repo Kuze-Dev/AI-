@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Admin\Actions\CreateRoleAction;
 use Domain\Admin\DataTransferObjects\RoleData;
-use function Pest\Laravel\assertModelExists;
 use Spatie\Permission\Models\Permission;
+
+use function Pest\Laravel\assertModelExists;
 
 it('can create role', function () {
     $permission = Permission::create(['name' => 'admin.view']);

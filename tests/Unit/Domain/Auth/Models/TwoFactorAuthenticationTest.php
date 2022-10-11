@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Auth\Model\TwoFactorAuthentication;
 use Tests\Fixtures\User;
 

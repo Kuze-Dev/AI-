@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Auth\Actions\DisableTwoFactorAuthenticationAction;
 use Domain\Auth\Events\TwoFactorAuthenticationDisabled;
 use Illuminate\Support\Facades\Event;
-use function Pest\Laravel\assertDatabaseHas;
 use Tests\Fixtures\User;
+
+use function Pest\Laravel\assertDatabaseHas;
 
 beforeEach(function () {
     Event::fake();

@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Auth\Actions\AddSafeDeviceAction;
 use Domain\Auth\Events\SafeDeviceAdded;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
-use function Pest\Laravel\assertDatabaseCount;
 use Tests\Fixtures\User;
+
+use function Pest\Laravel\assertDatabaseCount;
 
 beforeEach(function () {
     Event::fake();

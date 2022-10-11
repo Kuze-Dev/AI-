@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Auth\Actions;
 
 use Domain\Auth\Contracts\TwoFactorAuthenticatable;
@@ -9,11 +11,11 @@ class CheckIfOnSafeDeviceAction
 {
     public function execute(TwoFactorAuthenticatable $authenticatable, Request $request): bool
     {
-        if (! $authenticatable->hasEnabledTwoFactorAuthentication()) {
+        if ( ! $authenticatable->hasEnabledTwoFactorAuthentication()) {
             return false;
         }
 
-        if (! $token = $request->cookie(config('domain.auth.two_factor.safe_devices.cookie'))) {
+        if ( ! $token = $request->cookie(config('domain.auth.two_factor.safe_devices.cookie'))) {
             return false;
         }
 

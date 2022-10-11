@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Admin\Models\Admin;
 use Illuminate\Support\Facades\Hash;
 

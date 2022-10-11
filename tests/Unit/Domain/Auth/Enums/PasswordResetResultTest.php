@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Auth\Enums\PasswordResetResult;
 use Illuminate\Validation\ValidationException;
 

@@ -1,12 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Admin\DataTransferObjects;
 
 class RoleData
 {
-    /**
-     * @param  array<int>  $permissions
-     */
+    /** @param  array<int>  $permissions */
     public function __construct(
         public readonly string $name,
         public readonly ?string $guard_name = null,

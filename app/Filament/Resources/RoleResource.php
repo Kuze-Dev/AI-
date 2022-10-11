@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RoleResource\Pages;
@@ -29,7 +31,7 @@ class RoleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static string | array $middlewares = ['password.confirm:admin.password.confirm'];
+    protected static string|array $middlewares = ['password.confirm:admin.password.confirm'];
 
     public static function form(Form $form): Form
     {
@@ -151,12 +153,12 @@ class RoleResource extends Resource
 
     private static function selectAllHydrated(Forms\Components\Toggle $component, ?Role $record): void
     {
-        if (! $record) {
+        if ( ! $record) {
             return;
         }
 
         foreach (self::$permissionGroups as $permissionGroup) {
-            if (! $record->hasPermissionTo($permissionGroup->main)) {
+            if ( ! $record->hasPermissionTo($permissionGroup->main)) {
                 return;
             }
         }
@@ -176,7 +178,7 @@ class RoleResource extends Resource
     private static function permissionGroupStateHydrated(PermissionGroup $permissionGroup): Closure
     {
         return function (Forms\Components\Toggle $component, ?Role $record) use ($permissionGroup): void {
-            if (! $record) {
+            if ( ! $record) {
                 return;
             }
 
@@ -191,11 +193,11 @@ class RoleResource extends Resource
                 "{$groupName}_abilities",
                 $get($groupName)
                     ? $permissionGroup->abilities->pluck('id')
-                    ->merge($get("{$groupName}_abilities"))
-                    ->unique()
+                        ->merge($get("{$groupName}_abilities"))
+                        ->unique()
                     : $permissionGroup->abilities->pluck('id')
-                    ->diff($get("{$groupName}_abilities"))
-                    ->values()
+                        ->diff($get("{$groupName}_abilities"))
+                        ->values()
             );
 
             self::refreshSelectAllState($get, $set);
@@ -205,16 +207,16 @@ class RoleResource extends Resource
     private static function permissionGroupAbilitiesStateHydrated(PermissionGroup $permissionGroup): Closure
     {
         return function (Forms\Components\CheckboxList $component, ?Role $record) use ($permissionGroup): void {
-            if (! $record) {
+            if ( ! $record) {
                 return;
             }
 
             $state = $record->hasPermissionTo($permissionGroup->main)
                 ? array_keys($component->getOptions())
                 : $record->permissions->pluck('id')
-                ->intersect(array_keys($component->getOptions()))
-                ->values()
-                ->toArray();
+                    ->intersect(array_keys($component->getOptions()))
+                    ->values()
+                    ->toArray();
 
             $component->state($state);
         };
@@ -235,7 +237,7 @@ class RoleResource extends Resource
     private static function refreshSelectAllState(Closure $get, Closure $set): void
     {
         foreach (self::$permissionGroups->keys() as $groupName) {
-            if (! $get($groupName)) {
+            if ( ! $get($groupName)) {
                 $set('select_all', false);
 
                 return;

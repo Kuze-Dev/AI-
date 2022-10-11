@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Auth\Actions;
 
 use Domain\Auth\DataTransferObjects\ResetPasswordData;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Auth\Actions\AddSafeDeviceAction;
 use Domain\Auth\Actions\AuthenticateTwoFactorAction;
 use Domain\Auth\Actions\ValidateRecoveryCodeAction;
@@ -155,7 +157,7 @@ it('throws exception when invalid user provider is given', function () {
 
 it('throws exception when user is not two factor authenticatable', function () {
     $userProvider = mock(EloquentUserProvider::class)
-        ->expect(retrieveById: fn () => new FoundationUser);
+        ->expect(retrieveById: fn () => new FoundationUser());
     Auth::shouldReceive('createUserProvider')
         ->once()
         ->andReturn($userProvider);

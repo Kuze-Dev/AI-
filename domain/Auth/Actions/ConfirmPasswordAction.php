@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Auth\Actions;
 
 use Illuminate\Support\Facades\Session;
@@ -9,7 +11,7 @@ class ConfirmPasswordAction
 {
     public function execute(string $password, ?string $guard = null): bool
     {
-        if (! Session::isStarted()) {
+        if ( ! Session::isStarted()) {
             return false;
         }
 
