@@ -1,0 +1,109 @@
+{
+    "name": "juliomotol/gularis",
+    "type": "project",
+    "description": "Gularis, a Laravel Boilerplate",
+    "keywords": ["framework", "laravel"],
+    "license": "MIT",
+    "require": {
+        "php": "^8.0.2",
+        "bacon/bacon-qr-code": "^2.0",
+        "filament/filament": "^2.16.6",
+        "guzzlehttp/guzzle": "^7.2",
+        "laravel/framework": "^9.28",
+        "laravel/sanctum": "^3.0",
+        "laravel/tinker": "^2.7",
+        "pragmarx/google2fa": "^8.0",
+        "saade/filament-laravel-log": "^1.1",
+        "spatie/data-transfer-object": "^3.8",
+        "spatie/laravel-permission": "^5.5",
+        "spatie/laravel-route-attributes": "^1.11"
+    },
+    "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.7",
+        "barryvdh/laravel-ide-helper": "^2.12",
+        "fakerphp/faker": "^1.9.1",
+        "laravel/pint": "^1.0",
+        "laravel/sail": "^1.0.1",
+        "nunomaduro/collision": "^6.1",
+        "nunomaduro/larastan": "^2.1",
+        "pestphp/pest": "^1.21",
+        "pestphp/pest-plugin-laravel": "^1.2",
+        "pestphp/pest-plugin-mock": "^1.0",
+        "phpstan/phpstan": "^1.8",
+        "phpunit/phpunit": "^9.5.10",
+        "spatie/laravel-ignition": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Domain\\": "domain/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+            "@php artisan ide-helper:generate",
+            "@php artisan ide-helper:meta"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi"
+        ],
+        "clear-all": [
+            "@php artisan clear-compiled",
+            "@php artisan cache:clear",
+            "@php artisan route:clear",
+            "@php artisan view:clear",
+            "@php artisan config:clear",
+            "composer dumpautoload -o"
+        ],
+        "cache-all": [
+            "@php artisan config:cache",
+            "@php artisan route:cache",
+            "@php artisan view:cache"
+        ],
+        "reset": [
+            "composer clear-all",
+            "composer cache-all"
+        ],
+        "ide-helper": [
+            "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+            "@php artisan ide-helper:generate --ansi",
+            "@php artisan ide-helper:meta --ansi",
+            "@php artisan ide-helper:models -r -W --ansi"
+        ],
+        "analyse": "vendor/bin/phpstan analyse",
+        "format": "vendor/bin/pint",
+        "format-dry-run": "vendor/bin/pint --test",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage-html build/coverage"
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

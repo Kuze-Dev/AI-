@@ -1,0 +1,14 @@
+<?php
+
+namespace Spatie\Permission\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Contracts\Role as RoleContract;
+
+/** 
+ * @property string $name
+ * @property string $guard_name
+ */
+class Role extends Model implements RoleContract
+{
+}

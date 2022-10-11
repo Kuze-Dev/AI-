@@ -1,0 +1,28 @@
+includes:
+    - ./vendor/nunomaduro/larastan/extension.neon
+
+parameters:
+
+    tmpDir: build/phpstan
+
+    stubFiles:
+        - stubs/Permission.stub
+        - stubs/Role.stub
+
+    paths:
+        - app
+        - config
+        - database
+        - domain
+
+    # The level 9 is the highest level
+    level: 8
+
+    ignoreErrors:
+
+    excludePaths:
+        - ./*/*/FileToBeExcluded.php
+
+    checkOctaneCompatibility: true
+    checkModelProperties: true
+    checkMissingIterableValueType: false

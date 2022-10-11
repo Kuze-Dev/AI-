@@ -1,0 +1,14 @@
+<?php
+
+namespace Spatie\Permission\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Contracts\Permission as PermissionContract;
+
+/**
+ * @property string $name
+ * @property string $guard_name
+ */
+class Permission extends Model implements PermissionContract
+{
+}

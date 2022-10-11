@@ -1,0 +1,44 @@
+<?php
+
+use Domain\Auth\Actions\LoginAction;
+use Domain\Auth\DataTransferObjects\LoginData;
+use Domain\Auth\Enums\LoginResult;
+use Illuminate\Auth\EloquentUserProvider;
+use Illuminate\Cache\RateLimiter;
+use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Support\Facades\Auth;
+use Mockery\MockInterface;
+use Tests\Fixtures\User;
+
+it('can login a user', function () {
+    $user = mock(new User())
+        ->expect(hasEnabledTwoFactorAuthentication: fn () => false);
+    $userProvider = mock(EloquentUserProvider::class)
+        ->expect(
+            retrieveByCredentials: fn () => $user,
+            validateCredentials: fn () => true,
+        );
+    $guard = mock(StatefulGuard::class)
+        ->expect(attempt: fn (array $credentials, ?bool $remember) => true);
+    Auth::shouldReceive('guard')
+        ->once()
+        ->andReturn($guard);
+    Auth::shouldReceive('createUserProvider')
+        ->once()
+        ->andReturn($userProvider);
+
+    $this->mock(
+        RateLimiter::class,
+        fn (MockInterface $mock) => $mock->allows([
+            'tooManyAttempts' => false,
+            'clear' => null,
+        ])
+    );
+
+    $result = app(LoginAction::class)->execute(new LoginData(
+        email: 'test@user',
+        password: 'secret'
+    ));
+
+    expect($result)->toEqual(LoginResult::SUCCESS);
+});
