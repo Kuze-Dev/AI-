@@ -11,6 +11,7 @@ class CreateRoleAction
 {
     public function execute(RoleData $roleData): Role
     {
+        /** @var Role $role */
         $role = Role::create(array_filter([
             'name' => $roleData->name,
             'guard_name' => $roleData->guard_name,
