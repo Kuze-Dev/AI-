@@ -14,7 +14,7 @@ class AdminPolicy
     use HandlesAuthorization;
     use ChecksWildcardPermissions;
 
-    public function before(User $user, string $ability, mixed $admin): mixed
+    public function before(User $user, string $ability, mixed $admin = null): mixed
     {
         if ($admin instanceof Admin && $admin->isSuperAdmin()) {
             return false;
