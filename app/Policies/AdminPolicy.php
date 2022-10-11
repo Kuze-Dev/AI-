@@ -14,7 +14,7 @@ class AdminPolicy
     use HandlesAuthorization;
     use ChecksWildcardPermissions;
 
-    public function before(User $user, string $ability, mixed $admin = null): mixed
+    public function before(User $user, string $ability, mixed $admin = null): bool|null
     {
         if ($admin instanceof Admin && $admin->isSuperAdmin()) {
             return false;
@@ -23,57 +23,57 @@ class AdminPolicy
         return null;
     }
 
-    public function viewAny(User $user): mixed
+    public function viewAny(User $user): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function view(User $user, Admin $admin): mixed
+    public function view(User $user, Admin $admin): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function create(User $user): mixed
+    public function create(User $user): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function update(User $user, Admin $admin): mixed
+    public function update(User $user, Admin $admin): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function delete(User $user, Admin $admin): mixed
+    public function delete(User $user, Admin $admin): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function deleteAny(User $user): mixed
+    public function deleteAny(User $user): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function restore(User $user, Admin $admin): mixed
+    public function restore(User $user, Admin $admin): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function restoreAny(User $user): mixed
+    public function restoreAny(User $user): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function forceDelete(User $user, Admin $admin): mixed
+    public function forceDelete(User $user, Admin $admin): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function forceDeleteAny(User $user): mixed
+    public function forceDeleteAny(User $user): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function resendVerification(User $user, Admin $admin): mixed
+    public function resendVerification(User $user, Admin $admin): bool
     {
         if ($admin->hasVerifiedEmail()) {
             return false;
@@ -82,7 +82,7 @@ class AdminPolicy
         return $this->checkWildcardPermissions($user);
     }
 
-    public function sendPasswordReset(User $user, Admin $admin): mixed
+    public function sendPasswordReset(User $user, Admin $admin): bool
     {
         return $this->checkWildcardPermissions($user);
     }
