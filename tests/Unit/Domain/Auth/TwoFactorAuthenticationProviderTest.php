@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Domain\Auth\Contracts\TwoFactorAuthenticationProvider;
+use PragmaRX\Google2FA\Google2FA;
 
 it('can generate secret key', function () {
     $secret = app(TwoFactorAuthenticationProvider::class)->generateSecretKey();
@@ -21,7 +22,7 @@ it('can generate qr code', function () {
 it('can verify code', function () {
     $secret = app(TwoFactorAuthenticationProvider::class)->generateSecretKey();
 
-    $code = app(\PragmaRX\Google2FA\Google2FA::class)->getCurrentOtp($secret);
+    $code = app(Google2FA::class)->getCurrentOtp($secret);
 
     $result = app(TwoFactorAuthenticationProvider::class)->verify($secret, $code);
 
@@ -31,7 +32,7 @@ it('can verify code', function () {
 it('can\'t verify used code', function () {
     $secret = app(TwoFactorAuthenticationProvider::class)->generateSecretKey();
 
-    $code = app(\PragmaRX\Google2FA\Google2FA::class)->getCurrentOtp($secret);
+    $code = app(Google2FA::class)->getCurrentOtp($secret);
 
     app(TwoFactorAuthenticationProvider::class)->verify($secret, $code);
 

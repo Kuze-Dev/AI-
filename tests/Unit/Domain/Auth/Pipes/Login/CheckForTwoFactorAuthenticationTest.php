@@ -74,7 +74,7 @@ it('proceeds through pipeline when user is on safe device', function () {
         );
     $this->mock(
         CheckIfOnSafeDeviceAction::class,
-        fn (MockInterface $mock) => $mock->shouldReceive('execute')->andReturn(true)
+        fn (MockInterface $mock) => $mock->allows('execute')->andReturns(true)
     );
     Auth::shouldReceive('createUserProvider')
         ->once()
@@ -102,9 +102,8 @@ it('throws exception on invalid credentials', function () {
 
     $this->mock(
         RateLimiter::class,
-        fn (MockInterface $mock) => $mock->shouldReceive('hit')
-            ->once()
-            ->andReturn(null)
+        fn (MockInterface $mock) => $mock->expects('hit')
+            ->andReturns(null)
     );
 
     app(CheckForTwoFactorAuthentication::class)->handle(

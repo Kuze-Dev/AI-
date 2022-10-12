@@ -25,6 +25,7 @@ class AuthenticateTwoFactorAction
     ) {
     }
 
+    /** @throws \Illuminate\Auth\AuthenticationException */
     public function execute(TwoFactorData $twoFactorData): bool
     {
         $user = $this->getChallengedUser($twoFactorData);
@@ -52,6 +53,7 @@ class AuthenticateTwoFactorAction
         return true;
     }
 
+    /** @throws \Illuminate\Auth\AuthenticationException */
     protected function getChallengedUser(TwoFactorData $twoFactorData): Authenticatable&TwoFactorAuthenticatable
     {
         $userProvider = Auth::createUserProvider(config("auth.guard.{$twoFactorData->guard}.provider"));

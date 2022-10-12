@@ -32,7 +32,6 @@ use Eloquent;
  * @property-read int|null $recovery_codes_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Auth\Model\SafeDevice[] $safeDevices
  * @property-read int|null $safe_devices_count
- *
  * @method static \Illuminate\Database\Eloquent\Builder|TwoFactorAuthentication newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TwoFactorAuthentication newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TwoFactorAuthentication query()
@@ -43,7 +42,7 @@ use Eloquent;
  * @method static \Illuminate\Database\Eloquent\Builder|TwoFactorAuthentication whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TwoFactorAuthentication whereSecret($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TwoFactorAuthentication whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class TwoFactorAuthentication extends Model
 {

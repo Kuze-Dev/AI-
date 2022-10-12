@@ -14,7 +14,7 @@ class RolePolicy
     use HandlesAuthorization;
     use ChecksWildcardPermissions;
 
-    public function before(User $user, string $ability, mixed $role): mixed
+    public function before(?User $user, string $ability, mixed $role = null): bool|null
     {
         if ($role instanceof Role && $role->name === config('domain.admin.role.super_admin')) {
             return false;
@@ -23,52 +23,52 @@ class RolePolicy
         return null;
     }
 
-    public function viewAny(User $user): mixed
+    public function viewAny(User $user): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function view(User $user, Role $role): mixed
+    public function view(User $user, Role $role): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function create(User $user): mixed
+    public function create(User $user): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function update(User $user, Role $role): mixed
+    public function update(User $user, Role $role): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function delete(User $user, Role $role): mixed
+    public function delete(User $user, Role $role): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function deleteAny(User $user): mixed
+    public function deleteAny(User $user): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function restore(User $user, Role $role): mixed
+    public function restore(User $user, Role $role): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function restoreAny(User $user): mixed
+    public function restoreAny(User $user): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function forceDelete(User $user, Role $role): mixed
+    public function forceDelete(User $user, Role $role): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function forceDeleteAny(User $user): mixed
+    public function forceDeleteAny(User $user): bool
     {
         return $this->checkWildcardPermissions($user);
     }

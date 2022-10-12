@@ -25,16 +25,18 @@ class ResetPassword extends Component implements HasForms
 
     public string $email;
 
-    public string $password;
+    public ?string $password = null;
+
+    public ?string $password_confirmation = null;
 
     public string $token;
 
     public function mount(Request $request): void
     {
-        $this->email = $request->get('email');
-        $this->token = (string) $request->route('token');
-
-        $this->form->fill();
+        $this->form->fill([
+            'email' => $request->get('email'),
+            'token' => (string) $request->route('token'),
+        ]);
     }
 
     public function resetPassword(): void
@@ -44,6 +46,7 @@ class ResetPassword extends Component implements HasForms
         $result = app(ResetPasswordAction::class)->execute(
             new ResetPasswordData(
                 email: $this->email,
+                /** @phpstan-ignore-next-line  */
                 password: $this->password,
                 token: $this->token,
             ),

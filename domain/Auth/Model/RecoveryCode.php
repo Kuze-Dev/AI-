@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property int|null $used_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- *
  * @method static \Illuminate\Database\Eloquent\Builder|RecoveryCode newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|RecoveryCode newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|RecoveryCode query()
