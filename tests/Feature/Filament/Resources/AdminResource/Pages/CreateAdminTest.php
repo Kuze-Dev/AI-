@@ -6,6 +6,8 @@ use App\Filament\Resources\AdminResource;
 use Domain\Admin\Models\Admin;
 use Illuminate\Auth\Middleware\RequirePassword;
 
+use Tests\RequestFactories\AdminRequestFactory;
+
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\get;
 use function Pest\Laravel\withoutMiddleware;
@@ -24,16 +26,12 @@ it('can create', function () {
     assertDatabaseCount(Admin::class, 1); // on logged in user
 
     livewire(AdminResource\Pages\CreateAdmin::class)
-        ->fillForm([
-            'first_name' => fake()->firstName(),
-            'last_name' => fake()->lastName(),
-            'email' => fake()->safeEmail(),
-            'password' => 'passs',
-            'password_confirmation' => 'passs',
-            'active' => true,
-            'roles' => [],
-            'permissions' => [],
-        ])
+        ->fillForm(
+            AdminRequestFactory::new()
+                ->roles([1])
+                ->permissions([2])
+                ->create()
+        )
         ->call('create')
         ->assertHasNoFormErrors();
 
