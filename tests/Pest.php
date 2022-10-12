@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Tests\Fixtures\User;
 
 use function Pest\Laravel\seed;
@@ -30,6 +31,10 @@ uses(
 )
     ->beforeEach(function () {
         Http::preventStrayRequests();
+
+        foreach (array_keys(config('filesystems.disks')) as $disk) {
+            Storage::fake($disk);
+        }
     })
     ->in('Feature', 'Unit');
 
