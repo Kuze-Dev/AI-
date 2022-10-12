@@ -13,18 +13,22 @@ declare(strict_types=1);
 |
 */
 
+use Database\Seeders\Auth\PermissionSeeder;
+use Database\Seeders\Auth\RoleSeeder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Tests\Fixtures\User;
 
+use function Pest\Laravel\seed;
+
 uses(
     Illuminate\Foundation\Testing\TestCase::class,
     Tests\CreatesApplication::class,
     Illuminate\Foundation\Testing\LazilyRefreshDatabase::class
 )
-    ->beforeEach(function() {
+    ->beforeEach(function () {
         Http::preventStrayRequests();
     })
     ->in('Feature', 'Unit');
@@ -38,3 +42,12 @@ uses()->beforeEach(function () {
 
     Relation::morphMap(['test_user' => User::class]);
 })->in('Unit/Domain/Auth');
+
+uses()
+    ->beforeEach(function () {
+        seed([
+            PermissionSeeder::class,
+            RoleSeeder::class,
+        ]);
+    })
+    ->in('Feature/Filament');

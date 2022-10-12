@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Password::defaults(
-            fn () => $this->app->isLocal()
+            fn () => $this->app->environment('local', 'testing')
                 ? Password::min(4)
                 : Password::min(8)
                     ->mixedCase()
