@@ -35,8 +35,8 @@ it('can update admin', function () {
             'email' => $initialEmail,
         ]
     );
-    expect($admin->hasRole($role))->toBeTrue()
-        ->and($admin->hasPermissionTo($permission))->toBeTrue();
+    expect($admin->hasRole($role))->toBeTrue();
+    expect($admin->hasPermissionTo($permission))->toBeTrue();
 });
 
 it('resend email verification when email updated', function () {
