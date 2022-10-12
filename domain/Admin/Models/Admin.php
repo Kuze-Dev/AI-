@@ -132,6 +132,6 @@ class Admin extends Authenticatable implements MustVerifyEmail, HasName, Filamen
 
     public function canAccessFilament(): bool
     {
-        return $this->hasVerifiedEmail() && $this->isActive();
+        return $this->isActive();
     }
 }

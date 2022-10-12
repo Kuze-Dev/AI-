@@ -34,13 +34,16 @@ class UpdateAdminAction
 
     protected function getAdminAttributes(AdminData $adminData): array
     {
-        return array_filter([
-            'first_name' => $adminData->first_name,
-            'last_name' => $adminData->last_name,
-            'email' => config('domain.admin.can_change_email') ? $adminData->email : null,
-            'password' => $adminData->password,
-            'active' => $adminData->active,
-            'timezone' => $adminData->timezone,
-        ]);
+        return array_filter(
+            [
+                'first_name' => $adminData->first_name,
+                'last_name' => $adminData->last_name,
+                'email' => config('domain.admin.can_change_email') ? $adminData->email : null,
+                'password' => $adminData->password,
+                'active' => $adminData->active,
+                'timezone' => $adminData->timezone,
+            ],
+            fn ($value) => filled($value)
+        );
     }
 }

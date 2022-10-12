@@ -39,7 +39,7 @@ it('can create', function () {
 });
 
 it('can create with roles', function () {
-    assertDatabaseCount(Admin::class, 1); // on logged in user
+    assertDatabaseCount(Admin::class, 1); // with logged-in user
 
     livewire(AdminResource\Pages\CreateAdmin::class)
         ->fillForm(
@@ -60,7 +60,7 @@ it('can create with roles', function () {
 });
 
 it('can create with permissions', function () {
-    assertDatabaseCount(Admin::class, 1); // on logged in user
+    assertDatabaseCount(Admin::class, 1); // with logged-in user
 
     livewire(AdminResource\Pages\CreateAdmin::class)
         ->fillForm(
@@ -81,7 +81,7 @@ it('can create with permissions', function () {
 });
 
 it('can create with active', function (bool $active) {
-    assertDatabaseCount(Admin::class, 1); // on logged in user
+    assertDatabaseCount(Admin::class, 1); // with logged-in user
 
     livewire(AdminResource\Pages\CreateAdmin::class)
         ->fillForm(
