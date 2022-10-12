@@ -1,0 +1,55 @@
+image: laravelsail/php81-composer:latest
+
+pipelines:
+  default:
+    - parallel:
+        - step:
+            name: Check Format
+            script:
+              - composer install
+              - composer format-dry-dun
+            caches:
+              - composer
+            condition:
+              changesets:
+                includePaths:
+                  - "**.php"
+                  - "pint.json"
+        - step:
+            name: Analyse
+            script:
+              - composer install
+              - composer analyse
+            caches:
+              - composer
+            condition:
+              changesets:
+                includePaths:
+                  - "**.php"
+                  - "phpstan.neon.dist"
+        - step:
+            name: Test
+            script:
+              - composer install
+              - composer test
+            caches:
+              - composer
+
+  custom:
+    format:
+      - step:
+          script:
+            - composer install
+            - composer format
+            - |
+              if ([ -n "$(git status -s)" ]); then
+                git add .
+                git -c user.name="Bitbucket Pipeline Bot" -c user.email="no-reply@bitbucket.org" commit -m "🎨 Fix format"
+              fi
+          caches:
+            - composer
+          condition:
+            changesets:
+              includePaths:
+                - "**.php"
+                - "pint.json"
