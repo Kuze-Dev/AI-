@@ -32,7 +32,8 @@
         "pestphp/pest-plugin-mock": "^1.0",
         "phpstan/phpstan": "^1.8",
         "spatie/laravel-ignition": "^1.0",
-        "spatie/laravel-ray": "^1.31"
+        "spatie/laravel-ray": "^1.31",
+        "spatie/x-ray": "^1.1"
     },
     "autoload": {
         "psr-4": {
@@ -90,7 +91,8 @@
         "format": "vendor/bin/pint",
         "format-dry-run": "vendor/bin/pint --test",
         "test": "vendor/bin/pest",
-        "test-coverage": "vendor/bin/pest --coverage-html build/coverage"
+        "test-coverage": "vendor/bin/pest --coverage-html build/coverage",
+        "x-ray": "vendor/bin/x-ray app database domain resources routes tests"
     },
     "extra": {
         "laravel": {

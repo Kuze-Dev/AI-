@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use Domain\Admin\Models\Admin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -12,38 +13,30 @@ use Illuminate\Validation\Rules\Password;
 /** @property \Illuminate\Foundation\Application $app */
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
-    public function register()
+    public function register(): void
     {
     }
 
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot()
+    public function boot(): void
     {
         Model::preventLazyLoading( ! $this->app->isProduction());
         Model::preventSilentlyDiscardingAttributes( ! $this->app->isProduction());
 
         Relation::enforceMorphMap([
-            'admin' => \Domain\Admin\Models\Admin::class,
+            Admin::class,
         ]);
 
         Password::defaults(
-            fn () => Password::min(8)
-                ->mixedCase()
-                ->numbers()
-                ->symbols()
-                ->when(
-                    $this->app->isProduction(),
-                    fn (Password $password) => $password->uncompromised()
-                )
+            fn () => $this->app->isLocal()
+                ? Password::min(4)
+                : Password::min(8)
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()
+                    ->when(
+                        $this->app->isProduction(),
+                        fn (Password $password) => $password->uncompromised()
+                    )
         );
     }
 }
