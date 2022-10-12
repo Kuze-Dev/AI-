@@ -16,13 +16,18 @@ declare(strict_types=1);
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Tests\Fixtures\User;
 
 uses(
     Illuminate\Foundation\Testing\TestCase::class,
     Tests\CreatesApplication::class,
     Illuminate\Foundation\Testing\LazilyRefreshDatabase::class
-)->in('Feature', 'Unit');
+)
+    ->beforeEach(function() {
+        Http::preventStrayRequests();
+    })
+    ->in('Feature', 'Unit');
 
 uses()->beforeEach(function () {
     DB::connection()->getSchemaBuilder()->create('test_users', function (Blueprint $table) {
