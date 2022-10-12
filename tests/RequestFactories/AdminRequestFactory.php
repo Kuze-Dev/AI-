@@ -36,4 +36,11 @@ class AdminRequestFactory extends RequestFactory
             'permissions' => $permissions,
         ]);
     }
+
+    public function active(bool $active = true): self
+    {
+        return $this->state([
+            'active' => $active,
+        ]);
+    }
 }
