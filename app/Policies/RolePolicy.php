@@ -14,7 +14,7 @@ class RolePolicy
     use HandlesAuthorization;
     use ChecksWildcardPermissions;
 
-    public function before(User $user, string $ability, mixed $role = null): bool|null
+    public function before(?User $user, string $ability, mixed $role = null): bool|null
     {
         if ($role instanceof Role && $role->name === config('domain.admin.role.super_admin')) {
             return false;

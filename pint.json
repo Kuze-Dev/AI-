@@ -1,9 +1,11 @@
 {
     "preset": "psr12",
     "exclude": [
-        "config"
+        "config",
+        "build"
     ],
     "notPath": [
+        "ray.php"
     ],
     "rules": {
         "declare_strict_types": true,

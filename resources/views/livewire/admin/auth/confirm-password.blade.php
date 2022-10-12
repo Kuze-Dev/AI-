@@ -4,8 +4,8 @@
     <x-filament::button class="w-full" form="confirm" type="submit">
         {{ trans('Confirm') }}
     </x-filament::button>
-    
+
     <div class="text-center">
-        <x-tables::link href="{{ url()->previous() }}">{{ trans('Go back') }}</x-table::link>
+        <x-tables::link href="{{ url()->previous() }}">{{ trans('Go back') }}</x-tables::link>
     </div>
 </form>

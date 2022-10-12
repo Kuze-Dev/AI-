@@ -9,6 +9,6 @@
     </x-filament::button>
 
     <div class="text-center">
-        <x-tables::link href="#" wire:click.prevent="logout">{{ trans('Sign out') }}</x-table::link>
+        <x-tables::link href="#" wire:click.prevent="logout">{{ trans('Sign out') }}</x-tables::link>
     </div>
 </section>
