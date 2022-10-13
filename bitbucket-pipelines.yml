@@ -1,8 +1,7 @@
 image: laravelsail/php81-composer:latest
 
 definitions:
-  setupScript: &setupScript
-    composer install --prefer-dist --no-interaction &&
+  setupScript: &setupScript composer install --prefer-dist --no-interaction &&
     cp .env.example .env &&
     php artisan key:generate
   steps:
@@ -11,6 +10,8 @@ definitions:
           - *setupScript
         caches:
           - composer
+  caches:
+    phpstan: build/phpstan
 
 pipelines:
   default:
@@ -32,6 +33,9 @@ pipelines:
             script:
               - *setupScript
               - composer analyse -- --memory-limit 256M
+            caches:
+              - composer
+              - phpstan
             condition:
               changesets:
                 includePaths:
