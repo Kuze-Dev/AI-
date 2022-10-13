@@ -20,7 +20,7 @@ pipelines:
             name: Check Format
             script:
               - *setupScript
-              - composer format-dry-dun
+              - composer format-dry-run
             condition:
               changesets:
                 includePaths:
@@ -31,7 +31,7 @@ pipelines:
             name: Analyse
             script:
               - *setupScript
-              - composer analyse
+              - composer analyse -- --memory-limit 256M
             condition:
               changesets:
                 includePaths:
