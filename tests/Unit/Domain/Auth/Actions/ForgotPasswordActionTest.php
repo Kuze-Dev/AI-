@@ -15,7 +15,9 @@ it('can send password reset', function () {
                 ->expect(sendResetLink: fn (array $credentials) => PasswordBroker::RESET_LINK_SENT)
         );
 
-    $result = app(ForgotPasswordAction::class)->execute('test@user');
+    $result = app(ForgotPasswordAction::class)
+//        ->onQueue()
+        ->execute('test@user');
 
     expect($result)->toEqual(PasswordResetResult::RESET_LINK_SENT);
 });
