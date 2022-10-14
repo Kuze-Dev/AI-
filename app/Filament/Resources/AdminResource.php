@@ -162,10 +162,6 @@ class AdminResource extends Resource
                             };
                         });
                     }),
-                //                Tables\Filters\Filter::make('active')
-                //                    ->query(fn (Builder $query): Builder => $query->where('active', true)),
-                //                Tables\Filters\Filter::make('email_verified')
-                //                    ->query(fn (Builder $query): Builder => $query->whereNotNull('email_verified_at')),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
@@ -191,7 +187,6 @@ class AdminResource extends Resource
                         ->requiresConfirmation()
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
                             $result = app(ForgotPasswordAction::class)
-//                                ->onQueue()
                                 ->execute($record->email, 'admin');
 
                             if ($result->failed()) {
