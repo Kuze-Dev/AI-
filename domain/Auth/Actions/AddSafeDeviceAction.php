@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Domain\Auth\Actions;
 
 use Domain\Auth\Contracts\TwoFactorAuthenticatable;
+use Domain\Auth\DataTransferObjects\SafeDeviceData;
 use Domain\Auth\Events\SafeDeviceAdded;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 
 class AddSafeDeviceAction
 {
-    public function execute(TwoFactorAuthenticatable $authenticatable, Request $request): TwoFactorAuthenticatable
+    public function execute(TwoFactorAuthenticatable $authenticatable, SafeDeviceData $safeDeviceData): TwoFactorAuthenticatable
     {
         if ( ! $authenticatable->hasEnabledTwoFactorAuthentication()) {
             return $authenticatable;
@@ -23,8 +23,8 @@ class AddSafeDeviceAction
 
         $authenticatable->twoFactorAuthentication->safeDevices()
             ->make([
-                'ip' => $request->ip(),
-                'user_agent' => $request->userAgent(),
+                'ip' => $safeDeviceData->ip,
+                'user_agent' => $safeDeviceData->userAgent,
             ])
             ->forceFill(['remember_token' => $token])
             ->save();
@@ -43,7 +43,7 @@ class AddSafeDeviceAction
             config('domain.auth.two_factor.safe_devices.expiration_days') * 1440
         );
 
-        Event::dispatch(new SafeDeviceAdded($authenticatable, $request));
+        Event::dispatch(new SafeDeviceAdded($authenticatable, $safeDeviceData));
 
         return $authenticatable;
     }
