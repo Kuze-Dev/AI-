@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Database\Factories\AdminFactory;
 use Domain\Admin\Actions\UpdateAdminAction;
 use Domain\Admin\DataTransferObjects\AdminData;
-use Illuminate\Auth\Notifications\VerifyEmail;
+use Domain\Admin\Notifications\VerifyEmail;
 use Illuminate\Contracts\Notifications\Dispatcher;
 use Mockery\MockInterface;
 use Spatie\Permission\Models\Permission;

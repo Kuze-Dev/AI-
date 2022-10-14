@@ -49,4 +49,18 @@ class AdminFactory extends Factory
             },
         ]);
     }
+
+    public function active(bool $active = true): self
+    {
+        return $this->state(fn (array $attributes) => [
+            'active' => $active,
+        ]);
+    }
+
+    public function softDeleted(): self
+    {
+        return $this->state(fn (array $attributes) => [
+            'deleted_at' => now(),
+        ]);
+    }
 }
