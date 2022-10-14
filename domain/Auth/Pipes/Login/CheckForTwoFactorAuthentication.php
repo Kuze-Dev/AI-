@@ -54,7 +54,7 @@ class CheckForTwoFactorAuthentication
         $userProvider = Auth::createUserProvider(config("auth.guards.{$guard}.provider"));
 
         if ( ! $userProvider instanceof EloquentUserProvider) {
-            throw new InvalidArgumentException("`auth.guard.{$loginData->guard}.provider` must be set to `eloquent`");
+            throw new UserProviderNotSupportedException($guard);
         }
 
         $user = $userProvider->retrieveByCredentials(['email' => $loginData->email]);
