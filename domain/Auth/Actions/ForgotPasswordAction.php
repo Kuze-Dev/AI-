@@ -7,12 +7,8 @@ namespace Domain\Auth\Actions;
 use Domain\Auth\Enums\PasswordResetResult;
 use Illuminate\Support\Facades\Password;
 
-//use Spatie\QueueableAction\QueueableAction;
-
 class ForgotPasswordAction
 {
-//    use QueueableAction;
-
     public function execute(string $email, ?string $broker = null): PasswordResetResult
     {
         $result = Password::broker($broker)

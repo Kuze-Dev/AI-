@@ -30,7 +30,6 @@ class RequestPasswordReset extends Component implements HasForms
     public function sendResetPasswordRequest(): void
     {
         $result = app(ForgotPasswordAction::class)
-//            ->onQueue()
             ->execute($this->email, 'admin');
 
         $result->throw();
