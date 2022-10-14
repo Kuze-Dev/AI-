@@ -6,6 +6,7 @@ use Domain\Auth\Actions\CheckIfOnSafeDeviceAction;
 use Domain\Auth\DataTransferObjects\LoginData;
 use Domain\Auth\Enums\LoginResult;
 use Domain\Auth\Events\TwoFactorAuthenticationChallenged;
+use Domain\Auth\Exceptions\UserProviderNotSupportedException;
 use Domain\Auth\Pipes\Login\CheckForTwoFactorAuthentication;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\Events\Failed;
@@ -124,4 +125,4 @@ it('throws exception on invalid user provider', function () {
         new LoginData(email: 'test@user', password: 'secret'),
         fn () => LoginResult::SUCCESS
     );
-})->throws(InvalidArgumentException::class);
+})->throws(UserProviderNotSupportedException::class);

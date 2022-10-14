@@ -7,6 +7,7 @@ use Domain\Auth\Actions\AuthenticateTwoFactorAction;
 use Domain\Auth\Actions\ValidateRecoveryCodeAction;
 use Domain\Auth\Actions\ValidateTotpCodeAction;
 use Domain\Auth\DataTransferObjects\TwoFactorData;
+use Domain\Auth\Exceptions\UserProviderNotSupportedException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Contracts\Auth\UserProvider;
@@ -153,7 +154,7 @@ it('throws exception when invalid user provider is given', function () {
         ->andReturn($userProvider);
 
     app(AuthenticateTwoFactorAction::class)->execute(new TwoFactorData(code: 'invalid'));
-})->throws(InvalidArgumentException::class);
+})->throws(UserProviderNotSupportedException::class);
 
 it('throws exception when user is not two factor authenticatable', function () {
     $userProvider = mock(EloquentUserProvider::class)
