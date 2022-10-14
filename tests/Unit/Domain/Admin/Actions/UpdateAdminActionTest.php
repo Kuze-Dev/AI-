@@ -14,8 +14,6 @@ use Spatie\Permission\Models\Role;
 use function Pest\Laravel\assertDatabaseHas;
 
 it('can update admin', function () {
-    config(['domain.admin.can_change_email' => false]);
-
     $admin = AdminFactory::new()->create();
     $initialEmail = $admin->email;
     $role = Role::create(['name' => 'Admin']);
