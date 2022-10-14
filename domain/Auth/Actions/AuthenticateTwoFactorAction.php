@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Auth\Actions;
 
 use Domain\Auth\Contracts\TwoFactorAuthenticatable;
+use Domain\Auth\DataTransferObjects\SafeDeviceData;
 use Domain\Auth\DataTransferObjects\TwoFactorData;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\EloquentUserProvider;
@@ -47,7 +48,13 @@ class AuthenticateTwoFactorAction
         Auth::guard($twoFactorData->guard)->login($user, Session::pull('login.remember', false));
 
         if ($twoFactorData->remember_device) {
-            $this->addSafeDevice->execute($user, Request::instance());
+            $this->addSafeDevice->execute(
+                $user,
+                new SafeDeviceData(
+                    (string) Request::ip(),
+                    (string) Request::userAgent(),
+                )
+            );
         }
 
         return true;

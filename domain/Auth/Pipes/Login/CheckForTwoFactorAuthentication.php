@@ -14,7 +14,6 @@ use Illuminate\Auth\Events\Failed;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
@@ -35,7 +34,7 @@ class CheckForTwoFactorAuthentication
             return $next($loginData);
         }
 
-        if ($this->checkIfOnSafeDevice->execute($user, Request::instance())) {
+        if ($this->checkIfOnSafeDevice->execute($user)) {
             return $next($loginData);
         }
 

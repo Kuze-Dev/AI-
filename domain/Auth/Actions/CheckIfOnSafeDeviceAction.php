@@ -9,13 +9,18 @@ use Illuminate\Http\Request;
 
 class CheckIfOnSafeDeviceAction
 {
-    public function execute(TwoFactorAuthenticatable $authenticatable, Request $request): bool
+    public function __construct(
+        protected Request $request
+    ) {
+    }
+
+    public function execute(TwoFactorAuthenticatable $authenticatable): bool
     {
         if ( ! $authenticatable->hasEnabledTwoFactorAuthentication()) {
             return false;
         }
 
-        if ( ! $token = $request->cookie(config('domain.auth.two_factor.safe_devices.cookie'))) {
+        if ( ! $token = $this->request->cookie(config('domain.auth.two_factor.safe_devices.cookie'))) {
             return false;
         }
 
