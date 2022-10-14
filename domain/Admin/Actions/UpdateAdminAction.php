@@ -9,11 +9,6 @@ use Domain\Admin\Models\Admin;
 
 class UpdateAdminAction
 {
-    public function __construct(
-        protected SendEmailVerificationNotificationToAdminAction $sendEmailVerificationNotificationToAdminAction
-    ) {
-    }
-
     public function execute(Admin $admin, AdminData $adminData): Admin
     {
         $admin->update($this->getAdminAttributes($adminData));
@@ -24,9 +19,7 @@ class UpdateAdminAction
             $admin->forceFill(['email_verified_at' => null])
                 ->save();
 
-            $this
-                ->sendEmailVerificationNotificationToAdminAction
-                ->execute($admin);
+            $admin->sendEmailVerificationNotification();
         }
 
         return $admin;

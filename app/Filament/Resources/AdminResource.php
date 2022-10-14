@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AdminResource\Pages;
-use Domain\Admin\Actions\SendEmailVerificationNotificationToAdminAction;
 use Domain\Admin\Models\Admin;
 use Domain\Auth\Actions\ForgotPasswordAction;
 use Filament\Forms;
@@ -176,10 +175,7 @@ class AdminResource extends Resource
                     Tables\Actions\Action::make('resend-verification')
                         ->requiresConfirmation()
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
-                            app(SendEmailVerificationNotificationToAdminAction::class)
-                                ->onQueue()
-                                ->execute($record);
-
+                            $record->sendEmailVerificationNotification();
                             $action->success();
                         })
                         ->authorize(fn (Admin $record) => Auth::user()?->can('resendVerification', $record) ?? false),
