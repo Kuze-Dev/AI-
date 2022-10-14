@@ -6,6 +6,7 @@ use Domain\Auth\Actions\CheckIfOnSafeDeviceAction;
 use Domain\Auth\Model\SafeDevice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Mockery\MockInterface;
 use Tests\Fixtures\User;
 
 beforeEach(function () {
@@ -30,17 +31,17 @@ beforeEach(function () {
 });
 
 it('can check if on safe device', function () {
-    $request = mock(Request::class)->expect(cookie: fn (string $key) => 'secret');
+    $this->mock(Request::class, fn (MockInterface $mock) => $mock->allows('cookie')->andReturns('secret'));
 
-    $result = app(CheckIfOnSafeDeviceAction::class)->execute($this->user, $request);
+    $result = app(CheckIfOnSafeDeviceAction::class)->execute($this->user);
 
     expect($result)->tobeTrue();
 });
 
 it('can check if not on safe device', function () {
-    $request = mock(Request::class)->expect(cookie: fn (string $key) => null);
+    $this->mock(Request::class, fn (MockInterface $mock) => $mock->allows('cookie')->andReturns(null));
 
-    $result = app(CheckIfOnSafeDeviceAction::class)->execute($this->user, $request);
+    $result = app(CheckIfOnSafeDeviceAction::class)->execute($this->user);
 
     expect($result)->tobefalse();
 });
@@ -48,11 +49,9 @@ it('can check if not on safe device', function () {
 it('returns false when two factor is disabled', function () {
     $this->user->twoFactorAuthentication()->update(['enabled_at' => null]);
     $this->user->refresh();
-    $request = mock(Request::class)
-        ->shouldNotReceive('cookie')
-        ->getMock();
+    $this->mock(Request::class, fn (MockInterface $mock) => $mock->shouldNotReceive('cookie'));
 
-    $result = app(CheckIfOnSafeDeviceAction::class)->execute($this->user, $request);
+    $result = app(CheckIfOnSafeDeviceAction::class)->execute($this->user);
 
     expect($result)->tobefalse();
 });
