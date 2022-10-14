@@ -12,9 +12,11 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Component;
+use Livewire\Redirector;
 
 /**
  * @property \Filament\Forms\ComponentContainer $form
@@ -23,13 +25,13 @@ class ResetPassword extends Component implements HasForms
 {
     use InteractsWithForms;
 
-    public string $email;
+    public string $email = '';
 
-    public ?string $password = null;
+    public string $password = '';
 
-    public ?string $password_confirmation = null;
+    public string $password_confirmation = '';
 
-    public string $token;
+    public string $token = '';
 
     public function mount(Request $request): void
     {
@@ -39,14 +41,13 @@ class ResetPassword extends Component implements HasForms
         ]);
     }
 
-    public function resetPassword(): void
+    public function resetPassword(): Redirector|RedirectResponse
     {
         $this->validate();
 
         $result = app(ResetPasswordAction::class)->execute(
             new ResetPasswordData(
                 email: $this->email,
-                /** @phpstan-ignore-next-line  */
                 password: $this->password,
                 token: $this->token,
             ),
@@ -60,7 +61,7 @@ class ResetPassword extends Component implements HasForms
             ->success()
             ->send();
 
-        redirect()->intended(Filament::getUrl());
+        return redirect()->intended(Filament::getUrl());
     }
 
     protected function getFormSchema(): array

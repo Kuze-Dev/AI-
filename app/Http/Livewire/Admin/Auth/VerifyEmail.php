@@ -9,18 +9,18 @@ use Domain\Auth\Actions\VerifyEmailAction;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Http\RedirectResponse;
 use Livewire\Component;
+use Livewire\Redirector;
 
 class VerifyEmail extends Component
 {
-    public function mount(VerifyEmailRequest $request): void
+    public function mount(VerifyEmailRequest $request): Redirector|RedirectResponse
     {
         $user = $request->user();
 
         if ( ! $user instanceof MustVerifyEmail) {
-            redirect()->intended(Filament::getUrl());
-
-            return;
+            return redirect()->intended(Filament::getUrl());
         }
 
         $result = app(VerifyEmailAction::class)->execute($user);
@@ -32,6 +32,6 @@ class VerifyEmail extends Component
                 ->send();
         }
 
-        redirect()->intended(Filament::getUrl());
+        return redirect()->intended(Filament::getUrl());
     }
 }
