@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Notification\Actions;
 
-use App\Events\NotificationUnread;
+use Domain\Notification\Events\NotificationUnread;
 use Domain\Notification\Exceptions\CantUnReadNotificationException;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Notifications\DatabaseNotification;

@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-use App\Events\NotificationRead;
-use App\Events\NotificationUnread;
 use App\Notifications\Basic\SuccessBasicNotification;
 use Database\Factories\AdminFactory;
+use Domain\Notification\Events\NotificationRead;
+use Domain\Notification\Events\NotificationUnread;
 use Domain\Notification\Exceptions\CantReadNotificationException;
 use Domain\Notification\Exceptions\CantUnReadNotificationException;
 use Illuminate\Notifications\DatabaseNotification;
-
 use Illuminate\Support\Facades\Event;
 
 use function Pest\Laravel\actingAs;
