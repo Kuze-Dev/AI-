@@ -22,11 +22,11 @@ class RequestPasswordReset extends Component implements HasForms
 {
     use InteractsWithForms;
 
-    public string $email = '';
+    public string $email;
 
     public function mount(): void
     {
-        $this->form->fill();
+        $this->form->fill(['email' => '']);
     }
 
     public function sendResetPasswordRequest(): Redirector|RedirectResponse

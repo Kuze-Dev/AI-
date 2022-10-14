@@ -24,9 +24,9 @@ class Login extends Component implements HasForms
 {
     use InteractsWithForms;
 
-    public string $email = '';
+    public string $email;
 
-    public string $password = '';
+    public string $password;
 
     public bool $remember = false;
 
@@ -36,7 +36,10 @@ class Login extends Component implements HasForms
             redirect()->intended(Filament::getUrl());
         }
 
-        $this->form->fill();
+        $this->form->fill([
+            'email' => '',
+            'password' => '',
+        ]);
     }
 
     public function authenticate(): Redirector|RedirectResponse
