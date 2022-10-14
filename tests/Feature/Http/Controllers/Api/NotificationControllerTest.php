@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-use App\Notifications\Basic\SuccessBasicNotification;
 use Database\Factories\AdminFactory;
+use Domain\Admin\Models\Admin;
 use Domain\Notification\Events\NotificationRead;
 use Domain\Notification\Events\NotificationUnread;
 use Domain\Notification\Exceptions\CantReadNotificationException;
 use Domain\Notification\Exceptions\CantUnReadNotificationException;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Event;
+use Tests\Fixtures\TestNotification;
 
-use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\patchJson;
@@ -24,23 +24,14 @@ it('require login', function () {
 });
 
 it('return list', function () {
-    AdminFactory::new()
-        ->createOne()
-        ->notify(new SuccessBasicNotification('other notification'));
-
-    $user = AdminFactory::new()
-        ->createOne();
+    createNotificationForOtherUser();
 
     $message = fake()->sentence();
 
-    $notification = new SuccessBasicNotification($message);
+    $notification = new TestNotification($message);
 
+    $user = loginAsUser();
     $user->notify($notification);
-
-    // TODO: move to helper
-    actingAs($user);
-
-    assertDatabaseCount(DatabaseNotification::class, 2);
 
     getJson('api/notifications')
         ->assertOk()
@@ -57,13 +48,8 @@ it('return list', function () {
 it('mark as read', function () {
     Event::fake();
 
-    $user = AdminFactory::new()
-        ->createOne();
-
-    $user->notify(new SuccessBasicNotification(fake()->sentence()));
-
-    // TODO: move to helper
-    actingAs($user);
+    $user = loginAsUser();
+    $user->notify(new TestNotification(fake()->sentence()));
 
     assertDatabaseCount(DatabaseNotification::class, 1);
     /** @var DatabaseNotification $notification */
@@ -83,13 +69,8 @@ it('mark as read', function () {
 it('mark as un-read', function () {
     Event::fake();
 
-    $user = AdminFactory::new()
-        ->createOne();
-
-    $user->notify(new SuccessBasicNotification(fake()->sentence()));
-
-    // TODO: move to helper
-    actingAs($user);
+    $user = loginAsUser();
+    $user->notify(new TestNotification(fake()->sentence()));
 
     assertDatabaseCount(DatabaseNotification::class, 1);
     /** @var DatabaseNotification $notification */
@@ -109,22 +90,13 @@ it('mark as un-read', function () {
 });
 
 it('cant update in not associated', function (string $url, string $exception) {
-    $userOther = AdminFactory::new()
-        ->createOne();
+    $otherUSer = createNotificationForOtherUser();
 
-    $userOther->notify(new SuccessBasicNotification(fake()->sentence()));
-
-    $user = AdminFactory::new()
-        ->createOne();
-
-    // TODO: move to helper
-    actingAs($user);
-
-    assertDatabaseCount(DatabaseNotification::class, 1);
-    $notification = DatabaseNotification::first();
+    $notification = $otherUSer->notifications()->first();
 
     withoutExceptionHandling();
 
+    loginAsUser();
     expect(fn () => patchJson('api/notifications/' . $notification->getRouteKey() . $url))
         ->toThrow($exception);
 })
@@ -138,3 +110,47 @@ it('cant update in not associated', function (string $url, string $exception) {
             CantUnReadNotificationException::class,
         ],
     ]);
+
+it('filter read only', function () {
+    createNotificationForOtherUser();
+
+    $message = fake()->sentence();
+    $notification = new TestNotification($message);
+
+    $user = loginAsUser();
+    $user->notify($notification);
+    $user->notify($notification);
+
+    /** @var DatabaseNotification $notificationModel */
+    $notificationModel = $user->notifications()->first();
+    $notificationModel->markAsRead();
+
+    $this->markTestIncomplete('working in progress');
+
+    getJson('api/notifications?'.http_build_query(['filter[]']))
+        ->assertOk()
+        ->assertJson(function (Illuminate\Testing\Fluent\AssertableJson $json) use ($notification, $message) {
+            $json
+                ->count('data', 1)
+                ->where('data.0.attributes.data.message', $message)
+                ->where('data.0.attributes.type', $notification->databaseType())
+                ->where('data.0.attributes.read_at', null)
+                ->etc();
+        });
+});
+
+function createNotificationForOtherUser(): Admin
+{
+    $userOther = AdminFactory::new()
+        ->createOne();
+
+    $userOther->notify(new TestNotification(fake()->sentence()));
+    $userOther->notify(new TestNotification(fake()->sentence()));
+
+    /** @var DatabaseNotification $notification */
+    $notification = $userOther->notifications->first();
+
+    $notification->markAsRead();
+
+    return $userOther;
+}

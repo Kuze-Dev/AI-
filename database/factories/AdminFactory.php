@@ -49,4 +49,11 @@ class AdminFactory extends Factory
             },
         ]);
     }
+
+    public function active(bool $active = true): self
+    {
+        return $this->state(fn (array $attributes) => [
+            'active' => $active,
+        ]);
+    }
 }

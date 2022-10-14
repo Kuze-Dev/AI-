@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Notifications\Basic;
+namespace Tests\Fixtures;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
-class SuccessBasicNotification extends Notification
+class TestNotification extends Notification
 {
     use Queueable;
 
