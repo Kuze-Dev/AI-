@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Domain\Notification\Actions;
 
+use App\Events\NotificationUnread;
 use Domain\Notification\Exceptions\CantUnReadNotificationException;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Notifications\DatabaseNotification;
 
-class MarkAsUnReadNotificationAction
+class MarkAsUnreadNotificationAction
 {
     public function execute(User $user, DatabaseNotification $databaseNotification): void
     {
@@ -17,5 +18,7 @@ class MarkAsUnReadNotificationAction
         }
 
         $databaseNotification->markAsUnread();
+
+        event(new NotificationUnread());
     }
 }

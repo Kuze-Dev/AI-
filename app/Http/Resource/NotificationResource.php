@@ -8,15 +8,18 @@ use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @property-read array{message:string, type:string} $data
+ * @property-read array $data
+ * @property-read string $type
+ * @property-read \Carbon\Carbon|null $read_at
  */
 class NotificationResource extends JsonApiResource
 {
     protected function toAttributes(Request $request): array
     {
         return [
-            'message' => $this->data['message'],
-            'type' => $this->data['type'],
+            'data' => $this->data,
+            'type' => $this->type,
+            'read_at' => $this->read_at,
         ];
     }
 }

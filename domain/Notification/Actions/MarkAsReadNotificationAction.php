@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Notification\Actions;
 
+use App\Events\NotificationRead;
 use Domain\Notification\Exceptions\CantReadNotificationException;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Notifications\DatabaseNotification;
@@ -17,5 +18,7 @@ class MarkAsReadNotificationAction
         }
 
         $databaseNotification->markAsRead();
+
+        event(new NotificationRead());
     }
 }
