@@ -9,7 +9,7 @@ use function Pest\Laravel\actingAs;
 
 function loginAsAdmin(Admin $admin = null): Admin
 {
-    $admin ??= loginAsAdmin();
+    $admin ??= loginAsUser();
 
     $admin->assignRole(config('domain.admin.role.super_admin'));
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Admin\Models;
 
+use Domain\Admin\Notifications\VerifyEmail;
+use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -67,7 +69,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static \Illuminate\Database\Query\Builder|Admin withoutTrashed()
  * @mixin \Eloquent
  */
-class Admin extends Authenticatable implements MustVerifyEmail, HasName
+class Admin extends Authenticatable implements MustVerifyEmail, HasName, FilamentUser
 {
     use HasApiTokens;
     use HasRoles;
@@ -127,5 +129,15 @@ class Admin extends Authenticatable implements MustVerifyEmail, HasName
     public function getFilamentName(): string
     {
         return $this->full_name;
+    }
+
+    public function canAccessFilament(): bool
+    {
+        return $this->isActive();
+    }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new VerifyEmail());
     }
 }

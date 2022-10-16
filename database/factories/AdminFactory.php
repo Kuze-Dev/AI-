@@ -56,4 +56,11 @@ class AdminFactory extends Factory
             'active' => $active,
         ]);
     }
+
+    public function softDeleted(): self
+    {
+        return $this->state(fn (array $attributes) => [
+            'deleted_at' => now(),
+        ]);
+    }
 }

@@ -10,58 +10,51 @@ definitions:
           - *setupScript
         caches:
           - composer
+    - step: &check-format
+        <<: *setup
+        name: Check Format
+        script:
+          - *setupScript
+          - composer format-dry-run
+        condition:
+          changesets:
+            includePaths:
+              - "**.php"
+              - "pint.json"
+    - step: &analyse
+        <<: *setup
+        name: Analyse
+        script:
+          - *setupScript
+          - composer analyse -- --memory-limit 256M
+        caches:
+          - composer
+          - phpstan
+        condition:
+          changesets:
+            includePaths:
+              - "**.php"
+              - "phpstan.neon.dist"
+    - step: &test
+        <<: *setup
+        name: Test
+        script:
+          - *setupScript
+          - composer test
   caches:
     phpstan: build/phpstan
 
 pipelines:
-  default:
-    - parallel:
-        - step:
-            <<: *setup
-            name: Check Format
-            script:
-              - *setupScript
-              - composer format-dry-run
-            condition:
-              changesets:
-                includePaths:
-                  - "**.php"
-                  - "pint.json"
-        - step:
-            <<: *setup
-            name: Analyse
-            script:
-              - *setupScript
-              - composer analyse -- --memory-limit 256M
-            caches:
-              - composer
-              - phpstan
-            condition:
-              changesets:
-                includePaths:
-                  - "**.php"
-                  - "phpstan.neon.dist"
-        - step:
-            <<: *setup
-            name: Test
-            script:
-              - *setupScript
-              - composer test
+  branches:
+    master:
+      - parallel:
+          - step: *check-format
+          - step: *analyse
+          - step: *test
 
-  custom:
-    format:
-      - step:
-          <<: *setup
-          script:
-            - *setupScript
-            - composer format
-            - |
-              if ([ -n "$(git status -s)" ]); then
-                git add .
-                git -c user.name="Bitbucket Pipeline Bot" -c user.email="no-reply@bitbucket.org" commit -m "🎨 Fix format"
-              fi
-          condition:
-            changesets:
-              includePaths:
-                - "**.php"
-                - "pint.json"
+  pull-requests:
+    "**":
+      - parallel:
+          - step: *check-format
+          - step: *analyse
+          - step: *test

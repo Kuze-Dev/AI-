@@ -27,6 +27,17 @@ class AdminResource extends Resource
 
     protected static string|array $middlewares = ['password.confirm:admin.password.confirm'];
 
+    protected static ?string $recordTitleAttribute = 'full_name';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'email',
+            'first_name',
+            'last_name',
+        ];
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -86,11 +97,20 @@ class AdminResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('full_name')->sortable(),
-                Tables\Columns\BooleanColumn::make('email_verified_at')
+                Tables\Columns\TextColumn::make('full_name')
+                    ->sortable()
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        /** @var Builder|Admin $query */
+                        return $query
+                            ->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%");
+                    }),
+                Tables\Columns\IconColumn::make('email_verified_at')
                     ->label(trans('Verified'))
-                    ->getStateUsing(fn (Admin $record): bool => $record->hasVerifiedEmail()),
-                Tables\Columns\BooleanColumn::make('active'),
+                    ->getStateUsing(fn (Admin $record): bool => $record->hasVerifiedEmail())
+                    ->boolean(),
+                Tables\Columns\IconColumn::make('active')
+                    ->boolean(),
                 Tables\Columns\TagsColumn::make('roles.name'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
@@ -98,6 +118,49 @@ class AdminResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('role')
+                    ->options(
+                        app(config('permission.models.role'))
+                            ->pluck('name', 'id')
+                            ->put('no-roles', 'No Roles')
+                    )
+                    ->query(function (Builder $query, array $data) {
+                        $query->when(filled($data['value']), function (Builder $query) use ($data) {
+                            /** @var Admin|Builder $query */
+
+                            if ($data['value'] === 'no-roles') {
+                                $query->whereDoesntHave('roles');
+                                return;
+                            }
+                            $query->role($data['value']);
+                        });
+                    }),
+                Tables\Filters\SelectFilter::make('active')
+                    ->options(['1' => 'Active', '0' => 'Inactive'])
+                    ->query(function (Builder $query, array $data) {
+                        $query->when(filled($data['value']), function (Builder $query) use ($data) {
+                            $query->when(filled($data['value']), function (Builder $query) use ($data) {
+                                /** @var Admin|Builder $query */
+                                match ($data['value']) {
+                                    '1' => $query->where('active', true),
+                                    '0' => $query->where('active', false),
+                                    default => '',
+                                };
+                            });
+                        });
+                    }),
+                Tables\Filters\SelectFilter::make('email_verified')
+                    ->options(['1' => 'Verified', '0' => 'Not Verified'])
+                    ->query(function (Builder $query, array $data) {
+                        $query->when(filled($data['value']), function (Builder $query) use ($data) {
+                            /** @var Admin|Builder $query */
+                            match ($data['value']) {
+                                '1' => $query->whereNotNull('email_verified_at'),
+                                '0' => $query->whereNull('email_verified_at'),
+                                default => '',
+                            };
+                        });
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
@@ -119,7 +182,8 @@ class AdminResource extends Resource
                     Tables\Actions\Action::make('send-password-reset')
                         ->requiresConfirmation()
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
-                            $result = app(ForgotPasswordAction::class)->execute($record->email, 'admin');
+                            $result = app(ForgotPasswordAction::class)
+                                ->execute($record->email, 'admin');
 
                             if ($result->failed()) {
                                 $action->failureNotificationMessage($result->getMessage())
@@ -133,7 +197,8 @@ class AdminResource extends Resource
                         ->authorize('sendPasswordReset'),
                 ]),
             ])
-            ->bulkActions([]);
+            ->bulkActions([])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getPages(): array
