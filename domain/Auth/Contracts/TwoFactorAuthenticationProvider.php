@@ -10,5 +10,7 @@ interface TwoFactorAuthenticationProvider
 
     public function qrCodeUrl(string $name, string $holder, string $secret): string;
 
+    public function getCurrentOtp(string $secret): string;
+
     public function verify(string $secret, string $code): bool;
 }
