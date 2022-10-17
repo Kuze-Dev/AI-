@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Admin\Models;
 
+use Domain\Admin\Notifications\ResetPassword;
 use Domain\Admin\Notifications\VerifyEmail;
 use Domain\Auth\Contracts\TwoFactorAuthenticatable as TwoFactorAuthenticatableContract;
 use Domain\Auth\TwoFactorAuthenticatable;
@@ -142,5 +143,10 @@ class Admin extends Authenticatable implements MustVerifyEmail, HasName, Filamen
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new VerifyEmail());
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPassword($token));
     }
 }
