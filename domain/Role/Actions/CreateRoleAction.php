@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Domain\Admin\Actions;
+namespace Domain\Role\Actions;
 
-use Domain\Admin\DataTransferObjects\RoleData;
+use Domain\Role\DataTransferObjects\RoleData;
 use Spatie\Permission\Models\Role;
 
 class CreateRoleAction

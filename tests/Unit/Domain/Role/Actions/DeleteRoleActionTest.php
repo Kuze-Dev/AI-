@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Database\Factories\AdminFactory;
-use Domain\Admin\Actions\DeleteRoleAction;
-use Domain\Admin\Exceptions\CantDeleteRoleWithAssociatedUsersException;
-use Domain\Admin\Exceptions\CantDeleteSuperAdminRoleException;
+use Domain\Role\Actions\DeleteRoleAction;
+use Domain\Role\Exceptions\CantDeleteRoleWithAssociatedUsersException;
+use Domain\Role\Exceptions\CantDeleteSuperAdminRoleException;
 use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\assertModelMissing;
@@ -20,7 +20,7 @@ it('can delete role', function () {
 });
 
 it('can\' delete super admin role', function () {
-    $role = Role::create(['name' => config('domain.admin.role.super_admin')]);
+    $role = Role::create(['name' => config('domain.role.super_admin')]);
 
     app(DeleteRoleAction::class)->execute($role);
 })->throws(CantDeleteSuperAdminRoleException::class);

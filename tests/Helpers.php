@@ -11,7 +11,7 @@ function loginAsAdmin(Admin $admin = null): Admin
 {
     $admin ??= loginAsUser();
 
-    $admin->assignRole(config('domain.admin.role.super_admin'));
+    $admin->assignRole(config('domain.role.super_admin'));
 
     return $admin;
 }

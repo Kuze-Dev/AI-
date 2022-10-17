@@ -25,6 +25,6 @@ class AdminSeeder extends Seeder
             ->create();
 
         /** @phpstan-ignore-next-line */
-        $superAdmin->syncRoles(Role::whereName(config('domain.admin.role.super_admin'))->first());
+        $superAdmin->syncRoles(Role::whereName(config('domain.role.super_admin'))->first());
     }
 }
