@@ -16,7 +16,7 @@ it('can verify email', function () {
 
     $this->mock(
         VerifyEmailRequest::class,
-        fn (MockInterface $mock) => $mock->allows(['user' => $user])
+        fn (MockInterface $mock) => $mock->expects('user')->andReturns($user)
     );
 
     livewire(VerifyEmail::class)->assertNotified();

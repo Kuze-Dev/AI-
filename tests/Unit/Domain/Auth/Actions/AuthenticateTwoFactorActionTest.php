@@ -41,7 +41,7 @@ it('can authenticate via totp code', function () {
         ->andReturn($userProvider);
     $this->mock(
         ValidateTotpCodeAction::class,
-        fn (MockInterface $mock) => $mock->allows('execute')->andReturns(true)
+        fn (MockInterface $mock) => $mock->expects('execute')->andReturns(true)
     );
 
     $result = app(AuthenticateTwoFactorAction::class)->execute(new TwoFactorData(code: 'secret'));
@@ -62,7 +62,7 @@ it('can authenticate via recovery code', function () {
         ->andReturn($userProvider);
     $this->mock(
         ValidateRecoveryCodeAction::class,
-        fn (MockInterface $mock) => $mock->shouldReceive('execute')->andReturn(true)
+        fn (MockInterface $mock) => $mock->expects('execute')->andReturns(true)
     );
 
     $result = app(AuthenticateTwoFactorAction::class)->execute(new TwoFactorData(recovery_code: 'secret'));
@@ -83,11 +83,11 @@ it('can add safe device upon authentication', function () {
         ->andReturn($userProvider);
     $this->mock(
         ValidateTotpCodeAction::class,
-        fn (MockInterface $mock) => $mock->shouldReceive('execute')->andReturn(true)
+        fn (MockInterface $mock) => $mock->expects('execute')->andReturns(true)
     );
     $this->mock(
         AddSafeDeviceAction::class,
-        fn (MockInterface $mock) => $mock->shouldReceive('execute')
+        fn (MockInterface $mock) => $mock->expects('execute')
     );
 
     $result = app(AuthenticateTwoFactorAction::class)->execute(new TwoFactorData(code: 'secret', remember_device: true));
@@ -103,7 +103,7 @@ it('won\'t authenticate invalid totp code', function () {
         ->andReturn($userProvider);
     $this->mock(
         ValidateTotpCodeAction::class,
-        fn (MockInterface $mock) => $mock->shouldReceive('execute')->andReturn(false)
+        fn (MockInterface $mock) => $mock->expects('execute')->andReturns(false)
     );
 
     $result = app(AuthenticateTwoFactorAction::class)->execute(new TwoFactorData(code: 'secret'));
@@ -119,7 +119,7 @@ it('won\'t authenticate invalid recovery code', function () {
         ->andReturn($userProvider);
     $this->mock(
         ValidateRecoveryCodeAction::class,
-        fn (MockInterface $mock) => $mock->shouldReceive('execute')->andReturn(false)
+        fn (MockInterface $mock) => $mock->expects('execute')->andReturns(false)
     );
 
     $result = app(AuthenticateTwoFactorAction::class)->execute(new TwoFactorData(recovery_code: 'invalid'));

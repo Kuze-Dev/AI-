@@ -75,7 +75,7 @@ it('proceeds through pipeline when user is on safe device', function () {
         );
     $this->mock(
         CheckIfOnSafeDeviceAction::class,
-        fn (MockInterface $mock) => $mock->allows('execute')->andReturns(true)
+        fn (MockInterface $mock) => $mock->expects('execute')->andReturns(true)
     );
     Auth::shouldReceive('createUserProvider')
         ->once()

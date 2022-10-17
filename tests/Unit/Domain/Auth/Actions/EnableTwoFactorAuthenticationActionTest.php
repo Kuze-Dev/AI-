@@ -23,7 +23,7 @@ beforeEach(function () {
 it('can enable two factor authentication', function () {
     $this->mock(
         ValidateTotpCodeAction::class,
-        fn (MockInterface $mock) => $mock->allows('execute')->andReturns(true)
+        fn (MockInterface $mock) => $mock->expects('execute')->andReturns(true)
     );
     $result = app(EnableTwoFactorAuthenticationAction::class)->execute($this->user, 'valid code');
 
@@ -35,7 +35,7 @@ it('can enable two factor authentication', function () {
 it('won\'t enable two factor authentication on invalid code ', function () {
     $this->mock(
         ValidateTotpCodeAction::class,
-        fn (MockInterface $mock) => $mock->allows('execute')->andReturns(false)
+        fn (MockInterface $mock) => $mock->expects('execute')->andReturns(false)
     );
     $result = app(EnableTwoFactorAuthenticationAction::class)->execute($this->user, 'valid code');
 
@@ -50,7 +50,7 @@ it('will reload two factor authentication if loaded in relations', function () {
     $user = mock($this->user)->expect(load: fn () => $this->user);
     $this->mock(
         ValidateTotpCodeAction::class,
-        fn (MockInterface $mock) => $mock->allows('execute')->andReturns(true)
+        fn (MockInterface $mock) => $mock->expects('execute')->andReturns(true)
     );
 
     $result = app(EnableTwoFactorAuthenticationAction::class)->execute($user, 'secret');
