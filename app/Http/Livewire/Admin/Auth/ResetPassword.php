@@ -36,7 +36,7 @@ class ResetPassword extends Component implements HasForms
     public function mount(Request $request): void
     {
         $this->form->fill([
-            'email' => $request->get('email'),
+            'email' => (string) $request->get('email'),
             'password' => '',
             'password_confirmation' => '',
             'token' => (string) $request->route('token'),

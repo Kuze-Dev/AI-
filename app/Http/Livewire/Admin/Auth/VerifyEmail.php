@@ -10,6 +10,7 @@ use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\UnauthorizedException;
 use Livewire\Component;
 use Livewire\Redirector;
 
@@ -20,7 +21,7 @@ class VerifyEmail extends Component
         $user = $request->user();
 
         if ( ! $user instanceof MustVerifyEmail) {
-            return redirect()->intended(Filament::getUrl());
+            throw new UnauthorizedException();
         }
 
         $result = app(VerifyEmailAction::class)->execute($user);
