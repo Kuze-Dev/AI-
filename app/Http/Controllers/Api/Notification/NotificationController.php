@@ -6,7 +6,9 @@ namespace App\Http\Controllers\Api\Notification;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resource\NotificationResource;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -27,6 +29,18 @@ class NotificationController extends Controller
             QueryBuilder::for(
                 Auth::user()->notifications()
             )
+                ->allowedFilters([
+                    AllowedFilter::callback(
+                        'status',
+                        function (Builder $query, string $value) {
+                            match ($value) {
+                                'unread' => $query->whereNull('read_at'),
+                                'read' => $query->whereNotNull('read_at'),
+                                default => '',
+                            };
+                        }
+                    ),
+                ])
                 ->paginate()
         );
     }

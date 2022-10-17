@@ -4,19 +4,15 @@ declare(strict_types=1);
 
 use Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
-use Domain\Notification\Events\NotificationRead;
-use Domain\Notification\Events\NotificationUnread;
 use Domain\Notification\Exceptions\CantReadNotificationException;
 use Domain\Notification\Exceptions\CantUnReadNotificationException;
 use Illuminate\Notifications\DatabaseNotification;
-use Illuminate\Support\Facades\Event;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\Fixtures\TestNotification;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\patchJson;
 use function Pest\Laravel\withoutExceptionHandling;
-use function PHPUnit\Framework\assertTrue;
 
 it('require login', function () {
     getJson('api/notifications')
@@ -45,50 +41,6 @@ it('return list', function () {
         });
 });
 
-it('mark as read', function () {
-    Event::fake();
-
-    $user = loginAsUser();
-    $user->notify(new TestNotification(fake()->sentence()));
-
-    assertDatabaseCount(DatabaseNotification::class, 1);
-    /** @var DatabaseNotification $notification */
-    $notification = DatabaseNotification::first();
-
-    assertTrue($notification->unread());
-
-    patchJson('api/notifications/' . $notification->getRouteKey() . '/mark-as-read')
-        ->assertOk()
-        ->assertValid();
-
-    Event::assertDispatched(NotificationRead::class, 1);
-
-    assertTrue($notification->refresh()->read());
-});
-
-it('mark as un-read', function () {
-    Event::fake();
-
-    $user = loginAsUser();
-    $user->notify(new TestNotification(fake()->sentence()));
-
-    assertDatabaseCount(DatabaseNotification::class, 1);
-    /** @var DatabaseNotification $notification */
-    $notification = DatabaseNotification::first();
-
-    $notification->markAsRead();
-
-    assertTrue($notification->refresh()->read());
-
-    patchJson('api/notifications/' . $notification->getRouteKey() . '/mark-as-unread')
-        ->assertOk()
-        ->assertValid();
-
-    Event::assertDispatched(NotificationUnread::class, 1);
-
-    assertTrue($notification->refresh()->unread());
-});
-
 it('cant update in not associated', function (string $url, string $exception) {
     $otherUSer = createNotificationForOtherUser();
 
@@ -111,11 +63,10 @@ it('cant update in not associated', function (string $url, string $exception) {
         ],
     ]);
 
-it('filter read only', function () {
+it('filter', function (string $status, int $dataCount) {
     createNotificationForOtherUser();
 
-    $message = fake()->sentence();
-    $notification = new TestNotification($message);
+    $notification = new TestNotification(fake()->sentence());
 
     $user = loginAsUser();
     $user->notify($notification);
@@ -125,19 +76,28 @@ it('filter read only', function () {
     $notificationModel = $user->notifications()->first();
     $notificationModel->markAsRead();
 
-    $this->markTestIncomplete('working in progress');
-
-    getJson('api/notifications?'.http_build_query(['filter[]']))
+    getJson('api/notifications?'.http_build_query(['filter[status]' => $status]))
         ->assertOk()
-        ->assertJson(function (Illuminate\Testing\Fluent\AssertableJson $json) use ($notification, $message) {
+        ->assertJson(function (AssertableJson $json) use ($status, $dataCount, $user, $notification) {
             $json
-                ->count('data', 1)
-                ->where('data.0.attributes.data.message', $message)
-                ->where('data.0.attributes.type', $notification->databaseType())
-                ->where('data.0.attributes.read_at', null)
+                ->count('data', $dataCount)
+                ->where('data.0.attributes.data', $notification->toArray($user))
+                ->whereType(
+                    'data.0.attributes.read_at',
+                    match ($status) {
+                        'unread' => 'null',
+                        'read' => 'string',
+                        '' => 'string|null'
+                    }
+                )
                 ->etc();
         });
-});
+})
+    ->with([
+        ['unread', 1],
+        ['read', 1],
+        'all' => ['', 2],
+    ]);
 
 function createNotificationForOtherUser(): Admin
 {
