@@ -1,9 +1,8 @@
 {
-    "name": "juliomotol/gularis",
-    "type": "project",
-    "description": "Gularis, a Laravel Boilerplate",
-    "keywords": ["framework", "laravel"],
-    "license": "MIT",
+    "name": "halcyon/tall-boilerplate",
+    "type": "boilerplate",
+    "description": "Halcyon TALL Boilerplate",
+    "license": "proprietary",
     "require": {
         "php": "^8.1.9",
         "composer-runtime-api": "^2.0",
