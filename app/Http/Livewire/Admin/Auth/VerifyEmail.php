@@ -8,9 +8,9 @@ use App\Http\Requests\Admin\Auth\VerifyEmailRequest;
 use Domain\Auth\Actions\VerifyEmailAction;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Validation\UnauthorizedException;
 use Livewire\Component;
 use Livewire\Redirector;
 
@@ -21,7 +21,7 @@ class VerifyEmail extends Component
         $user = $request->user();
 
         if ( ! $user instanceof MustVerifyEmail) {
-            throw new UnauthorizedException();
+            throw new AuthorizationException();
         }
 
         $result = app(VerifyEmailAction::class)->execute($user);
