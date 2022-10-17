@@ -9,11 +9,18 @@ use function Pest\Laravel\actingAs;
 
 function loginAsAdmin(Admin $admin = null): Admin
 {
+    $admin ??= loginAsUser();
+
+    $admin->assignRole(config('domain.admin.role.super_admin'));
+
+    return $admin;
+}
+
+function loginAsUser(Admin $admin = null): Admin
+{
     $admin ??= AdminFactory::new()
         ->active()
         ->createOne();
-
-    $admin->assignRole(config('domain.admin.role.super_admin'));
 
     actingAs($admin);
 
