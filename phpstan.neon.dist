@@ -19,7 +19,6 @@ parameters:
     level: 8
 
     ignoreErrors:
-        - '#Cannot call method notifications\(\) on Domain\\Admin\\Models\\Admin\|null#'
 
     excludePaths:
         - ./*/*/FileToBeExcluded.php

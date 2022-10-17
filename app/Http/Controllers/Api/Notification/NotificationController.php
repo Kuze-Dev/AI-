@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\Notification;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resource\NotificationResource;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -25,9 +26,13 @@ class NotificationController extends Controller
     #[Get('/')]
     public function index(): JsonApiResourceCollection
     {
+        if (!$user = Auth::user()) {
+            throw new AuthenticationException();
+        }
+
         return NotificationResource::collection(
             QueryBuilder::for(
-                Auth::user()->notifications()
+                $user->notifications()
             )
                 ->allowedFilters([
                     AllowedFilter::callback(
