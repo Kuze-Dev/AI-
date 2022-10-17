@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Http\Livewire\Admin\Auth\AccountDeactivatedNotice;
 use App\Http\Livewire\Admin\Auth\ConfirmPassword;
 use App\Http\Livewire\Admin\Auth\EmailVerificationNotice;
 use App\Http\Livewire\Admin\Auth\RequestPasswordReset;
@@ -73,14 +74,19 @@ class AuthServiceProvider extends ServiceProvider
                             ->name('confirm');
                     });
 
-                Route::prefix('verify')
-                    ->name('verification.')
-                    ->middleware(\Filament\Http\Middleware\Authenticate::class)
+                Route::middleware(\Filament\Http\Middleware\Authenticate::class)
                     ->group(function () {
-                        Route::get('/', EmailVerificationNotice::class)
-                            ->name('notice');
-                        Route::get('/{id}/{hash}', VerifyEmailLivewire::class)
-                            ->name('verify');
+                        Route::get('account-deactivated', AccountDeactivatedNotice::class)
+                            ->name('account-deactivated.notice');
+
+                        Route::prefix('verify')
+                            ->name('verification.')
+                            ->group(function () {
+                                Route::get('/', EmailVerificationNotice::class)
+                                    ->name('notice');
+                                Route::get('/{id}/{hash}', VerifyEmailLivewire::class)
+                                    ->name('verify');
+                            });
                     });
             });
     }

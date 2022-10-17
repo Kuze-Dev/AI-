@@ -316,6 +316,7 @@ return [
         'auth' => [
             Authenticate::class,
             'verified:admin.verification.notice',
+            'active:admin.account-deactivated.notice',
         ],
         'base' => [
             EncryptCookies::class,

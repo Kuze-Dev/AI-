@@ -6,7 +6,9 @@ namespace Domain\Admin\Models;
 
 use Domain\Admin\Notifications\ResetPassword;
 use Domain\Admin\Notifications\VerifyEmail;
+use Domain\Auth\Contracts\HasActiveState as HasActiveStateContract;
 use Domain\Auth\Contracts\TwoFactorAuthenticatable as TwoFactorAuthenticatableContract;
+use Domain\Auth\HasActiveState;
 use Domain\Auth\TwoFactorAuthenticatable;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
@@ -72,13 +74,14 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static \Illuminate\Database\Query\Builder|Admin withoutTrashed()
  * @mixin \Eloquent
  */
-class Admin extends Authenticatable implements MustVerifyEmail, HasName, FilamentUser, TwoFactorAuthenticatableContract
+class Admin extends Authenticatable implements MustVerifyEmail, HasName, TwoFactorAuthenticatableContract, FilamentUser, HasActiveStateContract
 {
     use HasApiTokens;
     use HasRoles;
     use Notifiable;
     use SoftDeletes;
     use TwoFactorAuthenticatable;
+    use HasActiveState;
 
     protected $fillable = [
         'first_name',
@@ -107,11 +110,6 @@ class Admin extends Authenticatable implements MustVerifyEmail, HasName, Filamen
         return $this->id === 1;
     }
 
-    public function isActive(): bool
-    {
-        return $this->active;
-    }
-
     /** @return Attribute<string, never> */
     protected function fullName(): Attribute
     {
@@ -137,7 +135,7 @@ class Admin extends Authenticatable implements MustVerifyEmail, HasName, Filamen
 
     public function canAccessFilament(): bool
     {
-        return $this->isActive();
+        return true;
     }
 
     public function sendEmailVerificationNotification(): void
