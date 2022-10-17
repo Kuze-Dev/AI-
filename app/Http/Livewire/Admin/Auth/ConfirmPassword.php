@@ -33,13 +33,7 @@ class ConfirmPassword extends Component implements HasForms
     {
         $this->form->validate();
 
-        $confirmed = app(ConfirmPasswordAction::class)->execute($this->password, 'admin');
-
-        if ( ! $confirmed) {
-            throw ValidationException::withMessages([
-                'password' => trans('auth.failed'),
-            ]);
-        }
+        app(ConfirmPasswordAction::class)->execute($this->password, 'admin');
 
         return redirect()->intended(Filament::getUrl());
     }
