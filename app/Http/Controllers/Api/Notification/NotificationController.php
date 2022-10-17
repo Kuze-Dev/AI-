@@ -46,7 +46,7 @@ class NotificationController extends Controller
                         }
                     ),
                 ])
-                ->paginate()
+                ->jsonPaginate()
         );
     }
 }

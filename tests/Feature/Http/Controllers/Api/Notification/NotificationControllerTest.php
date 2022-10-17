@@ -99,6 +99,35 @@ it('filter', function (string $status, int $dataCount) {
         'all' => ['', 2],
     ]);
 
+it('paginate', function (int $page, int $size) {
+    $notification = new TestNotification(fake()->sentence());
+
+    $user = loginAsUser();
+
+    foreach (range(1, 40) as $i) {
+        $user->notify($notification);
+    }
+
+    getJson('api/notifications?'.http_build_query([
+        'page[number]' => $page,
+        'page[size]' => $size,
+    ]))
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) use ($size) {
+            $json
+                ->count('data', $size)
+                ->etc();
+        });
+})
+    ->with([
+        'page 1' => 1,
+        'page 2' => 2,
+    ])
+    ->with([
+        'size 10' => 10,
+        'size 20' => 20,
+    ]);
+
 function createNotificationForOtherUser(): Admin
 {
     $userOther = AdminFactory::new()
