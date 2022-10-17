@@ -40,6 +40,8 @@ class Login extends Component implements HasForms
 
     public function authenticate(): Redirector|RedirectResponse
     {
+        $this->form->validate();
+
         $result = app(LoginAction::class)->execute(new LoginData(
             email: $this->email,
             password: $this->password,

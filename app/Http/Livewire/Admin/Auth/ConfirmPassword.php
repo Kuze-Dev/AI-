@@ -31,6 +31,8 @@ class ConfirmPassword extends Component implements HasForms
 
     public function confirm(): Redirector|RedirectResponse
     {
+        $this->form->validate();
+
         $confirmed = app(ConfirmPasswordAction::class)->execute($this->password, 'admin');
 
         if ( ! $confirmed) {

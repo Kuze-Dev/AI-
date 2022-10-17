@@ -45,7 +45,7 @@ class ResetPassword extends Component implements HasForms
 
     public function resetPassword(): Redirector|RedirectResponse
     {
-        $this->validate();
+        $this->form->validate();
 
         $result = app(ResetPasswordAction::class)->execute(
             new ResetPasswordData(

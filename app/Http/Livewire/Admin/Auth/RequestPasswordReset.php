@@ -31,6 +31,8 @@ class RequestPasswordReset extends Component implements HasForms
 
     public function sendResetPasswordRequest(): Redirector|RedirectResponse
     {
+        $this->form->validate();
+
         $result = app(ForgotPasswordAction::class)->execute($this->email, 'admin');
 
         $result->throw();
