@@ -35,7 +35,7 @@ class TwoFactorAuthentication extends Component implements HasForms
 
     public function mount(): void
     {
-        if (Filament::auth()->check() || !Session::has('login.id')) {
+        if ( ! Session::has('login.id')) {
             redirect()->intended(Filament::getUrl());
         }
 
@@ -57,7 +57,7 @@ class TwoFactorAuthentication extends Component implements HasForms
 
         $result = app(AuthenticateTwoFactorAction::class)->execute($this->buildTwoFactorData());
 
-        if (!$result) {
+        if ( ! $result) {
             throw ValidationException::withMessages(['code' => trans('Invalid code.')]);
         }
 
@@ -77,6 +77,7 @@ class TwoFactorAuthentication extends Component implements HasForms
                 remember_device: $this->remember,
                 guard: 'admin'
             ),
+            default => throw ValidationException::withMessages(['method' => 'Invalid method selected']),
         };
     }
 
