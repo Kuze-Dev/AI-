@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Domain\Admin\Models;
 
 use Domain\Admin\Notifications\VerifyEmail;
+use Domain\Auth\Contracts\TwoFactorAuthenticatable as TwoFactorAuthenticatableContract;
+use Domain\Auth\TwoFactorAuthenticatable;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -69,12 +71,13 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static \Illuminate\Database\Query\Builder|Admin withoutTrashed()
  * @mixin \Eloquent
  */
-class Admin extends Authenticatable implements MustVerifyEmail, HasName, FilamentUser
+class Admin extends Authenticatable implements MustVerifyEmail, HasName, FilamentUser, TwoFactorAuthenticatableContract
 {
     use HasApiTokens;
     use HasRoles;
     use Notifiable;
     use SoftDeletes;
+    use TwoFactorAuthenticatable;
 
     protected $fillable = [
         'first_name',

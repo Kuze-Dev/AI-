@@ -52,7 +52,7 @@ class Login extends Component implements HasForms
         ));
 
         return match ($result) {
-            LoginResult::TWO_FACTOR_REQUIRED => redirect()->to(''), // TODO: redirect to 2fa verification page
+            LoginResult::TWO_FACTOR_REQUIRED => redirect()->route('admin.two-factor'),
             LoginResult::SUCCESS => redirect()->intended(Filament::getUrl()),
         };
     }

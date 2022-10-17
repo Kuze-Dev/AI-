@@ -8,6 +8,7 @@ use App\Http\Livewire\Admin\Auth\ConfirmPassword;
 use App\Http\Livewire\Admin\Auth\EmailVerificationNotice;
 use App\Http\Livewire\Admin\Auth\RequestPasswordReset;
 use App\Http\Livewire\Admin\Auth\ResetPassword;
+use App\Http\Livewire\Admin\Auth\TwoFactorAuthentication;
 use App\Http\Livewire\Admin\Auth\VerifyEmail as VerifyEmailLivewire;
 use Domain\Admin\Models\Admin;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
@@ -54,6 +55,10 @@ class AuthServiceProvider extends ServiceProvider
             ->prefix('admin')
             ->name('admin.')
             ->group(function () {
+                Route::get('two-factor', TwoFactorAuthentication::class)
+                    ->middleware('guest:admin')
+                    ->name('two-factor');
+
                 Route::prefix('password')
                     ->name('password.')
                     ->group(function () {
