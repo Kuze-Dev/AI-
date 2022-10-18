@@ -1,4 +1,4 @@
-image: laravelsail/php81-composer:latest
+image: sail-8.1/app:latest
 
 definitions:
   setupScript: &setupScript composer install --prefer-dist --no-interaction &&
