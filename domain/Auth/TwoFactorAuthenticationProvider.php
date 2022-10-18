@@ -21,6 +21,11 @@ class TwoFactorAuthenticationProvider implements TwoFactorAuthenticationProvider
         return $this->engine->generateSecretKey();
     }
 
+    public function getCurrentOtp(string $secret): string
+    {
+        return $this->engine->getCurrentOtp($secret);
+    }
+
     public function qrCodeUrl(string $name, string $holder, string $secret): string
     {
         return $this->engine->getQRCodeUrl($name, $holder, $secret);

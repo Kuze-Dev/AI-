@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Http\Livewire\Admin\Auth\AccountDeactivatedNotice;
 use App\Http\Livewire\Admin\Auth\ConfirmPassword;
 use App\Http\Livewire\Admin\Auth\EmailVerificationNotice;
 use App\Http\Livewire\Admin\Auth\RequestPasswordReset;
 use App\Http\Livewire\Admin\Auth\ResetPassword;
+use App\Http\Livewire\Admin\Auth\TwoFactorAuthentication;
 use App\Http\Livewire\Admin\Auth\VerifyEmail as VerifyEmailLivewire;
 use Domain\Admin\Models\Admin;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
@@ -54,6 +56,10 @@ class AuthServiceProvider extends ServiceProvider
             ->prefix('admin')
             ->name('admin.')
             ->group(function () {
+                Route::get('two-factor', TwoFactorAuthentication::class)
+                    ->middleware('guest:admin')
+                    ->name('two-factor');
+
                 Route::prefix('password')
                     ->name('password.')
                     ->group(function () {
@@ -68,14 +74,19 @@ class AuthServiceProvider extends ServiceProvider
                             ->name('confirm');
                     });
 
-                Route::prefix('verify')
-                    ->name('verification.')
-                    ->middleware(\Filament\Http\Middleware\Authenticate::class)
+                Route::middleware(\Filament\Http\Middleware\Authenticate::class)
                     ->group(function () {
-                        Route::get('/', EmailVerificationNotice::class)
-                            ->name('notice');
-                        Route::get('/{id}/{hash}', VerifyEmailLivewire::class)
-                            ->name('verify');
+                        Route::get('account-deactivated', AccountDeactivatedNotice::class)
+                            ->name('account-deactivated.notice');
+
+                        Route::prefix('verify')
+                            ->name('verification.')
+                            ->group(function () {
+                                Route::get('/', EmailVerificationNotice::class)
+                                    ->name('notice');
+                                Route::get('/{id}/{hash}', VerifyEmailLivewire::class)
+                                    ->name('verify');
+                            });
                     });
             });
     }

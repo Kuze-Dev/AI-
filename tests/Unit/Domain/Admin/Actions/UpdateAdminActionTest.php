@@ -46,7 +46,7 @@ it('resend email verification when email updated', function () {
     $permission = Permission::create(['name' => 'admin.view']);
     $this->mock(
         Dispatcher::class,
-        fn (MockInterface $mock) => $mock->shouldReceive('send')
+        fn (MockInterface $mock) => $mock->expects('send')
             ->with($admin, VerifyEmail::class)
     );
 
