@@ -87,7 +87,7 @@ return [
     'auth' => [
         'guard' => 'admin',
         'pages' => [
-            'login' => \Filament\Http\Livewire\Auth\Login::class,
+            'login' => App\Http\Livewire\Admin\Auth\Login::class,
         ],
     ],
 
@@ -316,6 +316,7 @@ return [
         'auth' => [
             Authenticate::class,
             'verified:admin.verification.notice',
+            'active:admin.account-deactivated.notice',
         ],
         'base' => [
             EncryptCookies::class,

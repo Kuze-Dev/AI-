@@ -16,9 +16,7 @@ it('can login a user', function () {
 
     $this->mock(
         RateLimiter::class,
-        fn (MockInterface $mock) => $mock->allows([
-            'clear' => null,
-        ])
+        fn (MockInterface $mock) => $mock->expects('clear')
     );
 
     $result = app(AttemptToAuthenticate::class)->handle(

@@ -11,7 +11,9 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Livewire\Component;
+use Livewire\Redirector;
 
 /**
  * @property \Filament\Forms\ComponentContainer $form
@@ -24,11 +26,13 @@ class RequestPasswordReset extends Component implements HasForms
 
     public function mount(): void
     {
-        $this->form->fill();
+        $this->form->fill(['email' => '']);
     }
 
-    public function sendResetPasswordRequest(): void
+    public function sendResetPasswordRequest(): Redirector|RedirectResponse
     {
+        $this->form->validate();
+
         $result = app(ForgotPasswordAction::class)->execute($this->email, 'admin');
 
         $result->throw();
@@ -38,7 +42,7 @@ class RequestPasswordReset extends Component implements HasForms
             ->success()
             ->send();
 
-        redirect()->intended(Filament::getUrl());
+        return redirect()->intended(Filament::getUrl());
     }
 
     protected function getFormSchema(): array

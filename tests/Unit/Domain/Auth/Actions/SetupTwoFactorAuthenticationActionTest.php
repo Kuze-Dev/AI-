@@ -13,7 +13,7 @@ beforeEach(function () {
     $this->user = User::create(['email' => 'test@user']);
     $this->mock(
         TwoFactorAuthenticationProvider::class,
-        fn (MockInterface $mock) => $mock->allows('generateSecretKey')->andReturns('secret')
+        fn (MockInterface $mock) => $mock->expects('generateSecretKey')->andReturns('secret')
     );
 });
 

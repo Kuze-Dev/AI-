@@ -21,7 +21,7 @@ return [
 
     'two_factor' => [
         'totp' => [
-            'window' => null,
+            'window' => 60,
         ],
 
         'recovery_codes' => [

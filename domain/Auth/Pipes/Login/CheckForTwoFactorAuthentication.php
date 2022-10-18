@@ -9,6 +9,7 @@ use Domain\Auth\Contracts\TwoFactorAuthenticatable;
 use Domain\Auth\DataTransferObjects\LoginData;
 use Domain\Auth\Enums\LoginResult;
 use Domain\Auth\Events\TwoFactorAuthenticationChallenged;
+use Domain\Auth\Exceptions\UserProviderNotSupportedException;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Cache\RateLimiter;
@@ -16,7 +17,6 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
-use InvalidArgumentException;
 
 class CheckForTwoFactorAuthentication
 {
@@ -50,10 +50,11 @@ class CheckForTwoFactorAuthentication
 
     protected function validateCredentials(LoginData $loginData): Authenticatable
     {
-        $userProvider = Auth::createUserProvider(config("auth.guard.{$loginData->guard}.provider"));
+        $guard = $loginData->guard ?? config('auth.defaults.guard');
+        $userProvider = Auth::createUserProvider(config("auth.guards.{$guard}.provider"));
 
         if ( ! $userProvider instanceof EloquentUserProvider) {
-            throw new InvalidArgumentException("`auth.guard.{$loginData->guard}.provider` must be set to `eloquent`");
+            throw new UserProviderNotSupportedException($guard);
         }
 
         $user = $userProvider->retrieveByCredentials(['email' => $loginData->email]);

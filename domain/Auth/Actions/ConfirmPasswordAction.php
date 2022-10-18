@@ -11,10 +11,6 @@ class ConfirmPasswordAction
 {
     public function execute(string $password, ?string $guard = null): bool
     {
-        if ( ! Session::isStarted()) {
-            return false;
-        }
-
         Validator::validate(
             compact('password'),
             ['password' => [

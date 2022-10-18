@@ -43,6 +43,7 @@ uses()->beforeEach(function () {
         $table->increments('id');
         $table->string('email');
         $table->timestamp('email_verified_at')->nullable();
+        $table->boolean('active')->default(true);
     });
 
     Relation::morphMap(['test_user' => User::class]);

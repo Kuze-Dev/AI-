@@ -23,7 +23,7 @@ beforeEach(function () {
 it('can validate topt code', function () {
     $this->mock(
         TwoFactorAuthenticationProvider::class,
-        fn (MockInterface $mock) => $mock->allows('verify')->andReturns(true)
+        fn (MockInterface $mock) => $mock->expects('verify')->andReturns(true)
     );
 
     $result = app(ValidateTotpCodeAction::class)->execute($this->user, 'secret');
@@ -34,7 +34,7 @@ it('can validate topt code', function () {
 it('won\'t validate invalid topt code', function () {
     $this->mock(
         TwoFactorAuthenticationProvider::class,
-        fn (MockInterface $mock) => $mock->allows('verify')->andReturns(false)
+        fn (MockInterface $mock) => $mock->expects('verify')->andReturns(false)
     );
 
     $result = app(ValidateTotpCodeAction::class)->execute($this->user, 'secret');

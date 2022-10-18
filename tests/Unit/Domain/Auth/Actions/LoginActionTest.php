@@ -31,10 +31,10 @@ it('can login a user', function () {
 
     $this->mock(
         RateLimiter::class,
-        fn (MockInterface $mock) => $mock->allows([
-            'tooManyAttempts' => false,
-            'clear' => null,
-        ])
+        function (MockInterface $mock) {
+            $mock->expects('tooManyAttempts')->andReturns(false);
+            $mock->expects('clear');
+        }
     );
 
     $result = app(LoginAction::class)->execute(new LoginData(

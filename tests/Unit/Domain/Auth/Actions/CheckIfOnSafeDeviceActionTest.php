@@ -31,7 +31,10 @@ beforeEach(function () {
 });
 
 it('can check if on safe device', function () {
-    $this->mock(Request::class, fn (MockInterface $mock) => $mock->allows('cookie')->andReturns('secret'));
+    $this->mock(
+        Request::class,
+        fn (MockInterface $mock) => $mock->expects('cookie')->andReturns('secret')
+    );
 
     $result = app(CheckIfOnSafeDeviceAction::class)->execute($this->user);
 
@@ -39,7 +42,10 @@ it('can check if on safe device', function () {
 });
 
 it('can check if not on safe device', function () {
-    $this->mock(Request::class, fn (MockInterface $mock) => $mock->allows('cookie')->andReturns(null));
+    $this->mock(
+        Request::class,
+        fn (MockInterface $mock) => $mock->expects('cookie')->andReturns(null)
+    );
 
     $result = app(CheckIfOnSafeDeviceAction::class)->execute($this->user);
 
@@ -49,7 +55,10 @@ it('can check if not on safe device', function () {
 it('returns false when two factor is disabled', function () {
     $this->user->twoFactorAuthentication()->update(['enabled_at' => null]);
     $this->user->refresh();
-    $this->mock(Request::class, fn (MockInterface $mock) => $mock->shouldNotReceive('cookie'));
+    $this->mock(
+        Request::class,
+        fn (MockInterface $mock) => $mock->shouldNotReceive('cookie')
+    );
 
     $result = app(CheckIfOnSafeDeviceAction::class)->execute($this->user);
 
