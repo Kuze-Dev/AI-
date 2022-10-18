@@ -7,6 +7,7 @@ namespace Domain\Auth\Actions;
 use Domain\Auth\Contracts\TwoFactorAuthenticatable;
 use Domain\Auth\DataTransferObjects\SafeDeviceData;
 use Domain\Auth\DataTransferObjects\TwoFactorData;
+use Domain\Auth\Exceptions\UserProviderNotSupportedException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -15,7 +16,6 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\UnauthorizedException;
 use LogicException;
-use InvalidArgumentException;
 
 class AuthenticateTwoFactorAction
 {
@@ -63,10 +63,11 @@ class AuthenticateTwoFactorAction
     /** @throws \Illuminate\Auth\AuthenticationException */
     protected function getChallengedUser(TwoFactorData $twoFactorData): Authenticatable&TwoFactorAuthenticatable
     {
-        $userProvider = Auth::createUserProvider(config("auth.guard.{$twoFactorData->guard}.provider"));
+        $guard = $twoFactorData->guard ?? config('auth.defaults.guard');
+        $userProvider = Auth::createUserProvider(config("auth.guards.{$guard}.provider"));
 
         if ( ! $userProvider instanceof EloquentUserProvider) {
-            throw new InvalidArgumentException("`auth.guard.{$twoFactorData->guard}.provider` must be set to `eloquent`");
+            throw new UserProviderNotSupportedException($guard);
         }
 
         $user = $userProvider->retrieveById(Session::get('login.id'));

@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use Domain\Admin\Models\Admin;
+use Domain\Auth\Actions\EnableTwoFactorAuthenticationAction;
+use Domain\Auth\Actions\GenerateRecoveryCodesAction;
+use Domain\Auth\Actions\SetupTwoFactorAuthenticationAction;
+use Domain\Auth\Contracts\TwoFactorAuthenticationProvider;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -36,9 +40,7 @@ class AdminFactory extends Factory
 
     public function unverified(): self
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        return $this->state(['email_verified_at' => null]);
     }
 
     public function passwordPrompt(Command $command): self
@@ -52,15 +54,23 @@ class AdminFactory extends Factory
 
     public function active(bool $active = true): self
     {
-        return $this->state(fn (array $attributes) => [
-            'active' => $active,
-        ]);
+        return $this->state(['active' => $active]);
     }
 
     public function softDeleted(): self
     {
-        return $this->state(fn (array $attributes) => [
-            'deleted_at' => now(),
-        ]);
+        return $this->state(['deleted_at' => now()]);
+    }
+
+    public function withTwoFactorEnabled(): self
+    {
+        return $this->afterCreating(function (Admin $admin) {
+            app(SetupTwoFactorAuthenticationAction::class)->execute($admin);
+
+            $code = app(TwoFactorAuthenticationProvider::class)->getCurrentOtp($admin->twoFactorAuthentication->secret);
+
+            app(EnableTwoFactorAuthenticationAction::class)->execute($admin, $code);
+            app(GenerateRecoveryCodesAction::class)->execute($admin);
+        });
     }
 }
