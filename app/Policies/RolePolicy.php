@@ -52,24 +52,4 @@ class RolePolicy
     {
         return $this->checkWildcardPermissions($user);
     }
-
-    public function restore(User $user, Role $role): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
-
-    public function restoreAny(User $user): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
-
-    public function forceDelete(User $user, Role $role): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
-
-    public function forceDeleteAny(User $user): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
 }
