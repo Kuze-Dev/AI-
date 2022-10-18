@@ -33,6 +33,11 @@ class RoleResource extends Resource
 
     protected static string|array $middlewares = ['password.confirm:admin.password.confirm'];
 
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name'];
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -66,10 +71,19 @@ class RoleResource extends Resource
                     ->counts('permissions')
                     ->colors(['success']),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone),
+                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->sortable(),
             ])
-            ->actions([Tables\Actions\EditAction::make()])
-            ->bulkActions([]);
+            ->filters([
+                Tables\Filters\SelectFilter::make('guard_name')
+                    ->options(self::getGuards()->mapWithKeys(fn (string $guardName) => [$guardName => $guardName]))
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getPages(): array
