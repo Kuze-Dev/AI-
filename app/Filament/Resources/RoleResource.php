@@ -142,10 +142,7 @@ class RoleResource extends Resource
                 ->helperText(trans('Enable all Permissions for this role'))
                 ->reactive()
                 ->afterStateHydrated(function (Forms\Components\Toggle $component, ?Role $record): void {
-                    $component->state(
-                        self::$permissionGroups->pluck('main')
-                            ->every(fn (Permission $permission) => $record?->hasPermissionTo($permission))
-                    );
+                    $component->state(self::$permissionGroups->every(fn (PermissionGroup $permissionGroup): bool => $record?->hasPermissionTo($permissionGroup->main) ?? false));
                 })
                 ->afterStateUpdated(function (Closure $get, Closure $set, bool $state): void {
                     self::$permissionGroups->each(function (PermissionGroup $permissionGroup, string $groupName) use ($get, $set, $state): void {
@@ -191,9 +188,9 @@ class RoleResource extends Resource
                                                     $record?->hasPermissionTo($permissionGroup->main)
                                                         ? array_keys($component->getOptions())
                                                         : $record?->permissions->pluck('id')
-                                                        ->intersect(array_keys($component->getOptions()))
-                                                        ->values()
-                                                        ->toArray()
+                                                            ->intersect(array_keys($component->getOptions()))
+                                                            ->values()
+                                                            ->toArray()
                                                 );
                                             })
                                             ->afterStateUpdated(function (Closure $get, Closure $set) use ($groupName, $permissionGroup): void {
