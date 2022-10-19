@@ -1,4 +1,6 @@
-image: bitnami/laravel:latest
+image:
+  name: bitnami/laravel:latest
+  run-as-user: 1000
 
 definitions:
   caches:
