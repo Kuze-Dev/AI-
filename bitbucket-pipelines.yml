@@ -1,34 +1,36 @@
-image: laravelsail/php81-composer:latest
+image: atlassian/default-image:3
 
 definitions:
-  setupScript: &setupScript composer install --prefer-dist --no-interaction &&
-    cp .env.example .env &&
-    php artisan key:generate
+  caches:
+    phpstan: build/phpstan
+  setupScript: &setupScript |
+    cp .env.example .env \
+    docker compose up -d \
+    docker compose exec laravel.test composer i --prefer-dist --no-interaction \
+    docker compose exec laravel.test php artisan key:generate
   steps:
-    - step: &setup
-        script:
-          - *setupScript
+    - step: &common-step
         caches:
-          - composer
+          - docker
     - step: &check-format
-        <<: *setup
+        <<: *common-step
         name: Check Format
         script:
           - *setupScript
-          - composer format-dry-run
+          - docker compose exec laravel.test composer format-dry-run
         condition:
           changesets:
             includePaths:
               - "**.php"
               - "pint.json"
     - step: &analyse
-        <<: *setup
+        <<: *common-step
         name: Analyse
         script:
           - *setupScript
-          - composer analyse -- --memory-limit 256M
+          - docker compose exec laravel.test composer analyse -- --memory-limit 256M
         caches:
-          - composer
+          - docker
           - phpstan
         condition:
           changesets:
@@ -36,13 +38,14 @@ definitions:
               - "**.php"
               - "phpstan.neon.dist"
     - step: &test
-        <<: *setup
+        <<: *common-step
         name: Test
         script:
           - *setupScript
-          - composer test
-  caches:
-    phpstan: build/phpstan
+          - docker compose exec laravel.test composer test
+
+options:
+  docker: true
 
 pipelines:
   branches:
