@@ -1,20 +1,23 @@
-image: laravelsail/php81-composer:latest
+image:
+  name: bitnami/laravel:latest
+  run-as-user: 1000
 
 definitions:
-  setupScript: &setupScript composer install --prefer-dist --no-interaction &&
+  caches:
+    phpstan: build/phpstan
+  setup-script: &setup-script |
+    composer install --prefer-dist --no-interaction &&
     cp .env.example .env &&
     php artisan key:generate
   steps:
-    - step: &setup
-        script:
-          - *setupScript
+    - step: &common-step
         caches:
           - composer
     - step: &check-format
-        <<: *setup
+        <<: *common-step
         name: Check Format
         script:
-          - *setupScript
+          - *setup-script
           - composer format-dry-run
         condition:
           changesets:
@@ -22,10 +25,10 @@ definitions:
               - "**.php"
               - "pint.json"
     - step: &analyse
-        <<: *setup
+        <<: *common-step
         name: Analyse
         script:
-          - *setupScript
+          - *setup-script
           - composer analyse -- --memory-limit 256M
         caches:
           - composer
@@ -36,13 +39,11 @@ definitions:
               - "**.php"
               - "phpstan.neon.dist"
     - step: &test
-        <<: *setup
+        <<: *common-step
         name: Test
         script:
-          - *setupScript
+          - *setup-script
           - composer test
-  caches:
-    phpstan: build/phpstan
 
 pipelines:
   branches:
