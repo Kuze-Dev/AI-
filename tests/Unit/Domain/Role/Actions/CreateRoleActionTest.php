@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Domain\Admin\Actions\CreateRoleAction;
-use Domain\Admin\DataTransferObjects\RoleData;
+use Domain\Role\Actions\CreateRoleAction;
+use Domain\Role\DataTransferObjects\RoleData;
 use Spatie\Permission\Models\Permission;
 
 use function Pest\Laravel\assertModelExists;

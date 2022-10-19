@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Admin\DataTransferObjects;
+namespace Domain\Role\DataTransferObjects;
 
 class RoleData
 {

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\RoleResource\Pages;
 
 use App\Filament\Resources\RoleResource;
-use Domain\Admin\Actions\UpdateRoleAction;
-use Domain\Admin\DataTransferObjects\RoleData;
+use Domain\Role\Actions\UpdateRoleAction;
+use Domain\Role\DataTransferObjects\RoleData;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;

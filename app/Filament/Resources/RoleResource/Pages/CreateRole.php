@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\RoleResource\Pages;
 
 use App\Filament\Resources\RoleResource;
-use Domain\Admin\Actions\CreateRoleAction;
-use Domain\Admin\DataTransferObjects\RoleData;
+use Domain\Role\Actions\CreateRoleAction;
+use Domain\Role\DataTransferObjects\RoleData;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 

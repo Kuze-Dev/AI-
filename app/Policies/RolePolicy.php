@@ -16,7 +16,7 @@ class RolePolicy
 
     public function before(?User $user, string $ability, mixed $role = null): bool|null
     {
-        if ($role instanceof Role && $role->name === config('domain.admin.role.super_admin')) {
+        if ($role instanceof Role && $role->name === config('domain.role.super_admin')) {
             return false;
         }
 
@@ -49,26 +49,6 @@ class RolePolicy
     }
 
     public function deleteAny(User $user): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
-
-    public function restore(User $user, Role $role): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
-
-    public function restoreAny(User $user): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
-
-    public function forceDelete(User $user, Role $role): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
-
-    public function forceDeleteAny(User $user): bool
     {
         return $this->checkWildcardPermissions($user);
     }
