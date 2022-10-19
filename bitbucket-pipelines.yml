@@ -1,8 +1,6 @@
-image: atlassian/default-image:3
+image: docker:latest
 
 definitions:
-  caches:
-    phpstan: build/phpstan
   setup-script: &setup-script |
     cp .env.example .env &&
     docker compose up -d &&
@@ -29,9 +27,6 @@ definitions:
         script:
           - *setup-script
           - docker compose exec laravel.test composer analyse -- --memory-limit 256M
-        caches:
-          - docker
-          - phpstan
         condition:
           changesets:
             includePaths:
