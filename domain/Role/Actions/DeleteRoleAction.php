@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Domain\Admin\Actions;
+namespace Domain\Role\Actions;
 
-use Domain\Admin\Exceptions\CantDeleteRoleWithAssociatedUsersException;
-use Domain\Admin\Exceptions\CantDeleteSuperAdminRoleException;
+use Domain\Role\Exceptions\CantDeleteRoleWithAssociatedUsersException;
+use Domain\Role\Exceptions\CantDeleteSuperAdminRoleException;
 use Spatie\Permission\Models\Role;
 
 class DeleteRoleAction
 {
     public function execute(Role $role): ?bool
     {
-        if ($role->name === config('domain.admin.role.super_admin')) {
+        if ($role->name === config('domain.role.super_admin')) {
             throw new CantDeleteSuperAdminRoleException();
         }
 

@@ -33,6 +33,11 @@ class RoleResource extends Resource
 
     protected static string|array $middlewares = ['password.confirm:admin.password.confirm'];
 
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name'];
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -66,10 +71,19 @@ class RoleResource extends Resource
                     ->counts('permissions')
                     ->colors(['success']),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone),
+                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->sortable(),
             ])
-            ->actions([Tables\Actions\EditAction::make()])
-            ->bulkActions([]);
+            ->filters([
+                Tables\Filters\SelectFilter::make('guard_name')
+                    ->options(self::getGuards()->mapWithKeys(fn (string $guardName) => [$guardName => $guardName]))
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getPages(): array
@@ -103,13 +117,40 @@ class RoleResource extends Resource
         }
 
         return [
+            Forms\Components\Hidden::make('permissions')
+                ->reactive()
+                ->afterStateHydrated(function (Forms\Components\Hidden $component, ?Role $record): void {
+                    $component->state($record ? $record->permissions->pluck('id') : []);
+                })
+                ->dehydrateStateUsing(function (Closure $get): array {
+                    return self::$permissionGroups->reduce(
+                        function (array $permissions, PermissionGroup $permissionGroup, string $groupName) use ($get): array {
+                            if ($get($groupName) ?? false) {
+                                array_push($permissions, $permissionGroup->main->id);
+                            } else {
+                                $permissions = array_merge($permissions, $get("{$groupName}_abilities") ?? []);
+                            }
+
+                            return $permissions;
+                        },
+                        []
+                    );
+                }),
             Forms\Components\Toggle::make('select_all')
                 ->onIcon('heroicon-s-shield-check')
                 ->offIcon('heroicon-s-shield-exclamation')
                 ->helperText(trans('Enable all Permissions for this role'))
                 ->reactive()
-                ->afterStateHydrated(self::selectAllHydrated(...))
-                ->afterStateUpdated(self::selectAllUpdated(...))
+                ->afterStateHydrated(function (Forms\Components\Toggle $component, ?Role $record): void {
+                    $component->state(self::$permissionGroups->every(fn (PermissionGroup $permissionGroup): bool => $record?->hasPermissionTo($permissionGroup->main) ?? false));
+                })
+                ->afterStateUpdated(function (Closure $get, Closure $set, bool $state): void {
+                    self::$permissionGroups->each(function (PermissionGroup $permissionGroup, string $groupName) use ($get, $set, $state): void {
+                        $set($groupName, $state);
+
+                        self::refreshPermissionGroupAbilitiesState($groupName, $permissionGroup, $get, $set);
+                    });
+                })
                 ->dehydrated(false),
             Forms\Components\Grid::make(['sm' => 2])
                 ->schema(
@@ -122,8 +163,13 @@ class RoleResource extends Resource
                                     ->onIcon('heroicon-s-lock-open')
                                     ->offIcon('heroicon-s-lock-closed')
                                     ->reactive()
-                                    ->afterStateHydrated(self::permissionGroupStateHydrated($permissionGroup))
-                                    ->afterStateUpdated(self::permissionGroupStateUpdated($groupName, $permissionGroup))
+                                    ->afterStateHydrated(function (Forms\Components\Toggle $component, ?Role $record) use ($permissionGroup): void {
+                                        $component->state($record?->hasPermissionTo($permissionGroup->main));
+                                    })
+                                    ->afterStateUpdated(function (Closure $get, Closure $set) use ($groupName, $permissionGroup): void {
+                                        self::refreshPermissionGroupAbilitiesState($groupName, $permissionGroup, $get, $set);
+                                        self::refreshSelectAllState($get, $set);
+                                    })
                                     ->dehydrated(false),
                                 Forms\Components\Fieldset::make('Abilities')
                                     ->schema([
@@ -136,8 +182,21 @@ class RoleResource extends Resource
                                             ))
                                             ->columns(2)
                                             ->reactive()
-                                            ->afterStateHydrated(self::permissionGroupAbilitiesStateHydrated($permissionGroup))
-                                            ->afterStateUpdated(self::permissionGroupAbilitiesStateUpdated($groupName, $permissionGroup))
+                                            ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Role $record) use ($permissionGroup): void {
+                                                debug($record);
+                                                $component->state(
+                                                    $record?->hasPermissionTo($permissionGroup->main)
+                                                        ? array_keys($component->getOptions())
+                                                        : $record?->permissions->pluck('id')
+                                                            ->intersect(array_keys($component->getOptions()))
+                                                            ->values()
+                                                            ->toArray()
+                                                );
+                                            })
+                                            ->afterStateUpdated(function (Closure $get, Closure $set) use ($groupName, $permissionGroup): void {
+                                                self::refreshPermissionGroupState($groupName, $permissionGroup, $get, $set);
+                                                self::refreshSelectAllState($get, $set);
+                                            })
                                             ->dehydrated(false),
                                     ])
                                     ->columns(1),
@@ -146,120 +205,21 @@ class RoleResource extends Resource
                     )
                         ->toArray()
                 ),
-            Forms\Components\Hidden::make('permissions')
-                ->dehydrateStateUsing(self::permissionsDehydrated(...)),
         ];
-    }
-
-    private static function selectAllHydrated(Forms\Components\Toggle $component, ?Role $record): void
-    {
-        if ( ! $record) {
-            return;
-        }
-
-        foreach (self::$permissionGroups as $permissionGroup) {
-            if ( ! $record->hasPermissionTo($permissionGroup->main)) {
-                return;
-            }
-        }
-
-        $component->state(true);
-    }
-
-    private static function selectAllUpdated(Closure $get, Closure $set, bool $state): void
-    {
-        self::$permissionGroups->each(function (PermissionGroup $permissionGroup, string $groupName) use ($get, $set, $state): void {
-            $set($groupName, $state);
-
-            self::permissionGroupStateUpdated($groupName, $permissionGroup)($get, $set);
-        });
-    }
-
-    private static function permissionGroupStateHydrated(PermissionGroup $permissionGroup): Closure
-    {
-        return function (Forms\Components\Toggle $component, ?Role $record) use ($permissionGroup): void {
-            if ( ! $record) {
-                return;
-            }
-
-            $component->state($record->hasPermissionTo($permissionGroup->main));
-        };
-    }
-
-    private static function permissionGroupStateUpdated(string $groupName, PermissionGroup $permissionGroup): Closure
-    {
-        return function (Closure $get, Closure $set) use ($groupName, $permissionGroup): void {
-            $set(
-                "{$groupName}_abilities",
-                $get($groupName)
-                    ? $permissionGroup->abilities->pluck('id')
-                        ->merge($get("{$groupName}_abilities"))
-                        ->unique()
-                    : $permissionGroup->abilities->pluck('id')
-                        ->diff($get("{$groupName}_abilities"))
-                        ->values()
-            );
-
-            self::refreshSelectAllState($get, $set);
-        };
-    }
-
-    private static function permissionGroupAbilitiesStateHydrated(PermissionGroup $permissionGroup): Closure
-    {
-        return function (Forms\Components\CheckboxList $component, ?Role $record) use ($permissionGroup): void {
-            if ( ! $record) {
-                return;
-            }
-
-            $state = $record->hasPermissionTo($permissionGroup->main)
-                ? array_keys($component->getOptions())
-                : $record->permissions->pluck('id')
-                    ->intersect(array_keys($component->getOptions()))
-                    ->values()
-                    ->toArray();
-
-            $component->state($state);
-        };
-    }
-
-    private static function permissionGroupAbilitiesStateUpdated(string $groupName, PermissionGroup $permissionGroup): Closure
-    {
-        return function (Closure $get, Closure $set) use ($groupName, $permissionGroup): void {
-            $selectedPermissionsInGroup = $permissionGroup->abilities->pluck('id')
-                ->intersect($get("{$groupName}_abilities"));
-
-            $set($groupName, $selectedPermissionsInGroup->count() === $permissionGroup->abilities->count());
-
-            self::refreshSelectAllState($get, $set);
-        };
     }
 
     private static function refreshSelectAllState(Closure $get, Closure $set): void
     {
-        foreach (self::$permissionGroups->keys() as $groupName) {
-            if ( ! $get($groupName)) {
-                $set('select_all', false);
-
-                return;
-            }
-        }
-
-        $set('select_all', true);
+        $set('select_all', self::$permissionGroups->keys()->every(fn (string $groupName) => $get($groupName)));
     }
 
-    private static function permissionsDehydrated(Closure $get): array
+    private static function refreshPermissionGroupState(string $groupName, PermissionGroup $permissionGroup, Closure $get, Closure $set): void
     {
-        return self::$permissionGroups->reduce(
-            function (array $permissions, PermissionGroup $permissionGroup, string $groupName) use ($get): array {
-                if ($get($groupName) ?? false) {
-                    array_push($permissions, $permissionGroup->main->id);
-                } else {
-                    $permissions = array_merge($permissions, $get("{$groupName}_abilities"));
-                }
+        $set($groupName, $permissionGroup->abilities->pluck('id')->every(fn (int $id) => in_array($id, $get("{$groupName}_abilities"))));
+    }
 
-                return $permissions;
-            },
-            []
-        );
+    private static function refreshPermissionGroupAbilitiesState(string $groupName, PermissionGroup $permissionGroup, Closure $get, Closure $set): void
+    {
+        $set("{$groupName}_abilities", $get($groupName) ? $permissionGroup->abilities->pluck('id')->toArray() : []);
     }
 }

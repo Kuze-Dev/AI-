@@ -13,7 +13,7 @@ class RoleSeeder extends Seeder
     {
         Role::create([
             'id' => 1,
-            'name' => config('domain.admin.role.super_admin'),
+            'name' => config('domain.role.super_admin'),
         ]);
     }
 }

@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Domain\Admin\Actions;
+namespace Domain\Role\Actions;
 
-use Domain\Admin\DataTransferObjects\RoleData;
-use Domain\Admin\Exceptions\CantModifySuperAdminRoleException;
+use Domain\Role\DataTransferObjects\RoleData;
+use Domain\Role\Exceptions\CantModifySuperAdminRoleException;
 use Spatie\Permission\Models\Role;
 
 class UpdateRoleAction
 {
     public function execute(Role $role, RoleData $roleData): Role
     {
-        if ($role->name === config('domain.admin.role.super_admin')) {
+        if ($role->name === config('domain.role.super_admin')) {
             throw new CantModifySuperAdminRoleException();
         }
 

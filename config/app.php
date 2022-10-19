@@ -201,6 +201,7 @@ return [
          */
         Domain\Admin\AdminServiceProvider::class,
         Domain\Auth\AuthServiceProvider::class,
+        Domain\Role\RoleServiceProvider::class,
 
     ],
 

@@ -9,6 +9,8 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 
 /**
+ * @method \Illuminate\Support\Collection<string> keys()
+ *
  * @extends \Illuminate\Support\Collection<string, \App\Filament\Resources\RoleResource\Support\PermissionGroup>
  */
 class PermissionGroupCollection extends Collection
