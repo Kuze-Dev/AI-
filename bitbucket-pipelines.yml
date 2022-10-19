@@ -1,21 +1,22 @@
-image: docker:latest
+image: bitnami/laravel:latest
 
 definitions:
+  caches:
+    phpstan: build/phpstan
   setup-script: &setup-script |
+    composer install --prefer-dist --no-interaction &&
     cp .env.example .env &&
-    docker compose up -d &&
-    docker compose exec laravel.test composer i --prefer-dist --no-interaction &&
-    docker compose exec laravel.test php artisan key:generate
+    php artisan key:generate
   steps:
     - step: &common-step
         caches:
-          - docker
+          - composer
     - step: &check-format
         <<: *common-step
         name: Check Format
         script:
           - *setup-script
-          - docker compose exec laravel.test composer format-dry-run
+          - composer format-dry-run
         condition:
           changesets:
             includePaths:
@@ -26,7 +27,10 @@ definitions:
         name: Analyse
         script:
           - *setup-script
-          - docker compose exec laravel.test composer analyse -- --memory-limit 256M
+          - composer analyse -- --memory-limit 256M
+        caches:
+          - composer
+          - phpstan
         condition:
           changesets:
             includePaths:
@@ -37,10 +41,7 @@ definitions:
         name: Test
         script:
           - *setup-script
-          - docker compose exec laravel.test composer test
-
-options:
-  docker: true
+          - composer test
 
 pipelines:
   branches:
