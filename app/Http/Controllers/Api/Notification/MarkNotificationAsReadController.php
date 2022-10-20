@@ -14,9 +14,9 @@ use Spatie\RouteAttributes\Attributes\Patch;
 use Spatie\RouteAttributes\Attributes\Prefix;
 
 #[
-    Prefix('api/notifications'),
+    Prefix('notifications'),
     // TODO: auth for guard api
-    Middleware(['api', 'auth']),
+    Middleware(['auth']),
 ]
 class MarkNotificationAsReadController extends Controller
 {
