@@ -17,9 +17,9 @@ use Spatie\RouteAttributes\Attributes\Prefix;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
-    Prefix('api/notifications'),
+    Prefix('notifications'),
     // TODO: auth for guard api
-    Middleware(['api', 'auth']),
+    Middleware(['auth']),
 ]
 class NotificationController extends Controller
 {
