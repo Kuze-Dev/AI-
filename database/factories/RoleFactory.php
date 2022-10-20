@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Spatie\Permission\Guard;
 use Spatie\Permission\Models\Role;
 
 /**
@@ -18,6 +19,7 @@ class RoleFactory extends Factory
     {
         return [
             'name' => fake()->unique()->word(),
+            'guard_name' => Guard::getDefaultName(Role::class), // - Upgrading spatie/laravel-permission (5.5.5 => 5.5.12):
         ];
     }
 }
