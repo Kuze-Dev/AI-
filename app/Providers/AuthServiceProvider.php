@@ -45,9 +45,9 @@ class AuthServiceProvider extends ServiceProvider
         $this->configureNotificationUrls();
 
         /** @see https://freek.dev/1325-when-to-use-gateafter-in-laravel */
-        Gate::after(fn ($user) => $user instanceof Admin ? $user->isSuperAdmin() : null);
+        Gate::after(fn ($user) => $user instanceof Admin ? $user->hasRole(config('domain.role.super_admin')) : null);
 
-        ViewLog::can(fn (Admin $admin) => $admin->isSuperAdmin());
+        ViewLog::can(fn (Admin $admin) => $admin->hasRole(config('domain.role.super_admin')));
     }
 
     protected function registerRoutes(): void
