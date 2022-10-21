@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Livewire\Admin\Auth\EmailVerificationNotice;
+use App\Filament\Livewire\Auth\EmailVerificationNotice;
 use Database\Factories\AdminFactory;
 
 use function Pest\Livewire\livewire;

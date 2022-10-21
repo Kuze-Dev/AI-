@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Livewire\Admin\Auth\ConfirmPassword;
+use App\Filament\Livewire\Auth\ConfirmPassword;
 use Database\Factories\AdminFactory;
 
 use function Pest\Livewire\livewire;

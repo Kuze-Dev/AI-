@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Livewire\Admin\Auth\RequestPasswordReset;
+use App\Filament\Livewire\Auth\RequestPasswordReset;
 use Database\Factories\AdminFactory;
 
 use function Pest\Livewire\livewire;

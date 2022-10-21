@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Livewire\Admin\Auth\Login;
+use App\Filament\Livewire\Auth\Login;
 use Database\Factories\AdminFactory;
 
 use function Pest\Livewire\livewire;

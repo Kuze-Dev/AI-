@@ -87,7 +87,7 @@ return [
     'auth' => [
         'guard' => 'admin',
         'pages' => [
-            'login' => App\Http\Livewire\Admin\Auth\Login::class,
+            'login' => App\Filament\Livewire\Auth\Login::class,
         ],
     ],
 
