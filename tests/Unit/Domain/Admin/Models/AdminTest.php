@@ -5,12 +5,12 @@ declare(strict_types=1);
 use Domain\Admin\Models\Admin;
 use Illuminate\Support\Facades\Hash;
 
-it('can check if user is super admin', function () {
+it('can check if user is 0-day admin', function () {
     Admin::unguard();
     $admin = new Admin(['id' => 1]);
     Admin::reguard();
 
-    expect($admin->isSuperAdmin())->toBeTrue();
+    expect($admin->isZeroDayAdmin())->toBeTrue();
 });
 
 it('can check if user is active', function () {
