@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Livewire\Admin\Auth\ResetPassword;
+use App\Filament\Livewire\Auth\ResetPassword;
 use Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
 

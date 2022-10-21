@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Livewire\Admin\Auth;
+namespace App\Filament\Livewire\Auth;
 
 use Domain\Auth\Actions\LoginAction;
 use Domain\Auth\DataTransferObjects\LoginData;
