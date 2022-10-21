@@ -13,12 +13,6 @@ it('can check if user is 0-day admin', function () {
     expect($admin->isZeroDayAdmin())->toBeTrue();
 });
 
-it('can check if user is active', function () {
-    $admin = new Admin(['active' => true]);
-
-    expect($admin->isActive())->toBeTrue();
-});
-
 it('can get user\'s full name', function () {
     $admin = new Admin([
         'first_name' => 'John',
