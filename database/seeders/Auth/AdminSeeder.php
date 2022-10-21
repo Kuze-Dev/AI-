@@ -15,8 +15,8 @@ class AdminSeeder extends Seeder
     {
         /** @var Admin $superAdmin */
         $superAdmin = AdminFactory::new([
-            'first_name' => 'Super',
-            'last_name' => 'Admin',
+            'first_name' => 'System',
+            'last_name' => 'Administrator',
         ])
             ->when(
                 app()->isProduction(),
