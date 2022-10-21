@@ -6,6 +6,6 @@ namespace Domain\Admin\Exceptions;
 
 use LogicException;
 
-class CantDeleteSuperAdminException extends LogicException
+class CantDeleteZeroDayAdminException extends LogicException
 {
 }

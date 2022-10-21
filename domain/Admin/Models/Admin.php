@@ -105,7 +105,7 @@ class Admin extends Authenticatable implements MustVerifyEmail, HasName, TwoFact
         'to_be_logged_out' => 'boolean',
     ];
 
-    public function isSuperAdmin(): bool
+    public function isZeroDayAdmin(): bool
     {
         return $this->id === 1;
     }

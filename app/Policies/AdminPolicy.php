@@ -16,7 +16,7 @@ class AdminPolicy
 
     public function before(?User $user, string $ability, mixed $admin = null): bool|null
     {
-        if ($admin instanceof Admin && $admin->isSuperAdmin()) {
+        if ($admin instanceof Admin && $admin->isZeroDayAdmin()) {
             return false;
         }
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Database\Factories\AdminFactory;
 use Domain\Admin\Actions\DeleteAdminAction;
-use Domain\Admin\Exceptions\CantDeleteSuperAdminException;
+use Domain\Admin\Exceptions\CantDeleteZeroDayAdminException;
 
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Laravel\assertSoftDeleted;
@@ -34,4 +34,4 @@ it('can\'t delete super admin', function (bool $force) {
 })->with([
     'soft delete' => false,
     'force delete' => true,
-])->throws(CantDeleteSuperAdminException::class);
+])->throws(CantDeleteZeroDayAdminException::class);
