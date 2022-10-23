@@ -15,7 +15,6 @@ use Spatie\Health\Checks\Checks\ScheduleCheck;
 use Spatie\Health\Checks\Checks\UsedDiskSpaceCheck;
 use Spatie\Health\Facades\Health;
 use VictoRD11\SslCertificationHealthCheck\SslCertificationExpiredCheck;
-use VictoRD11\SslCertificationHealthCheck\SslCertificationValidCheck;
 
 /** @property \Illuminate\Foundation\Application $app */
 class HealthCheckServiceProvider extends ServiceProvider
@@ -36,8 +35,6 @@ class HealthCheckServiceProvider extends ServiceProvider
                 ->url(config('app.url'))
                 ->warnWhenSslCertificationExpiringDay(24)
                 ->failWhenSslCertificationExpiringDay(14),
-            SslCertificationValidCheck::new()
-                ->url(config('app.url')),
             UsedDiskSpaceCheck::new(),
             OptimizedAppCheck::new(),
             DatabaseConnectionCountCheck::new(),
