@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Factories\AdminFactory;
+use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Actions\DeleteAdminAction;
 use Domain\Admin\Exceptions\CantDeleteZeroDayAdminException;
 

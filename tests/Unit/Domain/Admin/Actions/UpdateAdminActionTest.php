@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Factories\AdminFactory;
+use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Actions\UpdateAdminAction;
 use Domain\Admin\DataTransferObjects\AdminData;
 use Domain\Admin\Notifications\VerifyEmail;

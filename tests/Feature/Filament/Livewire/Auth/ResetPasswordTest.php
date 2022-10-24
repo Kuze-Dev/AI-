@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Filament\Livewire\Auth\ResetPassword;
-use Database\Factories\AdminFactory;
+use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
 
 use function Pest\Livewire\livewire;

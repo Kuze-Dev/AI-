@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Auth;
 
+use Domain\Role\Database\Factories\RoleFactory;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 
 class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        Role::create([
-            'id' => 1,
-            'name' => config('domain.role.super_admin'),
-        ]);
+        RoleFactory::new(['name' => config('domain.role.super_admin')])
+            ->createOne();
     }
 }

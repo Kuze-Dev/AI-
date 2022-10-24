@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Factories\AdminFactory;
+use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Role\Actions\DeleteRoleAction;
 use Domain\Role\Exceptions\CantDeleteRoleWithAssociatedUsersException;
 use Domain\Role\Exceptions\CantDeleteSuperAdminRoleException;

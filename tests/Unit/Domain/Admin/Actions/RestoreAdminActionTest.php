@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Factories\AdminFactory;
+use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Actions\RestoreAdminAction;
 
 use function Pest\Laravel\assertNotSoftDeleted;

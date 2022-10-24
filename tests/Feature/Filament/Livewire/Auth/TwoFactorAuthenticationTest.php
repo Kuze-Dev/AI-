@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Filament\Livewire\Auth\TwoFactorAuthentication;
-use Database\Factories\AdminFactory;
+use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Auth\Contracts\TwoFactorAuthenticationProvider;
 use Illuminate\Support\Facades\Cache;
 

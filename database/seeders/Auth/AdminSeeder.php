@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Auth;
 
-use Database\Factories\AdminFactory;
+use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
