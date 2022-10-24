@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Filament\Resources\RoleResource\Pages\EditRole;
 use App\Filament\Resources\RoleResource\Support\PermissionGroupCollection;
-use Database\Factories\RoleFactory;
+use Domain\Role\Database\Factories\RoleFactory;
 
 use function Pest\Livewire\livewire;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Factories\AdminFactory;
+use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
 use Domain\Notification\Exceptions\CantReadNotificationException;
 use Domain\Notification\Exceptions\CantUnReadNotificationException;

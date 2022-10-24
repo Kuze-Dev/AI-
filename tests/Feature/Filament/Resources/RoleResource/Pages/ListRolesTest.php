@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\RoleResource\Pages\ListRoles;
-use Database\Factories\RoleFactory;
+use Domain\Role\Database\Factories\RoleFactory;
 use Filament\Pages\Actions\DeleteAction;
 
 use function Pest\Laravel\assertModelMissing;

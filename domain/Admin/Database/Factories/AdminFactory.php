@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Database\Factories;
+namespace Domain\Admin\Database\Factories;
 
 use Domain\Admin\Models\Admin;
 use Domain\Auth\Actions\EnableTwoFactorAuthenticationAction;

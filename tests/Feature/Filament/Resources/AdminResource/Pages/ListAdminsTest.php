@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Filament\Resources\AdminResource;
 use App\Filament\Resources\AdminResource\Pages\ListAdmins;
-use Database\Factories\AdminFactory;
+use Domain\Admin\Database\Factories\AdminFactory;
 use Filament\Pages\Actions\DeleteAction;
 use Filament\Pages\Actions\ForceDeleteAction;
 use Filament\Pages\Actions\RestoreAction;
