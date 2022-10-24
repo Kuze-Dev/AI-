@@ -32,7 +32,7 @@ class AccountDeactivatedNotice extends Component
 
     public function render(): View
     {
-        return view('livewire.admin.auth.account-deactivated-notice')
+        return view('filament.auth.account-deactivated-notice')
             ->layout('filament::components.layouts.card', [
                 'title' => trans('Account Deactivated'),
             ]);

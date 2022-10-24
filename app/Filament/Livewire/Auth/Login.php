@@ -50,7 +50,7 @@ class Login extends Component implements HasForms
         ));
 
         return match ($result) {
-            LoginResult::TWO_FACTOR_REQUIRED => redirect()->route('admin.two-factor'),
+            LoginResult::TWO_FACTOR_REQUIRED => redirect()->route('filament.auth.two-factor'),
             LoginResult::SUCCESS => redirect()->intended(Filament::getUrl()),
         };
     }
@@ -74,7 +74,7 @@ class Login extends Component implements HasForms
 
     public function render(): View
     {
-        return view('livewire.admin.auth.login')
+        return view('filament.auth.login')
             ->layout('filament::components.layouts.card', [
                 'title' => __('filament::login.title'),
             ]);

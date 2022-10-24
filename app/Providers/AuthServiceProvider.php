@@ -46,7 +46,7 @@ class AuthServiceProvider extends ServiceProvider
         VerifyEmailNotification::createUrlUsing(function (mixed $notifiable) {
             if ($notifiable instanceof Admin) {
                 return URL::temporarySignedRoute(
-                    'admin.verification.verify',
+                    'filament.auth.verification.verify',
                     now()->addMinutes(Config::get('auth.verification.expire', 60)),
                     [
                         'id' => $notifiable->getKey(),
@@ -59,7 +59,7 @@ class AuthServiceProvider extends ServiceProvider
         ResetPasswordNotification::createUrlUsing(function (mixed $notifiable, string $token) {
             if ($notifiable instanceof Admin) {
                 return URL::route(
-                    'admin.password.reset',
+                    'filament.auth.password.reset',
                     [
                         'token' => $token,
                         'email' => $notifiable->getEmailForPasswordReset(),

@@ -49,7 +49,7 @@ class ConfirmPassword extends Component implements HasForms
 
     public function render(): View
     {
-        return view('livewire.admin.auth.confirm-password')
+        return view('filament.auth.confirm-password')
             ->layout('filament::components.layouts.card', [
                 'title' => trans('Confirm Access'),
             ]);

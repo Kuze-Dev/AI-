@@ -37,7 +37,7 @@ it('redirects to two factor auth if user has it enabled', function () {
         ])
         ->call('authenticate')
         ->assertHasNoFormErrors()
-        ->assertRedirect(route('admin.two-factor'));
+        ->assertRedirect(route('filament.auth.two-factor'));
 
     expect(Auth::check())->toBeFalse();
 });

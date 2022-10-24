@@ -58,7 +58,7 @@ class RequestPasswordReset extends Component implements HasForms
 
     public function render(): View
     {
-        return view('livewire.admin.auth.request-password-reset')
+        return view('filament.auth.request-password-reset')
             ->layout('filament::components.layouts.card', [
                 'title' => trans('Reset password'),
             ]);

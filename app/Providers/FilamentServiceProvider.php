@@ -63,8 +63,9 @@ class FilamentServiceProvider extends ServiceProvider
     protected function registerRoutes(): void
     {
         Route::middleware(config('filament.middleware.base'))
+            ->domain(config('filament.domain'))
             ->prefix('admin')
-            ->name('admin.')
+            ->name('filament.auth.')
             ->group(function () {
                 Route::get('two-factor', TwoFactorAuthentication::class)
                     ->middleware('guest:admin')

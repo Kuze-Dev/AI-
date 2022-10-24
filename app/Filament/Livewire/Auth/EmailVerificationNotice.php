@@ -37,7 +37,7 @@ class EmailVerificationNotice extends Component
 
     public function render(): View
     {
-        return view('livewire.admin.auth.resend-email-verification')
+        return view('filament.auth.resend-email-verification')
             ->layout('filament::components.layouts.card', [
                 'title' => trans('Verify Your Email Address'),
             ]);

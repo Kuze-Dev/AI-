@@ -116,14 +116,14 @@ class TwoFactorAuthentication extends Component implements HasForms
                 },
             ]))
                 ->reactive()
-                ->cancelAction(new HtmlString(view('livewire.admin.auth.partials.two-factor-authentication-cancel')->render()))
-                ->submitAction(new HtmlString(view('livewire.admin.auth.partials.two-factor-authentication-submit')->render()))
+                ->cancelAction(new HtmlString(view('filament.auth.partials.two-factor-authentication-cancel')->render()))
+                ->submitAction(new HtmlString(view('filament.auth.partials.two-factor-authentication-submit')->render()))
         ];
     }
 
     public function render(): View
     {
-        return view('livewire.admin.auth.two-factor-authentication')
+        return view('filament.auth.two-factor-authentication')
             ->layout('filament::components.layouts.card', [
                 'title' => trans('Two Factor Authentication'),
             ]);
