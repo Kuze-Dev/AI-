@@ -1,7 +1,7 @@
 {
-    "name": "halcyon/tall-boilerplate",
+    "name": "halcyon/saas-boilerplate",
     "type": "boilerplate",
-    "description": "Halcyon TALL Boilerplate",
+    "description": "Halcyon SaaS Boilerplate",
     "license": "proprietary",
     "require": {
         "php": "^8.1.9",
