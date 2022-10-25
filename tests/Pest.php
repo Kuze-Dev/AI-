@@ -35,6 +35,8 @@ uses(
         foreach (array_keys(config('filesystems.disks')) as $disk) {
             Storage::fake($disk);
         }
+
+        config()->set('tenancy.database.prefix', 'test_tenant');
     })
     ->in('Feature', 'Unit');
 
