@@ -11,17 +11,24 @@ class UpdateTenantAction
     {
         $tenant->update(['name' => $tenantData->name]);
 
-        $oldDomains = $tenant->domains->pluck('domain');
+        if (!empty($tenantData->domains)) {
+            $this->syncDomains($tenant, $tenantData);
+        }
 
-        $detached = $oldDomains->diff($tenantData->domains);
-        $attached = collect($tenantData->domains)->diff($oldDomains);
+        return $tenant;
+    }
+
+    protected function syncDomains(Tenant $tenant, TenantData $tenantData): void
+    {
+        $currentDomains = $tenant->domains->pluck('domain');
+
+        $detached = $currentDomains->diff($tenantData->domains);
+        $attached = collect($tenantData->domains)->diff($currentDomains);
 
         $tenant->domains->whereIn('domain', $detached)->each->delete();
 
         foreach ($attached as $domain) {
             $tenant->createDomain(['domain' => $domain]);
         }
-
-        return $tenant;
     }
 }
