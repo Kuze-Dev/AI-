@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Tenant\DataTransferObjects;
 
 class TenantData
@@ -7,7 +9,7 @@ class TenantData
     /** @param array<string> $domains */
     public function __construct(
         public readonly string $name,
-        public readonly ?array $domains = [],
+        public readonly array $domains = [],
     ) {
     }
 }

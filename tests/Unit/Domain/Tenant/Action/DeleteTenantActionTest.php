@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Domain\Tenant\Actions\DeleteTenantAction;
 use Domain\Tenant\Database\Factories\TenantFactory;
 use Domain\Tenant\Models\Tenant;

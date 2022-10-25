@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Filament\Resources\TenantResource\Pages\CreateTenant;
 use Domain\Tenant\Models\Tenant;
+
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Livewire\livewire;
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Filament\Resources\TenantResource\Pages\ListTenants;
 use Domain\Tenant\Database\Factories\TenantFactory;
 use Filament\Pages\Actions\DeleteAction;
+
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Livewire\livewire;
 

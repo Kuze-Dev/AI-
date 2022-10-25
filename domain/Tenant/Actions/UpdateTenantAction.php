@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Tenant\Actions;
 
 use Domain\Tenant\DataTransferObjects\TenantData;
@@ -11,7 +13,7 @@ class UpdateTenantAction
     {
         $tenant->update(['name' => $tenantData->name]);
 
-        if (!empty($tenantData->domains)) {
+        if ( ! empty($tenantData->domains)) {
             $this->syncDomains($tenant, $tenantData);
         }
 
