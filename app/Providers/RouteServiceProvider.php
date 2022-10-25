@@ -31,10 +31,13 @@ class RouteServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         $this->routes(function () {
-            Route::middleware('web')
-                ->group(function () {
-                    Route::view('/', 'welcome');
-                });
+            foreach (config('tenancy.central_domains', []) as $domain) {
+                Route::middleware('web')
+                    ->domain($domain)
+                    ->group(function () {
+                        Route::view('/', 'welcome');
+                    });
+            }
         });
     }
 

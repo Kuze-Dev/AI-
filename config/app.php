@@ -196,6 +196,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\FilamentServiceProvider::class,
         App\Providers\HealthCheckServiceProvider::class,
+        App\Providers\TenancyServiceProvider::class,
 
         /*
          * Domain Service Providers...
