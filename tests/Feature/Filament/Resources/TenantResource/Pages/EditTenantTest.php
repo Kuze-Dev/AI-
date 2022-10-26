@@ -21,7 +21,7 @@ it('can render page', function () {
         ->assertSuccessful()
         ->assertFormSet([
             'name' => $tenant->name,
-            'domains' => $tenant->domains->only('domain')->toArray()
+            'domains' => $tenant->domains->only('domain')->toArray(),
         ]);
 });
 
@@ -32,8 +32,8 @@ it('can edit tenant', function () {
         ->fillForm([
             'name' => 'Test',
             'domains' => [
-                ['domain' => 'test']
-            ]
+                ['domain' => 'test'],
+            ],
         ])
         ->call('save')
         ->assertHasNoFormErrors();

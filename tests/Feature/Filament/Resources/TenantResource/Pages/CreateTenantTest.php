@@ -21,8 +21,8 @@ it('can create tenant', function () {
         ->fillForm([
             'name' => 'Test',
             'domains' => [
-                ['domain' => 'test']
-            ]
+                ['domain' => 'test'],
+            ],
         ])
         ->call('create')
         ->assertHasNoFormErrors();
