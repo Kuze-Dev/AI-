@@ -12,7 +12,7 @@ it('can deactivate account', function () {
 
     $user = User::create([
         'email' => 'test@user',
-        'active' => true
+        'active' => true,
     ]);
 
     $result = app(DeactivateAccountAction::class)->execute($user);
@@ -26,7 +26,7 @@ it('does nothing when already deactived', function () {
 
     $user = User::create([
         'email' => 'test@user',
-        'active' => false
+        'active' => false,
     ]);
 
     $result = app(DeactivateAccountAction::class)->execute($user);

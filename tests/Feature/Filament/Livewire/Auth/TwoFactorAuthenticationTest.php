@@ -37,14 +37,14 @@ it('can redirect back', function () {
 it('can render authentication via otp', function () {
     livewire(TwoFactorAuthentication::class)
         ->fill(['method' => 'otp'])
-        ->assertFormFieldExists('code');
+        ->assertFormFieldIsVisible('code');
 });
 
 it('can authenticate via otp', function () {
     livewire(TwoFactorAuthentication::class)
         ->fill([
             'method' => 'otp',
-            'code' => app(TwoFactorAuthenticationProvider::class)->getCurrentOtp($this->user->twoFactorAuthentication->secret)
+            'code' => app(TwoFactorAuthenticationProvider::class)->getCurrentOtp($this->user->twoFactorAuthentication->secret),
         ])
         ->call('verify')
         ->assertHasNoErrors();
@@ -55,14 +55,14 @@ it('can authenticate via otp', function () {
 it('can render authentication via recovery code', function () {
     livewire(TwoFactorAuthentication::class)
         ->fill(['method' => 'recovery_code'])
-        ->assertFormFieldExists('recovery_code');
+        ->assertFormFieldIsVisible('recovery_code');
 });
 
 it('can authenticate via recovery code', function () {
     livewire(TwoFactorAuthentication::class)
         ->fill([
             'method' => 'recovery_code',
-            'recovery_code' => $this->user->twoFactorAuthentication->recoveryCodes->first()->code
+            'recovery_code' => $this->user->twoFactorAuthentication->recoveryCodes->first()->code,
         ])
         ->call('verify')
         ->assertHasNoErrors();
@@ -74,7 +74,7 @@ it('throws error on invalid code', function () {
     livewire(TwoFactorAuthentication::class)
         ->fill([
             'method' => 'otp',
-            'code' => 'invalid'
+            'code' => 'invalid',
         ])
         ->call('verify')
         ->assertHasErrors();

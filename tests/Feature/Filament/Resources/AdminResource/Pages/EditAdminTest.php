@@ -2,33 +2,18 @@
 
 declare(strict_types=1);
 
-use App\Filament\Resources\AdminResource;
-
+use App\Filament\Resources\AdminResource\Pages\EditAdmin;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
-use Illuminate\Auth\Middleware\RequirePassword;
-
 use Tests\RequestFactories\AdminRequestFactory;
 
 use function Pest\Laravel\assertDatabaseCount;
-use function Pest\Laravel\get;
-use function Pest\Laravel\withoutMiddleware;
 use function Pest\Livewire\livewire;
 use function PHPUnit\Framework\assertSame;
 
 beforeEach(fn () => loginAsAdmin());
 
-it('can render page', function () {
-    withoutMiddleware(RequirePassword::class);
-
-    $admin = AdminFactory::new()
-        ->createOne();
-
-    get(AdminResource::getUrl('edit', $admin))
-        ->assertSuccessful();
-});
-
-it('can retrieve data', function () {
+it('can show edit', function () {
     $admin = AdminFactory::new()
         ->active()
         ->createOne();
@@ -36,9 +21,7 @@ it('can retrieve data', function () {
     $admin->assignRole(1);
     $admin->givePermissionTo(2);
 
-    livewire(AdminResource\Pages\EditAdmin::class, [
-        'record' => $admin->getKey(),
-    ])
+    livewire(EditAdmin::class, ['record' => $admin->getKey()])
         ->assertFormSet([
             'first_name' => $admin->first_name,
             'last_name' => $admin->last_name,
@@ -49,16 +32,14 @@ it('can retrieve data', function () {
         ]);
 });
 
-it('can save', function () {
+it('can update', function () {
     $admin = AdminFactory::new()
         ->active()
         ->createOne();
 
     assertDatabaseCount(Admin::class, 2); // with logged-in user
 
-    livewire(AdminResource\Pages\EditAdmin::class, [
-        'record' => $admin->getKey(),
-    ])
+    livewire(EditAdmin::class, ['record' => $admin->getKey()])
         ->fillForm(AdminRequestFactory::new()->create())
         ->call('save')
         ->assertHasNoFormErrors();
@@ -73,9 +54,7 @@ it('can update with active', function (bool $active) {
 
     assertDatabaseCount(Admin::class, 2); // with logged-in user
 
-    livewire(AdminResource\Pages\EditAdmin::class, [
-        'record' => $admin->getKey(),
-    ])
+    livewire(EditAdmin::class, ['record' => $admin->getKey()])
         ->fillForm(
             AdminRequestFactory::new()
                 ->active($active)

@@ -76,7 +76,7 @@ class RoleResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('guard_name')
-                    ->options(self::getGuards()->mapWithKeys(fn (string $guardName) => [$guardName => $guardName]))
+                    ->options(self::getGuards()->mapWithKeys(fn (string $guardName) => [$guardName => $guardName])),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

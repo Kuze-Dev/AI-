@@ -21,11 +21,11 @@ class ConfirmPassword extends Component implements HasForms
 {
     use InteractsWithForms;
 
-    public string $password;
+    public string $password = '';
 
     public function mount(): void
     {
-        $this->form->fill(['password' => '']);
+        $this->form->fill();
     }
 
     public function confirm(): Redirector|RedirectResponse

@@ -11,18 +11,14 @@ use function Pest\Livewire\livewire;
 
 beforeEach(fn () => loginAsAdmin());
 
-it('can render list role', function () {
-    livewire(ListRoles::class)->assertSuccessful();
-});
-
-it('can list roles', function () {
+it('can list', function () {
     $roles = RoleFactory::new()->count(9)->create();
 
     livewire(ListRoles::class)
         ->assertCanSeeTableRecords($roles);
 });
 
-it('can delete role', function () {
+it('can delete', function () {
     $role = RoleFactory::new()->create();
 
     livewire(ListRoles::class)

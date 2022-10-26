@@ -27,9 +27,7 @@ class ResetPassword extends Component implements HasForms
 
     public string $email;
 
-    public string $password;
-
-    public string $password_confirmation;
+    public string $password = '';
 
     public string $token;
 
@@ -37,8 +35,6 @@ class ResetPassword extends Component implements HasForms
     {
         $this->form->fill([
             'email' => (string) $request->get('email'),
-            'password' => '',
-            'password_confirmation' => '',
             'token' => (string) $request->route('token'),
         ]);
     }
@@ -82,6 +78,7 @@ class ResetPassword extends Component implements HasForms
                 ->required()
                 ->password()
                 ->same('password')
+                ->dehydrated(false)
                 ->autocomplete('new-password'),
         ];
     }

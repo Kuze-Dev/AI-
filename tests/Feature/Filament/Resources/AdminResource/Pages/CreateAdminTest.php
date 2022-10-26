@@ -2,32 +2,21 @@
 
 declare(strict_types=1);
 
-use App\Filament\Resources\AdminResource;
+use App\Filament\Resources\AdminResource\Pages\CreateAdmin;
 use Domain\Admin\Models\Admin;
-use Illuminate\Auth\Middleware\RequirePassword;
-
 use Tests\RequestFactories\AdminRequestFactory;
 
 use function Pest\Laravel\assertDatabaseCount;
-use function Pest\Laravel\get;
-use function Pest\Laravel\withoutMiddleware;
 use function Pest\Livewire\livewire;
 use function PHPUnit\Framework\assertCount;
 use function PHPUnit\Framework\assertSame;
 
 beforeEach(fn () => loginAsAdmin());
 
-it('can render page', function () {
-    withoutMiddleware(RequirePassword::class);
-
-    get(AdminResource::getUrl('create'))
-        ->assertSuccessful();
-});
-
 it('can create', function () {
     assertDatabaseCount(Admin::class, 1); // on logged in user
 
-    livewire(AdminResource\Pages\CreateAdmin::class)
+    livewire(CreateAdmin::class)
         ->fillForm(
             AdminRequestFactory::new()
                 ->create()
@@ -41,7 +30,7 @@ it('can create', function () {
 it('can create with roles', function () {
     assertDatabaseCount(Admin::class, 1); // with logged-in user
 
-    livewire(AdminResource\Pages\CreateAdmin::class)
+    livewire(CreateAdmin::class)
         ->fillForm(
             AdminRequestFactory::new()
                 ->roles([1])
@@ -62,7 +51,7 @@ it('can create with roles', function () {
 it('can create with permissions', function () {
     assertDatabaseCount(Admin::class, 1); // with logged-in user
 
-    livewire(AdminResource\Pages\CreateAdmin::class)
+    livewire(CreateAdmin::class)
         ->fillForm(
             AdminRequestFactory::new()
                 ->roles([])
@@ -83,7 +72,7 @@ it('can create with permissions', function () {
 it('can create with active', function (bool $active) {
     assertDatabaseCount(Admin::class, 1); // with logged-in user
 
-    livewire(AdminResource\Pages\CreateAdmin::class)
+    livewire(CreateAdmin::class)
         ->fillForm(
             AdminRequestFactory::new()
                 ->active($active)
