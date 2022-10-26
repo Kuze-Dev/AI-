@@ -10,7 +10,7 @@ use function Pest\Livewire\livewire;
 
 beforeEach(fn () => loginAsAdmin());
 
-it('can render page', function () {
+it('can show edit', function () {
     $role = RoleFactory::new()->createOne();
 
     livewire(EditRole::class, ['record' => $role->getKey()])
@@ -22,7 +22,7 @@ it('can render page', function () {
         ]);
 });
 
-it('can edit role', function () {
+it('can update', function () {
     $permissionGroups = PermissionGroupCollection::make(['guard_name' => 'admin']);
     $role = RoleFactory::new()->createOne();
 
@@ -32,7 +32,7 @@ it('can edit role', function () {
         ->fillForm([
             'name' => $role->name,
             'guard_name' => $role->guard_name,
-            $permissionGroups->keys()->first() => true
+            $permissionGroups->keys()->first() => true,
         ])
         ->call('save')
         ->assertHasNoFormErrors();

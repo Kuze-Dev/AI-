@@ -2,32 +2,21 @@
 
 declare(strict_types=1);
 
-use App\Filament\Resources\AdminResource;
 use App\Filament\Resources\AdminResource\Pages\ListAdmins;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Filament\Pages\Actions\DeleteAction;
 use Filament\Pages\Actions\ForceDeleteAction;
 use Filament\Pages\Actions\RestoreAction;
 use Filament\Tables\Filters\TrashedFilter;
-use Illuminate\Auth\Middleware\RequirePassword;
 
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Laravel\assertNotSoftDeleted;
 use function Pest\Laravel\assertSoftDeleted;
-use function Pest\Laravel\get;
-use function Pest\Laravel\withoutMiddleware;
 use function Pest\Livewire\livewire;
 
 beforeEach(fn () => loginAsAdmin());
 
-it('can render page', function () {
-    withoutMiddleware(RequirePassword::class);
-
-    get(AdminResource::getUrl())
-        ->assertSuccessful();
-});
-
-it('can list admins', function () {
+it('can list', function () {
     AdminFactory::new()->count(10)
         ->softDeleted()
         ->create();
@@ -39,7 +28,7 @@ it('can list admins', function () {
         ->assertCanSeeTableRecords($admins);
 });
 
-it('can list soft deleted admins', function () {
+it('can list soft deleted', function () {
     $admins = AdminFactory::new()->count(10)
         ->softDeleted()
         ->create();
@@ -52,7 +41,7 @@ it('can list soft deleted admins', function () {
         ->assertCanSeeTableRecords($admins);
 });
 
-it('can delete admin', function () {
+it('can delete', function () {
     $admin = AdminFactory::new()
         ->createOne();
 
@@ -62,7 +51,7 @@ it('can delete admin', function () {
     assertSoftDeleted($admin);
 });
 
-it('can restore admin', function () {
+it('can restore', function () {
     $admin = AdminFactory::new()
         ->softDeleted()
         ->createOne();
@@ -74,7 +63,7 @@ it('can restore admin', function () {
     assertNotSoftDeleted($admin);
 });
 
-it('can force delete admin', function () {
+it('can force delete', function () {
     $admin = AdminFactory::new()
         ->softDeleted()
         ->createOne();

@@ -130,6 +130,7 @@ class AdminResource extends Resource
 
                             if ($data['value'] === 'no-roles') {
                                 $query->whereDoesntHave('roles');
+
                                 return;
                             }
                             $query->role($data['value']);

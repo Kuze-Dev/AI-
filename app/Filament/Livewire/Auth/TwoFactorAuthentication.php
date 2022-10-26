@@ -17,6 +17,7 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\Redirector;
+use Closure;
 
 /**
  * @property \Filament\Forms\ComponentContainer $form
@@ -25,13 +26,11 @@ class TwoFactorAuthentication extends Component implements HasForms
 {
     use InteractsWithForms;
 
-    public string $code;
+    public string $code = '';
 
-    public string $recovery_code;
+    public string $recovery_code = '';
 
-    public bool $remember = false;
-
-    public string $method;
+    public bool $remember_device = false;
 
     public function mount(): void
     {
@@ -39,11 +38,7 @@ class TwoFactorAuthentication extends Component implements HasForms
             redirect()->intended(Filament::getUrl());
         }
 
-        $this->form->fill([
-            'code' => '',
-            'recovery_code' => '',
-            'method' => '',
-        ]);
+        $this->form->fill();
     }
 
     public function goBack(): Redirector|RedirectResponse
@@ -53,12 +48,13 @@ class TwoFactorAuthentication extends Component implements HasForms
 
     public function verify(): Redirector|RedirectResponse
     {
-        $this->form->validate();
-
         $result = app(AuthenticateTwoFactorAction::class)->execute($this->buildTwoFactorData());
 
         if ( ! $result) {
-            throw ValidationException::withMessages(['code' => trans('Invalid code.')]);
+            throw ValidationException::withMessages([
+                'code' => trans('Invalid code.'),
+                'recovery_code' => trans('Invalid code.'),
+            ]);
         }
 
         return redirect()->intended(Filament::getUrl());
@@ -66,25 +62,17 @@ class TwoFactorAuthentication extends Component implements HasForms
 
     protected function buildTwoFactorData(): TwoFactorData
     {
-        return match ($this->method) {
-            'otp' => new TwoFactorData(
-                code: $this->code,
-                remember_device: $this->remember,
-                guard: 'admin'
-            ),
-            'recovery_code' => new TwoFactorData(
-                recovery_code: $this->recovery_code,
-                remember_device: $this->remember,
-                guard: 'admin'
-            ),
-            default => throw ValidationException::withMessages(['method' => 'Invalid method selected']),
-        };
+        $data = array_filter($this->form->getState(), fn (mixed $value) => filled($value));
+
+        $data['guard'] = 'admin';
+
+        return new TwoFactorData(...$data);
     }
 
     protected function getFormSchema(): array
     {
         return [
-            Forms\Components\Wizard::make(fn () => array_filter([
+            Forms\Components\Wizard::make(fn (Closure $get) => array_filter([
                 Forms\Components\Wizard\Step::make('Select method')
                     ->schema([
                         Forms\Components\Radio::make('method')
@@ -93,23 +81,33 @@ class TwoFactorAuthentication extends Component implements HasForms
                                 'otp' => 'Via OTP',
                                 'recovery_code' => 'Via Recovery Code',
                             ])
-                            ->required(),
+                            ->afterStateUpdated(fn (Closure $get, Closure $set) => match ($get('method')) {
+                                'otp' => $set('recovery_code', ''),
+                                'recovery_code' => $set('code', ''),
+                                default => null,
+                            })
+                            ->required()
+                            ->dehydrated(false),
                     ]),
-                match ($this->method) {
+                match ($get('method')) {
                     'otp' => Forms\Components\Wizard\Step::make('Via OTP')
                         ->schema([
                             Forms\Components\TextInput::make('code')
                                 ->label(trans('Code'))
-                                ->required(),
-                            Forms\Components\Checkbox::make('remember')
+                                ->required()
+                                ->default(''),
+                            Forms\Components\Checkbox::make('remember_device')
+                                ->statePath('remember_device')
                                 ->label(trans('Remember this device')),
                         ]),
                     'recovery_code' => Forms\Components\Wizard\Step::make('Via Recovery Code')
                         ->schema([
                             Forms\Components\TextInput::make('recovery_code')
                                 ->label(trans('Recovery Code'))
-                                ->required(),
-                            Forms\Components\Checkbox::make('remember')
+                                ->required()
+                                ->default(''),
+                            Forms\Components\Checkbox::make('remember_device')
+                                ->statePath('remember_device')
                                 ->label(trans('Remember this device')),
                         ]),
                     default => null
@@ -117,7 +115,7 @@ class TwoFactorAuthentication extends Component implements HasForms
             ]))
                 ->reactive()
                 ->cancelAction(new HtmlString(view('filament.auth.partials.two-factor-authentication-cancel')->render()))
-                ->submitAction(new HtmlString(view('filament.auth.partials.two-factor-authentication-submit')->render()))
+                ->submitAction(new HtmlString(view('filament.auth.partials.two-factor-authentication-submit')->render())),
         ];
     }
 

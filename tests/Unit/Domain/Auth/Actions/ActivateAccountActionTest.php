@@ -12,7 +12,7 @@ it('can activate account', function () {
 
     $user = User::create([
         'email' => 'test@user',
-        'active' => false
+        'active' => false,
     ]);
 
     $result = app(ActivateAccountAction::class)->execute($user);
@@ -26,7 +26,7 @@ it('does nothing when already active', function () {
 
     $user = User::create([
         'email' => 'test@user',
-        'active' => true
+        'active' => true,
     ]);
 
     $result = app(ActivateAccountAction::class)->execute($user);

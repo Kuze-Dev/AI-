@@ -11,12 +11,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(fn () => loginAsAdmin());
 
-it('can render page', function () {
-    livewire(CreateRole::class)
-        ->assertFormExists()
-        ->assertSuccessful();
-});
-
 it('can create', function () {
     assertDatabaseCount(Role::class, 1); // from seed
 

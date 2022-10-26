@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use App\Filament\Pages\HealthCheckResults;
 
-use function Pest\Laravel\get;
+use function Pest\Livewire\livewire;
 
 beforeEach(fn () => loginAsAdmin());
 
 it('render', function () {
-    get(HealthCheckResults::getUrl())
-        ->assertOk();
+    livewire(HealthCheckResults::class)
+        ->assertSuccessful();
 });

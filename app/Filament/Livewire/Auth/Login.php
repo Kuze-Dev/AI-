@@ -24,18 +24,15 @@ class Login extends Component implements HasForms
 {
     use InteractsWithForms;
 
-    public string $email;
+    public string $email = '';
 
-    public string $password;
+    public string $password = '';
 
     public bool $remember = false;
 
     public function mount(): void
     {
-        $this->form->fill([
-            'email' => '',
-            'password' => '',
-        ]);
+        $this->form->fill();
     }
 
     public function authenticate(): Redirector|RedirectResponse
@@ -59,16 +56,18 @@ class Login extends Component implements HasForms
     {
         return [
             TextInput::make('email')
-                ->label(__('filament::login.fields.email.label'))
+                ->label(trans('filament::login.fields.email.label'))
                 ->email()
                 ->required()
-                ->autocomplete(),
+                ->autocomplete()
+                ->default(''),
             TextInput::make('password')
-                ->label(__('filament::login.fields.password.label'))
+                ->label(trans('filament::login.fields.password.label'))
                 ->password()
-                ->required(),
+                ->required()
+                ->default(''),
             Checkbox::make('remember')
-                ->label(__('filament::login.fields.remember.label')),
+                ->label(trans('filament::login.fields.remember.label')),
         ];
     }
 
