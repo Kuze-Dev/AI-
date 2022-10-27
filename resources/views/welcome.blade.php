@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Halcyon Laravel | Tall Boilerplate</title>
+    <title>Halcyon Laravel | SaaS Boilerplate</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -90,11 +90,11 @@
         <div class="prose-lg max-w-none text-center">
             <h1>
                 Halcyon Laravel<br>
-                TALL Boilerplate
+                SaaS Boilerplate
             </h1>
             <p>
-                Great minds come to one to produce a lovely product to help ease development time of projects.<br>
-                We love it, and we know you'll do too!
+                Build SaaS platforms with ease. Serve a single running application to multiple customers. <br>
+                They wouldn't even notice they're running in a single server!
             </p>
         </div>
 
@@ -119,7 +119,7 @@
                     </div>
                 </div>
             </div>
-            <a href="https://bitbucket.org/halcyonlaravel/tall-boilerplate/wiki/Home">
+            <a href="https://bitbucket.org/halcyonlaravel/saas-boilerplate/wiki/Home">
                 <div class="h-full rounded overflow-hidden shadow-md bg-white">
                     <div class="px-6 py-4 flex gap-4 content-start">
                         <x-heroicon-o-book-open class="h-10 flex-shrink-0" />
