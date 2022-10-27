@@ -53,7 +53,7 @@ class Kernel extends HttpKernel
         'tenant' => [
             PreventAccessFromCentralDomains::class,
             InitializeTenancyByDomainOrSubdomain::class,
-        ]
+        ],
     ];
 
     /**

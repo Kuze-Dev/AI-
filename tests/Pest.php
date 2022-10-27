@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 use Database\Seeders\Auth\PermissionSeeder;
 use Database\Seeders\Auth\RoleSeeder;
+use Domain\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -36,8 +37,9 @@ uses(
             Storage::fake($disk);
         }
 
-        config()->set('tenancy.database.prefix', 'test_tenant');
+        config()->set('tenancy.database.prefix', 'test_');
     })
+    ->afterEach(fn () => Tenant::all()->each->delete())
     ->in('Feature', 'Unit');
 
 uses()->beforeEach(function () {
