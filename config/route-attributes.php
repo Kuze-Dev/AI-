@@ -18,6 +18,15 @@ return [
            'prefix' => 'api',
            'middleware' => 'api',
         ],
+        // app_path('HttpTenant/Controllers') => [
+        //     'as' => 'tenant.',
+        //     'middleware' => ['tenant', 'web'],
+        // ],
+        // app_path('HttpTenantApi/Controllers') => [
+        //     'prefix' => 'api',
+        //     'as' => 'tenant.api',
+        //     'middleware' => ['tenant', 'api'],
+        // ],
     ],
 
     /**

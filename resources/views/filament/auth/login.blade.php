@@ -6,6 +6,6 @@
     </x-filament::button>
 
     <div class="text-center">
-        <x-tables::link href="{{ route('filament.auth.password.request') }}">{{ trans('Forgot password?') }}</x-tables::link>
+        <x-tables::link href="#" wire:click.prevent="redirectToRequestPasswordReset">{{ trans('Forgot password?') }}</x-tables::link>
     </div>
 </form>

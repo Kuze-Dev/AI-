@@ -47,9 +47,19 @@ class Login extends Component implements HasForms
         ));
 
         return match ($result) {
-            LoginResult::TWO_FACTOR_REQUIRED => redirect()->route('filament.auth.two-factor'),
+            LoginResult::TWO_FACTOR_REQUIRED => $this->redirectToTwoFactorAuthentication(),
             LoginResult::SUCCESS => redirect()->intended(Filament::getUrl()),
         };
+    }
+
+    public function redirectToTwoFactorAuthentication(): Redirector|RedirectResponse
+    {
+        return redirect()->route('filament.auth.two-factor');
+    }
+
+    public function redirectToRequestPasswordReset(): Redirector|RedirectResponse
+    {
+        return redirect()->route('filament.auth.password.request');
     }
 
     protected function getFormSchema(): array

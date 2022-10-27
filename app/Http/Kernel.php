@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomainOrSubdomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 class Kernel extends HttpKernel
 {
@@ -44,6 +46,13 @@ class Kernel extends HttpKernel
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ],
+
+        'universal' => [],
+
+        'tenant' => [
+            PreventAccessFromCentralDomains::class,
+            InitializeTenancyByDomainOrSubdomain::class,
         ],
     ];
 
