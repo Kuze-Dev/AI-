@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomainOrSubdomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 class Kernel extends HttpKernel
 {
@@ -47,6 +49,11 @@ class Kernel extends HttpKernel
         ],
 
         'universal' => [],
+
+        'tenant' => [
+            PreventAccessFromCentralDomains::class,
+            InitializeTenancyByDomainOrSubdomain::class,
+        ]
     ];
 
     /**
