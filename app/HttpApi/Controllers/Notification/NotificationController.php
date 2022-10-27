@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Api\Notification;
+namespace App\HttpApi\Controllers\Notification;
 
-use App\Http\Controllers\Controller;
-use App\Http\Resource\NotificationResource;
+use App\HttpApi\Resources\NotificationResource;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +20,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
     // TODO: auth for guard api
     Middleware(['auth']),
 ]
-class NotificationController extends Controller
+class NotificationController
 {
     #[Get('/')]
     public function index(): JsonApiResourceCollection

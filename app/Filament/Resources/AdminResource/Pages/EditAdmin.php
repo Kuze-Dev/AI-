@@ -11,6 +11,8 @@ use Domain\Admin\Models\Admin;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class EditAdmin extends EditRecord
 {
@@ -25,9 +27,11 @@ class EditAdmin extends EditRecord
         ];
     }
 
-    /** @param  Admin  $record */
+    /** @param Admin $record
+     * @throws Throwable
+     */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return app(UpdateAdminAction::class)->execute($record, new AdminData(...$data));
+        return DB::transaction(fn () => app(UpdateAdminAction::class)->execute($record, new AdminData(...$data)));
     }
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Resource;
+namespace App\HttpApi\Resources;
 
 use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;

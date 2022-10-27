@@ -30,5 +30,6 @@
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="DEBUGBAR_ENABLED" value="false"/>
         <env name="ADMIN_CHANGE_EMAIL" value="false"/>
+        <env name="SETTINGS_CACHE_ENABLED" value="false"/>
     </php>
 </phpunit>
