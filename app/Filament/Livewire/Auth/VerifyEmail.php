@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Livewire\Auth;
 
-use App\Http\Requests\Admin\Auth\VerifyEmailRequest;
+use App\Filament\Requests\VerifyEmailRequest;
 use Domain\Auth\Actions\VerifyEmailAction;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;

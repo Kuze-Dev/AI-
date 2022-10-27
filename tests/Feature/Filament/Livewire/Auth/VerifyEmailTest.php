@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Filament\Livewire\Auth\VerifyEmail;
-use App\Http\Requests\Admin\Auth\VerifyEmailRequest;
+use App\Filament\Requests\VerifyEmailRequest;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Mockery\MockInterface;
 

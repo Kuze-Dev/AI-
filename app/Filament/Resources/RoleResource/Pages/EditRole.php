@@ -10,7 +10,9 @@ use Domain\Role\DataTransferObjects\RoleData;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use Throwable;
 
 class EditRole extends EditRecord
 {
@@ -23,9 +25,11 @@ class EditRole extends EditRecord
         ];
     }
 
-    /** @param  Role  $record */
+    /** @param Role $record
+     * @throws Throwable
+     */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return app(UpdateRoleAction::class)->execute($record, new RoleData(...$data));
+        return DB::transaction(fn () => app(UpdateRoleAction::class)->execute($record, new RoleData(...$data)));
     }
 }

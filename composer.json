@@ -8,6 +8,7 @@
         "composer-runtime-api": "^2.0",
         "bacon/bacon-qr-code": "^2.0",
         "filament/filament": "^2.16.6",
+        "filament/spatie-laravel-settings-plugin": "^2.0",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^9.28",
         "laravel/sanctum": "^3.0",
@@ -74,15 +75,18 @@
             "@php artisan key:generate --ansi"
         ],
         "clear-all": [
+            "composer dumpautoload -o",
             "@php artisan optimize:clear --ansi",
-            "composer dumpautoload -o"
+            "@php artisan settings:clear-discovered --ansi",
+            "@php artisan settings:clear-cache --ansi"
         ],
         "cache-all": [
+            "composer dumpautoload -o",
             "@php artisan event:cache --ansi",
-            "@php artisan view:cache --ansi",
-            "@php artisan route:cache --ansi",
             "@php artisan config:cache --ansi",
-            "@php artisan view:cache --ansi"
+            "@php artisan route:cache --ansi",
+            "@php artisan view:cache --ansi",
+            "@php artisan settings:discover --ansi"
         ],
         "reset": [
             "composer clear-all",

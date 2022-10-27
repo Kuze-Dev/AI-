@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Api\Notification;
+namespace App\HttpApi\Controllers\Notification;
 
-use App\Http\Controllers\Controller;
 use Domain\Notification\Actions\MarkAsReadNotificationAction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Notifications\DatabaseNotification;
@@ -18,7 +17,7 @@ use Spatie\RouteAttributes\Attributes\Prefix;
     // TODO: auth for guard api
     Middleware(['auth']),
 ]
-class MarkNotificationAsReadController extends Controller
+class MarkNotificationAsReadController
 {
     #[Patch('{databaseNotification}/mark-as-read')]
     public function __invoke(DatabaseNotification $databaseNotification): JsonResponse
