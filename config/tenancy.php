@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Database\Seeders\Tenant\DatabaseSeeder;
 use Domain\Tenant\Models\Tenant;
+use Illuminate\Support\Str;
 use Stancl\Tenancy\Database\Models\Domain;
 
 return [
@@ -51,7 +52,7 @@ return [
          * Tenant database names are created like this:
          * prefix + tenant_id + suffix.
          */
-        'prefix' => 'tenant',
+        'prefix' => Str::snake(env('APP_NAME')).'_',
         'suffix' => '',
 
         /**

@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use Domain\Tenant\Models\Tenant;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Stancl\JobPipeline\JobPipeline;
+use Stancl\Tenancy\DatabaseConfig;
 use Stancl\Tenancy\Events;
+use Stancl\Tenancy\Features\TenantConfig;
 use Stancl\Tenancy\Jobs;
 use Stancl\Tenancy\Listeners;
 use Stancl\Tenancy\Middleware;
@@ -109,12 +112,14 @@ class TenancyServiceProvider extends ServiceProvider
 
         $this->makeTenancyMiddlewareHighestPriority();
 
-        \Stancl\Tenancy\Features\TenantConfig::$storageToConfigMap = [
+        TenantConfig::$storageToConfigMap = [
             'name' => [
                 'app.name',
                 'filament.brand',
             ],
         ];
+
+        DatabaseConfig::generateDatabaseNamesUsing(fn (Tenant $tenant) => config('tenancy.database.prefix').$tenant->name.config('tenancy.database.suffix'));
     }
 
     protected function bootEvents(): void
