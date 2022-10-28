@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Admin\Models;
 
+use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Admin\Notifications\ResetPassword;
 use Domain\Admin\Notifications\VerifyEmail;
 use Domain\Auth\Contracts\HasActiveState as HasActiveStateContract;
@@ -19,6 +20,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -40,14 +44,17 @@ use Spatie\Permission\Traits\HasRoles;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read int|null $activities_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Permission\Models\Permission[] $permissions
  * @property-read int|null $permissions_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Permission\Models\Role[] $roles
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Role\Models\Role[] $roles
  * @property-read int|null $roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Sanctum\PersonalAccessToken[] $tokens
  * @property-read int|null $tokens_count
+ * @property-read \Domain\Auth\Model\TwoFactorAuthentication|null $twoFactorAuthentication
  * @method static \Illuminate\Database\Eloquent\Builder|Admin newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Admin newQuery()
  * @method static \Illuminate\Database\Query\Builder|Admin onlyTrashed()
@@ -74,7 +81,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static \Illuminate\Database\Query\Builder|Admin withoutTrashed()
  * @mixin \Eloquent
  */
-class Admin extends Authenticatable implements MustVerifyEmail, HasName, TwoFactorAuthenticatableContract, FilamentUser, HasActiveStateContract
+class Admin extends Authenticatable implements MustVerifyEmail, HasName, TwoFactorAuthenticatableContract, FilamentUser, HasActiveStateContract, IsActivitySubject
 {
     use HasApiTokens;
     use HasRoles;
@@ -82,6 +89,7 @@ class Admin extends Authenticatable implements MustVerifyEmail, HasName, TwoFact
     use SoftDeletes;
     use TwoFactorAuthenticatable;
     use HasActiveState;
+    use LogsActivity;
 
     protected $fillable = [
         'first_name',
@@ -104,6 +112,19 @@ class Admin extends Authenticatable implements MustVerifyEmail, HasName, TwoFact
         'last_login_at' => 'datetime',
         'to_be_logged_out' => 'boolean',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
+    public function getActivitySubjectDescription(Activity $activity): string
+    {
+        return 'Admin: '.$this->full_name;
+    }
 
     public function isZeroDayAdmin(): bool
     {

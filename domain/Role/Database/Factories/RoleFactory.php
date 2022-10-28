@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Role\Database\Factories;
 
+use Domain\Role\Models\Role;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Spatie\Permission\Models\Role;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Spatie\Permission\Models\Role>

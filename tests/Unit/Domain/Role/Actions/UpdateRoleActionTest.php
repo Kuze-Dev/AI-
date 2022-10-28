@@ -5,8 +5,8 @@ declare(strict_types=1);
 use Domain\Role\Actions\UpdateRoleAction;
 use Domain\Role\DataTransferObjects\RoleData;
 use Domain\Role\Exceptions\CantModifySuperAdminRoleException;
+use Domain\Role\Models\Role;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\assertDatabaseHas;
 

@@ -11,7 +11,6 @@ use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Role;
 use Throwable;
 
 class EditRole extends EditRecord
@@ -25,7 +24,8 @@ class EditRole extends EditRecord
         ];
     }
 
-    /** @param Role $record
+    /**
+     * @param  \Domain\Role\Models\Role  $record
      * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model

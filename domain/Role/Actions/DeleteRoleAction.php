@@ -6,7 +6,7 @@ namespace Domain\Role\Actions;
 
 use Domain\Role\Exceptions\CantDeleteRoleWithAssociatedUsersException;
 use Domain\Role\Exceptions\CantDeleteSuperAdminRoleException;
-use Spatie\Permission\Models\Role;
+use Domain\Role\Models\Role;
 
 class DeleteRoleAction
 {

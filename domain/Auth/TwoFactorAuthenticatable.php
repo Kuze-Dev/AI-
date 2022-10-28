@@ -8,7 +8,7 @@ use Domain\Auth\Model\TwoFactorAuthentication;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
- * @property-read TwoFactorAuthentication $twoFactorAuthentication
+ * @property-read \Domain\Auth\Model\TwoFactorAuthentication|null $twoFactorAuthentication
  */
 trait TwoFactorAuthenticatable
 {
@@ -27,7 +27,7 @@ trait TwoFactorAuthenticatable
     public function hasEnabledTwoFactorAuthentication(): bool
     {
         if ($this->relationLoaded('twoFactorAuthentication')) {
-            return (bool) $this->twoFactorAuthentication->enabled_at;
+            return $this->twoFactorAuthentication?->enabled_at !== null;
         }
 
         return $this->twoFactorAuthentication()->whereNotNull('enabled_at')->exists();

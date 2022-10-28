@@ -15,7 +15,6 @@ declare(strict_types=1);
 
 use Database\Seeders\Auth\PermissionSeeder;
 use Database\Seeders\Auth\RoleSeeder;
-use Domain\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -37,27 +36,28 @@ uses(
             Storage::fake($disk);
         }
 
-        config()->set('tenancy.database.prefix', 'test_');
-    })
-    ->afterEach(fn () => Tenant::all()->each->delete())
-    ->in('Feature', 'Unit');
-
-uses()->beforeEach(function () {
-    DB::connection()->getSchemaBuilder()->create('test_users', function (Blueprint $table) {
-        $table->increments('id');
-        $table->string('email');
-        $table->timestamp('email_verified_at')->nullable();
-        $table->boolean('active')->default(true);
-    });
-
-    Relation::morphMap(['test_user' => User::class]);
-})->in('Unit/Domain/Auth');
-
-uses()
-    ->beforeEach(function () {
         seed([
             PermissionSeeder::class,
             RoleSeeder::class,
         ]);
+
+        config()->set('tenancy.database.prefix', 'test_');
     })
-    ->in('Feature/Filament');
+    ->in('Feature');
+
+uses(
+    Illuminate\Foundation\Testing\TestCase::class,
+    Tests\CreatesApplication::class,
+    Illuminate\Foundation\Testing\LazilyRefreshDatabase::class,
+)
+    ->beforeEach(function () {
+        DB::connection()->getSchemaBuilder()->create('test_users', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('email');
+            $table->timestamp('email_verified_at')->nullable();
+            $table->boolean('active')->default(true);
+        });
+
+        Relation::morphMap(['test_user' => User::class]);
+    })
+    ->in('Unit');

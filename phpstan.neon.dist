@@ -7,7 +7,6 @@ parameters:
 
     stubFiles:
         - stubs/Permission.stub
-        - stubs/Role.stub
 
     paths:
         - app
