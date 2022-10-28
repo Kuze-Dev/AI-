@@ -6,6 +6,8 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Foundation\Console\OptimizeClearCommand;
+use Illuminate\Support\Facades\Artisan;
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,5 +23,7 @@ class DatabaseSeeder extends Seeder
             Auth\RoleSeeder::class,
             Auth\AdminSeeder::class,
         ]);
+
+        Artisan::call(OptimizeClearCommand::class);
     }
 }

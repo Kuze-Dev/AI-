@@ -31,9 +31,6 @@ class FilamentServiceProvider extends ServiceProvider
                 NavigationGroup::make('Access')
                     ->icon('heroicon-s-lock-closed'),
 
-                NavigationGroup::make('Settings')
-                    ->icon('heroicon-s-cog'),
-
                 NavigationGroup::make('System')
                     ->icon('heroicon-s-exclamation'),
             ]);
@@ -48,12 +45,11 @@ class FilamentServiceProvider extends ServiceProvider
                             href="https://halcyonwebdesign.com.ph/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="text-gray-300 hover:text-primary-500 transition"
+                            class="hover:text-primary-500 transition"
                         >
                             Halcyon Web Design
                         </a>
                     </p>
-
                 HTML,
         );
 

@@ -12,6 +12,13 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as FoundationUser;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * @property int $id
+ * @property string $email
+ * @property string|null $email_verified_at
+ * @property bool $active
+ * @mixin \Eloquent
+ */
 class User extends FoundationUser implements TwoFactorAuthenticatableContract, MustVerifyEmail, HasActiveStateContract
 {
     use TwoFactorAuthenticatable;

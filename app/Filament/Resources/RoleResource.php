@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Resources\RoleResource\Pages;
 use App\Filament\Resources\RoleResource\Support\PermissionGroup;
 use App\Filament\Resources\RoleResource\Support\PermissionGroupCollection;
 use Closure;
+use Domain\Role\Models\Role;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -17,7 +19,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 class RoleResource extends Resource
 {
@@ -221,5 +222,12 @@ class RoleResource extends Resource
     private static function refreshPermissionGroupAbilitiesState(string $groupName, PermissionGroup $permissionGroup, Closure $get, Closure $set): void
     {
         $set("{$groupName}_abilities", $get($groupName) ? $permissionGroup->abilities->pluck('id')->toArray() : []);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            ActivitiesRelationManager::class,
+        ];
     }
 }

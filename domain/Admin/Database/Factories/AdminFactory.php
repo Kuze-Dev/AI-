@@ -67,6 +67,10 @@ class AdminFactory extends Factory
         return $this->afterCreating(function (Admin $admin) {
             app(SetupTwoFactorAuthenticationAction::class)->execute($admin);
 
+            if ( ! $admin->twoFactorAuthentication?->secret) {
+                return;
+            }
+
             $code = app(TwoFactorAuthenticationProvider::class)->getCurrentOtp($admin->twoFactorAuthentication->secret);
 
             app(EnableTwoFactorAuthenticationAction::class)->execute($admin, $code);

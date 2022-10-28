@@ -16,9 +16,14 @@ abstract class BaseSettings extends SettingsPage
 
     protected static ?string $navigationIcon = 'heroicon-o-cog';
 
+    public static function getSlug(): string
+    {
+        return static::$slug ?? static::getSettings()::group();
+    }
+
     public static function getRouteName(): string
     {
-        return 'filament.pages.settings.'.static::getSettings()::group();
+        return 'filament.pages.settings.'.self::getSlug();
     }
 
     protected function getBreadcrumb(): string
@@ -39,10 +44,11 @@ abstract class BaseSettings extends SettingsPage
     public static function getRoutes(): Closure
     {
         return function () {
-            $group = static::getSettings()::group();
-            Route::get('settings/'.$group, static::class)
+            $slug = self::getSlug();
+
+            Route::get('settings/'.$slug, static::class)
                 ->middleware(static::getMiddlewares())
-                ->name('settings.'.$group);
+                ->name('settings.'.$slug);
         };
     }
 }

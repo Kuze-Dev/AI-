@@ -6,7 +6,7 @@ use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Role\Actions\DeleteRoleAction;
 use Domain\Role\Exceptions\CantDeleteRoleWithAssociatedUsersException;
 use Domain\Role\Exceptions\CantDeleteSuperAdminRoleException;
-use Spatie\Permission\Models\Role;
+use Domain\Role\Models\Role;
 
 use function Pest\Laravel\assertModelMissing;
 

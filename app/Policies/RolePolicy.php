@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Policies\Concerns\ChecksWildcardPermissions;
+use Domain\Role\Models\Role;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User;
-use Spatie\Permission\Models\Role;
 
 class RolePolicy
 {

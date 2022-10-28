@@ -6,7 +6,7 @@ namespace App\Filament\Pages;
 
 class HealthCheckResults extends \ShuvroRoy\FilamentSpatieLaravelHealth\Pages\HealthCheckResults
 {
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     protected static function getNavigationGroup(): string
     {
