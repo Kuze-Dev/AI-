@@ -52,7 +52,7 @@ return [
          * Tenant database names are created like this:
          * prefix + tenant_id + suffix.
          */
-        'prefix' => Str::snake(env('APP_NAME')).'_',
+        'prefix' => Str::of(env('APP_NAME'))->lower()->snake().'_',
         'suffix' => '',
 
         /**
