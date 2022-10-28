@@ -10,6 +10,6 @@ trait ContextualSettingsPage
 {
     public static function getRouteName(): string
     {
-        return Filament::currentContext().'.pages.settings.'.static::getSettings()::group();
+        return Filament::currentContext().'.pages.settings.'.static::getSlug();
     }
 }
