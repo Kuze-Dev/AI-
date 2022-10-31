@@ -7,6 +7,7 @@ namespace App\Providers;
 use Domain\Tenant\Models\Tenant;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Stancl\JobPipeline\JobPipeline;
 use Stancl\Tenancy\DatabaseConfig;
 use Stancl\Tenancy\Events;
@@ -119,7 +120,7 @@ class TenancyServiceProvider extends ServiceProvider
             ],
         ];
 
-        DatabaseConfig::generateDatabaseNamesUsing(fn (Tenant $tenant) => config('tenancy.database.prefix').$tenant->name.config('tenancy.database.suffix'));
+        DatabaseConfig::generateDatabaseNamesUsing(fn (Tenant $tenant) => config('tenancy.database.prefix').Str::snake($tenant->name).config('tenancy.database.suffix'));
     }
 
     protected function bootEvents(): void
