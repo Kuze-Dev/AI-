@@ -100,7 +100,7 @@ return [
         /**
          * Each disk listed in the 'disks' array will be suffixed by the suffix_base, followed by the tenant_id.
          */
-        'suffix_base' => 'tenant',
+        'suffix_base' => 'tenants/'.Str::of(env('APP_NAME'))->lower()->snake().'_',
         'disks' => [
             'local',
             'public',
@@ -186,7 +186,7 @@ return [
      */
     'migration_parameters' => [
         '--force' => true, // This needs to be true to run migrations in production.
-        '--path' => [database_path('migrations/tenant')],
+        '--path' => [database_path('migrations/tenant'), database_path('migrations/tenant/settings')],
         '--realpath' => true,
     ],
 
