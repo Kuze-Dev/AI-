@@ -8,6 +8,7 @@ use App\Jobs\CreateFrameworkDirectoriesForTenant;
 use Domain\Tenant\Models\Tenant;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Stancl\JobPipeline\JobPipeline;
 use Stancl\Tenancy\Controllers\TenantAssetsController;
 use Stancl\Tenancy\DatabaseConfig;
@@ -122,7 +123,7 @@ class TenancyServiceProvider extends ServiceProvider
             ],
         ];
 
-        DatabaseConfig::generateDatabaseNamesUsing(fn (Tenant $tenant) => config('tenancy.database.prefix').$tenant->name.config('tenancy.database.suffix'));
+        DatabaseConfig::generateDatabaseNamesUsing(fn (Tenant $tenant) => config('tenancy.database.prefix').Str::snake($tenant->name).config('tenancy.database.suffix'));
 
         TenantAssetsController::$tenancyMiddleware = 'tenant';
     }
