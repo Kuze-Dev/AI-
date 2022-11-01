@@ -1,7 +1,7 @@
 {
-    "name": "halcyon/saas-boilerplate",
-    "type": "boilerplate",
-    "description": "Halcyon SaaS Boilerplate",
+    "name": "halcyon/saas-ecommerce",
+    "type": "project",
+    "description": "SaaS eCommerce",
     "license": "proprietary",
     "require": {
         "php": "^8.1.9",
