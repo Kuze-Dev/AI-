@@ -47,14 +47,14 @@ definitions:
 
 pipelines:
   branches:
-    master:
+    develop:
       - parallel:
           - step: *check-format
           - step: *analyse
           - step: *test
 
   pull-requests:
-    "**":
+    "develop":
       - parallel:
           - step: *check-format
           - step: *analyse
