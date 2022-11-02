@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
+use Domain\Tenant\Database\Factories\TenantFactory;
 
 use function Pest\Laravel\actingAs;
 
@@ -25,4 +26,11 @@ function loginAsUser(Admin $admin = null): Admin
     actingAs($admin);
 
     return $admin;
+}
+
+function testInTenantContext()
+{
+    $tenant = TenantFactory::new()->create(['name' => 'testing']);
+
+    tenancy()->initialize($tenant);
 }
