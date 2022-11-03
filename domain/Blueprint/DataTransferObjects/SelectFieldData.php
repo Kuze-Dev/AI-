@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Blueprint\DataTransferObjects;
 
 use Domain\Blueprint\Enums\FieldType;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class SelectFieldData extends FieldData
@@ -18,7 +19,6 @@ class SelectFieldData extends FieldData
         public readonly FieldType $type = FieldType::SELECT,
         public readonly array $rules = [],
         public readonly array $options = [],
-        public readonly ?string $default = null,
         public readonly ?bool $multiple = false,
     ) {
     }
@@ -37,6 +37,6 @@ class SelectFieldData extends FieldData
                 ->toArray();
         }
 
-        return new self(...$data);
+        return new self(...Arr::only($data, ['title', 'rules', 'options', 'multiple']));
     }
 }

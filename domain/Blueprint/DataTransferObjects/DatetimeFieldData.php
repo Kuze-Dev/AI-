@@ -6,6 +6,7 @@ namespace Domain\Blueprint\DataTransferObjects;
 
 use Carbon\Carbon;
 use Domain\Blueprint\Enums\FieldType;
+use Illuminate\Support\Arr;
 
 class DatetimeFieldData extends FieldData
 {
@@ -34,6 +35,6 @@ class DatetimeFieldData extends FieldData
             $data['max'] = Carbon::parse($data['max']);
         }
 
-        return new self(...$data);
+        return new self(...Arr::only($data, ['title', 'rules', 'min', 'max', 'format']));
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Blueprint\DataTransferObjects;
 
 use Domain\Blueprint\Enums\FieldType;
+use Illuminate\Support\Arr;
 
 class FileFieldData extends FieldData
 {
@@ -32,6 +33,6 @@ class FileFieldData extends FieldData
             $data['type'] = FieldType::from($data['type']);
         }
 
-        return new self(...$data);
+        return new self(...Arr::only($data, ['title', 'rules', 'multiple', 'reorder', 'accept', 'min_size', 'max_size', 'min_files', 'max_files']));
     }
 }

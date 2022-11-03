@@ -61,7 +61,6 @@ it('can parse array to SchemaData', function (FieldType $type, array $data) {
             'type' => 'select',
             'rules' => ['required'],
             'options' => ['foo', 'bar', 'baz'],
-            'default' => 'foo',
             'multiple' => true,
         ],
     ],
