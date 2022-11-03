@@ -13,6 +13,7 @@ class DatetimeFieldData extends FieldData
     /** @param array<string> $rules */
     private function __construct(
         public readonly string $title,
+        public readonly string $state_name,
         public readonly FieldType $type = FieldType::DATETIME,
         public readonly array $rules = [],
         public readonly ?Carbon $min = null,
@@ -35,6 +36,6 @@ class DatetimeFieldData extends FieldData
             $data['max'] = Carbon::parse($data['max']);
         }
 
-        return new self(...Arr::only($data, ['title', 'rules', 'min', 'max', 'format']));
+        return new self(...Arr::only($data, ['title', 'state_name', 'rules', 'min', 'max', 'format']));
     }
 }

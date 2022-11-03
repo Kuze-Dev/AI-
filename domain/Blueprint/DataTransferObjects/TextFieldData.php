@@ -12,6 +12,7 @@ class TextFieldData extends FieldData
     /** @param array<string> $rules */
     public function __construct(
         public readonly string $title,
+        public readonly string $state_name,
         public readonly FieldType $type,
         public readonly array $rules = [],
         public readonly ?int $min_length = null,
@@ -28,6 +29,6 @@ class TextFieldData extends FieldData
             $data['type'] = FieldType::from($data['type']);
         }
 
-        return new self(...Arr::only($data, ['title', 'type', 'rules', 'min_length', 'max_length', 'min', 'max', 'step']));
+        return new self(...Arr::only($data, ['title', 'state_name', 'type', 'rules', 'min_length', 'max_length', 'min', 'max', 'step']));
     }
 }

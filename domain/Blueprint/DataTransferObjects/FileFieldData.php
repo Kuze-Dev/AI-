@@ -15,6 +15,7 @@ class FileFieldData extends FieldData
      */
     private function __construct(
         public readonly string $title,
+        public readonly string $state_name,
         public readonly FieldType $type = FieldType::FILE,
         public readonly array $rules = [],
         public readonly bool $multiple = false,
@@ -33,6 +34,6 @@ class FileFieldData extends FieldData
             $data['type'] = FieldType::from($data['type']);
         }
 
-        return new self(...Arr::only($data, ['title', 'rules', 'multiple', 'reorder', 'accept', 'min_size', 'max_size', 'min_files', 'max_files']));
+        return new self(...Arr::only($data, ['title', 'state_name', 'rules', 'multiple', 'reorder', 'accept', 'min_size', 'max_size', 'min_files', 'max_files']));
     }
 }

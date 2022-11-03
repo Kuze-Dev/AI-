@@ -12,6 +12,7 @@ class TextareaFieldData extends FieldData
     /** @param array<string> $rules */
     private function __construct(
         public readonly string $title,
+        public readonly string $state_name,
         public readonly FieldType $type = FieldType::TEXTAREA,
         public readonly array $rules = [],
         public readonly ?int $min_length = null,
@@ -27,6 +28,6 @@ class TextareaFieldData extends FieldData
             $data['type'] = FieldType::from($data['type']);
         }
 
-        return new self(...Arr::only($data, ['title', 'rules', 'min_length', 'max_length', 'rows', 'cols']));
+        return new self(...Arr::only($data, ['title', 'state_name', 'rules', 'min_length', 'max_length', 'rows', 'cols']));
     }
 }

@@ -5,22 +5,22 @@ declare(strict_types=1);
 namespace Domain\Blueprint\DataTransferObjects;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Str;
 
-class SchemaData implements Arrayable
+class OptionData implements Arrayable
 {
     /** @param array<SectionData> $sections */
     private function __construct(
-        public readonly array $sections
+        public readonly string $label,
+        public readonly string $value
     ) {
     }
 
     public static function fromArray(array $data): self
     {
         return new self(
-            sections: array_map(
-                fn (array $section) => SectionData::fromArray($section),
-                $data['sections']
-            )
+            label: $data['label'],
+            value: $data['value'] ?? Str::snake($data['label']),
         );
     }
 

@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Domain\Blueprint\DataTransferObjects;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
 
-class SectionData
+class SectionData implements Arrayable
 {
-    /** @param array<string, FieldData> $fields */
+    /** @param array<FieldData> $fields */
     private function __construct(
         public readonly string $title,
+        public readonly string $state_name,
         public readonly array $fields
     ) {
     }
@@ -19,11 +21,16 @@ class SectionData
     {
         return new self(
             title: $data['title'],
-            fields: collect($data['fields'])
-                ->mapWithKeys(fn (array $field, string|int $key) => [
-                    (is_string($key) ? $key : Str::slug($field['title'])) => FieldData::fromArray($field),
-                ])
-                ->toArray()
+            state_name: $data['state_name'] ?? Str::snake($data['title']),
+            fields: array_map(
+                fn (array $field) => FieldData::fromArray($field),
+                $data['fields']
+            )
         );
+    }
+
+    public function toArray()
+    {
+        return (array) $this;
     }
 }

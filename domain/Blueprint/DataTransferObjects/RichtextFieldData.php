@@ -16,6 +16,7 @@ class RichtextFieldData extends FieldData
      */
     private function __construct(
         public readonly string $title,
+        public readonly string $state_name,
         public readonly FieldType $type = FieldType::RICHTEXT,
         public readonly array $rules = [],
         public readonly array $buttons = [],
@@ -37,6 +38,6 @@ class RichtextFieldData extends FieldData
             );
         }
 
-        return new self(...Arr::only($data, ['title', 'rules', 'buttons']));
+        return new self(...Arr::only($data, ['title', 'state_name', 'rules', 'buttons']));
     }
 }
