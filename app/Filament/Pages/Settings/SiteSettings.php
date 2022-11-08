@@ -9,6 +9,7 @@ use Filament\Forms\Components\Card;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Livewire\TemporaryUploadedFile;
 
 class SiteSettings extends BaseSettings
 {
@@ -33,17 +34,21 @@ class SiteSettings extends BaseSettings
                     ->maxLength(100)
                     ->columnSpan('full'),
                 FileUpload::make('logo')
-                    ->image()
                     ->acceptedFileTypes(['image/png', 'image/webp', 'image/jpg', 'image/jpeg'])
-                    ->maxSize(1000)
-                    ->required(),
+                    ->maxSize(1_000)
+                    ->required()
+                    ->getUploadedFileNameForStorageUsing(static function (TemporaryUploadedFile $file) {
+                        return 'logo.'.$file->extension();
+                    }),
                 FileUpload::make('favicon')
-                    ->image()
                     ->acceptedFileTypes(['image/ico', 'image/png', 'image/webp', 'image/jpg', 'image/jpeg'])
                     ->imageResizeTargetHeight('100')
                     ->imageResizeTargetWidth('100')
-                    ->maxSize(1000)
-                    ->required(),
+                    ->maxSize(1_000)
+                    ->required()
+                    ->getUploadedFileNameForStorageUsing(static function (TemporaryUploadedFile $file) {
+                        return 'favicon.'.$file->extension();
+                    }),
             ])
                 ->columns(2),
         ];

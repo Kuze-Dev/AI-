@@ -32,6 +32,7 @@ class AdminFactory extends Factory
 
                 return "{$firstName}.{$lastName}@{$domain}";
             },
+            'active' => true,
             'email_verified_at' => now(),
             'password' => 'secret',
             'remember_token' => Str::random(10),

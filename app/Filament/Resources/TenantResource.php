@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\TenantResource\Pages;
+use App\Filament\Rules\FullyQualifiedDomainNameRule;
 use Domain\Tenant\Models\Tenant;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -41,7 +42,8 @@ class TenantResource extends Resource
                             ->minItems(1)
                             ->schema([
                                 Forms\Components\TextInput::make('domain')
-                                    ->required(),
+                                    ->required()
+                                    ->rules([new FullyQualifiedDomainNameRule()]),
                             ]),
                     ]),
             ]);
