@@ -315,8 +315,8 @@ return [
     'middleware' => [
         'auth' => [
             Authenticate::class,
-            'verified:admin.verification.notice',
-            'active:admin.account-deactivated.notice',
+            'verified:filament.auth.verification.notice',
+            'active:filament.auth.account-deactivated.notice',
         ],
         'base' => [
             EncryptCookies::class,

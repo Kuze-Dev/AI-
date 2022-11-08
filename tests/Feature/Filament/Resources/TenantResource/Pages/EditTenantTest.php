@@ -26,19 +26,19 @@ it('can render page', function () {
 });
 
 it('can edit tenant', function () {
-    $tenant = TenantFactory::new()->withDomains('foo')->createOne();
+    $tenant = TenantFactory::new()->withDomains()->createOne();
 
     livewire(EditTenant::class, ['record' => $tenant->getKey()])
         ->fillForm([
             'name' => 'Test',
             'domains' => [
-                ['domain' => 'test'],
+                ['domain' => 'test.localhost'],
             ],
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     assertDatabaseHas(Tenant::class, ['name' => 'Test']);
-    assertDatabaseHas(Domain::class, ['domain' => 'test']);
+    assertDatabaseHas(Domain::class, ['domain' => 'test.localhost']);
     assertDatabaseCount(Domain::class, 1);
 });

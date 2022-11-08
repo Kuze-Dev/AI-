@@ -20,7 +20,6 @@ function loginAsAdmin(Admin $admin = null): Admin
 function loginAsUser(Admin $admin = null): Admin
 {
     $admin ??= AdminFactory::new()
-        ->active()
         ->createOne();
 
     actingAs($admin);
