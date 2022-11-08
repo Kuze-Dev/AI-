@@ -11,16 +11,20 @@ class SchemaDataCast implements CastsAttributes
 {
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  mixed  $value
+     * @param  string|array  $value
      */
     public function get($model, string $key, $value, array $attributes): SchemaData
     {
+        if (is_string($value)) {
+            $value = json_decode($value, true);
+        }
+
         return SchemaData::fromArray($value);
     }
 
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  mixed  $value
+     * @param  array  $value
      */
     public function set($model, string $key, $value, array $attributes): string
     {
