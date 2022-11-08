@@ -15,10 +15,10 @@ it('can create blueprint', function () {
         name: 'Foo',
         schema: SchemaData::fromArray([
             'sections' => [
-                'main' => [
+                [
                     'title' => 'Main',
                     'fields' => [
-                        'foo' => [
+                        [
                             'title' => 'Foo',
                             'type' => 'text',
                         ],
