@@ -6,6 +6,9 @@ namespace Domain\Blueprint\DataTransferObjects;
 
 use Illuminate\Contracts\Support\Arrayable;
 
+/**
+ * @implements Arrayable<string, mixed>
+ */
 class SchemaData implements Arrayable
 {
     /** @param array<SectionData> $sections */
@@ -24,6 +27,7 @@ class SchemaData implements Arrayable
         );
     }
 
+    /** @return array<string, mixed> */
     public function toArray()
     {
         return (array) $this;

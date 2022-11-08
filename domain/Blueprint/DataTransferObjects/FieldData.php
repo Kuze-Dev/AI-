@@ -6,8 +6,10 @@ namespace Domain\Blueprint\DataTransferObjects;
 
 use Domain\Blueprint\Enums\FieldType;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Str;
 
+/**
+ * @implements Arrayable<string, mixed>
+ */
 abstract class FieldData implements Arrayable
 {
     /** @param array<string> $rules */
@@ -25,13 +27,10 @@ abstract class FieldData implements Arrayable
             $data['type'] = FieldType::from($data['type']);
         }
 
-        if (!isset($data['state_name'])) {
-            $data['state_name'] = Str::snake($data['title']);
-        }
-
         return $data['type']->getFieldDataClass()::fromArray($data);
     }
 
+    /** @return array<string, mixed> */
     public function toArray()
     {
         return (array) $this;

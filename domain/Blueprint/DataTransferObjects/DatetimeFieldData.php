@@ -6,7 +6,7 @@ namespace Domain\Blueprint\DataTransferObjects;
 
 use Carbon\Carbon;
 use Domain\Blueprint\Enums\FieldType;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class DatetimeFieldData extends FieldData
 {
@@ -28,14 +28,21 @@ class DatetimeFieldData extends FieldData
             $data['type'] = FieldType::from($data['type']);
         }
 
-        if ( ! $data['min'] instanceof Carbon) {
+        if (($data['min'] ?? false) && ! $data['min'] instanceof Carbon) {
             $data['min'] = Carbon::parse($data['min']);
         }
 
-        if ( ! $data['max'] instanceof Carbon) {
+        if (($data['max'] ?? false) && ! $data['max'] instanceof Carbon) {
             $data['max'] = Carbon::parse($data['max']);
         }
 
-        return new self(...Arr::only($data, ['title', 'state_name', 'rules', 'min', 'max', 'format']));
+        return new self(
+            title: $data['title'],
+            state_name: $data['state_name'] ?? Str::snake($data['title']),
+            rules: $data['rules'] = [],
+            min: $data['min'] ?? null,
+            max: $data['max'] ?? null,
+            format: $data['format'] ?? null,
+        );
     }
 }

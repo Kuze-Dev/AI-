@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Domain\Blueprint\DataTransferObjects;
 
 use Domain\Blueprint\Enums\FieldType;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class TextareaFieldData extends FieldData
 {
@@ -28,6 +28,14 @@ class TextareaFieldData extends FieldData
             $data['type'] = FieldType::from($data['type']);
         }
 
-        return new self(...Arr::only($data, ['title', 'state_name', 'rules', 'min_length', 'max_length', 'rows', 'cols']));
+        return new self(
+            title: $data['title'],
+            state_name: $data['state_name'] ?? Str::snake($data['title']),
+            rules: $data['rules'] ?? [],
+            min_length: $data['min_length'] ?? null,
+            max_length: $data['max_length'] ?? null,
+            rows: $data['rows'] ?? null,
+            cols: $data['cols'] ?? null
+        );
     }
 }

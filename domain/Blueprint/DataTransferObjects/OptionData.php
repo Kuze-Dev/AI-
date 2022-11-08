@@ -7,9 +7,11 @@ namespace Domain\Blueprint\DataTransferObjects;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
 
+/**
+ * @implements Arrayable<string, mixed>
+ */
 class OptionData implements Arrayable
 {
-    /** @param array<SectionData> $sections */
     private function __construct(
         public readonly string $label,
         public readonly string $value
@@ -24,6 +26,7 @@ class OptionData implements Arrayable
         );
     }
 
+    /** @return array<string, mixed> */
     public function toArray()
     {
         return (array) $this;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Domain\Blueprint\DataTransferObjects;
 
 use Domain\Blueprint\Enums\FieldType;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class ToggleFieldData extends FieldData
 {
@@ -24,6 +24,10 @@ class ToggleFieldData extends FieldData
             $data['type'] = FieldType::from($data['type']);
         }
 
-        return new self(...Arr::only($data, ['title', 'state_name', 'rules']));
+        return new self(
+            title: $data['title'],
+            state_name: $data['state_name'] ?? Str::snake($data['title']),
+            type: $data['type'],
+        );
     }
 }

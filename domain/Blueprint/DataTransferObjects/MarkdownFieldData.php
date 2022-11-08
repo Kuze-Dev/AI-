@@ -6,7 +6,7 @@ namespace Domain\Blueprint\DataTransferObjects;
 
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\MarkdownButton;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class MarkdownFieldData extends FieldData
 {
@@ -38,6 +38,11 @@ class MarkdownFieldData extends FieldData
             );
         }
 
-        return new self(...Arr::only($data, ['title', 'state_name', 'rules', 'buttons']));
+        return new self(
+            title: $data['title'],
+            state_name: $data['state_name'] ?? Str::snake($data['title']),
+            rules: $data['rules'] ?? [],
+            buttons: $data['buttons'] ?? []
+        );
     }
 }

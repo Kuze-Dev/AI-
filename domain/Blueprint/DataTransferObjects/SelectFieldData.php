@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Domain\Blueprint\DataTransferObjects;
 
 use Domain\Blueprint\Enums\FieldType;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class SelectFieldData extends FieldData
@@ -26,17 +25,23 @@ class SelectFieldData extends FieldData
 
     public static function fromArray(array $data): self
     {
-        if (!$data['type'] instanceof FieldType) {
+        if ( ! $data['type'] instanceof FieldType) {
             $data['type'] = FieldType::from($data['type']);
         }
 
-        if (!empty($data['options'] ?? [])) {
+        if ( ! empty($data['options'] ?? [])) {
             $data['options'] = array_map(
                 fn (array $option) => OptionData::fromArray($option),
                 $data['options']
             );
         }
 
-        return new self(...Arr::only($data, ['title', 'state_name', 'rules', 'options', 'multiple']));
+        return new self(
+            title: $data['title'],
+            state_name: $data['state_name'] ?? Str::snake($data['title']),
+            rules: $data['rules'] ?? [],
+            options: $data['options'] ?? [],
+            multiple: $data['multiple'] ?? false
+        );
     }
 }
