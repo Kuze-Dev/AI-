@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use Domain\Admin\Models\Admin;
+use Domain\Blueprint\Models\Blueprint;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -25,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
         Relation::enforceMorphMap([
             Admin::class,
             config('permission.models.role'),
+            Blueprint::class,
         ]);
 
         Password::defaults(

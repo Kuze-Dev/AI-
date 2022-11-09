@@ -26,6 +26,7 @@ class PermissionSeeder extends BasePermissionSeeder
                     ]
                 ),
                 ...$this->generateFilamentResourcePermissions('role', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('blueprint', except: ['deleteAny']),
             ],
         ];
     }
