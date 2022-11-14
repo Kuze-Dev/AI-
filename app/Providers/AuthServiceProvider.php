@@ -24,6 +24,7 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Admin\Models\Admin::class => \App\Policies\AdminPolicy::class,
         \Spatie\Permission\Models\Role::class => \App\Policies\RolePolicy::class,
         \Domain\Tenant\Models\Tenant::class => \App\Policies\TenantPolicy::class,
+        \Domain\Blueprint\Models\Blueprint::class => \App\Policies\BlueprintPolicy::class,
     ];
 
     /**
