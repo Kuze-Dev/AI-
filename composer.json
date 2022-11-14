@@ -1,7 +1,7 @@
 {
-    "name": "halcyon/saas-ecommerce",
+    "name": "halcyon/saas-platform",
     "type": "project",
-    "description": "SaaS eCommerce",
+    "description": "SaaS Platform",
     "license": "proprietary",
     "require": {
         "php": "^8.1.9",
