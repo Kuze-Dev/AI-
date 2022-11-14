@@ -20,6 +20,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Closure;
+use Illuminate\Support\HtmlString;
 
 class BlueprintResource extends Resource
 {
@@ -116,7 +117,10 @@ class BlueprintResource extends Resource
                                                         ->map(fn (string $rule) => trim($rule))
                                                         ->toArray()
                                                     : [$state];
-                                            }),
+                                            })
+                                            ->helperText(new HtmlString(<<<HTML
+                                                Rules should be separated with "|". Available rules can be found on  <a href="https://laravel.com/docs/validation" class="text-primary-500" target="_blank" rel="noopener noreferrer">Laravel's Documentation</a>.
+                                            HTML)),
                                         Forms\Components\Section::make('Field Options')
                                             ->collapsible()
                                             ->when(fn (array $state) => filled($state['type'] ?? null))
