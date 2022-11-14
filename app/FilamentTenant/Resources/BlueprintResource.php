@@ -63,16 +63,10 @@ class BlueprintResource extends Resource
                                     ->lazy()
                                     ->required(),
                                 Forms\Components\TextInput::make('state_name')
-                                    ->disabled(function (?Blueprint $record, ?string $state) {
-                                        if ($record && Arr::first(
-                                            $record->schema->sections,
-                                            fn (SectionData $section) => $section->state_name === $state
-                                        )) {
-                                            return true;
-                                        }
-
-                                        return false;
-                                    }),
+                                    ->disabled(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
+                                        $record->schema->sections,
+                                        fn (SectionData $section) => $section->state_name === $state
+                                    ))),
                                 Forms\Components\Repeater::make('fields')
                                     ->orderable()
                                     ->itemLabel(function (array $state) {
@@ -102,19 +96,13 @@ class BlueprintResource extends Resource
                                             ->columnSpan(['sm' => 3]),
                                         Forms\Components\TextInput::make('state_name')
                                             ->columnSpan(['sm' => 2])
-                                            ->disabled(function (?Blueprint $record, ?string $state) {
-                                                if ($record && Arr::first(
-                                                    $record->schema->sections,
-                                                    fn (SectionData $section) => Arr::first(
-                                                        $section->fields,
-                                                        fn (FieldData $field) => $field->state_name === $state,
-                                                    )
-                                                )) {
-                                                    return true;
-                                                }
-
-                                                return false;
-                                            }),
+                                            ->disabled(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
+                                                $record->schema->sections,
+                                                fn (SectionData $section) => Arr::first(
+                                                    $section->fields,
+                                                    fn (FieldData $field) => $field->state_name === $state,
+                                                )
+                                            ))),
                                         Forms\Components\Select::make('type')
                                             ->reactive()
                                             ->options(
@@ -124,19 +112,13 @@ class BlueprintResource extends Resource
                                                     ])
                                             )
                                             ->required()
-                                            ->disabled(function (?Blueprint $record, Closure $get) {
-                                                if ($record && Arr::first(
-                                                    $record->schema->sections,
-                                                    fn (SectionData $section) => Arr::first(
-                                                        $section->fields,
-                                                        fn (FieldData $field) => $field->state_name === $get('state_name'),
-                                                    )
-                                                )) {
-                                                    return true;
-                                                }
-
-                                                return false;
-                                            }),
+                                            ->disabled(fn (?Blueprint $record, Closure $get) => (bool) ($record && Arr::first(
+                                                $record->schema->sections,
+                                                fn (SectionData $section) => Arr::first(
+                                                    $section->fields,
+                                                    fn (FieldData $field) => $field->state_name === $get('state_name'),
+                                                )
+                                            ))),
                                         Forms\Components\TextInput::make('rules')
                                             ->columnSpan(['sm' => 3])
                                             ->afterStateHydrated(function (Closure $set, ?array $state): void {
@@ -154,8 +136,8 @@ class BlueprintResource extends Resource
                                                     : [$state];
                                             })
                                             ->helperText(new HtmlString(<<<HTML
-                                                Rules should be separated with "|". Available rules can be found on  <a href="https://laravel.com/docs/validation" class="text-primary-500" target="_blank" rel="noopener noreferrer">Laravel's Documentation</a>.
-                                            HTML)),
+                                                    Rules should be separated with "|". Available rules can be found on  <a href="https://laravel.com/docs/validation" class="text-primary-500" target="_blank" rel="noopener noreferrer">Laravel's Documentation</a>.
+                                                HTML)),
                                         Forms\Components\Section::make('Field Options')
                                             ->collapsible()
                                             ->when(fn (array $state) => filled($state['type'] ?? null))
@@ -177,21 +159,21 @@ class BlueprintResource extends Resource
                                                     Forms\Components\TextInput::make('min_size')
                                                         ->numeric()
                                                         ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                                                     Forms\Components\TextInput::make('max_size')
                                                         ->numeric()
                                                         ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                                                     Forms\Components\TextInput::make('min_files')
                                                         ->numeric()
                                                         ->integer()
                                                         ->when(fn (Closure $get) => $get('multiple') === true)
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                                                     Forms\Components\TextInput::make('max_files')
                                                         ->numeric()
                                                         ->integer()
                                                         ->when(fn (Closure $get) => $get('multiple') === true)
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                                                 ],
                                                 FieldType::MARKDOWN => [
                                                     Forms\Components\CheckboxList::make('buttons')
@@ -244,19 +226,19 @@ class BlueprintResource extends Resource
                                                     Forms\Components\TextInput::make('min_length')
                                                         ->numeric()
                                                         ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                                                     Forms\Components\TextInput::make('max_length')
                                                         ->numeric()
                                                         ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                                                     Forms\Components\TextInput::make('rows')
                                                         ->numeric()
                                                         ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                                                     Forms\Components\TextInput::make('cols')
                                                         ->numeric()
                                                         ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                                                 ],
                                                 FieldType::TEXT,
                                                 FieldType::EMAIL,
@@ -266,25 +248,25 @@ class BlueprintResource extends Resource
                                                     Forms\Components\TextInput::make('min_length')
                                                         ->numeric()
                                                         ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                                                     Forms\Components\TextInput::make('max_length')
                                                         ->numeric()
                                                         ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                                                 ],
                                                 FieldType::NUMBER => [
                                                     Forms\Components\TextInput::make('min')
                                                         ->numeric()
                                                         ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                                                     Forms\Components\TextInput::make('max')
                                                         ->numeric()
                                                         ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                                                     Forms\Components\TextInput::make('step')
                                                         ->numeric()
                                                         ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                                                 ],
                                                 FieldType::TOGGLE => [],
                                                 default => [],
