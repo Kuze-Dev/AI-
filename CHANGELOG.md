@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://bitbucket.org/halcyonlaravel/saas-boilerplate/branches/compare/master%0Dv0.1.1)
+## [Unreleased](https://bitbucket.org/halcyonlaravel/saas-boilerplate/branches/compare/master%0Dv0.1.2)
+
+## [v0.1.2](https://bitbucket.org/halcyonlaravel/saas-boilerplate/branches/compare/v0.1.2%0Dv0.1.1)
+
+### Added
+
+- Added Activity Logs for `Tenant` model and `FilamentTenant` context.
 
 ## [v0.1.1](https://bitbucket.org/halcyonlaravel/saas-boilerplate/branches/compare/v0.1.1%0Dv0.1.0)
 

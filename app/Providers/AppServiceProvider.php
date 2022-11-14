@@ -25,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
         Relation::enforceMorphMap([
             Admin::class,
             config('permission.models.role'),
+            config('tenancy.tenant_model'),
         ]);
 
         Password::defaults(
