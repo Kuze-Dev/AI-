@@ -54,6 +54,7 @@ class BlueprintResource extends Resource
                             ->orderable()
                             ->itemLabel(fn (array $state) => $state['title'] ?? null)
                             ->minItems(1)
+                            ->collapsible()
                             ->schema([
                                 Forms\Components\TextInput::make('title')
                                     ->lazy()
@@ -135,15 +136,23 @@ class BlueprintResource extends Resource
                                                     Forms\Components\TextInput::make('accept')
                                                         ->columnSpan(2),
                                                     Forms\Components\TextInput::make('min_size')
-                                                        ->numeric(),
+                                                        ->numeric()
+                                                        ->integer()
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
                                                     Forms\Components\TextInput::make('max_size')
-                                                        ->numeric(),
+                                                        ->numeric()
+                                                        ->integer()
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
                                                     Forms\Components\TextInput::make('min_files')
                                                         ->numeric()
-                                                        ->when(fn (Closure $get) => $get('multiple') === true),
+                                                        ->integer()
+                                                        ->when(fn (Closure $get) => $get('multiple') === true)
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
                                                     Forms\Components\TextInput::make('max_files')
                                                         ->numeric()
-                                                        ->when(fn (Closure $get) => $get('multiple') === true),
+                                                        ->integer()
+                                                        ->when(fn (Closure $get) => $get('multiple') === true)
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
                                                 ],
                                                 FieldType::MARKDOWN => [
                                                     Forms\Components\CheckboxList::make('buttons')
@@ -195,16 +204,20 @@ class BlueprintResource extends Resource
                                                 FieldType::TEXTAREA => [
                                                     Forms\Components\TextInput::make('min_length')
                                                         ->numeric()
-                                                        ->integer(),
+                                                        ->integer()
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
                                                     Forms\Components\TextInput::make('max_length')
                                                         ->numeric()
-                                                        ->integer(),
+                                                        ->integer()
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
                                                     Forms\Components\TextInput::make('rows')
                                                         ->numeric()
-                                                        ->integer(),
+                                                        ->integer()
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
                                                     Forms\Components\TextInput::make('cols')
                                                         ->numeric()
-                                                        ->integer(),
+                                                        ->integer()
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
                                                 ],
                                                 FieldType::TEXT,
                                                 FieldType::EMAIL,
@@ -213,18 +226,26 @@ class BlueprintResource extends Resource
                                                 FieldType::PASSWORD => [
                                                     Forms\Components\TextInput::make('min_length')
                                                         ->numeric()
-                                                        ->integer(),
+                                                        ->integer()
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
                                                     Forms\Components\TextInput::make('max_length')
                                                         ->numeric()
-                                                        ->integer(),
+                                                        ->integer()
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
                                                 ],
                                                 FieldType::NUMBER => [
                                                     Forms\Components\TextInput::make('min')
-                                                        ->numeric(),
+                                                        ->numeric()
+                                                        ->integer()
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
                                                     Forms\Components\TextInput::make('max')
-                                                        ->numeric(),
+                                                        ->numeric()
+                                                        ->integer()
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
                                                     Forms\Components\TextInput::make('step')
-                                                        ->numeric(),
+                                                        ->numeric()
+                                                        ->integer()
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int)$state : null),
                                                 ],
                                                 FieldType::TOGGLE => [],
                                                 default => [],
