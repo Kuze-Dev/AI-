@@ -7,6 +7,9 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\BlueprintResource\Pages;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Closure;
+use Domain\Blueprint\DataTransferObjects\FieldData;
+use Domain\Blueprint\DataTransferObjects\SectionData;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
@@ -19,7 +22,6 @@ use Filament\Tables;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Closure;
 use Illuminate\Support\HtmlString;
 
 class BlueprintResource extends Resource
@@ -61,7 +63,16 @@ class BlueprintResource extends Resource
                                     ->lazy()
                                     ->required(),
                                 Forms\Components\TextInput::make('state_name')
-                                    ->disabled(fn (string $context) => $context === 'edit'),
+                                    ->disabled(function (?Blueprint $record, ?string $state) {
+                                        if ($record && Arr::first(
+                                            $record->schema->sections,
+                                            fn (SectionData $section) => $section->state_name === $state
+                                        )) {
+                                            return true;
+                                        }
+
+                                        return false;
+                                    }),
                                 Forms\Components\Repeater::make('fields')
                                     ->orderable()
                                     ->itemLabel(function (array $state) {
@@ -91,7 +102,19 @@ class BlueprintResource extends Resource
                                             ->columnSpan(['sm' => 3]),
                                         Forms\Components\TextInput::make('state_name')
                                             ->columnSpan(['sm' => 2])
-                                            ->disabled(fn (string $context) => $context === 'edit'),
+                                            ->disabled(function (?Blueprint $record, ?string $state) {
+                                                if ($record && Arr::first(
+                                                    $record->schema->sections,
+                                                    fn (SectionData $section) => Arr::first(
+                                                        $section->fields,
+                                                        fn (FieldData $field) => $field->state_name === $state,
+                                                    )
+                                                )) {
+                                                    return true;
+                                                }
+
+                                                return false;
+                                            }),
                                         Forms\Components\Select::make('type')
                                             ->reactive()
                                             ->options(
@@ -101,7 +124,19 @@ class BlueprintResource extends Resource
                                                     ])
                                             )
                                             ->required()
-                                            ->disabled(fn (string $context) => $context === 'edit'),
+                                            ->disabled(function (?Blueprint $record, Closure $get) {
+                                                if ($record && Arr::first(
+                                                    $record->schema->sections,
+                                                    fn (SectionData $section) => Arr::first(
+                                                        $section->fields,
+                                                        fn (FieldData $field) => $field->state_name === $get('state_name'),
+                                                    )
+                                                )) {
+                                                    return true;
+                                                }
+
+                                                return false;
+                                            }),
                                         Forms\Components\TextInput::make('rules')
                                             ->columnSpan(['sm' => 3])
                                             ->afterStateHydrated(function (Closure $set, ?array $state): void {
