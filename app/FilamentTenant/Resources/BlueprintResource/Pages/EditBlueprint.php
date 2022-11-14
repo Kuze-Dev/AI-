@@ -37,4 +37,10 @@ class EditBlueprint extends EditRecord
                 )
             ));
     }
+
+    protected function afterSave(): void{
+        $this->record = $this->resolveRecord($this->record->getRouteKey());
+
+        $this->fillForm();
+    }
 }
