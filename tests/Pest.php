@@ -44,7 +44,10 @@ uses(
 
         config()->set('tenancy.database.prefix', 'test_');
     })
-    ->afterEach(fn () => Tenant::all()->each->delete())
+    ->afterEach(function () {
+        tenancy()->end();
+        Tenant::all()->each->delete();
+    })
     ->in('Feature');
 
 uses(
@@ -64,5 +67,8 @@ uses(
 
         config()->set('tenancy.database.prefix', 'test_');
     })
-    ->afterEach(fn () => Tenant::all()->each->delete())
+    ->afterEach(function () {
+        tenancy()->end();
+        Tenant::all()->each->delete();
+    })
     ->in('Unit');
