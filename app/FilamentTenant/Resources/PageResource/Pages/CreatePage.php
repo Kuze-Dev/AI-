@@ -22,6 +22,11 @@ class CreatePage extends CreateRecord
 
     protected function getFormSchema(): array
     {
+        $behaviors = collect(PageBehavior::cases())
+            ->mapWithKeys(fn (PageBehavior $fieldType) => [
+                $fieldType->value => Str::headline($fieldType->value),
+            ]);
+
         return [
             Forms\Components\Card::make([
                 Forms\Components\TextInput::make('name')
@@ -40,23 +45,13 @@ class CreatePage extends CreateRecord
                         ->schema([
                             Forms\Components\Select::make('past_behavior')
                                 ->required()
-                                ->options(
-                                    collect(PageBehavior::cases())
-                                        ->mapWithKeys(fn (PageBehavior $fieldType) => [
-                                            $fieldType->value => Str::headline($fieldType->value),
-                                        ])
-                                )
-                                ->in(PageBehavior::toArray()),
+                                ->options($behaviors)
+                                ->in($behaviors->keys()),
 
                             Forms\Components\Select::make('future_behavior')
                                 ->required()
-                                ->options(
-                                    collect(PageBehavior::cases())
-                                        ->mapWithKeys(fn (PageBehavior $fieldType) => [
-                                            $fieldType->value => Str::headline($fieldType->value),
-                                        ])
-                                )
-                                ->in(PageBehavior::toArray()),
+                                ->options($behaviors)
+                                ->in($behaviors->keys()),
                         ])
                         ->when(fn (array $state) => $state['published_dates'])
                         ->columns(),
