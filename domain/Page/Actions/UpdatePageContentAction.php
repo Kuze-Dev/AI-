@@ -17,6 +17,7 @@ class UpdatePageContentAction
         }
 
         $page->update([
+            'name' => $updatePageData->name,
             'data' => $updatePageData->data,
             'published_at' => $updatePageData->published_at,
         ]);

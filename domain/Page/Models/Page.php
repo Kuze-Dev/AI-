@@ -16,6 +16,13 @@ use Spatie\Activitylog\Traits\LogsActivity;
 /**
  * Domain\Page\Models\Page
  *
+ * @property int $blueprint_id
+ * @property string $name
+ * @property \Domain\Page\Enums\PageBehavior|null $past_behavior
+ * @property \Domain\Page\Enums\PageBehavior|null $future_behavior
+ * @property array|null $data
+ * @property \Illuminate\Support\Carbon|null $published_at
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Activitylog\Models\Activity[] $activities
  * @property-read int|null $activities_count
  * @property-read \Domain\Blueprint\Models\Blueprint|null $blueprint

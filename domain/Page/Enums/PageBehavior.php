@@ -10,15 +10,12 @@ enum PageBehavior: string
     case UNLISTED = 'unlisted';
     case HIDDEN = 'hidden';
 
-    /** @return array<non-empty-string, non-empty-string> */
-    public static function toArray(): array
+    public function color(): string
     {
-        $cases = [];
-
-        foreach (self::cases() as $case) {
-            $cases[$case->value] = $case->value;
-        }
-
-        return $cases;
+        return match ($this) {
+            self::PUBLIC => 'success',
+            self::UNLISTED => 'danger',
+            self::HIDDEN => 'warning',
+        };
     }
 }

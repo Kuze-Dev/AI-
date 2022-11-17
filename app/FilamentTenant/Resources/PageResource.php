@@ -37,9 +37,24 @@ class PageResource extends Resource
                 Tables\Columns\TextColumn::make('blueprint.name')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\BadgeColumn::make('past_behavior')
+                    ->sortable()
+                    ->colors(fn (Page $record) => [$record->past_behavior?->color() ?? '']),
+                Tables\Columns\BadgeColumn::make('future_behavior')
+                    ->sortable()
+                    ->colors(fn (Page $record) => [$record->future_behavior?->color() ?? '']),
+                Tables\Columns\TextColumn::make('published_at')
+                    ->label(trans('Published date'))
+                    ->date(timezone: Auth::user()?->timezone)
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->sortable()
+                    ->toggleable()
+                    ->toggledHiddenByDefault(),
             ])
             ->filters([
             ])
@@ -50,7 +65,7 @@ class PageResource extends Resource
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('updated_at', 'desc');
     }
 
     public static function getRelations(): array

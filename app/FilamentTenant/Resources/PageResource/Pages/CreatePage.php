@@ -30,8 +30,7 @@ class CreatePage extends CreateRecord
         return [
             Forms\Components\Card::make([
                 Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->unique(ignoreRecord: true),
+                    ->required(),
                 Forms\Components\Select::make('blueprint_id')
                     ->relationship('blueprint', 'name')
                     ->required()
