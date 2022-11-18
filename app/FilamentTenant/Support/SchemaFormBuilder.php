@@ -1,11 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Support;
 
 use Closure;
+use Domain\Blueprint\DataTransferObjects\DatetimeFieldData;
 use Domain\Blueprint\DataTransferObjects\FieldData;
+use Domain\Blueprint\DataTransferObjects\FileFieldData;
+use Domain\Blueprint\DataTransferObjects\MarkdownFieldData;
+use Domain\Blueprint\DataTransferObjects\RichtextFieldData;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
 use Domain\Blueprint\DataTransferObjects\SectionData;
+use Domain\Blueprint\DataTransferObjects\SelectFieldData;
+use Domain\Blueprint\DataTransferObjects\TextareaFieldData;
+use Domain\Blueprint\DataTransferObjects\TextFieldData;
+use Domain\Blueprint\DataTransferObjects\ToggleFieldData;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
@@ -68,18 +78,12 @@ class SchemaFormBuilder extends Component
 
     private function generateFieldComponent(FieldData $field): Field
     {
-        return match ($field->type) {
-            FieldType::DATETIME => DateTimePicker::make($field->state_name)
-                ->label($field->title)
-                ->required(fn () => in_array('required', $field->rules))
-                ->rules($field->rules)
+        $fieldComponent = match ($field::class) {
+            DatetimeFieldData::class => DateTimePicker::make($field->state_name)
                 ->minDate($field->min)
                 ->maxDate($field->max)
                 ->format($field->format),
-            FieldType::FILE => FileUpload::make($field->state_name)
-                ->label($field->title)
-                ->required(fn () => in_array('required', $field->rules))
-                ->rules($field->rules)
+            FileFieldData::class => FileUpload::make($field->state_name)
                 ->multiple($field->multiple)
                 ->enableReordering($field->reorder)
                 ->acceptedFileTypes($field->accept)
@@ -87,49 +91,49 @@ class SchemaFormBuilder extends Component
                 ->minSize($field->max_size)
                 ->minFiles($field->min_files)
                 ->maxFiles($field->max_files),
-            FieldType::MARKDOWN => MarkdownEditor::make($field->state_name)
-                ->label($field->title)
-                ->required(fn () => in_array('required', $field->rules))
-                ->rules($field->rules)
+            MarkdownFieldData::class => MarkdownEditor::make($field->state_name)
                 ->toolbarButtons(array_map(fn (MarkdownButton $button) => $button->value, $field->buttons)),
-            FieldType::RICHTEXT => RichEditor::make($field->state_name)
-                ->label($field->title)
-                ->required(fn () => in_array('required', $field->rules))
-                ->rules($field->rules)
+            RichtextFieldData::class => RichEditor::make($field->state_name)
                 ->toolbarButtons(array_map(fn (RichtextButton $button) => $button->value, $field->buttons)),
-            FieldType::SELECT => Select::make($field->state_name)
-                ->label($field->title)
-                ->required(fn () => in_array('required', $field->rules))
-                ->rules($field->rules)
+            SelectFieldData::class => Select::make($field->state_name)
                 ->options(Arr::pluck($field->options, 'label', 'value')),
-            FieldType::TEXTAREA => Textarea::make($field->state_name)
-                ->label($field->title)
-                ->required(fn () => in_array('required', $field->rules))
-                ->rules($field->rules)
+            TextareaFieldData::class => Textarea::make($field->state_name)
                 ->minLength(fn () => $field->min_length)
                 ->maxLength(fn () => $field->max_length),
-            FieldType::TEXT,
-            FieldType::EMAIL,
-            FieldType::TEL,
-            FieldType::URL,
-            FieldType::PASSWORD => TextInput::make($field->state_name)
-                ->label($field->title)
-                ->required(fn () => in_array('required', $field->rules))
-                ->rules($field->rules)
-                ->minLength(fn () => $field->min_length)
-                ->maxLength(fn () => $field->max_length),
-            FieldType::NUMBER => TextInput::make($field->state_name)
-                ->label($field->title)
-                ->required(fn () => in_array('required', $field->rules))
-                ->rules($field->rules)
-                ->numeric()
-                ->minValue($field->min)
-                ->maxValue($field->max),
-            FieldType::TOGGLE => Toggle::make($field->state_name)
-                ->label($field->title)
-                ->required(fn () => in_array('required', $field->rules))
-                ->rules($field->rules),
+            TextFieldData::class => $this->makeTextFieldComponent($field),
+            ToggleFieldData::class => Toggle::make($field->state_name),
             default => throw new InvalidArgumentException(),
         };
+
+        return $fieldComponent
+            ->label($field->title)
+            ->required(fn () => in_array('required', $field->rules))
+            ->rules($field->rules);
+    }
+
+    private function makeTextFieldComponent(TextFieldData $textFieldData): TextInput
+    {
+        if ($textFieldData->type === FieldType::NUMBER) {
+            return TextInput::make($textFieldData->state_name)
+                ->numeric()
+                ->minValue($textFieldData->min)
+                ->maxValue($textFieldData->max);
+        }
+
+        $textInput = match ($textFieldData->type) {
+            FieldType::EMAIL => TextInput::make($textFieldData->state_name)
+                ->email(),
+            FieldType::TEL => TextInput::make($textFieldData->state_name)
+                ->tel(),
+            FieldType::URL => TextInput::make($textFieldData->state_name)
+                ->url(),
+            FieldType::PASSWORD => TextInput::make($textFieldData->state_name)
+                ->password(),
+            default => TextInput::make($textFieldData->state_name),
+        };
+
+        return $textInput
+            ->minLength(fn () => $textFieldData->min_length)
+            ->maxLength(fn () => $textFieldData->max_length);
     }
 }
