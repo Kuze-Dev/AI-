@@ -36,7 +36,8 @@ class PageResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('blueprint.name')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->url(fn (Page $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
                 Tables\Columns\BadgeColumn::make('past_behavior')
                     ->sortable()
                     ->colors(fn (Page $record) => [$record->past_behavior?->color() ?? '']),

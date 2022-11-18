@@ -1,0 +1,42 @@
+<?php
+
+declare(strict_types=1);
+
+use App\FilamentTenant\Resources\PageResource\Pages\EditPage;
+use Domain\Page\Database\Factories\PageFactory;
+use Domain\Page\Models\Page;
+use Filament\Facades\Filament;
+
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Livewire\livewire;
+
+beforeEach(function () {
+    testInTenantContext();
+    Filament::setContext('filament-tenant');
+    loginAsAdmin();
+});
+
+it('can render page', function () {
+    $page = PageFactory::new()
+        ->createOne();
+
+    livewire(EditPage::class, ['record' => $page->getKey()])
+        ->assertFormExists()
+        ->assertSuccessful()
+        ->assertFormSet([
+            'name' => $page->name,
+        ]);
+});
+
+it('can edit page', function () {
+    $page = PageFactory::new()->createOne();
+
+    livewire(EditPage::class, ['record' => $page->getKey()])
+        ->fillForm([
+            'name' => 'Test',
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    assertDatabaseHas(Page::class, ['name' => 'Test']);
+});

@@ -16,6 +16,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 /**
  * Domain\Page\Models\Page
  *
+ * @property int $id
  * @property int $blueprint_id
  * @property string $name
  * @property \Domain\Page\Enums\PageBehavior|null $past_behavior

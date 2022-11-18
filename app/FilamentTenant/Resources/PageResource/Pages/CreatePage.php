@@ -44,13 +44,13 @@ class CreatePage extends CreateRecord
                         ->schema([
                             Forms\Components\Select::make('past_behavior')
                                 ->required()
-                                ->options($behaviors)
-                                ->in($behaviors->keys()),
+                                ->enum(PageBehavior::class)
+                                ->options($behaviors),
 
                             Forms\Components\Select::make('future_behavior')
                                 ->required()
-                                ->options($behaviors)
-                                ->in($behaviors->keys()),
+                                ->enum(PageBehavior::class)
+                                ->options($behaviors),
                         ])
                         ->when(fn (array $state) => $state['published_dates'])
                         ->columns(),
