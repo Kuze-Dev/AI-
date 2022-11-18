@@ -7,12 +7,15 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Domain\Page\Enums\PageBehavior;
 use Domain\Page\Models\Page;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Exception;
+use Illuminate\Support\Str;
 
 class PageResource extends Resource
 {
@@ -29,6 +32,11 @@ class PageResource extends Resource
     /** @throws Exception */
     public static function table(Table $table): Table
     {
+        $behaviorsFilterOptions = collect(PageBehavior::cases())
+            ->mapWithKeys(fn (PageBehavior $fieldType) => [
+                $fieldType->value => Str::headline($fieldType->value),
+            ]);
+
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
@@ -40,14 +48,19 @@ class PageResource extends Resource
                     ->url(fn (Page $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
                 Tables\Columns\BadgeColumn::make('past_behavior')
                     ->sortable()
-                    ->colors(fn (Page $record) => [$record->past_behavior?->color() ?? '']),
+                    ->colors(fn (Page $record) => [$record->past_behavior?->color() ?? ''])
+                    ->default('--')
+                    ->toggleable(),
                 Tables\Columns\BadgeColumn::make('future_behavior')
                     ->sortable()
-                    ->colors(fn (Page $record) => [$record->future_behavior?->color() ?? '']),
+                    ->colors(fn (Page $record) => [$record->future_behavior?->color() ?? ''])
+                    ->default('--')
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('published_at')
                     ->label(trans('Published date'))
                     ->date(timezone: Auth::user()?->timezone)
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -58,6 +71,45 @@ class PageResource extends Resource
                     ->toggledHiddenByDefault(),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('blueprint')
+                    ->relationship('blueprint', 'name')
+                    ->searchable()
+                    ->optionsLimit(20),
+                Tables\Filters\TernaryFilter::make('published_at')
+                    ->label(trans('Published date'))
+                    ->nullable(),
+                Tables\Filters\SelectFilter::make('has_behavior')
+                    ->options(['1' => 'Yes', '0' => 'No'])
+                    ->query(function (Builder $query, array $data) {
+                        $query->when(filled($data['value']), function (Builder $query) use ($data) {
+                            $query->when(filled($data['value']), function (Builder $query) use ($data) {
+                                /** @var Page|Builder $query */
+                                match ($data['value']) {
+                                    '1' => $query->whereNotNull('past_behavior')->whereNotNull('future_behavior'),
+                                    '0' => $query->whereNull('past_behavior')->whereNull('future_behavior'),
+                                    default => '',
+                                };
+                            });
+                        });
+                    }),
+                Tables\Filters\SelectFilter::make('past_behavior')
+                    ->multiple()
+                    ->options($behaviorsFilterOptions)
+                    ->query(function (Builder $query, array $data) {
+                        $query->when(filled($data['values']), function (Builder $query) use ($data) {
+                            /** @var Page|Builder $query */
+                            $query->whereIn('past_behavior', $data['values']);
+                        });
+                    }),
+                Tables\Filters\SelectFilter::make('future_behavior')
+                    ->multiple()
+                    ->options($behaviorsFilterOptions)
+                    ->query(function (Builder $query, array $data) {
+                        $query->when(filled($data['values']), function (Builder $query) use ($data) {
+                            /** @var Page|Builder $query */
+                            $query->whereIn('future_behavior', $data['values']);
+                        });
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
