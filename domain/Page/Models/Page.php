@@ -60,9 +60,7 @@ class Page extends Model implements IsActivitySubject
             ->dontSubmitEmptyLogs();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Page\Models\Page>
-     */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Page\Models\Page> */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
