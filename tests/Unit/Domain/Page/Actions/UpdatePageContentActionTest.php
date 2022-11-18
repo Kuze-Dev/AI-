@@ -6,7 +6,7 @@ use Domain\Page\Actions\UpdatePageContentAction;
 use Domain\Page\Database\Factories\PageFactory;
 
 use Domain\Page\DataTransferObjects\PageContentData;
-use Domain\Page\Exceptions\UpdatePageContentException;
+use Domain\Page\Exceptions\PageException;
 use Domain\Page\Models\Page;
 
 use function Pest\Faker\faker;
@@ -78,7 +78,7 @@ it('can update page w/ published_at behavior', function () {
     );
 });
 
-it('throws exception', function () {
+it('throws exception when published_at not null if hasPublishedAtBehavior is false', function () {
     $page = PageFactory::new()
         ->withOutPublishedAtBehavior()
         ->createOne();
@@ -93,6 +93,6 @@ it('throws exception', function () {
     );
 })
     ->throws(
-        UpdatePageContentException::class,
+        PageException::class,
         'Property `published_at` must null when hasPublishedAtBehavior is `false`'
     );

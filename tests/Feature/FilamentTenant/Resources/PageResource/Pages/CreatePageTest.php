@@ -23,7 +23,7 @@ beforeEach(function () {
 it('can render page', function () {
     livewire(CreatePage::class)
         ->assertFormExists()
-        ->assertSuccessful();
+        ->assertOk();
 });
 
 it('can create page', function () {
@@ -37,7 +37,8 @@ it('can create page', function () {
             'blueprint_id' => $blueprint->getKey(),
         ])
         ->call('create')
-        ->assertHasNoFormErrors();
+        ->assertHasNoFormErrors()
+        ->assertOk();
 
     assertDatabaseCount(Page::class, 1);
 });
@@ -59,7 +60,8 @@ it('can not create page with same name', function () {
             'blueprint_id' => $blueprint->getKey(),
         ])
         ->call('create')
-        ->assertHasFormErrors(['name' => 'unique']);
+        ->assertHasFormErrors(['name' => 'unique'])
+        ->assertOk();
 
     assertDatabaseCount(Page::class, 1);
 });
@@ -76,7 +78,8 @@ it('can create page w/out published dates', function () {
             'published_dates' => false,
         ])
         ->call('create')
-        ->assertHasNoFormErrors();
+        ->assertHasNoFormErrors()
+        ->assertOk();
 
     assertDatabaseCount(Page::class, 1);
 });
@@ -95,7 +98,8 @@ it('can create page w/ published dates', function () {
             'future_behavior' => Arr::random(PageBehavior::cases())->value,
         ])
         ->call('create')
-        ->assertHasNoFormErrors();
+        ->assertHasNoFormErrors()
+        ->assertOk();
 
     assertDatabaseCount(Page::class, 1);
 });

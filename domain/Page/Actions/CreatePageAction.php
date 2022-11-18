@@ -5,17 +5,26 @@ declare(strict_types=1);
 namespace Domain\Page\Actions;
 
 use Domain\Page\DataTransferObjects\PageData;
+use Domain\Page\Exceptions\PageException;
 use Domain\Page\Models\Page;
 
 class CreatePageAction
 {
-    public function execute(PageData $createPageData): Page
+    /** @throws \Domain\Page\Exceptions\PageException */
+    public function execute(PageData $pageData): Page
     {
+        if (
+            ($pageData->past_behavior === null && $pageData->future_behavior !== null) ||
+            ($pageData->future_behavior === null && $pageData->past_behavior !== null)
+        ) {
+            throw PageException::pastAndFutureBehaviorMustBothNullOrNotNull();
+        }
+
         return Page::create([
-            'name' => $createPageData->name,
-            'blueprint_id' => $createPageData->blueprint_id,
-            'past_behavior' => $createPageData->past_behavior,
-            'future_behavior' => $createPageData->future_behavior,
+            'name' => $pageData->name,
+            'blueprint_id' => $pageData->blueprint_id,
+            'past_behavior' => $pageData->past_behavior,
+            'future_behavior' => $pageData->future_behavior,
         ]);
     }
 }

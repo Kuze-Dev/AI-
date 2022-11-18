@@ -17,21 +17,24 @@ beforeEach(function () {
 });
 
 it('can render page', function () {
-    livewire(ListPages::class)->assertSuccessful();
+    livewire(ListPages::class)
+        ->assertOk();
 });
 
 it('can list pages', function () {
     $blueprints = PageFactory::new()->count(5)->create();
 
     livewire(ListPages::class)
-        ->assertCanSeeTableRecords($blueprints);
+        ->assertCanSeeTableRecords($blueprints)
+        ->assertOk();
 });
 
 it('can delete page', function () {
     $blueprint = PageFactory::new()->createOne();
 
     livewire(ListPages::class)
-        ->callTableAction(DeleteAction::class, $blueprint);
+        ->callTableAction(DeleteAction::class, $blueprint)
+        ->assertOk();
 
     assertModelMissing($blueprint);
 });

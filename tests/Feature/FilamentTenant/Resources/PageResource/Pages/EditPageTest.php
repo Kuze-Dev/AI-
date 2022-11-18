@@ -26,7 +26,8 @@ it('can render page', function () {
         ->assertSuccessful()
         ->assertFormSet([
             'name' => $page->name,
-        ]);
+        ])
+        ->assertOk();
 });
 
 it('can edit page', function () {
@@ -37,7 +38,8 @@ it('can edit page', function () {
             'name' => 'Test',
         ])
         ->call('save')
-        ->assertHasNoFormErrors();
+        ->assertHasNoFormErrors()
+        ->assertOk();
 
     assertDatabaseHas(Page::class, ['name' => 'Test']);
 });
@@ -57,7 +59,8 @@ it('can not update page with same name', function () {
             'blueprint_id' => $page->blueprint->getKey(),
         ])
         ->call('save')
-        ->assertHasFormErrors(['name' => 'unique']);
+        ->assertHasFormErrors(['name' => 'unique'])
+        ->assertOk();
 
     assertDatabaseCount(Page::class, 2);
 });
