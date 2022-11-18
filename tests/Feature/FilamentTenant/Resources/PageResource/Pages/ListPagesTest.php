@@ -22,19 +22,19 @@ it('can render page', function () {
 });
 
 it('can list pages', function () {
-    $blueprints = PageFactory::new()->count(5)->create();
+    $pages = PageFactory::new()->count(5)->create();
 
     livewire(ListPages::class)
-        ->assertCanSeeTableRecords($blueprints)
+        ->assertCanSeeTableRecords($pages)
         ->assertOk();
 });
 
 it('can delete page', function () {
-    $blueprint = PageFactory::new()->createOne();
+    $pages = PageFactory::new()->createOne();
 
     livewire(ListPages::class)
-        ->callTableAction(DeleteAction::class, $blueprint)
+        ->callTableAction(DeleteAction::class, $pages)
         ->assertOk();
 
-    assertModelMissing($blueprint);
+    assertModelMissing($pages);
 });
