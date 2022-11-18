@@ -61,9 +61,9 @@ class EditPage extends EditRecord
                                     ->required()
                                     ->rule('date'),
                                 Forms\Components\Placeholder::make('past_behavior')
-                                    ->content(Str::headline($this->record->past_behavior?->value)),
+                                    ->content(Str::headline($this->record->past_behavior?->value ?? '')),
                                 Forms\Components\Placeholder::make('future_behavior')
-                                    ->content(Str::headline($this->record->future_behavior?->value)),
+                                    ->content(Str::headline($this->record->future_behavior?->value ?? '')),
                             ]),
 
                     ])
@@ -75,7 +75,10 @@ class EditPage extends EditRecord
         ];
     }
 
-    /** @throws Throwable */
+    /**
+     * @param \Domain\Page\Models\Page $record
+     * @throws Throwable
+     */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(

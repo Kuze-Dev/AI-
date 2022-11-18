@@ -10,6 +10,9 @@ use Domain\Page\Models\Page;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Page\Models\Page>
+ */
 class PageFactory extends Factory
 {
     protected $model = Page::class;

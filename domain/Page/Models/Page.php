@@ -26,7 +26,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  *
  * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Activitylog\Models\Activity[] $activities
  * @property-read int|null $activities_count
- * @property-read \Domain\Blueprint\Models\Blueprint|null $blueprint
+ * @property-read \Domain\Blueprint\Models\Blueprint $blueprint
  * @method static \Illuminate\Database\Eloquent\Builder|\Domain\Page\Models\Page newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\Domain\Page\Models\Page newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\Domain\Page\Models\Page query()
@@ -60,6 +60,9 @@ class Page extends Model implements IsActivitySubject
             ->dontSubmitEmptyLogs();
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Page\Models\Page>
+     */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
