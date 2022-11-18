@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\FilamentTenant\Resources\PageResource\Pages\CreatePage;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Enums\PageBehavior;
 use Domain\Page\Models\Page;
 use Filament\Facades\Filament;
@@ -37,6 +38,28 @@ it('can create page', function () {
         ])
         ->call('create')
         ->assertHasNoFormErrors();
+
+    assertDatabaseCount(Page::class, 1);
+});
+
+it('can not create page with same name', function () {
+    $blueprint = BlueprintFactory::new()
+        ->withDummySchema()
+        ->createOne();
+
+    PageFactory::new()->createOne([
+        'name' => 'page 1',
+    ]);
+
+    assertDatabaseCount(Page::class, 1);
+
+    livewire(CreatePage::class)
+        ->fillForm([
+            'name' => 'page 1',
+            'blueprint_id' => $blueprint->getKey(),
+        ])
+        ->call('create')
+        ->assertHasFormErrors(['name' => 'unique']);
 
     assertDatabaseCount(Page::class, 1);
 });

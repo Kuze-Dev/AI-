@@ -7,6 +7,7 @@ use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Models\Page;
 use Filament\Facades\Filament;
 
+use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -39,4 +40,24 @@ it('can edit page', function () {
         ->assertHasNoFormErrors();
 
     assertDatabaseHas(Page::class, ['name' => 'Test']);
+});
+
+it('can not update page with same name', function () {
+    PageFactory::new()->createOne([
+        'name' => 'page 1',
+    ]);
+
+    $page = PageFactory::new()->createOne();
+
+    assertDatabaseCount(Page::class, 2);
+
+    livewire(EditPage::class, ['record' => $page->getKey()])
+        ->fillForm([
+            'name' => 'page 1',
+            'blueprint_id' => $page->blueprint->getKey(),
+        ])
+        ->call('save')
+        ->assertHasFormErrors(['name' => 'unique']);
+
+    assertDatabaseCount(Page::class, 2);
 });
