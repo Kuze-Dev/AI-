@@ -13,7 +13,6 @@ use Filament\Resources\Pages\CreateRecord;
 use Filament\Forms;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Throwable;
 
 class CreatePage extends CreateRecord
@@ -24,7 +23,7 @@ class CreatePage extends CreateRecord
     {
         $behaviors = collect(PageBehavior::cases())
             ->mapWithKeys(fn (PageBehavior $fieldType) => [
-                $fieldType->value => Str::headline($fieldType->value),
+                $fieldType->value => $fieldType->label(),
             ]);
 
         return [

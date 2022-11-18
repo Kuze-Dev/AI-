@@ -15,7 +15,6 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Exception;
-use Illuminate\Support\Str;
 
 class PageResource extends Resource
 {
@@ -34,7 +33,7 @@ class PageResource extends Resource
     {
         $behaviorsFilterOptions = collect(PageBehavior::cases())
             ->mapWithKeys(fn (PageBehavior $fieldType) => [
-                $fieldType->value => Str::headline($fieldType->value),
+                $fieldType->value => $fieldType->label(),
             ]);
 
         return $table
@@ -47,14 +46,14 @@ class PageResource extends Resource
                     ->searchable()
                     ->url(fn (Page $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
                 Tables\Columns\BadgeColumn::make('past_behavior')
-                    ->sortable()
+                    ->formatStateUsing(fn (Page $record) => $record->past_behavior?->label() ?? '--')
                     ->colors(fn (Page $record) => [$record->past_behavior?->color() ?? ''])
-                    ->default('--')
+                    ->sortable()
                     ->toggleable(),
                 Tables\Columns\BadgeColumn::make('future_behavior')
-                    ->sortable()
+                    ->formatStateUsing(fn (Page $record) => $record->future_behavior?->label() ?? '--')
                     ->colors(fn (Page $record) => [$record->future_behavior?->color() ?? ''])
-                    ->default('--')
+                    ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('published_at')
                     ->label(trans('Published date'))

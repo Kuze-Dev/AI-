@@ -13,7 +13,6 @@ use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Throwable;
 use Exception;
 use Filament\Forms;
@@ -61,9 +60,9 @@ class EditPage extends EditRecord
                                     ->required()
                                     ->rule('date'),
                                 Forms\Components\Placeholder::make('past_behavior')
-                                    ->content(Str::headline($this->record->past_behavior?->value ?? '')),
+                                    ->content($this->record->past_behavior?->label() ?? ''),
                                 Forms\Components\Placeholder::make('future_behavior')
-                                    ->content(Str::headline($this->record->future_behavior?->value ?? '')),
+                                    ->content($this->record->future_behavior?->label() ?? ''),
                             ]),
 
                     ])
