@@ -26,6 +26,7 @@ return new class () extends Migration {
                 ->comment('php enum');
 
             $table->json('data')->nullable();
+            $table->string('slug')->unique();
 
             $table->timestamp('published_at')->nullable();
 
