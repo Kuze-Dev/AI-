@@ -86,7 +86,7 @@ class SchemaFormBuilder extends Component
             FileFieldData::class => FileUpload::make($field->state_name)
                 ->multiple($field->multiple)
                 ->enableReordering($field->reorder)
-                ->acceptedFileTypes($field->accept)
+                ->acceptedFileTypes(fn () => !empty($field->accept) ? $field->accept : null)
                 ->maxSize($field->min_size)
                 ->minSize($field->max_size)
                 ->minFiles($field->min_files)
