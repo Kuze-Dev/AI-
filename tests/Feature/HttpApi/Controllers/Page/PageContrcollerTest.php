@@ -33,13 +33,14 @@ it('return list', function () {
 it('show', function () {
     $page = PageFactory::new()
         ->publicPublished()
-        ->createOne();
+        ->createOne(['name' => 'My Page Title']);
 
     getJson('api/pages/'.$page->getRouteKey())
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($page) {
             $json
                 ->where('data.type', 'pages')
+                ->where('data.id', Str::slug($page->name))
                 ->where('data.attributes.name', $page->name)
                 ->etc();
         });
