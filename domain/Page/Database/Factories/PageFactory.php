@@ -19,39 +19,28 @@ class PageFactory extends Factory
 
     public function definition(): array
     {
-        $randomBehavior = function (array $attributes): ?string {
-            if ($attributes['published_at'] === null) {
-                return null;
-            }
-
-            return Arr::random(PageBehavior::cases())->value;
-        };
-
         return [
-            'blueprint_id' => BlueprintFactory::new()->withDummySchema(),
+            'blueprint_id' => null,
             'name' => $this->faker->name(),
-            'past_behavior' => $randomBehavior,
-            'future_behavior' => $randomBehavior,
+            'past_behavior' => null,
+            'future_behavior' => null,
             'data' => null,
-            'published_at' => $this->faker->boolean() ? now() : null,
+            'published_at' => null,
         ];
-    }
-
-    public function withOutPublishedAtBehavior(): self
-    {
-        return $this->state(function (array $attributes) {
-            return [
-                'published_at' => null,
-            ];
-        });
     }
 
     public function withPublishedAtBehavior(): self
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'published_at' => now(),
-            ];
+        return $this->state(function (array $definition) {
+            $definition['past_behavior'] = Arr::random(PageBehavior::cases())->value;
+            $definition['future_behavior'] = Arr::random(PageBehavior::cases())->value;
+
+            return $definition;
         });
+    }
+
+    public function withDummyBlueprint(): self
+    {
+        return $this->for(BlueprintFactory::new()->withDummySchema());
     }
 }

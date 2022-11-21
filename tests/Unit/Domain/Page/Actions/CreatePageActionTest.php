@@ -16,40 +16,15 @@ use function Pest\Laravel\assertDatabaseHas;
 
 beforeEach(fn () => testInTenantContext());
 
-it('can create page w/ published_at behavior', function () {
-    $name = fake()->realText();
-    $blueprintId = BlueprintFactory::new()->withDummySchema()->createOne()->getKey();
-
-    $pastBehavior = Arr::random(PageBehavior::cases());
-    $futureBehavior = Arr::random(PageBehavior::cases());
-
-    app(CreatePageAction::class)
-        ->execute(new PageData(
-            name:$name,
-            blueprint_id: $blueprintId,
-            past_behavior: $pastBehavior,
-            future_behavior: $futureBehavior
-        ));
-
-    assertDatabaseCount(Page::class, 1);
-    assertDatabaseHas(Page::class, [
-        'name' => $name,
-        'blueprint_id' => $blueprintId,
-
-        'past_behavior' => $pastBehavior->value,
-        'future_behavior' => $futureBehavior->value,
-        'data' => null,
-        'published_at' => null,
-    ]);
-});
-
-it('can create page w/out published_at behavior', function () {
-    $name = fake()->realText();
-    $blueprintId = BlueprintFactory::new()->withDummySchema()->createOne()->getKey();
+it('can create page', function () {
+    $blueprintId = BlueprintFactory::new()
+        ->withDummySchema()
+        ->createOne()
+        ->getKey();
 
     app(CreatePageAction::class)
         ->execute(new PageData(
-            name:$name,
+            name: 'Foo',
             blueprint_id: $blueprintId,
             past_behavior: null,
             future_behavior: null
@@ -57,13 +32,35 @@ it('can create page w/out published_at behavior', function () {
 
     assertDatabaseCount(Page::class, 1);
     assertDatabaseHas(Page::class, [
-        'name' => $name,
+        'name' => 'Foo',
+        'blueprint_id' => $blueprintId,
+    ]);
+});
+
+it('can create page w/ published_at behavior', function () {
+    $blueprintId = BlueprintFactory::new()
+        ->withDummySchema()
+        ->createOne()
+        ->getKey();
+
+    $pastBehavior = Arr::random(PageBehavior::cases());
+    $futureBehavior = Arr::random(PageBehavior::cases());
+
+    app(CreatePageAction::class)
+        ->execute(new PageData(
+            name: 'Foo',
+            blueprint_id: $blueprintId,
+            past_behavior: $pastBehavior,
+            future_behavior: $futureBehavior
+        ));
+
+    assertDatabaseCount(Page::class, 1);
+    assertDatabaseHas(Page::class, [
+        'name' => 'Foo',
         'blueprint_id' => $blueprintId,
 
-        'past_behavior' => null,
-        'future_behavior' => null,
-        'data' => null,
-        'published_at' => null,
+        'past_behavior' => $pastBehavior->value,
+        'future_behavior' => $futureBehavior->value,
     ]);
 });
 
@@ -77,7 +74,7 @@ it(
 
         app(CreatePageAction::class)->execute(
             new PageData(
-                name:faker()->sentence(2),
+                name: faker()->sentence(2),
                 blueprint_id: $blueprintId,
                 past_behavior: $pastBehavior,
                 future_behavior: $futureBehavior

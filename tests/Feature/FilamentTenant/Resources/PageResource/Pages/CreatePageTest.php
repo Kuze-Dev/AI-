@@ -48,9 +48,9 @@ it('can not create page with same name', function () {
         ->withDummySchema()
         ->createOne();
 
-    PageFactory::new()->createOne([
-        'name' => 'page 1',
-    ]);
+    PageFactory::new()
+        ->withDummyBlueprint()
+        ->createOne(['name' => 'page 1']);
 
     assertDatabaseCount(Page::class, 1);
 
@@ -61,24 +61,6 @@ it('can not create page with same name', function () {
         ])
         ->call('create')
         ->assertHasFormErrors(['name' => 'unique'])
-        ->assertOk();
-
-    assertDatabaseCount(Page::class, 1);
-});
-
-it('can create page w/out published dates', function () {
-    $blueprint = BlueprintFactory::new()
-        ->withDummySchema()
-        ->createOne();
-
-    livewire(CreatePage::class)
-        ->fillForm([
-            'name' => 'Test',
-            'blueprint_id' => $blueprint->getKey(),
-            'published_dates' => false,
-        ])
-        ->call('create')
-        ->assertHasNoFormErrors()
         ->assertOk();
 
     assertDatabaseCount(Page::class, 1);
