@@ -21,7 +21,7 @@ it('can render page', function () {
     $page = PageFactory::new()
         ->createOne();
 
-    livewire(EditPage::class, ['record' => $page->getKey()])
+    livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->assertFormExists()
         ->assertSuccessful()
         ->assertFormSet([
@@ -33,7 +33,7 @@ it('can render page', function () {
 it('can edit page', function () {
     $page = PageFactory::new()->createOne();
 
-    livewire(EditPage::class, ['record' => $page->getKey()])
+    livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
         ])
@@ -53,7 +53,7 @@ it('can not update page with same name', function () {
 
     assertDatabaseCount(Page::class, 2);
 
-    livewire(EditPage::class, ['record' => $page->getKey()])
+    livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'page 1',
             'blueprint_id' => $page->blueprint->getKey(),

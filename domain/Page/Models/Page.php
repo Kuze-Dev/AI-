@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 
 /**
  * Domain\Page\Models\Page
@@ -22,6 +24,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property \Domain\Page\Enums\PageBehavior|null $past_behavior
  * @property \Domain\Page\Enums\PageBehavior|null $future_behavior
  * @property array|null $data
+ * @property string $slug
  * @property \Illuminate\Support\Carbon|null $published_at
  *
  * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Activitylog\Models\Activity[] $activities
@@ -35,6 +38,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class Page extends Model implements IsActivitySubject
 {
     use LogsActivity;
+    use HasSlug;
 
     protected $fillable = [
         'blueprint_id',
@@ -74,5 +78,17 @@ class Page extends Model implements IsActivitySubject
     public function hasPublishedAtBehavior(): bool
     {
         return $this->past_behavior !== null || $this->future_behavior !== null;
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    public function getSlugOptions(): SlugOptions
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom('name')
+            ->saveSlugsTo($this->getRouteKeyName());
     }
 }
