@@ -79,28 +79,17 @@ class SchemaFormBuilder extends Component
     private function generateFieldComponent(FieldData $field): Field
     {
         $fieldComponent = match ($field::class) {
-            DatetimeFieldData::class => DateTimePicker::make($field->state_name)
-                ->minDate($field->min)
-                ->maxDate($field->max)
-                ->format($field->format),
-            FileFieldData::class => FileUpload::make($field->state_name)
-                ->multiple($field->multiple)
-                ->enableReordering($field->reorder)
-                ->acceptedFileTypes(fn () => !empty($field->accept) ? $field->accept : null)
-                ->maxSize($field->min_size)
-                ->minSize($field->max_size)
-                ->minFiles($field->min_files)
-                ->maxFiles($field->max_files),
+            DatetimeFieldData::class => $this->makeDateTimePickerComponent($field),
+            FileFieldData::class => $this->makeFileUploadComponent($field),
             MarkdownFieldData::class => MarkdownEditor::make($field->state_name)
                 ->toolbarButtons(array_map(fn (MarkdownButton $button) => $button->value, $field->buttons)),
             RichtextFieldData::class => RichEditor::make($field->state_name)
                 ->toolbarButtons(array_map(fn (RichtextButton $button) => $button->value, $field->buttons)),
             SelectFieldData::class => Select::make($field->state_name)
-                ->options(Arr::pluck($field->options, 'label', 'value')),
-            TextareaFieldData::class => Textarea::make($field->state_name)
-                ->minLength(fn () => $field->min_length)
-                ->maxLength(fn () => $field->max_length),
-            TextFieldData::class => $this->makeTextFieldComponent($field),
+                ->options(Arr::pluck($field->options, 'label', 'value'))
+                ->multiple($field->multiple),
+            TextareaFieldData::class => $this->makeTextAreaComponent($field),
+            TextFieldData::class => $this->makeTextInputComponent($field),
             ToggleFieldData::class => Toggle::make($field->state_name),
             default => throw new InvalidArgumentException(),
         };
@@ -111,7 +100,70 @@ class SchemaFormBuilder extends Component
             ->rules($field->rules);
     }
 
-    private function makeTextFieldComponent(TextFieldData $textFieldData): TextInput
+    private function makeDateTimePickerComponent(DatetimeFieldData $datetimeFieldData): DateTimePicker
+    {
+        $dateTimePicker = DateTimePicker::make($datetimeFieldData->state_name)
+            ->format($datetimeFieldData->format);
+
+        if ($datetimeFieldData->min) {
+            $dateTimePicker->minDate($datetimeFieldData->min);
+        }
+
+        if ($datetimeFieldData->max) {
+            $dateTimePicker->maxDate($datetimeFieldData->max);
+        }
+
+        return $dateTimePicker;
+    }
+
+    private function makeFileUploadComponent(FileFieldData $fileFieldData): FileUpload
+    {
+        $fileUpload = FileUpload::make($fileFieldData->state_name)
+            ->getUploadedFileUrlUsing(fn (string $file) => tenant_asset($file));
+
+        if ($fileFieldData->multiple) {
+            $fileUpload->multiple($fileFieldData->multiple)
+                ->minFiles($fileFieldData->min_files)
+                ->maxFiles($fileFieldData->max_files);
+        }
+
+        if ($fileFieldData->reorder) {
+            $fileUpload->enableReordering($fileFieldData->reorder);
+        }
+
+        if ( ! empty($fileFieldData->accept)) {
+            $fileUpload->acceptedFileTypes($fileFieldData->accept);
+        }
+
+        if ($fileFieldData->min_size) {
+            $fileUpload->minSize($fileFieldData->min_size);
+        }
+
+        if ($fileFieldData->max_size) {
+            $fileUpload->maxSize($fileFieldData->max_size);
+        }
+
+        return $fileUpload;
+    }
+
+    private function makeTextAreaComponent(TextareaFieldData $textareaFieldData): Textarea
+    {
+        $textarea = Textarea::make($textareaFieldData->state_name)
+            ->rows($textareaFieldData->rows)
+            ->cols($textareaFieldData->cols);
+
+        if ($textareaFieldData->min_length) {
+            $textarea->minLength(fn () => $textareaFieldData->min_length);
+        }
+
+        if ($textareaFieldData->max_length) {
+            $textarea->maxLength(fn () => $textareaFieldData->max_length);
+        }
+
+        return $textarea;
+    }
+
+    private function makeTextInputComponent(TextFieldData $textFieldData): TextInput
     {
         if ($textFieldData->type === FieldType::NUMBER) {
             return TextInput::make($textFieldData->state_name)
