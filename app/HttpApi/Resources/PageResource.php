@@ -9,6 +9,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
  * @property-read string $name
+ * @property-read array|null $data
  */
 class PageResource extends JsonApiResource
 {
@@ -16,6 +17,7 @@ class PageResource extends JsonApiResource
     {
         return  [
             'name' => $this->name,
+            'data' => $this->data,
         ];
     }
 }
