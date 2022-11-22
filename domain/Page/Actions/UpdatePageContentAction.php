@@ -11,9 +11,7 @@ class UpdatePageContentAction
 {
     public function execute(Page $page, PageContentData $pageContentData): Page
     {
-        $page->update([
-            'data' => $pageContentData->data,
-        ]);
+        $page->update(['data' => $pageContentData->data]);
 
         return $page;
     }

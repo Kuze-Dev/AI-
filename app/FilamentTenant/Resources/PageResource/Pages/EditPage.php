@@ -49,9 +49,7 @@ class EditPage extends EditRecord
     {
         return DB::transaction(
             fn () => app(UpdatePageContentAction::class)
-                ->execute($record, new PageContentData(
-                    data: $data['data'],
-                ))
+                ->execute($record, new PageContentData(data: $data['data']))
         );
     }
 }

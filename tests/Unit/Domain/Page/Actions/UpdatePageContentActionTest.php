@@ -21,9 +21,7 @@ it('can update page', function () {
 
     app(UpdatePageContentAction::class)->execute(
         $page,
-        new PageContentData(
-            data: $blueprintData,
-        )
+        new PageContentData(data: $blueprintData)
     );
 
     assertDatabaseHas(
