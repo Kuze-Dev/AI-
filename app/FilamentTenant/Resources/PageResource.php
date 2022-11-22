@@ -42,7 +42,17 @@ class PageResource extends Resource
                     ->required()
                     ->exists(Blueprint::class, 'id')
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->reactive()
+                    ->helperText(function (?Page $record, ?string $state) {
+                        if ($record === null) {
+                            return;
+                        }
+
+                        if ($record->blueprint_id !== (int) $state) {
+                            return trans('Modifying the blueprint will reset all the page\'s content.');
+                        }
+                    }),
             ]),
         ]);
     }
