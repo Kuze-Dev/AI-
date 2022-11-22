@@ -13,6 +13,6 @@ class ApiServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        JsonApiResource::resolveIdUsing(fn(Model $resource, Request $request): string => $resource->getRouteKey());
+        JsonApiResource::resolveIdUsing(fn (Model $resource, Request $request): string => $resource->getRouteKey());
     }
 }

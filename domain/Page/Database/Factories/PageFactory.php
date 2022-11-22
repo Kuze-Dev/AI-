@@ -28,15 +28,4 @@ class PageFactory extends Factory
     {
         return $this->for(BlueprintFactory::new()->withDummySchema());
     }
-
-    public function publicPublished(): self
-    {
-        return $this->state(function (array $attributes) {
-            return [
-                'published_at' => now(),
-                'past_behavior' => PageBehavior::PUBLIC,
-                'future_behavior' => PageBehavior::PUBLIC,
-            ];
-        });
-    }
 }

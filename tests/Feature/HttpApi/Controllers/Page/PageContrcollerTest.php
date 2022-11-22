@@ -15,7 +15,7 @@ beforeEach(function () {
 
 it('return list', function () {
     PageFactory::new()
-        ->publicPublished()
+        ->withDummyBlueprint()
         ->count(10)
         ->create();
 
@@ -32,7 +32,7 @@ it('return list', function () {
 
 it('show', function () {
     $page = PageFactory::new()
-        ->publicPublished()
+        ->withDummyBlueprint()
         ->createOne(['name' => 'My Page Title']);
 
     getJson('api/pages/'.$page->getRouteKey())
@@ -44,4 +44,38 @@ it('show', function () {
                 ->where('data.attributes.name', $page->name)
                 ->etc();
         });
+});
+
+it('filter', function () {
+    $pages = PageFactory::new()
+        ->withDummyBlueprint()
+        ->count(2)
+        ->sequence(
+            ['name' => 'page 1'],
+            ['name' => 'page 2'],
+        )
+        ->create();
+
+    foreach ($pages as $page) {
+        getJson('api/pages?'.http_build_query(['filter[name]' => $page->name]))
+            ->assertOk()
+            ->assertJson(function (AssertableJson $json) use ($page) {
+                $json
+                    ->count('data', 1)
+                    ->where('data.0.type', 'pages')
+                    ->where('data.0.id', $page->getRouteKey())
+                    ->where('data.0.attributes.name', $page->name)
+                    ->etc();
+            });
+        getJson('api/pages?'.http_build_query(['filter[slug]' => $page->slug]))
+            ->assertOk()
+            ->assertJson(function (AssertableJson $json) use ($page) {
+                $json
+                    ->count('data', 1)
+                    ->where('data.0.type', 'pages')
+                    ->where('data.0.id', $page->getRouteKey())
+                    ->where('data.0.attributes.name', $page->name)
+                    ->etc();
+            });
+    }
 });
