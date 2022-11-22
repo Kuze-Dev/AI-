@@ -19,7 +19,7 @@ class SelectFieldData extends FieldData
         public readonly FieldType $type = FieldType::SELECT,
         public readonly array $rules = [],
         public readonly array $options = [],
-        public readonly ?bool $multiple = false,
+        public readonly bool $multiple = false,
     ) {
     }
 

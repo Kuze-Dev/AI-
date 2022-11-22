@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Page\Models\Page;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -28,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
             config('permission.models.role'),
             config('tenancy.tenant_model'),
             Blueprint::class,
+            Page::class,
         ]);
 
         Password::defaults(
