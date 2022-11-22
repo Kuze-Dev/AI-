@@ -76,7 +76,7 @@ class Page extends Model implements IsActivitySubject
         return SlugOptions::create()
             ->generateSlugsFrom('name')
             ->preventOverwrite()
-            ->doNotGenerateSlugsOnUpdate(false)
+            ->doNotGenerateSlugsOnUpdate()
             ->saveSlugsTo($this->getRouteKeyName());
     }
 }
