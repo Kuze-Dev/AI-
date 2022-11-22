@@ -7,7 +7,6 @@ namespace App\FilamentTenant\Resources\PageResource\Pages;
 use App\FilamentTenant\Resources\PageResource;
 use Domain\Page\Actions\UpdatePageAction;
 use Domain\Page\DataTransferObjects\PageData;
-use Domain\Page\Enums\PageBehavior;
 use Domain\Page\Models\Page;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -46,8 +45,6 @@ class ConfigurePage extends EditRecord
                 ->execute($record, new PageData(
                     name: $data['name'],
                     blueprint_id: (int) $data['blueprint_id'],
-                    past_behavior: PageBehavior::tryFrom($data['past_behavior'] ?? ''),
-                    future_behavior: PageBehavior::tryFrom($data['future_behavior'] ?? ''),
                 ))
         );
     }

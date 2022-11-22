@@ -7,7 +7,6 @@ namespace App\FilamentTenant\Resources\PageResource\Pages;
 use App\FilamentTenant\Resources\PageResource;
 use Domain\Page\Actions\CreatePageAction;
 use Domain\Page\DataTransferObjects\PageData;
-use Domain\Page\Enums\PageBehavior;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -25,8 +24,6 @@ class CreatePage extends CreateRecord
                 ->execute(new PageData(
                     name: $data['name'],
                     blueprint_id: (int) $data['blueprint_id'],
-                    past_behavior: PageBehavior::tryFrom($data['past_behavior'] ?? ''),
-                    future_behavior: PageBehavior::tryFrom($data['future_behavior'] ?? ''),
                 ))
         );
     }
