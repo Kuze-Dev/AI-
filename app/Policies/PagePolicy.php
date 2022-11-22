@@ -27,6 +27,11 @@ class PagePolicy
         return $this->checkWildcardPermissions($user);
     }
 
+    public function configure(User $user, Page $page): bool
+    {
+        return $this->checkWildcardPermissions($user);
+    }
+
     public function update(User $user, Page $page): bool
     {
         return $this->checkWildcardPermissions($user);

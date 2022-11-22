@@ -93,6 +93,7 @@ class PageResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('configure')
+                    ->authorize('page.configure')
                     ->icon('heroicon-s-cog')
                     ->url(fn (Page $record) => route('filament-tenant.resources.' . self::getSlug() . '.configure', $record)),
                 Tables\Actions\DeleteAction::make(),
