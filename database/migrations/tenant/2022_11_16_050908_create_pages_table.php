@@ -16,19 +16,9 @@ return new class () extends Migration {
             $table->foreignIdFor(BlueprintModel::class)->constrained();
 
             $table->string('name')->unique();
-
-            $table->string('past_behavior')
-                ->nullable()
-                ->comment('php enum');
-
-            $table->string('future_behavior')
-                ->nullable()
-                ->comment('php enum');
-
-            $table->json('data')->nullable();
             $table->string('slug')->unique();
 
-            $table->timestamp('published_at')->nullable();
+            $table->json('data')->nullable();
 
             $table->timestamps();
         });

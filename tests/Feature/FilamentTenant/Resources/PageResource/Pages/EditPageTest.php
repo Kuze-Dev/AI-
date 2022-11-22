@@ -3,11 +3,12 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\PageResource\Pages\EditPage;
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Blueprint\Enums\FieldType;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Models\Page;
 use Filament\Facades\Filament;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -19,48 +20,39 @@ beforeEach(function () {
 
 it('can render page', function () {
     $page = PageFactory::new()
-        ->createOne();
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->createOne(['data' => ['main' => ['header' => 'Foo']]]);
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->assertFormExists()
         ->assertSuccessful()
-        ->assertFormSet([
-            'name' => $page->name,
-        ])
+        ->assertFormSet(['data' => ['main' => ['header' => 'Foo']]])
         ->assertOk();
 });
 
 it('can edit page', function () {
-    $page = PageFactory::new()->createOne();
+    $page = PageFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->createOne(['data' => ['main' => ['header' => 'Foo']]]);
+
+    $newData = ['main' => ['header' => 'Bar']];
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
-        ->fillForm([
-            'name' => 'Test',
-        ])
+        ->fillForm(['data' => $newData])
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk();
 
-    assertDatabaseHas(Page::class, ['name' => 'Test']);
-});
-
-it('can not update page with same name', function () {
-    PageFactory::new()->createOne([
-        'name' => 'page 1',
-    ]);
-
-    $page = PageFactory::new()->createOne();
-
-    assertDatabaseCount(Page::class, 2);
-
-    livewire(EditPage::class, ['record' => $page->getRouteKey()])
-        ->fillForm([
-            'name' => 'page 1',
-            'blueprint_id' => $page->blueprint->getKey(),
-        ])
-        ->call('save')
-        ->assertHasFormErrors(['name' => 'unique'])
-        ->assertOk();
-
-    assertDatabaseCount(Page::class, 2);
+    assertDatabaseHas(
+        Page::class,
+        ['data' => json_encode($newData)]
+    );
 });

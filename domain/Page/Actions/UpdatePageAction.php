@@ -7,14 +7,21 @@ namespace Domain\Page\Actions;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 
-class CreatePageAction
+class UpdatePageAction
 {
-    public function execute(PageData $pageData): Page
+    public function execute(Page $page, PageData $pageData): Page
     {
-        return Page::create([
+        $page->fill([
             'name' => $pageData->name,
-            'slug' => $pageData->slug,
             'blueprint_id' => $pageData->blueprint_id,
         ]);
+
+        if ($page->isDirty('blueprint_id')) {
+            $page->data = null;
+        }
+
+        $page->save();
+
+        return $page;
     }
 }
