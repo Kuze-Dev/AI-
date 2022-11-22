@@ -23,6 +23,7 @@ class CreatePage extends CreateRecord
             fn () => app(CreatePageAction::class)
                 ->execute(new PageData(
                     name: $data['name'],
+                    slug: $data['slug'],
                     blueprint_id: (int) $data['blueprint_id'],
                 ))
         );

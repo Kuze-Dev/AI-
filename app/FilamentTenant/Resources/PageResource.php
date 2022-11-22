@@ -36,6 +36,9 @@ class PageResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->unique(ignoreRecord: true)
                     ->required(),
+                Forms\Components\TextInput::make('slug')
+                    ->unique(ignoreRecord: true)
+                    ->disabled(fn (?Page $record) => $record !== null),
                 Forms\Components\Select::make('blueprint_id')
                     ->relationship('blueprint', 'name')
                     ->saveRelationshipsUsing(null)
@@ -63,6 +66,9 @@ class PageResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('slug')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('blueprint.name')

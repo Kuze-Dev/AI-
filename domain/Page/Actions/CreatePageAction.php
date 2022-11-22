@@ -13,6 +13,7 @@ class CreatePageAction
     {
         return Page::create([
             'name' => $pageData->name,
+            'slug' => $pageData->slug,
             'blueprint_id' => $pageData->blueprint_id,
         ]);
     }

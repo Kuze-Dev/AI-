@@ -39,6 +39,7 @@ class Page extends Model implements IsActivitySubject
     protected $fillable = [
         'blueprint_id',
         'name',
+        'slug',
         'data',
     ];
 
@@ -74,6 +75,8 @@ class Page extends Model implements IsActivitySubject
     {
         return SlugOptions::create()
             ->generateSlugsFrom('name')
+            ->preventOverwrite()
+            ->doNotGenerateSlugsOnUpdate(false)
             ->saveSlugsTo($this->getRouteKeyName());
     }
 }
