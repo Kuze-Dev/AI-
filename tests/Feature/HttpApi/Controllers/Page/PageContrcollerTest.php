@@ -10,7 +10,6 @@ use function Pest\Laravel\getJson;
 
 beforeEach(function () {
     testInTenantContext();
-    loginAsUser();
 });
 
 it('return list', function () {
