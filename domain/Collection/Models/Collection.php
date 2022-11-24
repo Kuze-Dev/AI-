@@ -1,0 +1,78 @@
+<?php 
+
+declare(strict_types = 1);
+
+namespace Domain\Collection\Models;
+
+use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Blueprint\Models\Blueprint;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
+
+class Collection extends Model implements IsActivitySubject 
+{
+    use LogsActivity,
+        HasSlug;
+
+    protected $fillable = [
+        'name',
+        'blueprint_id',
+        'slug',
+        'data'
+    ];
+
+    protected $casts = [
+        'data' => 'array',
+    ];
+
+    /**
+     * @return LogOptions
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
+    public function blueprint(): BelongsTo 
+    {
+        return $this->belongsTo(Blueprint::class);
+    }
+
+    /**
+     * @param Activity $activity
+     * 
+     * @return string
+     */
+    public function getActivitySubjectDescription(Activity $activity): string
+    {
+        return 'Collection: '.$this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    /**
+     * @return SlugOptions
+     */
+    public function getSlugOptions(): SlugOptions 
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom('name')
+            ->preventOverwrite()
+            ->doNotGenerateSlugsOnUpdate()
+            ->saveSlugsTo($this->getRouteKeyName());
+    }
+}
