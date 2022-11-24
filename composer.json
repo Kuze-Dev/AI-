@@ -24,6 +24,7 @@
         "spatie/laravel-queueable-action": "^2.14",
         "spatie/laravel-route-attributes": "^1.11",
         "spatie/laravel-sluggable": "^3.4",
+        "spatie/laravel-validation-rules": "^3.2",
         "stancl/tenancy": "^3.6",
         "timacdonald/json-api": "^0.2.1",
         "victord11/ssl-certification-health-check": "^1.0"
