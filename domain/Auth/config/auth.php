@@ -7,11 +7,11 @@ use Domain\Auth\Pipes\Login\EnsureLoginIsNotThrottled;
 return [
 
     'login' => [
-        'pipeline' => array_filter([
+        'pipeline' => [
             EnsureLoginIsNotThrottled::class,
             CheckForTwoFactorAuthentication::class,
             AttemptToAuthenticate::class,
-        ]),
+        ],
 
         'throttle' => [
             'max_attempts' => env('AUTH_LOGIN_THROTTLE_MAX_ATTEMPTS', 5),

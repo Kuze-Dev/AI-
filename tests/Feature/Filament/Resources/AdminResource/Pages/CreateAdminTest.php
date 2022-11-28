@@ -11,7 +11,7 @@ use function Pest\Livewire\livewire;
 use function PHPUnit\Framework\assertCount;
 use function PHPUnit\Framework\assertSame;
 
-beforeEach(fn () => loginAsAdmin());
+beforeEach(fn () => loginAsSuperAdmin());
 
 it('can create', function () {
     assertDatabaseCount(Admin::class, 1); // on logged in user

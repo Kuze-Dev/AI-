@@ -9,7 +9,7 @@ use Filament\Pages\Actions\DeleteAction;
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Livewire\livewire;
 
-beforeEach(fn () => loginAsAdmin());
+beforeEach(fn () => loginAsSuperAdmin());
 
 it('can list', function () {
     $roles = RoleFactory::new()->count(9)->create();

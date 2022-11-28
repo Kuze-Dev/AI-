@@ -11,7 +11,7 @@ use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Livewire\livewire;
 use function PHPUnit\Framework\assertSame;
 
-beforeEach(fn () => loginAsAdmin());
+beforeEach(fn () => loginAsSuperAdmin());
 
 it('can show edit', function () {
     $admin = AdminFactory::new()
