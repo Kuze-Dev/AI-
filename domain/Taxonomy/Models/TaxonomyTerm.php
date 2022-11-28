@@ -1,14 +1,12 @@
 <?php
 
-namespace Domain\TaxonomyTerm\Models;
+declare(strict_types=1);
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
-use Domain\Blueprint\Models\Blueprint;
+namespace Domain\Taxonomy\Models;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-use Domain\Taxonomy\Models\Taxonomy;
 
 class TaxonomyTerm extends Model
 {
@@ -21,7 +19,8 @@ class TaxonomyTerm extends Model
         'description',
         'order',
     ];
-    public function taxonomies(): BelongsTo 
+
+    public function taxonomies(): BelongsTo
     {
         return $this->belongsTo(Taxonomy::class);
     }

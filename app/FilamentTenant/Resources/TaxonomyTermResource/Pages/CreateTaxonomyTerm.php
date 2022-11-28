@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\TaxonomyTermResource\Pages;
 
 use App\FilamentTenant\Resources\TaxonomyTermResource;
-use Filament\Pages\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateTaxonomyTerm extends CreateRecord

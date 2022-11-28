@@ -7,7 +7,6 @@ namespace App\FilamentTenant\Resources\TaxonomyResource\Pages;
 use App\FilamentTenant\Resources\TaxonomyResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Exception;
 
 class ListTaxonomies extends ListRecords
 {

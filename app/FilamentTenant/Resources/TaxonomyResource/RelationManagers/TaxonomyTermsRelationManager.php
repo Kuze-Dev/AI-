@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\TaxonomyResource\RelationManagers;
 
-use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 use Illuminate\Support\Str;
 use Closure;
@@ -23,27 +20,25 @@ use Filament\Tables\Columns\TextColumn;
 
 class TaxonomyTermsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'taxonomy_terms';
+    protected static string $relationship = 'taxonomyTerms';
 
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $modelLabel = 'Taxonomy Term';
-    
-
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                    Card::make()->schema([
-                        TextInput::make('name')
+                Card::make()->schema([
+                    TextInput::make('name')
                         ->reactive()
-                            ->afterStateUpdated(function (Closure $set, $state) {
-                                $set('slug', Str::slug($state));
-                            })->required(),
-                        TextInput::make('slug')->required(),
-                        RichEditor::make('description')->required(),
-                    ])
+                        ->afterStateUpdated(function (Closure $set, $state) {
+                            $set('slug', Str::slug($state));
+                        })->required(),
+                    TextInput::make('slug')->required(),
+                    RichEditor::make('description')->required(),
+                ]),
             ]);
     }
 
@@ -55,7 +50,7 @@ class TaxonomyTermsRelationManager extends RelationManager
                 TextColumn::make('created_at')->date(),
             ])
             ->filters([
-                //
+
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()->label('New Taxonomy Term'),
@@ -70,5 +65,5 @@ class TaxonomyTermsRelationManager extends RelationManager
                 Tables\Actions\DissociateBulkAction::make(),
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
-    }    
+    }
 }
