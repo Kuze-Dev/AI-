@@ -23,9 +23,7 @@ class EditCollection extends EditRecord
     protected function getActions(): array
     {
         return [
-            Actions\Action::make('configure')
-                ->icon('heroicon-s-cog'),
-            Actions\DeleteAction::make()
+            // 
         ];
     }
 }

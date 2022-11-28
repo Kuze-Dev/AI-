@@ -109,7 +109,6 @@ class CollectionResource extends Resource
                 ->optionsLimit(20),
         ])
         ->actions([
-            Tables\Actions\EditAction::make(),
             Tables\Actions\Action::make('configure')
                 ->authorize('collection.configure')
                 ->icon('heroicon-s-cog')
@@ -140,7 +139,6 @@ class CollectionResource extends Resource
         return [
             'index' => Resources\CollectionResource\Pages\ListCollection::route('/'),
             'create' => Resources\CollectionResource\Pages\CreateCollection::route('/create'),
-            'edit' => Resources\CollectionResource\Pages\EditCollection::route('/{record}/edit'),
             'configure' => Resources\CollectionResource\Pages\ConfigureCollection::route('/{record}/configure'),
         ];
     }    
