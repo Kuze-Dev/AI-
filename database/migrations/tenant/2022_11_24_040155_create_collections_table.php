@@ -19,8 +19,8 @@ return new class extends Migration
             $table->id();
 
             $table->foreignIdFor(BlueprintModel::class)->constrained();
-            $table->string('slug');
-            $table->string('name');
+            $table->string('name')->unique();
+            $table->string('slug')->unique();
             $table->json('data')->nullable();
             
             $table->timestamps();

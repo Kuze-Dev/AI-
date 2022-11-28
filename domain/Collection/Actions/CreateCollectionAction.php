@@ -9,10 +9,18 @@ use Domain\Collection\Models\Collection;
 
 class CreateCollectionAction
 {
+    /**
+     * Execute create collection query.
+     *  
+     * @param CollectionData $collectionData
+     * 
+     * @return Collection
+     */
     public function execute(CollectionData $collectionData): Collection
     {
         return Collection::create([
             'name' => $collectionData->name,
+            'slug' => $collectionData->slug,
             'blueprint_id' => $collectionData->blueprint_id,
         ]);
     }

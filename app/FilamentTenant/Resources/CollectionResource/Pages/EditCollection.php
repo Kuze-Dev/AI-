@@ -10,8 +10,16 @@ use Filament\Pages\Actions;
 
 class EditCollection extends EditRecord
 {
+    /**
+     * @var string
+     */
     protected static string $resource = CollectionResource::class;
 
+    /**
+     * @return array
+     * 
+     * @throws Exception
+     */
     protected function getActions(): array
     {
         return [

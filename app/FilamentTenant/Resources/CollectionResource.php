@@ -6,7 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
-
+use Domain\Blueprint\Models\Blueprint;
 use Domain\Collection\Models\Collection;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -110,6 +110,10 @@ class CollectionResource extends Resource
         ])
         ->actions([
             Tables\Actions\EditAction::make(),
+            Tables\Actions\Action::make('configure')
+                ->authorize('collection.configure')
+                ->icon('heroicon-s-cog')
+                ->url(fn (Collection $record) => route('filament-tenant.resources.'. self::getSlug() . '.configure', $record)),
             Tables\Actions\DeleteAction::make(),
         ])
         ->bulkActions([
@@ -134,7 +138,10 @@ class CollectionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Resources\CollectionResource\Pages\ListCollection::route('/')
+            'index' => Resources\CollectionResource\Pages\ListCollection::route('/'),
+            'create' => Resources\CollectionResource\Pages\CreateCollection::route('/create'),
+            'edit' => Resources\CollectionResource\Pages\EditCollection::route('/{record}/edit'),
+            'configure' => Resources\CollectionResource\Pages\ConfigureCollection::route('/{record}/configure'),
         ];
     }    
 }
