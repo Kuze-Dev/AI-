@@ -9,13 +9,16 @@ use Domain\Tenant\Actions\CreateTenantAction;
 use Domain\Tenant\DataTransferObjects\TenantData;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class CreateTenant extends CreateRecord
 {
     protected static string $resource = TenantResource::class;
 
+    /** @throws Throwable */
     public function handleRecordCreation(array $data): Model
     {
-        return app(CreateTenantAction::class)->execute(new TenantData(...$data));
+        return DB::transaction(fn () => app(CreateTenantAction::class)->execute(new TenantData(...$data)));
     }
 }

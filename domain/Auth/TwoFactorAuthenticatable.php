@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Auth;
 
+use Domain\Auth\Actions\GenerateRecoveryCodesAction;
+use Domain\Auth\Actions\SetupTwoFactorAuthenticationAction;
+use Domain\Auth\Contracts\TwoFactorAuthenticatable as TwoFactorAuthenticatableContract;
 use Domain\Auth\Model\TwoFactorAuthentication;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
@@ -13,6 +16,14 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 trait TwoFactorAuthenticatable
 {
     protected string $twoFactorHolderAttribute = 'email';
+
+    public static function bootTwoFactorAuthenticatable(): void
+    {
+        self::created(function (TwoFactorAuthenticatableContract $twoFactorAuthenticatable) {
+            app(SetupTwoFactorAuthenticationAction::class)->execute($twoFactorAuthenticatable);
+            app(GenerateRecoveryCodesAction::class)->execute($twoFactorAuthenticatable);
+        });
+    }
 
     public function twoFactorHolder(): string
     {

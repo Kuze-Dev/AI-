@@ -1,6 +1,13 @@
 # Release Notes
 
-## [Unreleased](https://bitbucket.org/halcyonlaravel/saas-boilerplate/branches/compare/master%0Dv0.1.3)
+## [Unreleased](https://bitbucket.org/halcyonlaravel/saas-boilerplate/branches/compare/master%0Dv0.1.4)
+
+## [v0.1.4](https://bitbucket.org/halcyonlaravel/saas-boilerplate/branches/compare/v0.1.4%0Dv0.1.3)
+
+### Changed
+
+- Use DB transaction when calling tenant actions.
+- Sync with [`halcyonlaravel/tall-boilerplate` v0.1.4](https://bitbucket.org/halcyonlaravel/tall-boilerplate/src/v0.1.4/)
 
 ## [v0.1.3](https://bitbucket.org/halcyonlaravel/saas-boilerplate/branches/compare/v0.1.3%0Dv0.1.2)
 

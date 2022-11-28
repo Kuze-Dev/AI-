@@ -25,4 +25,10 @@ class PermissionGroup
 
         return new self($main, $abilities);
     }
+
+    /** @return Collection<int, string> */
+    public function getParts(): Collection
+    {
+        return $this->abilities->map(fn (Permission $permission) => explode('.', $permission->name, 2)[1]);
+    }
 }

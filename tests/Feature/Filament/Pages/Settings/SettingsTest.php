@@ -7,7 +7,7 @@ use Spatie\LaravelSettings\SettingsContainer;
 
 use function Pest\Laravel\get;
 
-beforeEach(fn () => loginAsAdmin());
+beforeEach(fn () => loginAsSuperAdmin());
 
 it('can render page', function () {
     get(Settings::getUrl())

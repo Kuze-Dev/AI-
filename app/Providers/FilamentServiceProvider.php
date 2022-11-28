@@ -11,10 +11,12 @@ use App\Filament\Livewire\Auth\RequestPasswordReset;
 use App\Filament\Livewire\Auth\ResetPassword;
 use App\Filament\Livewire\Auth\TwoFactorAuthentication;
 use App\Filament\Livewire\Auth\VerifyEmail;
+use Domain\Admin\Models\Admin;
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Saade\FilamentLaravelLog\Pages\ViewLog;
 
 /** @property \Illuminate\Foundation\Application $app */
 class FilamentServiceProvider extends ServiceProvider
@@ -52,6 +54,8 @@ class FilamentServiceProvider extends ServiceProvider
                     </p>
                 HTML,
         );
+
+        ViewLog::can(fn (?Admin $admin) => $admin?->hasRole(config('domain.role.super_admin')));
 
         $this->registerRoutes();
     }

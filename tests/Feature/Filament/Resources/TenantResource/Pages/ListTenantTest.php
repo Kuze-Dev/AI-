@@ -9,7 +9,7 @@ use Filament\Pages\Actions\DeleteAction;
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Livewire\livewire;
 
-beforeEach(fn () => loginAsAdmin());
+beforeEach(fn () => loginAsSuperAdmin());
 
 it('can render page', function () {
     livewire(ListTenants::class)->assertSuccessful();
