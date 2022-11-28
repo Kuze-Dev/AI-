@@ -9,6 +9,7 @@ use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Support\Facades\Auth;
 
 class FormSubmissionsRelationManager extends RelationManager
 {
@@ -20,9 +21,8 @@ class FormSubmissionsRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('id')
-                    ->required()
-                    ->maxLength(255),
+                Forms\Components\TextInput::make('id'),
+                Forms\Components\TextInput::make('data'),
             ]);
     }
 
@@ -31,19 +31,14 @@ class FormSubmissionsRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id'),
-            ])
-            ->filters([
-
-            ])
-            ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Columns\TextColumn::make('data'),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->sortable(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ->defaultSort('created_at', 'desc');
     }
 }

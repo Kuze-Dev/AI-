@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $sender
  * @property string $template
  *
+ * @property-read \Domain\Form\Models\Form $form
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification query()
@@ -36,6 +37,7 @@ class FormEmailNotification extends Model
         'template',
     ];
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Form\Models\Form, \Domain\Form\Models\FormEmailNotification> */
     public function form(): BelongsTo
     {
         return $this->belongsTo(Form::class);

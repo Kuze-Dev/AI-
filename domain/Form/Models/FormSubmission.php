@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace Domain\Form\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Domain\Form\Models\FormSubmission
  *
- * @property int $id
- * @property int $form_id
- * @property array $data
- *
+ * @property-read \Domain\Form\Models\Form $form
  * @method static \Illuminate\Database\Eloquent\Builder|FormSubmission newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FormSubmission newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FormSubmission query()
@@ -28,4 +26,10 @@ class FormSubmission extends Model
     protected $casts = [
         'data' => 'array',
     ];
+
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Form\Models\Form, \Domain\Form\Models\FormSubmission> */
+    public function form(): BelongsTo
+    {
+        return $this->belongsTo(Form::class);
+    }
 }

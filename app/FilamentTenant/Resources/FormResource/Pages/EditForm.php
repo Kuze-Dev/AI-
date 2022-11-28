@@ -27,7 +27,10 @@ class EditForm extends EditRecord
         ];
     }
 
-    /** @throws Throwable */
+    /**
+     * @param \Domain\Form\Models\Form $record
+     * @throws Throwable
+     */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(fn () => app(UpdateFormAction::class)
@@ -35,7 +38,9 @@ class EditForm extends EditRecord
                 $record,
                 FormData::fromArray(
                     $data,
-                    formEmailNotifications: $this->form->getRawState()['formEmailNotifications']
+                    // TODO: optimize to maintainable code
+//                    formEmailNotifications: $this->validate()['data']['formEmailNotifications'] ?? null
+                    formEmailNotifications: $this->form->getRawState()['formEmailNotifications'] ?? null
                 )
             ));
     }

@@ -73,17 +73,19 @@ class FormResource extends Resource
                         ->schema([
                             Forms\Components\TextInput::make('recipient')
                                 ->label(trans('Recipient/s'))
-                                ->helperText('Seperated by comma')
                                 ->required()
-                                ->rule(new Delimited('email')),
+                                ->rule(new Delimited('email'))
+                                ->helperText('Seperated by comma'),
                             Forms\Components\TextInput::make('cc')
                                 ->label(trans('CC/s'))
                                 ->nullable()
-                                ->rule(new Delimited('email')),
+                                ->rule(new Delimited('email'))
+                                ->helperText('Seperated by comma'),
                             Forms\Components\TextInput::make('bcc')
                                 ->label(trans('BCC/s'))
                                 ->nullable()
-                                ->rule(new Delimited('email')),
+                                ->rule(new Delimited('email'))
+                                ->helperText('Seperated by comma'),
                             Forms\Components\TextInput::make('reply_to')
                                 ->nullable()
                                 ->email(),

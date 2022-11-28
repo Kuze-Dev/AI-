@@ -26,7 +26,7 @@ use Spatie\Sluggable\SlugOptions;
  *
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
  * @property-read int|null $activities_count
- * @property-read Blueprint|null $blueprint
+ * @property-read Blueprint $blueprint
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Form\Models\FormEmailNotification[] $formEmailNotifications
  * @property-read int|null $form_email_notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Form\Models\FormSubmission[] $formSubmissions
@@ -65,16 +65,19 @@ class Form extends Model implements IsActivitySubject
         return 'Form: '.$this->name;
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Form\Models\Form> */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Form\Models\FormEmailNotification> */
     public function formEmailNotifications(): HasMany
     {
         return $this->hasMany(FormEmailNotification::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Form\Models\FormSubmission> */
     public function formSubmissions(): HasMany
     {
         return $this->hasMany(FormSubmission::class);

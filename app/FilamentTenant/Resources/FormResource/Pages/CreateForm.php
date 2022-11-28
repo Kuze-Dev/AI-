@@ -22,7 +22,7 @@ class CreateForm extends CreateRecord
         return DB::transaction(fn () => app(CreateFormAction::class)
             ->execute(FormData::fromArray(
                 $data,
-                formEmailNotifications: $this->form->getRawState()['formEmailNotifications']
+                formEmailNotifications: $this->form->getRawState()['formEmailNotifications'] ?? null
             )));
     }
 }

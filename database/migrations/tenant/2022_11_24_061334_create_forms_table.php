@@ -46,7 +46,7 @@ return new class () extends Migration {
 
             $table->foreignIdFor(Form::class)->constrained();
 
-            $table->text('data');
+            $table->json('data');
 
             $table->timestamps();
         });
