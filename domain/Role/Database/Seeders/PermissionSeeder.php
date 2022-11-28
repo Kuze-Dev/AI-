@@ -49,7 +49,7 @@ abstract class PermissionSeeder extends Seeder
         bool $hasSoftDeletes = false,
         array $customPermissions = [],
     ): array {
-        return collect(self::FILAMENT_ABILITIES)
+        $permissions = collect(self::FILAMENT_ABILITIES)
             ->when(
                 $hasSoftDeletes,
                 fn (Collection $abilities) => $abilities->merge(self::FILAMENT_SOFT_DELETES_ABILITIES)
@@ -63,7 +63,15 @@ abstract class PermissionSeeder extends Seeder
                 fn (Collection $abilities) => $abilities->diff($except)
             )
             ->merge($customPermissions)
-            ->map(fn (string $ability) => "{$resourceName}.{$ability}")
+            ->toArray();
+
+        return $this->generatePermissionGroup($resourceName, $permissions);
+    }
+
+    protected function generatePermissionGroup(string $resourceName, array $permissions): array
+    {
+        return collect($permissions)
+            ->map(fn (string $permission) => "{$resourceName}.{$permission}")
             ->prepend($resourceName)
             ->toArray();
     }
