@@ -14,7 +14,7 @@ use function Pest\Livewire\livewire;
 beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
-    loginAsAdmin();
+    loginAsSuperAdmin();
 });
 
 it('can render page', function () {

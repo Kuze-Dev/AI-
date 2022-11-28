@@ -180,7 +180,7 @@ class AdminResource extends Resource
                             $record->sendEmailVerificationNotification();
                             $action->success();
                         })
-                        ->authorize(fn (Admin $record) => Auth::user()?->can('resendVerification', $record) ?? false),
+                        ->authorize('resendVerification'),
                     Tables\Actions\Action::make('send-password-reset')
                         ->requiresConfirmation()
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
@@ -188,7 +188,7 @@ class AdminResource extends Resource
                                 ->execute($record->email, 'admin');
 
                             if ($result->failed()) {
-                                $action->failureNotificationMessage($result->getMessage())
+                                $action->failureNotificationTitle($result->getMessage())
                                     ->failure();
 
                                 return;

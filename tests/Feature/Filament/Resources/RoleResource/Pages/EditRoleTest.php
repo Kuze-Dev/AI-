@@ -8,7 +8,7 @@ use Domain\Role\Database\Factories\RoleFactory;
 
 use function Pest\Livewire\livewire;
 
-beforeEach(fn () => loginAsAdmin());
+beforeEach(fn () => loginAsSuperAdmin());
 
 it('can show edit', function () {
     $role = RoleFactory::new()->createOne();
