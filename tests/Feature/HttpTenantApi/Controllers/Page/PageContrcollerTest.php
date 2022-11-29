@@ -18,7 +18,7 @@ it('return list', function () {
         ->count(10)
         ->create();
 
-    getJson(route('tenant.api.pages.index'))
+    getJson('api/pages')
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json
@@ -34,7 +34,7 @@ it('show', function () {
         ->withDummyBlueprint()
         ->createOne(['name' => 'My Page Title']);
 
-    getJson(route('tenant.api.pages.show', $page))
+    getJson('api/pages/'.$page->getRouteKey())
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($page) {
             $json
@@ -56,7 +56,7 @@ it('filter', function () {
         ->create();
 
     foreach ($pages as $page) {
-        getJson(route('tenant.api.pages.index', ['filter' => ['name' => $page->name]]))
+        getJson('api/pages?'.http_build_query(['filter' => ['name' => $page->name]]))
             ->assertOk()
             ->assertJson(function (AssertableJson $json) use ($page) {
                 $json
