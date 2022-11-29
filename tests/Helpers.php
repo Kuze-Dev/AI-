@@ -5,6 +5,9 @@ declare(strict_types=1);
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
 use Domain\Tenant\Database\Factories\TenantFactory;
+use Domain\Tenant\Models\Tenant;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\URL;
 
 use function Pest\Laravel\actingAs;
 
@@ -29,9 +32,18 @@ function loginAsUser(Admin $user = null): Admin
     return tap($user, actingAs(...));
 }
 
-function testInTenantContext()
+function testInTenantContext(): Tenant
 {
-    $tenant = TenantFactory::new()->create(['name' => 'testing']);
+    /** @var Tenant */
+    $tenant = TenantFactory::new()->createOne(['name' => 'testing']);
+
+    $domain = 'test.'.parse_url(config('app.url'), PHP_URL_HOST);
+
+    $tenant->createDomain(['domain' => $domain]);
+
+    URL::forceRootUrl(Request::getScheme().'://'.$domain);
 
     tenancy()->initialize($tenant);
+
+    return $tenant;
 }

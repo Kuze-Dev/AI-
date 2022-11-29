@@ -13,6 +13,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Stancl\Tenancy\Database\Models\Tenant;
+use TiMacDonald\JsonApi\JsonApiResource;
 
 /** @property \Illuminate\Foundation\Application $app */
 class AppServiceProvider extends ServiceProvider
@@ -51,5 +52,7 @@ class AppServiceProvider extends ServiceProvider
                         fn (Password $password) => $password->uncompromised()
                     )
         );
+
+        JsonApiResource::resolveIdUsing(fn (Model $resource): string => $resource->getRouteKey());
     }
 }
