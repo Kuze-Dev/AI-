@@ -9,7 +9,7 @@ use Spatie\Permission\Models\Role;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Livewire\livewire;
 
-beforeEach(fn () => loginAsAdmin());
+beforeEach(fn () => loginAsSuperAdmin());
 
 it('can create', function () {
     assertDatabaseCount(Role::class, 1); // from seed

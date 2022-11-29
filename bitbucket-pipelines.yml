@@ -54,7 +54,7 @@ pipelines:
           - step: *test
 
   pull-requests:
-    "develop":
+    '**':
       - parallel:
           - step: *check-format
           - step: *analyse
