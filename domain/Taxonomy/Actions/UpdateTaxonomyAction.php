@@ -9,10 +9,10 @@ use Domain\Taxonomy\Models\Taxonomy;
 
 class UpdateTaxonomyAction
 {
-    public function execute(Taxonomy $taxonomy, TaxonomyData $pageData): Taxonomy
+    public function execute(Taxonomy $taxonomy, TaxonomyData $taxonomyData): Taxonomy
     {
         $taxonomy->fill([
-            'name' => $pageData->name,
+            'name' => $taxonomyData->name,
         ]);
 
         $taxonomy->save();

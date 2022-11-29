@@ -8,7 +8,7 @@ use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
-
+use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Support\Str;
 use Closure;
 
@@ -35,8 +35,11 @@ class TaxonomyTermsRelationManager extends RelationManager
                         ->reactive()
                         ->afterStateUpdated(function (Closure $set, $state) {
                             $set('slug', Str::slug($state));
-                        })->required(),
-                    TextInput::make('slug')->required(),
+                        })->required()
+                        ->unique(ignoreRecord: true),
+                    TextInput::make('slug')->required()
+                        ->disabled(fn (?TaxonomyTerm $record) => $record !== null)
+                        ->unique(ignoreRecord: true),
                     RichEditor::make('description')->required(),
                 ]),
             ]);

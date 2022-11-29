@@ -8,7 +8,6 @@ use App\FilamentTenant\Resources;
 use App\FilamentTenant\Resources\TaxonomyResource\RelationManagers\TaxonomyTermsRelationManager;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Taxonomy\Models\Taxonomy;
-//use App\Models\Taxonomy;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -41,8 +40,11 @@ class TaxonomyResource extends Resource
                         ->reactive()
                         ->afterStateUpdated(function (Closure $set, $state) {
                             $set('slug', Str::slug($state));
-                        })->required(),
-                    TextInput::make('slug')->required(),
+                        })->required()
+                        ->unique(ignoreRecord: true),
+                    TextInput::make('slug')->required()
+                        ->disabled(fn (?Taxonomy $record) => $record !== null)
+                        ->unique(ignoreRecord: true),
                 ]),
             ]);
     }
@@ -59,6 +61,7 @@ class TaxonomyResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

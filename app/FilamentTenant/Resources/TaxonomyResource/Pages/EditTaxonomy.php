@@ -16,15 +16,7 @@ class EditTaxonomy extends EditRecord
     protected function getActions(): array
     {
         return [
-            Actions\Action::make('configure')
-                ->icon('heroicon-s-cog'),
-            //->url(route('filament-tenant.resources.' . self::$resource::getSlug() . '.configure', $this->record)),
             Actions\DeleteAction::make(),
         ];
-    }
-
-    protected function getRedirectUrl(): string
-    {
-        return $this->getResource()::getUrl('index');
     }
 }
