@@ -6,6 +6,8 @@ namespace Domain\Form\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * Domain\Form\Models\FormSubmission
@@ -18,6 +20,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class FormSubmission extends Model
 {
+    use LogsActivity;
+
     protected $fillable = [
         'form_id',
         'data',
@@ -26,6 +30,14 @@ class FormSubmission extends Model
     protected $casts = [
         'data' => 'array',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Form\Models\Form, \Domain\Form\Models\FormSubmission> */
     public function form(): BelongsTo

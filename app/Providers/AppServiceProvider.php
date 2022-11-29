@@ -7,6 +7,8 @@ namespace App\Providers;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Form\Models\Form;
+use Domain\Form\Models\FormEmailNotification;
+use Domain\Form\Models\FormSubmission;
 use Domain\Page\Models\Page;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -39,6 +41,8 @@ class AppServiceProvider extends ServiceProvider
             Blueprint::class,
             Page::class,
             Form::class,
+            FormSubmission::class,
+            FormEmailNotification::class,
         ]);
 
         Password::defaults(

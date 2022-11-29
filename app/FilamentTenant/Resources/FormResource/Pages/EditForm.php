@@ -27,6 +27,11 @@ class EditForm extends EditRecord
         ];
     }
 
+    public function hasCombinedRelationManagerTabsWithForm(): bool
+    {
+        return true;
+    }
+
     /**
      * @param \Domain\Form\Models\Form $record
      * @throws Throwable

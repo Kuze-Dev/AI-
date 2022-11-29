@@ -6,7 +6,6 @@ namespace App\FilamentTenant\Resources\FormResource\RelationManagers;
 
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Domain\Form\Models\FormSubmission;
-use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
@@ -23,7 +22,6 @@ class FormSubmissionsRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('id'),
                 SchemaFormBuilder::make(
                     'data',
                     fn (FormSubmission $record) => $record->form->blueprint->schema
@@ -36,7 +34,6 @@ class FormSubmissionsRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id'),
-                Tables\Columns\TextColumn::make('data'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),

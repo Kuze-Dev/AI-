@@ -6,6 +6,8 @@ namespace Domain\Form\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * Domain\Form\Models\FormEmailNotification
@@ -27,6 +29,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class FormEmailNotification extends Model
 {
+    use LogsActivity;
+
     protected $fillable = [
         'form_id',
         'recipient',
@@ -36,6 +40,14 @@ class FormEmailNotification extends Model
         'sender',
         'template',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Form\Models\Form, \Domain\Form\Models\FormEmailNotification> */
     public function form(): BelongsTo

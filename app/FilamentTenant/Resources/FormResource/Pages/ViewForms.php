@@ -10,4 +10,9 @@ use Filament\Resources\Pages\ViewRecord;
 class ViewForms extends ViewRecord
 {
     protected static string $resource = FormResource::class;
+
+    public function hasCombinedRelationManagerTabsWithForm(): bool
+    {
+        return true;
+    }
 }
