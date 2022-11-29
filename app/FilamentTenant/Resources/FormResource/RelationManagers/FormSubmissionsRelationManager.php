@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\FormResource\RelationManagers;
 
+use App\FilamentTenant\Support\SchemaFormBuilder;
+use Domain\Form\Models\FormSubmission;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -22,7 +24,10 @@ class FormSubmissionsRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\TextInput::make('id'),
-                Forms\Components\TextInput::make('data'),
+                SchemaFormBuilder::make(
+                    'data',
+                    fn (FormSubmission $record) => $record->form->blueprint->schema
+                ),
             ]);
     }
 
