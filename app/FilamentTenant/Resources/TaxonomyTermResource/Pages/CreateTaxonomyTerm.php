@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\TaxonomyTermResource\Pages;
 
-use App\FilamentTenant\Resources\TaxonomyTermResource;
+use App\FilamentTenant\Resources\TaxonomyResource;
 use Domain\Taxonomy\Actions\CreateTaxonomyTermAction;
 use Domain\Taxonomy\DataTransferObjects\TaxonomyTermData;
 use Filament\Resources\Pages\CreateRecord;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class CreateTaxonomyTerm extends CreateRecord
 {
-    protected static string $resource = TaxonomyTermResource::class;
+    protected static string $resource = TaxonomyResource::class;
 
     protected function handleRecordCreation(array $data): Model
     {
