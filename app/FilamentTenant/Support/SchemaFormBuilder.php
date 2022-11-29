@@ -91,7 +91,7 @@ class SchemaFormBuilder extends Component
             TextareaFieldData::class => $this->makeTextAreaComponent($field),
             TextFieldData::class => $this->makeTextInputComponent($field),
             ToggleFieldData::class => Toggle::make($field->state_name),
-            default => throw new InvalidArgumentException(),
+            default => throw new InvalidArgumentException('Cannot generate field component for `'.$field::class.'` as its not supported.'),
         };
 
         return $fieldComponent
