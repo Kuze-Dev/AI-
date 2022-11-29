@@ -29,7 +29,7 @@ class EditPage extends EditRecord
         return [
             Actions\Action::make('configure')
                 ->icon('heroicon-s-cog')
-                ->url(route('filament-tenant.resources.' . self::$resource::getSlug() . '.configure', $this->record)),
+                ->url(self::$resource::getUrl('configure', $this->record)),
             Actions\DeleteAction::make(),
         ];
     }
