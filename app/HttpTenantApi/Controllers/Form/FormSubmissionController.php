@@ -20,15 +20,7 @@ class FormSubmissionController extends Controller
     #[Post('form-submissions/{form}')]
     public function __invoke(Request $request, Form $form): JsonResponse
     {
-        $fieldAndRules = [];
-
-        foreach ($form->blueprint->schema->sections as $section) {
-            foreach ($section->fields as $field) {
-                $fieldAndRules[$section->state_name.'.'.$field->state_name] = $field->rules;
-            }
-        }
-
-        $attributes = $this->validate($request, $fieldAndRules);
+        $attributes = $this->validate($request, $form->blueprint->schema->forValidation());
 
         DB::transaction(
             function () use ($form, $attributes) {
