@@ -21,9 +21,6 @@ it('store', function () {
         ->withDummySchema()
         ->createOne();
 
-    $this->assertDatabaseEmpty(Form::class);
-    $this->assertDatabaseEmpty(FormEmailNotification::class);
-
     $name = faker()->sentence(2);
     $storeSubmission = faker()->boolean();
     $slug = faker()->boolean() ? Str::slug(faker()->sentence(2)) : null;
@@ -50,6 +47,9 @@ it('store', function () {
 
     $emailNotificationDTO[] = new FormEmailNotificationData(...$emailNotifications[0]);
     $emailNotificationDTO[] = new FormEmailNotificationData(...$emailNotifications[1]);
+
+    $this->assertDatabaseEmpty(Form::class);
+    $this->assertDatabaseEmpty(FormEmailNotification::class);
 
     app(CreateFormAction::class)
         ->execute(new FormData(

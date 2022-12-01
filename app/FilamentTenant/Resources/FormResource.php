@@ -76,7 +76,6 @@ class FormResource extends Resource
                             Forms\Components\Card::make([
                                 Forms\Components\Repeater::make('formEmailNotifications')
                                     ->relationship()
-                                    ->saveRelationshipsUsing(null)
                                     ->default(null)
                                     ->nullable()
                                     ->schema([

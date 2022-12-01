@@ -5,8 +5,10 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\FormResource\Pages\EditForm;
 use Domain\Form\Database\Factories\FormFactory;
 use Domain\Form\Models\Form;
+use Domain\Form\Models\FormEmailNotification;
 use Filament\Facades\Filament;
 
+use function Pest\Faker\faker;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -37,10 +39,20 @@ it('can edit page', function () {
             'store_submission' => true,
         ]);
 
+    $formEmailNotification = [
+        'recipient' => faker()->safeEmail(),
+        'cc' => faker()->safeEmail(),
+        'bcc' => faker()->safeEmail(),
+        'reply_to' => faker()->safeEmail(),
+        'sender' => faker()->safeEmail(),
+        'template' => faker()->safeEmail(),
+    ];
+
     livewire(EditForm::class, ['record' => $form->getRouteKey()])
         ->fillForm([
             'name' => 'new name',
             'store_submission' => false,
+            'formEmailNotifications' => [$formEmailNotification],
         ])
         ->call('save')
         ->assertOk()
@@ -50,5 +62,9 @@ it('can edit page', function () {
         'id' => $form->id,
         'name' => 'new name',
         'store_submission' => false,
+    ]);
+    assertDatabaseHas(FormEmailNotification::class,  [
+        'id' => $form->id,
+        ...$formEmailNotification,
     ]);
 });
