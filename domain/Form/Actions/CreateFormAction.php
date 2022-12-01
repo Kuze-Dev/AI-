@@ -6,10 +6,14 @@ namespace Domain\Form\Actions;
 
 use Domain\Form\DataTransferObjects\FormData;
 use Domain\Form\Models\Form;
-use Domain\Form\Models\FormEmailNotification;
 
 class CreateFormAction
 {
+    public function __construct(
+        protected AddFormEmailNotificationsAction $addFormEmailNotificationsAction
+    ) {
+    }
+
     public function execute(FormData $formData): Form
     {
         $form = Form::create([
@@ -20,15 +24,7 @@ class CreateFormAction
         ]);
 
         foreach ($formData->form_email_notifications ?? [] as $formEmailNotification) {
-            FormEmailNotification::create([
-                'form_id' => $form->id,
-                'recipient' => $formEmailNotification->recipient,
-                'cc' => $formEmailNotification->cc,
-                'bcc' => $formEmailNotification->bcc,
-                'reply_to' => $formEmailNotification->reply_to,
-                'sender' => $formEmailNotification->sender,
-                'template' => $formEmailNotification->template,
-            ]);
+            $this->addFormEmailNotificationsAction->execute($form, $formEmailNotification);
         }
 
         return $form;

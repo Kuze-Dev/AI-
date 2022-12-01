@@ -27,11 +27,6 @@ class FormPolicy
         return $this->checkWildcardPermissions($user);
     }
 
-    public function configure(User $user, Form $form): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
-
     public function update(User $user, Form $form): bool
     {
         return $this->checkWildcardPermissions($user);

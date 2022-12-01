@@ -43,8 +43,6 @@ class EditForm extends EditRecord
                 $record,
                 FormData::fromArray(
                     $data,
-                    // TODO: optimize to maintainable code
-//                    formEmailNotifications: $this->validate()['data']['formEmailNotifications'] ?? null
                     formEmailNotifications: $this->form->getRawState()['formEmailNotifications'] ?? null
                 )
             ));

@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Form;
 
 use App\Http\Controllers\Controller;
-use Domain\Form\Actions\CreateForSubmissionAction;
-use Domain\Form\DataTransferObjects\ForSubmissionData;
+use App\HttpTenantApi\FormSubmission\FormSubmissionRequest;
+use Domain\Form\Actions\CreateFormSubmissionAction;
 use Domain\Form\Models\Form;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\RouteAttributes\Attributes\Post;
 use Throwable;
@@ -18,22 +17,21 @@ class FormSubmissionController extends Controller
 {
     /** @throws Throwable */
     #[Post('form-submissions/{form}')]
-    public function __invoke(Request $request, Form $form): JsonResponse
+    public function __invoke(FormSubmissionRequest $request, Form $form): JsonResponse
     {
-        $attributes = $this->validate($request, $form->blueprint->schema->forValidation());
-
         DB::transaction(
-            function () use ($form, $attributes) {
-                return app(CreateForSubmissionAction::class)
+            function () use ($request, $form) {
+                return app(CreateFormSubmissionAction::class)
                     ->execute(
-                        new ForSubmissionData(
-                            form_id: $form->id,
-                            data: $attributes,
-                        )
+                        form: $form,
+                        data: $request->validated(),
                     );
             }
         );
 
-        return response()->json();
+        return response()
+            ->json([
+                'message' => 'Successfully unread notification!',
+            ], 201);
     }
 }

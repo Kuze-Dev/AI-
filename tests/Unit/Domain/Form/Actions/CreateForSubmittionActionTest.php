@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-use Domain\Form\Actions\CreateForSubmissionAction;
+use Domain\Form\Actions\CreateFormSubmissionAction;
 use Domain\Form\Database\Factories\FormEmailNotificationFactory;
 use Domain\Form\Database\Factories\FormFactory;
-use Domain\Form\DataTransferObjects\ForSubmissionData;
 use Domain\Form\Mail\FormEmailNotificationMail;
 use Illuminate\Support\Facades\Mail;
 
@@ -26,11 +25,11 @@ it('store', function () {
 
     $data = [fake()->word() => fake()->sentence(3)];
 
-    app(CreateForSubmissionAction::class)
-        ->execute(new ForSubmissionData(
-            form_id: $form->id,
+    app(CreateFormSubmissionAction::class)
+        ->execute(
+            form: $form,
             data: $data,
-        ));
+        );
 
     assertDatabaseCount(FormSubmission::class, 1);
     assertDatabaseHas(FormSubmission::class, [
@@ -47,11 +46,11 @@ it('do not store', function () {
 
     $this->assertDatabaseEmpty(FormSubmission::class);
 
-    app(CreateForSubmissionAction::class)
-        ->execute(new ForSubmissionData(
-            form_id: $form->id,
+    app(CreateFormSubmissionAction::class)
+        ->execute(
+            form: $form,
             data: ['field' => 'value'],
-        ));
+        );
 
     $this->assertDatabaseEmpty(FormSubmission::class);
 });
@@ -63,11 +62,11 @@ it('dispatch email notifications', function () {
         ->has(FormEmailNotificationFactory::new())
         ->createOne();
 
-    app(CreateForSubmissionAction::class)
-        ->execute(new ForSubmissionData(
-            form_id: $form->id,
+    app(CreateFormSubmissionAction::class)
+        ->execute(
+            form: $form,
             data: ['field' => 'value'],
-        ));
+        );
 
     Mail::assertQueued(FormEmailNotificationMail::class, 2);
 });

@@ -33,16 +33,16 @@ class SchemaData implements Arrayable
         return (array) $this;
     }
 
-    public function forValidation(): array
+    public function getValidationRules(): array
     {
-        $fieldAndRules = [];
+        $rules = [];
 
         foreach ($this->sections as $section) {
             foreach ($section->fields as $field) {
-                $fieldAndRules[$section->state_name.'.'.$field->state_name] = $field->rules;
+                $rules[$section->state_name.'.'.$field->state_name] = $field->rules;
             }
         }
 
-        return $fieldAndRules;
+        return $rules;
     }
 }

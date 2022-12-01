@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\FilamentTenant\Resources\FormResource\Pages\ViewForms;
+use App\FilamentTenant\Resources\FormResource\Pages\ViewForm;
 use Domain\Form\Database\Factories\FormFactory;
 use Filament\Facades\Filament;
 
@@ -19,7 +19,7 @@ it('can view page', function () {
         ->withDummyBlueprint()
         ->createOne();
 
-    livewire(ViewForms::class, ['record' => $form->getRouteKey()])
+    livewire(ViewForm::class, ['record' => $form->getRouteKey()])
         ->assertFormSet([
             'name' => $form->name,
             'store_submission' => $form->store_submission,

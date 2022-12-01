@@ -161,7 +161,7 @@ class FormResource extends Resource
         return [
             'index' => Pages\ListForms::route('/'),
             'create' => Pages\CreateForm::route('/create'),
-            'view' => Pages\ViewForms::route('/{record}'),
+            'view' => Pages\ViewForm::route('/{record}'),
             'edit' => Pages\EditForm::route('/{record}/edit'),
         ];
     }

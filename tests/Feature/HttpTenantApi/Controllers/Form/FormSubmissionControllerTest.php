@@ -23,7 +23,7 @@ it('submit form', function () {
         'api/form-submissions/'.$form->getRouteKey(),
         [fake()->word() => fake()->sentence(3)]
     )
-        ->assertOk()
+        ->assertCreated()
         ->assertValid();
 
     assertDatabaseCount(FormSubmission::class, 1);
