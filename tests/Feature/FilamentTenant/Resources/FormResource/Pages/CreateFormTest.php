@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\FormResource\Pages\CreateForm;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Form\Models\Form;
+use Domain\Form\Models\FormEmailNotification;
 use Filament\Facades\Filament;
 
 use function Pest\Faker\faker;
@@ -32,10 +33,21 @@ it('can create page', function () {
         ->fillForm([
             'name' => faker()->sentence(2),
             'blueprint_id' => $blueprint->getKey(),
+            'formEmailNotifications' => [
+                [
+                    'recipient' => faker()->safeEmail(),
+                    'cc' => faker()->safeEmail(),
+                    'bcc' => faker()->safeEmail(),
+                    'reply_to' => faker()->safeEmail(),
+                    'sender' => faker()->safeEmail(),
+                    'template' => faker()->safeEmail(),
+                ],
+            ],
         ])
         ->call('create')
-        ->assertHasNoFormErrors()
-        ->assertOk();
+        ->assertOk()
+        ->assertHasNoFormErrors();
 
     assertDatabaseCount(Form::class, 1);
+    assertDatabaseCount(FormEmailNotification::class, 1);
 });
