@@ -9,6 +9,7 @@ use Domain\Form\Models\FormEmailNotification;
 use Filament\Facades\Filament;
 
 use function Pest\Faker\faker;
+use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -48,6 +49,9 @@ it('can edit page', function () {
         'template' => faker()->safeEmail(),
     ];
 
+    assertDatabaseCount(Form::class, 1);
+    $this->assertDatabaseEmpty(FormEmailNotification::class);
+
     livewire(EditForm::class, ['record' => $form->getRouteKey()])
         ->fillForm([
             'name' => 'new name',
@@ -64,7 +68,7 @@ it('can edit page', function () {
         'store_submission' => false,
     ]);
     assertDatabaseHas(FormEmailNotification::class,  [
-        'id' => $form->id,
+        'form_id' => $form->id,
         ...$formEmailNotification,
     ]);
 });

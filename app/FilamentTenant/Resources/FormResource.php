@@ -35,6 +35,39 @@ class FormResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $formEmailNotificationsRepeaterCreate = Forms\Components\Repeater::make('formEmailNotifications')
+            ->relationship()
+            ->nullable()
+            ->schema([
+                Forms\Components\TextInput::make('recipient')
+                    ->label(trans('Recipient/s'))
+                    ->required()
+                    ->rule(new Delimited('email'))
+                    ->helperText('Seperated by comma'),
+                Forms\Components\TextInput::make('cc')
+                    ->label(trans('CC/s'))
+                    ->nullable()
+                    ->rule(new Delimited('email'))
+                    ->helperText('Seperated by comma'),
+                Forms\Components\TextInput::make('bcc')
+                    ->label(trans('BCC/s'))
+                    ->nullable()
+                    ->rule(new Delimited('email'))
+                    ->helperText('Seperated by comma'),
+                Forms\Components\TextInput::make('reply_to')
+                    ->nullable()
+                    ->email(),
+                Forms\Components\TextInput::make('sender')
+                    ->required()
+                    ->email(),
+                Forms\Components\MarkdownEditor::make('template')
+                    ->required()
+                    ->columnSpanFull(),
+            ])
+            ->columns(5);
+
+        $formEmailNotificationsRepeaterEdit = clone $formEmailNotificationsRepeaterCreate;
+
         return $form
             ->schema([
 
@@ -74,38 +107,15 @@ class FormResource extends Resource
                     Tabs\Tab::make(trans('Form email notifications'))
                         ->schema([
                             Forms\Components\Card::make([
-                                Forms\Components\Repeater::make('formEmailNotifications')
-                                    ->relationship()
-                                    ->default(null)
-                                    ->nullable()
-                                    ->schema([
-                                        Forms\Components\TextInput::make('recipient')
-                                            ->label(trans('Recipient/s'))
-                                            ->required()
-                                            ->rule(new Delimited('email'))
-                                            ->helperText('Seperated by comma'),
-                                        Forms\Components\TextInput::make('cc')
-                                            ->label(trans('CC/s'))
-                                            ->nullable()
-                                            ->rule(new Delimited('email'))
-                                            ->helperText('Seperated by comma'),
-                                        Forms\Components\TextInput::make('bcc')
-                                            ->label(trans('BCC/s'))
-                                            ->nullable()
-                                            ->rule(new Delimited('email'))
-                                            ->helperText('Seperated by comma'),
-                                        Forms\Components\TextInput::make('reply_to')
-                                            ->nullable()
-                                            ->email(),
-                                        Forms\Components\TextInput::make('sender')
-                                            ->required()
-                                            ->email(),
-                                        Forms\Components\MarkdownEditor::make('template')
-                                            ->required()
-                                            ->columnSpanFull(),
-                                    ])
-                                    ->columns(5),
-                            ]), ]),
+
+                                $formEmailNotificationsRepeaterCreate
+                                    ->saveRelationshipsUsing(null)
+                                    ->visibleOn('create'),
+
+                                $formEmailNotificationsRepeaterEdit
+                                    ->visibleOn('edit'),
+                            ]),
+                        ]),
                 ])->columnSpanFull(),
             ]);
     }

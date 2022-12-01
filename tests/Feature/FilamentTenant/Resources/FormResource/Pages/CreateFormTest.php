@@ -29,6 +29,9 @@ it('can create page', function () {
         ->withDummySchema()
         ->createOne();
 
+    $this->assertDatabaseEmpty(Form::class);
+    $this->assertDatabaseEmpty(FormEmailNotification::class);
+
     livewire(CreateForm::class)
         ->fillForm([
             'name' => faker()->sentence(2),
