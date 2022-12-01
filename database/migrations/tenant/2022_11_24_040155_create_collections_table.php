@@ -21,6 +21,9 @@ return new class extends Migration
             $table->foreignIdFor(BlueprintModel::class)->constrained();
             $table->string('name')->unique();
             $table->string('slug')->unique();
+            $table->tinyInteger('display_publish_dates')->default(0);
+            $table->string('future_publish_date')->nullable();
+            $table->string('past_publish_date')->nullable();
             $table->json('data')->nullable();
             
             $table->timestamps();

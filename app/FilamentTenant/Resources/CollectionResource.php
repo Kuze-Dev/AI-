@@ -16,6 +16,7 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Filament\Forms\FormsComponent;
 use Illuminate\Support\Facades\Auth;
 
 class CollectionResource extends Resource
@@ -75,6 +76,36 @@ class CollectionResource extends Resource
                                 return trans('Modifying the blueprint will reset all the page\'s content.');
                             }
                         }),
+                    
+                    Forms\Components\Card::make([
+                        Forms\Components\Toggle::make('display_publish_dates')
+                            ->onIcon('heroicon-s-shield-check')
+                            ->offIcon('heroicon-s-shield-exclamation')
+                            ->helperText(trans('Enable publish date visibility and behavior of collections'))
+                            ->reactive()
+                            ->afterStateHydrated(function (Forms\Components\Toggle $component, ?Collection $record): void {
+                        }),
+                        Forms\Components\Grid::make(12)
+                            ->schema([
+                                Forms\Components\Select::make('past_publish_date')
+                                    ->options([
+                                        'public' => 'Public',
+                                        'private' => 'Private',
+                                        'unlisted' => 'Unlisted'
+                                    ])
+                                    ->columnSpan(6)
+                                    ->required(),
+                                Forms\Components\Select::make('future_publish_date')
+                                    ->options([
+                                        'public' => 'Public',
+                                        'private' => 'Private',
+                                        'unlisted' => 'Unlisted'
+                                    ])
+                                    ->columnSpan(6)
+                                    ->required()
+                        ]),
+                        
+                    ]),
                 ]),
             ]);
     }
@@ -139,7 +170,7 @@ class CollectionResource extends Resource
         return [
             'index' => Resources\CollectionResource\Pages\ListCollection::route('/'),
             'create' => Resources\CollectionResource\Pages\CreateCollection::route('/create'),
-            'configure' => Resources\CollectionResource\Pages\ConfigureCollection::route('/{record}/configure'),
+            'configure' => Resources\CollectionResource\Pages\ConfigureCollection::route('/{record}/configure')
         ];
     }    
 }

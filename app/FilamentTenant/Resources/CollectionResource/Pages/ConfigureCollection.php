@@ -39,7 +39,11 @@ class ConfigureCollection extends EditRecord
             fn () => app (UpdateCollectionAction::class)
                 ->execute($record, new CollectionData(
                     name: $data['name'],
-                    blueprint_id: (int) $data['blueprint_id']
+                    blueprint_id: (int) $data['blueprint_id'],
+                    slug: $data['slug'],
+                    display_publish_dates: $data['display_publish_dates'] == false ? 0 : 1,
+                    past_publish_date: $data['past_publish_date'],
+                    future_publsh_date: $data['future_publish_date']
                 ))
         );
     }

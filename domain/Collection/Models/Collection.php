@@ -19,10 +19,23 @@ class Collection extends Model implements IsActivitySubject
     use LogsActivity,
         HasSlug;
 
+    /**
+     * Declaration of constants for labels 
+     * collection of publish date behaviors.
+     */
+    const BEHAVIOR_PUBLIC = 'public';
+    
+    const BEHAVIOR_UNLISTED = 'unlisted';
+
+    const BEHAVIOR_PRIVATE = 'private';
+    
     protected $fillable = [
         'name',
         'blueprint_id',
         'slug',
+        'display_publish_dates',
+        'past_publish_date',
+        'future_publish_date',
         'data'
     ];
 
