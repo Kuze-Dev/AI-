@@ -21,7 +21,7 @@ return new class () extends Migration {
             $table->string('name')->unique();
             $table->string('slug')->unique();
             $table->text('description')->nullable();
-            $table->unsignedInteger('order')->default('1');
+            $table->unsignedInteger('order')->default(1);
             $table->timestamps();
         });
     }

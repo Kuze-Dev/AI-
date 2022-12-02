@@ -10,6 +10,7 @@ class TaxonomyTermData
         public readonly int $taxonomy_id,
         public readonly string $name,
         public readonly ?string $slug = null,
+        public readonly ?string $description = null,
     ) {
     }
 }

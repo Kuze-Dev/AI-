@@ -31,6 +31,7 @@ class Taxonomy extends Model implements IsActivitySubject
             ->dontSubmitEmptyLogs();
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Taxonomy\Models\TaxonomyTerm> */
     public function taxonomyTerms(): HasMany
     {
         return $this->hasMany(TaxonomyTerm::class);
