@@ -36,9 +36,4 @@ class FormPolicy
     {
         return $this->checkWildcardPermissions($user);
     }
-
-    public function deleteAny(User $user): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
 }
