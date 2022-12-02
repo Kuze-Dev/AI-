@@ -4,6 +4,7 @@ declare (strict_types = 1);
 
 namespace App\FilamentTenant\Resources\CollectionResource\RelationManagers;
 
+use App\FilamentTenant\Support\SchemaFormBuilder;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -11,6 +12,8 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Livewire\Component as LivewireComponent;
+use Livewire\Livewire;
 
 class CollectionEntriesRelationManager extends RelationManager
 {
@@ -20,13 +23,23 @@ class CollectionEntriesRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = null;
 
+    /**
+     * Get the form schema from reference 
+     * blueprint and inject to SchemaFormBuilder 
+     * to produce the final form fields.
+     * 
+     * @param Form $form
+     * 
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('null')
-                    ->required()
-                    ->maxLength(255),
+                SchemaFormBuilder::make(
+                    'data', 
+                    fn (RelationManager $livewire) => $livewire->ownerRecord->blueprint->schema
+                )
             ]);
     }
 

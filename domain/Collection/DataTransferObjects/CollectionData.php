@@ -12,7 +12,7 @@ class CollectionData
         public readonly ?string $slug = null,
         public readonly int $display_publish_dates,
         public readonly ?string $past_publish_date,
-        public readonly ?string $future_publsh_date
+        public readonly ?string $future_publish_date
     ) {
         
     }

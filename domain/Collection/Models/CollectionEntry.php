@@ -16,15 +16,10 @@ class CollectionEntry extends Model
      * @var array
      */
     protected $fillable = [
-        'data'
+        'data',
+        'collection_id'
     ];
 
-    /**
-     * Specify the reference table 
-     * in the database for this model.
-     * @var string
-     */
-    protected $table = 'collection_entries';
     /**
      * @return BelongsTo
      */

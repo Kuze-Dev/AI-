@@ -172,7 +172,8 @@ class CollectionResource extends Resource
         return [
             'index' => Resources\CollectionResource\Pages\ListCollection::route('/'),
             'create' => Resources\CollectionResource\Pages\CreateCollection::route('/create'),
-            'configure' => Resources\CollectionResource\Pages\ConfigureCollection::route('/{record}/configure')
+            'configure' => Resources\CollectionResource\Pages\ConfigureCollection::route('/{record}/configure'),
+            'create-entry' => Resources\CollectionResource\Pages\CreateCollectionEntry::route('/{record}/create-entry')
         ];
     }    
 }

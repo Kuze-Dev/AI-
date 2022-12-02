@@ -43,7 +43,7 @@ class ConfigureCollection extends EditRecord
                     slug: $data['slug'],
                     display_publish_dates: $data['display_publish_dates'],
                     past_publish_date: $data['past_publish_date'],
-                    future_publsh_date: $data['future_publish_date']
+                    future_publish_date: $data['future_publish_date']
                 ))
         );
     }
