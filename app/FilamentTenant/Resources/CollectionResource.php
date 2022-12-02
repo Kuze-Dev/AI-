@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
+use App\FilamentTenant\Resources\CollectionResource\RelationManagers\CollectionEntriesRelationManager;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Collection\Models\Collection;
 use Filament\Forms;
@@ -158,7 +159,8 @@ class CollectionResource extends Resource
     public static function getRelations(): array
     {
         return [
-            ActivitiesRelationManager::class
+            ActivitiesRelationManager::class,
+            CollectionEntriesRelationManager::class,
         ];
     }
     

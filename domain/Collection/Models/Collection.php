@@ -8,6 +8,8 @@ use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Blueprint;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -54,9 +56,20 @@ class Collection extends Model implements IsActivitySubject
             ->dontSubmitEmptyLogs();
     }
 
+    /**
+     * @return BelongsTo
+     */
     public function blueprint(): BelongsTo 
     {
         return $this->belongsTo(Blueprint::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function collectionEntries(): HasMany 
+    {
+        return $this->hasMany(CollectionEntry::class);
     }
 
     /**
