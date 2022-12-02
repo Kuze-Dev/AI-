@@ -27,6 +27,7 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Blueprint\Models\Blueprint::class => \App\Policies\BlueprintPolicy::class,
         \Domain\Page\Models\Page::class => \App\Policies\PagePolicy::class,
         \Domain\Form\Models\Form::class => \App\Policies\FormPolicy::class,
+        \Domain\Form\Models\FormSubmission::class => \App\Policies\FormSubmissionPolicy::class,
     ];
 
     /**
