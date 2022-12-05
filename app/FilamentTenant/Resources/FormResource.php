@@ -96,7 +96,7 @@ class FormResource extends Resource
                                     ->reactive()
                                     ->helperText(function (?FormModel $record, ?string $state) {
                                         if ($record !== null && $record->blueprint_id !== (int) $state) {
-                                            return trans('Modifying the blueprint will reset all the page\'s content.');
+                                            return trans('Modifying the blueprint will reset all the form\'s content.');
                                         }
                                     }),
 
