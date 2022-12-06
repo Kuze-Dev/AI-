@@ -143,7 +143,6 @@ class FormResource extends Resource
 
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -163,7 +162,6 @@ class FormResource extends Resource
         return [
             'index' => Pages\ListForms::route('/'),
             'create' => Pages\CreateForm::route('/create'),
-            'view' => Pages\ViewForm::route('/{record}'),
             'edit' => Pages\EditForm::route('/{record}/edit'),
         ];
     }
