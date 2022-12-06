@@ -16,14 +16,14 @@ class FormData
     ) {
     }
 
-    public static function fromArray(array $data, ?array $formEmailNotifications): self
+    public static function fromArray(array $data): self
     {
         $formEmailNotificationsData = null;
 
-        if ($formEmailNotifications !== null) {
+        if ($data['formEmailNotifications'] ?? false) {
             $formEmailNotificationsData = array_map(
                 fn (array $formEmailNotificationsDatum) => FormEmailNotificationData::fromArray($formEmailNotificationsDatum),
-                $formEmailNotifications
+                $data['formEmailNotifications']
             );
         }
 

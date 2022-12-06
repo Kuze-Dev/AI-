@@ -20,9 +20,6 @@ class CreateForm extends CreateRecord
     protected function handleRecordCreation(array $data): Model
     {
         return DB::transaction(fn () => app(CreateFormAction::class)
-            ->execute(FormData::fromArray(
-                $data,
-                formEmailNotifications: $this->form->getRawState()['formEmailNotifications'] ?? null
-            )));
+            ->execute(FormData::fromArray($this->data)));
     }
 }

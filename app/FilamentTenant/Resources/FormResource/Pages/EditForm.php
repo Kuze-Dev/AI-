@@ -41,10 +41,7 @@ class EditForm extends EditRecord
         return DB::transaction(fn () => app(UpdateFormAction::class)
             ->execute(
                 $record,
-                FormData::fromArray(
-                    $data,
-                    formEmailNotifications: $this->form->getRawState()['formEmailNotifications'] ?? null
-                )
+                FormData::fromArray($this->data)
             ));
     }
 }
