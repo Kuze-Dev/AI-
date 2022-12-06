@@ -26,16 +26,16 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
     {
         $envelop = new Envelope(
             from: $this->formEmailNotification->sender,
-            to:explode(',', $this->formEmailNotification->recipient),
+            to:$this->formEmailNotification->recipient,
             subject: 'Form Submission for '.$this->formEmailNotification->form->name,
         );
 
         if ($this->formEmailNotification->cc !== null) {
-            $envelop->cc(explode(',', $this->formEmailNotification->cc));
+            $envelop->cc($this->formEmailNotification->cc);
         }
 
         if ($this->formEmailNotification->bcc !== null) {
-            $envelop->bcc(explode(',', $this->formEmailNotification->bcc));
+            $envelop->bcc($this->formEmailNotification->bcc);
         }
 
         if ($this->formEmailNotification->reply_to !== null) {

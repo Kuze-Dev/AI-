@@ -21,9 +21,9 @@ it('generate mail', function () {
 
     $mailable = new FormEmailNotificationMail($formEmailNotification);
     $mailable->assertFrom($formEmailNotification->sender);
-    $mailable->assertTo(explode(',', $formEmailNotification->recipient));
-    $mailable->assertHasCc(explode(',', $formEmailNotification->cc));
-    $mailable->assertHasBcc(explode(',', $formEmailNotification->bcc));
+    $mailable->assertTo($formEmailNotification->recipient);
+    $mailable->assertHasCc($formEmailNotification->cc);
+    $mailable->assertHasBcc($formEmailNotification->bcc);
     $mailable->assertHasReplyTo($formEmailNotification->reply_to);
     $mailable->assertHasSubject('Form Submission for '.$formEmailNotification->form->name);
 });
