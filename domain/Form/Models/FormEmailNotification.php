@@ -15,9 +15,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
  *
  * @property int $id
  * @property int $form_id
- * @property \Domain\Form\Models\Casts\DelimiterCast $recipient
- * @property \Domain\Form\Models\Casts\DelimiterCast|null $cc
- * @property \Domain\Form\Models\Casts\DelimiterCast|null $bcc
+ * @property array $recipient
+ * @property array|null $cc
+ * @property array|null $bcc
  * @property string|null $reply_to
  * @property string $sender
  * @property string $template
