@@ -10,10 +10,14 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 
 /**
  * Domain\Blueprint\Models\Blueprint
  *
+ * @property string $name
+ * @property string $slug *
  * @property \Domain\Blueprint\DataTransferObjects\SchemaData $schema
  * @method static \Illuminate\Database\Eloquent\Builder|Blueprint newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Blueprint newQuery()
@@ -22,6 +26,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  */
 class Blueprint extends Model implements IsActivitySubject
 {
+    use HasSlug;
     use LogsActivity;
 
     protected $fillable = [
@@ -44,5 +49,19 @@ class Blueprint extends Model implements IsActivitySubject
     public function getActivitySubjectDescription(Activity $activity): string
     {
         return 'Blueprint: '.$this->name;
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    public function getSlugOptions(): SlugOptions
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom('name')
+            ->preventOverwrite()
+            ->doNotGenerateSlugsOnUpdate()
+            ->saveSlugsTo($this->getRouteKeyName());
     }
 }

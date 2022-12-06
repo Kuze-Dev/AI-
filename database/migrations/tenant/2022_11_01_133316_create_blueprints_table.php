@@ -13,6 +13,7 @@ return new class () extends Migration {
             $table->id();
             $table->string('name')->unique();
             $table->json('schema');
+            $table->string('slug')->unique();
 
             $table->timestamps();
         });
