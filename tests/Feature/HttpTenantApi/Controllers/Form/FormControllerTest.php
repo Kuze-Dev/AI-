@@ -48,3 +48,37 @@ it('fetch show with blueprint', function () {
                 ->etc();
         });
 });
+
+it('filter', function () {
+    $forms = FormFactory::new()
+        ->withDummyBlueprint()
+        ->count(2)
+        ->sequence(
+            ['name' => 'form 1'],
+            ['name' => 'form 2'],
+        )
+        ->create();
+
+    foreach ($forms as $form) {
+        getJson('api/forms?'.http_build_query(['filter' => ['name' => $form->name]]))
+            ->assertOk()
+            ->assertJson(function (AssertableJson $json) use ($form) {
+                $json
+                    ->count('data', 1)
+                    ->where('data.0.type', 'forms')
+                    ->where('data.0.id', $form->getRouteKey())
+                    ->where('data.0.attributes.name', $form->name)
+                    ->etc();
+            });
+        getJson('api/forms?'.http_build_query(['filter' => ['slug' => $form->slug]]))
+            ->assertOk()
+            ->assertJson(function (AssertableJson $json) use ($form) {
+                $json
+                    ->count('data', 1)
+                    ->where('data.0.type', 'forms')
+                    ->where('data.0.id', $form->getRouteKey())
+                    ->where('data.0.attributes.name', $form->name)
+                    ->etc();
+            });
+    }
+});

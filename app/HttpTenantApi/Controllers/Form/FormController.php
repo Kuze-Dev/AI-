@@ -7,6 +7,7 @@ namespace App\HttpTenantApi\Controllers\Form;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\FormResource;
 use Domain\Form\Models\Form;
+use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
@@ -15,7 +16,12 @@ class FormController extends Controller
 {
     public function index(): JsonApiResourceCollection
     {
-        return FormResource::collection(Form::with('blueprint')->paginate());
+        return FormResource::collection(
+            QueryBuilder::for(Form::class)
+                ->allowedIncludes('blueprint')
+                ->allowedFilters(['name', 'slug'])
+                ->jsonPaginate()
+        );
     }
 
     public function show(Form $form): FormResource
