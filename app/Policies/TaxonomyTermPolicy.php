@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Policies\Concerns\ChecksWildcardPermissions;
-use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User;
 
-class TaxonomyPolicy
+class TaxonomyTermPolicy
 {
     use HandlesAuthorization;
     use ChecksWildcardPermissions;
@@ -19,7 +19,7 @@ class TaxonomyPolicy
         return $this->checkWildcardPermissions($user);
     }
 
-    public function view(User $user, Taxonomy $taxonomy): bool
+    public function view(User $user, TaxonomyTerm $taxonomyTerm): bool
     {
         return $this->checkWildcardPermissions($user);
     }
@@ -29,12 +29,12 @@ class TaxonomyPolicy
         return $this->checkWildcardPermissions($user);
     }
 
-    public function update(User $user, Taxonomy $taxonomy): bool
+    public function update(User $user, TaxonomyTerm $taxonomyTerm): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function delete(User $user, Taxonomy $taxonomy): bool
+    public function delete(User $user, TaxonomyTerm $taxonomyTerm): bool
     {
         return $this->checkWildcardPermissions($user);
     }
