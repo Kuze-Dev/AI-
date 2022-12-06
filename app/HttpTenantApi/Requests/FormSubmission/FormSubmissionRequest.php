@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\FormSubmission;
+namespace App\HttpTenantApi\Requests\FormSubmission;
 
 use Illuminate\Foundation\Http\FormRequest;
 

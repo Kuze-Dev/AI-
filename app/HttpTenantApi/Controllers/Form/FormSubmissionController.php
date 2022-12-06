@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Form;
 
 use App\Http\Controllers\Controller;
-use App\HttpTenantApi\FormSubmission\FormSubmissionRequest;
+use App\HttpTenantApi\Requests\FormSubmission\FormSubmissionRequest;
 use Domain\Form\Actions\CreateFormSubmissionAction;
 use Domain\Form\Models\Form;
 use Illuminate\Http\JsonResponse;
@@ -16,7 +16,7 @@ use Throwable;
 class FormSubmissionController extends Controller
 {
     /** @throws Throwable */
-    #[Post('form-submissions/{form}')]
+    #[Post('form/{form}/submissions')]
     public function __invoke(FormSubmissionRequest $request, Form $form): JsonResponse
     {
         DB::transaction(
