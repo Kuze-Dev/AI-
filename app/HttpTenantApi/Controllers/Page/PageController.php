@@ -16,7 +16,7 @@ class PageController
     public function index(): JsonApiResourceCollection
     {
         return PageResource::collection(
-            QueryBuilder::for(Page::class)
+            QueryBuilder::for(Page::query()->select(['name', 'slug']))
                 ->allowedFilters(['name', 'slug'])
                 ->jsonPaginate()
         );
