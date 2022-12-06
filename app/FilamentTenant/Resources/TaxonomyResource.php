@@ -44,7 +44,8 @@ class TaxonomyResource extends Resource
                         ->unique(ignoreRecord: true),
                     TextInput::make('slug')->required()
                         ->disabled(fn (?Taxonomy $record) => $record !== null)
-                        ->unique(ignoreRecord: true),
+                        ->unique(ignoreRecord: true)
+                        ->rules('alpha_dash'),
                 ]),
             ]);
     }

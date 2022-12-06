@@ -35,12 +35,16 @@ class TaxonomyTermsRelationManager extends RelationManager
                         ->reactive()
                         ->afterStateUpdated(function (Closure $set, $state) {
                             $set('slug', Str::slug($state));
-                        })->required()
+                        })
+                        ->required()
                         ->unique(ignoreRecord: true),
-                    TextInput::make('slug')->required()
-                        ->disabled(fn (?TaxonomyTerm $record) => $record !== null)
-                        ->unique(ignoreRecord: true),
-                    RichEditor::make('description')->required(),
+                    TextInput::make('slug')
+                        ->required()
+                        ->unique(ignoreRecord: true)
+                        ->rules('alpha_dash')
+                        ->disabled(fn (?TaxonomyTerm $record) => $record !== null),
+                    RichEditor::make('description')
+                        ->required(),
                 ]),
             ]);
     }
@@ -56,12 +60,10 @@ class TaxonomyTermsRelationManager extends RelationManager
 
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()->label('New Taxonomy Term'),
-                Tables\Actions\AssociateAction::make()->disabled()->hidden(),
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DissociateAction::make()->disabled()->hidden(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
