@@ -17,7 +17,7 @@ class FormController extends Controller
     public function index(): JsonApiResourceCollection
     {
         return FormResource::collection(
-            QueryBuilder::for(Form::class)
+            QueryBuilder::for(Form::query()->select(['name', 'blueprint_id', 'slug']))
                 ->allowedIncludes('blueprint')
                 ->allowedFilters(['name', 'slug'])
                 ->jsonPaginate()
