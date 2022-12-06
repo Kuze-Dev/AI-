@@ -6,12 +6,10 @@ namespace App\Policies;
 
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Taxonomy\Models\TaxonomyTerm;
-use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User;
 
 class TaxonomyTermPolicy
 {
-    use HandlesAuthorization;
     use ChecksWildcardPermissions;
 
     public function viewAny(User $user): bool

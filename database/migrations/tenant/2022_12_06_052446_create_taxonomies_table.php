@@ -8,11 +8,6 @@ use Illuminate\Support\Facades\Schema;
 use Domain\Taxonomy\Models\Taxonomy as TaxonomyModel;
 
 return new class () extends Migration {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up(): void
     {
         Schema::create('taxonomies', function (Blueprint $table) {
@@ -33,11 +28,6 @@ return new class () extends Migration {
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down(): void
     {
         Schema::dropIfExists('taxonomy_terms');
