@@ -17,6 +17,7 @@ use Exception;
 class EditForm extends EditRecord
 {
     protected static string $resource = FormResource::class;
+    private array $rawValidatedData;
 
     /** @throws Exception */
     protected function getActions(): array
@@ -41,7 +42,12 @@ class EditForm extends EditRecord
         return DB::transaction(fn () => app(UpdateFormAction::class)
             ->execute(
                 $record,
-                FormData::fromArray($this->data)
+                FormData::fromArray($this->rawValidatedData)
             ));
+    }
+
+    public function beforeValidate(): void
+    {
+        $this->rawValidatedData = $this->form->validate()[$this->form->getStatePath()];
     }
 }

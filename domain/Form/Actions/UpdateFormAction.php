@@ -39,7 +39,7 @@ class UpdateFormAction
         ];
 
         if ($formEmailNotificationData->id === null) {
-            FormEmailNotification::create($newData);
+            $form->formEmailNotifications()->create($newData);
         } else {
             FormEmailNotification::whereKey($formEmailNotificationData->id)
                 ->whereBelongsTo($form)

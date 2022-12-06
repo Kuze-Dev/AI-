@@ -73,8 +73,6 @@ it('can edit page', function () {
         'store_submission' => false,
     ]);
 
-    $this->markTestSkipped('filament bugs on getting latest data on relationships.');
-
     assertDatabaseHas(FormEmailNotification::class,  [
         'form_id' => $form->id,
         ...$formEmailNotification,
