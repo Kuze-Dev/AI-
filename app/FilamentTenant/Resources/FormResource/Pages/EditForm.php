@@ -50,4 +50,9 @@ class EditForm extends EditRecord
     {
         $this->rawValidatedData = $this->form->validate()[$this->form->getStatePath()];
     }
+
+    public function afterSave()
+    {
+        $this->fillForm();
+    }
 }
