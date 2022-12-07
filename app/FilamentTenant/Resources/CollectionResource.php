@@ -94,6 +94,8 @@ class CollectionResource extends Resource
                                         'private' => 'Private',
                                         'unlisted' => 'Unlisted'
                                     ])
+                                    ->default('public')
+                                    ->searchable()
                                     ->columnSpan(6)
                                     ->required(),
                                 Forms\Components\Select::make('future_publish_date')
@@ -102,6 +104,8 @@ class CollectionResource extends Resource
                                         'private' => 'Private',
                                         'unlisted' => 'Unlisted'
                                     ])
+                                    ->default('public')
+                                    ->searchable()
                                     ->columnSpan(6)
                                     ->required()
                         ]),
@@ -114,7 +118,14 @@ class CollectionResource extends Resource
                             ->onIcon('heroicon-s-shield-check')
                             ->offIcon('heroicon-s-shield-exclamation')
                             ->helperText(trans('Grants option for ordering of collection entries'))
-                            ->reactive()    
+                            ->reactive(),
+                    Forms\Components\Select::make('order_direction')
+                        ->options([
+                            'asc' => 'Ascending',
+                            'desc' => 'Descending',
+                        ])
+                        ->default('asc')
+                        ->searchable()
                     ])
                 ]),
             ]);
@@ -181,8 +192,7 @@ class CollectionResource extends Resource
         return [
             'index' => Resources\CollectionResource\Pages\ListCollection::route('/'),
             'create' => Resources\CollectionResource\Pages\CreateCollection::route('/create'),
-            'configure' => Resources\CollectionResource\Pages\ConfigureCollection::route('/{record}/configure'),
-            'create-entry' => Resources\CollectionResource\Pages\CreateCollectionEntry::route('/{record}/create-entry')
+            'configure' => Resources\CollectionResource\Pages\ConfigureCollection::route('/{record}/configure')
         ];
     }    
 }

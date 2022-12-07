@@ -39,7 +39,8 @@ class Collection extends Model implements IsActivitySubject
         'past_publish_date',
         'future_publish_date',
         'data',
-        'isSortable'
+        'isSortable',
+        'order_direction'
     ];
 
     protected $casts = [

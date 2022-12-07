@@ -13,7 +13,8 @@ class CollectionData
         public readonly int $display_publish_dates,
         public readonly ?string $past_publish_date,
         public readonly ?string $future_publish_date,
-        public readonly ?int $isSortable 
+        public readonly ?int $isSortable,
+        public readonly ?string $order_direction
     ) {
         
     }

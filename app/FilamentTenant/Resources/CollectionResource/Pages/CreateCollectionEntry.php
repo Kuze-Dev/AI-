@@ -3,6 +3,7 @@
 namespace App\FilamentTenant\Resources\CollectionResource\Pages;
 
 use App\FilamentTenant\Resources\CollectionResource;
+use Domain\Collection\Actions\CreateCollectionEntryAction;
 use Domain\Collection\DataTransferObjects\CollectionEntryData;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;

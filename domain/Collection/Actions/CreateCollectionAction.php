@@ -25,7 +25,8 @@ class CreateCollectionAction
             'display_publish_dates' => $collectionData->display_publish_dates,
             'past_publish_date' => $collectionData->past_publish_date,
             'future_publish_date' => $collectionData->future_publsh_date,
-            'isSortable' => $collectionData->isSortable
+            'isSortable' => $collectionData->isSortable,
+            'order_direction' => $collectionData->order_direction
         ]);
     }
 }

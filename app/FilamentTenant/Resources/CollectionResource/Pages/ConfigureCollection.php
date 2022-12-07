@@ -44,7 +44,8 @@ class ConfigureCollection extends EditRecord
                     display_publish_dates: $data['display_publish_dates'],
                     past_publish_date: $data['past_publish_date'],
                     future_publish_date: $data['future_publish_date'],
-                    isSortable: (int) $data['isSortable']
+                    isSortable: (int) $data['isSortable'],
+                    order_direction: $data['order_direction']
                 ))
         );
     }
