@@ -5,6 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Domain\Blueprint\Models\Blueprint as BlueprintModel;
+use Domain\Collection\Models\Collection as CollectionModel;
 
 return new class extends Migration
 {
@@ -28,6 +29,13 @@ return new class extends Migration
             
             $table->timestamps();
         });
+
+        Schema::create('collection_entries', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(CollectionModel::class)->constrained();
+            $table->json('data');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -38,5 +46,6 @@ return new class extends Migration
     public function down()
     {
         Schema::dropIfExists('collections');
+        Schema::dropIfExists('collection_entries');
     }
 };
