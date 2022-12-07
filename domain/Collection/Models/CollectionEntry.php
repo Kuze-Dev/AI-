@@ -20,6 +20,10 @@ class CollectionEntry extends Model
         'collection_id'
     ];
 
+    protected $casts = [
+        'data' => 'array'
+    ];
+
     /**
      * @return BelongsTo
      */

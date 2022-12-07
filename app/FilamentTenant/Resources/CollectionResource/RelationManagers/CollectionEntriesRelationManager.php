@@ -10,6 +10,7 @@ use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Actions\AssociateAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Livewire\Component as LivewireComponent;
@@ -43,24 +44,48 @@ class CollectionEntriesRelationManager extends RelationManager
             ]);
     }
 
+    /**
+     * @param Table $table
+     * 
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('null'),
+                Tables\Columns\TextColumn::make('null')
+                    ->sortable()
+                    ->searchable(),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make('Create collection entry'),
+                Tables\Actions\AssociateAction::make()
+                    ->disabled()
+                    ->hidden()
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DissociateAction::make()
+                    ->disabled()
+                    ->hidden(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }    
+
+    /**
+     * @return Builder
+     */
+    protected function getTableQuery(): Builder
+    {
+        return parent::getTableQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
 }
