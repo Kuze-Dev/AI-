@@ -107,6 +107,15 @@ class CollectionResource extends Resource
                         ]),
                         
                     ]),
+                    
+                    Forms\Components\Card::make([
+                        Forms\Components\Toggle::make('isSortable')
+                            ->label(trans('Allow ordering'))
+                            ->onIcon('heroicon-s-shield-check')
+                            ->offIcon('heroicon-s-shield-exclamation')
+                            ->helperText(trans('Grants option for ordering of collection entries'))
+                            ->reactive()    
+                    ])
                 ]),
             ]);
     }

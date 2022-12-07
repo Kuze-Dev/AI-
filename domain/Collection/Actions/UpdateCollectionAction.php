@@ -25,7 +25,8 @@ class UpdateCollectionAction
             'blueprint_id' => $collectionData->blueprint_id,
             'display_publish_dates' => $collectionData->display_publish_dates,
             'past_publish_date' => $collectionData->past_publish_date,
-            'future_publish_date' => $collectionData->future_publish_date
+            'future_publish_date' => $collectionData->future_publish_date,
+            'isSortable' => $collectionData->isSortable
         ]);
 
         if ($collection->isDirty('blueprint_id')) {
