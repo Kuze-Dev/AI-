@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
 use App\FilamentTenant\Resources\TaxonomyResource\RelationManagers\TaxonomyTermsRelationManager;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
@@ -45,7 +46,8 @@ class TaxonomyResource extends Resource
                     TextInput::make('slug')->required()
                         ->disabled(fn (?Taxonomy $record) => $record !== null)
                         ->unique(ignoreRecord: true)
-                        ->rules('alpha_dash'),
+                        ->rules('alpha_dash')
+                        ->disabled(),
                 ]),
             ]);
     }
@@ -73,6 +75,7 @@ class TaxonomyResource extends Resource
     {
         return [
             TaxonomyTermsRelationManager::class,
+            ActivitiesRelationManager::class,
         ];
     }
 

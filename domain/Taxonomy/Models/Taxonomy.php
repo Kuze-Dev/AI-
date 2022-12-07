@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
@@ -17,6 +18,7 @@ class Taxonomy extends Model implements IsActivitySubject
 {
     use HasFactory;
     use HasSlug;
+    use LogsActivity;
 
     protected $fillable = [
         'name',
@@ -31,15 +33,15 @@ class Taxonomy extends Model implements IsActivitySubject
             ->dontSubmitEmptyLogs();
     }
 
+    public function getActivitySubjectDescription(Activity $activity): string
+    {
+        return 'Taxonomy: '.$this->name;
+    }
+
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Taxonomy\Models\TaxonomyTerm> */
     public function taxonomyTerms(): HasMany
     {
         return $this->hasMany(TaxonomyTerm::class);
-    }
-
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Taxonomy: '.$this->name;
     }
 
     public function getRouteKeyName(): string

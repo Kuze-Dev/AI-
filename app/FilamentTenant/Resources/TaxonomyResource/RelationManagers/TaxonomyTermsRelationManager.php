@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\TaxonomyResource\RelationManagers;
 
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
@@ -38,15 +39,22 @@ class TaxonomyTermsRelationManager extends RelationManager
                         })
                         ->required()
                         ->unique(ignoreRecord: true),
-                    TextInput::make('slug')
-                        ->required()
+                    TextInput::make('slug')->required()
+                        ->disabled(fn (?TaxonomyTerm $record) => $record !== null)
                         ->unique(ignoreRecord: true)
                         ->rules('alpha_dash')
-                        ->disabled(fn (?TaxonomyTerm $record) => $record !== null),
+                        ->disabled(),
                     RichEditor::make('description')
                         ->required(),
                 ]),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            ActivitiesRelationManager::class,
+        ];
     }
 
     public static function table(Table $table): Table
