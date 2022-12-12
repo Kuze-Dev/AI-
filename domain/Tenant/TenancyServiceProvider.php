@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Domain\Tenant;
 
 use Domain\Tenant\Jobs\CreateFrameworkDirectoriesForTenant;
+use Domain\Tenant\Jobs\CreateS3Bucket;
+use Domain\Tenant\Jobs\DeleteS3Bucket;
 use Domain\Tenant\Models\Tenant;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
@@ -33,6 +35,7 @@ class TenancyServiceProvider extends ServiceProvider
                     Jobs\MigrateDatabase::class,
                     Jobs\SeedDatabase::class,
                     CreateFrameworkDirectoriesForTenant::class,
+                    CreateS3Bucket::class,
 
                     // Your own jobs to prepare the tenant.
                     // Provision API keys, create S3 buckets, anything you want!
@@ -49,6 +52,7 @@ class TenancyServiceProvider extends ServiceProvider
             Events\TenantDeleted::class => [
                 JobPipeline::make([
                     Jobs\DeleteDatabase::class,
+                    DeleteS3Bucket::class,
                 ])->send(function (Events\TenantDeleted $event) {
                     return $event->tenant;
                 })->shouldBeQueued(true),
