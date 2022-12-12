@@ -196,7 +196,6 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\FilamentServiceProvider::class,
         App\Providers\HealthCheckServiceProvider::class,
-        App\Providers\TenancyServiceProvider::class,
         App\Providers\FilamentTenantServiceProvider::class,
 
         /*
@@ -205,6 +204,7 @@ return [
         Domain\Admin\AdminServiceProvider::class,
         Domain\Auth\AuthServiceProvider::class,
         Domain\Role\RoleServiceProvider::class,
+        Domain\Tenant\TenancyServiceProvider::class,
 
     ],
 

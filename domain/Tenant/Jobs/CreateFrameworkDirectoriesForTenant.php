@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Jobs;
+namespace Domain\Tenant\Jobs;
 
 use Domain\Tenant\Models\Tenant;
 use Illuminate\Bus\Queueable;
