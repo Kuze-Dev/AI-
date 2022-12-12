@@ -17,12 +17,6 @@ class CreateTaxonomy extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(
-            fn () => app(CreateTaxonomyAction::class)
-                ->execute(new TaxonomyData(
-                    name:$data['name'],
-                    slug:$data['slug']
-                ))
-        );
+        return DB::transaction(fn () => app(CreateTaxonomyAction::class)->execute(new TaxonomyData(...$data)));
     }
 }

@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\TaxonomyResource\Pages\CreateTaxonomy;
-use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Models\Taxonomy;
 use Filament\Facades\Filament;
 
@@ -16,7 +15,6 @@ beforeEach(function () {
     loginAsSuperAdmin();
 });
 
-
 it('can render page', function () {
     livewire(CreateTaxonomy::class)
         ->assertFormExists()
@@ -24,14 +22,9 @@ it('can render page', function () {
 });
 
 it('can create page', function () {
-    $taxonomy = TaxonomyFactory::new()
-    ->withDummyBlueprint()
-    ->createOne(); 
-
     livewire(CreateTaxonomy::class)
         ->fillForm([
             'name' => 'Test',
-            'blueprint_id' => $taxonomy->getKey(),
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -39,4 +32,3 @@ it('can create page', function () {
 
     assertDatabaseCount(Taxonomy::class, 1);
 });
-

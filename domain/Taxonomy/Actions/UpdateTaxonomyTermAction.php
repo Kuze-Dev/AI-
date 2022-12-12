@@ -11,12 +11,10 @@ class UpdateTaxonomyTermAction
 {
     public function execute(TaxonomyTerm $taxonomyTerm, TaxonomyTermData $taxonomyTermData): TaxonomyTerm
     {
-        $taxonomyTerm->fill([
+        $taxonomyTerm->update([
             'name' => $taxonomyTermData->name,
-            'taxonomy_id' => $taxonomyTermData->taxonomy_id,
+            'description' => $taxonomyTermData->description,
         ]);
-
-        $taxonomyTerm->save();
 
         return $taxonomyTerm;
     }

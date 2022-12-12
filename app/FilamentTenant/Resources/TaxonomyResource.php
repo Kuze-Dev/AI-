@@ -13,14 +13,11 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-
+use Filament\Forms;
 use Illuminate\Support\Str;
 use Closure;
 
-use Filament\Forms\Components\Card;
-use Filament\Forms\Components\TextInput;
-
-use Filament\Tables\Columns\TextColumn;
+use Filament\Resources\RelationManagers\RelationGroup;
 
 class TaxonomyResource extends Resource
 {
@@ -30,20 +27,25 @@ class TaxonomyResource extends Resource
 
     protected static ?string $navigationGroup = 'CMS';
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name'];
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Card::make()->schema([
-                    TextInput::make('name')
+                Forms\Components\Card::make()->schema([
+                    Forms\Components\TextInput::make('name')
                         ->reactive()
                         ->afterStateUpdated(function (Closure $set, $state) {
                             $set('slug', Str::slug($state));
                         })->required()
                         ->unique(ignoreRecord: true),
-                    TextInput::make('slug')->required()
+                    Forms\Components\TextInput::make('slug')->required()
                         ->disabled(fn (?Taxonomy $record) => $record !== null)
                         ->unique(ignoreRecord: true)
                         ->rules('alpha_dash')
@@ -56,12 +58,13 @@ class TaxonomyResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')->sortable()->searchable(),
-                TextColumn::make('slug'),
+                Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('slug'),
+                Tables\Columns\BadgeColumn::make('taxonomy_terms_count')
+                    ->counts('taxonomyTerms')
+                    ->sortable(),
             ])
-            ->filters([
-
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
@@ -74,8 +77,10 @@ class TaxonomyResource extends Resource
     public static function getRelations(): array
     {
         return [
-            TaxonomyTermsRelationManager::class,
-            ActivitiesRelationManager::class,
+            RelationGroup::make('Main', [
+                TaxonomyTermsRelationManager::class,
+                ActivitiesRelationManager::class,
+            ]),
         ];
     }
 

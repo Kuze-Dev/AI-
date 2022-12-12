@@ -11,11 +11,9 @@ class UpdateTaxonomyAction
 {
     public function execute(Taxonomy $taxonomy, TaxonomyData $taxonomyData): Taxonomy
     {
-        $taxonomy->fill([
+        $taxonomy->update([
             'name' => $taxonomyData->name,
         ]);
-
-        $taxonomy->save();
 
         return $taxonomy;
     }

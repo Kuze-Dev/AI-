@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\TaxonomyResource\Pages\EditTaxonomy;
-use Domain\Blueprint\Database\Factories\BlueprintFactory;
-use Domain\Blueprint\Enums\FieldType;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Models\Taxonomy;
 use Filament\Facades\Filament;
@@ -18,12 +16,10 @@ beforeEach(function () {
     loginAsSuperAdmin();
 });
 
-
 it('can render page', function () {
-   $taxonomy = TaxonomyFactory::new()
-    ->withDummyBlueprint()
-    ->createOne();
-   livewire(EditTaxonomy::class, ['record' => $taxonomy->getRouteKey()])
+    $taxonomy = TaxonomyFactory::new()->createOne();
+
+    livewire(EditTaxonomy::class, ['record' => $taxonomy->getRouteKey()])
         ->assertFormExists()
         ->assertSuccessful()
         ->assertFormSet(['name' => $taxonomy->name])
@@ -31,22 +27,19 @@ it('can render page', function () {
 });
 
 it('can edit page', function () {
-    $taxonomy = TaxonomyFactory::new()
-        ->withDummyBlueprint()
-        ->createOne([
-            'name' => 'old name',
-        ]);
+    $taxonomy = TaxonomyFactory::new()->createOne(['name' => 'old name']);
 
     livewire(EditTaxonomy::class, ['record' => $taxonomy->getRouteKey()])
-        ->fillForm(['name' => 'new name',])
+        ->fillForm(['name' => 'new name', ])
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk();
 
     assertDatabaseHas(
         Taxonomy::class,
-        ['id' => $taxonomy->id,
-        'name' => 'new name',]
+        [
+            'id' => $taxonomy->id,
+            'name' => 'new name',
+        ]
     );
 });
-
