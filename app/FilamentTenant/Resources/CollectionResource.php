@@ -17,6 +17,7 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Closure;
 use Filament\Forms\FormsComponent;
 use Illuminate\Support\Facades\Auth;
 
@@ -84,8 +85,10 @@ class CollectionResource extends Resource
                             ->offIcon('heroicon-s-shield-exclamation')
                             ->helperText(trans('Enable publish date visibility and behavior of collections'))
                             ->reactive()
-                            ->afterStateHydrated(function (Forms\Components\Toggle $component, ?Collection $record): void {
-                        }),
+                            ->afterStateUpdated(function (Closure $set, $state) {
+                                $set('display_publish_dates', $state);
+                            })
+                            ,
                         Forms\Components\Grid::make(12)
                             ->schema([
                                 Forms\Components\Select::make('past_publish_date')
@@ -95,6 +98,7 @@ class CollectionResource extends Resource
                                         'unlisted' => 'Unlisted'
                                     ])
                                     ->default('public')
+                                    ->when(fn (Closure $get) => $get('display_publish_dates'))
                                     ->searchable()
                                     ->columnSpan(6)
                                     ->required(),
@@ -106,6 +110,7 @@ class CollectionResource extends Resource
                                     ])
                                     ->default('public')
                                     ->searchable()
+                                    ->when(fn (Closure $get) => $get('display_publish_dates'))
                                     ->columnSpan(6)
                                     ->required()
                         ]),
@@ -119,13 +124,6 @@ class CollectionResource extends Resource
                             ->offIcon('heroicon-s-shield-exclamation')
                             ->helperText(trans('Grants option for ordering of collection entries'))
                             ->reactive(),
-                    Forms\Components\Select::make('order_direction')
-                        ->options([
-                            'asc' => 'Ascending',
-                            'desc' => 'Descending',
-                        ])
-                        ->default('asc')
-                        ->searchable()
                     ])
                 ]),
             ]);
