@@ -14,7 +14,6 @@ class CollectionData
         public readonly ?string $past_publish_date,
         public readonly ?string $future_publish_date,
         public readonly ?int $is_sortable,
-        public readonly ?string $order_direction
     ) {
         
     }

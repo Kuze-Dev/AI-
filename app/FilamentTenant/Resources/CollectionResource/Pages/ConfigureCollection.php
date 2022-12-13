@@ -41,11 +41,10 @@ class ConfigureCollection extends EditRecord
                     name: $data['name'],
                     blueprint_id: (int) $data['blueprint_id'],
                     slug: $data['slug'],
-                    display_publish_dates: $data['display_publish_dates'],
+                    display_publish_dates: $data['display_publish_dates'] == true ? 1 : 0,
                     past_publish_date: $data['past_publish_date'],
                     future_publish_date: $data['future_publish_date'],
                     is_sortable: (int) $data['is_sortable'],
-                    order_direction: $data['order_direction']
                 ))
         );
     }
