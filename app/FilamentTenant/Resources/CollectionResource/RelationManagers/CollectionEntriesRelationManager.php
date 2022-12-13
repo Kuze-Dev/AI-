@@ -5,6 +5,7 @@ declare (strict_types = 1);
 namespace App\FilamentTenant\Resources\CollectionResource\RelationManagers;
 
 use App\FilamentTenant\Support\SchemaFormBuilder;
+use Domain\Collection\Models\CollectionEntry;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -53,9 +54,8 @@ class CollectionEntriesRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('null')
-                    ->sortable()
-                    ->searchable(),
+                Tables\Columns\ViewColumn::make('data')
+                    ->view('filament.table.columns.data-transformer')
             ])
             ->filters([
                 //
@@ -78,6 +78,11 @@ class CollectionEntriesRelationManager extends RelationManager
             ]);
     }    
 
+    protected function getTableReorderColumn(): ?string
+    {
+        return 'order';
+    }
+ 
     /**
      * @return Builder
      */

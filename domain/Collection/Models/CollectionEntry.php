@@ -17,7 +17,8 @@ class CollectionEntry extends Model
      */
     protected $fillable = [
         'data',
-        'collection_id'
+        'collection_id',
+        'order'
     ];
 
     protected $casts = [
