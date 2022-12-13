@@ -81,8 +81,6 @@ class CollectionResource extends Resource
                     
                     Forms\Components\Card::make([
                         Forms\Components\Toggle::make('display_publish_dates')
-                            ->onIcon('heroicon-s-shield-check')
-                            ->offIcon('heroicon-s-shield-exclamation')
                             ->helperText(trans('Enable publish date visibility and behavior of collections'))
                             ->reactive()
                             ->afterStateUpdated(function (Closure $set, $state) {
@@ -118,8 +116,6 @@ class CollectionResource extends Resource
                     Forms\Components\Card::make([
                         Forms\Components\Toggle::make('isSortable')
                             ->label(trans('Allow ordering'))
-                            ->onIcon('heroicon-s-shield-check')
-                            ->offIcon('heroicon-s-shield-exclamation')
                             ->helperText(trans('Grants option for ordering of collection entries'))
                             ->reactive(),
                     ])
