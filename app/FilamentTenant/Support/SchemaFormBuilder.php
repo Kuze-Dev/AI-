@@ -118,8 +118,11 @@ class SchemaFormBuilder extends Component
 
     private function makeFileUploadComponent(FileFieldData $fileFieldData): FileUpload
     {
-        $fileUpload = FileUpload::make($fileFieldData->state_name)
-            ->getUploadedFileUrlUsing(fn (string $file) => tenant_asset($file));
+        $fileUpload = FileUpload::make($fileFieldData->state_name);
+
+        if (config('filament.default_filesystem_disk') !== 's3'){
+            $fileUpload->getUploadedFileUrlUsing(fn (string $file) => tenant_asset($file));
+        }
 
         if ($fileFieldData->multiple) {
             $fileUpload->multiple($fileFieldData->multiple)

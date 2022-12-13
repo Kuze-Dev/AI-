@@ -55,7 +55,7 @@ class TenancyServiceProvider extends ServiceProvider
                     DeleteS3Bucket::class,
                 ])->send(function (Events\TenantDeleted $event) {
                     return $event->tenant;
-                })->shouldBeQueued(true),
+                })->shouldBeQueued($this->app->isProduction()),
             ],
 
             // Domain events

@@ -39,7 +39,11 @@ class SiteSettings extends BaseSiteSettings
                     ->getUploadedFileNameForStorageUsing(static function (TemporaryUploadedFile $file) {
                         return 'logo.'.$file->extension();
                     })
-                    ->getUploadedFileUrlUsing(fn (string $file) => tenant_asset($file)),
+                    ->tap(function (FileUpload $fileUpload) {
+                        if (config('filament.default_filesystem_disk') !== 's3'){
+                            $fileUpload->getUploadedFileUrlUsing(fn (string $file) => tenant_asset($file));
+                        }
+                    }),
                 FileUpload::make('favicon')
                     ->acceptedFileTypes(['image/ico', 'image/png', 'image/webp', 'image/jpg', 'image/jpeg'])
                     ->imageResizeTargetHeight('100')
@@ -49,7 +53,11 @@ class SiteSettings extends BaseSiteSettings
                     ->getUploadedFileNameForStorageUsing(static function (TemporaryUploadedFile $file) {
                         return 'favicon.'.$file->extension();
                     })
-                    ->getUploadedFileUrlUsing(fn (string $file) => tenant_asset($file)),
+                    ->tap(function (FileUpload $fileUpload) {
+                        if (config('filament.default_filesystem_disk') !== 's3'){
+                            $fileUpload->getUploadedFileUrlUsing(fn (string $file) => tenant_asset($file));
+                        }
+                    }),
             ])
                 ->columns(2),
         ];
