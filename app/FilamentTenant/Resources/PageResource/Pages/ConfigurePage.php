@@ -48,4 +48,12 @@ class ConfigurePage extends EditRecord
                 ))
         );
     }
+
+    /**
+     * @return string|null
+     */
+    protected function getRedirectUrl(): ?string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

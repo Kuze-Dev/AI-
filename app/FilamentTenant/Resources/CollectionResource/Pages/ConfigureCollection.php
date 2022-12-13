@@ -48,4 +48,12 @@ class ConfigureCollection extends EditRecord
                 ))
         );
     }
+
+    /**
+     * @return string|null
+     */
+    protected function getRedirectUrl(): ?string
+    {
+        return $this->getResource()::getUrl('configure', $this->record->slug);
+    }
 }
