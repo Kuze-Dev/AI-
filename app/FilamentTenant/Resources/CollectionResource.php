@@ -98,7 +98,6 @@ class CollectionResource extends Resource
                                         'unlisted' => 'Unlisted'
                                     ])
                                     ->default('public')
-                                    ->when(fn (Closure $get) => $get('display_publish_dates'))
                                     ->searchable()
                                     ->columnSpan(6)
                                     ->required(),
@@ -110,10 +109,9 @@ class CollectionResource extends Resource
                                     ])
                                     ->default('public')
                                     ->searchable()
-                                    ->when(fn (Closure $get) => $get('display_publish_dates'))
                                     ->columnSpan(6)
                                     ->required()
-                        ]),
+                        ])->when(fn (Closure $get) => $get('display_publish_dates')),
                         
                     ]),
                     
