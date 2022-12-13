@@ -26,7 +26,7 @@ class UpdateCollectionAction
             'display_publish_dates' => $collectionData->display_publish_dates,
             'past_publish_date' => $collectionData->past_publish_date,
             'future_publish_date' => $collectionData->future_publish_date,
-            'isSortable' => $collectionData->isSortable,
+            'is_sortable' => $collectionData->is_sortable,
             'order_direction' =>$collectionData->order_direction
         ]);
 

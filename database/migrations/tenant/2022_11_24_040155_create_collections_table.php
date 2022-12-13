@@ -25,8 +25,7 @@ return new class extends Migration
             $table->tinyInteger('display_publish_dates')->default(0);
             $table->string('future_publish_date')->nullable();
             $table->string('past_publish_date')->nullable();
-            $table->tinyInteger('isSortable')->default(0);
-            $table->enum('order_direction', ['asc', 'desc'])->default('asc');
+            $table->tinyInteger('is_sortable')->default(0);
             $table->json('data')->nullable();
             
             $table->timestamps();

@@ -114,7 +114,7 @@ class CollectionResource extends Resource
                     ]),
                     
                     Forms\Components\Card::make([
-                        Forms\Components\Toggle::make('isSortable')
+                        Forms\Components\Toggle::make('is_sortable')
                             ->label(trans('Allow ordering'))
                             ->helperText(trans('Grants option for ordering of collection entries'))
                             ->reactive(),
