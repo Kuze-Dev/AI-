@@ -1,0 +1,19 @@
+<?php
+
+namespace App\FilamentTenant\Resources\MenuResource\Pages;
+
+use App\FilamentTenant\Resources\MenuResource;
+use Filament\Pages\Actions;
+use Filament\Resources\Pages\ListRecords;
+
+class ListMenus extends ListRecords
+{
+    protected static string $resource = MenuResource::class;
+
+    protected function getActions(): array
+    {
+        return [
+            Actions\CreateAction::make(),
+        ];
+    }
+}
