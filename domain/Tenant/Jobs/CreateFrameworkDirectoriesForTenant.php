@@ -24,6 +24,10 @@ class CreateFrameworkDirectoriesForTenant implements ShouldQueue
 
     public function handle(): void
     {
+        if (! config('tenancy.filesystem.suffix_storage_path')) {
+            return;
+        }
+
         $this->tenant->run(function ($tenant) {
             $storage_path = storage_path();
 
