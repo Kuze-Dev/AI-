@@ -15,8 +15,16 @@ return new class() extends Migration
     {
         Schema::create('menus', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->json('schema');
+            $table->string('name');
+            $table->timestamps();
+        });
+        Schema::create('menu_nodes', function (Blueprint $table) {
+            $table->id();
+            $table->string('label');
+            $table->bigInteger('parent_id')->unsigned()->nullable();
+            $table->string('url')->nullable();
+            $table->string('target')->nullable();
+            $table->integer('order')->unsigned();
             $table->timestamps();
         });
     }

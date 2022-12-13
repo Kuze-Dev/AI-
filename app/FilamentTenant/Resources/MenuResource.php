@@ -2,6 +2,7 @@
 
 namespace App\FilamentTenant\Resources;
 
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\MenuResource\Pages;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Menu\Models\Menu;
@@ -92,7 +93,7 @@ class MenuResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ActivitiesRelationManager::class,
         ];
     }
 
