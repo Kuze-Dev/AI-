@@ -16,15 +16,17 @@ return new class() extends Migration
         Schema::create('menus', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('slug');
             $table->timestamps();
         });
-        Schema::create('menu_nodes', function (Blueprint $table) {
+        Schema::create('nodes', function (Blueprint $table) {
             $table->id();
-            $table->string('label');
+            $table->string('name');
+            $table->bigInteger('menu_id')->unsigned()->nullable();
             $table->bigInteger('parent_id')->unsigned()->nullable();
             $table->string('url')->nullable();
             $table->string('target')->nullable();
-            $table->integer('order')->unsigned();
+            $table->integer('sort')->unsigned();
             $table->timestamps();
         });
     }
@@ -37,5 +39,6 @@ return new class() extends Migration
     public function down()
     {
         Schema::dropIfExists('menus');
+        Schema::dropIfExists('nodes');
     }
 };

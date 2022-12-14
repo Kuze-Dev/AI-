@@ -18,8 +18,8 @@ class CreateMenu extends CreateRecord
     {
         return DB::transaction(fn () => app(CreateMenuAction::class)
             ->execute(new MenuData(
-                title: $data['title'],
-                schema: $data['schema'],
+                name: $data['name'],
+                slug: $data['slug']
             )));
     }
 }

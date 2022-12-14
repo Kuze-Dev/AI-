@@ -12,8 +12,7 @@ class UpdateMenuAction
     public function execute(Menu $Menu, MenuData $menuData): Menu
     {
         $Menu->update([
-            'title' => $menuData->title,
-            'schema' => $menuData->schema,
+            'name' => $menuData->name,
         ]);
         return $Menu;
     }

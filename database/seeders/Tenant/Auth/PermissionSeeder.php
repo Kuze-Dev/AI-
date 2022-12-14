@@ -29,6 +29,7 @@ class PermissionSeeder extends BasePermissionSeeder
                 ...$this->generateFilamentResourcePermissions('activity', only: ['viewAny', 'view']),
                 ...$this->generatePermissionGroup('settings', ['site']),
                 ...$this->generateFilamentResourcePermissions('blueprint', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('menu', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('page', except: ['deleteAny'], customPermissions: ['configure']),
             ],
         ];

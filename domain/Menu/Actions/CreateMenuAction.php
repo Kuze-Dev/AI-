@@ -12,8 +12,8 @@ class CreateMenuAction
     public function execute(MenuData $menuData): Menu
     {
         return Menu::create([
-            'title' => $menuData->title,
-            'schema' => $menuData->schema,
+            'name' => $menuData->name,
+            'slug' => $menuData->slug,
         ]);
     }
 }

@@ -7,8 +7,8 @@ namespace Domain\Menu\DataTransferObjects;
 class MenuData
 {
     public function __construct(
-        public readonly string $title,
-        public readonly array $schema,
+        public readonly string $name,
+        public readonly string $slug,
     ) {
     }
 }

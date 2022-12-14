@@ -198,6 +198,7 @@ return [
         App\Providers\HealthCheckServiceProvider::class,
         App\Providers\TenancyServiceProvider::class,
         App\Providers\FilamentTenantServiceProvider::class,
+        Spatie\EloquentSortable\EloquentSortableServiceProvider::class,
 
         /*
          * Domain Service Providers...

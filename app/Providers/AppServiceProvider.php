@@ -6,6 +6,8 @@ namespace App\Providers;
 
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Menu\Models\Menu;
+use Domain\Menu\Models\Node;
 use Domain\Page\Models\Page;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -24,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Model::shouldBeStrict( ! $this->app->isProduction());
+        Model::shouldBeStrict(!$this->app->isProduction());
 
         Model::handleMissingAttributeViolationUsing(function (Model $model, string $key) {
             if ($model instanceof Tenant && Str::startsWith($key, Tenant::internalPrefix())) {
@@ -38,19 +40,21 @@ class AppServiceProvider extends ServiceProvider
             config('tenancy.tenant_model'),
             Blueprint::class,
             Page::class,
+            Menu::class,
+            Node::class,
         ]);
 
         Password::defaults(
             fn () => $this->app->environment('local', 'testing')
                 ? Password::min(4)
                 : Password::min(8)
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols()
-                    ->when(
-                        $this->app->isProduction(),
-                        fn (Password $password) => $password->uncompromised()
-                    )
+                ->mixedCase()
+                ->numbers()
+                ->symbols()
+                ->when(
+                    $this->app->isProduction(),
+                    fn (Password $password) => $password->uncompromised()
+                )
         );
 
         JsonApiResource::resolveIdUsing(fn (Model $resource): string => $resource->getRouteKey());
