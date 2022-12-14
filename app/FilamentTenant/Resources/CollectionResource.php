@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Filament\Forms\FormsComponent;
+use Filament\Resources\RelationManagers\RelationGroup;
 use Illuminate\Support\Facades\Auth;
 
 class CollectionResource extends Resource
@@ -47,7 +48,7 @@ class CollectionResource extends Resource
 
     /**
      * @param Form $form
-     * 
+     *
      * @return Form
      */
     public static function form(Form $form): Form
@@ -73,20 +74,18 @@ class CollectionResource extends Resource
                             if ($record === null) {
                                 return;
                             }
-    
+
                             if ($record->blueprint_id !== (int) $state) {
                                 return trans('Modifying the blueprint will reset all the page\'s content.');
                             }
                         }),
-                    
+
                     Forms\Components\Card::make([
                         Forms\Components\Toggle::make('display_publish_dates')
                             ->helperText(trans('Enable publish date visibility and behavior of collections'))
                             ->reactive()
-                            ->afterStateUpdated(function (Closure $set, $state) {
-                                $set('display_publish_dates', $state);
-                            })
-                            ,
+                            ->afterStateHydrated(fn (?Collection $record, Forms\Components\Toggle $component) => $component->state($record && $record->hasPublishDates()))
+                            ->dehydrated(false),
                         Forms\Components\Grid::make(12)
                             ->schema([
                                 Forms\Components\Select::make('past_publish_date')
@@ -110,9 +109,9 @@ class CollectionResource extends Resource
                                     ->columnSpan(6)
                                     ->required()
                         ])->when(fn (Closure $get) => $get('display_publish_dates')),
-                        
+
                     ]),
-                    
+
                     Forms\Components\Card::make([
                         Forms\Components\Toggle::make('is_sortable')
                             ->label(trans('Allow ordering'))
@@ -164,18 +163,20 @@ class CollectionResource extends Resource
         ])
         ->defaultSort('updated_at', 'desc');
     }
-    
+
     /**
      * @return array
      */
     public static function getRelations(): array
     {
         return [
-            ActivitiesRelationManager::class,
-            CollectionEntriesRelationManager::class,
+            RelationGroup::make('Main', [
+                CollectionEntriesRelationManager::class,
+                ActivitiesRelationManager::class,
+            ]),
         ];
     }
-    
+
     /**
      * @return array
      */
@@ -184,7 +185,8 @@ class CollectionResource extends Resource
         return [
             'index' => Resources\CollectionResource\Pages\ListCollection::route('/'),
             'create' => Resources\CollectionResource\Pages\CreateCollection::route('/create'),
-            'configure' => Resources\CollectionResource\Pages\ConfigureCollection::route('/{record}/configure')
+            'configure' => Resources\CollectionResource\Pages\ConfigureCollection::route('/{record}/configure'),
+            'entry.create' => Resources\CollectionResource\Pages\CreateCollectionEntry::route('/{ownerRecord}/create')
         ];
-    }    
+    }
 }

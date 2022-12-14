@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types = 1);
 
@@ -16,21 +16,21 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-class Collection extends Model implements IsActivitySubject 
+class Collection extends Model implements IsActivitySubject
 {
     use LogsActivity,
         HasSlug;
 
     /**
-     * Declaration of constants for labels 
+     * Declaration of constants for labels
      * collection of publish date behaviors.
      */
     const BEHAVIOR_PUBLIC = 'public';
-    
+
     const BEHAVIOR_UNLISTED = 'unlisted';
 
     const BEHAVIOR_PRIVATE = 'private';
-    
+
     protected $fillable = [
         'name',
         'blueprint_id',
@@ -43,6 +43,7 @@ class Collection extends Model implements IsActivitySubject
     ];
 
     protected $casts = [
+        'display_publish_dates' => 'bool',
         'data' => 'array',
     ];
 
@@ -60,7 +61,7 @@ class Collection extends Model implements IsActivitySubject
     /**
      * @return BelongsTo
      */
-    public function blueprint(): BelongsTo 
+    public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
     }
@@ -68,14 +69,14 @@ class Collection extends Model implements IsActivitySubject
     /**
      * @return HasMany
      */
-    public function collectionEntries(): HasMany 
+    public function collectionEntries(): HasMany
     {
         return $this->hasMany(CollectionEntry::class);
     }
 
     /**
      * @param Activity $activity
-     * 
+     *
      * @return string
      */
     public function getActivitySubjectDescription(Activity $activity): string
@@ -94,12 +95,17 @@ class Collection extends Model implements IsActivitySubject
     /**
      * @return SlugOptions
      */
-    public function getSlugOptions(): SlugOptions 
+    public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
             ->generateSlugsFrom('name')
             ->preventOverwrite()
             ->doNotGenerateSlugsOnUpdate()
             ->saveSlugsTo($this->getRouteKeyName());
+    }
+
+    public function hasPublishDates(): bool
+    {
+        return $this->past_publish_date || $this->future_publish_date;
     }
 }

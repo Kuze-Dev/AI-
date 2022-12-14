@@ -22,18 +22,18 @@ use Livewire\Livewire;
 class CollectionEntriesRelationManager extends RelationManager
 {
     protected static ?string $modelLabel = 'Collection Entries';
-    
+
     protected static string $relationship = 'collectionEntries';
 
     protected static ?string $recordTitleAttribute = null;
 
     /**
-     * Get the form schema from reference 
-     * blueprint and inject to SchemaFormBuilder 
+     * Get the form schema from reference
+     * blueprint and inject to SchemaFormBuilder
      * to produce the final form fields.
-     * 
+     *
      * @param Form $form
-     * 
+     *
      * @return Form
      */
     public static function form(Form $form): Form
@@ -41,7 +41,7 @@ class CollectionEntriesRelationManager extends RelationManager
         return $form
             ->schema([
                 SchemaFormBuilder::make(
-                    'data', 
+                    'data',
                     fn (RelationManager $livewire) => $livewire->ownerRecord->blueprint->schema
                 )
             ]);
@@ -49,7 +49,7 @@ class CollectionEntriesRelationManager extends RelationManager
 
     /**
      * @param Table $table
-     * 
+     *
      * @return Table
      */
     public static function table(Table $table): Table
@@ -63,22 +63,17 @@ class CollectionEntriesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make('Create collection entry'),
-                Tables\Actions\AssociateAction::make()
-                    ->disabled()
-                    ->hidden()
+                Tables\Actions\CreateAction::make('Create collection entry')
+                    ->url(fn (self $livewire) => route('filament-tenant.resources.collections.entry.create', $livewire->getOwnerRecord())),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
-                Tables\Actions\DissociateAction::make()
-                    ->disabled()
-                    ->hidden(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
-    }    
+    }
 
     /**
      * @return string|null
@@ -87,13 +82,13 @@ class CollectionEntriesRelationManager extends RelationManager
     {
         return 'order';
     }
-    
+
     /**
      * @return bool
      */
     protected function canReorder(): bool
     {
-        return $this->ownerRecord->is_sortable == 0 ? false : true; 
+        return $this->ownerRecord->is_sortable == 0 ? false : true;
     }
 
     /**
