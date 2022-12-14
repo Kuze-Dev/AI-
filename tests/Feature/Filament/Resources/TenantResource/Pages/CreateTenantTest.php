@@ -8,7 +8,7 @@ use Domain\Tenant\Models\Tenant;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Livewire\livewire;
 
-beforeEach(fn () => loginAsAdmin());
+beforeEach(fn () => loginAsSuperAdmin());
 
 it('can render page', function () {
     livewire(CreateTenant::class)

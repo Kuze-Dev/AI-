@@ -80,8 +80,10 @@ class RoleResource extends Resource
                     ->options(self::getGuards()->mapWithKeys(fn (string $guardName) => [$guardName => $guardName])),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->authorize('update'),
+                Tables\Actions\DeleteAction::make()
+                    ->authorize('delete'),
             ])
             ->bulkActions([])
             ->defaultSort('created_at', 'desc');

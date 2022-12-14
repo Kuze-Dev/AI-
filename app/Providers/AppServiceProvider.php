@@ -11,7 +11,10 @@ use Domain\Page\Models\Page;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
+use Stancl\Tenancy\Database\Models\Tenant;
+use TiMacDonald\JsonApi\JsonApiResource;
 
 /** @property \Illuminate\Foundation\Application $app */
 class AppServiceProvider extends ServiceProvider
@@ -22,8 +25,13 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Model::preventLazyLoading( ! $this->app->isProduction());
-        Model::preventSilentlyDiscardingAttributes( ! $this->app->isProduction());
+        Model::shouldBeStrict( ! $this->app->isProduction());
+
+        Model::handleMissingAttributeViolationUsing(function (Model $model, string $key) {
+            if ($model instanceof Tenant && Str::startsWith($key, Tenant::internalPrefix())) {
+                return null;
+            }
+        });
 
         Relation::enforceMorphMap([
             Admin::class,
@@ -46,5 +54,7 @@ class AppServiceProvider extends ServiceProvider
                         fn (Password $password) => $password->uncompromised()
                     )
         );
+
+        JsonApiResource::resolveIdUsing(fn (Model $resource): string => $resource->getRouteKey());
     }
 }

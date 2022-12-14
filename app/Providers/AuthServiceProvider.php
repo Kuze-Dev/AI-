@@ -11,7 +11,6 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
-use Saade\FilamentLaravelLog\Pages\ViewLog;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -23,6 +22,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         \Domain\Admin\Models\Admin::class => \App\Policies\AdminPolicy::class,
         \Spatie\Permission\Models\Role::class => \App\Policies\RolePolicy::class,
+        \Spatie\Activitylog\Models\Activity::class => \App\Policies\ActivityPolicy::class,
         \Domain\Tenant\Models\Tenant::class => \App\Policies\TenantPolicy::class,
         \Domain\Blueprint\Models\Blueprint::class => \App\Policies\BlueprintPolicy::class,
         \Domain\Page\Models\Page::class => \App\Policies\PagePolicy::class,
@@ -41,8 +41,6 @@ class AuthServiceProvider extends ServiceProvider
 
         /** @see https://freek.dev/1325-when-to-use-gateafter-in-laravel */
         Gate::after(fn ($user) => $user instanceof Admin ? $user->hasRole(config('domain.role.super_admin')) : null);
-
-        ViewLog::can(fn (Admin $admin) => $admin->hasRole(config('domain.role.super_admin')));
     }
 
     protected function configureNotificationUrls(): void

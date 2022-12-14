@@ -1,6 +1,9 @@
 <x-filament::page>
     <div class="grid grid-cols-1   lg:grid-cols-2   filament-forms-component-container gap-6">
         @foreach ($settings as $setting)
+            @if(!$setting::shouldShowSettingsCard())
+                @continue
+            @endif
             <div class=" col-span-1">
                 <div class="filament-forms-card-component dark:border-gray-600 dark:bg-gray-800 p-6 bg-white rounded-xl border border-gray-300">
                     <div class="grid grid-cols-1 filament-forms-component-container gap-6">
