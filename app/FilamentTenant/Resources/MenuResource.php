@@ -137,13 +137,7 @@ class MenuResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
-                    ->before(function () {
-                        $nodes = $this->record->nodes;
-
-                        foreach ($nodes as $node);
-                        Node::find($node->id)->delete();
-                    }),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

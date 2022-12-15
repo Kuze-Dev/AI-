@@ -5,11 +5,11 @@ namespace App\FilamentTenant\Resources\MenuResource\Pages;
 use App\FilamentTenant\Resources\MenuResource;
 use Domain\Menu\Actions\UpdateMenuAction;
 use Domain\Menu\DataTransferObjects\MenuData;
-use Domain\Menu\Models\Node;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Domain\Menu\Models\Menu;
 
 class EditMenu extends EditRecord
 {
@@ -18,14 +18,7 @@ class EditMenu extends EditRecord
     protected function getActions(): array
     {
         return [
-            Actions\DeleteAction::make()
-                ->before(function () {
-                    $nodes = $this->record->nodes;
-
-                    foreach ($nodes as $node) {
-                        Node::find($node->id)->delete();
-                    }
-                }),
+            Actions\DeleteAction::make(),
         ];
     }
 
