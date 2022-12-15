@@ -8,7 +8,7 @@ use Domain\Menu\Models\Node;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Node\Models\Node>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Menu\Models\Node>
  */
 class NodeFactory extends Factory
 {

@@ -6,6 +6,7 @@ namespace Domain\Menu\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -22,10 +23,6 @@ class Menu extends Model implements IsActivitySubject
         'slug',
     ];
 
-    protected $casts = [
-        'nodes' => 'object',
-    ];
-
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -39,9 +36,12 @@ class Menu extends Model implements IsActivitySubject
         return 'Menu: ' . $this->name;
     }
 
-    public function nodes()
+    /**
+     * @return HasMany<Node>
+     */
+    public function nodes(): HasMany
     {
-        return $this->hasMany(Node::class);
+        return $this->hasMany(Node::class, 'menu_id', 'id');
     }
 
     public function getRouteKeyName(): string
