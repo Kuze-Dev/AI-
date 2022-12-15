@@ -45,8 +45,20 @@ class CollectionEntryRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\ViewColumn::make('data')
-                    ->view('filament.table.columns.data-transformer')
+                Tables\Columns\TextColumn::make('title')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('slug')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->sortable()
+                    ->toggleable()
+                    ->toggledHiddenByDefault(),
             ])
             ->filters([
                 //
