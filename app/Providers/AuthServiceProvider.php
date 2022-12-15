@@ -27,6 +27,8 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Blueprint\Models\Blueprint::class => \App\Policies\BlueprintPolicy::class,
         \Domain\Menu\Models\Menu::class => \App\Policies\MenuPolicy::class,
         \Domain\Page\Models\Page::class => \App\Policies\PagePolicy::class,
+        \Domain\Taxonomy\Models\Taxonomy::class => \App\Policies\TaxonomyPolicy::class,
+        \Domain\Taxonomy\Models\TaxonomyTerm::class => \App\Policies\TaxonomyTermPolicy::class,
     ];
 
     /**
