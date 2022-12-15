@@ -20,7 +20,7 @@ it('submit form', function () {
     $this->assertDatabaseEmpty(FormSubmission::class);
 
     postJson(
-        'api/form/'.$form->getRouteKey().'/submissions',
+        'api/forms/'.$form->getRouteKey().'/submissions',
         [fake()->word() => fake()->sentence(3)]
     )
         ->assertCreated()

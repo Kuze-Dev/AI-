@@ -11,17 +11,16 @@ use Illuminate\Support\Facades\Mail;
 
 class CreateFormSubmissionAction
 {
-    public function __construct(
-        protected AddFormSubmissionAction $addFormSubmissionAction
-    ) {
-    }
-
-    public function execute(Form $form,  array $data): ?FormSubmission
+    public function execute(Form $form, array $data): ?FormSubmission
     {
+        $formSubmission = $form->store_submission
+            ? $form->formSubmissions()->create(['data' => $data])
+            : null;
+
         foreach ($form->formEmailNotifications as $emailNotification) {
             Mail::send(new FormEmailNotificationMail($emailNotification));
         }
 
-        return $this->addFormSubmissionAction->execute($form,   $data);
+        return $formSubmission;
     }
 }

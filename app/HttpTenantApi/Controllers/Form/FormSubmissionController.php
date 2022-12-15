@@ -16,7 +16,7 @@ use Throwable;
 class FormSubmissionController extends Controller
 {
     /** @throws Throwable */
-    #[Post('form/{form}/submissions')]
+    #[Post('forms/{form}/submissions')]
     public function __invoke(FormSubmissionRequest $request, Form $form): JsonResponse
     {
         DB::transaction(
