@@ -18,7 +18,7 @@ class CreateFormSubmissionAction
             : null;
 
         foreach ($form->formEmailNotifications as $emailNotification) {
-            Mail::send(new FormEmailNotificationMail($emailNotification));
+            Mail::send(new FormEmailNotificationMail($emailNotification, $data));
         }
 
         return $formSubmission;
