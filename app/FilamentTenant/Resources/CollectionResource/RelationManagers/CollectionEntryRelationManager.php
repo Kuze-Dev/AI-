@@ -5,24 +5,13 @@ declare (strict_types = 1);
 namespace App\FilamentTenant\Resources\CollectionResource\RelationManagers;
 
 use App\FilamentTenant\Support\SchemaFormBuilder;
-use Closure;
-use Domain\Collection\Models\CollectionEntry;
-use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Actions\AssociateAction;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Livewire\Component as LivewireComponent;
-use Livewire\Livewire;
 
-class CollectionEntriesRelationManager extends RelationManager
+class CollectionEntryRelationManager extends RelationManager
 {
-    protected static ?string $modelLabel = 'Collection Entries';
-
     protected static string $relationship = 'collectionEntries';
 
     protected static ?string $recordTitleAttribute = null;

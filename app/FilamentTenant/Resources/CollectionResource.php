@@ -6,7 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
-use App\FilamentTenant\Resources\CollectionResource\RelationManagers\CollectionEntriesRelationManager;
+use App\FilamentTenant\Resources\CollectionResource\RelationManagers\CollectionEntryRelationManager;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Collection\Models\Collection;
 use Filament\Forms;
@@ -171,7 +171,7 @@ class CollectionResource extends Resource
     {
         return [
             RelationGroup::make('Main', [
-                CollectionEntriesRelationManager::class,
+                CollectionEntryRelationManager::class,
                 ActivitiesRelationManager::class,
             ]),
         ];
