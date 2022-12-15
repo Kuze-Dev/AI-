@@ -30,11 +30,12 @@ class UpdateFormAction
     protected static function formEmailNotification(FormEmailNotificationData $formEmailNotificationData, Form $form): void
     {
         $newData = [
-            'recipient' => $formEmailNotificationData->recipient,
+            'to' => $formEmailNotificationData->to,
             'cc' => $formEmailNotificationData->cc,
             'bcc' => $formEmailNotificationData->bcc,
-            'reply_to' => $formEmailNotificationData->reply_to,
             'sender' => $formEmailNotificationData->sender,
+            'reply_to' => $formEmailNotificationData->reply_to,
+            'subject' => $formEmailNotificationData->subject,
             'template' => $formEmailNotificationData->template,
         ];
 

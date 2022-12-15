@@ -13,11 +13,12 @@ class AddFormEmailNotificationsAction
     public function execute(Form $form, FormEmailNotificationData $formEmailNotificationData): FormEmailNotification
     {
         return $form->formEmailNotifications()->create([
-            'recipient' => $formEmailNotificationData->recipient,
+            'to' => $formEmailNotificationData->to,
             'cc' => $formEmailNotificationData->cc,
             'bcc' => $formEmailNotificationData->bcc,
-            'reply_to' => $formEmailNotificationData->reply_to,
             'sender' => $formEmailNotificationData->sender,
+            'reply_to' => $formEmailNotificationData->reply_to,
+            'subject' => $formEmailNotificationData->subject,
             'template' => $formEmailNotificationData->template,
         ]);
     }

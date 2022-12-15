@@ -15,11 +15,11 @@ use Spatie\Activitylog\Traits\LogsActivity;
  *
  * @property int $id
  * @property int $form_id
- * @property array $recipient
+ * @property array $to
  * @property array|null $cc
  * @property array|null $bcc
- * @property string|null $reply_to
  * @property string $sender
+ * @property array|null $reply_to
  * @property string $template
  *
  * @property-read \Domain\Form\Models\Form $form
@@ -34,18 +34,20 @@ class FormEmailNotification extends Model
 
     protected $fillable = [
         'form_id',
-        'recipient',
+        'to',
         'cc',
         'bcc',
-        'reply_to',
         'sender',
+        'reply_to',
+        'subject',
         'template',
     ];
 
     protected $casts = [
-        'recipient' => DelimiterCast::class,
+        'to' => DelimiterCast::class,
         'cc' => DelimiterCast::class,
         'bcc' => DelimiterCast::class,
+        'reply_to' => DelimiterCast::class,
     ];
 
     public function getActivitylogOptions(): LogOptions

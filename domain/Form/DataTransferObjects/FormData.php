@@ -6,33 +6,27 @@ namespace Domain\Form\DataTransferObjects;
 
 class FormData
 {
-    /** @param \Domain\Form\DataTransferObjects\FormEmailNotificationData[]|null $form_email_notifications */
+    /** @param \Domain\Form\DataTransferObjects\FormEmailNotificationData[] $form_email_notifications */
     public function __construct(
-        public readonly int $blueprint_id,
+        public readonly string $blueprint_id,
         public readonly string $name,
         public readonly bool $store_submission,
         public readonly ?string $slug = null,
-        public readonly ?array $form_email_notifications = null,
+        public readonly array $form_email_notifications = [],
     ) {
     }
 
     public static function fromArray(array $data): self
     {
-        $formEmailNotificationsData = null;
-
-        if ($data['formEmailNotifications'] ?? false) {
-            $formEmailNotificationsData = array_map(
-                fn (array $formEmailNotificationsDatum) => FormEmailNotificationData::fromArray($formEmailNotificationsDatum),
-                $data['formEmailNotifications']
-            );
-        }
-
         return new self(
-            blueprint_id: (int) $data['blueprint_id'],
+            blueprint_id: $data['blueprint_id'],
             name: $data['name'],
             store_submission: $data['store_submission'],
             slug: $data['slug'] ?? null,
-            form_email_notifications: $formEmailNotificationsData,
+            form_email_notifications: array_map(
+                fn (array $formEmailNotificationData) => new FormEmailNotificationData(...$formEmailNotificationData),
+                $data['form_email_notifications'] ?? []
+            ),
         );
     }
 }

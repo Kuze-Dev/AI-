@@ -18,11 +18,12 @@ class FormEmailNotificationFactory extends Factory
     {
         return [
             'form_id' => FormFactory::new(),
-            'recipient' => $this->emails(),
+            'to' => $this->emails(),
             'cc' => $this->emails(),
             'bcc' => $this->emails(),
-            'reply_to' => $this->faker->safeEmail(),
             'sender' => $this->faker->safeEmail(),
+            'reply_to' => $this->faker->safeEmail(),
+            'subject' => $this->faker->sentence(),
             'template' => $this->faker->word(),
         ];
     }

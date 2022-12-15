@@ -19,7 +19,6 @@ use Illuminate\Support\Facades\Auth;
 use Exception;
 use Illuminate\Support\Str;
 use Spatie\ValidationRules\Rules\Delimited;
-use Filament\Forms\Components\Tabs;
 
 class FormResource extends Resource
 {
@@ -37,79 +36,71 @@ class FormResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Card::make([
+                    Forms\Components\TextInput::make('name')
+                        ->unique(ignoreRecord: true)
+                        ->required(),
+                    Forms\Components\TextInput::make('slug')
+                        ->unique(ignoreRecord: true)
+                        ->rules('alpha_dash')
+                        ->disabled(fn (?FormModel $record) => $record !== null)
+                        ->afterStateUpdated(function ($state, $set) {
+                            $set('slug', Str::slug($state));
+                        }),
+                    Forms\Components\Select::make('blueprint_id')
+                        ->relationship('blueprint', 'name')
+                        ->saveRelationshipsUsing(null)
+                        ->required()
+                        ->exists(Blueprint::class, 'id')
+                        ->searchable()
+                        ->preload()
+                        ->reactive()
+                        ->helperText(function (?FormModel $record, ?string $state) {
+                            if ($record !== null && $record->blueprint_id !== (int) $state) {
+                                return trans('Modifying the blueprint will reset all the form\'s content.');
+                            }
+                        }),
+                    Forms\Components\Toggle::make('store_submission'),
+                ]),
 
-                Tabs::make('Heading')->tabs([
-
-                    Tabs\Tab::make('Main Fields')
+                Forms\Components\Card::make([
+                    Forms\Components\Repeater::make('form_email_notifications')
+                        ->relationship('formEmailNotifications')
+                        ->saveRelationshipsUsing(null)
+                        ->nullable()
                         ->schema([
-                            Forms\Components\Card::make([
-                                Forms\Components\TextInput::make('name')
-                                    ->unique(ignoreRecord: true)
-                                    ->required(),
-                                Forms\Components\TextInput::make('slug')
-                                    ->unique(ignoreRecord: true)
-                                    ->rules('alpha_dash')
-                                    ->disabled(fn (?FormModel $record) => $record !== null)
-                                    ->afterStateUpdated(function ($state, $set) {
-                                        $set('slug', Str::slug($state));
-                                    }),
-                                Forms\Components\Select::make('blueprint_id')
-                                    ->relationship('blueprint', 'name')
-                                    ->saveRelationshipsUsing(null)
-                                    ->required()
-                                    ->exists(Blueprint::class, 'id')
-                                    ->searchable()
-                                    ->preload()
-                                    ->reactive()
-                                    ->helperText(function (?FormModel $record, ?string $state) {
-                                        if ($record !== null && $record->blueprint_id !== (int) $state) {
-                                            return trans('Modifying the blueprint will reset all the form\'s content.');
-                                        }
-                                    }),
-
-                                Forms\Components\Toggle::make('store_submission'),
-                            ]),
-                        ]),
-
-                    Tabs\Tab::make(trans('Form email notifications'))
-                        ->schema([
-                            Forms\Components\Card::make([
-
-                                Forms\Components\Repeater::make('formEmailNotifications')
-                                    ->relationship()
-                                    ->saveRelationshipsUsing(null)
-                                    ->default(null)
-                                    ->nullable()
-                                    ->schema([
-                                        Forms\Components\TextInput::make('recipient')
-                                            ->label(trans('Recipient/s'))
-                                            ->required()
-                                            ->rule(new Delimited('email'))
-                                            ->helperText('Seperated by comma'),
-                                        Forms\Components\TextInput::make('cc')
-                                            ->label(trans('CC/s'))
-                                            ->nullable()
-                                            ->rule(new Delimited('email'))
-                                            ->helperText('Seperated by comma'),
-                                        Forms\Components\TextInput::make('bcc')
-                                            ->label(trans('BCC/s'))
-                                            ->nullable()
-                                            ->rule(new Delimited('email'))
-                                            ->helperText('Seperated by comma'),
-                                        Forms\Components\TextInput::make('reply_to')
-                                            ->nullable()
-                                            ->email(),
-                                        Forms\Components\TextInput::make('sender')
-                                            ->required()
-                                            ->email(),
-                                        Forms\Components\MarkdownEditor::make('template')
-                                            ->required()
-                                            ->columnSpanFull(),
-                                    ])
-                                    ->columns(5),
-                            ]),
-                        ]),
-                ])->columnSpanFull(),
+                            Forms\Components\Section::make('Recipients')
+                                ->schema([
+                                    Forms\Components\TextInput::make('to')
+                                        ->required()
+                                        ->rule(new Delimited('email'))
+                                        ->helperText('Seperated by comma'),
+                                    Forms\Components\TextInput::make('cc')
+                                        ->label(trans('CC'))
+                                        ->nullable()
+                                        ->rule(new Delimited('email'))
+                                        ->helperText('Seperated by comma'),
+                                    Forms\Components\TextInput::make('bcc')
+                                        ->label(trans('BCC'))
+                                        ->nullable()
+                                        ->rule(new Delimited('email'))
+                                        ->helperText('Seperated by comma'),
+                                ])
+                                ->columns(3),
+                            Forms\Components\TextInput::make('sender')
+                                ->required(),
+                            Forms\Components\TextInput::make('reply_to')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('subject')
+                                ->required()
+                                ->nullable()
+                                ->columnSpanFull(),
+                            Forms\Components\MarkdownEditor::make('template')
+                                ->required()
+                                ->columnSpanFull(),
+                        ])
+                        ->columns(2),
+                ]),
             ]);
     }
 
@@ -139,9 +130,7 @@ class FormResource extends Resource
                     ->toggleable()
                     ->toggledHiddenByDefault(),
             ])
-            ->filters([
-
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

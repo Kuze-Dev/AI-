@@ -36,20 +36,21 @@ it('can create page', function () {
         ->fillForm([
             'name' => faker()->sentence(2),
             'blueprint_id' => $blueprint->getKey(),
-            'formEmailNotifications' => [
+            'form_email_notifications' => [
                 [
-                    'recipient' => faker()->safeEmail(),
+                    'to' => faker()->safeEmail(),
                     'cc' => faker()->safeEmail(),
                     'bcc' => faker()->safeEmail(),
-                    'reply_to' => faker()->safeEmail(),
                     'sender' => faker()->safeEmail(),
-                    'template' => faker()->safeEmail(),
+                    'reply_to' => faker()->safeEmail(),
+                    'subject' => faker()->sentence(),
+                    'template' => faker()->paragraphs(asText: true),
                 ],
             ],
         ])
         ->call('create')
-        ->assertOk()
-        ->assertHasNoFormErrors();
+        ->assertHasNoFormErrors()
+        ->assertOk();
 
     assertDatabaseCount(Form::class, 1);
     assertDatabaseCount(FormEmailNotification::class, 1);

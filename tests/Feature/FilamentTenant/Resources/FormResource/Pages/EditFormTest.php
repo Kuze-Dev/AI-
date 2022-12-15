@@ -32,7 +32,7 @@ it('can render page', function () {
         ->assertSuccessful()
         ->assertFormSet([
             'name' => $form->name,
-            'formEmailNotifications' => ['record-1' => $form->formEmailNotifications->first()->toArray()],
+            'form_email_notifications' => ['record-1' => $form->formEmailNotifications->first()->toArray()],
         ])
         ->assertOk();
 });
@@ -46,11 +46,12 @@ it('can edit page', function () {
         ]);
 
     $formEmailNotification = [
-        'recipient' => faker()->safeEmail(),
+        'to' => faker()->safeEmail(),
         'cc' => faker()->safeEmail(),
         'bcc' => faker()->safeEmail(),
-        'reply_to' => faker()->safeEmail(),
         'sender' => faker()->safeEmail(),
+        'reply_to' => faker()->safeEmail(),
+        'subject' => faker()->sentence(),
         'template' => faker()->safeEmail(),
     ];
 
@@ -61,7 +62,7 @@ it('can edit page', function () {
         ->fillForm([
             'name' => 'new name',
             'store_submission' => false,
-            'formEmailNotifications' => [$formEmailNotification],
+            'form_email_notifications' => [$formEmailNotification],
         ])
         ->call('save')
         ->assertOk()

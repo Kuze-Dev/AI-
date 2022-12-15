@@ -28,19 +28,21 @@ it('store', function () {
     // 2 rows to make sure it iterate properly
     $emailNotifications = [
         [
-            'recipient' => faker()->safeEmail(),
+            'to' => faker()->safeEmail(),
             'cc' => faker()->boolean() ? faker()->safeEmail() : null,
             'bcc' => faker()->boolean() ? faker()->safeEmail() : null,
-            'reply_to' => faker()->boolean() ? faker()->safeEmail() : null,
             'sender' => faker()->safeEmail(),
+            'reply_to' => faker()->boolean() ? faker()->safeEmail() : null,
+            'subject' => faker()->sentence(),
             'template' => faker()->safeEmail(),
         ],
         [
-            'recipient' => faker()->safeEmail(),
+            'to' => faker()->safeEmail(),
             'cc' => faker()->boolean() ? faker()->safeEmail() : null,
             'bcc' => faker()->boolean() ? faker()->safeEmail() : null,
-            'reply_to' => faker()->boolean() ? faker()->safeEmail() : null,
             'sender' => faker()->safeEmail(),
+            'reply_to' => faker()->boolean() ? faker()->safeEmail() : null,
+            'subject' => faker()->sentence(),
             'template' => faker()->safeEmail(),
         ],
     ];

@@ -27,15 +27,14 @@ return new class () extends Migration {
         Schema::create('form_email_notifications', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(Form::class)
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->foreignIdFor(Form::class)->constrained();
 
-            $table->string('recipient');
+            $table->string('to');
             $table->string('cc')->nullable();
             $table->string('bcc')->nullable();
-            $table->string('reply_to')->nullable();
             $table->string('sender');
+            $table->string('reply_to')->nullable();
+            $table->string('subject');
             $table->longText('template');
 
             $table->timestamps();
