@@ -21,16 +21,6 @@ class Collection extends Model implements IsActivitySubject
     use LogsActivity,
         HasSlug;
 
-    /**
-     * Declaration of constants for labels
-     * collection of publish date behaviors.
-     */
-    const BEHAVIOR_PUBLIC = 'public';
-
-    const BEHAVIOR_UNLISTED = 'unlisted';
-
-    const BEHAVIOR_PRIVATE = 'private';
-
     protected $fillable = [
         'name',
         'blueprint_id',
@@ -44,6 +34,7 @@ class Collection extends Model implements IsActivitySubject
 
     protected $casts = [
         'display_publish_dates' => 'bool',
+        'is_sortable' => 'bool',
         'data' => 'array',
     ];
 
@@ -104,6 +95,11 @@ class Collection extends Model implements IsActivitySubject
             ->saveSlugsTo($this->getRouteKeyName());
     }
 
+    /**
+     * Check if date behaviors has values.
+     * 
+     * @return bool
+     */
     public function hasPublishDates(): bool
     {
         return $this->past_publish_date || $this->future_publish_date;

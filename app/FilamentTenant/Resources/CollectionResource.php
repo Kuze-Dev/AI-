@@ -186,7 +186,8 @@ class CollectionResource extends Resource
             'index' => Resources\CollectionResource\Pages\ListCollection::route('/'),
             'create' => Resources\CollectionResource\Pages\CreateCollection::route('/create'),
             'configure' => Resources\CollectionResource\Pages\ConfigureCollection::route('/{record}/configure'),
-            'entry.create' => Resources\CollectionResource\Pages\CreateCollectionEntry::route('/{ownerRecord}/create')
+            'entry.create' => Resources\CollectionResource\Pages\CreateCollectionEntry::route('/{ownerRecord}/create'),
+            'entry.edit' => Resources\CollectionResource\Pages\EditCollectionEntry::route('/{ownerRecord}/entry/{record}/edit'),
         ];
     }
 }

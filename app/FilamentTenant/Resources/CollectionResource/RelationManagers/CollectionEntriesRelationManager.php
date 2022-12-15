@@ -88,17 +88,6 @@ class CollectionEntriesRelationManager extends RelationManager
      */
     protected function canReorder(): bool
     {
-        return $this->ownerRecord->is_sortable == 0 ? false : true;
-    }
-
-    /**
-     * @return Builder
-     */
-    protected function getTableQuery(): Builder
-    {
-        return parent::getTableQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]);
+        return $this->ownerRecord->is_sortable;
     }
 }
