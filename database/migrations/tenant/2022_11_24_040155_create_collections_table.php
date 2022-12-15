@@ -32,9 +32,11 @@ return new class extends Migration
 
         Schema::create('collection_entries', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('order')->nullable();
             $table->foreignIdFor(CollectionModel::class)->constrained();
+            $table->string('title')->unique();
+            $table->string('slug')->unique();
             $table->json('data');
+            $table->bigInteger('order')->nullable();
             $table->timestamps();
         });
     }

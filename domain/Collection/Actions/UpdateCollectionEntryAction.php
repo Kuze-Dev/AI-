@@ -20,7 +20,11 @@ class UpdateCollectionEntryAction
      */
     public function execute(CollectionEntry $collectionEntry, CollectionEntryData $collectionEntryData): CollectionEntry
     {
-        $collectionEntry->update(['data' => $collectionEntryData->data]);
+        $collectionEntry->update([
+            'title' => $collectionEntryData->title,
+            'slug' => $collectionEntryData->slug,
+            'data' => $collectionEntryData->data,
+        ]);
 
         return $collectionEntry;
     }

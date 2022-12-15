@@ -7,9 +7,10 @@ namespace App\FilamentTenant\Resources\CollectionResource\Pages;
 use App\FilamentTenant\Resources\CollectionResource;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Domain\Collection\Actions\CreateCollectionEntryAction;
-use Domain\Collection\Actions\UpdateCollectionAction;
-use Domain\Collection\DataTransferObjects\CollectionData;
 use Domain\Collection\DataTransferObjects\CollectionEntryData;
+use Domain\Collection\Models\CollectionEntry;
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\TextInput;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -52,9 +53,22 @@ class CreateCollectionEntry extends CreateRecord
         ]);
     }
 
+    public function getModel(): string
+    {
+        return CollectionEntry::class;
+    }
+
     protected function getFormSchema(): array
     {
         return [
+            Card::make([
+                TextInput::make('title')
+                    ->unique(ignoreRecord: true)
+                    ->required(),
+                TextInput::make('slug')
+                    ->unique(ignoreRecord: true)
+                    ->disabled(fn (?CollectionEntry $record) => $record !== null),
+            ]),
             SchemaFormBuilder::make('data', fn () => $this->ownerRecord->blueprint->schema),
         ];
     }

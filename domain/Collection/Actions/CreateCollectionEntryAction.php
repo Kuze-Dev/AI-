@@ -20,6 +20,10 @@ class CreateCollectionEntryAction
     public function execute(Collection $collection, CollectionEntryData $collectionEntryData): CollectionEntry
     {
         return $collection->collectionEntries()
-            ->create(['data' => $collectionEntryData->data]);
+            ->create([
+                'title' => $collectionEntryData->title,
+                'slug' => $collectionEntryData->slug,
+                'data' => $collectionEntryData->data,
+            ]);
     }
 }
