@@ -19,7 +19,7 @@ use Spatie\Sluggable\SlugOptions;
  * Domain\Form\Models\Form
  *
  * @property int $id
- * @property int $blueprint_id
+ * @property string $blueprint_id
  * @property string $name
  * @property string $slug
  * @property bool $store_submission

@@ -10,10 +10,9 @@ return new class () extends Migration {
     public function up(): void
     {
         Schema::create('blueprints', function (Blueprint $table): void {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('name')->unique();
             $table->json('schema');
-            $table->string('slug')->unique();
 
             $table->timestamps();
         });
