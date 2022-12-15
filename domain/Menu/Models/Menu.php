@@ -19,11 +19,11 @@ class Menu extends Model implements IsActivitySubject
 
     protected $fillable = [
         'name',
-        'slug'
+        'slug',
     ];
 
     protected $casts = [
-        'nodes' => 'object'
+        'nodes' => 'object',
     ];
 
     public function getActivitylogOptions(): LogOptions

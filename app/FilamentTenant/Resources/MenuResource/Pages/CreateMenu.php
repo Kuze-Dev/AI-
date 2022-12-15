@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Resources\MenuResource\Pages;
 
 use App\FilamentTenant\Resources\MenuResource;
 use Domain\Menu\Actions\CreateMenuAction;
 use Domain\Menu\DataTransferObjects\MenuData;
-use Filament\Pages\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;

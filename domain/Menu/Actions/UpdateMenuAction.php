@@ -14,6 +14,7 @@ class UpdateMenuAction
         $Menu->update([
             'name' => $menuData->name,
         ]);
+
         return $Menu;
     }
 }

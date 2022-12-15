@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
@@ -7,7 +9,6 @@ use App\FilamentTenant\Resources\MenuResource\Pages;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Menu\Models\Menu;
-use Domain\Menu\Models\Node;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -107,19 +108,19 @@ class MenuResource extends Resource
                                                 Forms\Components\TextInput::make('url')
                                                     ->url()
                                                     ->placeholder('https://example.com')
-                                                    ->columnSpanFull()
+                                                    ->columnSpanFull(),
                                             ])
                                             ->columns(2)
-                                            ->columnSpan(2)
+                                            ->columnSpan(2),
                                     ])
                                     ->columns(2)
-                                    ->columnSpan(2)
+                                    ->columnSpan(2),
                             ])
                             ->columns(2)
-                            ->columnSpan(2)
-                    ])
+                            ->columnSpan(2),
+                    ]),
                 ])
-                    ->columns(2)
+                    ->columns(2),
             ]);
     }
 
@@ -133,7 +134,7 @@ class MenuResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                //
+
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -18,7 +18,7 @@ class Node extends Model implements Sortable
         'parent_id',
         'url',
         'target',
-        'sort'
+        'sort',
     ];
 
     public $sortable = [

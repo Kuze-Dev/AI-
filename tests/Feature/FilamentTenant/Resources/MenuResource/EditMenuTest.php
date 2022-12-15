@@ -47,11 +47,11 @@ it('can edit menu', function () {
                             [
                                 'name' => 'Test Edit Child',
                                 'url' => 'https://test-edit-child.com',
-                                'target' => '_blank'
-                            ]
-                        ]
-                    ]
-                ]
+                                'target' => '_blank',
+                            ],
+                        ],
+                    ],
+                ],
             ]
         )
         ->call('save')

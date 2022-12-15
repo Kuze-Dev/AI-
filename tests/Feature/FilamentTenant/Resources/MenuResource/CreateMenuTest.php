@@ -3,12 +3,8 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\MenuResource\Pages\CreateMenu;
-use Domain\Blueprint\Enums\FieldType;
-use Domain\Blueprint\Models\Blueprint;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\Field;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
@@ -47,9 +43,9 @@ it('can create menu', function () {
                             'name' => 'Test About Child 2',
                             'url' => 'https://test-url-about-child-2.com',
                             'target' => '_blank',
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
-            ]
+            ],
         ]);
 });

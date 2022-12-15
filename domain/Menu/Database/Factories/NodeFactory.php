@@ -19,7 +19,7 @@ class NodeFactory extends Factory
         return [
             'name' => fake()->word(),
             'url' => fake()->url(),
-            'target' => '_blank'
+            'target' => '_blank',
         ];
     }
 }
