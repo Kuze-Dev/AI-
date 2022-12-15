@@ -34,9 +34,7 @@ class Node extends Model implements Sortable
         return $this->belongsTo(Menu::class, 'menu_id', 'id');
     }
 
-    /**
-     * @return HasMany<Node>
-     */
+    /** @return HasMany<Node> */
     public function childs(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id', 'id');

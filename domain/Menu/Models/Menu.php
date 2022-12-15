@@ -36,9 +36,7 @@ class Menu extends Model implements IsActivitySubject
         return 'Menu: ' . $this->name;
     }
 
-    /**
-     * @return HasMany<Node>
-     */
+    /** @return HasMany<Node> */
     public function nodes(): HasMany
     {
         return $this->hasMany(Node::class, 'menu_id', 'id');
