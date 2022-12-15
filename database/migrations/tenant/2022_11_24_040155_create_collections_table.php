@@ -24,9 +24,9 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('future_publish_date')->nullable();
             $table->string('past_publish_date')->nullable();
-            $table->tinyInteger('is_sortable')->default(0);
+            $table->boolean('is_sortable')->default(false);
             $table->json('data')->nullable();
-            
+
             $table->timestamps();
         });
 
