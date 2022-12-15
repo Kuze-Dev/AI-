@@ -42,7 +42,7 @@ class CreateCollectionEntry extends CreateRecord
         return [
             Actions\Action::make('configure')
                 ->icon('heroicon-s-cog')
-                ->url(route('filament-tenant.resources.' . self::$resource::getSlug() . '.configure', $this->ownerRecord)),
+                ->url(route('filament-tenant.resources.' . self::$resource::getSlug() . '.edit', $this->ownerRecord)),
         ];
     }
 
@@ -83,6 +83,6 @@ class CreateCollectionEntry extends CreateRecord
 
     protected function getRedirectUrl(): string
     {
-        return static::getResource()::getUrl('configure', ['record' => $this->ownerRecord]);
+        return static::getResource()::getUrl('edit', ['record' => $this->ownerRecord]);
     }
 }

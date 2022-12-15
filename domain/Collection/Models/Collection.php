@@ -28,7 +28,6 @@ class Collection extends Model implements IsActivitySubject
         'display_publish_dates',
         'past_publish_date',
         'future_publish_date',
-        'data',
         'is_sortable',
     ];
 

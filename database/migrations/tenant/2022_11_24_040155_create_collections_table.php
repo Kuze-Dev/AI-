@@ -25,7 +25,6 @@ return new class extends Migration
             $table->string('future_publish_date')->nullable();
             $table->string('past_publish_date')->nullable();
             $table->boolean('is_sortable')->default(false);
-            $table->json('data')->nullable();
 
             $table->timestamps();
         });

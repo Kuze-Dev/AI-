@@ -152,10 +152,7 @@ class CollectionResource extends Resource
                 ->optionsLimit(20),
         ])
         ->actions([
-            Tables\Actions\Action::make('configure')
-                ->authorize('collection.configure')
-                ->icon('heroicon-s-cog')
-                ->url(fn (Collection $record) => route('filament-tenant.resources.'. self::getSlug() . '.configure', $record)),
+            Tables\Actions\EditAction::make(),
             Tables\Actions\DeleteAction::make(),
         ])
         ->bulkActions([
@@ -185,7 +182,7 @@ class CollectionResource extends Resource
         return [
             'index' => Resources\CollectionResource\Pages\ListCollection::route('/'),
             'create' => Resources\CollectionResource\Pages\CreateCollection::route('/create'),
-            'configure' => Resources\CollectionResource\Pages\ConfigureCollection::route('/{record}/configure'),
+            'edit' => Resources\CollectionResource\Pages\EditCollection::route('/{record}/edit'),
             'entry.create' => Resources\CollectionResource\Pages\CreateCollectionEntry::route('/{ownerRecord}/entry/create'),
             'entry.edit' => Resources\CollectionResource\Pages\EditCollectionEntry::route('/{ownerRecord}/entry/{record}/edit'),
         ];

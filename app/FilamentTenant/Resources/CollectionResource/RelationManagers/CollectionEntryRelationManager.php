@@ -5,36 +5,18 @@ declare (strict_types = 1);
 namespace App\FilamentTenant\Resources\CollectionResource\RelationManagers;
 
 use App\FilamentTenant\Support\SchemaFormBuilder;
+use Domain\Collection\Models\CollectionEntry;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Support\Facades\Auth;
 
 class CollectionEntryRelationManager extends RelationManager
 {
     protected static string $relationship = 'collectionEntries';
 
     protected static ?string $recordTitleAttribute = null;
-
-    /**
-     * Get the form schema from reference
-     * blueprint and inject to SchemaFormBuilder
-     * to produce the final form fields.
-     *
-     * @param Form $form
-     *
-     * @return Form
-     */
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                SchemaFormBuilder::make(
-                    'data',
-                    fn (RelationManager $livewire) => $livewire->ownerRecord->blueprint->schema
-                )
-            ]);
-    }
 
     /**
      * @param Table $table
@@ -68,7 +50,11 @@ class CollectionEntryRelationManager extends RelationManager
                     ->url(fn (self $livewire) => route('filament-tenant.resources.collections.entry.create', $livewire->getOwnerRecord())),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->url(fn (self $livewire, CollectionEntry $record) => route('filament-tenant.resources.collections.entry.edit', [
+                        $record,
+                        $livewire->ownerRecord 
+                    ])),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
@@ -77,6 +63,9 @@ class CollectionEntryRelationManager extends RelationManager
     }
 
     /**
+     * Set default column 
+     * storage for ordering.
+     * 
      * @return string|null
      */
     protected function getTableReorderColumn(): ?string
