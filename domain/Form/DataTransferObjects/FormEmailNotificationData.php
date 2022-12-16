@@ -7,13 +7,14 @@ namespace Domain\Form\DataTransferObjects;
 class FormEmailNotificationData
 {
     public function __construct(
-        public readonly string $to,
-        public readonly ?string $cc = null,
-        public readonly ?string $bcc = null,
+        public readonly array $to,
         public readonly string $sender,
-        public readonly ?string $reply_to = null,
         public readonly string $subject,
         public readonly string $template,
+        public readonly ?int $id = null,
+        public readonly array $cc = [],
+        public readonly array $bcc = [],
+        public readonly array $reply_to = [],
     ) {
     }
 }

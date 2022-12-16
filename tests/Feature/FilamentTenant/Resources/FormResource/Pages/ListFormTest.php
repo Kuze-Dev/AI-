@@ -18,7 +18,7 @@ it('can render page', function () {
         ->assertOk();
 });
 
-it('can list pages', function () {
+it('can list forms', function () {
     $forms = FormFactory::new()
         ->withDummyBlueprint()
         ->count(5)

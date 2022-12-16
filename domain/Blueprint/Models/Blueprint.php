@@ -15,8 +15,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
 /**
  * Domain\Blueprint\Models\Blueprint
  *
+ * @property string $id
  * @property string $name
- * @property string $slug *
  * @property \Domain\Blueprint\DataTransferObjects\SchemaData $schema
  * @method static \Illuminate\Database\Eloquent\Builder|Blueprint newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Blueprint newQuery()

@@ -24,7 +24,16 @@ class FormData
             store_submission: $data['store_submission'],
             slug: $data['slug'] ?? null,
             form_email_notifications: array_map(
-                fn (array $formEmailNotificationData) => new FormEmailNotificationData(...$formEmailNotificationData),
+                fn (array $formEmailNotificationData) => new FormEmailNotificationData(
+                    id: $formEmailNotificationData['id'] ?? null,
+                    to: $formEmailNotificationData['to'],
+                    cc: $formEmailNotificationData['cc'] ?? [],
+                    bcc: $formEmailNotificationData['bcc'] ?? [],
+                    sender: $formEmailNotificationData['sender'],
+                    reply_to: $formEmailNotificationData['reply_to'] ?? [],
+                    subject: $formEmailNotificationData['subject'],
+                    template: $formEmailNotificationData['template'],
+                ),
                 $data['form_email_notifications'] ?? []
             ),
         );

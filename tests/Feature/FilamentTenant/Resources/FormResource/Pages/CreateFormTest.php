@@ -24,7 +24,7 @@ it('can render page', function () {
         ->assertOk();
 });
 
-it('can create page', function () {
+it('can create form', function () {
     $blueprint = BlueprintFactory::new()
         ->withDummySchema()
         ->createOne();
@@ -38,11 +38,11 @@ it('can create page', function () {
             'blueprint_id' => $blueprint->getKey(),
             'form_email_notifications' => [
                 [
-                    'to' => faker()->safeEmail(),
-                    'cc' => faker()->safeEmail(),
-                    'bcc' => faker()->safeEmail(),
+                    'to' => [faker()->safeEmail()],
+                    'cc' => [faker()->safeEmail()],
+                    'bcc' => [faker()->safeEmail()],
                     'sender' => faker()->safeEmail(),
-                    'reply_to' => faker()->safeEmail(),
+                    'reply_to' => [faker()->safeEmail()],
                     'subject' => faker()->sentence(),
                     'template' => faker()->paragraphs(asText: true),
                 ],

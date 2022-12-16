@@ -28,41 +28,36 @@ it('can render page', function () {
         ->createOne();
 
     livewire(EditForm::class, ['record' => $form->getRouteKey()])
-        ->assertFormExists()
         ->assertSuccessful()
+        ->assertFormExists()
         ->assertFormSet([
             'name' => $form->name,
-            'form_email_notifications' => ['record-1' => $form->formEmailNotifications->first()->toArray()],
+            'form_email_notifications' => $form->formEmailNotifications->toArray(),
         ])
         ->assertOk();
 });
 
-it('can edit page', function () {
+it('can edit form', function () {
     $form = FormFactory::new()
         ->withDummyBlueprint()
-        ->createOne([
-            'name' => 'old name',
-            'store_submission' => true,
-        ]);
-
-    $formEmailNotification = [
-        'to' => faker()->safeEmail(),
-        'cc' => faker()->safeEmail(),
-        'bcc' => faker()->safeEmail(),
-        'sender' => faker()->safeEmail(),
-        'reply_to' => faker()->safeEmail(),
-        'subject' => faker()->sentence(),
-        'template' => faker()->safeEmail(),
-    ];
+        ->storeSubmission()
+        ->createOne();
 
     assertDatabaseCount(Form::class, 1);
-    $this->assertDatabaseEmpty(FormEmailNotification::class);
+    assertDatabaseCount(FormEmailNotification::class, 0);
 
     livewire(EditForm::class, ['record' => $form->getRouteKey()])
         ->fillForm([
-            'name' => 'new name',
+            'name' => 'Foo',
             'store_submission' => false,
-            'form_email_notifications' => [$formEmailNotification],
+            'form_email_notifications' => [
+                [
+                    'to' => ['test@user'],
+                    'sender' => 'test@user',
+                    'subject' => 'Foo Subject',
+                    'template' => 'Foo Template',
+                ]
+            ],
         ])
         ->call('save')
         ->assertOk()
@@ -70,12 +65,14 @@ it('can edit page', function () {
 
     assertDatabaseHas(Form::class,  [
         'id' => $form->id,
-        'name' => 'new name',
+        'name' => 'Foo',
         'store_submission' => false,
     ]);
-
     assertDatabaseHas(FormEmailNotification::class,  [
         'form_id' => $form->id,
-        ...$formEmailNotification,
+        'to' => ['test@user'],
+        'sender' => 'test@user',
+        'subject' => 'Foo Subject',
+        'template' => 'Foo Template',
     ]);
 });

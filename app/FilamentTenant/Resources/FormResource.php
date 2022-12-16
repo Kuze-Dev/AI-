@@ -18,7 +18,6 @@ use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 use Illuminate\Support\Str;
-use Spatie\ValidationRules\Rules\Delimited;
 
 class FormResource extends Resource
 {
@@ -65,32 +64,60 @@ class FormResource extends Resource
 
                 Forms\Components\Card::make([
                     Forms\Components\Repeater::make('form_email_notifications')
-                        ->relationship('formEmailNotifications')
-                        ->saveRelationshipsUsing(null)
+                        ->afterStateHydrated(fn (Forms\Components\Repeater $component, ?FormModel $record) => $component->state($record?->formEmailNotifications->toArray() ?? []))
                         ->nullable()
                         ->schema([
                             Forms\Components\Section::make('Recipients')
                                 ->schema([
                                     Forms\Components\TextInput::make('to')
                                         ->required()
-                                        ->rule(new Delimited('email'))
-                                        ->helperText('Seperated by comma'),
+                                        ->helperText('Seperated by comma')
+                                        ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
+                                            $component->state(implode(',', $state ?? []));
+                                        })
+                                        ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
+                                            ? Str::of($state)->split('/\,/')
+                                                ->map(fn (string $rule) => trim($rule))
+                                                ->toArray()
+                                            : ($state ?? [])),
                                     Forms\Components\TextInput::make('cc')
                                         ->label(trans('CC'))
                                         ->nullable()
-                                        ->rule(new Delimited('email'))
-                                        ->helperText('Seperated by comma'),
+                                        ->helperText('Seperated by comma')
+                                        ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
+                                            $component->state(implode(',', $state ?? []));
+                                        })
+                                        ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
+                                            ? Str::of($state)->split('/\,/')
+                                                ->map(fn (string $rule) => trim($rule))
+                                                ->toArray()
+                                            : ($state ?? [])),
                                     Forms\Components\TextInput::make('bcc')
                                         ->label(trans('BCC'))
                                         ->nullable()
-                                        ->rule(new Delimited('email'))
-                                        ->helperText('Seperated by comma'),
+                                        ->helperText('Seperated by comma')
+                                        ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
+                                            $component->state(implode(',', $state ?? []));
+                                        })
+                                        ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
+                                            ? Str::of($state)->split('/\,/')
+                                                ->map(fn (string $rule) => trim($rule))
+                                                ->toArray()
+                                            : ($state ?? [])),
                                 ])
                                 ->columns(3),
                             Forms\Components\TextInput::make('sender')
                                 ->required(),
                             Forms\Components\TextInput::make('reply_to')
-                                ->nullable(),
+                                ->nullable()
+                                ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
+                                    $component->state(implode('|', $state ?? []));
+                                })
+                                ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
+                                    ? Str::of($state)->split('/\,/')
+                                        ->map(fn (string $rule) => trim($rule))
+                                        ->toArray()
+                                    : ($state ?? [])),
                             Forms\Components\TextInput::make('subject')
                                 ->required()
                                 ->nullable()

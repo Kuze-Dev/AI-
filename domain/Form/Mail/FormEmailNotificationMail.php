@@ -27,8 +27,6 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
         protected readonly FormEmailNotification $formEmailNotification,
         protected readonly array $data,
     ) {
-        $this->theme = config('mail.markdown.theme');
-        $this->componentPaths = config('mail.markdown.paths');
     }
 
     public function envelope(): Envelope
@@ -69,15 +67,9 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
 
         $contents = Blade::render($compiledTemplate, $this->data);
 
-        $theme = match (true) {
-            View::exists($customTheme = Str::start($this->theme, 'mail.')) => $customTheme,
-            str_contains($this->theme, '::') => $this->theme,
-            default => 'mail::themes.' . $this->theme,
-        };
-
-        return new HtmlString((new CssToInlineStyles)->convert(
+        return new HtmlString((new CssToInlineStyles())->convert(
             $contents,
-            View::make($theme, $this->data)->render()
+            View::make($this->getTheme(), $this->data)->render()
         ));
     }
 
@@ -90,7 +82,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
 
         $contents = Blade::render($compiledTemplate, $this->data);
 
-        return new HtmlString(html_entity_decode(preg_replace("/[\r\n]{2,}/", "\n\n", $contents), ENT_QUOTES, 'UTF-8'));
+        return new HtmlString(html_entity_decode(preg_replace("/[\r\n]{2,}/", "\n\n", $contents) ?? '', ENT_QUOTES, 'UTF-8'));
     }
 
     protected function getNormalizedTemplate(): string
@@ -102,21 +94,37 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
             blade;
     }
 
-    protected function htmlComponentPaths()
+    protected function getTheme(): string
+    {
+        $this->theme ??= config('mail.markdown.theme');
+
+        if (View::exists($customTheme = Str::start($this->theme, 'mail.'))) {
+            return $customTheme;
+        }
+
+        if (str_contains($this->theme, '::')) {
+            return $this->theme;
+        }
+
+        return 'mail::themes.' . $this->theme;
+    }
+
+    protected function htmlComponentPaths(): array
     {
         return array_map(fn ($path) => $path . '/html', $this->componentPaths());
     }
 
-    protected function textComponentPaths()
+    protected function textComponentPaths(): array
     {
         return array_map(fn ($path) => $path . '/text', $this->componentPaths());
     }
 
-    protected function componentPaths()
+    protected function componentPaths(): array
     {
-        return array_unique(array_merge($this->componentPaths, [
-            base_path('vendor/laravel/framework/src/Illuminate/Mail/resources/views')
-        ]));
+        return array_unique(array_merge(
+            config('mail.markdown.paths'),
+            [base_path('vendor/laravel/framework/src/Illuminate/Mail/resources/views')]
+        ));
     }
 
     public function attachments(): array

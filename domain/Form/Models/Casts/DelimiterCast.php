@@ -19,6 +19,10 @@ class DelimiterCast implements CastsAttributes
 
     public function set($model, string $key, $value, array $attributes): ?string
     {
+        if (is_array($value)) {
+            return ! empty($value) ? implode(',', $value) : null;
+        }
+
         return $value;
     }
 }
