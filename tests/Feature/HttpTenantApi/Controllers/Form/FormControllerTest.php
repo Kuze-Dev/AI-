@@ -87,7 +87,7 @@ it('can list forms and filter by name', function () {
         ->assertJson(function (AssertableJson $json) use ($form) {
             $json->count('data', 1)
                 ->where('data.0.type', 'forms')
-                ->where("data.0.attributes.name", $form->name)
+                ->where('data.0.attributes.name', $form->name)
                 ->etc();
         });
 });

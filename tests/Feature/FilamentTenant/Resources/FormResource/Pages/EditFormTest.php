@@ -9,7 +9,6 @@ use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Filament\Facades\Filament;
 
-use function Pest\Faker\faker;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
@@ -56,7 +55,7 @@ it('can edit form', function () {
                     'sender' => 'test@user',
                     'subject' => 'Foo Subject',
                     'template' => 'Foo Template',
-                ]
+                ],
             ],
         ])
         ->call('save')
