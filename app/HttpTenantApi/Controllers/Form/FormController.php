@@ -19,7 +19,7 @@ class FormController extends Controller
         return FormResource::collection(
             QueryBuilder::for(Form::query()->select(['blueprint_id', 'name',  'slug']))
                 ->allowedIncludes('blueprint')
-                ->allowedFilters(['name', 'slug'])
+                ->allowedFilters(['name'])
                 ->jsonPaginate()
         );
     }

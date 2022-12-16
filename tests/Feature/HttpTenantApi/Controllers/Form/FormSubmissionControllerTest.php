@@ -11,7 +11,7 @@ use function Pest\Laravel\postJson;
 
 beforeEach(fn () => testInTenantContext());
 
-it('submit form', function () {
+it('can submit form', function () {
     $form = FormFactory::new()
         ->withDummyBlueprint()
         ->storeSubmission()
