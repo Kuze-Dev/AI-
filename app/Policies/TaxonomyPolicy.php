@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Policies;
+
+use App\Policies\Concerns\ChecksWildcardPermissions;
+use Domain\Taxonomy\Models\Taxonomy;
+use Illuminate\Foundation\Auth\User;
+
+class TaxonomyPolicy
+{
+    use ChecksWildcardPermissions;
+
+    public function viewAny(User $user): bool
+    {
+        return $this->checkWildcardPermissions($user);
+    }
+
+    public function view(User $user, Taxonomy $taxonomy): bool
+    {
+        return $this->checkWildcardPermissions($user);
+    }
+
+    public function create(User $user): bool
+    {
+        return $this->checkWildcardPermissions($user);
+    }
+
+    public function update(User $user, Taxonomy $taxonomy): bool
+    {
+        return $this->checkWildcardPermissions($user);
+    }
+
+    public function delete(User $user, Taxonomy $taxonomy): bool
+    {
+        return $this->checkWildcardPermissions($user);
+    }
+}

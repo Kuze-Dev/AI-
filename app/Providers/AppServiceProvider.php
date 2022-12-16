@@ -10,6 +10,8 @@ use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
 use Domain\Page\Models\Page;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -59,6 +61,8 @@ class AppServiceProvider extends ServiceProvider
             Form::class,
             FormSubmission::class,
             FormEmailNotification::class,
+            Taxonomy::class,
+            TaxonomyTerm::class,
         ]);
 
         Password::defaults(

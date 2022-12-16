@@ -28,6 +28,8 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Page\Models\Page::class => \App\Policies\PagePolicy::class,
         \Domain\Form\Models\Form::class => \App\Policies\FormPolicy::class,
         \Domain\Form\Models\FormSubmission::class => \App\Policies\FormSubmissionPolicy::class,
+        \Domain\Taxonomy\Models\Taxonomy::class => \App\Policies\TaxonomyPolicy::class,
+        \Domain\Taxonomy\Models\TaxonomyTerm::class => \App\Policies\TaxonomyTermPolicy::class,
     ];
 
     /**
