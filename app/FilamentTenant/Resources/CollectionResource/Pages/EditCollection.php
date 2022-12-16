@@ -16,7 +16,11 @@ class EditCollection extends EditRecord
 {
     protected static string $resource = CollectionResource::class;
 
-    protected function getActions(): array 
+    /**
+     * Declare action buttons 
+     * available on the page.
+     */
+    protected function getActions(): array
     {
         return [
             Actions\EditAction::make()
@@ -27,7 +31,7 @@ class EditCollection extends EditRecord
 
     protected function getTitle(): string
     {
-        return trans('Configure :label', [
+        return trans('Edit :label', [
             'label' => $this->getRecordTitle(),
         ]);
     }
@@ -38,21 +42,21 @@ class EditCollection extends EditRecord
             fn () => app (UpdateCollectionAction::class)
                 ->execute($record, new CollectionData(
                     name: $data['name'],
-                    blueprint_id: (int) $data['blueprint_id'],
+                    blueprint_id: $data['blueprint_id'],
                     slug: $data['slug'],
-                    display_publish_dates: $data['display_publish_dates'] == true ? 1 : 0,
-                    past_publish_date: $data['past_publish_date'],
-                    future_publish_date: $data['future_publish_date'],
-                    is_sortable: (int) $data['is_sortable'],
+                    is_sortable: $data['is_sortable'] == true ? 1 : 0, 
+                    past_publish_date: $data['past_publish_date'] ?? '',
+                    future_publish_date: $data['future_publish_date'] ?? ''
                 ))
         );
     }
 
     /**
-     * @return string|null
+     * Set redirection url 
+     * after successful transactions.
      */
     protected function getRedirectUrl(): ?string
     {
-        return $this->getResource()::getUrl('configure', $this->record->slug);
+        return $this->getResource()::getUrl('edit', $this->record->slug);
     }
 }

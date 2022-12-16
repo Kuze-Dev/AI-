@@ -31,8 +31,6 @@ class Collection extends Model implements IsActivitySubject
     ];
 
     protected $casts = [
-        'display_publish_dates' => 'bool',
-        'is_sortable' => 'bool',
         'data' => 'array',
     ];
 

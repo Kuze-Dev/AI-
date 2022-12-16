@@ -13,9 +13,10 @@ use function Pest\Livewire\livewire;
 beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
+    loginAsSuperAdmin();
 });
 
-it ('can render page', function () {
+it ('can render collection', function () {
     livewire(CreateCollection::class)
         ->assertFormExists()
         ->assertOk();
@@ -28,7 +29,7 @@ it ('can create collection', function () {
 
     livewire(CreateCollection::class)
         ->fillForm([
-            'name' => 'Test Collecton',
+            'name' => 'Test Collection',
             'blueprint_id' => $blueprint->getKey(),
             'future_publish_date' => 'public',
             'past_publish_date' => 'unlisted'

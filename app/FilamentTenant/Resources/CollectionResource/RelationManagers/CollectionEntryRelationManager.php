@@ -52,8 +52,8 @@ class CollectionEntryRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->url(fn (self $livewire, CollectionEntry $record) => route('filament-tenant.resources.collections.entry.edit', [
-                        $record,
-                        $livewire->ownerRecord 
+                        'ownerRecord' => $livewire->ownerRecord,
+                        'record' => $record, 
                     ])),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -78,6 +78,6 @@ class CollectionEntryRelationManager extends RelationManager
      */
     protected function canReorder(): bool
     {
-        return $this->ownerRecord->is_sortable;
+        return $this->ownerRecord->is_sortable == 1 ? true : false;
     }
 }

@@ -22,7 +22,6 @@ class CreateCollectionAction
             'name' => $collectionData->name,
             'slug' => $collectionData->slug,
             'blueprint_id' => $collectionData->blueprint_id,
-            'display_publish_dates' => $collectionData->display_publish_dates,
             'past_publish_date' => $collectionData->past_publish_date,
             'future_publish_date' => $collectionData->future_publish_date,
             'is_sortable' => $collectionData->is_sortable,

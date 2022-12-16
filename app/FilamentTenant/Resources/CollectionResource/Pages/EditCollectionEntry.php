@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use Domain\Collection\Actions\UpdateCollectionEntryAction;
+use Filament\Resources\RelationManagers\RelationGroup;
 
 class EditCollectionEntry extends EditRecord
 {
@@ -31,13 +34,18 @@ class EditCollectionEntry extends EditRecord
      */
     public function mount($record): void 
     {
-        $parent_key = Request::route('record');
-        $record_key = Request::route('ownerRecord');
+        $this->ownerRecord = static::getResource()::resolveRecordRouteBinding(Request::route('ownerRecord')); 
+        $this->record = app(CollectionEntry::class)->resolveRouteBinding($record);
 
-        $this->ownerRecord = static::getResource()::resolveRecordRouteBinding($parent_key);
-        $this->record = $record_key; 
+        if ($this->ownerRecord === null) {
+            throw (new ModelNotFoundException())->setModel($this->getModel(), [$key]);
+        }
 
-        parent::mount($parent_key);
+        $this->authorizeAccess();
+
+        $this->fillForm();
+
+        $this->previousUrl = url()->previous();
     }
 
     /**
@@ -46,7 +54,7 @@ class EditCollectionEntry extends EditRecord
     protected function getTitle(): string
     {
         return trans('Edit :label Collection Entry', [
-            'label' => $this->ownerRecord->name,
+            'label' => $this->record->title,
         ]);
     }
 
@@ -76,6 +84,27 @@ class EditCollectionEntry extends EditRecord
     }
 
     /**
+     * @return array
+     */
+    protected function getRelationManagers(): array
+    {
+        $managers = [
+            ActivitiesRelationManager::class
+        ];
+
+        return array_filter(
+            $managers,
+            function (string | RelationGroup $manager): bool {
+                if ($manager instanceof RelationGroup) {
+                    return (bool) count($manager->getManagers(ownerRecord: $this->getRecord()));
+                }
+
+                return $manager::canViewForRecord($this->getRecord());
+            },
+        );
+    }
+
+    /**
      * @param Model $record
      * @param array $data
      * 
@@ -84,8 +113,8 @@ class EditCollectionEntry extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(
-            fn () => app (EditCollectionEntryAction::class)
-                ->execute($this->ownerRecord, new CollectionEntryData(...$data))
+            fn () => app (UpdateCollectionEntryAction::class)
+                ->execute($this->record, new CollectionEntryData(...$data))
         );
     }
 }
