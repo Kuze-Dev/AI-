@@ -25,7 +25,6 @@ class Collection extends Model implements IsActivitySubject
         'name',
         'blueprint_id',
         'slug',
-        'display_publish_dates',
         'past_publish_date',
         'future_publish_date',
         'is_sortable',
