@@ -17,6 +17,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
 use Exception;
+use Filament\Resources\RelationManagers\RelationGroup;
 use Illuminate\Support\Str;
 
 class FormResource extends Resource
@@ -61,7 +62,6 @@ class FormResource extends Resource
                         }),
                     Forms\Components\Toggle::make('store_submission'),
                 ]),
-
                 Forms\Components\Card::make([
                     Forms\Components\Repeater::make('form_email_notifications')
                         ->afterStateHydrated(fn (Forms\Components\Repeater $component, ?FormModel $record) => $component->state($record?->formEmailNotifications->toArray() ?? []))
@@ -77,8 +77,8 @@ class FormResource extends Resource
                                         })
                                         ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
                                             ? Str::of($state)->split('/\,/')
-                                                ->map(fn (string $rule) => trim($rule))
-                                                ->toArray()
+                                            ->map(fn (string $rule) => trim($rule))
+                                            ->toArray()
                                             : ($state ?? [])),
                                     Forms\Components\TextInput::make('cc')
                                         ->label(trans('CC'))
@@ -89,8 +89,8 @@ class FormResource extends Resource
                                         })
                                         ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
                                             ? Str::of($state)->split('/\,/')
-                                                ->map(fn (string $rule) => trim($rule))
-                                                ->toArray()
+                                            ->map(fn (string $rule) => trim($rule))
+                                            ->toArray()
                                             : ($state ?? [])),
                                     Forms\Components\TextInput::make('bcc')
                                         ->label(trans('BCC'))
@@ -101,8 +101,8 @@ class FormResource extends Resource
                                         })
                                         ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
                                             ? Str::of($state)->split('/\,/')
-                                                ->map(fn (string $rule) => trim($rule))
-                                                ->toArray()
+                                            ->map(fn (string $rule) => trim($rule))
+                                            ->toArray()
                                             : ($state ?? [])),
                                 ])
                                 ->columns(3),
@@ -115,8 +115,8 @@ class FormResource extends Resource
                                 })
                                 ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
                                     ? Str::of($state)->split('/\,/')
-                                        ->map(fn (string $rule) => trim($rule))
-                                        ->toArray()
+                                    ->map(fn (string $rule) => trim($rule))
+                                    ->toArray()
                                     : ($state ?? [])),
                             Forms\Components\TextInput::make('subject')
                                 ->required()
@@ -146,8 +146,11 @@ class FormResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->url(fn (FormModel $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
-                Tables\Columns\ToggleColumn::make('store_submission')
-                    ->sortable(),
+                Tables\Columns\BadgeColumn::make('form_submissions_count')
+                    ->counts('formSubmissions')
+                    ->formatStateUsing(fn (FormModel $record, ?int $state) => $record->store_submission ? $state : 'N/A')
+                    ->icon('heroicon-s-mail')
+                    ->color(fn (FormModel $record) => $record->store_submission ? 'success' : 'secondary'),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -168,8 +171,10 @@ class FormResource extends Resource
     public static function getRelations(): array
     {
         return [
-            FormSubmissionsRelationManager::class,
-            ActivitiesRelationManager::class,
+            RelationGroup::make('Main', [
+                FormSubmissionsRelationManager::class,
+                ActivitiesRelationManager::class,
+            ])
         ];
     }
 
