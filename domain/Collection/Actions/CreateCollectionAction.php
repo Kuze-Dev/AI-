@@ -11,10 +11,6 @@ class CreateCollectionAction
 {
     /**
      * Execute create collection query.
-     *  
-     * @param CollectionData $collectionData
-     * 
-     * @return Collection
      */
     public function execute(CollectionData $collectionData): Collection
     {

@@ -10,10 +10,6 @@ class DeleteCollectionAction
 {
     /**
      * Execute a delete collection query.
-     * 
-     * @param Collection $collection
-     * 
-     * @return bool|null
      */
     public function execute (Collection $collection): ?bool 
     {

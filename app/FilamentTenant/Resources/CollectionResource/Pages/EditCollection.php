@@ -17,8 +17,8 @@ class EditCollection extends EditRecord
     protected static string $resource = CollectionResource::class;
 
     /**
-     * Declare action buttons 
-     * available on the page.
+     * Declare action buttons that 
+     * are available on the page.
      */
     protected function getActions(): array
     {
@@ -29,6 +29,9 @@ class EditCollection extends EditRecord
         ];
     }
 
+    /**
+     * Set the title of the page.
+     */
     protected function getTitle(): string
     {
         return trans('Edit :label', [
@@ -36,6 +39,10 @@ class EditCollection extends EditRecord
         ]);
     }
 
+    /**
+     * Execute database transaction
+     * for updating collections.
+     */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(

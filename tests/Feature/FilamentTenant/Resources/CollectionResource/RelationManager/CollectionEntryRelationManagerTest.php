@@ -24,11 +24,6 @@ beforeEach(function () {
     loginAsSuperAdmin();
 });
 
-// $blueprint = BlueprintFactory::new()
-//     ->withDummySchema()
-//     ->createOne();
-// 'blueprint_id' => $blueprint->getKey(),
-
 it ('can render component', function () {
     $collection = CollectionFactory::new()
         ->for(

@@ -19,7 +19,8 @@ class CollectionEntry extends Model implements IsActivitySubject
     use HasSlug;
 
     /**
-     * @var array
+     * Declare columns 
+     * that are mass assignable.
      */
     protected $fillable = [
         'title',
@@ -29,6 +30,10 @@ class CollectionEntry extends Model implements IsActivitySubject
         'order'
     ];
 
+    /**
+     * Columns that are converted 
+     * to a specific data type.
+     */
     protected $casts = [
         'data' => 'array'
     ];
@@ -43,8 +48,10 @@ class CollectionEntry extends Model implements IsActivitySubject
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
+
     /**
-     * @return BelongsTo
+     * Declare relationship of
+     * current model to collections.
      */
     public function collection(): BelongsTo
     {
@@ -52,15 +59,16 @@ class CollectionEntry extends Model implements IsActivitySubject
     }
 
     /**
-     * @param Activity $activity
-     *
-     * @return string
+     * Specify activity log description.
      */
     public function getActivitySubjectDescription(Activity $activity): string
     {
         return 'Collection Entry: '.$this->id;
     }
 
+    /**
+     * @return SlugOptions
+     */
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
@@ -70,6 +78,10 @@ class CollectionEntry extends Model implements IsActivitySubject
             ->saveSlugsTo($this->getRouteKeyName());
     }
 
+    /**
+     * Set the column refrence 
+     * for route keys.
+     */
     public function getRouteKeyName(): string
     {
         return 'slug';

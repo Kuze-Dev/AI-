@@ -19,9 +19,8 @@ class CollectionEntryRelationManager extends RelationManager
     protected static ?string $recordTitleAttribute = null;
 
     /**
-     * @param Table $table
-     *
-     * @return Table
+     * Set components for the 
+     * relation manager table.
      */
     public static function table(Table $table): Table
     {
@@ -74,7 +73,8 @@ class CollectionEntryRelationManager extends RelationManager
     }
 
     /**
-     * @return bool
+     * Determine if collection entries 
+     * can be re-ordered.
      */
     protected function canReorder(): bool
     {

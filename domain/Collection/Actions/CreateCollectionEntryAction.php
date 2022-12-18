@@ -11,11 +11,7 @@ use Domain\Collection\Models\CollectionEntry;
 class CreateCollectionEntryAction
 {
     /**
-     * Execute create collection query.
-     *
-     * @param CollectionData $collectionData
-     *
-     * @return Collection
+     * Execute create collection entry query.
      */
     public function execute(Collection $collection, CollectionEntryData $collectionEntryData): CollectionEntry
     {

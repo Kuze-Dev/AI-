@@ -13,6 +13,10 @@ class CreateCollection extends CreateRecord
 {
     protected static string $resource = CollectionResource::class;
 
+    /**
+     * Execute database transaction
+     * for creating collections.
+     */
     protected function handleRecordCreation(array $data): Model
     {
         return DB::transaction(fn () => app(CreateCollectionAction::class)

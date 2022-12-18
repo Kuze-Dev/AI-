@@ -12,7 +12,8 @@ class ListCollection extends ListRecords
     protected static string $resource = CollectionResource::class;
 
     /**
-     * @return array
+     * Declare action buttons that
+     * are available on the page.
      */
     protected function getActions(): array
     {

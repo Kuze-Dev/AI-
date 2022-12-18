@@ -18,7 +18,6 @@ class CollectionEntryFactory extends Factory
 
     /**
      * Define values of model instance.
-     * 
      */
     public function definition(): array
     {

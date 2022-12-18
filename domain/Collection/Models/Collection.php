@@ -21,6 +21,10 @@ class Collection extends Model implements IsActivitySubject
     use LogsActivity,
         HasSlug;
 
+    /**
+     * Declare columns 
+     * that are mass assignable.
+     */
     protected $fillable = [
         'name',
         'blueprint_id',
@@ -30,6 +34,10 @@ class Collection extends Model implements IsActivitySubject
         'is_sortable',
     ];
 
+    /**
+     * Columns that are converted 
+     * to a specific data type.
+     */
     protected $casts = [
         'data' => 'array',
     ];
@@ -46,7 +54,8 @@ class Collection extends Model implements IsActivitySubject
     }
 
     /**
-     * @return BelongsTo
+     * Declare relationship of 
+     * current model to blueprint.
      */
     public function blueprint(): BelongsTo
     {
@@ -54,7 +63,8 @@ class Collection extends Model implements IsActivitySubject
     }
 
     /**
-     * @return HasMany
+     * Declare relationship of
+     * current model to collection entries.
      */
     public function collectionEntries(): HasMany
     {
@@ -62,9 +72,7 @@ class Collection extends Model implements IsActivitySubject
     }
 
     /**
-     * @param Activity $activity
-     *
-     * @return string
+     * Specify activity log description.
      */
     public function getActivitySubjectDescription(Activity $activity): string
     {
@@ -72,7 +80,8 @@ class Collection extends Model implements IsActivitySubject
     }
 
     /**
-     * @return string
+     * Set the column refrence 
+     * for route keys.
      */
     public function getRouteKeyName(): string
     {
@@ -93,8 +102,6 @@ class Collection extends Model implements IsActivitySubject
 
     /**
      * Check if date behaviors has values.
-     * 
-     * @return bool
      */
     public function hasPublishDates(): bool
     {

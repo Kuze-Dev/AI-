@@ -20,8 +20,6 @@ class CollectionFactory extends Factory
 
     /**
      * Define values of model instance.
-     * 
-     * @return array
      */
     public function definition(): array 
     {
@@ -35,7 +33,8 @@ class CollectionFactory extends Factory
     }
 
     /**
-     * @return self
+     * Bind a blueprint record 
+     * to current model.
      */
     public function withDummyBlueprint(): self
     {

@@ -12,11 +12,6 @@ class UpdateCollectionAction
     /**
      * Execute operations for updating 
      * collection and save collection query.
-     * 
-     * @param Collection $collection
-     * @param CollectionData $collectionData
-     * 
-     * @return Collection
      */
     public function execute(Collection $collection, CollectionData $collectionData): Collection
     {

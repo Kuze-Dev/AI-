@@ -38,7 +38,7 @@ class EditCollectionEntry extends EditRecord
         $this->record = app(CollectionEntry::class)->resolveRouteBinding($record);
 
         if ($this->ownerRecord === null) {
-            throw (new ModelNotFoundException())->setModel($this->getModel(), [$key]);
+            throw (new ModelNotFoundException())->setModel($this->getModel(), [$this->ownerRecord]);
         }
 
         $this->authorizeAccess();
@@ -49,7 +49,7 @@ class EditCollectionEntry extends EditRecord
     }
 
     /**
-     * @return string
+     * Set the title of the page.
      */
     protected function getTitle(): string
     {
@@ -58,6 +58,10 @@ class EditCollectionEntry extends EditRecord
         ]);
     }
 
+    /**
+     * Specify reference
+     * model used for the page.
+     */
     public function getModel(): string
     {
         return CollectionEntry::class;
@@ -65,8 +69,6 @@ class EditCollectionEntry extends EditRecord
 
     /**
      * Build form from blueprint schema.
-     * 
-     * @return array
      */
     protected function getFormSchema(): array
     {
@@ -84,7 +86,8 @@ class EditCollectionEntry extends EditRecord
     }
 
     /**
-     * @return array
+     * Specify relationships 
+     * that are displayed in the page.
      */
     protected function getRelationManagers(): array
     {
@@ -105,10 +108,8 @@ class EditCollectionEntry extends EditRecord
     }
 
     /**
-     * @param Model $record
-     * @param array $data
-     * 
-     * @return Model
+     * Execute database transaction
+     * for updating collection entries.
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
