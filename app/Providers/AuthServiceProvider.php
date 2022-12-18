@@ -26,6 +26,8 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Tenant\Models\Tenant::class => \App\Policies\TenantPolicy::class,
         \Domain\Blueprint\Models\Blueprint::class => \App\Policies\BlueprintPolicy::class,
         \Domain\Page\Models\Page::class => \App\Policies\PagePolicy::class,
+        \Domain\Taxonomy\Models\Taxonomy::class => \App\Policies\TaxonomyPolicy::class,
+        \Domain\Taxonomy\Models\TaxonomyTerm::class => \App\Policies\TaxonomyTermPolicy::class,
         \Domain\Collection\Models\Collection::class => \App\Policies\CollectionPolicy::class,
         \Domain\Collection\Models\CollectionEntry::class => \App\Policies\CollectionEntryPolicy::class,
     ];
