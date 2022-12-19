@@ -13,7 +13,7 @@ it('can create tenant', function () {
     $tenant = app(CreateTenantAction::class)->execute(TenantData::fromArray([
         'name' => 'Test',
         'domains' => [
-            ['domain' => 'test.com']
+            ['domain' => 'test.com'],
         ],
     ]));
 

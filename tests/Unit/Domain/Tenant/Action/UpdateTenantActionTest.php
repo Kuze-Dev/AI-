@@ -22,8 +22,8 @@ it('can update tenant', function () {
         'domains' => [
             [
                 'id' => $tenant->domains->first()->id,
-                'domain' => 'test.com'
-            ]
+                'domain' => 'test.com',
+            ],
         ],
     ]));
 
