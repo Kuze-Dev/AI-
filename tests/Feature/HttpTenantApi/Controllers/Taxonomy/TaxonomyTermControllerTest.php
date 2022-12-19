@@ -1,9 +1,12 @@
 <?php
+
 declare(strict_types=1);
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
+
 use function Pest\Laravel\getJson;
+
 beforeEach(function () {
     testInTenantContext();
 });
@@ -35,4 +38,4 @@ it('fetch show taxonomyTerms with taxonomy', function () {
                 ->whereType('data.attributes.name', 'string')
                 ->etc();
         });
-})->only();
+});

@@ -18,7 +18,6 @@ class TaxonomyTermController
     {
         return TaxonomyTermResource::collection(
             QueryBuilder::for($taxonomy->taxonomyTerms()->select(['taxonomy_id', 'name', 'slug', 'description']))
-                ->allowedIncludes('taxonomy')
                 ->allowedFilters(['name', 'slug'])
                 ->jsonPaginate()
         );
