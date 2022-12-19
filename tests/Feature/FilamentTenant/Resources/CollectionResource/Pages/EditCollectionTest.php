@@ -1,6 +1,6 @@
 <?php 
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 use App\FilamentTenant\Resources\CollectionResource\Pages\EditCollection;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
@@ -18,7 +18,7 @@ beforeEach(function () {
     loginAsSuperAdmin();
 });
 
-it ('can render collection', function () {
+it('can render collection', function () {
     $collection = CollectionFactory::new()
         ->for(
             BlueprintFactory::new()
@@ -42,7 +42,7 @@ it ('can render collection', function () {
         ->assertOk();
 });
 
-it ('can edit collection', function () {
+it('can edit collection', function () {
     $collection = CollectionFactory::new()
     ->for(
         BlueprintFactory::new()

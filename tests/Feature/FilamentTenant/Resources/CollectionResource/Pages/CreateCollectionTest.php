@@ -1,6 +1,6 @@
 <?php 
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 use App\FilamentTenant\Resources\CollectionResource\Pages\CreateCollection;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
@@ -16,13 +16,13 @@ beforeEach(function () {
     loginAsSuperAdmin();
 });
 
-it ('can render collection', function () {
+it('can render collection', function () {
     livewire(CreateCollection::class)
         ->assertFormExists()
         ->assertOk();
 });
 
-it ('can create collection', function () {
+it('can create collection', function () {
     $blueprint = BlueprintFactory::new()
         ->withDummySchema()
         ->createOne();

@@ -1,6 +1,6 @@
 <?php 
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 use App\FilamentTenant\Resources\CollectionResource\Pages\ListCollection;
 use Domain\Collection\Database\Factories\CollectionFactory;
@@ -16,12 +16,12 @@ beforeEach(function () {
     loginAsSuperAdmin();
 });
 
-it ('can render collection', function () {
+it('can render collection', function () {
     livewire(ListCollection::class)
         ->assertOk();
 });
 
-it ('can list collections', function () {
+it('can list collections', function () {
     $collections = CollectionFactory::new()
         ->withDummyBlueprint()
         ->count(5)
@@ -32,7 +32,7 @@ it ('can list collections', function () {
         ->assertOk();
 });
 
-it ('can delete collection', function () {
+it('can delete collection', function () {
     $collection = CollectionFactory::new()
         ->withDummyBlueprint()
         ->createOne();

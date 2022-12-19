@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types = 1);
+declare(strict_types=1);
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,21 +11,17 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
         Schema::create('collections', function (Blueprint $table) {
             $table->id();
-
             $table->foreignIdFor(BlueprintModel::class)->constrained();
             $table->string('name')->unique();
             $table->string('slug')->unique();
             $table->string('future_publish_date')->nullable();
             $table->string('past_publish_date')->nullable();
             $table->boolean('is_sortable')->default(false);
-
             $table->timestamps();
         });
 
@@ -42,8 +38,6 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {

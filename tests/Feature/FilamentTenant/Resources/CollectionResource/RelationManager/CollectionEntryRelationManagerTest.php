@@ -1,21 +1,14 @@
 <?php 
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
-use App\FilamentTenant\Resources\CollectionResource\Pages\CreateCollection;
-use App\FilamentTenant\Resources\CollectionResource\Pages\CreateCollectionEntry;
 use App\FilamentTenant\Resources\CollectionResource\RelationManagers\CollectionEntryRelationManager;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
-use Domain\Collection\Actions\CreateCollectionEntryAction;
 use Domain\Collection\Database\Factories\CollectionEntryFactory;
-use Domain\Collection\Models\CollectionEntry;
 use Domain\Collection\Database\Factories\CollectionFactory;
 use Filament\Facades\Filament;
 
-use function Pest\Laravel\assertDatabaseCount;
-use function Pest\Livewire\assertDatabaseHas;
-use function Pest\Livewire\assertModelMissing;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
@@ -24,7 +17,7 @@ beforeEach(function () {
     loginAsSuperAdmin();
 });
 
-it ('can render component', function () {
+it('can render component', function () {
     $collection = CollectionFactory::new()
         ->for(
             BlueprintFactory::new()
