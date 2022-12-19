@@ -39,6 +39,7 @@ class Collection extends Model implements IsActivitySubject
      */
     protected $casts = [
         'data' => 'array',
+        'is_sortable' => 'boolean'
     ];
 
     /** @return LogOptions */

@@ -95,7 +95,7 @@ class CollectionResource extends Resource
                                     ->options(
                                         collect(PublishBehavior::cases())
                                             ->mapWithKeys(fn (PublishBehavior $behaviorType) => [
-                                                $behaviorType->name => Str::headline($behaviorType->value),
+                                                $behaviorType->value => Str::headline($behaviorType->value),
                                             ])
                                     )
                                     ->searchable()
@@ -105,7 +105,7 @@ class CollectionResource extends Resource
                                     ->options(
                                         collect(PublishBehavior::cases())
                                             ->mapWithKeys(fn (PublishBehavior $behaviorType) => [
-                                                $behaviorType->name => Str::headline($behaviorType->value),
+                                                $behaviorType->value => Str::headline($behaviorType->value),
                                             ])
                                     )
                                     ->searchable()
