@@ -19,7 +19,6 @@ class CreateForm extends CreateRecord
     /** @throws Throwable */
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(fn () => app(CreateFormAction::class)
-            ->execute(FormData::fromArray($this->data)));
+        return DB::transaction(fn () => app(CreateFormAction::class)->execute(FormData::fromArray($data)));
     }
 }
