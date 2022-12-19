@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
@@ -21,15 +21,15 @@ it('can render component', function () {
     $collection = CollectionFactory::new()
         ->for(
             BlueprintFactory::new()
-                ->addSchemaSection([ 'title' => 'Main' ])
-                ->addSchemaField([ 'title' => 'Header', 'type' => FieldType::TEXT ])
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
         )
         ->createOne([
             'name' => 'Test Collection',
             'future_publish_date' => 'public',
-            'past_publish_date' => 'unlisted'
+            'past_publish_date' => 'unlisted',
         ]);
-    
+
     $data = [
         'data' => ['main' => ['header' => 'Foo']],
         'title' => 'Test collection entry',
@@ -40,7 +40,7 @@ it('can render component', function () {
         ->count(1)
         ->create($data);
 
-    livewire(CollectionEntryRelationManager::class, ['ownerRecord' => $collection ])
+    livewire(CollectionEntryRelationManager::class, ['ownerRecord' => $collection])
         ->assertOk()
         ->assertCanSeeTableRecords($collectionEntry);
 });

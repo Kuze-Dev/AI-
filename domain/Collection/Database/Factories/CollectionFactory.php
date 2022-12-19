@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
@@ -8,32 +8,29 @@ use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Collection\Models\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-
-class CollectionFactory extends Factory 
+class CollectionFactory extends Factory
 {
     /**
      * Specify reference model.
-     * 
+     *
      * @var string
      */
     protected $model = Collection::class;
 
-    /**
-     * Define values of model instance.
-     */
-    public function definition(): array 
+    /** Define values of model instance. */
+    public function definition(): array
     {
         return [
             'blueprint_id' => null,
             'name' => $this->faker->name(),
             'past_publish_date' => 'private',
             'future_publish_date' => 'public',
-            'is_sortable' => rand(0, 1)
+            'is_sortable' => rand(0, 1),
         ];
     }
 
     /**
-     * Bind a blueprint record 
+     * Bind a blueprint record
      * to current model.
      */
     public function withDummyBlueprint(): self

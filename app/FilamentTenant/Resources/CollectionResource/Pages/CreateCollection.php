@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Resources\CollectionResource\Pages;
 
 use App\FilamentTenant\Resources\CollectionResource;
@@ -19,11 +21,13 @@ class CreateCollection extends CreateRecord
      */
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(fn () => app(CreateCollectionAction::class)
-            ->execute(new CollectionData(...$data, 
-                past_publish_date: $data['past_publish_date'] ?? '',
-                future_publish_date: $data['future_publish_date'] ?? ''
-            ))
+        return DB::transaction(
+            fn () => app(CreateCollectionAction::class)
+                ->execute(new CollectionData(
+                    ...$data,
+                    past_publish_date: $data['past_publish_date'] ?? '',
+                    future_publish_date: $data['future_publish_date'] ?? ''
+                ))
         );
     }
 }

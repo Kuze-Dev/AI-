@@ -1,8 +1,9 @@
 <?php
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\CollectionResource\Pages;
+
 use App\FilamentTenant\Resources\CollectionResource;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Domain\Collection\DataTransferObjects\CollectionEntryData;
@@ -25,16 +26,16 @@ class EditCollectionEntry extends EditRecord
     public $ownerRecord;
 
     /**
-     * Override mount and 
+     * Override mount and
      * call parent component mount.
-     * 
+     *
      * @param mixed $record
-     * 
+     *
      * @return void
      */
-    public function mount($record): void 
+    public function mount($record): void
     {
-        $this->ownerRecord = static::getResource()::resolveRecordRouteBinding(Request::route('ownerRecord')); 
+        $this->ownerRecord = static::getResource()::resolveRecordRouteBinding(Request::route('ownerRecord'));
         $this->record = app(CollectionEntry::class)->resolveRouteBinding($record);
 
         if ($this->ownerRecord === null) {
@@ -48,9 +49,7 @@ class EditCollectionEntry extends EditRecord
         $this->previousUrl = url()->previous();
     }
 
-    /**
-     * Set the title of the page.
-     */
+    /** Set the title of the page. */
     protected function getTitle(): string
     {
         return trans('Edit :label Collection Entry', [
@@ -67,9 +66,7 @@ class EditCollectionEntry extends EditRecord
         return CollectionEntry::class;
     }
 
-    /**
-     * Build form from blueprint schema.
-     */
+    /** Build form from blueprint schema. */
     protected function getFormSchema(): array
     {
         return [
@@ -86,18 +83,18 @@ class EditCollectionEntry extends EditRecord
     }
 
     /**
-     * Specify relationships 
+     * Specify relationships
      * that are displayed in the page.
      */
     protected function getRelationManagers(): array
     {
         $managers = [
-            ActivitiesRelationManager::class
+            ActivitiesRelationManager::class,
         ];
 
         return array_filter(
             $managers,
-            function (string | RelationGroup $manager): bool {
+            function (string|RelationGroup $manager): bool {
                 if ($manager instanceof RelationGroup) {
                     return (bool) count($manager->getManagers(ownerRecord: $this->getRecord()));
                 }
@@ -114,7 +111,7 @@ class EditCollectionEntry extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(
-            fn () => app (UpdateCollectionEntryAction::class)
+            fn () => app(UpdateCollectionEntryAction::class)
                 ->execute($this->record, new CollectionEntryData(...$data))
         );
     }

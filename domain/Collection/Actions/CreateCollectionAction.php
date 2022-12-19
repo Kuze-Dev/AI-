@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
@@ -9,9 +9,7 @@ use Domain\Collection\Models\Collection;
 
 class CreateCollectionAction
 {
-    /**
-     * Execute create collection query.
-     */
+    /** Execute create collection query. */
     public function execute(CollectionData $collectionData): Collection
     {
         return Collection::create([

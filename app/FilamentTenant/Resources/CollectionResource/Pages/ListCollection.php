@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Resources\CollectionResource\Pages;
 
 use App\FilamentTenant\Resources\CollectionResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Exception;
 
 class ListCollection extends ListRecords
 {

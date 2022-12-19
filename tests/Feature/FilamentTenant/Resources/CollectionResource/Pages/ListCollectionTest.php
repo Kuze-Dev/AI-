@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
@@ -36,10 +36,10 @@ it('can delete collection', function () {
     $collection = CollectionFactory::new()
         ->withDummyBlueprint()
         ->createOne();
-    
+
     livewire(ListCollection::class)
         ->callTableAction(DeleteAction::class, $collection)
         ->assertOk();
-    
+
     assertModelMissing($collection);
 });

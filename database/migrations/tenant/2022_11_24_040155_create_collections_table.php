@@ -7,11 +7,8 @@ use Illuminate\Support\Facades\Schema;
 use Domain\Blueprint\Models\Blueprint as BlueprintModel;
 use Domain\Collection\Models\Collection as CollectionModel;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
+return new class () extends Migration {
+    /** Run the migrations. */
     public function up()
     {
         Schema::create('collections', function (Blueprint $table) {
@@ -36,9 +33,7 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
+    /** Reverse the migrations. */
     public function down()
     {
         Schema::dropIfExists('collections');

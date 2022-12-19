@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
@@ -28,39 +28,38 @@ it('can render collection', function () {
         ->createOne([
             'name' => 'Test Collection',
             'future_publish_date' => 'public',
-            'past_publish_date' => 'unlisted'
+            'past_publish_date' => 'unlisted',
         ]);
 
-    livewire(EditCollection::class, [ 'record' => $collection->getRouteKey() ])
+    livewire(EditCollection::class, ['record' => $collection->getRouteKey()])
         ->assertFormExists()
         ->assertSuccessful()
         ->assertFormSet([
             'name' => 'Test Collection',
             'future_publish_date' => 'public',
-            'past_publish_date' => 'unlisted'
+            'past_publish_date' => 'unlisted',
         ])
         ->assertOk();
 });
 
 it('can edit collection', function () {
     $collection = CollectionFactory::new()
-    ->for(
-        BlueprintFactory::new()
-            ->addSchemaSection(['title' => 'Main'])
-            ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
-    )
-    ->createOne([
-        'name' => 'Test Collection',
-        'future_publish_date' => 'private',
-        'past_publish_date' => 'unlisted',
-    ]);
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->createOne([
+            'name' => 'Test Collection',
+            'future_publish_date' => 'private',
+            'past_publish_date' => 'unlisted',
+        ]);
 
-    $newData = [        
+    $newData = [
         'name' => 'Test Collection Updated',
         'future_publish_date' => 'public',
         'past_publish_date' => 'private',
     ];
-    
 
     livewire(EditCollection::class, ['record' => $collection->getRouteKey()])
         ->fillForm($newData)

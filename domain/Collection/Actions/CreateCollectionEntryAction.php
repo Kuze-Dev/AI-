@@ -10,9 +10,7 @@ use Domain\Collection\Models\CollectionEntry;
 
 class CreateCollectionEntryAction
 {
-    /**
-     * Execute create collection entry query.
-     */
+    /** Execute create collection entry query. */
     public function execute(Collection $collection, CollectionEntryData $collectionEntryData): CollectionEntry
     {
         return $collection->collectionEntries()

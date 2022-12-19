@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Collection\DataTransferObjects;
 
-class CollectionData 
+class CollectionData
 {
     public function __construct(
         public readonly string $name,
@@ -14,6 +14,5 @@ class CollectionData
         public readonly ?string $future_publish_date = null,
         public readonly ?int $is_sortable,
     ) {
-        
     }
 }

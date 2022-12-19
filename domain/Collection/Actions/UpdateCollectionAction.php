@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
@@ -7,10 +7,10 @@ namespace Domain\Collection\Actions;
 use Domain\Collection\DataTransferObjects\CollectionData;
 use Domain\Collection\Models\Collection;
 
-class UpdateCollectionAction 
+class UpdateCollectionAction
 {
     /**
-     * Execute operations for updating 
+     * Execute operations for updating
      * collection and save collection query.
      */
     public function execute(Collection $collection, CollectionData $collectionData): Collection

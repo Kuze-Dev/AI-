@@ -1,12 +1,10 @@
 <?php
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\CollectionResource\RelationManagers;
 
-use App\FilamentTenant\Support\SchemaFormBuilder;
 use Domain\Collection\Models\CollectionEntry;
-use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
@@ -19,7 +17,7 @@ class CollectionEntryRelationManager extends RelationManager
     protected static ?string $recordTitleAttribute = null;
 
     /**
-     * Set components for the 
+     * Set components for the
      * relation manager table.
      */
     public static function table(Table $table): Table
@@ -42,7 +40,7 @@ class CollectionEntryRelationManager extends RelationManager
                     ->toggledHiddenByDefault(),
             ])
             ->filters([
-                //
+
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make('Create collection entry')
@@ -52,7 +50,7 @@ class CollectionEntryRelationManager extends RelationManager
                 Tables\Actions\EditAction::make()
                     ->url(fn (self $livewire, CollectionEntry $record) => route('filament-tenant.resources.collections.entry.edit', [
                         'ownerRecord' => $livewire->ownerRecord,
-                        'record' => $record, 
+                        'record' => $record,
                     ])),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -62,9 +60,9 @@ class CollectionEntryRelationManager extends RelationManager
     }
 
     /**
-     * Set default column 
+     * Set default column
      * storage for ordering.
-     * 
+     *
      * @return string|null
      */
     protected function getTableReorderColumn(): ?string
@@ -73,7 +71,7 @@ class CollectionEntryRelationManager extends RelationManager
     }
 
     /**
-     * Determine if collection entries 
+     * Determine if collection entries
      * can be re-ordered.
      */
     protected function canReorder(): bool

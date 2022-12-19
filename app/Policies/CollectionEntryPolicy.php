@@ -1,6 +1,6 @@
-<?php 
+<?php
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Policies;
 
@@ -8,7 +8,7 @@ use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Collection\Models\CollectionEntry;
 use Illuminate\Foundation\Auth\User;
 
-class CollectionEntryPolicy 
+class CollectionEntryPolicy
 {
     use ChecksWildcardPermissions;
 

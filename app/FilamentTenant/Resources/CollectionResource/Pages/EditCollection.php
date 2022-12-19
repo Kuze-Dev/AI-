@@ -1,6 +1,6 @@
-<?php 
+<?php
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\CollectionResource\Pages;
 
@@ -12,12 +12,12 @@ use Filament\Pages\Actions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class EditCollection extends EditRecord 
+class EditCollection extends EditRecord
 {
     protected static string $resource = CollectionResource::class;
 
     /**
-     * Declare action buttons that 
+     * Declare action buttons that
      * are available on the page.
      */
     protected function getActions(): array
@@ -29,9 +29,7 @@ class EditCollection extends EditRecord
         ];
     }
 
-    /**
-     * Set the title of the page.
-     */
+    /** Set the title of the page. */
     protected function getTitle(): string
     {
         return trans('Edit :label', [
@@ -46,12 +44,12 @@ class EditCollection extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(
-            fn () => app (UpdateCollectionAction::class)
+            fn () => app(UpdateCollectionAction::class)
                 ->execute($record, new CollectionData(
                     name: $data['name'],
                     blueprint_id: $data['blueprint_id'],
                     slug: $data['slug'],
-                    is_sortable: $data['is_sortable'] == true ? 1 : 0, 
+                    is_sortable: $data['is_sortable'] == true ? 1 : 0,
                     past_publish_date: $data['past_publish_date'] ?? '',
                     future_publish_date: $data['future_publish_date'] ?? ''
                 ))
@@ -59,7 +57,7 @@ class EditCollection extends EditRecord
     }
 
     /**
-     * Set redirection url 
+     * Set redirection url
      * after successful transactions.
      */
     protected function getRedirectUrl(): ?string

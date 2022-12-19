@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Policies;
 
@@ -14,7 +14,7 @@ class CollectionPolicy
 
     /**
      * @param User $user
-     * 
+     *
      * @return bool
      */
     public function viewAny(User $user): bool
@@ -25,7 +25,7 @@ class CollectionPolicy
     /**
      * @param User $user
      * @param Collection $collection
-     * 
+     *
      * @return bool
      */
     public function view(User $user, Collection $collection): bool
@@ -35,7 +35,7 @@ class CollectionPolicy
 
     /**
      * @param User $user
-     * 
+     *
      * @return bool
      */
     public function create(User $user): bool
@@ -46,7 +46,7 @@ class CollectionPolicy
     /**
      * @param User $user
      * @param Collection $collection
-     * 
+     *
      * @return bool
      */
     public function configure(User $user, Collection $collection): bool
@@ -57,7 +57,7 @@ class CollectionPolicy
     /**
      * @param User $user
      * @param Collection $collection
-     * 
+     *
      * @return bool
      */
     public function update(User $user, Collection $collection): bool
@@ -68,7 +68,7 @@ class CollectionPolicy
     /**
      * @param User $user
      * @param Collection $collection
-     * 
+     *
      * @return bool
      */
     public function delete(User $user, Collection $collection): bool
@@ -78,7 +78,7 @@ class CollectionPolicy
 
     /**
      * @param User $user
-     * 
+     *
      * @return bool
      */
     public function deleteAny(User $user): bool

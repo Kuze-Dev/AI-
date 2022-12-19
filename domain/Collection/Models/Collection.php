@@ -8,7 +8,6 @@ use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Blueprint;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
@@ -18,11 +17,11 @@ use Spatie\Sluggable\SlugOptions;
 
 class Collection extends Model implements IsActivitySubject
 {
-    use LogsActivity,
-        HasSlug;
+    use LogsActivity;
+    use HasSlug;
 
     /**
-     * Declare columns 
+     * Declare columns
      * that are mass assignable.
      */
     protected $fillable = [
@@ -35,16 +34,14 @@ class Collection extends Model implements IsActivitySubject
     ];
 
     /**
-     * Columns that are converted 
+     * Columns that are converted
      * to a specific data type.
      */
     protected $casts = [
         'data' => 'array',
     ];
 
-    /**
-     * @return LogOptions
-     */
+    /** @return LogOptions */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -54,7 +51,7 @@ class Collection extends Model implements IsActivitySubject
     }
 
     /**
-     * Declare relationship of 
+     * Declare relationship of
      * current model to blueprint.
      */
     public function blueprint(): BelongsTo
@@ -71,16 +68,14 @@ class Collection extends Model implements IsActivitySubject
         return $this->hasMany(CollectionEntry::class);
     }
 
-    /**
-     * Specify activity log description.
-     */
+    /** Specify activity log description. */
     public function getActivitySubjectDescription(Activity $activity): string
     {
         return 'Collection: '.$this->name;
     }
 
     /**
-     * Set the column refrence 
+     * Set the column reference
      * for route keys.
      */
     public function getRouteKeyName(): string
@@ -88,9 +83,7 @@ class Collection extends Model implements IsActivitySubject
         return 'slug';
     }
 
-    /**
-     * @return SlugOptions
-     */
+    /** @return SlugOptions */
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
@@ -100,9 +93,7 @@ class Collection extends Model implements IsActivitySubject
             ->saveSlugsTo($this->getRouteKeyName());
     }
 
-    /**
-     * Check if date behaviors has values.
-     */
+    /** Check if date behaviors has values. */
     public function hasPublishDates(): bool
     {
         return $this->past_publish_date || $this->future_publish_date;

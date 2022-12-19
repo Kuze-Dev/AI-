@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
@@ -32,10 +32,10 @@ it('can create collection', function () {
             'name' => 'Test Collection',
             'blueprint_id' => $blueprint->getKey(),
             'future_publish_date' => 'public',
-            'past_publish_date' => 'unlisted'
+            'past_publish_date' => 'unlisted',
         ])
         ->call('create')
         ->assertHasNoFormErrors();
-    
+
     assertDatabaseCount(Collection::class, 1);
 });

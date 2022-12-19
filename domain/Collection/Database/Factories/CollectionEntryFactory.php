@@ -11,14 +11,12 @@ class CollectionEntryFactory extends Factory
 {
     /**
      * Specify reference model.
-     * 
+     *
      * @var string
      */
     protected $model = CollectionEntry::class;
 
-    /**
-     * Define values of model instance.
-     */
+    /** Define values of model instance. */
     public function definition(): array
     {
         return [
