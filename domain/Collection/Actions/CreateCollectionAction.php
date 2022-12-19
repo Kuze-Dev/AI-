@@ -16,8 +16,8 @@ class CreateCollectionAction
             'name' => $collectionData->name,
             'slug' => $collectionData->slug,
             'blueprint_id' => $collectionData->blueprint_id,
-            'past_publish_date' => $collectionData->past_publish_date,
-            'future_publish_date' => $collectionData->future_publish_date,
+            'past_publish_date_behavior' => $collectionData->past_publish_date_behavior,
+            'future_publish_date_behavior' => $collectionData->future_publish_date_behavior,
             'is_sortable' => $collectionData->is_sortable,
         ]);
     }

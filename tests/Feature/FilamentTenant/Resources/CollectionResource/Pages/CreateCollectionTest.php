@@ -31,8 +31,8 @@ it('can create collection', function () {
         ->fillForm([
             'name' => 'Test Collection',
             'blueprint_id' => $blueprint->getKey(),
-            'future_publish_date' => 'public',
-            'past_publish_date' => 'unlisted',
+            'future_publish_date_behavior' => 'public',
+            'past_publish_date_behavior' => 'unlisted',
         ])
         ->call('create')
         ->assertHasNoFormErrors();

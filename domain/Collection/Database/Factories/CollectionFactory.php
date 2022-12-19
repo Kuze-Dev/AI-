@@ -23,8 +23,8 @@ class CollectionFactory extends Factory
         return [
             'blueprint_id' => null,
             'name' => $this->faker->name(),
-            'past_publish_date' => 'private',
-            'future_publish_date' => 'public',
+            'past_publish_date_behavior' => 'private',
+            'future_publish_date_behavior' => 'public',
             'is_sortable' => rand(0, 1),
         ];
     }

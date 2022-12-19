@@ -27,8 +27,8 @@ it('can render collection', function () {
         )
         ->createOne([
             'name' => 'Test Collection',
-            'future_publish_date' => 'public',
-            'past_publish_date' => 'unlisted',
+            'future_publish_date_behavior' => 'public',
+            'past_publish_date_behavior' => 'unlisted',
         ]);
 
     livewire(EditCollection::class, ['record' => $collection->getRouteKey()])
@@ -36,8 +36,8 @@ it('can render collection', function () {
         ->assertSuccessful()
         ->assertFormSet([
             'name' => 'Test Collection',
-            'future_publish_date' => 'public',
-            'past_publish_date' => 'unlisted',
+            'future_publish_date_behavior' => 'public',
+            'past_publish_date_behavior' => 'unlisted',
         ])
         ->assertOk();
 });
@@ -51,14 +51,14 @@ it('can edit collection', function () {
         )
         ->createOne([
             'name' => 'Test Collection',
-            'future_publish_date' => 'private',
-            'past_publish_date' => 'unlisted',
+            'future_publish_date_behavior' => 'private',
+            'past_publish_date_behavior' => 'unlisted',
         ]);
 
     $newData = [
         'name' => 'Test Collection Updated',
-        'future_publish_date' => 'public',
-        'past_publish_date' => 'private',
+        'future_publish_date_behavior' => 'public',
+        'past_publish_date_behavior' => 'private',
     ];
 
     livewire(EditCollection::class, ['record' => $collection->getRouteKey()])

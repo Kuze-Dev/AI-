@@ -49,9 +49,9 @@ class EditCollection extends EditRecord
                     name: $data['name'],
                     blueprint_id: $data['blueprint_id'],
                     slug: $data['slug'],
-                    is_sortable: $data['is_sortable'] == true ? 1 : 0,
-                    past_publish_date: $data['past_publish_date'] ?? '',
-                    future_publish_date: $data['future_publish_date'] ?? ''
+                    is_sortable: $data['is_sortable'],
+                    past_publish_date_behavior: $data['past_publish_date_behavior'] ?? '',
+                    future_publish_date_behavior: $data['future_publish_date_behavior'] ?? ''
                 ))
         );
     }

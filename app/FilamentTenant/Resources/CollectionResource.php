@@ -90,7 +90,7 @@ class CollectionResource extends Resource
                             ->dehydrated(false),
                         Forms\Components\Grid::make(12)
                             ->schema([
-                                Forms\Components\Select::make('past_publish_date')
+                                Forms\Components\Select::make('past_publish_date_behavior')
                                     ->reactive()
                                     ->options(
                                         collect(PublishBehavior::cases())
@@ -98,23 +98,20 @@ class CollectionResource extends Resource
                                                 $behaviorType->name => Str::headline($behaviorType->value),
                                             ])
                                     )
-                                    ->default('public')
                                     ->searchable()
                                     ->columnSpan(6)
                                     ->required(),
-                                Forms\Components\Select::make('future_publish_date')
+                                Forms\Components\Select::make('future_publish_date_behavior')
                                     ->options(
                                         collect(PublishBehavior::cases())
                                             ->mapWithKeys(fn (PublishBehavior $behaviorType) => [
                                                 $behaviorType->name => Str::headline($behaviorType->value),
                                             ])
                                     )
-                                    ->default('public')
                                     ->searchable()
                                     ->columnSpan(6)
                                     ->required()
                         ])->when(fn (Closure $get) => $get('display_publish_dates')),
-
                     ]),
 
                     Forms\Components\Card::make([

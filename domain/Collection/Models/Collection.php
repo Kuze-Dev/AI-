@@ -100,6 +100,6 @@ class Collection extends Model implements IsActivitySubject
     /** Check if date behaviors has values. */
     public function hasPublishDates(): bool
     {
-        return $this->past_publish_date || $this->future_publish_date;
+        return $this->past_publish_date_behavior || $this->future_publish_date_behavior;
     }
 }
