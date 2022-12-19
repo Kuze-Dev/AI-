@@ -32,10 +32,6 @@ class EditForm extends EditRecord
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdateFormAction::class)
-            ->execute(
-                $record,
-                FormData::fromArray($data)
-            ));
+        return DB::transaction(fn () => app(UpdateFormAction::class)->execute($record, FormData::fromArray($data)));
     }
 }

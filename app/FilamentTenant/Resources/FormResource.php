@@ -76,7 +76,8 @@ class FormResource extends Resource
                                             $component->state(implode(',', $state ?? []));
                                         })
                                         ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
-                                            ? Str::of($state)->split('/\,/')
+                                            ? Str::of($state)
+                                                ->split('/\,/')
                                                 ->map(fn (string $rule) => trim($rule))
                                                 ->toArray()
                                             : ($state ?? [])),
@@ -88,7 +89,8 @@ class FormResource extends Resource
                                             $component->state(implode(',', $state ?? []));
                                         })
                                         ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
-                                            ? Str::of($state)->split('/\,/')
+                                            ? Str::of($state)
+                                                ->split('/\,/')
                                                 ->map(fn (string $rule) => trim($rule))
                                                 ->toArray()
                                             : ($state ?? [])),
@@ -100,7 +102,8 @@ class FormResource extends Resource
                                             $component->state(implode(',', $state ?? []));
                                         })
                                         ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
-                                            ? Str::of($state)->split('/\,/')
+                                            ? Str::of($state)
+                                                ->split('/\,/')
                                                 ->map(fn (string $rule) => trim($rule))
                                                 ->toArray()
                                             : ($state ?? [])),
@@ -114,7 +117,8 @@ class FormResource extends Resource
                                     $component->state(implode('|', $state ?? []));
                                 })
                                 ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
-                                    ? Str::of($state)->split('/\,/')
+                                    ? Str::of($state)
+                                        ->split('/\,/')
                                         ->map(fn (string $rule) => trim($rule))
                                         ->toArray()
                                     : ($state ?? [])),
