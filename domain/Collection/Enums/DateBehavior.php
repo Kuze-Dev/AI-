@@ -1,7 +1,8 @@
 <?php 
 
-namespace App\Domain\Collection\Enums;
+declare(strict_types=1);
 
+namespace App\Domain\Collection\Enums;
 
 enum DateBehavior: string 
 {
