@@ -8,11 +8,11 @@ class CollectionData
 {
     public function __construct(
         public readonly string $name,
-        public readonly int $blueprint_id,
+        public readonly ?int $blueprint_id = null,
         public readonly ?string $slug = null,
-        public readonly ?string $past_publish_date = null,
-        public readonly ?string $future_publish_date = null,
-        public readonly ?int $is_sortable,
+        public readonly ?string $past_publish_date_behavior = null,
+        public readonly ?string $future_publish_date_behavior = null,
+        public readonly ?bool $is_sortable,
     ) {
     }
 }

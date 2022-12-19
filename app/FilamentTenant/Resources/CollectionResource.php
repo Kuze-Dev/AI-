@@ -1,9 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types = 1);
 
 namespace App\FilamentTenant\Resources;
 
+use Domain\Collection\Enums\PublishBehavior;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
 use App\FilamentTenant\Resources\CollectionResource\RelationManagers\CollectionEntryRelationManager;
@@ -14,25 +15,37 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
+use Filament\Forms\FormsComponent;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class CollectionResource extends Resource
 {
     use ContextualResource;
 
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     protected static ?string $model = Collection::class;
 
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     protected static ?string $navigationGroup = 'CMS';
 
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     protected static ?string $recordTitleAttribute = 'name';
 
     /**
@@ -78,26 +91,29 @@ class CollectionResource extends Resource
                         Forms\Components\Grid::make(12)
                             ->schema([
                                 Forms\Components\Select::make('past_publish_date')
-                                    ->options([
-                                        'public' => 'Public',
-                                        'private' => 'Private',
-                                        'unlisted' => 'Unlisted',
-                                    ])
+                                    ->reactive()
+                                    ->options(
+                                        collect(PublishBehavior::cases())
+                                            ->mapWithKeys(fn (PublishBehavior $behaviorType) => [
+                                                $behaviorType->name => Str::headline($behaviorType->value),
+                                            ])
+                                    )
                                     ->default('public')
                                     ->searchable()
                                     ->columnSpan(6)
                                     ->required(),
                                 Forms\Components\Select::make('future_publish_date')
-                                    ->options([
-                                        'public' => 'Public',
-                                        'private' => 'Private',
-                                        'unlisted' => 'Unlisted',
-                                    ])
+                                    ->options(
+                                        collect(PublishBehavior::cases())
+                                            ->mapWithKeys(fn (PublishBehavior $behaviorType) => [
+                                                $behaviorType->name => Str::headline($behaviorType->value),
+                                            ])
+                                    )
                                     ->default('public')
                                     ->searchable()
                                     ->columnSpan(6)
-                                    ->required(),
-                            ])->when(fn (Closure $get) => $get('display_publish_dates')),
+                                    ->required()
+                        ])->when(fn (Closure $get) => $get('display_publish_dates')),
 
                     ]),
 
@@ -106,7 +122,7 @@ class CollectionResource extends Resource
                             ->label(trans('Allow ordering'))
                             ->helperText(trans('Grants option for ordering of collection entries'))
                             ->reactive(),
-                    ]),
+                    ])
                 ]),
             ]);
     }
@@ -114,43 +130,45 @@ class CollectionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('blueprint.name')
-                    ->sortable()
-                    ->searchable()
-                    ->url(fn (Collection $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable()
-                    ->toggleable()
-                    ->toggledHiddenByDefault(),
-            ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('blueprint')
-                    ->relationship('blueprint', 'name')
-                    ->searchable()
-                    ->optionsLimit(20),
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ])
-            ->defaultSort('updated_at', 'desc');
+        ->columns([
+            Tables\Columns\TextColumn::make('name')
+                ->sortable()
+                ->searchable(),
+            Tables\Columns\TextColumn::make('slug')
+                ->sortable()
+                ->searchable(),
+            Tables\Columns\TextColumn::make('blueprint.name')
+                ->sortable()
+                ->searchable()
+                ->url(fn (Collection $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
+            Tables\Columns\TextColumn::make('updated_at')
+                ->dateTime(timezone: Auth::user()?->timezone)
+                ->sortable(),
+            Tables\Columns\TextColumn::make('created_at')
+                ->dateTime(timezone: Auth::user()?->timezone)
+                ->sortable()
+                ->toggleable()
+                ->toggledHiddenByDefault(),
+        ])
+        ->filters([
+            Tables\Filters\SelectFilter::make('blueprint')
+                ->relationship('blueprint', 'name')
+                ->searchable()
+                ->optionsLimit(20),
+        ])
+        ->actions([
+            Tables\Actions\EditAction::make(),
+            Tables\Actions\DeleteAction::make(),
+        ])
+        ->bulkActions([
+            Tables\Actions\DeleteBulkAction::make(),
+        ])
+        ->defaultSort('updated_at', 'desc');
     }
 
-    /** @return array */
+    /**
+     * @return array
+     */
     public static function getRelations(): array
     {
         return [
@@ -161,7 +179,9 @@ class CollectionResource extends Resource
         ];
     }
 
-    /** @return array */
+    /**
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

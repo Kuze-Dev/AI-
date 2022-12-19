@@ -50,6 +50,8 @@ class CollectionEntry extends Model implements IsActivitySubject
     /**
      * Declare relationship of
      * current model to collections.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Collection\Models\Collection, \Domain\Collection\Models\CollectionEntry> 
      */
     public function collection(): BelongsTo
     {

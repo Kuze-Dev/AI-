@@ -28,8 +28,8 @@ class Collection extends Model implements IsActivitySubject
         'name',
         'blueprint_id',
         'slug',
-        'past_publish_date',
-        'future_publish_date',
+        'past_publish_date_behavior',
+        'future_publish_date_behavior',
         'is_sortable',
     ];
 
@@ -50,10 +50,12 @@ class Collection extends Model implements IsActivitySubject
             ->dontSubmitEmptyLogs();
     }
 
-    /**
-     * Declare relationship of
-     * current model to blueprint.
-     */
+     /** 
+      * Declare relationship of 
+      * current model to blueprint.
+      *
+      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Collection\Models\Collection> 
+      */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
@@ -62,6 +64,8 @@ class Collection extends Model implements IsActivitySubject
     /**
      * Declare relationship of
      * current model to collection entries.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Collection\Models\CollectionEntry> 
      */
     public function collectionEntries(): HasMany
     {

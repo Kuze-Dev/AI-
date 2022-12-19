@@ -24,7 +24,10 @@ class CreateCollection extends CreateRecord
         return DB::transaction(
             fn () => app(CreateCollectionAction::class)
                 ->execute(new CollectionData(
-                    ...$data,
+                    name: $data['name'],
+                    slug: $data['slug'],
+                    blueprint_id: $data['blueprint_id'],
+                    is_sortable: $data['is_sortable'],
                     past_publish_date: $data['past_publish_date'] ?? '',
                     future_publish_date: $data['future_publish_date'] ?? ''
                 ))

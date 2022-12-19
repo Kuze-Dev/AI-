@@ -16,8 +16,8 @@ return new class () extends Migration {
             $table->foreignIdFor(BlueprintModel::class)->constrained();
             $table->string('name')->unique();
             $table->string('slug')->unique();
-            $table->string('future_publish_date')->nullable();
-            $table->string('past_publish_date')->nullable();
+            $table->string('future_publish_date_behavior')->nullable();
+            $table->string('past_publish_date_behavior')->nullable();
             $table->boolean('is_sortable')->default(false);
             $table->timestamps();
         });
@@ -27,6 +27,7 @@ return new class () extends Migration {
             $table->foreignIdFor(CollectionModel::class)->constrained();
             $table->string('title')->unique();
             $table->string('slug')->unique();
+            // $table->dateTime('published_at')->nullable();
             $table->json('data');
             $table->bigInteger('order')->nullable();
             $table->timestamps();

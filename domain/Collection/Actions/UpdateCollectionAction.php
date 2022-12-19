@@ -23,10 +23,6 @@ class UpdateCollectionAction
             'is_sortable' => $collectionData->is_sortable,
         ]);
 
-        if ($collection->isDirty('blueprint_id')) {
-            $collection->data = null;
-        }
-
         $collection->save();
 
         return $collection;
