@@ -44,7 +44,7 @@ class ConfigurePage extends EditRecord
             fn () => app(UpdatePageAction::class)
                 ->execute($record, new PageData(
                     name: $data['name'],
-                    blueprint_id: (int) $data['blueprint_id'],
+                    blueprint_id: $data['blueprint_id'],
                 ))
         );
     }

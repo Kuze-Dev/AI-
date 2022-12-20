@@ -26,7 +26,7 @@ it('can render page', function () {
         ])
         ->createOne();
 
-    livewire(EditBlueprint::class, ['record' => $blueprint->getKey()])
+    livewire(EditBlueprint::class, ['record' => $blueprint->getRouteKey()])
         ->assertFormExists()
         ->assertSuccessful()
         ->assertFormSet([
@@ -37,7 +37,7 @@ it('can render page', function () {
 it('can edit blueprint', function () {
     $blueprint = BlueprintFactory::new()->withDummySchema()->createOne();
 
-    livewire(EditBlueprint::class, ['record' => $blueprint->getKey()])
+    livewire(EditBlueprint::class, ['record' => $blueprint->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
             'schema' => [

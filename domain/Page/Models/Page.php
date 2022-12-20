@@ -18,7 +18,7 @@ use Spatie\Sluggable\SlugOptions;
  * Domain\Page\Models\Page
  *
  * @property int $id
- * @property int $blueprint_id
+ * @property string $blueprint_id
  * @property string $name
  * @property array|null $data
  * @property string $slug

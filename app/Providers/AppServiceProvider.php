@@ -6,6 +6,9 @@ namespace App\Providers;
 
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Form\Models\Form;
+use Domain\Form\Models\FormEmailNotification;
+use Domain\Form\Models\FormSubmission;
 use Domain\Page\Models\Page;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
@@ -40,6 +43,9 @@ class AppServiceProvider extends ServiceProvider
             config('tenancy.tenant_model'),
             Blueprint::class,
             Page::class,
+            Form::class,
+            FormSubmission::class,
+            FormEmailNotification::class,
             Taxonomy::class,
             TaxonomyTerm::class,
         ]);
