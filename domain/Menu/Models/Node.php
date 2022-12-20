@@ -23,6 +23,10 @@ class Node extends Model implements Sortable
         'sort',
     ];
 
+    protected $with = [
+        'childs',
+    ];
+
     public array $sortable = [
         'order_column_name' => 'sort',
         'sort_when_creating' => true,
