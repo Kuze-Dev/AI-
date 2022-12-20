@@ -9,6 +9,7 @@ use App\FilamentTenant\Middleware\Authenticate;
 use Artificertech\FilamentMultiContext\ContextServiceProvider;
 use Artificertech\FilamentMultiContext\Http\Middleware\ApplyContext;
 use Filament\Facades\Filament;
+use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\UserMenuItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +21,21 @@ class FilamentTenantServiceProvider extends ContextServiceProvider
     public function packageBooted(): void
     {
         parent::packageBooted();
+
+        Filament::serving(function () {
+            if (Filament::currentContext() !== static::$name) {
+                return;
+            }
+
+            Filament::registerNavigationGroups([
+                NavigationGroup::make('CMS')
+                    ->icon('heroicon-s-document-text'),
+                NavigationGroup::make('Access')
+                    ->icon('heroicon-s-lock-closed'),
+                NavigationGroup::make('System')
+                    ->icon('heroicon-s-exclamation'),
+            ]);
+        });
 
         $this->registerRoutes();
     }
