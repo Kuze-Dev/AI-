@@ -6,7 +6,7 @@ namespace Domain\Form\Models\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
-class DelimiterCast implements CastsAttributes
+class DelimitedCast implements CastsAttributes
 {
     public function get($model, string $key, $value, array $attributes): ?array
     {

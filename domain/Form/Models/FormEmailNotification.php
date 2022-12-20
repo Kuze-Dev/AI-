@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Form\Models;
 
-use Domain\Form\Models\Casts\DelimiterCast;
+use Domain\Form\Models\Casts\DelimitedCast;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
@@ -44,10 +44,10 @@ class FormEmailNotification extends Model
     ];
 
     protected $casts = [
-        'to' => DelimiterCast::class,
-        'cc' => DelimiterCast::class,
-        'bcc' => DelimiterCast::class,
-        'reply_to' => DelimiterCast::class,
+        'to' => DelimitedCast::class,
+        'cc' => DelimitedCast::class,
+        'bcc' => DelimitedCast::class,
+        'reply_to' => DelimitedCast::class,
     ];
 
     public function getActivitylogOptions(): LogOptions

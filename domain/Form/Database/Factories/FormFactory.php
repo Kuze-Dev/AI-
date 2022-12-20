@@ -18,9 +18,8 @@ class FormFactory extends Factory
     public function definition(): array
     {
         return [
-            'blueprint_id' => null,
             'name' => $this->faker->name(),
-            'store_submission' => $this->faker->boolean(),
+            'store_submission' => false,
         ];
     }
 

@@ -17,7 +17,6 @@ class FormEmailNotificationFactory extends Factory
     public function definition(): array
     {
         return [
-            'form_id' => FormFactory::new(),
             'to' => $this->emails(),
             'cc' => $this->emails(),
             'bcc' => $this->emails(),
@@ -28,16 +27,11 @@ class FormEmailNotificationFactory extends Factory
         ];
     }
 
-    public function emails(?int $count = null): string
+    protected function emails(?int $count = null): array
     {
-        $count ??= $this->faker->randomDigitNotZero();
-
-        $emails = [];
-
-        foreach (range(1, $count) as $i) {
-            $emails[] = $this->faker->safeEmail();
-        }
-
-        return implode(',', $emails);
+        return array_map(
+            fn () => $this->faker->safeEmail(),
+            range(1, $count ?? random_int(1, 5))
+        );
     }
 }

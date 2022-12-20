@@ -63,7 +63,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
         View::flushFinderCache();
         View::replaceNamespace('mail', $this->htmlComponentPaths());
 
-        $compiledTemplate = Blade::compileEchos($this->getNormalizedTemplate());
+        $compiledTemplate = Blade::compileString($this->getNormalizedTemplate());
 
         $contents = Blade::render($compiledTemplate, $this->data);
 
@@ -78,7 +78,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
         View::flushFinderCache();
         View::replaceNamespace('mail', $this->textComponentPaths());
 
-        $compiledTemplate = Blade::compileEchos($this->getNormalizedTemplate());
+        $compiledTemplate = Blade::compileString($this->getNormalizedTemplate());
 
         $contents = Blade::render($compiledTemplate, $this->data);
 
