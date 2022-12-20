@@ -6,31 +6,28 @@ namespace Domain\Tenant\Actions;
 
 use Domain\Tenant\DataTransferObjects\TenantData;
 use Domain\Tenant\Models\Tenant;
+use Illuminate\Support\Arr;
 
 class UpdateTenantAction
 {
+    public function __construct(
+        protected SyncDomainAction $syncDomain,
+        protected DeleteDomainAction $deleteDomain,
+    ) {
+    }
+
     public function execute(Tenant $tenant, TenantData $tenantData): Tenant
     {
         $tenant->update(['name' => $tenantData->name]);
 
-        if ( ! empty($tenantData->domains)) {
-            $this->syncDomains($tenant, $tenantData);
+        foreach ($tenantData->domains as $domain) {
+            $this->syncDomain->execute($tenant, $domain);
+        }
+
+        foreach ($tenant->domains()->whereNotIn('id', Arr::pluck($tenantData->domains, 'id'))->get() as $domain) {
+            $this->deleteDomain->execute($domain);
         }
 
         return $tenant;
-    }
-
-    protected function syncDomains(Tenant $tenant, TenantData $tenantData): void
-    {
-        $currentDomains = $tenant->domains->pluck('domain');
-
-        $detached = $currentDomains->diff($tenantData->domains);
-        $attached = collect($tenantData->domains)->diff($currentDomains);
-
-        $tenant->domains->whereIn('domain', $detached)->each->delete();
-
-        foreach ($attached as $domain) {
-            $tenant->createDomain(['domain' => $domain]);
-        }
     }
 }
