@@ -17,10 +17,15 @@ it('can update tenant', function () {
         ->withDomains('test')
         ->createOne();
 
-    $tenant = app(UpdateTenantAction::class)->execute($tenant, new TenantData(
-        name: 'Test',
-        domains: ['test.com'],
-    ));
+    $tenant = app(UpdateTenantAction::class)->execute($tenant, TenantData::fromArray([
+        'name' => 'Test',
+        'domains' => [
+            [
+                'id' => $tenant->domains->first()->id,
+                'domain' => 'test.com',
+            ],
+        ],
+    ]));
 
     assertDatabaseHas(Tenant::class, ['name' => 'Test']);
     assertDatabaseHas(Domain::class, ['domain' => 'test.com']);

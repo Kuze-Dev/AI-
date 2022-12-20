@@ -21,7 +21,7 @@ it('can render page', function () {
         ->assertSuccessful()
         ->assertFormSet([
             'name' => $tenant->name,
-            'domains' => $tenant->domains->only('domain')->toArray(),
+            'domains' => $tenant->domains->toArray(),
         ]);
 });
 
@@ -31,9 +31,7 @@ it('can edit tenant', function () {
     livewire(EditTenant::class, ['record' => $tenant->getKey()])
         ->fillForm([
             'name' => 'Test',
-            'domains' => [
-                ['domain' => 'test.localhost'],
-            ],
+            'domains.0.domain' => 'test.localhost',
         ])
         ->call('save')
         ->assertHasNoFormErrors();

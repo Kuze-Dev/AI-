@@ -39,7 +39,9 @@ class TenantResource extends Resource
                 Forms\Components\Section::make(trans('Domains'))
                     ->schema([
                         Forms\Components\Repeater::make('domains')
-                            ->relationship('domains')
+                            ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Tenant $record, ?array $state) {
+                                $component->state($record?->domains->toArray() ?? $state);
+                            })
                             ->minItems(1)
                             ->schema([
                                 Forms\Components\TextInput::make('domain')
