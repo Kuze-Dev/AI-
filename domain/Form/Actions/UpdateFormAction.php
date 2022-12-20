@@ -6,11 +6,14 @@ namespace Domain\Form\Actions;
 
 use Domain\Form\DataTransferObjects\FormData;
 use Domain\Form\Models\Form;
+use Illuminate\Support\Arr;
 
 class UpdateFormAction
 {
     public function __construct(
-        protected SyncFormEmailNotificationAction $syncFormEmailNotification
+        protected AddFormEmailNotificationAction $addFormEmailNotification,
+        protected UpdateFormEmailNotificationAction $updateFormEmailNotification,
+        protected DeleteFormEmailNotificationAction $deleteFormEmailNotification
     ) {
     }
 
@@ -23,8 +26,18 @@ class UpdateFormAction
             'store_submission' => $formData->store_submission,
         ]);
 
-        foreach ($formData->form_email_notifications ?? [] as $formEmailNotification) {
-            $this->syncFormEmailNotification->execute($form, $formEmailNotification);
+        foreach ($form->formEmailNotifications()->whereNotIn('id', Arr::pluck($formData->form_email_notifications, 'id'))->get() as $formEmailNotification) {
+            $this->deleteFormEmailNotification->execute($formEmailNotification);
+        }
+
+        foreach ($formData->form_email_notifications as $formEmailNotificationData) {
+            if ($formEmailNotification = $form->formEmailNotifications->firstWhere('id', $formEmailNotificationData->id)) {
+                $this->updateFormEmailNotification->execute($formEmailNotification, $formEmailNotificationData);
+
+                continue;
+            }
+
+            $this->addFormEmailNotification->execute($form, $formEmailNotificationData);
         }
 
         return $form;

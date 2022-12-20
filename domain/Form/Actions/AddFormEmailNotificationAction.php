@@ -8,12 +8,11 @@ use Domain\Form\DataTransferObjects\FormEmailNotificationData;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 
-class SyncFormEmailNotificationAction
+class AddFormEmailNotificationAction
 {
     public function execute(Form $form, FormEmailNotificationData $formEmailNotificationData): FormEmailNotification
     {
-        return $form->formEmailNotifications()->updateOrCreate(
-            ['id' => $formEmailNotificationData->id],
+        return $form->formEmailNotifications()->create(
             [
                 'to' => $formEmailNotificationData->to,
                 'cc' => $formEmailNotificationData->cc,

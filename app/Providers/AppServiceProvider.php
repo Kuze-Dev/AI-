@@ -12,7 +12,6 @@ use Domain\Form\Models\FormSubmission;
 use Domain\Page\Models\Page;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
-use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -31,20 +30,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::shouldBeStrict( ! $this->app->isProduction());
-
-        Model::handleDiscardedAttributeViolationUsing(function (Model $model, array $keys) {
-            if (in_array($model->getKeyName(), $keys)) {
-                unset($keys[array_search($model->getKeyName(), $keys)]);
-            }
-
-            if ( ! empty($keys)) {
-                throw new MassAssignmentException(sprintf(
-                    'Add fillable property [%s] to allow mass assignment on [%s].',
-                    implode(', ', $keys),
-                    $model::class
-                ));
-            }
-        });
 
         Model::handleMissingAttributeViolationUsing(function (Model $model, string $key) {
             if ($model instanceof Tenant && Str::startsWith($key, Tenant::internalPrefix())) {
