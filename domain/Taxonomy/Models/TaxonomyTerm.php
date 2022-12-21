@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Domain\Taxonomy\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Collection\Models\CollectionEntry;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -46,6 +48,14 @@ class TaxonomyTerm extends Model implements IsActivitySubject, Sortable
     public function taxonomy(): BelongsTo
     {
         return $this->belongsTo(Taxonomy::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Collection\Models\CollectionEntry>
+     */
+    public function collectionEntries(): HasMany
+    {
+        return $this->hasMany(CollectionEntry::class);
     }
 
     public function getRouteKeyName(): string

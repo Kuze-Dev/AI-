@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Collection\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
@@ -27,6 +28,7 @@ class CollectionEntry extends Model implements IsActivitySubject
         'slug',
         'data',
         'collection_id',
+        'taxonomy_term_id',
         'order',
     ];
 
@@ -56,6 +58,17 @@ class CollectionEntry extends Model implements IsActivitySubject
     public function collection(): BelongsTo
     {
         return $this->belongsTo(Collection::class);
+    }
+
+    /**
+     * Declare relationship of 
+     * current model to taxonomy terms.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\TaxonomyTerm, \Domain\Collection\Models\CollectionEntry>
+     */
+    public function taxonomyTerm(): BelongsTo
+    {
+        return $this->belongsTo(TaxonomyTerm::class);
     }
 
     /** Specify activity log description. */

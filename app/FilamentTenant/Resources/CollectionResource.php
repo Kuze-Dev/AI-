@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
+use Domain\Taxonomy\Models\Taxonomy;
 use Filament\Forms\FormsComponent;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Illuminate\Support\Facades\Auth;
@@ -81,6 +82,19 @@ class CollectionResource extends Resource
                                 return trans('Modifying the blueprint will reset all the page\'s content.');
                             }
                         }),
+                    Forms\Components\Select::make('taxonomy_id')
+                        ->relationship('taxonomy', 'name')
+                        ->saveRelationshipsUsing(null)
+                        ->required()
+                        ->exists(Taxonomy::class, 'id')
+                        ->searchable()
+                        ->preload()
+                        ->reactive(),
+                        // ->helperText(function (?Taxonomy $record, ?string $state) {
+                        //     if ($record === null) {
+                        //         return;
+                        //     }
+                        // }),
 
                     Forms\Components\Card::make([
                         Forms\Components\Toggle::make('display_publish_dates')

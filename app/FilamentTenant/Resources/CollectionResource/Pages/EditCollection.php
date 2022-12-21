@@ -47,7 +47,8 @@ class EditCollection extends EditRecord
             fn () => app(UpdateCollectionAction::class)
                 ->execute($record, new CollectionData(
                     name: $data['name'],
-                    blueprint_id: $data['blueprint_id'],
+                    taxonomy_id: (int) $data['taxonomy_id'],
+                    blueprint_id: (int) $data['blueprint_id'],
                     slug: $data['slug'],
                     is_sortable: $data['is_sortable'],
                     past_publish_date_behavior: $data['past_publish_date_behavior'] ?? '',

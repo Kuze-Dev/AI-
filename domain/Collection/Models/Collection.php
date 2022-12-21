@@ -6,6 +6,7 @@ namespace Domain\Collection\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -27,6 +28,7 @@ class Collection extends Model implements IsActivitySubject
     protected $fillable = [
         'name',
         'blueprint_id',
+        'taxonomy_id',
         'slug',
         'past_publish_date_behavior',
         'future_publish_date_behavior',
@@ -73,11 +75,23 @@ class Collection extends Model implements IsActivitySubject
         return $this->hasMany(CollectionEntry::class);
     }
 
+    /**
+     * Declare relationship of 
+     * current model to taxonomy.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\Taxonomy, \Domain\Collection\Models\Collection> 
+     */
+    public function taxonomy(): BelongsTo
+    {
+        return $this->belongsTo(Taxonomy::class);
+    } 
+
     /** Specify activity log description. */
     public function getActivitySubjectDescription(Activity $activity): string
     {
         return 'Collection: '.$this->name;
     }
+
 
     /**
      * Set the column reference

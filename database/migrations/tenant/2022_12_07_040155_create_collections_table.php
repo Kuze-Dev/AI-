@@ -6,6 +6,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Domain\Blueprint\Models\Blueprint as BlueprintModel;
 use Domain\Collection\Models\Collection as CollectionModel;
+use Domain\Taxonomy\Models\Taxonomy as TaxonomyModel;
+use Domain\Taxonomy\Models\TaxonomyTerm as TaxonomyTermModel;
 
 return new class () extends Migration {
     /** Run the migrations. */
@@ -14,6 +16,7 @@ return new class () extends Migration {
         Schema::create('collections', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(BlueprintModel::class)->constrained();
+            $table->foreignIdFor(TaxonomyModel::class)->constrained();
             $table->string('name')->unique();
             $table->string('slug')->unique();
             $table->string('future_publish_date_behavior')->nullable();
@@ -25,6 +28,7 @@ return new class () extends Migration {
         Schema::create('collection_entries', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(CollectionModel::class)->constrained();
+            $table->foreignIdFor(TaxonomyTermModel::class)->constrained();
             $table->string('title')->unique();
             $table->string('slug')->unique();
             // $table->dateTime('published_at')->nullable();

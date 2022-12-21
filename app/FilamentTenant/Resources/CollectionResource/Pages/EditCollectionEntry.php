@@ -17,7 +17,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use Domain\Collection\Actions\UpdateCollectionEntryAction;
+use Filament\Forms\Components\Select;
 use Filament\Resources\RelationManagers\RelationGroup;
+use Illuminate\Support\Str;
 
 class EditCollectionEntry extends EditRecord
 {
@@ -77,6 +79,19 @@ class EditCollectionEntry extends EditRecord
                 TextInput::make('slug')
                     ->unique(ignoreRecord: true)
                     ->disabled(fn (CollectionEntry $record) => $record !== null),
+                Select::make('taxonomy_term_id')
+                    ->relationship('taxonomyTerm', 'name')
+                    ->options(
+                        collect($this->ownerRecord->taxonomy->taxonomyTerms)
+                            ->mapWithKeys(fn ($terms) => [
+                                $terms->id => Str::headline($terms->name)
+                            ])
+                    )
+                    ->saveRelationshipsUsing(null)
+                    ->required()
+                    ->searchable()
+                    ->preload()
+                    ->reactive()
             ]),
             SchemaFormBuilder::make('data', fn () => $this->ownerRecord->blueprint->schema),
         ];
@@ -109,10 +124,20 @@ class EditCollectionEntry extends EditRecord
      * for updating collection entries.
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
-    {
+    {  
         return DB::transaction(
             fn () => app(UpdateCollectionEntryAction::class)
-                ->execute($this->record, new CollectionEntryData(...$data))
+                ->execute($this->record, new CollectionEntryData(
+                    title: $data['title'],
+                    slug: $data['slug'],
+                    taxonomy_term_id: (int) $data['taxonomy_term_id'],
+                    data: $data['data']
+                ))
         );
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return static::getResource()::getUrl('edit', ['record' => $this->ownerRecord]);
     }
 }

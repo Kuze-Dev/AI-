@@ -18,6 +18,7 @@ class CreateCollectionEntryAction
                 'title' => $collectionEntryData->title,
                 'slug' => $collectionEntryData->slug,
                 'data' => $collectionEntryData->data,
+                'taxonomy_term_id' => $collectionEntryData->taxonomy_term_id,
             ]);
     }
 }

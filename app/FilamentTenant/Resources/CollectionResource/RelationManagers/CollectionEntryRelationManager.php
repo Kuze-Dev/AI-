@@ -38,6 +38,9 @@ class CollectionEntryRelationManager extends RelationManager
                     ->sortable()
                     ->toggleable()
                     ->toggledHiddenByDefault(),
+                Tables\Columns\TextColumn::make('taxonomyTerm.name')
+                    ->sortable()
+                    ->searchable(),
             ])
             ->filters([
 
@@ -56,7 +59,8 @@ class CollectionEntryRelationManager extends RelationManager
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])
+            ->defaultSort('order', 'desc');;
     }
 
     /**
@@ -76,6 +80,11 @@ class CollectionEntryRelationManager extends RelationManager
      */
     protected function canReorder(): bool
     {
-        return $this->ownerRecord->is_sortable == 1 ? true : false;
+        return $this->ownerRecord->is_sortable;
+    }
+
+    protected function getDefaultTableSortDirection(): ?string
+    {
+        return 'asc';
     }
 }

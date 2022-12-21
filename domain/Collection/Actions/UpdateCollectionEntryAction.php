@@ -18,6 +18,7 @@ class UpdateCollectionEntryAction
         $collectionEntry->update([
             'title' => $collectionEntryData->title,
             'slug' => $collectionEntryData->slug,
+            'taxonomy_term_id' => $collectionEntryData->taxonomy_term_id,
             'data' => $collectionEntryData->data,
         ]);
 
