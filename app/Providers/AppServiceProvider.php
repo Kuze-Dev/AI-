@@ -8,6 +8,9 @@ use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
+use Domain\Form\Models\Form;
+use Domain\Form\Models\FormEmailNotification;
+use Domain\Form\Models\FormSubmission;
 use Domain\Page\Models\Page;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
@@ -28,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Model::shouldBeStrict( ! $this->app->isProduction());
+        Model::shouldBeStrict(!$this->app->isProduction());
 
         Model::handleMissingAttributeViolationUsing(function (Model $model, string $key) {
             if ($model instanceof Tenant && Str::startsWith($key, Tenant::internalPrefix())) {
@@ -44,6 +47,9 @@ class AppServiceProvider extends ServiceProvider
             Page::class,
             Menu::class,
             Node::class,
+            Form::class,
+            FormSubmission::class,
+            FormEmailNotification::class,
             Taxonomy::class,
             TaxonomyTerm::class,
         ]);
@@ -52,13 +58,13 @@ class AppServiceProvider extends ServiceProvider
             fn () => $this->app->environment('local', 'testing')
                 ? Password::min(4)
                 : Password::min(8)
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols()
-                    ->when(
-                        $this->app->isProduction(),
-                        fn (Password $password) => $password->uncompromised()
-                    )
+                ->mixedCase()
+                ->numbers()
+                ->symbols()
+                ->when(
+                    $this->app->isProduction(),
+                    fn (Password $password) => $password->uncompromised()
+                )
         );
 
         JsonApiResource::resolveIdUsing(fn (Model $resource): string => $resource->getRouteKey());

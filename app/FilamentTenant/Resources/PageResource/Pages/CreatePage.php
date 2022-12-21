@@ -24,7 +24,7 @@ class CreatePage extends CreateRecord
                 ->execute(new PageData(
                     name: $data['name'],
                     slug: $data['slug'],
-                    blueprint_id: (int) $data['blueprint_id'],
+                    blueprint_id: $data['blueprint_id'],
                 ))
         );
     }

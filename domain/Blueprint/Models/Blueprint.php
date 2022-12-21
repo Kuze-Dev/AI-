@@ -6,6 +6,7 @@ namespace Domain\Blueprint\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Casts\SchemaDataCast;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
@@ -14,6 +15,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
 /**
  * Domain\Blueprint\Models\Blueprint
  *
+ * @property string $id
+ * @property string $name
  * @property \Domain\Blueprint\DataTransferObjects\SchemaData $schema
  * @method static \Illuminate\Database\Eloquent\Builder|Blueprint newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Blueprint newQuery()
@@ -22,6 +25,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  */
 class Blueprint extends Model implements IsActivitySubject
 {
+    use HasUuids;
     use LogsActivity;
 
     protected $fillable = [

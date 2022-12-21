@@ -9,11 +9,12 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Event;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Fixtures\User;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
 
 use function Pest\Laravel\seed;
 
@@ -24,6 +25,7 @@ uses(
 )
     ->beforeEach(function () {
         Http::preventStrayRequests();
+        Mail::fake();
 
         foreach (array_keys(config('filesystems.disks')) as $disk) {
             Storage::fake($disk);
@@ -53,6 +55,13 @@ uses(
     Illuminate\Foundation\Testing\LazilyRefreshDatabase::class,
 )
     ->beforeEach(function () {
+        Http::preventStrayRequests();
+        Mail::fake();
+
+        foreach (array_keys(config('filesystems.disks')) as $disk) {
+            Storage::fake($disk);
+        }
+
         DB::connection()->getSchemaBuilder()->create('test_users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
