@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @property-read string $name
+ * @property-read string $label
  * @property-read string $url
  * @property-read int $sort
  * @property-read string $target
@@ -19,7 +19,7 @@ class NodeResource extends JsonApiResource
     protected function toAttributes(Request $request): array
     {
         return  [
-            'name' => $this->name,
+            'label' => $this->label,
             'url' => $this->url,
             'target' => $this->target,
             'sort' => $this->sort,

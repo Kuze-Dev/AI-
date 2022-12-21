@@ -8,6 +8,7 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources\MenuResource\Pages;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
+use Domain\Menu\Enums\Target;
 use Domain\Menu\Models\Menu;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -23,9 +24,9 @@ class MenuResource extends Resource
 
     protected static ?string $model = Menu::class;
 
-    protected static ?string $navigationGroup = 'System';
+    protected static ?string $navigationGroup = 'CMS';
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-menu';
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -55,16 +56,17 @@ class MenuResource extends Resource
                             ->collapsible()
                             ->orderable()
                             ->schema([
-                                Forms\Components\TextInput::make('name')
+                                Forms\Components\TextInput::make('label')
                                     ->label('Label')
                                     ->required()
                                     ->maxLength(100),
                                 Forms\Components\Select::make('target')
-                                    ->options([
-                                        '_blank' => '_blank',
-                                        '_self' => '_self',
-                                        '_parent' => '_parent',
-                                    ]),
+                                    ->options(
+                                        collect(Target::cases())
+                                            ->mapWithKeys(fn (Target $target) => [
+                                                $target->value => Str::headline($target->value),
+                                            ])
+                                    ),
                                 Forms\Components\TextInput::make('url')
                                     ->url()
                                     ->placeholder('https://example.com')
@@ -73,18 +75,20 @@ class MenuResource extends Resource
                                     ->label('Sub Menus')
                                     ->relationship()
                                     ->collapsible()
+                                    ->defaultItems(0)
                                     ->orderable()
                                     ->schema([
-                                        Forms\Components\TextInput::make('name')
+                                        Forms\Components\TextInput::make('label')
                                             ->label('Label')
                                             ->required()
                                             ->maxLength(100),
                                         Forms\Components\Select::make('target')
-                                            ->options([
-                                                '_blank' => '_blank',
-                                                '_self' => '_self',
-                                                '_parent' => '_parent',
-                                            ]),
+                                            ->options(
+                                                collect(Target::cases())
+                                                    ->mapWithKeys(fn (Target $target) => [
+                                                        $target->value => Str::headline($target->value),
+                                                    ])
+                                            ),
                                         Forms\Components\TextInput::make('url')
                                             ->url()
                                             ->placeholder('https://example.com')
@@ -94,17 +98,19 @@ class MenuResource extends Resource
                                             ->relationship()
                                             ->collapsible()
                                             ->orderable()
+                                            ->defaultItems(0)
                                             ->schema([
-                                                Forms\Components\TextInput::make('name')
+                                                Forms\Components\TextInput::make('label')
                                                     ->label('Label')
                                                     ->required()
                                                     ->maxLength(100),
                                                 Forms\Components\Select::make('target')
-                                                    ->options([
-                                                        '_blank' => '_blank',
-                                                        '_self' => '_self',
-                                                        '_parent' => '_parent',
-                                                    ]),
+                                                    ->options(
+                                                        collect(Target::cases())
+                                                            ->mapWithKeys(fn (Target $target) => [
+                                                                $target->value => Str::headline($target->value),
+                                                            ])
+                                                    ),
                                                 Forms\Components\TextInput::make('url')
                                                     ->url()
                                                     ->placeholder('https://example.com')
@@ -129,13 +135,15 @@ class MenuResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('slug'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->sortable(),
             ])
-            ->filters([
-
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

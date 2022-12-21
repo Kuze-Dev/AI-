@@ -22,7 +22,7 @@ return new class () extends Migration {
         });
         Schema::create('nodes', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('label');
             $table->bigInteger('menu_id')->unsigned()->nullable();
             $table->bigInteger('parent_id')->unsigned()->nullable();
             $table->string('url')->nullable();

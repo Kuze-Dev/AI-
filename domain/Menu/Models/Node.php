@@ -15,7 +15,7 @@ class Node extends Model implements Sortable
     use SortableTrait;
 
     protected $fillable = [
-        'name',
+        'label',
         'menu_id',
         'parent_id',
         'url',

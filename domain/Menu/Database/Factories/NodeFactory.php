@@ -17,7 +17,7 @@ class NodeFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->word(),
+            'label' => fake()->word(),
             'target' => '_blank',
             'url' => fake()->url(),
         ];
