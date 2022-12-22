@@ -51,10 +51,10 @@ class MenuResource extends Resource
                         ->disabled(),
                     Forms\Components\Card::make([
                         Forms\Components\Repeater::make('nodes')
+                            ->afterStateHydrated(fn (Forms\Components\Repeater $component, ?Menu $record) => $component->state($record?->nodes->toArray() ?? []))
                             ->label('Menus')
-                            ->relationship()
-                            ->collapsible()
-                            ->orderable()
+                            ->nullable()
+                            ->orderable('sort')
                             ->schema([
                                 Forms\Components\TextInput::make('label')
                                     ->label('Label')
@@ -73,7 +73,6 @@ class MenuResource extends Resource
                                     ->columnSpanFull(),
                                 Forms\Components\Repeater::make('childs')
                                     ->label('Sub Menus')
-                                    ->relationship()
                                     ->collapsible()
                                     ->defaultItems(0)
                                     ->orderable()
@@ -95,7 +94,6 @@ class MenuResource extends Resource
                                             ->columnSpanFull(),
                                         Forms\Components\Repeater::make('childs')
                                             ->label('Sub Menus')
-                                            ->relationship()
                                             ->collapsible()
                                             ->orderable()
                                             ->defaultItems(0)

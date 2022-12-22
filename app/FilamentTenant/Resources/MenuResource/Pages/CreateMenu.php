@@ -15,14 +15,11 @@ class CreateMenu extends CreateRecord
 {
     protected static string $resource = MenuResource::class;
 
+    /**
+     * @throws Throwable
+     */
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(
-            fn () => app(CreateMenuAction::class)
-                ->execute(new MenuData(
-                    name: $data['name'],
-                    slug: $data['slug']
-                ))
-        );
+        return DB::transaction(fn () => app(CreateMenuAction::class)->execute(MenuData::fromArray($data)));
     }
 }

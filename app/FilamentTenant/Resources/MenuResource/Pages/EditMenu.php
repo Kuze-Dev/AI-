@@ -24,17 +24,13 @@ class EditMenu extends EditRecord
         ];
     }
 
-    /** @param Menu $record */
+    /**
+     * @param \Domain\Menu\Models\Menu $record
+     * @throws Throwable
+     */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdateMenuAction::class)
-            ->execute(
-                $record,
-                new MenuData(
-                    name: $data['name'],
-                    slug: $data['slug'],
-                )
-            ));
+        return DB::transaction(fn () => app(UpdateMenuAction::class)->execute($record, MenuData::fromArray(($data))));
     }
 
     protected function getRedirectUrl(): ?string
