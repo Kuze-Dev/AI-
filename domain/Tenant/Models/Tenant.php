@@ -11,8 +11,12 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
+use Stancl\Tenancy\Database\Models\Domain;
 use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 
+/**
+ * @property-read Domain[]|\Illuminate\Database\Eloquent\Collection $domains
+ */
 class Tenant extends BaseTenant implements TenantWithDatabase, IsActivitySubject
 {
     use HasDatabase;

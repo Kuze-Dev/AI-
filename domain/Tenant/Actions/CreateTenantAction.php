@@ -10,7 +10,7 @@ use Domain\Tenant\Models\Tenant;
 class CreateTenantAction
 {
     public function __construct(
-        protected SyncDomainAction $syncDomain,
+        protected CreateDomainAction $createDomain,
     ) {
     }
 
@@ -20,7 +20,7 @@ class CreateTenantAction
         $tenant = Tenant::create(['name' => $tenantData->name]);
 
         foreach ($tenantData->domains as $domain) {
-            $this->syncDomain->execute($tenant, $domain);
+            $this->createDomain->execute($tenant, $domain);
         }
 
         return $tenant;
