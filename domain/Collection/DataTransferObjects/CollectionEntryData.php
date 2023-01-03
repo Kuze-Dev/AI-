@@ -13,7 +13,7 @@ class CollectionEntryData
         public readonly ?string $slug,
         public readonly ?int $taxonomy_term_id = null,
         public readonly array $data,
-        // public readonly ?Carbon $published_at = null,
+        public readonly ?Carbon $published_at = null,
     ) {
     }
 }

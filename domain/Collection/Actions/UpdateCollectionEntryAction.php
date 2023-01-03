@@ -19,6 +19,7 @@ class UpdateCollectionEntryAction
             'title' => $collectionEntryData->title,
             'slug' => $collectionEntryData->slug,
             'taxonomy_term_id' => $collectionEntryData->taxonomy_term_id,
+            'published_at' => $collectionEntryData->published_at,
             'data' => $collectionEntryData->data,
         ]);
 

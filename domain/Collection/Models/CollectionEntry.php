@@ -30,6 +30,7 @@ class CollectionEntry extends Model implements IsActivitySubject
         'collection_id',
         'taxonomy_term_id',
         'order',
+        'published_at'
     ];
 
     /**
@@ -38,6 +39,7 @@ class CollectionEntry extends Model implements IsActivitySubject
      */
     protected $casts = [
         'data' => 'array',
+        'published_at' => 'date'
     ];
 
     /** @return LogOptions */

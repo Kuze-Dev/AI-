@@ -31,7 +31,7 @@ return new class () extends Migration {
             $table->foreignIdFor(TaxonomyTermModel::class)->constrained();
             $table->string('title')->unique();
             $table->string('slug')->unique();
-            // $table->dateTime('published_at')->nullable();
+            $table->dateTime('published_at')->nullable();
             $table->json('data');
             $table->bigInteger('order')->nullable();
             $table->timestamps();

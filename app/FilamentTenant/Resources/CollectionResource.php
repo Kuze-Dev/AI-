@@ -90,12 +90,6 @@ class CollectionResource extends Resource
                         ->searchable()
                         ->preload()
                         ->reactive(),
-                        // ->helperText(function (?Taxonomy $record, ?string $state) {
-                        //     if ($record === null) {
-                        //         return;
-                        //     }
-                        // }),
-
                     Forms\Components\Card::make([
                         Forms\Components\Toggle::make('display_publish_dates')
                             ->helperText(trans('Enable publish date visibility and behavior of collections'))
