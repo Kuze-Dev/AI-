@@ -24,6 +24,8 @@ abstract class BaseSettings extends SettingsPage
     public function mount(): void
     {
         abort_unless(self::authorizeAccess(), 403);
+
+        parent::mount();
     }
 
     public static function shouldShowSettingsCard(): bool
