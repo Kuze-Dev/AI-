@@ -28,7 +28,7 @@ class EditCollectionEntry extends EditRecord
 {
     protected static string $resource = CollectionResource::class;
 
-    public $ownerRecord;
+    public mixed $ownerRecord;
 
     /**
      * Override mount and
