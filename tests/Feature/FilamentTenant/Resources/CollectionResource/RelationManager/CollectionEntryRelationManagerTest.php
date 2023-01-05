@@ -7,6 +7,8 @@ use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Collection\Database\Factories\CollectionEntryFactory;
 use Domain\Collection\Database\Factories\CollectionFactory;
+use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
+use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Filament\Facades\Filament;
 
 use function Pest\Livewire\livewire;
@@ -18,7 +20,17 @@ beforeEach(function () {
 });
 
 it('can render component', function () {
+    $taxonomy = TaxonomyFactory::new()
+        ->createOne();
+
+    $taxonomyTerm = TaxonomyTermFactory::new()
+        ->for($taxonomy)
+        ->createOne();
+
     $collection = CollectionFactory::new()
+        ->for(
+            $taxonomy
+        )
         ->for(
             BlueprintFactory::new()
                 ->addSchemaSection(['title' => 'Main'])
@@ -37,6 +49,7 @@ it('can render component', function () {
 
     $collectionEntry = CollectionEntryFactory::new()
         ->for($collection)
+        ->for($taxonomyTerm)
         ->count(1)
         ->create($data);
 

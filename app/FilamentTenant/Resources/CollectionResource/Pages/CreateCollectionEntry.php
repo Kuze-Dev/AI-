@@ -28,7 +28,7 @@ class CreateCollectionEntry extends CreateRecord
 {
     protected static string $resource = CollectionResource::class;
 
-    public $ownerRecord;
+    public mixed $ownerRecord;
 
     public function mount(): void
     {

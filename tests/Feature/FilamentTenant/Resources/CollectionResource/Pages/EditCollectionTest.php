@@ -7,6 +7,7 @@ use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Collection\Database\Factories\CollectionFactory;
 use Domain\Collection\Models\Collection;
+use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -19,7 +20,11 @@ beforeEach(function () {
 });
 
 it('can render collection', function () {
+    $taxonomy = TaxonomyFactory::new()
+        ->createOne();
+
     $collection = CollectionFactory::new()
+        ->for($taxonomy)
         ->for(
             BlueprintFactory::new()
                 ->addSchemaSection(['title' => 'Main'])
@@ -43,7 +48,11 @@ it('can render collection', function () {
 });
 
 it('can edit collection', function () {
+    $taxonomy = TaxonomyFactory::new()
+        ->createOne();
+
     $collection = CollectionFactory::new()
+        ->for($taxonomy)
         ->for(
             BlueprintFactory::new()
                 ->addSchemaSection(['title' => 'Main'])
