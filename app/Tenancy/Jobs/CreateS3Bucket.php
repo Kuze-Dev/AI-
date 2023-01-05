@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Domain\Tenant\Jobs;
+namespace App\Tenancy\Jobs;
 
-use Aws\Credentials\Credentials;
-use Aws\S3\S3Client;
+use App\Tenancy\BucketManager;
 use Domain\Tenant\Models\Tenant;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -21,40 +20,31 @@ class CreateS3Bucket implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
+    protected BucketManager $bucketManager;
+
     public function __construct(
         protected Tenant $tenant
     ) {
+        $this->bucketManager = new BucketManager($tenant);
     }
 
     public function handle(): void
     {
+        if ( ! config('tenancy.filesystem.s3.enabled', false)) {
+            return;
+        }
+
         if ($this->tenant->getInternal('bucket') === null) {
             $this->tenant->setInternal('bucket', $this->generateBucketName());
 
             $this->tenant->save();
         }
 
-        $this->createBucket();
+        $this->bucketManager->createBucket();
     }
 
     protected function generateBucketName(): string
     {
         return Str::of(config('app.name'))->lower()->kebab() . '-' . Str::of($this->tenant->name)->lower()->kebab();
-    }
-
-    protected function createBucket(): void
-    {
-        $client = new S3Client([
-            "credentials" => new Credentials(
-                config('filesystems.disks.s3.key'),
-                config('filesystems.disks.s3.secret'),
-            ),
-            "endpoint" => config('filesystems.disks.s3.endpoint'),
-            "region" => config('filesystems.disks.s3.region'),
-            "version" => 'latest',
-            "use_path_style_endpoint" => config('filesystems.disks.s3.use_path_style_endpoint'),
-        ]);
-
-        $client->createBucket(['Bucket' => $this->tenant->getInternal('bucket')]);
     }
 }

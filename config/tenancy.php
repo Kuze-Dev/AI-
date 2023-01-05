@@ -34,7 +34,7 @@ return [
         Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper::class,
         // Stancl\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class, // Note: phpredis is needed
-        \Domain\Tenant\Bootstrappers\BucketBootstrapper::class,
+        App\Tenancy\Bootstrappers\BucketBootstrapper::class,
     ],
 
     /**
@@ -128,7 +128,7 @@ return [
          * edge cases, it can cause issues (like using Passport with Vapor - see #196), so
          * you may want to disable this if you are experiencing these edge case issues.
          */
-        'suffix_storage_path' => env('TENANCY_SUFFIX_STORAGE_PATH', true),
+        'suffix_storage_path' => env('TENANCY_FILESYSTEM_SUFFIX_STORAGE_PATH', true),
 
         /**
          * By default, asset() calls are made multi-tenant too. You can use global_asset() and mix()
@@ -137,7 +137,11 @@ return [
          * disable asset() helper tenancy and explicitly use tenant_asset() calls in places
          * where you want to use tenant-specific assets (product images, avatars, etc).
          */
-        'asset_helper_tenancy' => true,
+        'asset_helper_tenancy' => env('TENANCY_FILESYSTEM_ASSET_HELPER', true),
+
+        's3' => [
+            'enabled' => env('TENANCY_FILESYSTEM_S3_ENABLED', false),
+        ]
     ],
 
     /**

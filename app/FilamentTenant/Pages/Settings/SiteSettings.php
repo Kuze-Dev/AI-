@@ -40,7 +40,7 @@ class SiteSettings extends BaseSiteSettings
                         return 'logo.'.$file->extension();
                     })
                     ->tap(function (FileUpload $fileUpload) {
-                        if (config('filament.default_filesystem_disk') !== 's3'){
+                        if (config('filament.default_filesystem_disk') !== 's3') {
                             $fileUpload->getUploadedFileUrlUsing(fn (string $file) => tenant_asset($file));
                         }
                     }),
@@ -54,7 +54,7 @@ class SiteSettings extends BaseSiteSettings
                         return 'favicon.'.$file->extension();
                     })
                     ->tap(function (FileUpload $fileUpload) {
-                        if (config('filament.default_filesystem_disk') !== 's3'){
+                        if (config('filament.default_filesystem_disk') !== 's3') {
                             $fileUpload->getUploadedFileUrlUsing(fn (string $file) => tenant_asset($file));
                         }
                     }),
