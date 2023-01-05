@@ -7,11 +7,9 @@ namespace App\FilamentTenant\Resources\CollectionResource\Pages;
 use App\FilamentTenant\Resources\CollectionResource;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Carbon\Carbon;
-use Closure;
 use Domain\Collection\Actions\CreateCollectionEntryAction;
 use Domain\Collection\DataTransferObjects\CollectionEntryData;
 use Domain\Collection\Models\CollectionEntry;
-use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
@@ -24,6 +22,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
+use Domain\Collection\Models\Collection;
 
 class CreateCollectionEntry extends CreateRecord
 {
@@ -81,18 +80,18 @@ class CreateCollectionEntry extends CreateRecord
                     ->timezone(Auth::user()?->timezone)
                     ->when(fn (self $livewire) => $livewire->ownerRecord->hasPublishDates()),
                 Select::make('taxonomy_term_id')
-                        ->relationship('taxonomyTerm', 'name')
-                        ->options(
-                            collect($this->ownerRecord->taxonomy->taxonomyTerms)
-                                ->mapWithKeys(fn ($terms) => [
-                                    $terms->id => Str::headline($terms->name)
-                                ])
-                        )
-                        ->saveRelationshipsUsing(null)
-                        ->required()
-                        ->searchable()
-                        ->preload()
-                        ->reactive()
+                    ->relationship('taxonomyTerm', 'name')
+                    ->options(
+                        collect($this->ownerRecord->taxonomy->taxonomyTerms)
+                            ->mapWithKeys(fn ($terms) => [
+                                $terms->id => Str::headline($terms->name),
+                            ])
+                    )
+                    ->saveRelationshipsUsing(null)
+                    ->required()
+                    ->searchable()
+                    ->preload()
+                    ->reactive(),
             ]),
             SchemaFormBuilder::make('data', fn () => $this->ownerRecord->blueprint->schema),
         ];

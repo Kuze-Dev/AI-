@@ -8,13 +8,12 @@ use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Collection\Models\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Collection\Models\Collection>
+ */
 class CollectionFactory extends Factory
 {
-    /**
-     * Specify reference model.
-     *
-     * @var string
-     */
+    /** Specify reference model. */
     protected $model = Collection::class;
 
     /** Define values of model instance. */
@@ -22,6 +21,7 @@ class CollectionFactory extends Factory
     {
         return [
             'blueprint_id' => null,
+            'taxonomy_id' => null,
             'name' => $this->faker->name(),
             'past_publish_date_behavior' => 'private',
             'future_publish_date_behavior' => 'public',

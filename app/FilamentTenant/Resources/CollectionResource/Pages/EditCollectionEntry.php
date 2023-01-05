@@ -91,14 +91,14 @@ class EditCollectionEntry extends EditRecord
                     ->options(
                         collect($this->ownerRecord->taxonomy->taxonomyTerms)
                             ->mapWithKeys(fn ($terms) => [
-                                $terms->id => Str::headline($terms->name)
+                                $terms->id => Str::headline($terms->name),
                             ])
                     )
                     ->saveRelationshipsUsing(null)
                     ->required()
                     ->searchable()
                     ->preload()
-                    ->reactive()
+                    ->reactive(),
             ]),
             SchemaFormBuilder::make('data', fn () => $this->ownerRecord->blueprint->schema),
         ];
@@ -131,7 +131,7 @@ class EditCollectionEntry extends EditRecord
      * for updating collection entries.
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
-    {  
+    {
         return DB::transaction(
             fn () => app(UpdateCollectionEntryAction::class)
                 ->execute($this->record, new CollectionEntryData(

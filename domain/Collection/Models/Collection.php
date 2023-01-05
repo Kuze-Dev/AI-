@@ -41,7 +41,7 @@ class Collection extends Model implements IsActivitySubject
      */
     protected $casts = [
         'data' => 'array',
-        'is_sortable' => 'boolean'
+        'is_sortable' => 'boolean',
     ];
 
     /** @return LogOptions */
@@ -53,11 +53,11 @@ class Collection extends Model implements IsActivitySubject
             ->dontSubmitEmptyLogs();
     }
 
-     /** 
-      * Declare relationship of 
+     /**
+      * Declare relationship of
       * current model to blueprint.
       *
-      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Collection\Models\Collection> 
+      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Collection\Models\Collection>
       */
     public function blueprint(): BelongsTo
     {
@@ -67,8 +67,8 @@ class Collection extends Model implements IsActivitySubject
     /**
      * Declare relationship of
      * current model to collection entries.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Collection\Models\CollectionEntry> 
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Collection\Models\CollectionEntry>
      */
     public function collectionEntries(): HasMany
     {
@@ -76,22 +76,21 @@ class Collection extends Model implements IsActivitySubject
     }
 
     /**
-     * Declare relationship of 
+     * Declare relationship of
      * current model to taxonomy.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\Taxonomy, \Domain\Collection\Models\Collection> 
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\Taxonomy, \Domain\Collection\Models\Collection>
      */
     public function taxonomy(): BelongsTo
     {
         return $this->belongsTo(Taxonomy::class);
-    } 
+    }
 
     /** Specify activity log description. */
     public function getActivitySubjectDescription(Activity $activity): string
     {
         return 'Collection: '.$this->name;
     }
-
 
     /**
      * Set the column reference

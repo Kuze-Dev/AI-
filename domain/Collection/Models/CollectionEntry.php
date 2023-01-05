@@ -30,7 +30,7 @@ class CollectionEntry extends Model implements IsActivitySubject
         'collection_id',
         'taxonomy_term_id',
         'order',
-        'published_at'
+        'published_at',
     ];
 
     /**
@@ -39,7 +39,7 @@ class CollectionEntry extends Model implements IsActivitySubject
      */
     protected $casts = [
         'data' => 'array',
-        'published_at' => 'date'
+        'published_at' => 'date',
     ];
 
     /** @return LogOptions */
@@ -54,8 +54,8 @@ class CollectionEntry extends Model implements IsActivitySubject
     /**
      * Declare relationship of
      * current model to collections.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Collection\Models\Collection, \Domain\Collection\Models\CollectionEntry> 
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Collection\Models\Collection, \Domain\Collection\Models\CollectionEntry>
      */
     public function collection(): BelongsTo
     {
@@ -63,9 +63,9 @@ class CollectionEntry extends Model implements IsActivitySubject
     }
 
     /**
-     * Declare relationship of 
+     * Declare relationship of
      * current model to taxonomy terms.
-     * 
+     *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\TaxonomyTerm, \Domain\Collection\Models\CollectionEntry>
      */
     public function taxonomyTerm(): BelongsTo

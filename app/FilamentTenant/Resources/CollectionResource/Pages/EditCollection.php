@@ -11,6 +11,7 @@ use Filament\Resources\Pages\EditRecord;
 use Filament\Pages\Actions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Domain\Collection\Models\Collection;
 
 class EditCollection extends EditRecord
 {
@@ -40,6 +41,7 @@ class EditCollection extends EditRecord
     /**
      * Execute database transaction
      * for updating collections.
+     * @param Collection $record
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {

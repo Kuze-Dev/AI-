@@ -60,7 +60,7 @@ class CollectionEntryRelationManager extends RelationManager
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ])
-            ->defaultSort('order', 'desc');;
+            ->defaultSort('order', 'desc');
     }
 
     /**
