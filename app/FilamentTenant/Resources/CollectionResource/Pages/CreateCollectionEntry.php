@@ -37,7 +37,7 @@ class CreateCollectionEntry extends CreateRecord
         $this->ownerRecord = static::getResource()::resolveRecordRouteBinding($key);
 
         if ($this->ownerRecord === null) {
-            throw (new ModelNotFoundException())->setModel($this->getModel(), [$key]);
+            throw (new ModelNotFoundException())->setModel(CollectionEntry::class, [""]);
         }
 
         parent::mount();

@@ -44,7 +44,7 @@ class EditCollectionEntry extends EditRecord
         $this->record = app(CollectionEntry::class)->resolveRouteBinding($record);
 
         if ($this->ownerRecord === null) {
-            throw (new ModelNotFoundException())->setModel($this->getModel(), [$this->ownerRecord]);
+            throw (new ModelNotFoundException())->setModel(CollectionEntry::class, [""]);
         }
 
         $this->authorizeAccess();
