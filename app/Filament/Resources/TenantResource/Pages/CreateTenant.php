@@ -19,6 +19,6 @@ class CreateTenant extends CreateRecord
     /** @throws Throwable */
     public function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(fn () => app(CreateTenantAction::class)->execute(new TenantData(...$data)));
+        return DB::transaction(fn () => app(CreateTenantAction::class)->execute(TenantData::fromArray($data)));
     }
 }

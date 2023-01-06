@@ -31,6 +31,6 @@ class EditTenant extends EditRecord
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdateTenantAction::class)->execute($record, new TenantData(...$data)));
+        return DB::transaction(fn () => app(UpdateTenantAction::class)->execute($record, TenantData::fromArray($data)));
     }
 }

@@ -8,7 +8,7 @@ class PageData
 {
     public function __construct(
         public readonly string $name,
-        public readonly int $blueprint_id,
+        public readonly string $blueprint_id,
         public readonly ?string $slug = null,
     ) {
     }

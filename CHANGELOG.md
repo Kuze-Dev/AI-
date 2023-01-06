@@ -1,10 +1,16 @@
 # Release Notes
 
-## [Unreleased](https://bitbucket.org/halcyonlaravel/saas-boilerplate/branches/compare/master%0Dv0.1.4)
+## [Unreleased](https://bitbucket.org/halcyonlaravel/saas-boilerplate/branches/compare/master%0Dv0.1.5)
+
+## [Unreleased](https://bitbucket.org/halcyonlaravel/saas-boilerplate/branches/compare/v0.1.5%0Dv0.1.4)
 
 ### Changed
 
-- Simple calling filament route on page.
+- Sync with [tall-boilerplate v0.1.5](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.1.5%0Dv0.1.4)
+
+### Fixed
+
+- Properly redirect auth middlewares in FilamentTenant.
 
 ## [v0.1.4](https://bitbucket.org/halcyonlaravel/saas-boilerplate/branches/compare/v0.1.4%0Dv0.1.3)
 

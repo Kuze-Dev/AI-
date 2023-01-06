@@ -32,4 +32,17 @@ class SchemaData implements Arrayable
     {
         return (array) $this;
     }
+
+    public function getValidationRules(): array
+    {
+        $rules = [];
+
+        foreach ($this->sections as $section) {
+            foreach ($section->fields as $field) {
+                $rules[$section->state_name.'.'.$field->state_name] = $field->rules;
+            }
+        }
+
+        return $rules;
+    }
 }

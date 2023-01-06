@@ -28,11 +28,13 @@ class FilamentServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Filament::serving(function () {
-            Filament::registerNavigationGroups([
+            if (Filament::currentContext() !== 'filament') {
+                return;
+            }
 
+            Filament::registerNavigationGroups([
                 NavigationGroup::make('Access')
                     ->icon('heroicon-s-lock-closed'),
-
                 NavigationGroup::make('System')
                     ->icon('heroicon-s-exclamation'),
             ]);

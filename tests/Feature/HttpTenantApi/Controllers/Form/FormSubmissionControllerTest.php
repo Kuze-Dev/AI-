@@ -1,0 +1,30 @@
+<?php
+
+declare(strict_types=1);
+
+use Domain\Form\Database\Factories\FormFactory;
+
+use Domain\Form\Models\FormSubmission;
+
+use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\postJson;
+
+beforeEach(fn () => testInTenantContext());
+
+it('can submit form', function () {
+    $form = FormFactory::new()
+        ->withDummyBlueprint()
+        ->storeSubmission()
+        ->createOne();
+
+    $this->assertDatabaseEmpty(FormSubmission::class);
+
+    postJson(
+        'api/forms/'.$form->getRouteKey().'/submissions',
+        [fake()->word() => fake()->sentence(3)]
+    )
+        ->assertCreated()
+        ->assertValid();
+
+    assertDatabaseCount(FormSubmission::class, 1);
+});

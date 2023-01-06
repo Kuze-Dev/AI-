@@ -8,6 +8,7 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\Filament\Resources\AdminResource\Pages;
 use Domain\Admin\Models\Admin;
 use Domain\Auth\Actions\ForgotPasswordAction;
+use Domain\Role\Models\Role;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
+use Spatie\Permission\Models\Permission;
 
 class AdminResource extends Resource
 {
@@ -76,17 +78,25 @@ class AdminResource extends Resource
                     Forms\Components\Section::make(trans('Access'))
                         ->schema([
                             Forms\Components\Select::make('roles')
-                                ->relationship('roles', 'name')
-                                ->saveRelationshipsUsing(null)
-                                ->dehydrated(true)
                                 ->multiple()
-                                ->preload(),
+                                ->options(
+                                    fn () => Role::orderBy('name')
+                                        ->pluck('name', 'id')
+                                        ->toArray()
+                                )
+                                ->afterStateHydrated(function (Forms\Components\Select $component, ?Admin $record): void {
+                                    $component->state($record ? $record->roles->pluck('id')->toArray() : []);
+                                }),
                             Forms\Components\Select::make('permissions')
-                                ->relationship('permissions', 'name')
-                                ->saveRelationshipsUsing(null)
-                                ->dehydrated(true)
                                 ->multiple()
-                                ->preload(),
+                                ->options(
+                                    fn () => Permission::orderBy('name')
+                                        ->pluck('name', 'id')
+                                        ->toArray()
+                                )
+                                ->afterStateHydrated(function (Forms\Components\Select $component, ?Admin $record): void {
+                                    $component->state($record ? $record->permissions->pluck('id')->toArray() : []);
+                                }),
                         ]),
                 ])
                     ->columnSpan(['lg' => 1]),
