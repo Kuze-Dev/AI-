@@ -29,7 +29,7 @@ class DeleteS3Bucket implements ShouldQueue
 
     public function handle(): void
     {
-        if ( ! config('tenancy.filesystem.s3.enabled', false)) {
+        if (app()->runningUnitTests()) {
             return;
         }
 

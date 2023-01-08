@@ -30,14 +30,14 @@ class CreateS3Bucket implements ShouldQueue
 
     public function handle(): void
     {
-        if ( ! config('tenancy.filesystem.s3.enabled', false)) {
-            return;
-        }
-
         if ($this->tenant->getInternal('bucket') === null) {
             $this->tenant->setInternal('bucket', $this->generateBucketName());
 
             $this->tenant->save();
+        }
+
+        if (app()->runningUnitTests()) {
+            return;
         }
 
         $this->bucketManager->createBucket();

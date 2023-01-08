@@ -120,10 +120,6 @@ class SchemaFormBuilder extends Component
     {
         $fileUpload = FileUpload::make($fileFieldData->state_name);
 
-        if (config('filament.default_filesystem_disk') !== 's3') {
-            $fileUpload->getUploadedFileUrlUsing(fn (string $file) => tenant_asset($file));
-        }
-
         if ($fileFieldData->multiple) {
             $fileUpload->multiple($fileFieldData->multiple)
                 ->minFiles($fileFieldData->min_files)
