@@ -78,6 +78,7 @@ class CreateCollectionEntry extends CreateRecord
                     ->when(fn (self $livewire) => $livewire->ownerRecord->hasPublishDates()),
                 Select::make('taxonomy_term_id')
                     ->relationship('taxonomyTerm', 'name')
+                    ->multiple()
                     ->options(
                         collect($this->ownerRecord->taxonomy->taxonomyTerms)
                             ->mapWithKeys(fn ($terms) => [
@@ -101,7 +102,7 @@ class CreateCollectionEntry extends CreateRecord
                     title: $data['title'],
                     slug: $data['slug'],
                     published_at: Carbon::parse($data['published_at']),
-                    taxonomy_term_id: (int) $data['taxonomy_term_id'],
+                    taxonomy_term_id: (int) $data['taxonomy_term_id'] ?? null,
                     data: $data['data']
                 ))
         );

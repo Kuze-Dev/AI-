@@ -15,6 +15,7 @@ use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Domain\Collection\Enums\PublishBehavior;
 
 /**
  * Domain\Collection\Models\Collection
@@ -47,6 +48,8 @@ class Collection extends Model implements IsActivitySubject
     protected $casts = [
         'data' => 'array',
         'is_sortable' => 'boolean',
+        'past_publish_date_behavior' => PublishBehavior::class,
+        'future_publish_date_behavior' => PublishBehavior::class,
     ];
 
     /** @return LogOptions */

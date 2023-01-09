@@ -28,7 +28,7 @@ return new class () extends Migration {
         Schema::create('collection_entries', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(CollectionModel::class)->constrained();
-            $table->foreignIdFor(TaxonomyTermModel::class)->constrained();
+            $table->foreignIdFor(TaxonomyTermModel::class)->nullable()->constrained();
             $table->string('title')->unique();
             $table->string('slug')->unique();
             $table->dateTime('published_at')->nullable();

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Collection\DataTransferObjects;
 
+use Domain\Collection\Enums\PublishBehavior;
+
 class CollectionData
 {
     public function __construct(
@@ -11,8 +13,8 @@ class CollectionData
         public readonly ?string $blueprint_id = null,
         public readonly ?int $taxonomy_id = null,
         public readonly ?string $slug = null,
-        public readonly ?string $past_publish_date_behavior = null,
-        public readonly ?string $future_publish_date_behavior = null,
+        public readonly ?PublishBehavior $past_publish_date_behavior = null,
+        public readonly ?PublishBehavior $future_publish_date_behavior = null,
         public readonly ?bool $is_sortable,
     ) {
     }

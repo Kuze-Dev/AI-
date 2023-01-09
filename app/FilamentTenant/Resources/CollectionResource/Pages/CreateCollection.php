@@ -10,6 +10,7 @@ use Domain\Collection\DataTransferObjects\CollectionData;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Domain\Collection\Enums\PublishBehavior;
 
 class CreateCollection extends CreateRecord
 {
@@ -29,8 +30,8 @@ class CreateCollection extends CreateRecord
                     taxonomy_id: (int) $data['taxonomy_id'],
                     blueprint_id: $data['blueprint_id'],
                     is_sortable: $data['is_sortable'],
-                    past_publish_date_behavior: $data['past_publish_date_behavior'] ?? '',
-                    future_publish_date_behavior: $data['future_publish_date_behavior'] ?? ''
+                    past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior']) ?? '',
+                    future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior']) ?? ''
                 ))
         );
     }
