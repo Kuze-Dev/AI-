@@ -49,17 +49,6 @@ class CollectionPolicy
      *
      * @return bool
      */
-    public function configure(User $user, Collection $collection): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
-
-    /**
-     * @param User $user
-     * @param Collection $collection
-     *
-     * @return bool
-     */
     public function update(User $user, Collection $collection): bool
     {
         return $this->checkWildcardPermissions($user);

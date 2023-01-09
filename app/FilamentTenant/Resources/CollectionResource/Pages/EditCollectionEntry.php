@@ -41,8 +41,6 @@ class EditCollectionEntry extends EditRecord
     public function mount($record): void
     {
         $this->ownerRecord = static::getResource()::resolveRecordRouteBinding(func_get_args()[1]);
-        // $this->ownerRecord = static::getResource()::resolveRecordRouteBinding(Request::route('ownerRecord'));
-        // $this->record = app(CollectionEntry::class)->resolveRouteBinding($record);
         $this->record = app(CollectionEntry::class)->resolveRouteBinding(func_get_args()[0]);
 
         if ($this->ownerRecord === null) {
