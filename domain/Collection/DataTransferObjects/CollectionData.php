@@ -8,7 +8,7 @@ class CollectionData
 {
     public function __construct(
         public readonly string $name,
-        public readonly ?int $blueprint_id = null,
+        public readonly ?string $blueprint_id = null,
         public readonly ?int $taxonomy_id = null,
         public readonly ?string $slug = null,
         public readonly ?string $past_publish_date_behavior = null,

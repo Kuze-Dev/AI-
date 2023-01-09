@@ -41,7 +41,7 @@ it('can delete collection', function () {
     $collection = CollectionFactory::new()
         ->for(
             TaxonomyFactory::new()
-            ->createOne()
+                ->createOne()
         )
         ->withDummyBlueprint()
         ->createOne();

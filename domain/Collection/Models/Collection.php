@@ -16,6 +16,11 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
+/**
+ * Domain\Collection\Models\Collection
+ *
+ * @property bool $is_sortable
+ */
 class Collection extends Model implements IsActivitySubject
 {
     use LogsActivity;

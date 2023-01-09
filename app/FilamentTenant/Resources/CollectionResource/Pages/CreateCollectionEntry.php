@@ -20,7 +20,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
 use Domain\Collection\Models\Collection;
 
@@ -32,12 +31,10 @@ class CreateCollectionEntry extends CreateRecord
 
     public function mount(): void
     {
-        $key = Request::route('ownerRecord');
-
-        $this->ownerRecord = static::getResource()::resolveRecordRouteBinding($key);
+        $this->ownerRecord = static::getResource()::resolveRecordRouteBinding(func_get_args()[0]);
 
         if ($this->ownerRecord === null) {
-            throw (new ModelNotFoundException())->setModel(CollectionEntry::class, [""]);
+            throw (new ModelNotFoundException())->setModel(Collection::class, ['']);
         }
 
         parent::mount();
@@ -88,7 +85,6 @@ class CreateCollectionEntry extends CreateRecord
                             ])
                     )
                     ->saveRelationshipsUsing(null)
-                    ->required()
                     ->searchable()
                     ->preload()
                     ->reactive(),

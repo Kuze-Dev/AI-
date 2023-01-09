@@ -27,7 +27,7 @@ it('can create collection', function () {
     $blueprint = BlueprintFactory::new()
         ->withDummySchema()
         ->createOne();
-    
+
     $taxonomy = TaxonomyFactory::new()
         ->createOne();
 

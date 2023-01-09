@@ -27,7 +27,7 @@ class CreateCollection extends CreateRecord
                     name: $data['name'],
                     slug: $data['slug'],
                     taxonomy_id: (int) $data['taxonomy_id'],
-                    blueprint_id: (int) $data['blueprint_id'],
+                    blueprint_id: $data['blueprint_id'],
                     is_sortable: $data['is_sortable'],
                     past_publish_date_behavior: $data['past_publish_date_behavior'] ?? '',
                     future_publish_date_behavior: $data['future_publish_date_behavior'] ?? ''

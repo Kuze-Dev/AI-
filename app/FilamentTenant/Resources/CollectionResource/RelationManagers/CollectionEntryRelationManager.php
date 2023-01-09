@@ -9,7 +9,11 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
+use Domain\Collection\Models\Collection;
 
+/**
+ * @property Collection $ownerRecord
+ */
 class CollectionEntryRelationManager extends RelationManager
 {
     protected static string $relationship = 'collectionEntries';
@@ -46,7 +50,8 @@ class CollectionEntryRelationManager extends RelationManager
 
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make('Create collection entry')
+                Tables\Actions\CreateAction::make()
+                    ->label('Create collection entry')
                     ->url(fn (self $livewire) => route('filament-tenant.resources.collections.entry.create', $livewire->getOwnerRecord())),
             ])
             ->actions([
