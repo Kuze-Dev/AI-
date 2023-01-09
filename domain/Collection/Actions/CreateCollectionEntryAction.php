@@ -13,13 +13,19 @@ class CreateCollectionEntryAction
     /** Execute create collection entry query. */
     public function execute(Collection $collection, CollectionEntryData $collectionEntryData): CollectionEntry
     {
-        return $collection->collectionEntries()
+        $collectionEntry = $collection->collectionEntries()
             ->create([
                 'title' => $collectionEntryData->title,
                 'slug' => $collectionEntryData->slug,
                 'data' => $collectionEntryData->data,
                 'published_at' => $collectionEntryData->published_at,
-                'taxonomy_term_id' => $collectionEntryData->taxonomy_term_id,
             ]);
+
+        if (!empty($collectionEntryData->taxonomy_terms)) {
+            $collectionEntry->taxonomyTerms()
+                ->attach($collectionEntryData->taxonomy_terms);
+        }
+        
+        return $collectionEntry;
     }
 }

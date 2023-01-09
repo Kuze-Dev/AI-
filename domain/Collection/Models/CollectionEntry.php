@@ -8,6 +8,7 @@ use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -62,15 +63,25 @@ class CollectionEntry extends Model implements IsActivitySubject
         return $this->belongsTo(Collection::class);
     }
 
-    /**
-     * Declare relationship of
-     * current model to taxonomy terms.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\TaxonomyTerm, \Domain\Collection\Models\CollectionEntry>
-     */
-    public function taxonomyTerm(): BelongsTo
+    // /**
+    //  * Declare relationship of
+    //  * current model to taxonomy terms.
+    //  *
+    //  * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\TaxonomyTerm, \Domain\Collection\Models\CollectionEntry>
+    //  */
+    // public function taxonomyTerm(): BelongsTo
+    // {
+    //     return $this->belongsTo(TaxonomyTerm::class);
+    // }
+    
+    public function taxonomyTerms(): BelongsToMany
     {
-        return $this->belongsTo(TaxonomyTerm::class);
+        return $this->belongsToMany(
+            TaxonomyTerm::class,
+            'collection_entries_taxonomy_terms',
+            'collection_entries_id',
+            'taxonomy_terms_id'
+        );
     }
 
     /** Specify activity log description. */

@@ -50,10 +50,20 @@ class TaxonomyTerm extends Model implements IsActivitySubject, Sortable
         return $this->belongsTo(Taxonomy::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Collection\Models\CollectionEntry> */
-    public function collectionEntries(): HasMany
+    // /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Collection\Models\CollectionEntry> */
+    // public function collectionEntries(): HasMany
+    // {
+    //     return $this->hasMany(CollectionEntry::class);
+    // }
+
+    public function collectionEntries(): belongsToMany
     {
-        return $this->hasMany(CollectionEntry::class);
+        return $this->belongsToMany(
+            CollectionEntry::class,
+            'collection_entries_taxonomy_terms',
+            'taxonomy_terms_id',
+            'collection_entries_id',
+        );
     }
 
     public function getRouteKeyName(): string

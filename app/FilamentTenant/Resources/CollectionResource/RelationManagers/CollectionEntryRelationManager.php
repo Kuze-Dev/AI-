@@ -42,9 +42,9 @@ class CollectionEntryRelationManager extends RelationManager
                     ->sortable()
                     ->toggleable()
                     ->toggledHiddenByDefault(),
-                Tables\Columns\TextColumn::make('taxonomyTerm.name')
-                    ->sortable()
-                    ->searchable(),
+                // Tables\Columns\TextColumn::make('taxonomyTerm.name')
+                //     ->sortable()
+                //     ->searchable(),
             ])
             ->filters([
 

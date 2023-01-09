@@ -36,6 +36,21 @@ return new class () extends Migration {
             $table->bigInteger('order')->nullable();
             $table->timestamps();
         });
+
+        Schema::create('collection_entries_taxonomy_terms', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBiginteger('taxonomy_terms_id')->unsigned();
+            $table->unsignedBiginteger('collection_entries_id')->unsigned();
+
+            $table->foreign('taxonomy_terms_id')
+                ->references('id')
+                ->on('taxonomy_terms')
+                ->onDelete('cascade');
+            $table->foreign('collection_entries_id')
+                ->references('id')
+                ->on('collection_entries')
+                ->onDelete('cascade');
+        });
     }
 
     /** Reverse the migrations. */
@@ -43,5 +58,6 @@ return new class () extends Migration {
     {
         Schema::dropIfExists('collections');
         Schema::dropIfExists('collection_entries');
+        Schema::dropIfExists('collection_entries_taxonomy_terms');
     }
 };

@@ -76,8 +76,7 @@ class CreateCollectionEntry extends CreateRecord
                     ->minDate(Carbon::now()->startOfDay())
                     ->timezone(Auth::user()?->timezone)
                     ->when(fn (self $livewire) => $livewire->ownerRecord->hasPublishDates()),
-                Select::make('taxonomy_term_id')
-                    ->relationship('taxonomyTerm', 'name')
+                Select::make('taxonomy_terms')
                     ->multiple()
                     ->options(
                         collect($this->ownerRecord->taxonomy->taxonomyTerms)
@@ -102,7 +101,7 @@ class CreateCollectionEntry extends CreateRecord
                     title: $data['title'],
                     slug: $data['slug'],
                     published_at: Carbon::parse($data['published_at']),
-                    taxonomy_term_id: (int) $data['taxonomy_term_id'] ?? null,
+                    taxonomy_terms: $data['taxonomy_terms'] ?? null,
                     data: $data['data']
                 ))
         );
