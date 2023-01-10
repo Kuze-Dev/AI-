@@ -15,13 +15,16 @@ class UpdateCollectionEntryAction
      */
     public function execute(CollectionEntry $collectionEntry, CollectionEntryData $collectionEntryData): CollectionEntry
     {
+        dd($collectionEntryData);
+
         $collectionEntry->update([
             'title' => $collectionEntryData->title,
             'slug' => $collectionEntryData->slug,
-            'taxonomy_term_id' => $collectionEntryData->taxonomy_term_id,
             'published_at' => $collectionEntryData->published_at,
             'data' => $collectionEntryData->data,
         ]);
+
+        $collectionEntry->sync($collectionEntryData->taxonomy_terms);
 
         return $collectionEntry;
     }

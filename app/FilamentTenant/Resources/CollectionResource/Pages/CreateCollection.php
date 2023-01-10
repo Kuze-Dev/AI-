@@ -27,7 +27,7 @@ class CreateCollection extends CreateRecord
                 ->execute(new CollectionData(
                     name: $data['name'],
                     slug: $data['slug'],
-                    taxonomy_id: (int) $data['taxonomy_id'],
+                    taxonomies: $data['taxonomies'],
                     blueprint_id: $data['blueprint_id'],
                     is_sortable: $data['is_sortable'],
                     past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior']) ?? '',

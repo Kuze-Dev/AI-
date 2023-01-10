@@ -101,7 +101,7 @@ class CreateCollectionEntry extends CreateRecord
                     title: $data['title'],
                     slug: $data['slug'],
                     published_at: Carbon::parse($data['published_at']),
-                    taxonomy_terms: $data['taxonomy_terms'] ?? null,
+                    taxonomy_terms: $data['taxonomy_terms'] ?? [],
                     data: $data['data']
                 ))
         );

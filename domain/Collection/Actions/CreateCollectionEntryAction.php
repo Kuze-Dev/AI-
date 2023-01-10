@@ -25,7 +25,7 @@ class CreateCollectionEntryAction
             $collectionEntry->taxonomyTerms()
                 ->attach($collectionEntryData->taxonomy_terms);
         }
-        
+
         return $collectionEntry;
     }
 }

@@ -11,7 +11,7 @@ class CollectionData
     public function __construct(
         public readonly string $name,
         public readonly ?string $blueprint_id = null,
-        public readonly ?int $taxonomy_id = null,
+        public readonly ?array $taxonomies = [],
         public readonly ?string $slug = null,
         public readonly ?PublishBehavior $past_publish_date_behavior = null,
         public readonly ?PublishBehavior $future_publish_date_behavior = null,

@@ -16,7 +16,6 @@ return new class () extends Migration {
         Schema::create('collections', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(BlueprintModel::class)->constrained();
-            $table->foreignIdFor(TaxonomyModel::class)->constrained();
             $table->string('name')->unique();
             $table->string('slug')->unique();
             $table->string('future_publish_date_behavior')->nullable();
@@ -28,7 +27,6 @@ return new class () extends Migration {
         Schema::create('collection_entries', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(CollectionModel::class)->constrained();
-            $table->foreignIdFor(TaxonomyTermModel::class)->nullable()->constrained();
             $table->string('title')->unique();
             $table->string('slug')->unique();
             $table->dateTime('published_at')->nullable();
@@ -37,11 +35,24 @@ return new class () extends Migration {
             $table->timestamps();
         });
 
+        Schema::create('collection_taxonomies', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('collection_id')->unsigned();
+            $table->unsignedBigInteger('taxonomy_id')->unsigned();
+            $table->foreign('collection_id')
+                ->references('id')
+                ->on('collections')
+                ->onDelete('cascade');
+            $table->foreign('taxonomy_id')
+                ->references('id')
+                ->on('taxonomies')
+                ->onDelete('cascade');
+        });
+
         Schema::create('collection_entries_taxonomy_terms', function (Blueprint $table) {
             $table->id();
             $table->unsignedBiginteger('taxonomy_terms_id')->unsigned();
             $table->unsignedBiginteger('collection_entries_id')->unsigned();
-
             $table->foreign('taxonomy_terms_id')
                 ->references('id')
                 ->on('taxonomy_terms')

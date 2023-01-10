@@ -48,7 +48,7 @@ it('can create collection entry', function () {
         ->fillForm([
             'title' => 'Test',
             'slug' => 'test',
-            'taxonomy_term_id' => $taxonomyTerm->getKey(),
+            'taxonomy_terms' => [$taxonomyTerm->getKey()],
             'data' => ['main' => ['header' => 'Foo']],
         ])
         ->call('create')
@@ -60,8 +60,14 @@ it('can create collection entry', function () {
             'id' => $collection->id,
             'title' => 'Test',
             'slug' => 'test',
-            'taxonomy_term_id' => $taxonomyTerm->getKey(),
             'data' => json_encode(['main' => ['header' => 'Foo']]),
         ]
     );
-});
+
+    assertDatabaseHas(
+        'collection_entries_taxonomy_terms', [
+            'taxonomy_terms_id' => $taxonomyTerm->getKey(),
+            'collection_entries_id' => CollectionEntry::latest()->first()->getKey()
+        ]
+    );
+})->only();

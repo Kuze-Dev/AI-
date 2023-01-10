@@ -14,7 +14,7 @@ class CollectionEntryPolicy
 
     /**
      * @param User $user
-     * 
+     *
      * @return bool
      */
     public function viewAny(User $user): bool
@@ -25,7 +25,7 @@ class CollectionEntryPolicy
     /**
      * @param User $user
      * @param CollectionEntry $collectionEntry
-     * 
+     *
      * @return bool
      */
     public function view(User $user, CollectionEntry $collectionEntry): bool
@@ -35,7 +35,7 @@ class CollectionEntryPolicy
 
     /**
      * @param User $user
-     * 
+     *
      * @return bool
      */
     public function create(User $user): bool
@@ -46,7 +46,7 @@ class CollectionEntryPolicy
     /**
      * @param User $user
      * @param CollectionEntry $collectionEntry
-     * 
+     *
      * @return bool
      */
     public function update(User $user, CollectionEntry $collectionEntry): bool
@@ -57,7 +57,7 @@ class CollectionEntryPolicy
     /**
      * @param User $user
      * @param CollectionEntry $collectionEntry
-     * 
+     *
      * @return bool
      */
     public function delete(User $user, CollectionEntry $collectionEntry): bool
@@ -67,7 +67,7 @@ class CollectionEntryPolicy
 
     /**
      * @param User $user
-     * 
+     *
      * @return bool
      */
     public function deleteAny(User $user): bool

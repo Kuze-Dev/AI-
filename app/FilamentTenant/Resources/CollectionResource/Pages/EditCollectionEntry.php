@@ -14,7 +14,6 @@ use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Request;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use Carbon\Carbon;
 use Domain\Collection\Actions\UpdateCollectionEntryAction;
@@ -90,15 +89,15 @@ class EditCollectionEntry extends EditRecord
                     ->minDate(Carbon::now()->startOfDay())
                     ->timezone(Auth::user()?->timezone)
                     ->when(fn (self $livewire) => $livewire->ownerRecord->hasPublishDates()),
-                Select::make('taxonomy_term_id')
-                    ->relationship('taxonomyTerm', 'name')
+                Select::make('taxonomy_terms')
+                    ->multiple()
+                    ->relationship('taxonomyTerms', 'id')
                     ->options(
                         collect($this->ownerRecord->taxonomy->taxonomyTerms)
                             ->mapWithKeys(fn ($terms) => [
                                 $terms->id => Str::headline($terms->name),
                             ])
                     )
-                    ->saveRelationshipsUsing(null)
                     ->required()
                     ->searchable()
                     ->preload()
@@ -141,7 +140,7 @@ class EditCollectionEntry extends EditRecord
                 ->execute($this->record, new CollectionEntryData(
                     title: $data['title'],
                     slug: $data['slug'],
-                    taxonomy_term_id: (int) $data['taxonomy_term_id'],
+                    taxonomy_terms: $data['taxonomy_terms'] ?? [],
                     published_at: Carbon::parse($data['published_at']),
                     data: $data['data']
                 ))

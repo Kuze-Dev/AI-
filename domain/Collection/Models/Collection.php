@@ -16,6 +16,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Domain\Collection\Enums\PublishBehavior;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Domain\Collection\Models\Collection
@@ -83,15 +84,24 @@ class Collection extends Model implements IsActivitySubject
         return $this->hasMany(CollectionEntry::class);
     }
 
-    /**
-     * Declare relationship of
-     * current model to taxonomy.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\Taxonomy, \Domain\Collection\Models\Collection>
-     */
-    public function taxonomy(): BelongsTo
+    // /**
+    //  * Declare relationship of
+    //  * current model to taxonomy.
+    //  *
+    //  * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\Taxonomy, \Domain\Collection\Models\Collection>
+    //  */
+    // public function taxonomy(): BelongsTo
+    // {
+    //     return $this->belongsTo(Taxonomy::class);
+    // }
+    public function taxonomies(): BelongsToMany
     {
-        return $this->belongsTo(Taxonomy::class);
+        return $this->belongsToMany(
+            Taxonomy::class,
+            'collection_taxonomies',
+            'collection_id',
+            'taxonomy_id',
+        );
     }
 
     /** Specify activity log description. */

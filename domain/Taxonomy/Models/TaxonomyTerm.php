@@ -8,6 +8,7 @@ use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Collection\Models\CollectionEntry;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
@@ -56,7 +57,7 @@ class TaxonomyTerm extends Model implements IsActivitySubject, Sortable
     //     return $this->hasMany(CollectionEntry::class);
     // }
 
-    public function collectionEntries(): belongsToMany
+    public function collectionEntries(): BelongsToMany
     {
         return $this->belongsToMany(
             CollectionEntry::class,

@@ -71,14 +71,19 @@ class CollectionResource extends Resource
                                 return trans('Modifying the blueprint will reset all the page\'s content.');
                             }
                         }),
-                    Forms\Components\Select::make('taxonomy_id')
-                        ->relationship('taxonomy', 'name')
-                        ->saveRelationshipsUsing(null)
-                        ->required()
-                        ->exists(Taxonomy::class, 'id')
+                    Forms\Components\Select::make('taxonomies')
+                        ->multiple()
+                        ->options(
+                            fn () => Taxonomy::orderBy('name')
+                                ->pluck('name', 'id')
+                                ->toArray()
+                        )
                         ->searchable()
                         ->preload()
-                        ->reactive(),
+                        ->reactive()
+                        ->afterStateHydrated(function (Forms\Components\Select $component, ?Collection $record) {
+                            $component->state($record ? $record->taxonomies->pluck('id')->toArray() : []);
+                        }),
                     Forms\Components\Card::make([
                         Forms\Components\Toggle::make('display_publish_dates')
                             ->helperText(trans('Enable publish date visibility and behavior of collections'))

@@ -47,7 +47,6 @@ it('can edit collection entry', function () {
     $originalData = [
         'title' => 'Test',
         'slug' => 'test',
-        'taxonomy_term_id' => $taxonomyTerm->getKey(),
         'data' => json_encode(['main' => ['header' => 'Foo']]),
     ];
 
@@ -59,7 +58,6 @@ it('can edit collection entry', function () {
 
     $newData = [
         'title' => 'Test update',
-        'taxonomy_term_id' => $taxonomyTerm->getKey(),
         'data' => ['main' => ['header' => 'Foo updated']],
     ];
 
@@ -75,7 +73,6 @@ it('can edit collection entry', function () {
         CollectionEntry::class,
         [
             'title' => 'Test update',
-            'taxonomy_term_id' => $taxonomyTerm->getKey(),
             'data' => json_encode(['main' => ['header' => 'Foo updated']]),
         ]
     );
