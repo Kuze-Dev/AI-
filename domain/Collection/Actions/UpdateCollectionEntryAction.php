@@ -15,8 +15,6 @@ class UpdateCollectionEntryAction
      */
     public function execute(CollectionEntry $collectionEntry, CollectionEntryData $collectionEntryData): CollectionEntry
     {
-        dd($collectionEntryData);
-
         $collectionEntry->update([
             'title' => $collectionEntryData->title,
             'slug' => $collectionEntryData->slug,

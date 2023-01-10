@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Domain\Collection\Models\Collection;
+use Filament\Forms\Components\Grid;
 
 class CreateCollectionEntry extends CreateRecord
 {
@@ -64,31 +65,28 @@ class CreateCollectionEntry extends CreateRecord
     protected function getFormSchema(): array
     {
         return [
-            Card::make([
-                TextInput::make('title')
-                    ->unique(ignoreRecord: true)
-                    ->required(),
-                TextInput::make('slug')
-                    ->unique(ignoreRecord: true)
-                    ->disabled(fn (?CollectionEntry $record) => $record !== null),
-                DateTimePicker::make('published_at')
+            Grid::make(12)
+            ->schema([
+                Card::make([
+                    TextInput::make('title')
+                        ->unique(ignoreRecord: true)
+                        ->required(),
+                    TextInput::make('slug')
+                        ->unique(ignoreRecord: true)
+                        ->disabled(fn (?CollectionEntry $record) => $record !== null),
+                ])
+                ->columnSpan($this->getMainColumnOffset()),
+                Card::make([
+                    DateTimePicker::make('published_at')
                     ->default(Carbon::now())
                     ->minDate(Carbon::now()->startOfDay())
                     ->timezone(Auth::user()?->timezone)
                     ->when(fn (self $livewire) => $livewire->ownerRecord->hasPublishDates()),
-                Select::make('taxonomy_terms')
-                    ->multiple()
-                    ->options(
-                        collect($this->ownerRecord->taxonomy->taxonomyTerms)
-                            ->mapWithKeys(fn ($terms) => [
-                                $terms->id => Str::headline($terms->name),
-                            ])
-                    )
-                    ->saveRelationshipsUsing(null)
-                    ->searchable()
-                    ->preload()
-                    ->reactive(),
+                ])
+                ->columnSpan(4)
+                ->when(fn (self $livewire) => !empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates())
             ]),
+
             SchemaFormBuilder::make('data', fn () => $this->ownerRecord->blueprint->schema),
         ];
     }
@@ -110,5 +108,21 @@ class CreateCollectionEntry extends CreateRecord
     protected function getRedirectUrl(): string
     {
         return static::getResource()::getUrl('edit', ['record' => $this->ownerRecord]);
+    }
+
+    protected function generateTaxonomySelections() 
+    {
+        // dd(empty($this->ownerRecord->taxonomies->toArray()));
+        // if (!empty($this->ownerRecord->taxonomies->toArray())) {
+
+        // }
+    }
+    
+    protected function getMainColumnOffset(): int 
+    {
+        if (!empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()) {
+            return 8;
+        }
+        return 12;
     }
 }
