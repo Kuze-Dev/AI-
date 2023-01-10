@@ -29,9 +29,9 @@ class CreateCollectionEntry extends CreateRecord
 
     public mixed $ownerRecord;
 
-    public function mount(): void
+    public function mount(string $ownerRecord = ''): void
     {
-        $this->ownerRecord = static::getResource()::resolveRecordRouteBinding(func_get_args()[0]);
+        $this->ownerRecord = static::getResource()::resolveRecordRouteBinding($ownerRecord);
 
         if ($this->ownerRecord === null) {
             throw (new ModelNotFoundException())->setModel(Collection::class, ['']);

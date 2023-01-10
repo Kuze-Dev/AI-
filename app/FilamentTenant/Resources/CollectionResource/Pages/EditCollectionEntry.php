@@ -38,12 +38,16 @@ class EditCollectionEntry extends EditRecord
      *
      * @return void
      */
-    public function mount($record): void
+    public function mount($record, string $ownerRecord = ''): void
     {
-        $this->ownerRecord = static::getResource()::resolveRecordRouteBinding(func_get_args()[1]);
-        $this->record = app(CollectionEntry::class)->resolveRouteBinding(func_get_args()[0]);
+        $this->ownerRecord = static::getResource()::resolveRecordRouteBinding($ownerRecord);
+        $this->record = app(CollectionEntry::class)->resolveRouteBinding($record);
 
         if ($this->ownerRecord === null) {
+            throw (new ModelNotFoundException())->setModel(Collection::class, ['']);
+        }
+
+        if ($this->record === null) {
             throw (new ModelNotFoundException())->setModel(CollectionEntry::class, ['']);
         }
 
