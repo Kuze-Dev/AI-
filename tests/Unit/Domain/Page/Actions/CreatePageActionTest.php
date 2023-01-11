@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Page\Actions\CreatePageAction;
+use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
+use Domain\Page\Models\SliceContent;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -13,20 +14,28 @@ use function Pest\Laravel\assertDatabaseHas;
 beforeEach(fn () => testInTenantContext());
 
 it('can create page', function () {
-    $blueprintId = BlueprintFactory::new()
-        ->withDummySchema()
+    $sliceId = SliceFactory::new()
+        ->withDummyBlueprint()
         ->createOne()
         ->getKey();
 
-    app(CreatePageAction::class)
-        ->execute(new PageData(
-            name: 'Foo',
-            blueprint_id: $blueprintId,
-        ));
+    $page = app(CreatePageAction::class)
+        ->execute(PageData::fromArray([
+            'name' => 'Foo',
+            'slice_contents' => [
+                [
+                    'slice_id' => $sliceId,
+                    'data' => ['name' => 'foo'],
+                ],
+            ],
+        ]));
 
     assertDatabaseCount(Page::class, 1);
-    assertDatabaseHas(Page::class, [
-        'name' => 'Foo',
-        'blueprint_id' => $blueprintId,
+    assertDatabaseCount(SliceContent::class, 1);
+    assertDatabaseHas(Page::class, ['name' => 'Foo']);
+    assertDatabaseHas(SliceContent::class, [
+        'page_id' => $page->id,
+        'slice_id' => $sliceId,
+        'data' => json_encode(['name' => 'foo']),
     ]);
 });
