@@ -65,6 +65,6 @@ class AppServiceProvider extends ServiceProvider
                     )
         );
 
-        JsonApiResource::resolveIdUsing(fn (Model $resource): string => $resource->getRouteKey());
+        JsonApiResource::resolveIdUsing(fn (Model $resource): string => (string) $resource->getRouteKey());
     }
 }
