@@ -10,6 +10,7 @@ use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
 use Domain\Page\Models\Page;
+use Domain\Page\Models\Slice;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
@@ -43,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
             config('tenancy.tenant_model'),
             Blueprint::class,
             Page::class,
+            Slice::class,
             Form::class,
             FormSubmission::class,
             FormEmailNotification::class,

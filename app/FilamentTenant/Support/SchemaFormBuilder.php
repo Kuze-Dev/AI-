@@ -20,7 +20,6 @@ use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
 use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Concerns\EntanglesStateWithSingularRelationship;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\FileUpload;
@@ -36,22 +35,23 @@ use InvalidArgumentException;
 
 class SchemaFormBuilder extends Component
 {
-    use EntanglesStateWithSingularRelationship;
-
     protected string $view = 'forms::components.group';
 
-    final public function __construct(string $name, SchemaData|Closure $schema)
+    protected SchemaData|Closure|null $schemaData = null;
+
+    final public function __construct(string $name, SchemaData|Closure|null $schemaData)
     {
         $this->statePath($name);
-        $this->schema(fn () => $this->generateFormSchema($this->evaluate($schema)));
+        $this->schemaData($schemaData);
     }
 
-    public static function make(string $name, SchemaData|callable $schema): static
+    public static function make(string $name, SchemaData|Closure $schemaData = null): static
     {
         $static = app(static::class, [
             'name' => $name,
-            'schema' => $schema,
+            'schemaData' => $schemaData,
         ]);
+
         $static->configure();
 
         return $static;
@@ -62,11 +62,27 @@ class SchemaFormBuilder extends Component
         parent::setUp();
 
         $this->columnSpan('full');
+
+        $this->schema(fn () => $this->generateFormSchema());
     }
 
-    private function generateFormSchema(SchemaData $schema): array
+    public function schemaData(SchemaData|Closure $schemaData = null): self
     {
-        return array_map(fn (SectionData $section) => $this->generateSectionSchema($section), $schema->sections);
+        $this->schemaData = $schemaData;
+
+        return $this;
+    }
+
+    public function getSchemaData(): ?SchemaData
+    {
+        return $this->evaluate($this->schemaData);
+    }
+
+    private function generateFormSchema(): array
+    {
+        return ($schema = $this->getSchemaData())
+            ? array_map(fn (SectionData $section) => $this->generateSectionSchema($section), $schema->sections)
+            : [];
     }
 
     private function generateSectionSchema(SectionData $section): Section
