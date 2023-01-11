@@ -15,6 +15,7 @@ use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
 use Domain\Blueprint\Models\Blueprint;
 use Filament\Forms;
+use Filament\Forms\Components\Component;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -118,7 +119,13 @@ class BlueprintResource extends Resource
                                                     $section->fields,
                                                     fn (FieldData $field) => $field->state_name === $get('state_name'),
                                                 )
-                                            ))),
+                                            )))
+                                            ->afterStateUpdated(
+                                                fn (Forms\Components\Select $component) => $component->getContainer()
+                                                    ->getComponent(fn (Component $component) => $component->getId() === 'field-options')
+                                                    ?->getChildComponentContainer()
+                                                    ->fill()
+                                            ),
                                         Forms\Components\TextInput::make('rules')
                                             ->columnSpan(['sm' => 3])
                                             ->afterStateHydrated(function (Closure $set, ?array $state): void {
@@ -139,6 +146,7 @@ class BlueprintResource extends Resource
                                                     Rules should be separated with "|". Available rules can be found on  <a href="https://laravel.com/docs/validation" class="text-primary-500" target="_blank" rel="noopener noreferrer">Laravel's Documentation</a>.
                                                 HTML)),
                                         Forms\Components\Section::make('Field Options')
+                                            ->id('field-options')
                                             ->collapsible()
                                             ->when(fn (array $state) => filled($state['type'] ?? null))
                                             ->columns(['sm' => 2])
@@ -183,9 +191,7 @@ class BlueprintResource extends Resource
                                                                     $fieldType->value => Str::headline($fieldType->value),
                                                                 ])
                                                         )
-                                                        ->lazy()
                                                         ->default(fn (Forms\Components\CheckboxList $component) => array_keys($component->getOptions()))
-                                                        ->afterStateUpdated(fn (Closure $set, string|array|null $state) => $set('buttons', $state === null ? [] : Arr::wrap($state)))
                                                         ->columns([
                                                             'sm' => 2,
                                                             'md' => 4,
@@ -200,9 +206,7 @@ class BlueprintResource extends Resource
                                                                     $fieldType->value => Str::headline($fieldType->value),
                                                                 ])
                                                         )
-                                                        ->lazy()
                                                         ->default(fn (Forms\Components\CheckboxList $component) => array_keys($component->getOptions()))
-                                                        ->afterStateUpdated(fn (Closure $set, string|array|null $state) => $set('buttons', $state === null ? [] : Arr::wrap($state)))
                                                         ->columns([
                                                             'sm' => 2,
                                                             'md' => 4,
