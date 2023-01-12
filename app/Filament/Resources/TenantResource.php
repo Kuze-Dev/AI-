@@ -46,7 +46,7 @@ class TenantResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('domain')
                                     ->required()
-                                    ->unique(ignoreRecord:true)
+                                    ->unique(ignoreRecord: true)
                                     ->rules([new FullyQualifiedDomainNameRule()]),
                             ]),
                     ]),
