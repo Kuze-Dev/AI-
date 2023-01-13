@@ -12,8 +12,8 @@ class CollectionEntryData
         public readonly string $title,
         public readonly ?string $slug,
         public readonly ?array $taxonomy_terms = [],
-        public readonly array $data,
         public readonly ?Carbon $published_at = null,
+        public readonly ?array $data = [],
     ) {
     }
 }

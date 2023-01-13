@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use Carbon\Carbon;
 use Domain\Collection\Actions\UpdateCollectionEntryAction;
+use Domain\Collection\Models\Collection;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Resources\RelationManagers\RelationGroup;

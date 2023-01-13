@@ -15,7 +15,7 @@ class CollectionData
         public readonly ?string $slug = null,
         public readonly ?PublishBehavior $past_publish_date_behavior = null,
         public readonly ?PublishBehavior $future_publish_date_behavior = null,
-        public readonly ?bool $is_sortable,
+        public readonly ?bool $is_sortable = false,
     ) {
     }
 }
