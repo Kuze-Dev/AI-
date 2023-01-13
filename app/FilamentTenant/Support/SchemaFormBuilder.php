@@ -118,8 +118,7 @@ class SchemaFormBuilder extends Component
 
     private function makeFileUploadComponent(FileFieldData $fileFieldData): FileUpload
     {
-        $fileUpload = FileUpload::make($fileFieldData->state_name)
-            ->getUploadedFileUrlUsing(fn (string $file) => tenant_asset($file));
+        $fileUpload = FileUpload::make($fileFieldData->state_name);
 
         if ($fileFieldData->multiple) {
             $fileUpload->multiple($fileFieldData->multiple)
