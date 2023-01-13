@@ -51,12 +51,12 @@ class TaxonomyTerm extends Model implements IsActivitySubject, Sortable
         return $this->belongsTo(Taxonomy::class);
     }
 
-    // /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Collection\Models\CollectionEntry> */
-    // public function collectionEntries(): HasMany
-    // {
-    //     return $this->hasMany(CollectionEntry::class);
-    // }
-
+    /**
+     * Declare relationship of 
+     * current model to collection entries.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Collection\Models\CollectionEntry> 
+     */
     public function collectionEntries(): BelongsToMany
     {
         return $this->belongsToMany(

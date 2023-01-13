@@ -11,6 +11,7 @@ use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
@@ -24,35 +25,6 @@ it('can render collection', function () {
         ->createOne();
 
     $collection = CollectionFactory::new()
-        ->for($taxonomy)
-        ->for(
-            BlueprintFactory::new()
-                ->addSchemaSection(['title' => 'Main'])
-                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
-        )
-        ->createOne([
-            'name' => 'Test Collection',
-            'future_publish_date_behavior' => 'public',
-            'past_publish_date_behavior' => 'unlisted',
-        ]);
-
-    livewire(EditCollection::class, ['record' => $collection->getRouteKey()])
-        ->assertFormExists()
-        ->assertSuccessful()
-        ->assertFormSet([
-            'name' => 'Test Collection',
-            'future_publish_date_behavior' => 'public',
-            'past_publish_date_behavior' => 'unlisted',
-        ])
-        ->assertOk();
-});
-
-it('can edit collection', function () {
-    $taxonomy = TaxonomyFactory::new()
-        ->createOne();
-
-    $collection = CollectionFactory::new()
-        ->for($taxonomy)
         ->for(
             BlueprintFactory::new()
                 ->addSchemaSection(['title' => 'Main'])
@@ -62,6 +34,41 @@ it('can edit collection', function () {
             'name' => 'Test Collection',
             'future_publish_date_behavior' => 'private',
             'past_publish_date_behavior' => 'unlisted',
+            'is_sortable' => true,
+        ]);
+
+    livewire(EditCollection::class, ['record' => $collection->getRouteKey()])
+        ->assertFormExists()
+        ->assertSuccessful()
+        ->assertFormSet([
+            'name' => 'Test Collection',
+            'future_publish_date_behavior' => 'private',
+            'past_publish_date_behavior' => 'unlisted',
+            'is_sortable' => true,
+        ])
+        ->assertOk();
+});
+
+it('can update collection', function () {
+    $taxonomy = TaxonomyFactory::new()
+        ->createOne();
+
+    $collection = CollectionFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->createOne([
+            'name' => 'Test Collection',
+            'future_publish_date_behavior' => 'private',
+            'past_publish_date_behavior' => 'unlisted',
+            'is_sortable' => true,
+        ]);
+
+    $collection->taxonomies()
+        ->attach([
+            $taxonomy->getKey(),
         ]);
 
     $newData = [
@@ -75,6 +82,161 @@ it('can edit collection', function () {
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk();
+
+    assertDatabaseHas(
+        'collection_taxonomies',
+        [
+            'taxonomy_id' => $taxonomy->getKey(),
+            'collection_id' => $collection->getKey(),
+        ]
+    );
+
+    assertDatabaseHas(
+        Collection::class,
+        $newData
+    );
+});
+
+it('can update collection to have no publish date behavior', function () {
+    $taxonomy = TaxonomyFactory::new()
+        ->createOne();
+
+    $collection = CollectionFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->createOne([
+            'name' => 'Test Collection',
+            'future_publish_date_behavior' => 'private',
+            'past_publish_date_behavior' => 'unlisted',
+            'is_sortable' => true,
+        ]);
+
+    $collection->taxonomies()
+        ->attach([
+            $taxonomy->getKey(),
+        ]);
+
+    $newData = [
+        'name' => 'Test Collection Updated',
+    ];
+
+    livewire(EditCollection::class, ['record' => $collection->getRouteKey()])
+        ->fillForm($newData)
+        ->call('save')
+        ->assertHasNoFormErrors()
+        ->assertOk();
+
+    assertDatabaseHas(
+        'collection_taxonomies',
+        [
+            'taxonomy_id' => $taxonomy->getKey(),
+            'collection_id' => $collection->getKey(),
+        ]
+    );
+
+    assertDatabaseHas(
+        Collection::class,
+        $newData
+    );
+});
+
+it('can update collection to have no taxonomy attached', function () {
+    $taxonomy = TaxonomyFactory::new()
+        ->createOne();
+
+    $collection = CollectionFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->createOne([
+            'name' => 'Test Collection',
+            'is_sortable' => true,
+        ]);
+
+    $collection->taxonomies()
+        ->attach([
+            $taxonomy->getKey(),
+        ]);
+
+    assertDatabaseHas(
+        'collection_taxonomies',
+        [
+            'taxonomy_id' => $taxonomy->getKey(),
+            'collection_id' => $collection->getKey(),
+        ]
+    );
+
+    $newData = [
+        'name' => 'Test Collection Updated',
+    ];
+
+    livewire(EditCollection::class, ['record' => $collection->getRouteKey()])
+        ->fillForm(array_merge($newData, [
+            'taxonomies' => [],
+        ]))
+        ->call('save')
+        ->assertHasNoFormErrors()
+        ->assertOk();
+
+    assertDatabaseMissing(
+        'collection_taxonomies',
+        [
+            'taxonomy_id' => $taxonomy->getKey(),
+            'collection_id' => $collection->getKey(),
+        ]
+    );
+
+    assertDatabaseHas(
+        Collection::class,
+        $newData
+    );
+});
+
+it('can update collection to have no sorting permissions', function () {
+    $taxonomy = TaxonomyFactory::new()
+        ->createOne();
+
+    $collection = CollectionFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->createOne([
+            'name' => 'Test Collection',
+            'future_publish_date_behavior' => 'private',
+            'past_publish_date_behavior' => 'unlisted',
+            'is_sortable' => true,
+        ]);
+
+    $collection->taxonomies()
+        ->attach([
+            $taxonomy->getKey(),
+        ]);
+
+    $newData = [
+        'name' => 'Test Collection Updated',
+        'is_sortable' => false,
+    ];
+
+    livewire(EditCollection::class, ['record' => $collection->getRouteKey()])
+        ->fillForm($newData)
+        ->call('save')
+        ->assertHasNoFormErrors()
+        ->assertOk();
+
+    assertDatabaseHas(
+        'collection_taxonomies',
+        [
+            'taxonomy_id' => $taxonomy->getKey(),
+            'collection_id' => $collection->getKey(),
+        ]
+    );
 
     assertDatabaseHas(
         Collection::class,

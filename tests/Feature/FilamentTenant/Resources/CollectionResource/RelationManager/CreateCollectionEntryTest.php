@@ -65,9 +65,10 @@ it('can create collection entry', function () {
     );
 
     assertDatabaseHas(
-        'collection_entries_taxonomy_terms', [
+        'collection_entries_taxonomy_terms',
+        [
             'taxonomy_terms_id' => $taxonomyTerm->getKey(),
-            'collection_entries_id' => CollectionEntry::latest()->first()->getKey()
+            'collection_entries_id' => CollectionEntry::latest()->first()->getKey(),
         ]
     );
-})->only();
+});

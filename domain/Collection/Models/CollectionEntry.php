@@ -63,17 +63,12 @@ class CollectionEntry extends Model implements IsActivitySubject
         return $this->belongsTo(Collection::class);
     }
 
-    // /**
-    //  * Declare relationship of
-    //  * current model to taxonomy terms.
-    //  *
-    //  * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\TaxonomyTerm, \Domain\Collection\Models\CollectionEntry>
-    //  */
-    // public function taxonomyTerm(): BelongsTo
-    // {
-    //     return $this->belongsTo(TaxonomyTerm::class);
-    // }
-
+    /**
+     * Declare relationship of
+     * current model to collections.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm>
+     */
     public function taxonomyTerms(): BelongsToMany
     {
         return $this->belongsToMany(

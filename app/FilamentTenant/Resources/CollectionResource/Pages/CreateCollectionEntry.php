@@ -12,7 +12,6 @@ use Domain\Collection\DataTransferObjects\CollectionEntryData;
 use Domain\Collection\Models\CollectionEntry;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\CreateRecord;
@@ -20,7 +19,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Domain\Collection\Models\Collection;
 use Filament\Forms\Components\Grid;
 
@@ -66,26 +64,26 @@ class CreateCollectionEntry extends CreateRecord
     {
         return [
             Grid::make(12)
-            ->schema([
-                Card::make([
-                    TextInput::make('title')
-                        ->unique(ignoreRecord: true)
-                        ->required(),
-                    TextInput::make('slug')
-                        ->unique(ignoreRecord: true)
-                        ->disabled(fn (?CollectionEntry $record) => $record !== null),
-                ])
-                ->columnSpan($this->getMainColumnOffset()),
-                Card::make([
-                    DateTimePicker::make('published_at')
-                    ->default(Carbon::now())
-                    ->minDate(Carbon::now()->startOfDay())
-                    ->timezone(Auth::user()?->timezone)
-                    ->when(fn (self $livewire) => $livewire->ownerRecord->hasPublishDates()),
-                ])
-                ->columnSpan(4)
-                ->when(fn (self $livewire) => !empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates())
-            ]),
+                ->schema([
+                    Card::make([
+                        TextInput::make('title')
+                            ->unique(ignoreRecord: true)
+                            ->required(),
+                        TextInput::make('slug')
+                            ->unique(ignoreRecord: true)
+                            ->disabled(fn (?CollectionEntry $record) => $record !== null),
+                    ])
+                        ->columnSpan($this->getMainColumnOffset()),
+                    Card::make([
+                        DateTimePicker::make('published_at')
+                            ->default(Carbon::now())
+                            ->minDate(Carbon::now()->startOfDay())
+                            ->timezone(Auth::user()?->timezone)
+                            ->when(fn (self $livewire) => $livewire->ownerRecord->hasPublishDates()),
+                    ])
+                        ->columnSpan(4)
+                        ->when(fn (self $livewire) => ! empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()),
+                ]),
 
             SchemaFormBuilder::make('data', fn () => $this->ownerRecord->blueprint->schema),
         ];
@@ -110,19 +108,17 @@ class CreateCollectionEntry extends CreateRecord
         return static::getResource()::getUrl('edit', ['record' => $this->ownerRecord]);
     }
 
-    protected function generateTaxonomySelections() 
+    protected function generateTaxonomySelections(): void
     {
-        // dd(empty($this->ownerRecord->taxonomies->toArray()));
-        // if (!empty($this->ownerRecord->taxonomies->toArray())) {
 
-        // }
     }
-    
-    protected function getMainColumnOffset(): int 
+
+    protected function getMainColumnOffset(): int
     {
-        if (!empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()) {
+        if ( ! empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()) {
             return 8;
         }
+
         return 12;
     }
 }

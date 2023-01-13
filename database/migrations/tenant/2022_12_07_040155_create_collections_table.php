@@ -6,8 +6,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Domain\Blueprint\Models\Blueprint as BlueprintModel;
 use Domain\Collection\Models\Collection as CollectionModel;
-use Domain\Taxonomy\Models\Taxonomy as TaxonomyModel;
-use Domain\Taxonomy\Models\TaxonomyTerm as TaxonomyTermModel;
 
 return new class () extends Migration {
     /** Run the migrations. */

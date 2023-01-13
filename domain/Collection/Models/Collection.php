@@ -84,16 +84,12 @@ class Collection extends Model implements IsActivitySubject
         return $this->hasMany(CollectionEntry::class);
     }
 
-    // /**
-    //  * Declare relationship of
-    //  * current model to taxonomy.
-    //  *
-    //  * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\Taxonomy, \Domain\Collection\Models\Collection>
-    //  */
-    // public function taxonomy(): BelongsTo
-    // {
-    //     return $this->belongsTo(Taxonomy::class);
-    // }
+    /**
+     * Declare relationship of
+     * current model to taxonomy.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\Taxonomy>
+     */
     public function taxonomies(): BelongsToMany
     {
         return $this->belongsToMany(

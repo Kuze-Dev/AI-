@@ -8,6 +8,8 @@ use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Livewire\livewire;
 
@@ -23,32 +25,52 @@ it('can render collection', function () {
 });
 
 it('can list collections', function () {
+    $taxonomy = TaxonomyFactory::new()
+        ->createOne();
+
     $collections = CollectionFactory::new()
         ->withDummyBlueprint()
-        ->for(
-            TaxonomyFactory::new()
-                ->createOne()
-        )
         ->count(5)
         ->create();
 
+    foreach ($collections as $collection) {
+        $collection->taxonomies()->attach([$taxonomy->getKey()]);
+    }
     livewire(ListCollection::class)
         ->assertCanSeeTableRecords($collections)
         ->assertOk();
+
+    foreach ($collections as $collection) {
+        assertDatabaseHas(
+            'collection_taxonomies',
+            [
+                'taxonomy_id' => $taxonomy->getKey(),
+                'collection_id' => $collection->getKey(),
+            ]
+        );
+    }
 });
 
 it('can delete collection', function () {
+    $taxonomy = TaxonomyFactory::new()
+        ->createOne();
+
     $collection = CollectionFactory::new()
-        ->for(
-            TaxonomyFactory::new()
-                ->createOne()
-        )
         ->withDummyBlueprint()
         ->createOne();
+    
+    $collection->taxonomies()->attach([$taxonomy->getKey()]);
 
     livewire(ListCollection::class)
         ->callTableAction(DeleteAction::class, $collection)
         ->assertOk();
 
     assertModelMissing($collection);
+    assertDatabaseMissing(
+        'collection_taxonomies',
+        [
+            'taxonomy_id' => $taxonomy->getKey(),
+            'collection_id' => $collection->getKey(),
+        ]
+    );
 });

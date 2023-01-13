@@ -21,7 +21,6 @@ class CollectionFactory extends Factory
     {
         return [
             'blueprint_id' => null,
-            'taxonomy_id' => null,
             'name' => $this->faker->name(),
             'past_publish_date_behavior' => 'private',
             'future_publish_date_behavior' => 'public',

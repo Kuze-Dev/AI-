@@ -21,7 +21,7 @@ class CreateCollectionEntryAction
                 'published_at' => $collectionEntryData->published_at,
             ]);
 
-        if (!empty($collectionEntryData->taxonomy_terms)) {
+        if ( ! empty($collectionEntryData->taxonomy_terms)) {
             $collectionEntry->taxonomyTerms()
                 ->attach($collectionEntryData->taxonomy_terms);
         }
