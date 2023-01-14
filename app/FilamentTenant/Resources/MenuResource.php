@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\MenuResource\Pages;
+use App\FilamentTenant\Support\Hierarchy;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Menu\Enums\Target;
@@ -49,82 +50,32 @@ class MenuResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->rules('alpha_dash')
                         ->disabled(),
-                    Forms\Components\Card::make([
-                        Forms\Components\Repeater::make('nodes')
-                            ->afterStateHydrated(fn (Forms\Components\Repeater $component, ?Menu $record) => $component->state($record?->nodes->toArray() ?? []))
-                            ->label('Menus')
-                            ->nullable()
-                            ->orderable('sort')
-                            ->schema([
-                                Forms\Components\TextInput::make('label')
-                                    ->label('Label')
-                                    ->required()
-                                    ->maxLength(100),
-                                Forms\Components\Select::make('target')
-                                    ->options(
-                                        collect(Target::cases())
-                                            ->mapWithKeys(fn (Target $target) => [
-                                                $target->value => Str::headline($target->value),
-                                            ])
-                                    ),
-                                Forms\Components\TextInput::make('url')
-                                    ->url()
-                                    ->placeholder('https://example.com')
-                                    ->columnSpanFull(),
-                                Forms\Components\Repeater::make('childs')
-                                    ->label('Sub Menus')
-                                    ->collapsible()
-                                    ->defaultItems(0)
-                                    ->orderable()
-                                    ->schema([
-                                        Forms\Components\TextInput::make('label')
-                                            ->label('Label')
-                                            ->required()
-                                            ->maxLength(100),
-                                        Forms\Components\Select::make('target')
-                                            ->options(
-                                                collect(Target::cases())
-                                                    ->mapWithKeys(fn (Target $target) => [
-                                                        $target->value => Str::headline($target->value),
-                                                    ])
-                                            ),
-                                        Forms\Components\TextInput::make('url')
-                                            ->url()
-                                            ->placeholder('https://example.com')
-                                            ->columnSpanFull(),
-                                        Forms\Components\Repeater::make('childs')
-                                            ->label('Sub Menus')
-                                            ->collapsible()
-                                            ->orderable()
-                                            ->defaultItems(0)
-                                            ->schema([
-                                                Forms\Components\TextInput::make('label')
-                                                    ->label('Label')
-                                                    ->required()
-                                                    ->maxLength(100),
-                                                Forms\Components\Select::make('target')
-                                                    ->options(
-                                                        collect(Target::cases())
-                                                            ->mapWithKeys(fn (Target $target) => [
-                                                                $target->value => Str::headline($target->value),
-                                                            ])
-                                                    ),
-                                                Forms\Components\TextInput::make('url')
-                                                    ->url()
-                                                    ->placeholder('https://example.com')
-                                                    ->columnSpanFull(),
-                                            ])
-                                            ->columns(2)
-                                            ->columnSpan(2),
-                                    ])
-                                    ->columns(2)
-                                    ->columnSpan(2),
-                            ])
-                            ->columns(2)
-                            ->columnSpan(2),
-                    ]),
-                ])
-                    ->columns(2),
+                    Hierarchy::make('nodes')
+                        ->collapsible()
+                        ->itemLabel(fn (array $state) => $state['label'] ?? null)
+                        ->schema([
+                            Forms\Components\Grid::make(['md' => 4])
+                                ->schema([
+                                    Forms\Components\TextInput::make('label')
+                                        ->label('Label')
+                                        ->required()
+                                        ->maxLength(100)
+                                        ->debounce()
+                                        ->columnSpan(['md' => 3]),
+                                    Forms\Components\Select::make('target')
+                                        ->options(
+                                            collect(Target::cases())
+                                                ->mapWithKeys(fn (Target $target) => [$target->value => Str::headline($target->value)])
+                                                ->toArray()
+                                        )
+                                        ->columnSpan(['md' => 1]),
+                                    Forms\Components\TextInput::make('url')
+                                        ->url()
+                                        ->placeholder('https://example.com')
+                                        ->columnSpanFull(),
+                                ])
+                        ]),
+                ]),
             ]);
     }
 
