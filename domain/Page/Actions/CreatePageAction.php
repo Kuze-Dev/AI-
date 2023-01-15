@@ -9,12 +9,22 @@ use Domain\Page\Models\Page;
 
 class CreatePageAction
 {
+    public function __construct(
+        protected CreateSliceContentAction $createSliceContent
+    ) {
+    }
+
     public function execute(PageData $pageData): Page
     {
-        return Page::create([
+        $page = Page::create([
             'name' => $pageData->name,
             'slug' => $pageData->slug,
-            'blueprint_id' => $pageData->blueprint_id,
         ]);
+
+        foreach ($pageData->slice_contents as $sliceContentData) {
+            $this->createSliceContent->execute($page, $sliceContentData);
+        }
+
+        return $page;
     }
 }

@@ -6,9 +6,12 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
+use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Domain\Blueprint\Models\Blueprint;
+use Closure;
 use Domain\Page\Models\Page;
+use Domain\Page\Models\Slice;
+use Domain\Page\Models\SliceContent;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -16,6 +19,8 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
 use Exception;
+use Filament\Forms\Components\Component;
+use Illuminate\Database\Eloquent\Collection;
 
 class PageResource extends Resource
 {
@@ -25,9 +30,12 @@ class PageResource extends Resource
 
     protected static ?string $navigationGroup = 'CMS';
 
-    protected static ?string $navigationIcon = 'heroicon-o-view-boards';
+    protected static ?string $navigationIcon = 'heroicon-o-document';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    /** @var Collection<int, Slice> */
+    public static ?Collection $cachedSlices = null;
 
     public static function form(Form $form): Form
     {
@@ -39,24 +47,48 @@ class PageResource extends Resource
                 Forms\Components\TextInput::make('slug')
                     ->unique(ignoreRecord: true)
                     ->disabled(fn (?Page $record) => $record !== null),
-                Forms\Components\Select::make('blueprint_id')
-                    ->relationship('blueprint', 'name')
-                    ->saveRelationshipsUsing(null)
-                    ->required()
-                    ->exists(Blueprint::class, 'id')
-                    ->searchable()
-                    ->preload()
-                    ->reactive()
-                    ->helperText(function (?Page $record, ?string $state) {
-                        if ($record === null) {
-                            return;
-                        }
-
-                        if ($record->blueprint_id !== (int) $state) {
-                            return trans('Modifying the blueprint will reset all the page\'s content.');
-                        }
-                    }),
             ]),
+            Forms\Components\Section::make(trans('Slices'))
+                ->schema([
+                    Forms\Components\Repeater::make('slice_contents')
+                        ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Page $record) {
+                            $state = $record?->sliceContents->sortBy('order')
+                                ->mapWithKeys(fn (SliceContent $item) => ["record-{$item->getKey()}" => $item])
+                                ->toArray();
+
+                            $component->state($state ?? []);
+                        })
+                        ->itemLabel(fn (array $state) => self::getCachedSlices()->firstWhere('id', $state['slice_id'])?->name)
+                        ->disableLabel()
+                        ->minItems(1)
+                        ->collapsible()
+                        ->orderable('order')
+                        ->schema(fn () => [
+                            Forms\Components\Select::make('slice_id')
+                                ->label('Slice')
+                                ->options(
+                                    self::getCachedSlices()
+                                        ->sortBy('name')
+                                        ->pluck('name', 'id')
+                                        ->toArray()
+                                )
+                                ->hidden(fn (?Page $record, Closure $get) => $record && $record->sliceContents->firstWhere('id', $get('id')))
+                                ->required()
+                                ->exists(Slice::class, 'id')
+                                ->searchable()
+                                ->reactive()
+                                ->afterStateUpdated(
+                                    fn (Forms\Components\Select $component) => $component->getContainer()
+                                        ->getComponent(fn (Component $component) => $component->getId() === 'schema-form')
+                                        ?->getChildComponentContainer()
+                                        ->fill()
+                                )
+                                ->dehydrateStateUsing(fn (string|int $state) => (int) $state),
+                            SchemaFormBuilder::make('data')
+                                ->id('schema-form')
+                                ->schemaData(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->blueprint->schema),
+                        ]),
+                ]),
         ]);
     }
 
@@ -71,10 +103,6 @@ class PageResource extends Resource
                 Tables\Columns\TextColumn::make('slug')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('blueprint.name')
-                    ->sortable()
-                    ->searchable()
-                    ->url(fn (Page $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -84,18 +112,9 @@ class PageResource extends Resource
                     ->toggleable()
                     ->toggledHiddenByDefault(),
             ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('blueprint')
-                    ->relationship('blueprint', 'name')
-                    ->searchable()
-                    ->optionsLimit(20),
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('configure')
-                    ->authorize('page.configure')
-                    ->icon('heroicon-s-cog')
-                    ->url(fn (Page $record) => self::getUrl('configure', $record)),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
@@ -117,7 +136,16 @@ class PageResource extends Resource
             'index' => Resources\PageResource\Pages\ListPages::route('/'),
             'create' => Resources\PageResource\Pages\CreatePage::route('/create'),
             'edit' => Resources\PageResource\Pages\EditPage::route('/{record}/edit'),
-            'configure' => Resources\PageResource\Pages\ConfigurePage::route('/{record}/configure'),
         ];
+    }
+
+    /** @return Collection<int, Slice> $cachedSlices */
+    protected static function getCachedSlices(): Collection
+    {
+        if ( ! isset(self::$cachedSlices)) {
+            self::$cachedSlices = Slice::with('blueprint')->get();
+        }
+
+        return self::$cachedSlices;
     }
 }

@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\PageResource\Pages\CreatePage;
-use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Page\Database\Factories\PageFactory;
+use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\Models\Page;
 use Filament\Facades\Filament;
 
@@ -24,14 +24,20 @@ it('can render page', function () {
 });
 
 it('can create page', function () {
-    $blueprint = BlueprintFactory::new()
-        ->withDummySchema()
-        ->createOne();
+    $sliceId = SliceFactory::new()
+        ->withDummyBlueprint()
+        ->createOne()
+        ->getKey();
 
     livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
-            'blueprint_id' => $blueprint->getKey(),
+            'slice_contents' => [
+                [
+                    'slice_id' => $sliceId,
+                    'data' => ['name' => 'foo'],
+                ],
+            ],
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -41,12 +47,12 @@ it('can create page', function () {
 });
 
 it('can not create page with same name', function () {
-    $blueprint = BlueprintFactory::new()
-        ->withDummySchema()
-        ->createOne();
+    $sliceId = SliceFactory::new()
+        ->withDummyBlueprint()
+        ->createOne()
+        ->getKey();
 
     PageFactory::new()
-        ->withDummyBlueprint()
         ->createOne(['name' => 'page 1']);
 
     assertDatabaseCount(Page::class, 1);
@@ -54,7 +60,12 @@ it('can not create page with same name', function () {
     livewire(CreatePage::class)
         ->fillForm([
             'name' => 'page 1',
-            'blueprint_id' => $blueprint->getKey(),
+            'slice_contents' => [
+                [
+                    'slice_id' => $sliceId,
+                    'data' => ['name' => 'foo'],
+                ],
+            ],
         ])
         ->call('create')
         ->assertHasFormErrors(['name' => 'unique'])

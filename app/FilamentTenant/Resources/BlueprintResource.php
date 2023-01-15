@@ -33,7 +33,7 @@ class BlueprintResource extends Resource
 
     protected static ?string $navigationGroup = 'CMS';
 
-    protected static ?string $navigationIcon = 'heroicon-o-template';
+    protected static ?string $navigationIcon = 'heroicon-o-table';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -108,9 +108,8 @@ class BlueprintResource extends Resource
                                             ->reactive()
                                             ->options(
                                                 collect(FieldType::cases())
-                                                    ->mapWithKeys(fn (FieldType $fieldType) => [
-                                                        $fieldType->value => Str::headline($fieldType->value),
-                                                    ])
+                                                    ->mapWithKeys(fn (FieldType $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                                                    ->toArray()
                                             )
                                             ->required()
                                             ->disabled(fn (?Blueprint $record, Closure $get) => (bool) ($record && Arr::first(
@@ -143,7 +142,7 @@ class BlueprintResource extends Resource
                                                     : [$state];
                                             })
                                             ->helperText(new HtmlString(<<<HTML
-                                                    Rules should be separated with "|". Available rules can be found on  <a href="https://laravel.com/docs/validation" class="text-primary-500" target="_blank" rel="noopener noreferrer">Laravel's Documentation</a>.
+                                                    Rules should be separated with "|". Available rules can be found on <a href="https://laravel.com/docs/validation" class="text-primary-500" target="_blank" rel="noopener noreferrer">Laravel's Documentation</a>.
                                                 HTML)),
                                         Forms\Components\Section::make('Field Options')
                                             ->id('field-options')
@@ -187,9 +186,8 @@ class BlueprintResource extends Resource
                                                     Forms\Components\CheckboxList::make('buttons')
                                                         ->options(
                                                             collect(MarkdownButton::cases())
-                                                                ->mapWithKeys(fn (MarkdownButton $fieldType) => [
-                                                                    $fieldType->value => Str::headline($fieldType->value),
-                                                                ])
+                                                                ->mapWithKeys(fn (MarkdownButton $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                                                                ->toArray()
                                                         )
                                                         ->default(fn (Forms\Components\CheckboxList $component) => array_keys($component->getOptions()))
                                                         ->columns([
@@ -202,9 +200,8 @@ class BlueprintResource extends Resource
                                                     Forms\Components\CheckboxList::make('buttons')
                                                         ->options(
                                                             collect(RichtextButton::cases())
-                                                                ->mapWithKeys(fn (RichtextButton $fieldType) => [
-                                                                    $fieldType->value => Str::headline($fieldType->value),
-                                                                ])
+                                                                ->mapWithKeys(fn (RichtextButton $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                                                                ->toArray()
                                                         )
                                                         ->default(fn (Forms\Components\CheckboxList $component) => array_keys($component->getOptions()))
                                                         ->columns([
