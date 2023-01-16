@@ -25,18 +25,8 @@ class EditCollection extends EditRecord
     protected function getActions(): array
     {
         return [
-            Actions\EditAction::make()
-                ->url(route('filament-tenant.resources.' . self::$resource::getSlug() . '.edit', $this->record)),
             Actions\DeleteAction::make(),
         ];
-    }
-
-    /** Set the title of the page. */
-    protected function getTitle(): string
-    {
-        return trans('Edit :label', [
-            'label' => $this->getRecordTitle(),
-        ]);
     }
 
     /**
@@ -58,14 +48,5 @@ class EditCollection extends EditRecord
                     future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
                 ))
         );
-    }
-
-    /**
-     * Set redirection url
-     * after successful transactions.
-     */
-    protected function getRedirectUrl(): ?string
-    {
-        return $this->getResource()::getUrl('edit', $this->record->slug);
     }
 }
