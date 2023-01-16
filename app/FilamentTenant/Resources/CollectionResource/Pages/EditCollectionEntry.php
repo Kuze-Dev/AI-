@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use App\FilamentTenant\Resources\CollectionResource\Traits\ColumnOffsets;
 use Carbon\Carbon;
 use Closure;
 use Domain\Collection\Actions\UpdateCollectionEntryAction;
@@ -22,16 +23,18 @@ use Domain\Collection\Models\Collection;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 class EditCollectionEntry extends EditRecord
 {
+    use ColumnOffsets;
+
     protected static string $resource = CollectionResource::class;
 
     public mixed $ownerRecord;
@@ -47,7 +50,6 @@ class EditCollectionEntry extends EditRecord
     public function mount($record, string $ownerRecord = ''): void
     {
         $this->ownerRecord = static::getResource()::resolveRecordRouteBinding($ownerRecord)->load('taxonomies.taxonomyTerms');
-        // $this->ownerRecord = static::getResource()::resolveRecordRouteBinding($ownerRecord);
         $this->record = app(CollectionEntry::class)->resolveRouteBinding($record);
 
         if ($this->ownerRecord === null) {
@@ -86,38 +88,47 @@ class EditCollectionEntry extends EditRecord
     protected function getFormSchema(): array
     {
         return [
-            Card::make([
-                TextInput::make('title')
-                    ->unique(ignoreRecord: true)
-                    ->required(),
-                TextInput::make('slug')
-                    ->unique(ignoreRecord: true)
-                    ->disabled(fn (CollectionEntry $record) => $record !== null),
-                DateTimePicker::make('published_at')
-                    ->minDate(Carbon::now()->startOfDay())
-                    ->timezone(Auth::user()?->timezone)
-                    ->when(fn (self $livewire) => $livewire->ownerRecord->hasPublishDates()),
-                Group::make()
-                    ->statePath('taxonomies')
-                    ->schema(
-                        fn () => $this->ownerRecord->taxonomies->map(
-                            fn (Taxonomy $taxonomy) => Select::make($taxonomy->name)
-                                ->statePath((string) $taxonomy->id)
-                                ->multiple()
-                                ->options(
-                                    $taxonomy->taxonomyTerms->sortBy('name')
-                                        ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->id => $term->name])
-                                        ->toArray()
-                                )
-                                ->afterStateHydrated(fn (Select $component, CollectionEntry $record) => $component->state($record->taxonomyTerms->where('taxonomy_id', $taxonomy->id)->pluck('id')->toArray()))
-                        )->toArray()
-                    )
-                    ->dehydrated(false),
-                Hidden::make('taxonomy_terms')
-                    ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies'), 1))
-                
-            ]),
-            SchemaFormBuilder::make('data', fn () => $this->ownerRecord->blueprint->schema),
+            Grid::make(12)
+                ->schema([
+                    Card::make([
+                        TextInput::make('title')
+                            ->unique(ignoreRecord: true)
+                            ->required(),
+                        TextInput::make('slug')
+                            ->unique(ignoreRecord: true)
+                            ->disabled(fn (?CollectionEntry $record) => $record !== null),
+                    ])
+                        ->columnSpan($this->getMainColumnOffset()),
+                    Card::make([
+                        DateTimePicker::make('published_at')
+                            ->minDate(Carbon::now()->startOfDay())
+                            ->timezone(Auth::user()?->timezone)
+                            ->when(fn (self $livewire) => $livewire->ownerRecord->hasPublishDates()),
+                        Group::make()
+                            ->statePath('taxonomies')
+                            ->schema(
+                                fn () => $this->ownerRecord->taxonomies->map(
+                                    fn (Taxonomy $taxonomy) => Select::make($taxonomy->name)
+                                        ->statePath((string) $taxonomy->id)
+                                        ->multiple()
+                                        ->options(
+                                            $taxonomy->taxonomyTerms->sortBy('name')
+                                                ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->id => $term->name])
+                                                ->toArray()
+                                        )
+                                        ->afterStateHydrated(fn (Select $component, CollectionEntry $record) => $component->state($record->taxonomyTerms->where('taxonomy_id', $taxonomy->id)->pluck('id')->toArray()))
+                                )->toArray()
+                            )
+                            ->dehydrated(false),
+                        Hidden::make('taxonomy_terms')
+                            ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies'), 1)),
+
+                    ])
+                        ->columnSpan(4)
+                        ->when(fn (self $livewire) => ! empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()),
+                    SchemaFormBuilder::make('data', fn () => $this->ownerRecord->blueprint->schema)
+                        ->columnSpan($this->getMainColumnOffset()),
+                ]),
         ];
     }
 

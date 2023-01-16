@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\CollectionResource\RelationManagers\CollectionEntryRelationManager;
+use Carbon\Carbon;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Collection\Database\Factories\CollectionEntryFactory;
@@ -29,9 +30,6 @@ it('can render component', function () {
 
     $collection = CollectionFactory::new()
         ->for(
-            $taxonomy
-        )
-        ->for(
             BlueprintFactory::new()
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
@@ -40,18 +38,26 @@ it('can render component', function () {
             'name' => 'Test Collection',
             'future_publish_date_behavior' => 'public',
             'past_publish_date_behavior' => 'unlisted',
+            'is_sortable' => true,
         ]);
 
     $data = [
         'data' => ['main' => ['header' => 'Foo']],
-        'title' => 'Test collection entry',
+        'published_at' => Carbon::now(),
     ];
+
+    $collection->taxonomies()->attach([
+        $taxonomy->getKey(),
+    ]);
 
     $collectionEntry = CollectionEntryFactory::new()
         ->for($collection)
-        ->for($taxonomyTerm)
-        ->count(1)
+        ->count(2)
         ->create($data);
+
+    foreach ($collectionEntry as $entry) {
+        $entry->taxonomyTerms()->attach([$taxonomyTerm->getKey()]);
+    }
 
     livewire(CollectionEntryRelationManager::class, ['ownerRecord' => $collection])
         ->assertOk()

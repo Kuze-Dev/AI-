@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\CollectionResource\Pages;
 
 use App\FilamentTenant\Resources\CollectionResource;
+use App\FilamentTenant\Resources\CollectionResource\Traits\ColumnOffsets;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Carbon\Carbon;
 use Closure;
@@ -31,6 +32,8 @@ use Illuminate\Support\Arr;
 
 class CreateCollectionEntry extends CreateRecord
 {
+    use ColumnOffsets;
+
     protected static string $resource = CollectionResource::class;
 
     public mixed $ownerRecord;
@@ -103,10 +106,10 @@ class CreateCollectionEntry extends CreateRecord
                             )
                             ->dehydrated(false),
                         Hidden::make('taxonomy_terms')
-                            ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies'), 1))
+                            ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies'), 1)),
                     ])
                         ->columnSpan(4)
-                        ->when(fn (self $livewire) => !empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()),
+                        ->when(fn (self $livewire) => ! empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()),
                     SchemaFormBuilder::make('data', fn () => $this->ownerRecord->blueprint->schema)
                         ->columnSpan($this->getMainColumnOffset()),
                 ]),
@@ -132,16 +135,21 @@ class CreateCollectionEntry extends CreateRecord
         return static::getResource()::getUrl('edit', ['record' => $this->ownerRecord]);
     }
 
-    protected function generateTaxonomySelections(): void
-    {
-    }
+    // protected function getMainColumnOffset(): int
+    // {
+    //     if (!empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()) {
+    //         return 8;
+    //     }
 
-    protected function getMainColumnOffset(): int
-    {
-        if (!empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()) {
-            return 8;
-        }
+    //     return 12;
+    // }
 
-        return 12;
-    }
+    // protected function getSideColumnOffset(): int
+    // {
+    //     if (!empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()) {
+    //         return 4;
+    //     }
+
+    //     return 0;
+    // }
 }

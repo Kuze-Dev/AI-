@@ -58,7 +58,7 @@ it('can delete collection', function () {
     $collection = CollectionFactory::new()
         ->withDummyBlueprint()
         ->createOne();
-    
+
     $collection->taxonomies()->attach([$taxonomy->getKey()]);
 
     livewire(ListCollection::class)

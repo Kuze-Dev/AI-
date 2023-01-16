@@ -87,7 +87,7 @@ class Collection extends Model implements IsActivitySubject
     /**
      * Declare relationship of
      * current model to taxonomy.
-     * 
+     *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\Taxonomy>
      */
     public function taxonomies(): BelongsToMany
