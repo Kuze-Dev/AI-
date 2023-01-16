@@ -166,7 +166,7 @@ class EditCollectionEntry extends EditRecord
                     title: $data['title'],
                     slug: $data['slug'],
                     taxonomy_terms: $data['taxonomy_terms'] ?? [],
-                    published_at: Carbon::parse($data['published_at']),
+                    published_at: isset($data['published_at']) ? Carbon::parse($data['published_at']) : null,
                     data: $data['data']
                 ))
         );
