@@ -27,6 +27,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
+use Filament\Pages\Actions;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -67,12 +68,33 @@ class EditCollectionEntry extends EditRecord
         $this->previousUrl = url()->previous();
     }
 
-    /** Set the title of the page. */
-    protected function getTitle(): string
+    protected function getActions(): array
     {
-        return trans('Edit :label Collection Entry', [
-            'label' => $this->record->title,
-        ]);
+        return [
+            Actions\DeleteAction::make()
+                ->successRedirectUrl(static::getResource()::getUrl('edit', ['record' => $this->ownerRecord])),
+        ];
+    }
+
+    protected function getBreadcrumbs(): array
+    {
+        $resource = static::getResource();
+
+        $breadcrumb = $this->getBreadcrumb();
+
+        return array_merge(
+            [
+                $resource::getUrl() => $resource::getBreadcrumb(),
+                $resource::getUrl('edit', ['record' => $this->ownerRecord]) => $this->ownerRecord->name,
+                $this->getRecordTitle(),
+            ],
+            (filled($breadcrumb) ? [$breadcrumb] : []),
+        );
+    }
+
+    public function getRecordTitle(): string
+    {
+        return $this->record->title;
     }
 
     /**

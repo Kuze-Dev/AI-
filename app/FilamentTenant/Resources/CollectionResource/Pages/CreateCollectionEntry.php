@@ -15,7 +15,6 @@ use Domain\Collection\Models\CollectionEntry;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
-use Filament\Pages\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -49,13 +48,24 @@ class CreateCollectionEntry extends CreateRecord
         parent::mount();
     }
 
-    protected function getActions(): array
+    public function getBreadcrumb(): string
     {
-        return [
-            Actions\Action::make('configure')
-                ->icon('heroicon-s-cog')
-                ->url(route('filament-tenant.resources.' . self::$resource::getSlug() . '.edit', $this->ownerRecord)),
-        ];
+        return trans('Create Collection Entry');
+    }
+
+    protected function getBreadcrumbs(): array
+    {
+        $resource = static::getResource();
+
+        $breadcrumb = $this->getBreadcrumb();
+
+        return array_merge(
+            [
+                $resource::getUrl() => $resource::getBreadcrumb(),
+                $resource::getUrl('edit', ['record' => $this->ownerRecord]) => $this->ownerRecord->name,
+            ],
+            (filled($breadcrumb) ? [$breadcrumb] : []),
+        );
     }
 
     protected function getTitle(): string
