@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Collection\Database\Factories;
 
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Collection\Enums\PublishBehavior;
 use Domain\Collection\Models\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,9 +23,9 @@ class CollectionFactory extends Factory
         return [
             'blueprint_id' => null,
             'name' => $this->faker->name(),
-            'past_publish_date_behavior' => 'private',
-            'future_publish_date_behavior' => 'public',
-            'is_sortable' => rand(0, 1),
+            'past_publish_date_behavior' => PublishBehavior::PRIVATE,
+            'future_publish_date_behavior' => PublishBehavior::PUBLIC,
+            'is_sortable' => (bool) rand(0, 1),
         ];
     }
 
