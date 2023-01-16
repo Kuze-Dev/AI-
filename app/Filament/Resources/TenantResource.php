@@ -15,6 +15,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Unique;
+use Stancl\Tenancy\Database\Models\Domain;
 
 class TenantResource extends Resource
 {
@@ -50,9 +51,10 @@ class TenantResource extends Resource
                                     ->unique(
                                         'domains',
                                         callback: fn (?Tenant $record, Unique $rule, ?string $state) => $rule
-                                            ->when($domain = $record?->domains->firstWhere('domain', $state))
-                                            ->ignore($domain),
-                                        ignoreRecord: true
+                                            ->when(
+                                                $record?->domains->firstWhere('domain', $state),
+                                                fn (Unique $rule, ?Domain $domain) => $rule->ignore($domain)
+                                            ),
                                     )
                                     ->rules([new FullyQualifiedDomainNameRule()]),
                             ]),
