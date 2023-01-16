@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Resources\CollectionResource\Traits\ColumnOffsets;
 use Carbon\Carbon;
 use Closure;
 use Domain\Collection\Actions\UpdateCollectionEntryAction;
@@ -34,8 +33,6 @@ use Illuminate\Support\Facades\Auth;
 
 class EditCollectionEntry extends EditRecord
 {
-    use ColumnOffsets;
-
     protected static string $resource = CollectionResource::class;
 
     public mixed $ownerRecord;
@@ -110,17 +107,25 @@ class EditCollectionEntry extends EditRecord
     protected function getFormSchema(): array
     {
         return [
-            Grid::make(12)
+            Grid::make(['lg' => 3])
                 ->schema([
-                    Card::make([
-                        TextInput::make('title')
-                            ->unique(ignoreRecord: true)
-                            ->required(),
-                        TextInput::make('slug')
-                            ->unique(ignoreRecord: true)
-                            ->disabled(fn (?CollectionEntry $record) => $record !== null),
-                    ])
-                        ->columnSpan($this->getMainColumnOffset()),
+                    Group::make()
+                        ->schema([
+                            Card::make([
+                                TextInput::make('title')
+                                    ->unique(ignoreRecord: true)
+                                    ->required(),
+                                TextInput::make('slug')
+                                    ->unique(ignoreRecord: true)
+                                    ->disabled(fn (?CollectionEntry $record) => $record !== null),
+                            ]),
+                            SchemaFormBuilder::make('data', fn () => $this->ownerRecord->blueprint->schema),
+                        ])
+                        ->tap(function (Group $component) {
+                            ! empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()
+                                ? $component->columnSpan(['lg' => 2])
+                                : $component->columnSpanFull();
+                        }),
                     Card::make([
                         DateTimePicker::make('published_at')
                             ->minDate(Carbon::now()->startOfDay())
@@ -144,12 +149,9 @@ class EditCollectionEntry extends EditRecord
                             ->dehydrated(false),
                         Hidden::make('taxonomy_terms')
                             ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies'), 1)),
-
                     ])
-                        ->columnSpan(4)
-                        ->when(fn (self $livewire) => ! empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()),
-                    SchemaFormBuilder::make('data', fn () => $this->ownerRecord->blueprint->schema)
-                        ->columnSpan($this->getMainColumnOffset()),
+                        ->columnSpan(['lg' => 1])
+                        ->when(fn () => ! empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()),
                 ]),
         ];
     }

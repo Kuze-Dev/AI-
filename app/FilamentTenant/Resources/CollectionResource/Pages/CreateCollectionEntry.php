@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\CollectionResource\Pages;
 
 use App\FilamentTenant\Resources\CollectionResource;
-use App\FilamentTenant\Resources\CollectionResource\Traits\ColumnOffsets;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Carbon\Carbon;
 use Closure;
@@ -31,8 +30,6 @@ use Illuminate\Support\Arr;
 
 class CreateCollectionEntry extends CreateRecord
 {
-    use ColumnOffsets;
-
     protected static string $resource = CollectionResource::class;
 
     public mixed $ownerRecord;
@@ -83,17 +80,25 @@ class CreateCollectionEntry extends CreateRecord
     protected function getFormSchema(): array
     {
         return [
-            Grid::make(12)
+            Grid::make(['lg' => 3])
                 ->schema([
-                    Card::make([
-                        TextInput::make('title')
-                            ->unique(ignoreRecord: true)
-                            ->required(),
-                        TextInput::make('slug')
-                            ->unique(ignoreRecord: true)
-                            ->disabled(fn (?CollectionEntry $record) => $record !== null),
-                    ])
-                        ->columnSpan($this->getMainColumnOffset()),
+                    Group::make()
+                        ->schema([
+                            Card::make([
+                                TextInput::make('title')
+                                    ->unique(ignoreRecord: true)
+                                    ->required(),
+                                TextInput::make('slug')
+                                    ->unique(ignoreRecord: true)
+                                    ->disabled(fn (?CollectionEntry $record) => $record !== null),
+                            ]),
+                            SchemaFormBuilder::make('data', fn () => $this->ownerRecord->blueprint->schema),
+                        ])
+                        ->tap(function (Group $component) {
+                            ! empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()
+                                ? $component->columnSpan(['lg' => 2])
+                                : $component->columnSpanFull();
+                        }),
                     Card::make([
                         DateTimePicker::make('published_at')
                             ->default(Carbon::now())
@@ -118,10 +123,8 @@ class CreateCollectionEntry extends CreateRecord
                         Hidden::make('taxonomy_terms')
                             ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies'), 1)),
                     ])
-                        ->columnSpan(4)
-                        ->when(fn (self $livewire) => ! empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()),
-                    SchemaFormBuilder::make('data', fn () => $this->ownerRecord->blueprint->schema)
-                        ->columnSpan($this->getMainColumnOffset()),
+                        ->columnSpan(['lg' => 1])
+                        ->when(fn () => ! empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()),
                 ]),
         ];
     }
