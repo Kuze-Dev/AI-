@@ -18,7 +18,7 @@ class CollectionEntryRelationManager extends RelationManager
 {
     protected static string $relationship = 'collectionEntries';
 
-    protected static ?string $recordTitleAttribute = null;
+    protected static ?string $recordTitleAttribute = 'title';
 
     /**
      * Set components for the
@@ -34,6 +34,9 @@ class CollectionEntryRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('slug')
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TagsColumn::make('taxonomyTerms.name')
+                    ->limit()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -42,12 +45,6 @@ class CollectionEntryRelationManager extends RelationManager
                     ->sortable()
                     ->toggleable()
                     ->toggledHiddenByDefault(),
-                // Tables\Columns\TextColumn::make('taxonomyTerm.name')
-                //     ->sortable()
-                //     ->searchable(),
-            ])
-            ->filters([
-
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
