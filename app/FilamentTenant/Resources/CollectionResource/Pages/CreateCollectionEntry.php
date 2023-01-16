@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Resources\CollectionResource\Pages;
 use App\FilamentTenant\Resources\CollectionResource;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Carbon\Carbon;
+use Closure;
 use Domain\Collection\Actions\CreateCollectionEntryAction;
 use Domain\Collection\DataTransferObjects\CollectionEntryData;
 use Domain\Collection\Models\CollectionEntry;
@@ -20,7 +21,13 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Domain\Collection\Models\Collection;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Select;
+use Illuminate\Support\Arr;
 
 class CreateCollectionEntry extends CreateRecord
 {
@@ -30,7 +37,7 @@ class CreateCollectionEntry extends CreateRecord
 
     public function mount(string $ownerRecord = ''): void
     {
-        $this->ownerRecord = static::getResource()::resolveRecordRouteBinding($ownerRecord);
+        $this->ownerRecord = static::getResource()::resolveRecordRouteBinding($ownerRecord)->load('taxonomies.taxonomyTerms');
 
         if ($this->ownerRecord === null) {
             throw (new ModelNotFoundException())->setModel(Collection::class, ['']);
@@ -80,12 +87,29 @@ class CreateCollectionEntry extends CreateRecord
                             ->minDate(Carbon::now()->startOfDay())
                             ->timezone(Auth::user()?->timezone)
                             ->when(fn (self $livewire) => $livewire->ownerRecord->hasPublishDates()),
+                        Group::make()
+                            ->statePath('taxonomies')
+                            ->schema(
+                                fn () => $this->ownerRecord->taxonomies->map(
+                                    fn (Taxonomy $taxonomy) => Select::make($taxonomy->name)
+                                        ->statePath((string) $taxonomy->id)
+                                        ->multiple()
+                                        ->options(
+                                            $taxonomy->taxonomyTerms->sortBy('name')
+                                                ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->id => $term->name])
+                                                ->toArray()
+                                        )
+                                )->toArray()
+                            )
+                            ->dehydrated(false),
+                        Hidden::make('taxonomy_terms')
+                            ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies'), 1))
                     ])
                         ->columnSpan(4)
-                        ->when(fn (self $livewire) => ! empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()),
+                        ->when(fn (self $livewire) => !empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()),
+                    SchemaFormBuilder::make('data', fn () => $this->ownerRecord->blueprint->schema)
+                        ->columnSpan($this->getMainColumnOffset()),
                 ]),
-
-            SchemaFormBuilder::make('data', fn () => $this->ownerRecord->blueprint->schema),
         ];
     }
 
@@ -110,12 +134,11 @@ class CreateCollectionEntry extends CreateRecord
 
     protected function generateTaxonomySelections(): void
     {
-
     }
 
     protected function getMainColumnOffset(): int
     {
-        if ( ! empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()) {
+        if (!empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()) {
             return 8;
         }
 

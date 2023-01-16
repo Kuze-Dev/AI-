@@ -16,11 +16,17 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use Carbon\Carbon;
+use Closure;
 use Domain\Collection\Actions\UpdateCollectionEntryAction;
 use Domain\Collection\Models\Collection;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Resources\RelationManagers\RelationGroup;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -40,7 +46,8 @@ class EditCollectionEntry extends EditRecord
      */
     public function mount($record, string $ownerRecord = ''): void
     {
-        $this->ownerRecord = static::getResource()::resolveRecordRouteBinding($ownerRecord);
+        $this->ownerRecord = static::getResource()::resolveRecordRouteBinding($ownerRecord)->load('taxonomies.taxonomyTerms');
+        // $this->ownerRecord = static::getResource()::resolveRecordRouteBinding($ownerRecord);
         $this->record = app(CollectionEntry::class)->resolveRouteBinding($record);
 
         if ($this->ownerRecord === null) {
@@ -90,19 +97,25 @@ class EditCollectionEntry extends EditRecord
                     ->minDate(Carbon::now()->startOfDay())
                     ->timezone(Auth::user()?->timezone)
                     ->when(fn (self $livewire) => $livewire->ownerRecord->hasPublishDates()),
-                Select::make('taxonomy_terms')
-                    ->multiple()
-                    ->relationship('taxonomyTerms', 'id')
-                    ->options(
-                        collect($this->ownerRecord->taxonomy->taxonomyTerms)
-                            ->mapWithKeys(fn ($terms) => [
-                                $terms->id => Str::headline($terms->name),
-                            ])
+                Group::make()
+                    ->statePath('taxonomies')
+                    ->schema(
+                        fn () => $this->ownerRecord->taxonomies->map(
+                            fn (Taxonomy $taxonomy) => Select::make($taxonomy->name)
+                                ->statePath((string) $taxonomy->id)
+                                ->multiple()
+                                ->options(
+                                    $taxonomy->taxonomyTerms->sortBy('name')
+                                        ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->id => $term->name])
+                                        ->toArray()
+                                )
+                                ->afterStateHydrated(fn (Select $component, CollectionEntry $record) => $component->state($record->taxonomyTerms->where('taxonomy_id', $taxonomy->id)->pluck('id')->toArray()))
+                        )->toArray()
                     )
-                    ->required()
-                    ->searchable()
-                    ->preload()
-                    ->reactive(),
+                    ->dehydrated(false),
+                Hidden::make('taxonomy_terms')
+                    ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies'), 1))
+                
             ]),
             SchemaFormBuilder::make('data', fn () => $this->ownerRecord->blueprint->schema),
         ];
