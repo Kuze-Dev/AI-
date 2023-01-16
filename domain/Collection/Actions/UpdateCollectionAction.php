@@ -23,7 +23,8 @@ class UpdateCollectionAction
             'is_sortable' => $collectionData->is_sortable,
         ]);
 
-        $collection->taxonomies()->sync($collectionData->taxonomies);
+        $collection->taxonomies()
+            ->sync($collectionData->taxonomies);
 
         return $collection;
     }

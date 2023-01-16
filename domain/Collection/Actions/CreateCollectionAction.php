@@ -21,9 +21,8 @@ class CreateCollectionAction
             'is_sortable' => $collectionData->is_sortable,
         ]);
 
-        if ( ! empty($collectionData->taxonomies)) {
-            $collection->taxonomies()->attach($collectionData->taxonomies);
-        }
+        $collection->taxonomies()
+            ->attach($collectionData->taxonomies);
 
         return $collection;
     }

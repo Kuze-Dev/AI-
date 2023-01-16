@@ -22,7 +22,8 @@ class UpdateCollectionEntryAction
             'data' => $collectionEntryData->data,
         ]);
 
-        $collectionEntry->taxonomyTerms()->sync($collectionEntryData->taxonomy_terms);
+        $collectionEntry->taxonomyTerms()
+            ->sync($collectionEntryData->taxonomy_terms);
 
         return $collectionEntry;
     }
