@@ -147,22 +147,4 @@ class CreateCollectionEntry extends CreateRecord
     {
         return static::getResource()::getUrl('edit', ['record' => $this->ownerRecord]);
     }
-
-    // protected function getMainColumnOffset(): int
-    // {
-    //     if (!empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()) {
-    //         return 8;
-    //     }
-
-    //     return 12;
-    // }
-
-    // protected function getSideColumnOffset(): int
-    // {
-    //     if (!empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()) {
-    //         return 4;
-    //     }
-
-    //     return 0;
-    // }
 }
