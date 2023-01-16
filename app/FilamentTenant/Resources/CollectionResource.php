@@ -55,9 +55,12 @@ class CollectionResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->disabled(fn (?Collection $record) => $record !== null),
                     Forms\Components\Select::make('blueprint_id')
-                        ->relationship('blueprint', 'name')
-                        ->saveRelationshipsUsing(null)
                         ->required()
+                        ->options(
+                            fn () => Blueprint::orderBy('name')
+                                ->pluck('name', 'id')
+                                ->toArray()
+                        )
                         ->exists(Blueprint::class, 'id')
                         ->searchable()
                         ->preload()
@@ -79,8 +82,6 @@ class CollectionResource extends Resource
                                 ->toArray()
                         )
                         ->searchable()
-                        ->preload()
-                        ->reactive()
                         ->afterStateHydrated(function (Forms\Components\Select $component, ?Collection $record) {
                             $component->state($record ? $record->taxonomies->pluck('id')->toArray() : []);
                         }),
@@ -90,18 +91,18 @@ class CollectionResource extends Resource
                             ->reactive()
                             ->afterStateHydrated(fn (?Collection $record, Forms\Components\Toggle $component) => $component->state($record && $record->hasPublishDates()))
                             ->dehydrated(false),
-                        Forms\Components\Grid::make(12)
+                        Forms\Components\Grid::make(['sm' => 2])
                             ->schema([
                                 Forms\Components\Select::make('past_publish_date_behavior')
-                                    ->reactive()
                                     ->options(
                                         collect(PublishBehavior::cases())
                                             ->mapWithKeys(fn (PublishBehavior $behaviorType) => [
                                                 $behaviorType->value => Str::headline($behaviorType->value),
                                             ])
+                                            ->toArray()
                                     )
                                     ->searchable()
-                                    ->columnSpan(6)
+                                    ->columnSpan(['sm' => 1])
                                     ->required(),
                                 Forms\Components\Select::make('future_publish_date_behavior')
                                     ->options(
@@ -109,9 +110,10 @@ class CollectionResource extends Resource
                                             ->mapWithKeys(fn (PublishBehavior $behaviorType) => [
                                                 $behaviorType->value => Str::headline($behaviorType->value),
                                             ])
+                                            ->toArray()
                                     )
                                     ->searchable()
-                                    ->columnSpan(6)
+                                    ->columnSpan(['sm' => 1])
                                     ->required(),
                             ])->when(fn (Closure $get) => $get('display_publish_dates')),
                     ]),
