@@ -14,6 +14,7 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Unique;
 
 class TenantResource extends Resource
 {
@@ -46,7 +47,13 @@ class TenantResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('domain')
                                     ->required()
-                                    ->unique('domains', ignoreRecord: true)
+                                    ->unique(
+                                        'domains',
+                                        callback: fn (?Tenant $record, Unique $rule, ?string $state) => $rule
+                                            ->when($domain = $record?->domains->firstWhere('domain', $state))
+                                            ->ignore($domain),
+                                        ignoreRecord: true
+                                    )
                                     ->rules([new FullyQualifiedDomainNameRule()]),
                             ]),
                     ]),
