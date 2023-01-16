@@ -24,8 +24,6 @@ class PageController
 
     public function show(Page $page): PageResource
     {
-        $page->load('sliceContents.slice');
-
         return PageResource::make($page);
     }
 }

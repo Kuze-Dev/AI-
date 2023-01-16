@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
-use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
@@ -12,14 +11,14 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class SliceContentResource extends JsonApiResource
 {
-    protected function toAttributes(Request $request): array
+    public function toAttributes($request): array
     {
         return  [
             'data' => $this->data,
         ];
     }
 
-    protected function toRelationships(Request $request): array
+    public function toRelationships($request): array
     {
         return [
             'slice' => fn () => SliceResource::make($this->slice),
