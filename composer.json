@@ -10,6 +10,7 @@
         "artificertech/filament-multi-context": "^2.0",
         "aws/aws-sdk-php": "^3.252",
         "bacon/bacon-qr-code": "^2.0",
+        "fakerphp/faker": "^1.21",
         "filament/filament": "^2.16.6",
         "filament/spatie-laravel-settings-plugin": "^2.0",
         "guzzlehttp/guzzle": "^7.2",
@@ -34,7 +35,6 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",
         "barryvdh/laravel-ide-helper": "^2.12",
-        "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.2",
         "laravel/sail": "^1.0.1",
         "nunomaduro/collision": "^6.1",
