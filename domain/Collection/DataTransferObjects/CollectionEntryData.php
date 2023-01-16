@@ -10,10 +10,10 @@ class CollectionEntryData
 {
     public function __construct(
         public readonly string $title,
-        public readonly ?string $slug,
+        public readonly ?string $slug = null,
         public readonly array $taxonomy_terms = [],
         public readonly ?Carbon $published_at = null,
-        public readonly ?array $data = [],
+        public readonly array $data = [],
     ) {
     }
 }
