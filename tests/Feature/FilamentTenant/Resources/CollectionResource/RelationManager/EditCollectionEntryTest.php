@@ -88,10 +88,10 @@ it('can edit collection entry', function () {
     // Check if terms has been removed from collection entry
     foreach ($taxonomyTermsInitial as $initialTerms) {
         assertDatabaseMissing(
-            'collection_entries_taxonomy_terms',
+            'collection_entry_taxonomy_term',
             [
-                'taxonomy_terms_id' => $initialTerms->getKey(),
-                'collection_entries_id' => $latestCollectionEntry->getKey(),
+                'taxonomy_term_id' => $initialTerms->getKey(),
+                'collection_entry_id' => $latestCollectionEntry->getKey(),
             ]
         );
     }
@@ -100,10 +100,10 @@ it('can edit collection entry', function () {
     // has been saved to the database
     foreach ($taxonomyTermsForUpdate as $updatedTerms) {
         assertDatabaseHas(
-            'collection_entries_taxonomy_terms',
+            'collection_entry_taxonomy_term',
             [
-                'taxonomy_terms_id' => $updatedTerms->getKey(),
-                'collection_entries_id' => $latestCollectionEntry->getKey(),
+                'taxonomy_term_id' => $updatedTerms->getKey(),
+                'collection_entry_id' => $latestCollectionEntry->getKey(),
             ]
         );
     }
@@ -182,10 +182,10 @@ it('can edit collection entry to have no taxonomy terms attached', function () {
     // Check if terms has been removed from collection entry
     foreach ($taxonomyTermsInitial as $initialTerms) {
         assertDatabaseMissing(
-            'collection_entries_taxonomy_terms',
+            'collection_entry_taxonomy_term',
             [
-                'taxonomy_terms_id' => $initialTerms->getKey(),
-                'collection_entries_id' => $latestCollectionEntry->getKey(),
+                'taxonomy_term_id' => $initialTerms->getKey(),
+                'collection_entry_id' => $latestCollectionEntry->getKey(),
             ]
         );
     }

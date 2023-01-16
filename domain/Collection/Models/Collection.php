@@ -92,12 +92,7 @@ class Collection extends Model implements IsActivitySubject
      */
     public function taxonomies(): BelongsToMany
     {
-        return $this->belongsToMany(
-            Taxonomy::class,
-            'collection_taxonomies',
-            'collection_id',
-            'taxonomy_id',
-        );
+        return $this->belongsToMany(Taxonomy::class);
     }
 
     /** Specify activity log description. */

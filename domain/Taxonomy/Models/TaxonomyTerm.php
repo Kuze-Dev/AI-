@@ -58,12 +58,7 @@ class TaxonomyTerm extends Model implements IsActivitySubject, Sortable
      */
     public function collectionEntries(): BelongsToMany
     {
-        return $this->belongsToMany(
-            CollectionEntry::class,
-            'collection_entries_taxonomy_terms',
-            'taxonomy_terms_id',
-            'collection_entries_id',
-        );
+        return $this->belongsToMany(CollectionEntry::class);
     }
 
     public function getRouteKeyName(): string

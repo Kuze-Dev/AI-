@@ -33,7 +33,7 @@ return new class () extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('collection_taxonomies', function (Blueprint $table) {
+        Schema::create('collection_taxonomy', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('collection_id')->unsigned();
             $table->unsignedBigInteger('taxonomy_id')->unsigned();
@@ -47,15 +47,15 @@ return new class () extends Migration {
                 ->onDelete('cascade');
         });
 
-        Schema::create('collection_entries_taxonomy_terms', function (Blueprint $table) {
+        Schema::create('collection_entry_taxonomy_term', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBiginteger('taxonomy_terms_id')->unsigned();
-            $table->unsignedBiginteger('collection_entries_id')->unsigned();
-            $table->foreign('taxonomy_terms_id')
+            $table->unsignedBiginteger('taxonomy_term_id')->unsigned();
+            $table->unsignedBiginteger('collection_entry_id')->unsigned();
+            $table->foreign('taxonomy_term_id')
                 ->references('id')
                 ->on('taxonomy_terms')
                 ->onDelete('cascade');
-            $table->foreign('collection_entries_id')
+            $table->foreign('collection_entry_id')
                 ->references('id')
                 ->on('collection_entries')
                 ->onDelete('cascade');
@@ -65,8 +65,9 @@ return new class () extends Migration {
     /** Reverse the migrations. */
     public function down(): void
     {
-        Schema::dropIfExists('collections');
+        Schema::dropIfExists('collection_entry_taxonomy_term');
+        Schema::dropIfExists('collection_taxonomy');
         Schema::dropIfExists('collection_entries');
-        Schema::dropIfExists('collection_entries_taxonomy_terms');
+        Schema::dropIfExists('collections');
     }
 };

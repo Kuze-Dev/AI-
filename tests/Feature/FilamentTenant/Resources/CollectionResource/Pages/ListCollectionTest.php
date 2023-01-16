@@ -42,7 +42,7 @@ it('can list collections', function () {
 
     foreach ($collections as $collection) {
         assertDatabaseHas(
-            'collection_taxonomies',
+            'collection_taxonomy',
             [
                 'taxonomy_id' => $taxonomy->getKey(),
                 'collection_id' => $collection->getKey(),
@@ -67,7 +67,7 @@ it('can delete collection', function () {
 
     assertModelMissing($collection);
     assertDatabaseMissing(
-        'collection_taxonomies',
+        'collection_taxonomy',
         [
             'taxonomy_id' => $taxonomy->getKey(),
             'collection_id' => $collection->getKey(),

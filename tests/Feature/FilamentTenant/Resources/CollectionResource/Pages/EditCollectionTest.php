@@ -84,7 +84,7 @@ it('can update collection', function () {
         ->assertOk();
 
     assertDatabaseHas(
-        'collection_taxonomies',
+        'collection_taxonomy',
         [
             'taxonomy_id' => $taxonomy->getKey(),
             'collection_id' => $collection->getKey(),
@@ -130,7 +130,7 @@ it('can update collection to have no publish date behavior', function () {
         ->assertOk();
 
     assertDatabaseHas(
-        'collection_taxonomies',
+        'collection_taxonomy',
         [
             'taxonomy_id' => $taxonomy->getKey(),
             'collection_id' => $collection->getKey(),
@@ -164,7 +164,7 @@ it('can update collection to have no taxonomy attached', function () {
         ]);
 
     assertDatabaseHas(
-        'collection_taxonomies',
+        'collection_taxonomy',
         [
             'taxonomy_id' => $taxonomy->getKey(),
             'collection_id' => $collection->getKey(),
@@ -184,7 +184,7 @@ it('can update collection to have no taxonomy attached', function () {
         ->assertOk();
 
     assertDatabaseMissing(
-        'collection_taxonomies',
+        'collection_taxonomy',
         [
             'taxonomy_id' => $taxonomy->getKey(),
             'collection_id' => $collection->getKey(),
@@ -231,7 +231,7 @@ it('can update collection to have no sorting permissions', function () {
         ->assertOk();
 
     assertDatabaseHas(
-        'collection_taxonomies',
+        'collection_taxonomy',
         [
             'taxonomy_id' => $taxonomy->getKey(),
             'collection_id' => $collection->getKey(),

@@ -47,7 +47,7 @@ it('can create collection', function () {
     assertDatabaseCount(Collection::class, 1);
 
     assertDatabaseHas(
-        'collection_taxonomies',
+        'collection_taxonomy',
         [
             'taxonomy_id' => $taxonomy->getKey(),
             'collection_id' => Collection::latest()->first()->getKey(),
@@ -76,7 +76,7 @@ it('can create collection with no taxonomy', function () {
     assertDatabaseCount(Collection::class, 1);
 
     assertDatabaseMissing(
-        'collection_taxonomies',
+        'collection_taxonomy',
         [
             'taxonomy_id' => $taxonomy->getKey(),
             'collection_id' => Collection::latest()->first()->getKey(),
@@ -106,7 +106,7 @@ it('can create collection with single taxonomy', function () {
     assertDatabaseCount(Collection::class, 1);
 
     assertDatabaseHas(
-        'collection_taxonomies',
+        'collection_taxonomy',
         [
             'taxonomy_id' => $taxonomy->getKey(),
             'collection_id' => Collection::latest()->first()->getKey(),
@@ -138,7 +138,7 @@ it('can create collection with multiple taxonomy', function () {
 
     foreach ($taxonomies as $taxonomy) {
         assertDatabaseHas(
-            'collection_taxonomies',
+            'collection_taxonomy',
             [
                 'taxonomy_id' => $taxonomy->getKey(),
                 'collection_id' => Collection::latest()->first()->getKey(),

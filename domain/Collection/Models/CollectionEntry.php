@@ -71,12 +71,7 @@ class CollectionEntry extends Model implements IsActivitySubject
      */
     public function taxonomyTerms(): BelongsToMany
     {
-        return $this->belongsToMany(
-            TaxonomyTerm::class,
-            'collection_entries_taxonomy_terms',
-            'collection_entries_id',
-            'taxonomy_terms_id'
-        );
+        return $this->belongsToMany(TaxonomyTerm::class);
     }
 
     /** Specify activity log description. */

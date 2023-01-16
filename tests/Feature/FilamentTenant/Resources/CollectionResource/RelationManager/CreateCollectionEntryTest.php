@@ -74,10 +74,10 @@ it('can create collection entry', function () {
     );
 
     assertDatabaseHas(
-        'collection_entries_taxonomy_terms',
+        'collection_entry_taxonomy_term',
         [
-            'taxonomy_terms_id' => $taxonomyTerm->getKey(),
-            'collection_entries_id' => CollectionEntry::latest()->first()->getKey(),
+            'taxonomy_term_id' => $taxonomyTerm->getKey(),
+            'collection_entry_id' => CollectionEntry::latest()->first()->getKey(),
         ]
     );
 });
@@ -129,10 +129,10 @@ it('can create collection entry with no taxonomy terms', function () {
     );
 
     assertDatabaseMissing(
-        'collection_entries_taxonomy_terms',
+        'collection_entry_taxonomy_term',
         [
-            'taxonomy_terms_id' => $taxonomyTerm->getKey(),
-            'collection_entries_id' => CollectionEntry::latest()->first()->getKey(),
+            'taxonomy_term_id' => $taxonomyTerm->getKey(),
+            'collection_entry_id' => CollectionEntry::latest()->first()->getKey(),
         ]
     );
 });
@@ -180,10 +180,10 @@ it('can create collection entry with no publish date', function () {
     );
 
     assertDatabaseMissing(
-        'collection_entries_taxonomy_terms',
+        'collection_entry_taxonomy_term',
         [
-            'taxonomy_terms_id' => $taxonomyTerm->getKey(),
-            'collection_entries_id' => CollectionEntry::latest()->first()->getKey(),
+            'taxonomy_term_id' => $taxonomyTerm->getKey(),
+            'collection_entry_id' => CollectionEntry::latest()->first()->getKey(),
         ]
     );
 });

@@ -52,12 +52,7 @@ class Taxonomy extends Model implements IsActivitySubject
      */
     public function collections(): BelongsToMany
     {
-        return $this->belongsToMany(
-            Collection::class,
-            'collection_taxonomies',
-            'taxonomy_id',
-            'collection_id'
-        );
+        return $this->belongsToMany(Collection::class);
     }
 
     public function getRouteKeyName(): string
