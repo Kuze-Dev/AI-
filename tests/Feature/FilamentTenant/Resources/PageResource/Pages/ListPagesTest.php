@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\FilamentTenant\Resources\PageResource\Pages\ListPages;
 use Domain\Page\Database\Factories\PageFactory;
+use Domain\Page\Database\Factories\SliceFactory;
 use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 
@@ -23,7 +24,7 @@ it('can render page', function () {
 
 it('can list pages', function () {
     $pages = PageFactory::new()
-        ->withDummyBlueprint()
+        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
         ->count(5)
         ->create();
 
@@ -32,30 +33,14 @@ it('can list pages', function () {
         ->assertOk();
 });
 
-it('can filter pages by blueprint', function () {
-    $pages = PageFactory::new()
-        ->withDummyBlueprint()
-        ->count(10)
-        ->create();
-
-    $blueprint = $pages->random()->blueprint;
-
-    livewire(ListPages::class)
-        ->assertCanSeeTableRecords($pages)
-        ->filterTable('blueprint', $blueprint->id)
-        ->assertCanSeeTableRecords($pages->where('blueprint_id', $blueprint->id))
-        ->assertCanNotSeeTableRecords($pages->where('blueprint_id', '!=', $blueprint->id))
-        ->assertOk();
-});
-
 it('can delete page', function () {
-    $pages = PageFactory::new()
-        ->withDummyBlueprint()
+    $page = PageFactory::new()
+        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
         ->createOne();
 
     livewire(ListPages::class)
-        ->callTableAction(DeleteAction::class, $pages)
+        ->callTableAction(DeleteAction::class, $page)
         ->assertOk();
 
-    assertModelMissing($pages);
+    assertModelMissing($page);
 });

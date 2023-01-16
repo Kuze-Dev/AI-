@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
-use Domain\Blueprint\Models\Blueprint;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -18,17 +17,22 @@ use Spatie\Sluggable\SlugOptions;
  * Domain\Page\Models\Page
  *
  * @property int $id
- * @property string $blueprint_id
  * @property string $name
- * @property array|null $data
  * @property string $slug
- *
- * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Activitylog\Models\Activity[] $activities
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
  * @property-read int|null $activities_count
- * @property-read \Domain\Blueprint\Models\Blueprint $blueprint
- * @method static \Illuminate\Database\Eloquent\Builder|\Domain\Page\Models\Page newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\Domain\Page\Models\Page newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\Domain\Page\Models\Page query()
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Page\Models\SliceContent[] $sliceContents
+ * @property-read int|null $slice_contents_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Page newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Page newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Page query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Page whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Page whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Page whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Page whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Page whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class Page extends Model implements IsActivitySubject
@@ -37,14 +41,8 @@ class Page extends Model implements IsActivitySubject
     use HasSlug;
 
     protected $fillable = [
-        'blueprint_id',
         'name',
         'slug',
-        'data',
-    ];
-
-    protected $casts = [
-        'data' => 'array',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -55,10 +53,10 @@ class Page extends Model implements IsActivitySubject
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Page\Models\Page> */
-    public function blueprint(): BelongsTo
+    /** @return HasMany<SliceContent> */
+    public function sliceContents(): HasMany
     {
-        return $this->belongsTo(Blueprint::class);
+        return $this->hasMany(SliceContent::class);
     }
 
     public function getActivitySubjectDescription(Activity $activity): string

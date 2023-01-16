@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Page\Actions\UpdatePageAction;
 use Domain\Page\Database\Factories\PageFactory;
+use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
+use Domain\Page\Models\SliceContent;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -15,45 +16,29 @@ beforeEach(fn () => testInTenantContext());
 
 it('can update page', function () {
     $page = PageFactory::new()
-        ->withDummyBlueprint()
+        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
         ->createOne();
 
     app(UpdatePageAction::class)
         ->execute(
             $page,
-            new PageData(
-                name: 'Foo',
-                blueprint_id: $page->blueprint_id,
-            )
+            PageData::fromArray([
+                'name' => 'Foo',
+                'slice_contents' => [
+                    [
+                        'slice_id' => $page->sliceContents->first()->slice_id,
+                        'data' => ['name' => 'foo'],
+                    ],
+                ],
+            ])
         );
 
     assertDatabaseCount(Page::class, 1);
-    assertDatabaseHas(Page::class, [
-        'name' => 'Foo',
-    ]);
-});
-
-it('can clear data when blueprint is changed', function () {
-    $name = fake()->realText();
-    $blueprint = BlueprintFactory::new()->withDummySchema()->createOne();
-
-    $page = PageFactory::new()
-        ->withDummyBlueprint()
-        ->createOne(['data' => ['foo' => ['bar' => 'baz']]]);
-
-    app(UpdatePageAction::class)
-        ->execute(
-            $page,
-            new PageData(
-                name: $name,
-                blueprint_id: $blueprint->id
-            )
-        );
-
-    assertDatabaseCount(Page::class, 1);
-    assertDatabaseHas(Page::class, [
-        'name' => $name,
-        'blueprint_id' => $blueprint->id,
-        'data' => null,
+    assertDatabaseCount(SliceContent::class, 1);
+    assertDatabaseHas(Page::class, ['name' => 'Foo']);
+    assertDatabaseHas(SliceContent::class, [
+        'page_id' => $page->id,
+        'slice_id' => $page->sliceContents->first()->slice_id,
+        'data' => json_encode(['name' => 'foo']),
     ]);
 });

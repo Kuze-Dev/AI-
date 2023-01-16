@@ -16,7 +16,7 @@ class PageController
     public function index(): JsonApiResourceCollection
     {
         return PageResource::collection(
-            QueryBuilder::for(Page::query()->select(['name', 'slug']))
+            QueryBuilder::for(Page::query())
                 ->allowedFilters(['name', 'slug'])
                 ->jsonPaginate()
         );
@@ -24,6 +24,8 @@ class PageController
 
     public function show(Page $page): PageResource
     {
+        $page->load('sliceContents.slice');
+
         return PageResource::make($page);
     }
 }

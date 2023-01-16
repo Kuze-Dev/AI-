@@ -8,21 +8,21 @@ use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @mixin \Domain\Page\Models\Page
+ * @mixin \Domain\Page\Models\SliceContent
  */
-class PageResource extends JsonApiResource
+class SliceContentResource extends JsonApiResource
 {
     protected function toAttributes(Request $request): array
     {
         return  [
-            'name' => $this->name,
+            'data' => $this->data,
         ];
     }
 
     protected function toRelationships(Request $request): array
     {
         return [
-            'sliceContents' => fn () => SliceContentResource::collection($this->sliceContents),
+            'slice' => fn () => SliceResource::make($this->slice),
         ];
     }
 }
