@@ -21,8 +21,8 @@ class CollectionController
     public function index(): JsonApiResourceCollection
     {
         return CollectionResource::collection(
-            QueryBuilder::for(Collection::query()->select(['name', 'slug']))
-                ->allowedIncludes(['blueprint', 'taxonomies','collectionEntries'])
+            QueryBuilder::for(Collection::query())
+                ->allowedIncludes(['taxonomies'])
                 ->allowedFilters(['name', 'slug'])
                 ->jsonPaginate()
         );

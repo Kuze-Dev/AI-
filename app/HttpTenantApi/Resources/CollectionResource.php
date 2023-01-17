@@ -7,10 +7,7 @@ namespace App\HttpTenantApi\Resources;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @property-read string $name,
- * @property-read string|null $past_publish_date_behavior
- * @property-read string|null $future_publish_date_behavior
- * @property-read bool $is_sortable
+ * @mixin \Domain\Collection\Models\Collection
  */
 class CollectionResource extends JsonApiResource
 {
@@ -27,9 +24,7 @@ class CollectionResource extends JsonApiResource
     public function toRelationships($request): array
     {
         return [
-            'blueprint' => fn () => BlueprintResource::make($this->blueprint),
             'taxonomies' => fn () => TaxonomyResource::collection($this->taxonomies),
-            'collectionEntries' => fn () => CollectionEntryResource::collection($this->collectionEntries)
         ];
     }
 }

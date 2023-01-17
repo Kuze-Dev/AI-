@@ -11,7 +11,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
-#[ApiResource('collections.entries', only: ['index', 'show'], parameters: ['entry' => 'collectionEntry'])]
+#[ApiResource('collections.entries', only: ['index', 'show'], parameters: ['entries' => 'collectionEntry'])]
 class CollectionEntryController
 {
     public function index(Collection $collection): JsonApiResourceCollection

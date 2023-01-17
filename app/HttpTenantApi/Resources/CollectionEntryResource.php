@@ -7,10 +7,7 @@ namespace App\HttpTenantApi\Resources;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @property-read string $title,
- * @property-read array $data
- * @property-read int $order
- * @property-read \Carbon\Carbon published_at
+ * @mixin \Domain\Collection\Models\CollectionEntry
  */
 class CollectionEntryResource extends JsonApiResource
 {

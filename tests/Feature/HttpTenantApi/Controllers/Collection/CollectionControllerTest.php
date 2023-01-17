@@ -20,14 +20,14 @@ it('can list collections', function () {
 
     $taxonomy = TaxonomyFactory::new()
         ->createOne();
-    
+
     $collections = CollectionFactory::new()
         ->for($blueprint)
         ->count(10)
         ->create();
 
-    foreach($collections as $collection) {
-        $collection->taxonomies()->attach([ $taxonomy->getKey() ]);
+    foreach ($collections as $collection) {
+        $collection->taxonomies()->attach([$taxonomy->getKey()]);
     }
 
     getJson('api/collections')
@@ -35,11 +35,10 @@ it('can list collections', function () {
         ->assertJson(function (AssertableJson $json) {
             $json
                 ->count('data', 10)
-                ->where('data.0.type','collections')
+                ->where('data.0.type', 'collections')
                 ->whereType('data.0.attributes.name', 'string')
                 ->etc();
         });
-
 });
 
 it('can show a collection', function () {
@@ -55,7 +54,7 @@ it('can show a collection', function () {
         ->createOne();
 
     $collection->taxonomies()->attach([$taxonomy->getKey()]);
-    
+
     getJson('api/collections/' . $collection->getRouteKey())
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($collection) {
