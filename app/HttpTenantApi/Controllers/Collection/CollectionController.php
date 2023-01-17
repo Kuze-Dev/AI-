@@ -10,11 +10,6 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
-// [list] /api/collections
-// [show] /api/collections/:collection
-// [list] /api/collections/:collection/entries
-// [show] /api/collections/:collection/entries/:entry
-
 #[ApiResource('collections', only: ['index', 'show'])]
 class CollectionController
 {

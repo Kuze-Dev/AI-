@@ -17,8 +17,7 @@ class CollectionEntryController
     public function index(Collection $collection): JsonApiResourceCollection
     {
         return CollectionEntryResource::collection(
-            QueryBuilder::for($collection->collectionEntries()
-                ->select(['title', 'slug', 'data', 'collection_id', 'order', 'published_at']))
+            QueryBuilder::for($collection->collectionEntries())
                 ->allowedFilters(['title', 'slug', 'order', 'published_at'])
                 ->jsonPaginate()
         );
