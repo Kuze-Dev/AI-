@@ -121,7 +121,7 @@ class CreateCollectionEntry extends CreateRecord
                             )
                             ->dehydrated(false),
                         Hidden::make('taxonomy_terms')
-                            ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies'), 1)),
+                            ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                     ])
                         ->columnSpan(['lg' => 1])
                         ->when(fn () => ! empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()),

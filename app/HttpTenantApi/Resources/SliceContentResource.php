@@ -15,6 +15,7 @@ class SliceContentResource extends JsonApiResource
     {
         return  [
             'data' => $this->data,
+            'order' => $this->order,
         ];
     }
 
