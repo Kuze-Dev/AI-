@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Filament\Facades\Filament;
 use Domain\Page\Database\Factories\PageFactory;
+use Domain\Page\Database\Factories\SliceFactory;
 
 beforeEach(function () {
     testInTenantContext();
@@ -25,6 +26,26 @@ it('Page resource must be globaly searchable', function () {
     ),
 
         $results->getCategories()['pages']->first()->url
+        
+    );
+   
+});
+
+it('Slice resource must be globaly searchable', function () {
+
+    $data = SliceFactory::new()
+            ->withDummyBlueprint()
+            ->createOne();
+
+    $results = Filament::getGlobalSearchProvider()
+            ->getResults($data->name);
+
+    $this->assertEquals(
+        route('filament-tenant.resources.slices.edit',
+        $data->getRouteKey()
+    ),
+
+        $results->getCategories()['slices']->first()->url
         
     );
    
