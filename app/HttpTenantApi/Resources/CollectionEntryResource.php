@@ -21,7 +21,7 @@ class CollectionEntryResource extends JsonApiResource
             'title' => $this->title,
             'data' => $this->data,
             'order' => $this->order,
-            'published_at' => $this->published_at
+            'published_at' => $this->published_at,
         ];
     }
 }

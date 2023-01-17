@@ -18,8 +18,8 @@ class CollectionEntryController
     {
         return CollectionEntryResource::collection(
             QueryBuilder::for($collection->collectionEntries()
-                ->select(['title','slug','data', 'collection_id', 'order', 'published_at']))
-                ->allowedFilters(['title','slug','order','published_at'])
+                ->select(['title', 'slug', 'data', 'collection_id', 'order', 'published_at']))
+                ->allowedFilters(['title', 'slug', 'order', 'published_at'])
                 ->jsonPaginate()
         );
     }

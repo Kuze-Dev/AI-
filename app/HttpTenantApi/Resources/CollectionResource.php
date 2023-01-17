@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
@@ -30,6 +30,7 @@ class CollectionResource extends JsonApiResource
         return [
             'blueprint' => fn () => BlueprintResource::make($this->blueprint),
             'taxonomies' => fn () => TaxonomyResource::collection($this->taxonomies),
+            'entries' => fn () => CollectionEntryResource::collection($this->collectionEntries)
         ];
     }
 }

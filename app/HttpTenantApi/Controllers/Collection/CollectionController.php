@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Collection;
 
@@ -22,8 +22,9 @@ class CollectionController
     {
         return CollectionResource::collection(
             QueryBuilder::for(Collection::query()->select(['name', 'slug']))
-            ->allowedFilters(['name','slug'])
-            ->jsonPaginate()
+                ->allowedIncludes(['blueprint', 'taxonomies','entries'])
+                ->allowedFilters(['name', 'slug'])
+                ->jsonPaginate()
         );
     }
 
