@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Collection\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Collection\Models\Builders\CollectionEntryBuilder;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -97,5 +98,10 @@ class CollectionEntry extends Model implements IsActivitySubject
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function newEloquentBuilder($query)
+    {
+        return new CollectionEntryBuilder($query);
     }
 }
