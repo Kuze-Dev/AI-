@@ -18,9 +18,11 @@ use Filament\Tables;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Taxonomy\Models\Taxonomy;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 
 class CollectionResource extends Resource
 {
@@ -37,6 +39,24 @@ class CollectionResource extends Resource
 
     /** @var string|null */
     protected static ?string $recordTitleAttribute = 'name';
+
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'collectionEntries.title'];
+    }
+
+    protected static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with('collectionEntries');
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Total Entries' => $record->collectionEntries->count(),
+        ];
+    }
 
     /**
      * @param Form $form
@@ -189,4 +209,5 @@ class CollectionResource extends Resource
             'entry.edit' => Resources\CollectionResource\Pages\EditCollectionEntry::route('/{ownerRecord}/entry/{record}/edit'),
         ];
     }
+ 
 }
