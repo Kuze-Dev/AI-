@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Domain\Taxonomy\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Collection\Models\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -40,6 +42,17 @@ class Taxonomy extends Model implements IsActivitySubject
     public function taxonomyTerms(): HasMany
     {
         return $this->hasMany(TaxonomyTerm::class);
+    }
+
+    /**
+     * Declare relationship of
+     * current model to collections.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Collection\Models\Collection>
+     */
+    public function collections(): BelongsToMany
+    {
+        return $this->belongsToMany(Collection::class);
     }
 
     public function getRouteKeyName(): string

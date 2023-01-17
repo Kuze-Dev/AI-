@@ -6,6 +6,8 @@ namespace App\Providers;
 
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Collection\Models\Collection;
+use Domain\Collection\Models\CollectionEntry;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
@@ -50,6 +52,8 @@ class AppServiceProvider extends ServiceProvider
             FormEmailNotification::class,
             Taxonomy::class,
             TaxonomyTerm::class,
+            Collection::class,
+            CollectionEntry::class,
         ]);
 
         Password::defaults(
