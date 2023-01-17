@@ -34,6 +34,15 @@ class BucketManager
         return Arr::only($config, ['credentials', 'endpoint', 'region', 'version', 'use_path_style_endpoint']);
     }
 
+    public function bucketExists(): bool
+    {
+        $result = $this->s3Client->listBuckets();
+
+        $buckets = Arr::pluck($result['Buckets'], 'Name');
+
+        return in_array($this->tenant->getInternal('bucket'), $buckets);
+    }
+
     public function createBucket(): void
     {
         $this->s3Client->createBucket(['Bucket' => $this->tenant->getInternal('bucket')]);
