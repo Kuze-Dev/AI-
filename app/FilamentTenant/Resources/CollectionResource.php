@@ -40,7 +40,6 @@ class CollectionResource extends Resource
     /** @var string|null */
     protected static ?string $recordTitleAttribute = 'name';
 
-
     public static function getGloballySearchableAttributes(): array
     {
         return ['name', 'collectionEntries.title'];
