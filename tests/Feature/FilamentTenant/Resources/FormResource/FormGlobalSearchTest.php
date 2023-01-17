@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Filament\Facades\Filament;
+use Domain\Form\Database\Factories\FormFactory;
 
 beforeEach(function () {
     testInTenantContext();
@@ -13,21 +13,21 @@ beforeEach(function () {
 
 it('blueprint must have a getGloballySearchableAttribute', function () {
 
-    $data = BlueprintFactory::new()
-            ->withDummySchema()
+    $data = FormFactory::new()
+            ->withDummyBlueprint()
             ->create();
     
     $results = Filament::getGlobalSearchProvider()
             ->getResults($data->name);
-  
+
     $this->assertEquals(
-        route('filament-tenant.resources.blueprints.edit',
+        route('filament-tenant.resources.forms.edit',
         $data->getRouteKey()
     ),
 
-        $results->getCategories()['blueprints']->first()->url
+        $results->getCategories()['forms']->first()->url
         
     );
    
-});
+})->only();
 
