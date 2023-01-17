@@ -11,7 +11,7 @@ beforeEach(function () {
     loginAsSuperAdmin();
 });
 
-it('blueprint must have a getGloballySearchableAttribute', function () {
+it('blueprint resource must be globaly searchable', function () {
 
     $data = BlueprintFactory::new()
             ->withDummySchema()

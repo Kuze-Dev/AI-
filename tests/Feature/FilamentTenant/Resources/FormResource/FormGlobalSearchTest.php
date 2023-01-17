@@ -11,7 +11,7 @@ beforeEach(function () {
     loginAsSuperAdmin();
 });
 
-it('blueprint must have a getGloballySearchableAttribute', function () {
+it('form resource must be globaly searchable', function () {
 
     $data = FormFactory::new()
             ->withDummyBlueprint()
@@ -29,5 +29,5 @@ it('blueprint must have a getGloballySearchableAttribute', function () {
         
     );
    
-})->only();
+});
 
