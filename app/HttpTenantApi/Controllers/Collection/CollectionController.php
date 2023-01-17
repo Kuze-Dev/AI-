@@ -22,7 +22,7 @@ class CollectionController
     {
         return CollectionResource::collection(
             QueryBuilder::for(Collection::query()->select(['name', 'slug']))
-                ->allowedIncludes(['blueprint', 'taxonomies','entries'])
+                ->allowedIncludes(['blueprint', 'taxonomies','collectionEntries'])
                 ->allowedFilters(['name', 'slug'])
                 ->jsonPaginate()
         );

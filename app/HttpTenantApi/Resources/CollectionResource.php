@@ -30,7 +30,7 @@ class CollectionResource extends JsonApiResource
         return [
             'blueprint' => fn () => BlueprintResource::make($this->blueprint),
             'taxonomies' => fn () => TaxonomyResource::collection($this->taxonomies),
-            'entries' => fn () => CollectionEntryResource::collection($this->collectionEntries)
+            'collectionEntries' => fn () => CollectionEntryResource::collection($this->collectionEntries)
         ];
     }
 }
