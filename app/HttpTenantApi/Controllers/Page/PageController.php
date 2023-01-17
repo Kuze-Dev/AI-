@@ -22,8 +22,12 @@ class PageController
         );
     }
 
-    public function show(Page $page): PageResource
+    public function show(string $page): PageResource
     {
-        return PageResource::make($page);
+        return PageResource::make(
+            QueryBuilder::for(Page::whereSlug($page))
+                ->allowedIncludes(['sliceContents.slice'])
+                ->firstOrFail()
+        );
     }
 }
