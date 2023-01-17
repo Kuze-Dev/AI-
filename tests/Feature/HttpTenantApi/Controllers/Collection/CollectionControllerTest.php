@@ -58,7 +58,7 @@ it('can list collections with taxonomies', function () {
         $collection->taxonomies()->attach([$taxonomy->getKey()]);
     }
 
-    getJson("api/collections?include=taxonomies")
+    getJson('api/collections?include=taxonomies')
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json

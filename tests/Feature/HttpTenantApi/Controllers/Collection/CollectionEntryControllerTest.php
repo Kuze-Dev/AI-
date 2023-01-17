@@ -32,17 +32,17 @@ it('can list collection entries', function () {
                 ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
         )
         ->createOne();
-    
-    $collection->taxonomies()->attach([ $taxonomy->getKey() ]);
+
+    $collection->taxonomies()->attach([$taxonomy->getKey()]);
 
     $collectionEntries = CollectionEntryFactory::new()
         ->for($collection)
         ->count(10)
         ->create([
-            'data' => ['main' => ['header' => 'Foo']]
+            'data' => ['main' => ['header' => 'Foo']],
         ]);
-    
-    foreach($collectionEntries as $entry) {
+
+    foreach ($collectionEntries as $entry) {
         $entry->taxonomyTerms()->attach($taxonomyTerms->pluck('id'));
     }
 
@@ -54,7 +54,6 @@ it('can list collection entries', function () {
                 ->whereType('data.0.attributes.title', 'string')
                 ->etc();
         });
-
 });
 
 it('can show collection entry', function () {
@@ -73,15 +72,15 @@ it('can show collection entry', function () {
                 ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
         )
         ->createOne();
-    
-    $collection->taxonomies()->attach([ $taxonomy->getKey() ]);
+
+    $collection->taxonomies()->attach([$taxonomy->getKey()]);
 
     $collectionEntry = CollectionEntryFactory::new()
         ->for($collection)
         ->createOne([
-            'data' => ['main' => ['header' => 'Foo']]
+            'data' => ['main' => ['header' => 'Foo']],
         ]);
-    
+
     $collectionEntry->taxonomyTerms()->attach($taxonomyTerms->pluck('id'));
 
     getJson("api/collections/{$collection->getRouteKey()}/entries/{$collectionEntry->getRouteKey()}")
@@ -91,5 +90,4 @@ it('can show collection entry', function () {
                 ->whereType('data.attributes.title', 'string')
                 ->etc();
         });
-
 });
