@@ -20,15 +20,12 @@ it('Page resource must be globaly searchable', function () {
     $results = Filament::getGlobalSearchProvider()
             ->getResults($data->name);
 
-    $this->assertEquals(
-        route('filament-tenant.resources.pages.edit',
-        $data->getRouteKey()
-    ),
-
+    expect(
+        route('filament-tenant.resources.pages.edit',$data->getRouteKey())
+    )->toEqual(
         $results->getCategories()['pages']->first()->url
-        
     );
-   
+
 });
 
 it('Slice resource must be globaly searchable', function () {
@@ -40,13 +37,10 @@ it('Slice resource must be globaly searchable', function () {
     $results = Filament::getGlobalSearchProvider()
             ->getResults($data->name);
 
-    $this->assertEquals(
-        route('filament-tenant.resources.slices.edit',
-        $data->getRouteKey()
-    ),
-
+    expect(
+        route('filament-tenant.resources.slices.edit',$data->getRouteKey())
+    )->toEqual(
         $results->getCategories()['slices']->first()->url
-        
     );
    
 });

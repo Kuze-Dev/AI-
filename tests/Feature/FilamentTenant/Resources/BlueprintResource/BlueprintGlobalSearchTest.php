@@ -20,14 +20,10 @@ it('blueprint resource must be globaly searchable', function () {
     $results = Filament::getGlobalSearchProvider()
             ->getResults($data->name);
   
-    $this->assertEquals(
-        route('filament-tenant.resources.blueprints.edit',
-        $data->getRouteKey()
-    ),
-
-        $results->getCategories()['blueprints']->first()->url
-        
-    );
-   
+    expect(
+        route('filament-tenant.resources.blueprints.edit',$data->getRouteKey())
+        )->toEqual(
+            $results->getCategories()['blueprints']->first()->url
+        );
 });
 

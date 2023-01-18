@@ -19,14 +19,11 @@ it('Taxonomy resource must be globaly searchable', function () {
     $results = Filament::getGlobalSearchProvider()
             ->getResults($data->name);
     
-    $this->assertEquals(
-        route('filament-tenant.resources.taxonomies.edit',
-        $data->getRouteKey()
-    ),
-
-        $results->getCategories()['taxonomies']->first()->url
-        
-    );
+    expect(
+        route('filament-tenant.resources.taxonomies.edit',$data->getRouteKey())
+        )->toEqual(
+            $results->getCategories()['taxonomies']->first()->url
+        );
    
 });
 

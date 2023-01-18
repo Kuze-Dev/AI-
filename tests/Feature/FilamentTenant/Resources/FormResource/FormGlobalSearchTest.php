@@ -20,13 +20,10 @@ it('form resource must be globaly searchable', function () {
     $results = Filament::getGlobalSearchProvider()
             ->getResults($data->name);
 
-    $this->assertEquals(
-        route('filament-tenant.resources.forms.edit',
-        $data->getRouteKey()
-    ),
-
+    expect(
+        route('filament-tenant.resources.forms.edit',$data->getRouteKey())
+    )->toEqual(
         $results->getCategories()['forms']->first()->url
-        
     );
    
 });
