@@ -13,35 +13,30 @@ beforeEach(function () {
 });
 
 it('Page resource must be globaly searchable', function () {
-
     $data = PageFactory::new()
-            ->create();
-    
+        ->create();
+
     $results = Filament::getGlobalSearchProvider()
-            ->getResults($data->name);
+        ->getResults($data->name);
 
     expect(
-        route('filament-tenant.resources.pages.edit',$data->getRouteKey())
+        route('filament-tenant.resources.pages.edit', $data->getRouteKey())
     )->toEqual(
         $results->getCategories()['pages']->first()->url
     );
-
 });
 
 it('Slice resource must be globaly searchable', function () {
-
     $data = SliceFactory::new()
-            ->withDummyBlueprint()
-            ->createOne();
+        ->withDummyBlueprint()
+        ->createOne();
 
     $results = Filament::getGlobalSearchProvider()
-            ->getResults($data->name);
+        ->getResults($data->name);
 
     expect(
-        route('filament-tenant.resources.slices.edit',$data->getRouteKey())
+        route('filament-tenant.resources.slices.edit', $data->getRouteKey())
     )->toEqual(
         $results->getCategories()['slices']->first()->url
     );
-   
 });
-

@@ -208,5 +208,4 @@ class CollectionResource extends Resource
             'entry.edit' => Resources\CollectionResource\Pages\EditCollectionEntry::route('/{ownerRecord}/entry/{record}/edit'),
         ];
     }
- 
 }

@@ -12,18 +12,15 @@ beforeEach(function () {
 });
 
 it('Taxonomy resource must be globaly searchable', function () {
-
     $data = TaxonomyFactory::new()
-            ->create();
-    
-    $results = Filament::getGlobalSearchProvider()
-            ->getResults($data->name);
-    
-    expect(
-        route('filament-tenant.resources.taxonomies.edit',$data->getRouteKey())
-        )->toEqual(
-            $results->getCategories()['taxonomies']->first()->url
-        );
-   
-});
+        ->create();
 
+    $results = Filament::getGlobalSearchProvider()
+        ->getResults($data->name);
+
+    expect(
+        route('filament-tenant.resources.taxonomies.edit', $data->getRouteKey())
+    )->toEqual(
+        $results->getCategories()['taxonomies']->first()->url
+    );
+});

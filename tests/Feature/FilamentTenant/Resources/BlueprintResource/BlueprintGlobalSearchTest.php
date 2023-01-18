@@ -12,18 +12,16 @@ beforeEach(function () {
 });
 
 it('blueprint resource must be globaly searchable', function () {
-
     $data = BlueprintFactory::new()
-            ->withDummySchema()
-            ->create();
-    
-    $results = Filament::getGlobalSearchProvider()
-            ->getResults($data->name);
-  
-    expect(
-        route('filament-tenant.resources.blueprints.edit',$data->getRouteKey())
-        )->toEqual(
-            $results->getCategories()['blueprints']->first()->url
-        );
-});
+        ->withDummySchema()
+        ->create();
 
+    $results = Filament::getGlobalSearchProvider()
+        ->getResults($data->name);
+
+    expect(
+        route('filament-tenant.resources.blueprints.edit', $data->getRouteKey())
+    )->toEqual(
+        $results->getCategories()['blueprints']->first()->url
+    );
+});
