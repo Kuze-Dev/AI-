@@ -53,7 +53,7 @@ class CollectionResource extends Resource
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         return [
-            'Total Entries' => $record->collectionEntries->count(),
+            trans('Total Entries') => $record->collectionEntries->count(),
         ];
     }
 
