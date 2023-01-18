@@ -22,6 +22,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * Domain\Collection\Models\Collection
  *
  * @property bool $is_sortable
+ * @property-read int $collection_entries_count
+ *
  */
 class Collection extends Model implements IsActivitySubject
 {

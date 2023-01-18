@@ -50,10 +50,11 @@ class CollectionResource extends Resource
         return parent::getGlobalSearchEloquentQuery()->withCount('collectionEntries');
     }
 
+    /** @param Collection $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         return [
-            trans('Total Entries') => $record->collectionEntries->count(),
+            trans('Total Entries') => $record->collection_entries_count,
         ];
     }
 
