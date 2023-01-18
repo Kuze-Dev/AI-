@@ -47,7 +47,7 @@ class CollectionResource extends Resource
 
     protected static function getGlobalSearchEloquentQuery(): Builder
     {
-        return parent::getGlobalSearchEloquentQuery()->with('collectionEntries');
+        return parent::getGlobalSearchEloquentQuery()->withCount('collectionEntries');
     }
 
     public static function getGlobalSearchResultDetails(Model $record): array
