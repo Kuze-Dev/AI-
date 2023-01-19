@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Collection;
 
 use App\HttpTenantApi\Resources\CollectionEntryResource;
+use Domain\Collection\Enums\PublishBehavior;
+use Domain\Collection\Models\Builders\CollectionEntryBuilder;
 use Domain\Collection\Models\Collection;
 use Domain\Collection\Models\CollectionEntry;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
@@ -18,7 +21,9 @@ class CollectionEntryController
     {
         return CollectionEntryResource::collection(
             QueryBuilder::for($collection->collectionEntries())
-                ->allowedFilters(['title', 'slug', 'order', 'published_at'])
+                ->allowedFilters(['title', 'slug', 'order', AllowedFilter::callback('publish_status', function (CollectionEntryBuilder $query, $value) use ($collection) {
+                    $query->wherePublishStatus(PublishBehavior::tryFrom($value), $collection);
+                }) ])
                 ->jsonPaginate()
         );
     }

@@ -100,7 +100,7 @@ class CollectionEntry extends Model implements IsActivitySubject
         return 'slug';
     }
 
-    public function newEloquentBuilder($query)
+    public function newEloquentBuilder($query): CollectionEntryBuilder
     {
         return new CollectionEntryBuilder($query);
     }

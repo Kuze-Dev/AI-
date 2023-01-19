@@ -2,13 +2,38 @@
 
 namespace Domain\Collection\Models\Builders;
 
+use Auth;
+use Carbon\Carbon;
 use Domain\Collection\Enums\PublishBehavior;
+use Domain\Collection\Models\Collection;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Builder<\Domain\Collection\Models\CollectionEntry>
+ */
 class CollectionEntryBuilder extends Builder
 {
-    public function wherePusblishStatus(PublishBehavior $publishBehavior): self
+    public function wherePublishStatus(PublishBehavior $publishBehavior, Collection $collection): self
     {
-        // Add query here
+        $recordedDates = $collection->collectionEntries()->pluck('published_at');
+        $timezone = Auth::user()->timezone ?? 'Asia/Manila';
+
+        $finalQuery = $this->where('id','null');
+
+        if ($collection->past_publish_date_behavior == $publishBehavior) {
+            $minDate = Carbon::parse($recordedDates->min())->timezone($timezone)->startOfDay();
+            $currentDate = Carbon::now()->timezone($timezone)->startOfDay();
+
+            $finalQuery = $this->whereBetween('published_at', [$minDate, $currentDate]);
+        }
+
+        if ($collection->future_publish_date_behavior == $publishBehavior) {
+            $maxDate = Carbon::parse($recordedDates->min())->timezone($timezone)->startOfDay();
+            $currentDate = Carbon::now()->timezone($timezone)->startOfDay();
+
+            $finalQuery = $this->whereBetween('published_at', [$maxDate, $currentDate]);
+        }
+
+        return $finalQuery;
     }
 }
