@@ -37,7 +37,7 @@ class FormResource extends Resource
     {
         return $form
             ->schema([
-            Forms\Components\Group::make([
+            // Forms\Components\Group::make([
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
@@ -65,6 +65,18 @@ class FormResource extends Resource
                     Forms\Components\Toggle::make('store_submission'),
                     ]),
                 Forms\Components\Card::make([
+                    Forms\Components\Group::make([
+                        Forms\Components\Group::make([
+                            Forms\Components\Section::make('Available Values')
+                            ->schema([
+                                \App\Forms\Components\Interpolation::make('interpolation')
+                                ->items(function(Closure $get) {
+                                    
+                                    return Blueprint::where('id',$get('blueprint_id'))->firstorfail()->toArray();
+                                }),
+                            ]),
+                            ])->columnSpan(['lg' => 1])->extraAttributes(['class' => 'sticky md:hidden',]),
+                    Forms\Components\Group::make([
                     Forms\Components\Repeater::make('form_email_notifications')
                         ->afterStateHydrated(fn (Forms\Components\Repeater $component, ?FormModel $record) => $component->state($record?->formEmailNotifications->toArray() ?? []))
                         ->nullable()
@@ -128,14 +140,15 @@ class FormResource extends Resource
                                 ->required()
                                 ->nullable()
                                 ->columnSpanFull(),
-                            Forms\Components\MarkdownEditor::make('template')
+                            Forms\Components\MarkdownEditor::make('template') 
                                 ->required()
                                 ->columnSpanFull(),
-                        ])
-                        ->columns(2),
-                            ]),
-                ])->columnSpan(2),
-                Forms\Components\Group::make([
+                        ]),
+                        ]),
+                    ])->columnSpan(3),
+               
+               
+                    Forms\Components\Group::make([
                         Forms\Components\Section::make('Available Values')
                         ->schema([
                             \App\Forms\Components\Interpolation::make('interpolation')
@@ -144,8 +157,10 @@ class FormResource extends Resource
                                 return Blueprint::where('id',$get('blueprint_id'))->firstorfail()->toArray();
                             }),
                         ]),
-                    ])->extraAttributes(['class' => 'sticky', 'style' => 'top:70px'])->columnSpan(['lg' => 1]),
-            ])->columns(3);
+                        ])->columnSpan(1)->extraAttributes(['class' => 'sticky sm:hidden', 'style' => 'top:70px']),
+                    ])->columns(4),
+            // ])->columns(3);
+        ]);
     }
 
     /** @throws Exception */
