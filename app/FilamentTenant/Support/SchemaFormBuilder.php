@@ -62,8 +62,6 @@ class SchemaFormBuilder extends Component
         parent::setUp();
 
         $this->columnSpan('full');
-
-        $this->schema(fn () => $this->generateFormSchema());
     }
 
     public function schemaData(SchemaData|Closure $schemaData = null): self
@@ -78,7 +76,7 @@ class SchemaFormBuilder extends Component
         return $this->evaluate($this->schemaData);
     }
 
-    private function generateFormSchema(): array
+    public function getChildComponents(): array
     {
         return ($schema = $this->getSchemaData())
             ? array_map(fn (SectionData $section) => $this->generateSectionSchema($section), $schema->sections)
