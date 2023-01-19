@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Auth;
 use Exception;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Illuminate\Support\Str;
+use Closure;
 
 class FormResource extends Resource
 {
@@ -36,6 +37,7 @@ class FormResource extends Resource
     {
         return $form
             ->schema([
+            Forms\Components\Group::make([
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
@@ -61,7 +63,7 @@ class FormResource extends Resource
                             }
                         }),
                     Forms\Components\Toggle::make('store_submission'),
-                ]),
+                    ]),
                 Forms\Components\Card::make([
                     Forms\Components\Repeater::make('form_email_notifications')
                         ->afterStateHydrated(fn (Forms\Components\Repeater $component, ?FormModel $record) => $component->state($record?->formEmailNotifications->toArray() ?? []))
@@ -131,8 +133,19 @@ class FormResource extends Resource
                                 ->columnSpanFull(),
                         ])
                         ->columns(2),
-                ]),
-            ]);
+                            ]),
+                ])->columnSpan(2),
+                Forms\Components\Group::make([
+                        Forms\Components\Section::make('Available Values')
+                        ->schema([
+                            \App\Forms\Components\Interpolation::make('interpolation')
+                            ->items(function(Closure $get) {
+                                
+                                return Blueprint::where('id',$get('blueprint_id'))->firstorfail()->toArray();
+                            }),
+                        ]),
+                    ])->extraAttributes(['class' => 'sticky', 'style' => 'top:70px'])->columnSpan(['lg' => 1]),
+            ])->columns(3);
     }
 
     /** @throws Exception */
