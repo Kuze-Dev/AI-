@@ -18,22 +18,20 @@ class CollectionEntryBuilder extends Builder
         $recordedDates = $collection->collectionEntries()->pluck('published_at');
         $timezone = Auth::user()->timezone ?? 'Asia/Manila';
 
-        $finalQuery = $this->where('id','null');
-
         if ($collection->past_publish_date_behavior == $publishBehavior) {
             $minDate = Carbon::parse($recordedDates->min())->timezone($timezone)->startOfDay();
             $currentDate = Carbon::now()->timezone($timezone)->startOfDay();
 
-            $finalQuery = $this->whereBetween('published_at', [$minDate, $currentDate]);
+            return $this->whereBetween('published_at', [$minDate, $currentDate]);
         }
 
         if ($collection->future_publish_date_behavior == $publishBehavior) {
-            $maxDate = Carbon::parse($recordedDates->min())->timezone($timezone)->startOfDay();
-            $currentDate = Carbon::now()->timezone($timezone)->startOfDay();
+            $maxDate = Carbon::parse($recordedDates->max())->timezone($timezone)->endOfDay();
+            $currentDate = Carbon::now()->addDay()->timezone($timezone)->startOfDay();
 
-            $finalQuery = $this->whereBetween('published_at', [$maxDate, $currentDate]);
+            return $this->whereBetween('published_at', [$maxDate, $currentDate]);
         }
 
-        return $finalQuery;
+        return $this->where('id','null');
     }
 }
