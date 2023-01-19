@@ -27,7 +27,7 @@ return new class () extends Migration {
             $table->bigInteger('parent_id')->unsigned()->nullable();
             $table->string('url')->nullable();
             $table->string('target')->nullable();
-            $table->integer('sort')->unsigned();
+            $table->integer('order')->unsigned();
             $table->timestamps();
         });
     }

@@ -13,6 +13,7 @@ class CreateMenuAction
         protected CreateNodeAction $createNodeAction
     ) {
     }
+
     public function execute(MenuData $menuData): Menu
     {
         $menu = Menu::create([
@@ -20,7 +21,7 @@ class CreateMenuAction
             'slug' => $menuData->slug,
         ]);
 
-        if (!empty($menuData->nodes)) {
+        if ( ! empty($menuData->nodes)) {
             foreach ($menuData->nodes ?? [] as $nodeData) {
                 $this->createNodeAction->execute($menu, $nodeData);
             }

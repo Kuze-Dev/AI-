@@ -10,16 +10,24 @@ use Domain\Menu\Models\Node;
 
 class CreateNodeAction
 {
-    public function execute(Menu $menu, NodeData $nodeData): Node
+    public function execute(Menu $menu, NodeData $nodeData, ?Node $parentNode = null): Node
     {
         $node = Node::create([
             'label' => $nodeData->label,
             'menu_id' => $menu->id,
-            'parent_id' => $nodeData->parent_id,
-            'sort' => $nodeData->sort,
+            'parent_id' => $parentNode?->id,
             'url' => $nodeData->url,
             'target' => $nodeData->target,
         ]);
+
+        $nodeIds = [];
+
+        foreach ($nodeData->children as $child) {
+            $nodeIds[] = $this->execute($menu, $child, $parentNode)->id;
+        }
+
+        Node::setNewOrder($nodeIds);
+
         return $node;
     }
 }

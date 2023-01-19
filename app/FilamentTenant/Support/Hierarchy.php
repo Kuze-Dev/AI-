@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Support;
 
 use Closure;
@@ -19,19 +21,19 @@ class Hierarchy extends Field implements CanConcealComponents
 
     protected string $view = 'filament.forms.components.hierarchy';
 
-    protected string | Closure | null $createItemButtonLabel = null;
+    protected string|Closure|null $createItemButtonLabel = null;
 
-    protected bool | Closure $isItemCreationDisabled = false;
+    protected bool|Closure $isItemCreationDisabled = false;
 
-    protected bool | Closure $isItemDeletionDisabled = false;
+    protected bool|Closure $isItemDeletionDisabled = false;
 
-    protected bool | Closure $isItemMovementDisabled = false;
+    protected bool|Closure $isItemMovementDisabled = false;
 
-    protected string | Closure | null $orderColumn = null;
+    protected string|Closure|null $orderColumn = null;
 
-    protected string | Closure | null $itemLabel = null;
+    protected string|Closure|null $itemLabel = null;
 
-    protected string | Closure $childrenStatePath = 'children';
+    protected string|Closure $childrenStatePath = 'children';
 
     protected function setUp(): void
     {
@@ -42,7 +44,7 @@ class Hierarchy extends Field implements CanConcealComponents
         $this->registerListeners([
             'hierarchy::createItem' => [
                 function (self $component, string $statePath): void {
-                    if (!Str::startsWith($statePath, $component->getStatePath())) {
+                    if ( ! Str::startsWith($statePath, $component->getStatePath())) {
                         return;
                     }
 
@@ -58,7 +60,7 @@ class Hierarchy extends Field implements CanConcealComponents
             ],
             'hierarchy::deleteItem' => [
                 function (self $component, string $statePath, string $uuidToDelete): void {
-                    if (!Str::startsWith($statePath, $component->getStatePath())) {
+                    if ( ! Str::startsWith($statePath, $component->getStatePath())) {
                         return;
                     }
 
@@ -77,7 +79,7 @@ class Hierarchy extends Field implements CanConcealComponents
                         return;
                     }
 
-                    if (!Str::startsWith($statePath, $component->getStatePath())) {
+                    if ( ! Str::startsWith($statePath, $component->getStatePath())) {
                         return;
                     }
 
@@ -102,21 +104,21 @@ class Hierarchy extends Field implements CanConcealComponents
         });
     }
 
-    public function createItemButtonLabel(string | Closure | null $label): static
+    public function createItemButtonLabel(string|Closure|null $label): static
     {
         $this->createItemButtonLabel = $label;
 
         return $this;
     }
 
-    public function defaultItems(int | Closure $count): static
+    public function defaultItems(int|Closure $count): static
     {
         $this->default(static function (self $component) use ($count): array {
             $items = [];
 
             $count = $component->evaluate($count);
 
-            if (!$count) {
+            if ( ! $count) {
                 return $items;
             }
 
@@ -130,28 +132,28 @@ class Hierarchy extends Field implements CanConcealComponents
         return $this;
     }
 
-    public function disableItemCreation(bool | Closure $condition = true): static
+    public function disableItemCreation(bool|Closure $condition = true): static
     {
         $this->isItemCreationDisabled = $condition;
 
         return $this;
     }
 
-    public function disableItemDeletion(bool | Closure $condition = true): static
+    public function disableItemDeletion(bool|Closure $condition = true): static
     {
         $this->isItemDeletionDisabled = $condition;
 
         return $this;
     }
 
-    public function disableItemMovement(bool | Closure $condition = true): static
+    public function disableItemMovement(bool|Closure $condition = true): static
     {
         $this->isItemMovementDisabled = $condition;
 
         return $this;
     }
 
-    public function childrenStatePath(string | Closure $childrenStatePath): static
+    public function childrenStatePath(string|Closure $childrenStatePath): static
     {
         $this->childrenStatePath = $childrenStatePath;
 
@@ -206,15 +208,15 @@ class Hierarchy extends Field implements CanConcealComponents
         return $this->evaluate($this->childrenStatePath);
     }
 
-    public function orderable(string | Closure | null $column = 'sort'): static
+    public function orderable(string|Closure|null $column = 'sort'): static
     {
         $this->orderColumn = $column;
-        $this->disableItemMovement(static fn (self $component): bool => !$component->evaluate($column));
+        $this->disableItemMovement(static fn (self $component): bool => ! $component->evaluate($column));
 
         return $this;
     }
 
-    public function itemLabel(string | Closure | null $label): static
+    public function itemLabel(string|Closure|null $label): static
     {
         $this->itemLabel = $label;
 

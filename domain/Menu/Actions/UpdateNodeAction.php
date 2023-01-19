@@ -17,12 +17,12 @@ class UpdateNodeAction
             $node->update([
                 'label' => $nodeData->label,
                 'menu_id' => $menu->id,
-                'parent_id' => $nodeData->parent_id,
-                'sort' => $nodeData->sort,
+                'parent_id' => $nodeData?->id,
                 'url' => $nodeData->url,
                 'target' => $nodeData->target,
             ]);
         }
+
         return $node;
     }
 }

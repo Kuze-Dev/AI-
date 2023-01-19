@@ -20,15 +20,7 @@ class MenuData
             name: $data['name'],
             slug: $data['slug'],
             nodes: array_map(
-                fn (array $nodeData) => new NodeData(
-                    id: $nodeData['id'] ?? null,
-                    label: $nodeData['label'],
-                    menu_id: $nodeData['menu_id'] ?? null,
-                    parent_id: $nodeData['parent_id'] ?? null,
-                    sort: $nodeData['sort'] ?? null,
-                    url: $nodeData['url'] ?? null,
-                    target: $nodeData['target'],
-                ),
+                fn (array $nodeData) => NodeData::fromArray($nodeData),
                 $data['nodes'] ?? []
             ),
         );

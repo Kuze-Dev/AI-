@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Menu\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,17 +21,17 @@ class Node extends Model implements Sortable
         'parent_id',
         'url',
         'target',
-        'sort',
+        'order',
     ];
 
     protected $with = [
-        'childs',
+        'children',
     ];
 
-    public array $sortable = [
-        'order_column_name' => 'sort',
-        'sort_when_creating' => true,
-    ];
+    // public array $sortable = [
+    //     'order_column_name' => 'sort',
+    //     'sort_when_creating' => true,
+    // ];
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Menu\Models\Menu, \Domain\Menu\Models\Node> */
     public function menu(): BelongsTo
@@ -39,8 +40,13 @@ class Node extends Model implements Sortable
     }
 
     /** @return HasMany<Node> */
-    public function childs(): HasMany
+    public function children(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id', 'id');
+    }
+
+    public function buildSortQuery(): Builder
+    {
+        return static::query()->whereMenuId($this->menu_id)->whereParentId($this->parent_id);
     }
 }

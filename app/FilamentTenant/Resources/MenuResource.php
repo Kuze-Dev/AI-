@@ -11,6 +11,7 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Menu\Enums\Target;
 use Domain\Menu\Models\Menu;
+use Domain\Menu\Models\Node;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -51,6 +52,11 @@ class MenuResource extends Resource
                         ->rules('alpha_dash')
                         ->disabled(),
                     Hierarchy::make('nodes')
+                        ->formatStateUsing(
+                            fn (?Menu $record, ?array $state) => $record?->nodes
+                                ->mapWithKeys(fn (Node $node) => ["record-{$node->getKey()}" => $node])
+                                ->toArray() ?? $state ?? []
+                        )
                         ->collapsible()
                         ->itemLabel(fn (array $state) => $state['label'] ?? null)
                         ->schema([
@@ -73,7 +79,7 @@ class MenuResource extends Resource
                                         ->url()
                                         ->placeholder('https://example.com')
                                         ->columnSpanFull(),
-                                ])
+                                ]),
                         ]),
                 ]),
             ]);

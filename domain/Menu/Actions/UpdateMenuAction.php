@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Menu\Actions;
 
-use Domain\Menu\Actions\DeleteNodeAction;
 use Domain\Menu\DataTransferObjects\MenuData;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
@@ -30,7 +29,7 @@ class UpdateMenuAction
             $this->deleteNodeAction->execute($node);
         }
 
-        if (!empty($menuData->nodes)) {
+        if ( ! empty($menuData->nodes)) {
             foreach ($menuData->nodes ?? [] as $nodeData) {
                 $node = Node::find($nodeData->id);
                 if ($node) {

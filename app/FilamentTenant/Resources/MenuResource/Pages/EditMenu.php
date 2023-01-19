@@ -11,7 +11,6 @@ use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Domain\Menu\Models\Menu;
 
 class EditMenu extends EditRecord
 {
