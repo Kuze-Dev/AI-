@@ -1,11 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Collection\Models\Builders;
 
-use Auth;
-use Carbon\Carbon;
 use Domain\Collection\Enums\PublishBehavior;
-use Domain\Collection\Models\Collection;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -13,25 +12,22 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class CollectionEntryBuilder extends Builder
 {
-    public function wherePublishStatus(PublishBehavior $publishBehavior, Collection $collection): self
+    public function wherePublishStatus(PublishBehavior $publishBehavior = null, string $timezone = null): self
     {
-        $recordedDates = $collection->collectionEntries()->pluck('published_at');
-        $timezone = Auth::user()->timezone ?? 'Asia/Manila';
-
-        if ($collection->past_publish_date_behavior == $publishBehavior) {
-            $minDate = Carbon::parse($recordedDates->min())->timezone($timezone)->startOfDay();
-            $currentDate = Carbon::now()->timezone($timezone)->startOfDay();
-
-            return $this->whereBetween('published_at', [$minDate, $currentDate]);
-        }
-
-        if ($collection->future_publish_date_behavior == $publishBehavior) {
-            $maxDate = Carbon::parse($recordedDates->max())->timezone($timezone)->endOfDay();
-            $currentDate = Carbon::now()->addDay()->timezone($timezone)->startOfDay();
-
-            return $this->whereBetween('published_at', [$maxDate, $currentDate]);
-        }
-
-        return $this->where('id','null');
+        return $this
+            ->where(
+                fn ($query) => $query->where('published_at', '>', now($timezone))
+                    ->whereHas(
+                        'collection',
+                        fn ($query) => $query->where('future_publish_date_behavior', $publishBehavior)
+                    )
+            )
+            ->orWhere(
+                fn ($query) => $query->where('published_at', '<=', now($timezone))
+                    ->whereHas(
+                        'collection',
+                        fn ($query) => $query->where('past_publish_date_behavior', $publishBehavior)
+                    )
+            );
     }
 }
