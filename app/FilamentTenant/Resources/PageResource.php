@@ -45,8 +45,7 @@ class PageResource extends Resource
                     ->unique(ignoreRecord: true)
                     ->required(),
                 Forms\Components\TextInput::make('slug')
-                    ->unique(ignoreRecord: true)
-                    ->disabled(fn (?Page $record) => $record !== null),
+                    ->unique(ignoreRecord: true),
             ]),
             Forms\Components\Section::make(trans('Slices'))
                 ->schema([
