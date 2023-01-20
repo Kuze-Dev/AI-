@@ -14,20 +14,16 @@ class CollectionEntryBuilder extends Builder
 {
     public function wherePublishStatus(PublishBehavior $publishBehavior = null, string $timezone = null): self
     {
-        return $this
-            ->where(
-                fn ($query) => $query->where('published_at', '>', now($timezone))
-                    ->whereHas(
-                        'collection',
-                        fn ($query) => $query->where('future_publish_date_behavior', $publishBehavior)
-                    )
-            )
-            ->orWhere(
-                fn ($query) => $query->where('published_at', '<=', now($timezone))
-                    ->whereHas(
-                        'collection',
-                        fn ($query) => $query->where('past_publish_date_behavior', $publishBehavior)
-                    )
-            );
+        return $this->where(
+            fn ($query) => $query
+                ->where(
+                    fn ($query) => $query->where('published_at', '<=', now($timezone)->endOfDay())
+                        ->whereRelation('collection', 'past_publish_date_behavior', $publishBehavior)
+                )
+                ->orWhere(
+                    fn ($query) => $query->where('published_at', '>', now($timezone)->endOfDay())
+                        ->whereRelation('collection', 'future_publish_date_behavior', $publishBehavior)
+                )
+        );
     }
 }
