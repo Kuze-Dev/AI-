@@ -72,7 +72,7 @@ class Page extends Model implements IsActivitySubject
 
     public function sluggable(): MorphMany
     {
-        return $this->morphMany(RecordsSlugHistory::class,'sluggable');
+        return $this->morphMany(RecordsSlugHistory::class, 'sluggable');
     }
 
     // public function getSlugOptions(): SlugOptions
@@ -82,5 +82,4 @@ class Page extends Model implements IsActivitySubject
     //         ->preventOverwrite()
     //         ->saveSlugsTo($this->getRouteKeyName());
     // }
-
 }

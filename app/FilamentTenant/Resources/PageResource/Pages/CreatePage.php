@@ -25,7 +25,6 @@ class CreatePage extends CreateRecord
 
     public function mutateFormDataBeforeCreate(array $data): array
     {
-
         $data['slug'] = Str::slug($data['slug']);
 
         return $data;

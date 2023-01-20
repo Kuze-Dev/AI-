@@ -11,7 +11,6 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-
 class RecordsSlugHistory extends Model implements IsActivitySubject
 {
     use LogsActivity;
@@ -30,11 +29,10 @@ class RecordsSlugHistory extends Model implements IsActivitySubject
             ->dontSubmitEmptyLogs();
     }
 
-    public function sluggable() : MorphTo
+    public function sluggable(): MorphTo
     {
-        return $this->morphTo();   
+        return $this->morphTo();
     }
-    
 
     public function getActivitySubjectDescription(Activity $activity): string
     {

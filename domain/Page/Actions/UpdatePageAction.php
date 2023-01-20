@@ -23,20 +23,17 @@ class UpdatePageAction
     {
         $page->update([
             'name' => $pageData->name,
-            'slug' => $pageData->slug
+            'slug' => $pageData->slug,
         ]);
 
-        $slug = RecordsSlugHistory::where('slug',$page->slug)
-        ->where('sluggable_type', $page->getMorphClass())->first();
+        $slug = RecordsSlugHistory::where('slug', $page->slug)
+            ->where('sluggable_type', $page->getMorphClass())->first();
 
-        
-        if (!empty($slug)) {
-
+        if ( ! empty($slug)) {
             $slug->sluggable_id = $page->id;
             $slug->save();
-        }else{
+        } else {
             $page->sluggable()->updateorcreate(['slug' => $pageData->slug]);
-
         }
 
         foreach ($page->sliceContents->whereNotIn('id', Arr::pluck($pageData->slice_contents, 'id')) as $domain) {

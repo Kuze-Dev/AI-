@@ -41,7 +41,6 @@ class EditPage extends EditRecord
 
     public function mutateFormDataBeforeSave(array $data): array
     {
-
         $data['slug'] = Str::slug($data['slug']);
 
         return $data;
