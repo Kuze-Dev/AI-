@@ -21,9 +21,18 @@ class CollectionEntryController
     {
         return CollectionEntryResource::collection(
             QueryBuilder::for($collection->collectionEntries())
-                ->allowedFilters(['title', 'slug', 'order', AllowedFilter::callback('publish_status', function (CollectionEntryBuilder $query, $value) {
-                    $query->wherePublishStatus(PublishBehavior::tryFrom($value));
-                })])
+                ->allowedFilters([
+                    'title',
+                    'slug',
+                    'order',
+                    AllowedFilter::callback(
+                        'publish_status',
+                        fn (CollectionEntryBuilder $query, $value) => $query->wherePublishStatus(PublishBehavior::tryFrom($value))
+                    ),
+                ])
+                ->allowedSorts([
+                    'published_at',
+                ])
                 ->jsonPaginate()
         );
     }
