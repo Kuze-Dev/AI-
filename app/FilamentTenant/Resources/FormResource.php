@@ -37,7 +37,7 @@ class FormResource extends Resource
     {
         return $form
             ->schema([
-            // Forms\Components\Group::make([
+                // Forms\Components\Group::make([
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
@@ -63,104 +63,101 @@ class FormResource extends Resource
                             }
                         }),
                     Forms\Components\Toggle::make('store_submission'),
-                    ]),
+                ]),
                 Forms\Components\Card::make([
                     Forms\Components\Group::make([
                         Forms\Components\Group::make([
                             Forms\Components\Section::make('Available Values')
-                            ->schema([
-                                \App\Forms\Components\Interpolation::make('interpolation')
-                                ->items(function(Closure $get) {
-                                    
-                                    return Blueprint::where('id',$get('blueprint_id'))->firstorfail()->toArray();
-                                }),
-                            ]),
-                            ])->columnSpan(['lg' => 1])->extraAttributes(['class' => 'sticky md:hidden',]),
-                    Forms\Components\Group::make([
-                    Forms\Components\Repeater::make('form_email_notifications')
-                        ->afterStateHydrated(fn (Forms\Components\Repeater $component, ?FormModel $record) => $component->state($record?->formEmailNotifications->toArray() ?? []))
-                        ->nullable()
-                        ->schema([
-                            Forms\Components\Section::make('Recipients')
                                 ->schema([
-                                    Forms\Components\TextInput::make('to')
+                                    \App\Forms\Components\Interpolation::make('interpolation')
+                                        ->items(function (Closure $get) {
+                                            return Blueprint::where('id', $get('blueprint_id'))->firstorfail()->toArray();
+                                        }),
+                                ]),
+                        ])->columnSpan(['lg' => 1])->extraAttributes(['class' => 'sticky md:hidden', ]),
+                        Forms\Components\Group::make([
+                            Forms\Components\Repeater::make('form_email_notifications')
+                                ->afterStateHydrated(fn (Forms\Components\Repeater $component, ?FormModel $record) => $component->state($record?->formEmailNotifications->toArray() ?? []))
+                                ->nullable()
+                                ->schema([
+                                    Forms\Components\Section::make('Recipients')
+                                        ->schema([
+                                            Forms\Components\TextInput::make('to')
+                                                ->required()
+                                                ->helperText('Seperated by comma')
+                                                ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
+                                                    $component->state(implode(',', $state ?? []));
+                                                })
+                                                ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
+                                                    ? Str::of($state)
+                                                        ->split('/\,/')
+                                                        ->map(fn (string $rule) => trim($rule))
+                                                        ->toArray()
+                                                    : ($state ?? [])),
+                                            Forms\Components\TextInput::make('cc')
+                                                ->label(trans('CC'))
+                                                ->nullable()
+                                                ->helperText('Seperated by comma')
+                                                ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
+                                                    $component->state(implode(',', $state ?? []));
+                                                })
+                                                ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
+                                                    ? Str::of($state)
+                                                        ->split('/\,/')
+                                                        ->map(fn (string $rule) => trim($rule))
+                                                        ->toArray()
+                                                    : ($state ?? [])),
+                                            Forms\Components\TextInput::make('bcc')
+                                                ->label(trans('BCC'))
+                                                ->nullable()
+                                                ->helperText('Seperated by comma')
+                                                ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
+                                                    $component->state(implode(',', $state ?? []));
+                                                })
+                                                ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
+                                                    ? Str::of($state)
+                                                        ->split('/\,/')
+                                                        ->map(fn (string $rule) => trim($rule))
+                                                        ->toArray()
+                                                    : ($state ?? [])),
+                                        ])
+                                        ->columns(3),
+                                    Forms\Components\TextInput::make('sender')
+                                        ->required(),
+                                    Forms\Components\TextInput::make('reply_to')
+                                        ->nullable()
+                                        ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
+                                            $component->state(implode('|', $state ?? []));
+                                        })
+                                        ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
+                                            ? Str::of($state)
+                                                ->split('/\,/')
+                                                ->map(fn (string $rule) => trim($rule))
+                                                ->toArray()
+                                            : ($state ?? [])),
+                                    Forms\Components\TextInput::make('subject')
                                         ->required()
-                                        ->helperText('Seperated by comma')
-                                        ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
-                                            $component->state(implode(',', $state ?? []));
-                                        })
-                                        ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
-                                            ? Str::of($state)
-                                                ->split('/\,/')
-                                                ->map(fn (string $rule) => trim($rule))
-                                                ->toArray()
-                                            : ($state ?? [])),
-                                    Forms\Components\TextInput::make('cc')
-                                        ->label(trans('CC'))
                                         ->nullable()
-                                        ->helperText('Seperated by comma')
-                                        ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
-                                            $component->state(implode(',', $state ?? []));
-                                        })
-                                        ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
-                                            ? Str::of($state)
-                                                ->split('/\,/')
-                                                ->map(fn (string $rule) => trim($rule))
-                                                ->toArray()
-                                            : ($state ?? [])),
-                                    Forms\Components\TextInput::make('bcc')
-                                        ->label(trans('BCC'))
-                                        ->nullable()
-                                        ->helperText('Seperated by comma')
-                                        ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
-                                            $component->state(implode(',', $state ?? []));
-                                        })
-                                        ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
-                                            ? Str::of($state)
-                                                ->split('/\,/')
-                                                ->map(fn (string $rule) => trim($rule))
-                                                ->toArray()
-                                            : ($state ?? [])),
-                                ])
-                                ->columns(3),
-                            Forms\Components\TextInput::make('sender')
-                                ->required(),
-                            Forms\Components\TextInput::make('reply_to')
-                                ->nullable()
-                                ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
-                                    $component->state(implode('|', $state ?? []));
-                                })
-                                ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
-                                    ? Str::of($state)
-                                        ->split('/\,/')
-                                        ->map(fn (string $rule) => trim($rule))
-                                        ->toArray()
-                                    : ($state ?? [])),
-                            Forms\Components\TextInput::make('subject')
-                                ->required()
-                                ->nullable()
-                                ->columnSpanFull(),
-                            Forms\Components\MarkdownEditor::make('template') 
-                                ->required()
-                                ->columnSpanFull(),
-                        ]),
+                                        ->columnSpanFull(),
+                                    Forms\Components\MarkdownEditor::make('template')
+                                        ->required()
+                                        ->columnSpanFull(),
+                                ]),
                         ]),
                     ])->columnSpan(3),
-               
-               
+
                     Forms\Components\Group::make([
                         Forms\Components\Section::make('Available Values')
-                        ->schema([
-                            \App\Forms\Components\Interpolation::make('interpolation')
-                            ->items(function(Closure $get) {
-                                
-                                return Blueprint::where('id',$get('blueprint_id'))->firstorfail()->toArray();
-                            }),
-                        ]),
-                        ])->columnSpan(1)->extraAttributes(['class' => 'sticky sm:hidden', 'style' => 'top:70px']),
-                    ])->columns(4),
-            // ])->columns(3);
-        ]);
+                            ->schema([
+                                \App\Forms\Components\Interpolation::make('interpolation')
+                                    ->items(function (Closure $get) {
+                                        return Blueprint::where('id', $get('blueprint_id'))->firstorfail()->toArray();
+                                    }),
+                            ]),
+                    ])->columnSpan(1)->extraAttributes(['class' => 'sticky sm:hidden md:block', 'style' => 'top:70px']),
+                ])->columns(4),
+                // ])->columns(3);
+            ]);
     }
 
     /** @throws Exception */
