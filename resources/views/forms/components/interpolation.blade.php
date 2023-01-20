@@ -1,19 +1,15 @@
 <x-dynamic-component
     :component="$getFieldWrapperView()"
-    :state-path="$getStatePath()" 
+    :state-path="$getStatePath()"
 >
-        <div>
-        <!-- Interact with the `state` property in Alpine.js -->
+    <code>
         @if (!empty($getItems()))
             @foreach($getItems()['schema']['sections'] as $item)
-
                 @foreach ($item->fields as $field)
-                    <dd>
-                    <?php echo'{{$'?>{{$item->state_name}}<?php echo "['";?>{{$field->state_name}}<?php echo "']}}";?>
-                    </dd>
+                    <?php echo'{{ $'?>{{$item->state_name}}<?php echo "['";?>{{$field->state_name}}<?php echo "'] }}";?>
+                    <br>
                 @endforeach
-            
             @endforeach
         @endif
-    </div>
+    </code>
 </x-dynamic-component>
