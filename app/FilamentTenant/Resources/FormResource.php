@@ -71,7 +71,7 @@ class FormResource extends Resource
                                 ->schema([
                                     \App\Forms\Components\Interpolation::make('interpolation')
                                         ->items(function (Closure $get) {
-                                            return Blueprint::where('id', $get('blueprint_id'))->firstorfail()->toArray();
+                                            return !is_null($get('blueprint_id')) ? Blueprint::where('id', $get('blueprint_id'))->firstorfail()->toArray() : [];
                                         }),
                                 ]),
                         ])->columnSpan(['lg' => 1])->extraAttributes(['class' => 'sticky md:hidden', ]),
@@ -151,7 +151,7 @@ class FormResource extends Resource
                             ->schema([
                                 \App\Forms\Components\Interpolation::make('interpolation')
                                     ->items(function (Closure $get) {
-                                        return Blueprint::where('id', $get('blueprint_id'))->firstorfail()->toArray();
+                                        return !is_null($get('blueprint_id')) ? Blueprint::where('id', $get('blueprint_id'))->firstorfail()->toArray() : [];
                                     }),
                             ]),
                     ])->columnSpan(1)->extraAttributes(['class' => 'sticky sm:hidden md:block', 'style' => 'top:70px']),
