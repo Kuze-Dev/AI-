@@ -7,6 +7,7 @@ namespace Domain\Page\Models;
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -38,7 +39,7 @@ use Spatie\Sluggable\SlugOptions;
 class Page extends Model implements IsActivitySubject
 {
     use LogsActivity;
-    use HasSlug;
+    // use HasSlug;
 
     protected $fillable = [
         'name',
@@ -69,12 +70,17 @@ class Page extends Model implements IsActivitySubject
         return 'slug';
     }
 
-    public function getSlugOptions(): SlugOptions
+    public function sluggable(): MorphMany
     {
-        return SlugOptions::create()
-            ->generateSlugsFrom('name')
-            ->preventOverwrite()
-            ->doNotGenerateSlugsOnUpdate()
-            ->saveSlugsTo($this->getRouteKeyName());
+        return $this->morphMany(RecordsSlugHistory::class,'sluggable');
     }
+
+    // public function getSlugOptions(): SlugOptions
+    // {
+    //     return SlugOptions::create()
+    //         ->generateSlugsFrom('name')
+    //         ->preventOverwrite()
+    //         ->saveSlugsTo($this->getRouteKeyName());
+    // }
+
 }
