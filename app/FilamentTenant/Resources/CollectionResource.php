@@ -7,7 +7,6 @@ namespace App\FilamentTenant\Resources;
 use Domain\Collection\Enums\PublishBehavior;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
-use App\FilamentTenant\Resources\CollectionEntryResource\RelationManagers\CollectionEntryRelationManager;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Collection\Models\Collection;
 use Filament\Forms;
@@ -18,7 +17,6 @@ use Filament\Tables;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Taxonomy\Models\Taxonomy;
-use Filament\Resources\RelationManagers\RelationGroup;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
