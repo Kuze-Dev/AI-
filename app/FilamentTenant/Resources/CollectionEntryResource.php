@@ -6,9 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
-use App\FilamentTenant\Resources\CollectionResource\RelationManagers\CollectionEntryRelationManager;
 use App\FilamentTenant\Support\SchemaFormBuilder;
-use Domain\Collection\Models\Collection;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -20,9 +18,10 @@ use Closure;
 use Domain\Collection\Models\CollectionEntry;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
-use Filament\Resources\RelationManagers\RelationGroup;
+use Filament\Facades\Filament;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 class CollectionEntryResource extends Resource
 {
@@ -32,7 +31,30 @@ class CollectionEntryResource extends Resource
 
     protected static bool $shouldRegisterNavigation = false;
 
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static ?string $recordTitleAttribute = 'title';
+
+    protected static ?string $slug = 'entries';
+
+    public static function getRouteBaseName(): string
+    {
+        return Filament::currentContext() . '.resources.collections.entries';
+    }
+
+    public static function getRoutes(): Closure
+    {
+        return function () {
+            $slug = static::getSlug();
+
+            Route::name("collections.{$slug}.")
+                ->prefix('collections/{ownerRecord}')
+                ->middleware(static::getMiddlewares())
+                ->group(function () {
+                    foreach (static::getPages() as $name => $page) {
+                        Route::get($page['route'], $page['class'])->name($name);
+                    }
+                });
+        };
+    }
 
     public static function form(Form $form): Form
     {
@@ -48,22 +70,24 @@ class CollectionEntryResource extends Resource
                                 ->unique(ignoreRecord: true)
                                 ->disabled(fn (?CollectionEntry $record) => $record !== null),
                         ]),
-                        SchemaFormBuilder::make('data', fn () => $this->ownerRecord->blueprint->schema),
+                        SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
                     ])
                     ->tap(function (Forms\Components\Group $component) {
-                        !empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()
-                            ? $component->columnSpan(['lg' => 2])
-                            : $component->columnSpanFull();
+                        $component->columnSpan(
+                            fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray()) || $livewire->ownerRecord->hasPublishDates()
+                                ? 2
+                                : 'full'
+                        );
                     }),
                 Forms\Components\Card::make([
                     Forms\Components\DateTimePicker::make('published_at')
                         ->minDate(Carbon::now()->startOfDay())
                         ->timezone(Auth::user()?->timezone)
-                        ->when(fn (self $livewire) => $livewire->ownerRecord->hasPublishDates()),
+                        ->when(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
                     Forms\Components\Group::make()
                         ->statePath('taxonomies')
                         ->schema(
-                            fn () => $this->ownerRecord->taxonomies->map(
+                            fn ($livewire) => $livewire->ownerRecord->taxonomies->map(
                                 fn (Taxonomy $taxonomy) => Forms\Components\Select::make($taxonomy->name)
                                     ->statePath((string) $taxonomy->id)
                                     ->multiple()
@@ -72,7 +96,11 @@ class CollectionEntryResource extends Resource
                                             ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->id => $term->name])
                                             ->toArray()
                                     )
-                                    ->afterStateHydrated(fn (Forms\Components\Select $component, CollectionEntry $record) => $component->state($record->taxonomyTerms->where('taxonomy_id', $taxonomy->id)->pluck('id')->toArray()))
+                                    ->formatStateUsing(
+                                        fn (?CollectionEntry $record) => $record?->taxonomyTerms->where('taxonomy_id', $taxonomy->id)
+                                            ->pluck('id')
+                                            ->toArray() ?? []
+                                    )
                             )->toArray()
                         )
                         ->dehydrated(false),
@@ -80,7 +108,7 @@ class CollectionEntryResource extends Resource
                         ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies'), 1)),
                 ])
                     ->columnSpan(['lg' => 1])
-                    ->when(fn () => !empty($this->ownerRecord->taxonomies->toArray()) || $this->ownerRecord->hasPublishDates()),
+                    ->when(fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray()) || $livewire->ownerRecord->hasPublishDates()),
             ]);
     }
 
@@ -88,16 +116,15 @@ class CollectionEntryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('title')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('blueprint.name')
-                    ->sortable()
-                    ->searchable()
-                    ->url(fn (Collection $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
+                Tables\Columns\TagsColumn::make('taxonomyTerms.name')
+                    ->limit()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -107,20 +134,15 @@ class CollectionEntryResource extends Resource
                     ->toggleable()
                     ->toggledHiddenByDefault(),
             ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('blueprint')
-                    ->relationship('blueprint', 'name')
-                    ->searchable()
-                    ->optionsLimit(20),
-            ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->url(fn ($livewire, CollectionEntry $record) => self::getUrl('edit', [$livewire->ownerRecord, $record])),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ])
-            ->defaultSort('updated_at', 'desc');
+            ->defaultSort('order', 'desc');
     }
 
     /** @return array */
@@ -135,11 +157,9 @@ class CollectionEntryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Resources\CollectionResource\Pages\ListCollection::route('/'),
-            'create' => Resources\CollectionResource\Pages\CreateCollection::route('/create'),
-            'edit' => Resources\CollectionResource\Pages\EditCollection::route('/{record}/edit'),
-            'entry.create' => Resources\CollectionResource\Pages\CreateCollectionEntry::route('/{ownerRecord}/entry/create'),
-            'entry.edit' => Resources\CollectionResource\Pages\EditCollectionEntry::route('/{ownerRecord}/entry/{record}/edit'),
+            'index' => Resources\CollectionEntryResource\Pages\ListCollectionEntry::route('entries'),
+            'create' => Resources\CollectionEntryResource\Pages\CreateCollectionEntry::route('entries/create'),
+            'edit' => Resources\CollectionEntryResource\Pages\EditCollectionEntry::route('entries/{record}/edit'),
         ];
     }
 }
