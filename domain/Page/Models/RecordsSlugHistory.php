@@ -13,22 +13,17 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * Domain\Page\Models\RecordsSlugHistory
- *
  * @property int $id
- * @property string $slug
  * @property int $sluggable_id
- * @property string $sluggable_type
+ * @property string $slug
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read MorphTo $sluggable
+ * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read int|null $activities_count
+ * @property-read Model|\Eloquent $sluggable
  * @method static \Illuminate\Database\Eloquent\Builder|RecordsSlugHistory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|RecordsSlugHistory newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|RecordsSlugHistory query()
- * @method static \Illuminate\Database\Eloquent\Builder|RecordsSlugHistory whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|RecordsSlugHistory whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|RecordsSlugHistory whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|RecordsSlugHistory whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder|RecordsSlugHistory whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class RecordsSlugHistory extends Model implements IsActivitySubject

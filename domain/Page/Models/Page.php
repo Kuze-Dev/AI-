@@ -27,8 +27,8 @@ use Spatie\Sluggable\SlugOptions;
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Page\Models\SliceContent[] $sliceContents
  * @property-read int|null $slice_contents_count
- * @property-read RecordsSlugHistory $sluggable
- * @property-read resolveRouteBindingQuery
+ * @property-read \Illuminate\Database\Eloquent\Collection|RecordsSlugHistory[] $sluggable
+ * @property-read int|null $sluggable_count
  * @method static \Illuminate\Database\Eloquent\Builder|Page newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page query()
@@ -39,6 +39,7 @@ use Spatie\Sluggable\SlugOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|Page whereUpdatedAt($value)
  * @mixin \Eloquent
  */
+
 class Page extends Model implements IsActivitySubject
 {
     use LogsActivity;
