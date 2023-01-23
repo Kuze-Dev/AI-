@@ -66,10 +66,10 @@ class FormResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\Section::make('Available Values')
                         ->schema([
-                            \App\Forms\Components\Interpolation::make('interpolation')
-                                ->items(function (Closure $get) {
-                                    return !is_null($get('blueprint_id')) ? Blueprint::where('id', $get('blueprint_id'))->firstorfail()->toArray() : [];
-                                }),
+                            \App\Forms\Components\SchemaInterpolations::make(
+                                'data',
+                                fn (Closure $get) => ! is_null($get('blueprint_id')) ? Blueprint::where('id', $get('blueprint_id'))->firstorfail()->toArray() : []
+                            ),
                         ])
                         ->columnSpan(['md' => 1])
                         ->extraAttributes(['class' => 'md:order-last md:sticky top-[5.5rem]']),
@@ -87,9 +87,9 @@ class FormResource extends Resource
                                         })
                                         ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
                                             ? Str::of($state)
-                                            ->split('/\,/')
-                                            ->map(fn (string $rule) => trim($rule))
-                                            ->toArray()
+                                                ->split('/\,/')
+                                                ->map(fn (string $rule) => trim($rule))
+                                                ->toArray()
                                             : ($state ?? [])),
                                     Forms\Components\TextInput::make('cc')
                                         ->label(trans('CC'))
@@ -100,9 +100,9 @@ class FormResource extends Resource
                                         })
                                         ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
                                             ? Str::of($state)
-                                            ->split('/\,/')
-                                            ->map(fn (string $rule) => trim($rule))
-                                            ->toArray()
+                                                ->split('/\,/')
+                                                ->map(fn (string $rule) => trim($rule))
+                                                ->toArray()
                                             : ($state ?? [])),
                                     Forms\Components\TextInput::make('bcc')
                                         ->label(trans('BCC'))
@@ -113,9 +113,9 @@ class FormResource extends Resource
                                         })
                                         ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
                                             ? Str::of($state)
-                                            ->split('/\,/')
-                                            ->map(fn (string $rule) => trim($rule))
-                                            ->toArray()
+                                                ->split('/\,/')
+                                                ->map(fn (string $rule) => trim($rule))
+                                                ->toArray()
                                             : ($state ?? [])),
                                 ])
                                 ->columns(3),
@@ -128,9 +128,9 @@ class FormResource extends Resource
                                 })
                                 ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
                                     ? Str::of($state)
-                                    ->split('/\,/')
-                                    ->map(fn (string $rule) => trim($rule))
-                                    ->toArray()
+                                        ->split('/\,/')
+                                        ->map(fn (string $rule) => trim($rule))
+                                        ->toArray()
                                     : ($state ?? [])),
                             Forms\Components\TextInput::make('subject')
                                 ->required()

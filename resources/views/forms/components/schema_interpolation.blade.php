@@ -3,8 +3,8 @@
     :state-path="$getStatePath()"
 >
     <code>
-        @if (!empty($getItems()))
-            @foreach($getItems()['schema']['sections'] as $item)
+        @if (!empty($getSchemaData()))
+            @foreach($getSchemaData()['schema']['sections'] as $item)
                 @foreach ($item->fields as $field)
                     <?php echo'{{ $'?>{{$item->state_name}}<?php echo "['";?>{{$field->state_name}}<?php echo "'] }}";?>
                     <br>
