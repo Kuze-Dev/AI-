@@ -22,7 +22,7 @@ class CreateMenuAction
         ]);
 
         if ( ! empty($menuData->nodes)) {
-            foreach ($menuData->nodes ?? [] as $nodeData) {
+            foreach ($menuData->nodes as $nodeData) {
                 $this->createNodeAction->execute($menu, $nodeData);
             }
         }

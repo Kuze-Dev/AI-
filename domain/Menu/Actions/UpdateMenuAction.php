@@ -30,10 +30,10 @@ class UpdateMenuAction
         }
 
         if ( ! empty($menuData->nodes)) {
-            foreach ($menuData->nodes ?? [] as $nodeData) {
+            foreach ($menuData->nodes as $nodeData) {
                 $node = Node::find($nodeData->id);
                 if ($node) {
-                    $this->updateNodeAction->execute($menu, $nodeData);
+                    $this->updateNodeAction->execute($node, $nodeData);
                 } else {
                     $this->createNodeAction->execute($menu, $nodeData);
                 }

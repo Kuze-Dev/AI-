@@ -13,7 +13,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class MenuResource extends JsonApiResource
 {
-    protected function toAttributes(Request $request): array
+    public function toAttributes($request): array
     {
         return  [
             'name' => $this->name,

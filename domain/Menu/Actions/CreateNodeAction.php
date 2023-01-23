@@ -22,7 +22,7 @@ class CreateNodeAction
 
         $nodeIds = [];
 
-        foreach ($nodeData->children as $child) {
+        foreach ($nodeData->children ?? [] as $child) {
             $nodeIds[] = $this->execute($menu, $child, $parentNode)->id;
         }
 

@@ -28,11 +28,6 @@ class Node extends Model implements Sortable
         'children',
     ];
 
-    // public array $sortable = [
-    //     'order_column_name' => 'sort',
-    //     'sort_when_creating' => true,
-    // ];
-
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Menu\Models\Menu, \Domain\Menu\Models\Node> */
     public function menu(): BelongsTo
     {
@@ -45,6 +40,7 @@ class Node extends Model implements Sortable
         return $this->hasMany(self::class, 'parent_id', 'id');
     }
 
+    /** @return Builder<Node> */
     public function buildSortQuery(): Builder
     {
         return static::query()->whereMenuId($this->menu_id)->whereParentId($this->parent_id);

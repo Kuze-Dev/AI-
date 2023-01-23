@@ -16,7 +16,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class NodeResource extends JsonApiResource
 {
-    protected function toAttributes(Request $request): array
+    public function toAttributes($request): array
     {
         return  [
             'label' => $this->label,
@@ -27,7 +27,7 @@ class NodeResource extends JsonApiResource
         ];
     }
 
-    protected function toRelationships(Request $request): array
+    public function toRelationships($request): array
     {
         return [
             'childs' => fn () => NodeResource::make($this->childs),
