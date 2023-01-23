@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Eloquent;
 
 /**
  * Domain\Page\Models\RecordsSlugHistory
@@ -20,7 +21,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
  * @property-read int|null $activities_count
- * @property-read Model|\Eloquent $sluggable
+ * @property-read Model|Eloquent $sluggable
  * @method static \Illuminate\Database\Eloquent\Builder|RecordsSlugHistory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|RecordsSlugHistory newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|RecordsSlugHistory query()
@@ -44,13 +45,15 @@ class RecordsSlugHistory extends Model implements IsActivitySubject
             ->dontSubmitEmptyLogs();
     }
 
+    /** @return MorphTo<Model&RecordsSlugHistory, self> */
     public function sluggable(): MorphTo
     {
+        /** @var MorphTo<Model&RecordsSlugHistory, self> */
         return $this->morphTo();
     }
 
     public function getActivitySubjectDescription(Activity $activity): string
     {
-        return 'RecordsSlugHistory: '.$this->name;
+        return 'RecordsSlugHistory: '.$this->slug;
     }
 }

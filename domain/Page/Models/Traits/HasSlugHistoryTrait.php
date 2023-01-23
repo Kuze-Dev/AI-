@@ -12,9 +12,10 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait HasSlugHistoryTrait
 {
-
+    /** @return MorphMany<Model> */
     public function sluggable(): MorphMany
     {
+        /** @var MorphMany<Model> */
         return $this->morphMany(RecordsSlugHistory::class, 'sluggable');
     }
 
@@ -26,8 +27,7 @@ trait HasSlugHistoryTrait
      * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Relations\Relation
      */
-
-    public function resolveRouteBindingQuery($query, $value, $field = null) : Relation
+    public function resolveRouteBindingQuery($query, $value, $field = null): Relation
     {
         return $query->where($field ?? $this->getRouteKeyName(), $value)
             ->orWhereHas('sluggable', fn ($q) => $q->where('slug', $value));
