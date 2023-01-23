@@ -11,6 +11,8 @@ class SchemaInterpolations extends Component
 {
     protected string $view = 'forms.components.schema_interpolation';
 
+    protected Closure|null $schemaData = null;
+
     final public function __construct(string $name, Closure|null $schemaData)
     {
         $this->statePath($name);
