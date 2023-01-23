@@ -12,6 +12,46 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait HasSlugHistoryTrait
 {
+
+    public static function boot()
+    {
+
+        if(!static::getEventDispatcher()){
+            static::setEventDispatcher( new \Illuminate\Events\Dispatcher());
+        }
+
+        parent::boot();
+
+        static::created( function($model) {
+
+            $slug = RecordsSlugHistory::where('slug', $model->slug)
+            ->where('sluggable_type', $model->getMorphClass())->first();
+
+        if ( ! empty($slug)) {
+            $slug->sluggable_id = $model->id;
+            $slug->save();
+        } else {
+            $model->sluggable()->updateorcreate(['slug' => $model->slug]);
+        }
+        
+        });
+
+
+        static::updated(function($model) {
+
+            $slug = RecordsSlugHistory::where('slug', $model->slug)
+            ->where('sluggable_type', $model->getMorphClass())->first();
+
+        if ( ! empty($slug)) {
+            $slug->sluggable_id = $model->id;
+            $slug->save();
+        } else {
+            $model->sluggable()->updateorcreate(['slug' => $model->slug]);
+        }
+
+        });
+    }
+
     /** @return MorphMany<Model> */
     public function sluggable(): MorphMany
     {
@@ -19,15 +59,7 @@ trait HasSlugHistoryTrait
         return $this->morphMany(RecordsSlugHistory::class, 'sluggable');
     }
 
-    /**
-     * Retrieve the model for a bound value.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $query
-     * @param  mixed  $value
-     * @param  string|null  $field
-     * @return \Illuminate\Database\Eloquent\Relations\Relation
-     */
-    public function resolveRouteBindingQuery($query, $value, $field = null): Relation
+    public function resolveRouteBindingQuery($query, $value, $field = null)
     {
         return $query->where($field ?? $this->getRouteKeyName(), $value)
             ->orWhereHas('sluggable', fn ($q) => $q->where('slug', $value));

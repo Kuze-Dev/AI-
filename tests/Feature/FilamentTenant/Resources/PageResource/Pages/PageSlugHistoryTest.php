@@ -134,8 +134,6 @@ it('Old slug can be assigned to new or existing record', function () {
         )
         ->createOne();
 
-    $pageOne->sluggable()->create(['slug' => $pageOne->slug]);
-
     $pageTwo = PageFactory::new(['name' => 'Page Two'])
         ->addSliceContent(
             SliceFactory::new()
@@ -147,8 +145,6 @@ it('Old slug can be assigned to new or existing record', function () {
             ['data' => ['main' => ['header' => 'Foo']]]
         )
         ->createOne();
-
-    $pageTwo->sluggable()->create(['slug' => $pageTwo->slug]);
 
     // assertDatabaseCount(Page::class, 2);
 
