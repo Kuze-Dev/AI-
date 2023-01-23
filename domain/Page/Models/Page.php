@@ -6,9 +6,9 @@ namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Page\Models\Traits\HasSlugHistoryTrait;
+use Domain\Page\Models\RecordsSlugHistory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -27,6 +27,8 @@ use Spatie\Sluggable\SlugOptions;
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Page\Models\SliceContent[] $sliceContents
  * @property-read int|null $slice_contents_count
+ * @property-read RecordsSlugHistory $sluggable
+ * @property-read resolveRouteBindingQuery
  * @method static \Illuminate\Database\Eloquent\Builder|Page newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page query()
@@ -40,7 +42,7 @@ use Spatie\Sluggable\SlugOptions;
 class Page extends Model implements IsActivitySubject
 {
     use LogsActivity;
-    // use HasSlug;
+    use HasSlug;
     use HasSlugHistoryTrait;
 
     protected $fillable = [
@@ -55,7 +57,6 @@ class Page extends Model implements IsActivitySubject
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
-
 
     /** @return HasMany<SliceContent> */
     public function sliceContents(): HasMany
@@ -73,4 +74,12 @@ class Page extends Model implements IsActivitySubject
         return 'slug';
     }
 
+    public function getSlugOptions(): SlugOptions
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom('name')
+            ->preventOverwrite()
+            ->doNotGenerateSlugsOnUpdate()
+            ->saveSlugsTo($this->getRouteKeyName());
+    }
 }
