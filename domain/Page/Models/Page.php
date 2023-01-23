@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Page\Models\Traits\HasSlugHistoryTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -40,6 +41,7 @@ class Page extends Model implements IsActivitySubject
 {
     use LogsActivity;
     // use HasSlug;
+    use HasSlugHistoryTrait;
 
     protected $fillable = [
         'name',
@@ -53,6 +55,7 @@ class Page extends Model implements IsActivitySubject
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
+
 
     /** @return HasMany<SliceContent> */
     public function sliceContents(): HasMany
@@ -70,16 +73,4 @@ class Page extends Model implements IsActivitySubject
         return 'slug';
     }
 
-    public function sluggable(): MorphMany
-    {
-        return $this->morphMany(RecordsSlugHistory::class, 'sluggable');
-    }
-
-    // public function getSlugOptions(): SlugOptions
-    // {
-    //     return SlugOptions::create()
-    //         ->generateSlugsFrom('name')
-    //         ->preventOverwrite()
-    //         ->saveSlugsTo($this->getRouteKeyName());
-    // }
 }
