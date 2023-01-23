@@ -32,7 +32,7 @@ class EditMenu extends EditRecord implements HasTreesContract
     /** @param \Domain\Menu\Models\Menu $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdateMenuAction::class)->execute($record, MenuData::fromArray(($data))));
+        return DB::transaction(fn () => app(UpdateMenuAction::class)->execute($record, MenuData::fromArray($data)));
     }
 
     protected function getRedirectUrl(): ?string

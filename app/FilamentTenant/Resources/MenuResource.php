@@ -30,10 +30,7 @@ class MenuResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-menu';
 
-    public static function getGloballySearchableAttributes(): array
-    {
-        return ['name'];
-    }
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Form $form): Form
     {
@@ -90,7 +87,9 @@ class MenuResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('name')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('slug'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime(timezone: Auth::user()?->timezone)

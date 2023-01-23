@@ -16,7 +16,7 @@
     @endphp
 
     <div {{ $attributes->merge($getExtraAttributes())->class([
-        'filament-forms-tree-component space-y-2 rounded-xl',
+        'filament-forms-tree-component space-y-6 rounded-xl',
     ]) }}>
         <div
             class="space-y-2"

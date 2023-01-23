@@ -10,9 +10,9 @@ class NodeData
 {
     public function __construct(
         public readonly string $label,
+        public readonly Target $target,
         public readonly ?int $id = null,
         public readonly ?string $url = null,
-        public readonly Target $target,
         public readonly ?array $children = [],
     ) {
     }
@@ -26,11 +26,5 @@ class NodeData
             target: Target::from($data['target']),
             children: array_map(fn (array $child) => self::fromArray($child), $data['children'] ?? [])
         );
-    }
-
-    /** @return array<string, mixed> */
-    public function toArray()
-    {
-        return (array) $this;
     }
 }

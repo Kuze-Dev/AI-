@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Menu\Models;
 
+use Domain\Menu\Enums\Target;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,28 +17,32 @@ class Node extends Model implements Sortable
     use SortableTrait;
 
     protected $fillable = [
-        'label',
         'menu_id',
         'parent_id',
-        'url',
+        'label',
         'target',
+        'url',
         'order',
+    ];
+
+    protected $casts = [
+        'target' => Target::class,
     ];
 
     protected $with = [
         'children',
     ];
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Menu\Models\Menu, \Domain\Menu\Models\Node> */
+    /** @return BelongsTo<Menu, Node> */
     public function menu(): BelongsTo
     {
-        return $this->belongsTo(Menu::class, 'menu_id', 'id');
+        return $this->belongsTo(Menu::class);
     }
 
     /** @return HasMany<Node> */
     public function children(): HasMany
     {
-        return $this->hasMany(self::class, 'parent_id', 'id');
+        return $this->hasMany(self::class, 'parent_id');
     }
 
     /** @return Builder<Node> */

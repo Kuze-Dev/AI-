@@ -6,7 +6,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class() extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -20,13 +21,14 @@ return new class () extends Migration {
             $table->string('slug');
             $table->timestamps();
         });
+
         Schema::create('nodes', function (Blueprint $table) {
             $table->id();
             $table->string('label');
-            $table->bigInteger('menu_id')->unsigned()->nullable();
+            $table->bigInteger('menu_id')->unsigned();
             $table->bigInteger('parent_id')->unsigned()->nullable();
             $table->string('url')->nullable();
-            $table->string('target')->nullable();
+            $table->string('target');
             $table->integer('order')->unsigned();
             $table->timestamps();
         });
@@ -39,7 +41,7 @@ return new class () extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('menus');
         Schema::dropIfExists('nodes');
+        Schema::dropIfExists('menus');
     }
 };

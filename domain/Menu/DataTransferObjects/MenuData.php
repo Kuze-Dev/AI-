@@ -19,10 +19,7 @@ class MenuData
         return new self(
             name: $data['name'],
             slug: $data['slug'],
-            nodes: array_map(
-                fn (array $nodeData) => NodeData::fromArray($nodeData),
-                $data['nodes'] ?? []
-            ),
+            nodes: array_map(fn (array $nodeData) => NodeData::fromArray($nodeData), $data['nodes'] ?? []),
         );
     }
 }
