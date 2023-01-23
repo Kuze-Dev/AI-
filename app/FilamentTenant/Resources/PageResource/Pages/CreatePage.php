@@ -19,13 +19,6 @@ class CreatePage extends CreateRecord
     /** @throws Throwable */
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(
-            fn () => app(CreatePageAction::class)
-                ->execute(new PageData(
-                    name: $data['name'],
-                    slug: $data['slug'],
-                    blueprint_id: $data['blueprint_id'],
-                ))
-        );
+        return DB::transaction(fn () => app(CreatePageAction::class)->execute(PageData::fromArray($data)));
     }
 }

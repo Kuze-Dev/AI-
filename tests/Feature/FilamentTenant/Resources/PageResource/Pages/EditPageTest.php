@@ -6,7 +6,9 @@ use App\FilamentTenant\Resources\PageResource\Pages\EditPage;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Page\Database\Factories\PageFactory;
+use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\Models\Page;
+use Domain\Page\Models\SliceContent;
 use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -20,39 +22,53 @@ beforeEach(function () {
 
 it('can render page', function () {
     $page = PageFactory::new()
-        ->for(
-            BlueprintFactory::new()
-                ->addSchemaSection(['title' => 'Main'])
-                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        ->addSliceContent(
+            SliceFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+                ),
+            ['data' => ['main' => ['header' => 'Foo']]]
         )
-        ->createOne(['data' => ['main' => ['header' => 'Foo']]]);
+        ->createOne();
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->assertFormExists()
         ->assertSuccessful()
-        ->assertFormSet(['data' => ['main' => ['header' => 'Foo']]])
+        ->assertFormSet([
+            'name' => $page->name,
+            'slice_contents.record-1' => $page->sliceContents->first()->toArray(),
+        ])
         ->assertOk();
 });
 
 it('can edit page', function () {
     $page = PageFactory::new()
-        ->for(
-            BlueprintFactory::new()
-                ->addSchemaSection(['title' => 'Main'])
-                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        ->addSliceContent(
+            SliceFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+                ),
+            ['data' => ['main' => ['header' => 'Foo']]]
         )
-        ->createOne(['data' => ['main' => ['header' => 'Foo']]]);
-
-    $newData = ['main' => ['header' => 'Bar']];
+        ->createOne();
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
-        ->fillForm(['data' => $newData])
+        ->fillForm([
+            'name' => 'Test',
+            'slice_contents.record-1.data.main.header' => 'Bar',
+        ])
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk();
 
-    assertDatabaseHas(
-        Page::class,
-        ['data' => json_encode($newData)]
-    );
+    assertDatabaseHas(Page::class, ['name' => 'Test']);
+    assertDatabaseHas(SliceContent::class, [
+        'page_id' => $page->id,
+        'slice_id' => $page->sliceContents->first()->slice_id,
+        'data' => json_encode(['main' => ['header' => 'Bar']]),
+    ]);
 });

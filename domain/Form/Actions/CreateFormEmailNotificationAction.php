@@ -8,7 +8,7 @@ use Domain\Form\DataTransferObjects\FormEmailNotificationData;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 
-class AddFormEmailNotificationAction
+class CreateFormEmailNotificationAction
 {
     public function execute(Form $form, FormEmailNotificationData $formEmailNotificationData): FormEmailNotification
     {

@@ -11,7 +11,8 @@ use Illuminate\Support\Arr;
 class UpdateTenantAction
 {
     public function __construct(
-        protected SyncDomainAction $syncDomain,
+        protected CreateDomainAction $createDomain,
+        protected UpdateDomainAction $updateDomain,
         protected DeleteDomainAction $deleteDomain,
     ) {
     }
@@ -20,12 +21,18 @@ class UpdateTenantAction
     {
         $tenant->update(['name' => $tenantData->name]);
 
-        foreach ($tenantData->domains as $domain) {
-            $this->syncDomain->execute($tenant, $domain);
+        foreach ($tenant->domains->whereNotIn('id', Arr::pluck($tenantData->domains, 'id')) as $domain) {
+            $this->deleteDomain->execute($domain);
         }
 
-        foreach ($tenant->domains()->whereNotIn('id', Arr::pluck($tenantData->domains, 'id'))->get() as $domain) {
-            $this->deleteDomain->execute($domain);
+        foreach ($tenantData->domains as $domainData) {
+            if ($domain = $tenant->domains->firstWhere('id', $domainData->id)) {
+                $this->updateDomain->execute($domain, $domainData);
+
+                continue;
+            }
+
+            $this->createDomain->execute($tenant, $domainData);
         }
 
         return $tenant;

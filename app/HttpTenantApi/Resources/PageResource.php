@@ -4,20 +4,24 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
-use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @property-read string $name
- * @property-read array|null $data
+ * @mixin \Domain\Page\Models\Page
  */
 class PageResource extends JsonApiResource
 {
-    protected function toAttributes(Request $request): array
+    public function toAttributes($request): array
     {
         return  [
             'name' => $this->name,
-            'data' => $this->data,
+        ];
+    }
+
+    public function toRelationships($request): array
+    {
+        return [
+            'sliceContents' => fn () => SliceContentResource::collection($this->sliceContents),
         ];
     }
 }

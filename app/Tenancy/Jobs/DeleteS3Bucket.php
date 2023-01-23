@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Jobs;
+namespace App\Tenancy\Jobs;
 
+use App\Tenancy\BucketManager;
 use Domain\Tenant\Models\Tenant;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -11,23 +12,27 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class CreateFrameworkDirectoriesForTenant implements ShouldQueue
+class DeleteS3Bucket implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
     use Queueable;
     use SerializesModels;
 
-    public function __construct(protected Tenant $tenant)
-    {
+    protected BucketManager $bucketManager;
+
+    public function __construct(
+        protected Tenant $tenant
+    ) {
+        $this->bucketManager = new BucketManager($tenant);
     }
 
     public function handle(): void
     {
-        $this->tenant->run(function ($tenant) {
-            $storage_path = storage_path();
+        if (app()->runningUnitTests()) {
+            return;
+        }
 
-            mkdir("$storage_path/framework/cache", 0777, true);
-        });
+        $this->bucketManager->deleteBucket();
     }
 }

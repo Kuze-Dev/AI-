@@ -8,7 +8,7 @@ use Domain\Blueprint\Models\Blueprint;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Field;
 
-use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
@@ -44,7 +44,7 @@ it('can create blueprint', function () {
         ->call('create')
         ->assertHasNoFormErrors();
 
-    assertDatabaseCount(Blueprint::class, 1);
+    assertDatabaseHas(Blueprint::class, ['name' => 'Test']);
 });
 
 it('can dehydrate rules as array', function ($state) {

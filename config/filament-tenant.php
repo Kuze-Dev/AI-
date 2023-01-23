@@ -117,8 +117,8 @@ return [
     'middleware' => [
         'auth' => [
             Authenticate::class,
-            'verified:filament-tenant.admin.verification.notice',
-            'active:filament-tenant.admin.account-deactivated.notice',
+            'verified:filament-tenant.auth.verification.notice',
+            'active:filament-tenant.auth.account-deactivated.notice',
         ],
         'base' => [
             EncryptCookies::class,

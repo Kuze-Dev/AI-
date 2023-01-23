@@ -11,7 +11,7 @@ use Illuminate\Support\Arr;
 class UpdateFormAction
 {
     public function __construct(
-        protected AddFormEmailNotificationAction $addFormEmailNotification,
+        protected CreateFormEmailNotificationAction $createFormEmailNotification,
         protected UpdateFormEmailNotificationAction $updateFormEmailNotification,
         protected DeleteFormEmailNotificationAction $deleteFormEmailNotification
     ) {
@@ -26,7 +26,7 @@ class UpdateFormAction
             'store_submission' => $formData->store_submission,
         ]);
 
-        foreach ($form->formEmailNotifications()->whereNotIn('id', Arr::pluck($formData->form_email_notifications, 'id'))->get() as $formEmailNotification) {
+        foreach ($form->formEmailNotifications->whereNotIn('id', Arr::pluck($formData->form_email_notifications, 'id')) as $formEmailNotification) {
             $this->deleteFormEmailNotification->execute($formEmailNotification);
         }
 
@@ -37,7 +37,7 @@ class UpdateFormAction
                 continue;
             }
 
-            $this->addFormEmailNotification->execute($form, $formEmailNotificationData);
+            $this->createFormEmailNotification->execute($form, $formEmailNotificationData);
         }
 
         return $form;

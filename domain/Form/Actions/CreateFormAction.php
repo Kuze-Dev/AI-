@@ -10,7 +10,7 @@ use Domain\Form\Models\Form;
 class CreateFormAction
 {
     public function __construct(
-        protected AddFormEmailNotificationAction $addFormEmailNotification
+        protected CreateFormEmailNotificationAction $createFormEmailNotification
     ) {
     }
 
@@ -24,7 +24,7 @@ class CreateFormAction
         ]);
 
         foreach ($formData->form_email_notifications ?? [] as $formEmailNotification) {
-            $this->addFormEmailNotification->execute($form, $formEmailNotification);
+            $this->createFormEmailNotification->execute($form, $formEmailNotification);
         }
 
         return $form;
