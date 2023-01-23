@@ -6,7 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\MenuResource\Pages;
-use App\FilamentTenant\Support\Hierarchy;
+use App\FilamentTenant\Support\Tree;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Menu\Enums\Target;
@@ -51,37 +51,38 @@ class MenuResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->rules('alpha_dash')
                         ->disabled(),
-                    Hierarchy::make('nodes')
-                        ->formatStateUsing(
-                            fn (?Menu $record, ?array $state) => $record?->nodes
-                                ->mapWithKeys(fn (Node $node) => ["record-{$node->getKey()}" => $node])
-                                ->toArray() ?? $state ?? []
-                        )
-                        ->collapsible()
-                        ->itemLabel(fn (array $state) => $state['label'] ?? null)
-                        ->schema([
-                            Forms\Components\Grid::make(['md' => 4])
-                                ->schema([
-                                    Forms\Components\TextInput::make('label')
-                                        ->label('Label')
-                                        ->required()
-                                        ->maxLength(100)
-                                        ->debounce()
-                                        ->columnSpan(['md' => 3]),
-                                    Forms\Components\Select::make('target')
-                                        ->options(
-                                            collect(Target::cases())
-                                                ->mapWithKeys(fn (Target $target) => [$target->value => Str::headline($target->value)])
-                                                ->toArray()
-                                        )
-                                        ->columnSpan(['md' => 1]),
-                                    Forms\Components\TextInput::make('url')
-                                        ->url()
-                                        ->placeholder('https://example.com')
-                                        ->columnSpanFull(),
-                                ]),
-                        ]),
                 ]),
+                Forms\Components\Section::make(trans('Nodes'))
+                    ->schema([
+                        Tree::make('nodes')
+                            ->formatStateUsing(
+                                fn (?Menu $record, ?array $state) => $record?->nodes
+                                    ->mapWithKeys(fn (Node $node) => ["record-{$node->getKey()}" => $node])
+                                    ->toArray() ?? $state ?? []
+                            )
+                            ->itemLabel(fn (array $state) => $state['label'] ?? null)
+                            ->schema([
+                                Forms\Components\Grid::make(['md' => 4])
+                                    ->schema([
+                                        Forms\Components\TextInput::make('label')
+                                            ->required()
+                                            ->maxLength(100)
+                                            ->columnSpan(['md' => 3]),
+                                        Forms\Components\Select::make('target')
+                                            ->options(
+                                                collect(Target::cases())
+                                                    ->mapWithKeys(fn (Target $target) => [$target->value => Str::headline($target->value)])
+                                                    ->toArray()
+                                            )
+                                            ->columnSpan(['md' => 1]),
+                                        Forms\Components\TextInput::make('url')
+                                            ->url()
+                                            ->placeholder('https://example.com')
+                                            ->columnSpanFull(),
+                                    ]),
+                            ]),
+                    ])
+                    ->hiddenOn('create'),
             ]);
     }
 
