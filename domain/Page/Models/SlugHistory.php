@@ -13,7 +13,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Eloquent;
 
 /**
- * Domain\Page\Models\RecordsSlugHistory
+ * Domain\Page\Models\SlugHistory
  * @property int $id
  * @property int $sluggable_id
  * @property string $slug
@@ -22,12 +22,12 @@ use Eloquent;
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
  * @property-read int|null $activities_count
  * @property-read Model|Eloquent $sluggable
- * @method static \Illuminate\Database\Eloquent\Builder|RecordsSlugHistory newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|RecordsSlugHistory newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|RecordsSlugHistory query()
+ * @method static \Illuminate\Database\Eloquent\Builder|SlugHistory newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|SlugHistory newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|SlugHistory query()
  * @mixin \Eloquent
  */
-class RecordsSlugHistory extends Model implements IsActivitySubject
+class SlugHistory extends Model implements IsActivitySubject
 {
     use LogsActivity;
 
@@ -45,15 +45,15 @@ class RecordsSlugHistory extends Model implements IsActivitySubject
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return MorphTo<Model&RecordsSlugHistory, self> */
+    /** @return MorphTo<Model&SlugHistory, self> */
     public function sluggable(): MorphTo
     {
-        /** @var MorphTo<Model&RecordsSlugHistory, self> */
+        /** @var MorphTo<Model&SlugHistory, self> */
         return $this->morphTo();
     }
 
     public function getActivitySubjectDescription(Activity $activity): string
     {
-        return 'RecordsSlugHistory: '.$this->slug;
+        return 'SlugHistory: '.$this->slug;
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace  Domain\Page\Models\Traits;
 
-use Domain\Page\Models\RecordsSlugHistory;
+use Domain\Page\Models\SlugHistory;
 
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -17,7 +17,7 @@ trait HasSlugHistoryTrait
         parent::boot();
 
         static::created(function ($model) {
-            $slug = RecordsSlugHistory::where('slug', $model->slug)
+            $slug = SlugHistory::where('slug', $model->slug)
                 ->where('sluggable_type', $model->getMorphClass())->first();
 
             if ( ! empty($slug)) {
@@ -29,7 +29,7 @@ trait HasSlugHistoryTrait
         });
 
         static::updated(function ($model) {
-            $slug = RecordsSlugHistory::where('slug', $model->slug)
+            $slug = SlugHistory::where('slug', $model->slug)
                 ->where('sluggable_type', $model->getMorphClass())->first();
 
             if ( ! empty($slug)) {
@@ -41,10 +41,10 @@ trait HasSlugHistoryTrait
         });
     }
 
-    /** @return MorphMany<RecordsSlugHistory> */
+    /** @return MorphMany<SlugHistory> */
     public function sluggable(): MorphMany
     {
-        return $this->morphMany(RecordsSlugHistory::class, 'sluggable');
+        return $this->morphMany(SlugHistory::class, 'sluggable');
     }
 
    /**

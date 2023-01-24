@@ -26,7 +26,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Page\Models\SliceContent[] $sliceContents
  * @property-read int|null $slice_contents_count
- * @property-read \Illuminate\Database\Eloquent\Collection|RecordsSlugHistory[] $sluggable
+ * @property-read \Illuminate\Database\Eloquent\Collection|SlugHistory[] $sluggable
  * @property-read int|null $sluggable_count
  * @method static \Illuminate\Database\Eloquent\Builder|Page newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page newQuery()

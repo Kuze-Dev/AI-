@@ -14,9 +14,9 @@ return new class () extends Migration {
      */
     public function up()
     {
-        Schema::create('records_slug_histories', function (Blueprint $table) {
+        Schema::create('slug_histories', function (Blueprint $table) {
             $table->id();
-            $table->string('slug');
+            $table->string('slug')->index();
             $table->integer('sluggable_id');
             $table->string('sluggable_type');
             $table->timestamps();
@@ -30,6 +30,6 @@ return new class () extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('records_slug_histories');
+        Schema::dropIfExists('slug_histories');
     }
 };
