@@ -30,7 +30,7 @@
         </button>
 
         <p @class([
-            'flex-none px-4 text-xs font-medium text-gray-600 truncate',
+            'flex-none px-4 truncate',
             'dark:text-gray-400' => config('forms.dark_mode'),
         ])>
             {{ $getItemLabel($item) }}
@@ -63,7 +63,7 @@
     </div>
 
     <div @class([
-        'ml-4 pl-4 border-l border-dashed border-gray-300',
+        'ml-5 pl-5 border-l border-dashed border-gray-300',
         'dark:border-gray-600' => config('forms.dark_mode'),
     ])>
         <div
