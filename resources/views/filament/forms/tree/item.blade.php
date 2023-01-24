@@ -62,7 +62,10 @@
         </ul>
     </div>
 
-    <div class="ml-6">
+    <div @class([
+        'ml-4 pl-4 border-l border-dashed border-gray-300',
+        'dark:border-gray-600' => config('forms.dark_mode'),
+    ])>
         <div
             class="space-y-2"
             wire:key="{{ $statePath }}.children"
