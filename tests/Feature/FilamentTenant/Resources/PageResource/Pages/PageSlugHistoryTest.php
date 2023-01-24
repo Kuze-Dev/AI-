@@ -179,4 +179,4 @@ it('Old slug can be assigned to new or existing record', function () {
     expect(
         Page::where('slug', 'page-one')->first()->sluggable
     )->toHaveCount(2);
-})->only();
+});

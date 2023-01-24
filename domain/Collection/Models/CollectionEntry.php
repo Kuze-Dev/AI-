@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Collection\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Support\SlugHistory\HasSlugHistory;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +20,7 @@ class CollectionEntry extends Model implements IsActivitySubject
 {
     use LogsActivity;
     use HasSlug;
+    use HasSlugHistory;
 
     /**
      * Declare columns

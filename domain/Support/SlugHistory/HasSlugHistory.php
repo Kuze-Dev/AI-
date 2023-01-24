@@ -22,7 +22,7 @@ trait HasSlugHistory
                 $slug->sluggable_id = $model->id;
                 $slug->save();
             } else {
-                $model->sluggable()->updateorcreate(['slug' => $model->slug]);
+                $model->sluggable()->create(['slug' => $model->slug]);
             }
         });
 
@@ -34,7 +34,7 @@ trait HasSlugHistory
                 $slug->sluggable_id = $model->id;
                 $slug->save();
             } else {
-                $model->sluggable()->updateorcreate(['slug' => $model->slug]);
+                $model->sluggable()->create(['slug' => $model->slug]);
             }
         });
     }
