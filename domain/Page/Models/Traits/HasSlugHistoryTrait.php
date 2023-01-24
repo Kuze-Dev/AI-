@@ -52,7 +52,7 @@ trait HasSlugHistoryTrait
     *
     * @return Relation<static>|Builder<static>
     */
-    public function resolveRouteBindingQuery( $query, $value, $field = null) : Relation|Builder
+    public function resolveRouteBindingQuery($query, $value, $field = null): Relation|Builder
     {
         /**
          * @phpstan-ignore-next-line
