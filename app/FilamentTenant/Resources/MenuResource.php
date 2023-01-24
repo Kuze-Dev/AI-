@@ -17,6 +17,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -31,6 +32,14 @@ class MenuResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-menu';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function resolveRecordRouteBinding($key): ?Model
+    {
+        return app(static::getModel())
+            ->resolveRouteBindingQuery(static::getEloquentQuery(), $key, static::getRecordRouteKeyName())
+            ->with('nodes.children')
+            ->first();
+    }
 
     public static function form(Form $form): Form
     {
@@ -54,7 +63,7 @@ class MenuResource extends Resource
                         Tree::make('nodes')
                             ->formatStateUsing(
                                 fn (?Menu $record, ?array $state) => $record?->nodes
-                                    ->mapWithKeys(fn (Node $node) => ["record-{$node->getKey()}" => $node])
+                                    ->mapWithKeys(self::mapNodeWithNormalizedKey(...))
                                     ->toArray() ?? $state ?? []
                             )
                             ->itemLabel(fn (array $state) => $state['label'] ?? null)
@@ -122,5 +131,14 @@ class MenuResource extends Resource
             'create' => Pages\CreateMenu::route('/create'),
             'edit' => Pages\EditMenu::route('/{record}/edit'),
         ];
+    }
+
+    private static function mapNodeWithNormalizedKey(Node $node): array
+    {
+        if ($node->relationLoaded('children') && $node->children->isNotEmpty()) {
+            $node->setRelation('children', $node->children->mapWithKeys(self::mapNodeWithNormalizedKey(...)));
+        }
+
+        return ["record-{$node->getKey()}" => $node];
     }
 }

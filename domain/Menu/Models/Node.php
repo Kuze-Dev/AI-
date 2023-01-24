@@ -29,10 +29,6 @@ class Node extends Model implements Sortable
         'target' => Target::class,
     ];
 
-    protected $with = [
-        'children',
-    ];
-
     /** @return BelongsTo<Menu, Node> */
     public function menu(): BelongsTo
     {
@@ -42,7 +38,7 @@ class Node extends Model implements Sortable
     /** @return HasMany<Node> */
     public function children(): HasMany
     {
-        return $this->hasMany(self::class, 'parent_id');
+        return $this->hasMany(self::class, 'parent_id')->with('children');
     }
 
     /** @return Builder<Node> */

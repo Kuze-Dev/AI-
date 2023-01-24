@@ -17,7 +17,7 @@ return new class() extends Migration
     {
         Schema::create('menus', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('slug');
             $table->timestamps();
         });
@@ -25,8 +25,8 @@ return new class() extends Migration
         Schema::create('nodes', function (Blueprint $table) {
             $table->id();
             $table->string('label');
-            $table->bigInteger('menu_id')->unsigned();
-            $table->bigInteger('parent_id')->unsigned()->nullable();
+            $table->bigInteger('menu_id')->unsigned()->index();
+            $table->bigInteger('parent_id')->unsigned()->nullable()->index();
             $table->string('url')->nullable();
             $table->string('target');
             $table->integer('order')->unsigned();
