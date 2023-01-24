@@ -37,9 +37,15 @@ class Menu extends Model implements IsActivitySubject
     }
 
     /** @return HasMany<Node> */
+    public function parentNodes(): HasMany
+    {
+        return $this->nodes()->whereNull('parent_id');
+    }
+
+    /** @return HasMany<Node> */
     public function nodes(): HasMany
     {
-        return $this->hasMany(Node::class)->whereNull('parent_id');
+        return $this->hasMany(Node::class);
     }
 
     public function getRouteKeyName(): string

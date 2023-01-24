@@ -38,7 +38,7 @@ class Node extends Model implements Sortable
     /** @return HasMany<Node> */
     public function children(): HasMany
     {
-        return $this->hasMany(self::class, 'parent_id')->with('children');
+        return $this->hasMany(self::class, 'parent_id')->ordered()->with('children');
     }
 
     /** @return Builder<Node> */
