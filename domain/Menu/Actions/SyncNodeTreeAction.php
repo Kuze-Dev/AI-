@@ -63,7 +63,7 @@ class SyncNodeTreeAction
             'url' => $nodeData->url,
         ])->save();
 
-        if (!empty($nodeData->children)) {
+        if ( ! empty($nodeData->children)) {
             $this->syncNodes($nodeData->children, $node);
         }
 
@@ -77,7 +77,7 @@ class SyncNodeTreeAction
 
     protected function inlineChildren(NodeData $nodeData): array
     {
-        if (!empty($nodeData->children)) {
+        if ( ! empty($nodeData->children)) {
             $children = Arr::map($nodeData->children, $this->inlineChildren(...));
         }
 

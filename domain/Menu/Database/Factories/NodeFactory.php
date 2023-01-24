@@ -21,7 +21,7 @@ class NodeFactory extends Factory
             'menu_id' => null,
             'parent_id' => null,
             'label' => fake()->word(),
-            'target' => Target::SELF,
+            'target' => Target::self,
             'url' => fake()->url(),
             'order' => null,
         ];

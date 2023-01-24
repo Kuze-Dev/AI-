@@ -33,7 +33,7 @@ class MenuResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function resolveRecordRouteBinding($key): ?Model
+    public static function resolveRecordRouteBinding(mixed $key): ?Model
     {
         return app(static::getModel())
             ->resolveRouteBindingQuery(static::getEloquentQuery(), $key, static::getRecordRouteKeyName())
@@ -75,6 +75,7 @@ class MenuResource extends Resource
                                             ->maxLength(100)
                                             ->columnSpan(['md' => 3]),
                                         Forms\Components\Select::make('target')
+                                            ->required()
                                             ->options(
                                                 collect(Target::cases())
                                                     ->mapWithKeys(fn (Target $target) => [$target->value => Str::headline($target->value)])

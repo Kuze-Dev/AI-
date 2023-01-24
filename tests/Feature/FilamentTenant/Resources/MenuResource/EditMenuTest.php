@@ -40,12 +40,12 @@ it('can edit menu', function () {
                 'name' => 'Test Edit Menu',
                 'nodes' => [
                     [
-                        'name' => 'Test Edit Node',
+                        'label' => 'Test Edit Node',
                         'url' => 'https://test-edit-node.com',
                         'target' => '_blank',
                         'childs' => [
                             [
-                                'name' => 'Test Edit Child',
+                                'label' => 'Test Edit Child',
                                 'url' => 'https://test-edit-child.com',
                                 'target' => '_blank',
                             ],
