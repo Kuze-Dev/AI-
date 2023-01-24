@@ -24,13 +24,13 @@ class CollectionEntryController
                 ->allowedFilters([
                     'title',
                     'slug',
-                    'order',
                     AllowedFilter::callback(
                         'publish_status',
                         fn (CollectionEntryBuilder $query, $value) => $query->wherePublishStatus(PublishBehavior::tryFrom($value))
                     ),
                 ])
                 ->allowedSorts([
+                    'order',
                     'published_at',
                 ])
                 ->jsonPaginate()
