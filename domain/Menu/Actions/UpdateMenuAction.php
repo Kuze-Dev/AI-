@@ -6,15 +6,11 @@ namespace Domain\Menu\Actions;
 
 use Domain\Menu\DataTransferObjects\MenuData;
 use Domain\Menu\Models\Menu;
-use Domain\Menu\Models\Node;
-use Illuminate\Support\Arr;
 
 class UpdateMenuAction
 {
     public function __construct(
-        protected CreateNodeAction $createNodeAction,
-        protected UpdateNodeAction $updateNodeAction,
-        protected DeleteNodeAction $deleteNodeAction,
+        protected SyncNodeTreeAction $syncNodeAction,
     ) {
     }
 
@@ -25,20 +21,7 @@ class UpdateMenuAction
             'slug' => $menuData->slug,
         ]);
 
-        foreach ($menu->nodes()->whereNotIn('id', Arr::pluck($menuData->nodes, 'id'))->get() as $node) {
-            $this->deleteNodeAction->execute($node);
-        }
-
-        if ( ! empty($menuData->nodes)) {
-            foreach ($menuData->nodes as $nodeData) {
-                $node = Node::find($nodeData->id);
-                if ($node) {
-                    $this->updateNodeAction->execute($node, $nodeData);
-                } else {
-                    $this->createNodeAction->execute($menu, $nodeData);
-                }
-            }
-        }
+        $this->syncNodeAction->execute($menu, $menuData->nodes);
 
         return $menu;
     }
