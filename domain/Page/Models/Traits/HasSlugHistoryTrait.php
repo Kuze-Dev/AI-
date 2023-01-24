@@ -7,14 +7,9 @@ namespace  Domain\Page\Models\Traits;
 use Domain\Page\Models\RecordsSlugHistory;
 
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Builder;
 
-/**  
- * @template TRelatedModel of RecordsSlugHistory
- * 
- */
 trait HasSlugHistoryTrait
 {
     public static function boot(): void
@@ -46,21 +41,25 @@ trait HasSlugHistoryTrait
         });
     }
 
-    /** @return MorphMany<Model> */
+    /** @return MorphMany<RecordsSlugHistory> */
     public function sluggable(): MorphMany
     {
-        /** @var MorphMany<Model> */
         return $this->morphMany(RecordsSlugHistory::class, 'sluggable');
     }
 
    /**
-    * @param static|Relation<static> $query
+    * @param static|Builder<static>|Relation<static> $query
     *
-    * @return Relation|Builder<static> 
+    * @return Relation<static>|Builder<static>
     */
-    public function resolveRouteBindingQuery( $query, $value, $field = null) : Builder
+    public function resolveRouteBindingQuery( $query, $value, $field = null) : Relation|Builder
     {
+        /**
+         * @phpstan-ignore-next-line
+         *
+         * The next line is ignore due to the framework's inconsistent typings
+         */
         return $query->where($field ?? $this->getRouteKeyName(), $value)
-            ->orWhereHas('sluggable', fn ($q) => $q->where('slug', $value));
+            ->orWhereRelation('sluggable', 'slug', $value);
     }
 }
