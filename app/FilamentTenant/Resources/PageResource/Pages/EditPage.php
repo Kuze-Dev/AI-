@@ -11,7 +11,6 @@ use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Throwable;
 use Exception;
 
@@ -37,17 +36,6 @@ class EditPage extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(fn () => app(UpdatePageAction::class)->execute($record, PageData::fromArray($data)));
-    }
-
-    public function mutateFormDataBeforeSave(array $data): array
-    {
-        if (is_null($data['slug'])) {
-            $data['slug'] = Str::slug($data['name']);
-        } else {
-            $data['slug'] = Str::slug($data['slug']);
-        }
-
-        return $data;
     }
 
     protected function afterSave(): void
