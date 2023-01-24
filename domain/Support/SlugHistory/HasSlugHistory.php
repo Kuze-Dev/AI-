@@ -2,15 +2,13 @@
 
 declare(strict_types=1);
 
-namespace  Domain\Page\Models\Traits;
-
-use Domain\Page\Models\SlugHistory;
+namespace  Domain\Support\SlugHistory;
 
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Builder;
 
-trait HasSlugHistoryTrait
+trait HasSlugHistory
 {
     public static function boot(): void
     {

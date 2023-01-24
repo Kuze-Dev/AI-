@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Page\Models;
+namespace Domain\Support\SlugHistory;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +13,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Eloquent;
 
 /**
- * Domain\Page\Models\SlugHistory
+ * Domain\Support\SlugHistory\SlugHistory
  * @property int $id
  * @property int $sluggable_id
  * @property string $slug
