@@ -45,7 +45,6 @@ class PageResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->unique(ignoreRecord: true)
                     ->debounce()
-                    // ->reactive()
                     ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
                         if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
                             $set('slug', Str::slug($state));
