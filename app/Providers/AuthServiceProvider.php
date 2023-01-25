@@ -25,6 +25,7 @@ class AuthServiceProvider extends ServiceProvider
         \Spatie\Activitylog\Models\Activity::class => \App\Policies\ActivityPolicy::class,
         \Domain\Tenant\Models\Tenant::class => \App\Policies\TenantPolicy::class,
         \Domain\Blueprint\Models\Blueprint::class => \App\Policies\BlueprintPolicy::class,
+        \Domain\Menu\Models\Menu::class => \App\Policies\MenuPolicy::class,
         \Domain\Page\Models\Page::class => \App\Policies\PagePolicy::class,
         \Domain\Page\Models\Slice::class => \App\Policies\SlicePolicy::class,
         \Domain\Form\Models\Form::class => \App\Policies\FormPolicy::class,
