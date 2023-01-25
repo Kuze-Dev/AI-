@@ -54,13 +54,7 @@ class FormResource extends Resource
                         ->required()
                         ->exists(Blueprint::class, 'id')
                         ->searchable()
-                        ->preload()
-                        ->reactive()
-                        ->helperText(function (?FormModel $record, ?string $state) {
-                            if ($record !== null && $record->blueprint_id !== (int) $state) {
-                                return trans('Modifying the blueprint will reset all the form\'s content.');
-                            }
-                        }),
+                        ->preload(),
                     Forms\Components\Toggle::make('store_submission'),
                 ]),
                 Forms\Components\Card::make([

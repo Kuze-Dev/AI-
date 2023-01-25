@@ -64,17 +64,7 @@ class CollectionResource extends Resource
                         ->exists(Blueprint::class, 'id')
                         ->searchable()
                         ->preload()
-                        ->reactive()
-                        ->disabled(fn (?Collection $record) => $record !== null)
-                        ->helperText(function (?Collection $record, ?string $state) {
-                            if ($record === null) {
-                                return;
-                            }
-
-                            if ($record->blueprint_id !== (int) $state) {
-                                return trans('Modifying the blueprint will reset all the page\'s content.');
-                            }
-                        }),
+                        ->disabled(fn (?Collection $record) => $record !== null),
                     Forms\Components\Select::make('taxonomies')
                         ->multiple()
                         ->options(
