@@ -134,6 +134,7 @@ class CollectionEntryResource extends Resource
                     ->toggleable()
                     ->toggledHiddenByDefault(),
             ])
+            ->reorderable('order')
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->url(fn ($livewire, CollectionEntry $record) => self::getUrl('edit', [$livewire->ownerRecord, $record])),
@@ -142,7 +143,7 @@ class CollectionEntryResource extends Resource
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ])
-            ->defaultSort('order', 'desc');
+            ->defaultSort('order');
     }
 
     /** @return array */

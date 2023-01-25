@@ -9,6 +9,7 @@ use App\FilamentTenant\Resources\CollectionResource;
 use Domain\Collection\Models\Collection;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Str;
 
@@ -60,5 +61,16 @@ class ListCollectionEntry extends ListRecords
             ],
             (filled($breadcrumb) ? [$breadcrumb] : []),
         );
+    }
+
+    protected function isTableReorderable(): bool
+    {
+        return $this->ownerRecord->is_sortable;
+    }
+
+    /** @return Builder<\Domain\Collection\Models\CollectionEntry> */
+    protected function getTableQuery(): Builder
+    {
+        return $this->ownerRecord->collectionEntries()->getQuery();
     }
 }
