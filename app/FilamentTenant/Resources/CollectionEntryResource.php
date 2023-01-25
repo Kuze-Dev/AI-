@@ -110,7 +110,7 @@ class CollectionEntryResource extends Resource
                         )
                         ->dehydrated(false),
                     Forms\Components\Hidden::make('taxonomy_terms')
-                        ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies'), 1)),
+                        ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                 ])
                     ->columnSpan(['lg' => 1])
                     ->when(fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray()) || $livewire->ownerRecord->hasPublishDates()),
