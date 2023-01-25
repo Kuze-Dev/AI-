@@ -22,6 +22,7 @@ use Filament\Facades\Filament;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\Rules\Unique;
 
 class CollectionEntryResource extends Resource
 {
@@ -65,7 +66,10 @@ class CollectionEntryResource extends Resource
                     ->schema([
                         Forms\Components\Card::make([
                             Forms\Components\TextInput::make('title')
-                                ->unique(ignoreRecord: true)
+                                ->unique(
+                                    callback: fn ($livewire, Unique $rule) => $rule->where('collection_id', $livewire->ownerRecord->id),
+                                    ignoreRecord: true
+                                )
                                 ->required(),
                             Forms\Components\TextInput::make('slug')
                                 ->unique(ignoreRecord: true)
