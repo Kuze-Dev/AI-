@@ -38,7 +38,7 @@ class SelectFieldData extends FieldData
 
         return new self(
             title: $data['title'],
-            state_name: $data['state_name'] ?? Str::snake($data['title']),
+            state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             rules: $data['rules'] ?? [],
             options: $data['options'] ?? [],
             multiple: $data['multiple'] ?? false

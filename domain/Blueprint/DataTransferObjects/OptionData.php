@@ -22,7 +22,7 @@ class OptionData implements Arrayable
     {
         return new self(
             label: $data['label'],
-            value: $data['value'] ?? Str::snake($data['label']),
+            value: $data['value'] ?? (string) Str::of($data['label'])->lower()->snake(),
         );
     }
 
