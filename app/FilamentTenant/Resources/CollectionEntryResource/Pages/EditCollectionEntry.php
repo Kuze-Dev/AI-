@@ -17,6 +17,7 @@ use Domain\Collection\Models\Collection;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\DeleteAction;
 
+/** @method class-string<\Illuminate\Database\Eloquent\Model> getModel() */
 class EditCollectionEntry extends EditRecord
 {
     protected static string $resource = CollectionEntryResource::class;
@@ -42,6 +43,18 @@ class EditCollectionEntry extends EditRecord
         }
 
         parent::mount($record);
+    }
+
+    /** @param string $key */
+    protected function resolveRecord($key): Model
+    {
+        $record = $this->ownerRecord->resolveChildRouteBinding('collectionEntries', $key, null);
+
+        if ($record === null) {
+            throw (new ModelNotFoundException())->setModel($this->getModel(), [$key]);
+        }
+
+        return $record;
     }
 
     protected function getActions(): array
