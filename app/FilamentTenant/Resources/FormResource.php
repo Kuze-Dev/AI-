@@ -50,6 +50,7 @@ class FormResource extends Resource
                     Forms\Components\Select::make('blueprint_id')
                         ->relationship('blueprint', 'name')
                         ->saveRelationshipsUsing(null)
+                        ->disabled(fn (?FormModel $record) => $record !== null)
                         ->required()
                         ->exists(Blueprint::class, 'id')
                         ->searchable()

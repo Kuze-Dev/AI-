@@ -65,6 +65,7 @@ class CollectionResource extends Resource
                         ->searchable()
                         ->preload()
                         ->reactive()
+                        ->disabled(fn (?Collection $record) => $record !== null)
                         ->helperText(function (?Collection $record, ?string $state) {
                             if ($record === null) {
                                 return;
