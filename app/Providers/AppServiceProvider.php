@@ -6,6 +6,8 @@ namespace App\Providers;
 
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Menu\Models\Menu;
+use Domain\Menu\Models\Node;
 use Domain\Collection\Models\Collection;
 use Domain\Collection\Models\CollectionEntry;
 use Domain\Form\Models\Form;
@@ -47,6 +49,8 @@ class AppServiceProvider extends ServiceProvider
             Blueprint::class,
             Page::class,
             Slice::class,
+            Menu::class,
+            Node::class,
             Form::class,
             FormSubmission::class,
             FormEmailNotification::class,

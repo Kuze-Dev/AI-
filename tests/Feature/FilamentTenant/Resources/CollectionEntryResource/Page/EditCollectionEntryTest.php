@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\FilamentTenant\Resources\CollectionResource\Pages\EditCollectionEntry;
+use App\FilamentTenant\Resources\CollectionEntryResource\Pages\EditCollectionEntry;
 use Carbon\Carbon;
 use Domain\Collection\Models\CollectionEntry;
 use Domain\Collection\Database\Factories\CollectionFactory;

@@ -7,7 +7,6 @@ namespace App\FilamentTenant\Resources;
 use Domain\Collection\Enums\PublishBehavior;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
-use App\FilamentTenant\Resources\CollectionResource\RelationManagers\CollectionEntryRelationManager;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Collection\Models\Collection;
 use Filament\Forms;
@@ -84,16 +83,7 @@ class CollectionResource extends Resource
                         ->exists(Blueprint::class, 'id')
                         ->searchable()
                         ->preload()
-                        ->reactive()
-                        ->helperText(function (?Collection $record, ?string $state) {
-                            if ($record === null) {
-                                return;
-                            }
-
-                            if ($record->blueprint_id !== (int) $state) {
-                                return trans('Modifying the blueprint will reset all the page\'s content.');
-                            }
-                        }),
+                        ->disabled(fn (?Collection $record) => $record !== null),
                     Forms\Components\Select::make('taxonomies')
                         ->multiple()
                         ->options(
@@ -178,6 +168,10 @@ class CollectionResource extends Resource
                     ->optionsLimit(20),
             ])
             ->actions([
+                Tables\Actions\Action::make('view-entries')
+                    ->icon('heroicon-s-eye')
+                    ->color('secondary')
+                    ->url(fn (Collection $record) => CollectionEntryResource::getUrl('index', [$record])),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -191,10 +185,7 @@ class CollectionResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationGroup::make('Main', [
-                CollectionEntryRelationManager::class,
-                ActivitiesRelationManager::class,
-            ]),
+            ActivitiesRelationManager::class,
         ];
     }
 
@@ -205,8 +196,6 @@ class CollectionResource extends Resource
             'index' => Resources\CollectionResource\Pages\ListCollection::route('/'),
             'create' => Resources\CollectionResource\Pages\CreateCollection::route('/create'),
             'edit' => Resources\CollectionResource\Pages\EditCollection::route('/{record}/edit'),
-            'entry.create' => Resources\CollectionResource\Pages\CreateCollectionEntry::route('/{ownerRecord}/entry/create'),
-            'entry.edit' => Resources\CollectionResource\Pages\EditCollectionEntry::route('/{ownerRecord}/entry/{record}/edit'),
         ];
     }
 }

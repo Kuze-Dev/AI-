@@ -24,7 +24,7 @@ class SectionData implements Arrayable
     {
         return new self(
             title: $data['title'],
-            state_name: $data['state_name'] ?? Str::snake($data['title']),
+            state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             fields: array_map(
                 fn (array $field) => FieldData::fromArray($field),
                 $data['fields']

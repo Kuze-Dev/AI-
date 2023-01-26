@@ -51,19 +51,30 @@ class PageResource extends Resource
             Forms\Components\Section::make(trans('Slices'))
                 ->schema([
                     Forms\Components\Repeater::make('slice_contents')
-                        ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Page $record) {
-                            $state = $record?->sliceContents->sortBy('order')
-                                ->mapWithKeys(fn (SliceContent $item) => ["record-{$item->getKey()}" => $item])
-                                ->toArray();
+                        ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Page $record, ?array $state) {
+                            if ($record === null || $record->sliceContents->isEmpty()) {
+                                $component->state($state ?? []);
 
-                            $component->state($state ?? []);
+                                return;
+                            }
+
+                            $component->state(
+                                $record->sliceContents->sortBy('order')
+                                    ->mapWithKeys(fn (SliceContent $item) => ["record-{$item->getKey()}" => $item])
+                                    ->toArray()
+                            );
+
+                            // WORKAROUND: Force after state hydrate after setting the new state
+                            foreach ($component->getChildComponentContainers() as $componentContainer) {
+                                $componentContainer->callAfterStateHydrated();
+                            }
                         })
                         ->itemLabel(fn (array $state) => self::getCachedSlices()->firstWhere('id', $state['slice_id'])?->name)
                         ->disableLabel()
                         ->minItems(1)
                         ->collapsible()
                         ->orderable('order')
-                        ->schema(fn () => [
+                        ->schema([
                             Forms\Components\Select::make('slice_id')
                                 ->label('Slice')
                                 ->options(

@@ -40,11 +40,11 @@ class CreateS3Bucket implements ShouldQueue
             return;
         }
 
-        if ($this->bucketManager->bucketExists()) {
-            return;
+        if ( ! $this->bucketManager->bucketExists()) {
+            $this->bucketManager->createBucket();
         }
 
-        $this->bucketManager->createBucket();
+        $this->bucketManager->configureBucket();
     }
 
     protected function generateBucketName(): string

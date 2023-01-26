@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tenancy;
 
+use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
+use Domain\Tenant\Models\Tenant;
 use Illuminate\Support\Arr;
-use Stancl\Tenancy\Contracts\Tenant;
+use Livewire\FileUploadConfiguration;
 
 class BucketManager
 {
@@ -46,6 +48,53 @@ class BucketManager
     public function createBucket(): void
     {
         $this->s3Client->createBucket(['Bucket' => $this->tenant->getInternal('bucket')]);
+    }
+
+    public function configureBucket(): void
+    {
+        $bucket = $this->tenant->getInternal('bucket');
+
+        // temporarily uploaded file cleanup from Livewire.
+        $this->s3Client->putBucketLifecycleConfiguration([
+            'Bucket' => $bucket,
+            'LifecycleConfiguration' => [
+                'Rules' => [
+                    [
+                        'Prefix' => FileUploadConfiguration::path(),
+                        'Expiration' => ['Days' => 1],
+                        'Status' => 'Enabled',
+                    ],
+                ],
+            ],
+        ]);
+
+        try {
+            $this->s3Client->putBucketCors([
+                'Bucket' => $bucket,
+                'CORSConfiguration' => [
+                    'CORSRules' => [
+                        [
+                            'AllowedHeaders' => ['*'],
+                            'AllowedMethods' => [
+                                'PUT',
+                                'POST',
+                                'DELETE',
+                            ],
+                            'AllowedOrigins' => $this->tenant->domains->pluck('domain')->map(fn (string $domain) => 'https://' . $domain)->toArray(),
+                        ],
+                        [
+                            'AllowedMethods' => [
+                                'GET',
+                                'HEAD',
+                            ],
+                            'AllowedOrigins' => ['*'],
+                        ],
+                    ],
+                ],
+            ]);
+        } catch (S3Exception $exception) {
+            report($exception);
+        }
     }
 
     public function deleteBucket(): void
