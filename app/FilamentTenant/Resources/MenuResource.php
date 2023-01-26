@@ -20,6 +20,7 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
 
 class MenuResource extends Resource
 {
@@ -32,6 +33,24 @@ class MenuResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-menu';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'nodes.url', 'nodes.label'];
+    }
+
+    protected static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->withCount('nodes');
+    }
+
+    /** @param Collection $record */
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            trans('Total Node') => $record->nodes_count,
+        ];
+    }
 
     public static function resolveRecordRouteBinding(mixed $key): ?Model
     {
