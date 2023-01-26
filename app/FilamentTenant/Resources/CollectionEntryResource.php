@@ -15,7 +15,6 @@ use Filament\Tables;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
 use Closure;
-use Domain\Collection\Models\Collection;
 use Domain\Collection\Models\CollectionEntry;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
