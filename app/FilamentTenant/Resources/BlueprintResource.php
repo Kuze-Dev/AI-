@@ -68,211 +68,7 @@ class BlueprintResource extends Resource
                                         $record->schema->sections,
                                         fn (SectionData $section) => $section->state_name === $state
                                     ))),
-                                Forms\Components\Repeater::make('fields')
-                                    ->orderable()
-                                    ->itemLabel(function (array $state) {
-                                        if (blank($state['title'])) {
-                                            return null;
-                                        }
-
-                                        $label = $state['title'];
-
-                                        if (filled($state['type'])) {
-                                            $type = $state['type'] instanceof FieldType
-                                                ? $state['type']->value
-                                                : $state['type'];
-
-                                            $label .= ' (' . ucfirst($type) . ')';
-                                        }
-
-                                        return $label;
-                                    })
-                                    ->minItems(1)
-                                    ->columns(['sm' => 3])
-                                    ->collapsible()
-                                    ->schema([
-                                        Forms\Components\TextInput::make('title')
-                                            ->required()
-                                            ->lazy()
-                                            ->columnSpan(['sm' => 3]),
-                                        Forms\Components\TextInput::make('state_name')
-                                            ->columnSpan(['sm' => 2])
-                                            ->disabled(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
-                                                $record->schema->sections,
-                                                fn (SectionData $section) => Arr::first(
-                                                    $section->fields,
-                                                    fn (FieldData $field) => $field->state_name === $state,
-                                                )
-                                            ))),
-                                        Forms\Components\Select::make('type')
-                                            ->reactive()
-                                            ->options(
-                                                collect(FieldType::cases())
-                                                    ->mapWithKeys(fn (FieldType $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
-                                                    ->toArray()
-                                            )
-                                            ->required()
-                                            ->disabled(fn (?Blueprint $record, Closure $get) => (bool) ($record && Arr::first(
-                                                $record->schema->sections,
-                                                fn (SectionData $section) => Arr::first(
-                                                    $section->fields,
-                                                    fn (FieldData $field) => $field->state_name === $get('state_name'),
-                                                )
-                                            )))
-                                            ->afterStateUpdated(
-                                                fn (Forms\Components\Select $component) => $component->getContainer()
-                                                    ->getComponent(fn (Component $component) => $component->getId() === 'field-options')
-                                                    ?->getChildComponentContainer()
-                                                    ->fill()
-                                            ),
-                                        Forms\Components\TextInput::make('rules')
-                                            ->columnSpan(['sm' => 3])
-                                            ->afterStateHydrated(function (Closure $set, ?array $state): void {
-                                                $set('rules', implode('|', $state ?? []));
-                                            })
-                                            ->dehydrateStateUsing(function (string|null $state): array {
-                                                if ($state === null) {
-                                                    return [];
-                                                }
-
-                                                return Str::contains($state, '|')
-                                                    ? Str::of($state)->split('/\|/')
-                                                        ->map(fn (string $rule) => trim($rule))
-                                                        ->toArray()
-                                                    : [$state];
-                                            })
-                                            ->helperText(new HtmlString(<<<HTML
-                                                    Rules should be separated with "|". Available rules can be found on <a href="https://laravel.com/docs/validation" class="text-primary-500" target="_blank" rel="noopener noreferrer">Laravel's Documentation</a>.
-                                                HTML)),
-                                        Forms\Components\Section::make('Field Options')
-                                            ->id('field-options')
-                                            ->collapsible()
-                                            ->when(fn (array $state) => filled($state['type'] ?? null))
-                                            ->columns(['sm' => 2])
-                                            ->schema(fn (array $state) => match ($state['type'] instanceof FieldType ? $state['type'] : FieldType::tryFrom($state['type'] ?? '')) {
-                                                FieldType::DATETIME => [
-                                                    Forms\Components\DateTimePicker::make('min')
-                                                        ->timezone(Auth::user()?->timezone),
-                                                    Forms\Components\DateTimePicker::make('max')
-                                                        ->timezone(Auth::user()?->timezone),
-                                                    Forms\Components\TextInput::make('format'),
-                                                ],
-                                                FieldType::FILE => [
-                                                    Forms\Components\Toggle::make('multiple')
-                                                        ->reactive(),
-                                                    Forms\Components\Toggle::make('reorder'),
-                                                    Forms\Components\TextInput::make('accept')
-                                                        ->columnSpan(2),
-                                                    Forms\Components\TextInput::make('min_size')
-                                                        ->numeric()
-                                                        ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
-                                                    Forms\Components\TextInput::make('max_size')
-                                                        ->numeric()
-                                                        ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
-                                                    Forms\Components\TextInput::make('min_files')
-                                                        ->numeric()
-                                                        ->integer()
-                                                        ->when(fn (Closure $get) => $get('multiple') === true)
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
-                                                    Forms\Components\TextInput::make('max_files')
-                                                        ->numeric()
-                                                        ->integer()
-                                                        ->when(fn (Closure $get) => $get('multiple') === true)
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
-                                                ],
-                                                FieldType::MARKDOWN => [
-                                                    Forms\Components\CheckboxList::make('buttons')
-                                                        ->options(
-                                                            collect(MarkdownButton::cases())
-                                                                ->mapWithKeys(fn (MarkdownButton $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
-                                                                ->toArray()
-                                                        )
-                                                        ->default(fn (Forms\Components\CheckboxList $component) => array_keys($component->getOptions()))
-                                                        ->columns([
-                                                            'sm' => 2,
-                                                            'md' => 4,
-                                                        ])
-                                                        ->columnSpan(['sm' => 2]),
-                                                ],
-                                                FieldType::RICHTEXT => [
-                                                    Forms\Components\CheckboxList::make('buttons')
-                                                        ->options(
-                                                            collect(RichtextButton::cases())
-                                                                ->mapWithKeys(fn (RichtextButton $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
-                                                                ->toArray()
-                                                        )
-                                                        ->default(fn (Forms\Components\CheckboxList $component) => array_keys($component->getOptions()))
-                                                        ->columns([
-                                                            'sm' => 2,
-                                                            'md' => 4,
-                                                        ])
-                                                        ->columnSpan(['sm' => 2]),
-                                                ],
-                                                FieldType::SELECT => [
-                                                    Forms\Components\Toggle::make('multiple'),
-                                                    Forms\Components\Repeater::make('options')
-                                                        ->collapsible()
-                                                        ->orderable()
-                                                        ->itemLabel(fn (array $state) => $state['title'] ?? null)
-                                                        ->columnSpan(['sm' => 2])
-                                                        ->columns(2)
-                                                        ->schema([
-                                                            Forms\Components\TextInput::make('value'),
-                                                            Forms\Components\TextInput::make('label'),
-                                                        ]),
-                                                ],
-                                                FieldType::TEXTAREA => [
-                                                    Forms\Components\TextInput::make('min_length')
-                                                        ->numeric()
-                                                        ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
-                                                    Forms\Components\TextInput::make('max_length')
-                                                        ->numeric()
-                                                        ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
-                                                    Forms\Components\TextInput::make('rows')
-                                                        ->numeric()
-                                                        ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
-                                                    Forms\Components\TextInput::make('cols')
-                                                        ->numeric()
-                                                        ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
-                                                ],
-                                                FieldType::TEXT,
-                                                FieldType::EMAIL,
-                                                FieldType::TEL,
-                                                FieldType::URL,
-                                                FieldType::PASSWORD => [
-                                                    Forms\Components\TextInput::make('min_length')
-                                                        ->numeric()
-                                                        ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
-                                                    Forms\Components\TextInput::make('max_length')
-                                                        ->numeric()
-                                                        ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
-                                                ],
-                                                FieldType::NUMBER => [
-                                                    Forms\Components\TextInput::make('min')
-                                                        ->numeric()
-                                                        ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
-                                                    Forms\Components\TextInput::make('max')
-                                                        ->numeric()
-                                                        ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
-                                                    Forms\Components\TextInput::make('step')
-                                                        ->numeric()
-                                                        ->integer()
-                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
-                                                ],
-                                                FieldType::TOGGLE => [],
-                                                default => [],
-                                            }),
-                                    ]),
+                                self::getFieldsSchema(),
                             ]),
                     ]),
             ]);
@@ -310,5 +106,249 @@ class BlueprintResource extends Resource
         return [
             ActivitiesRelationManager::class,
         ];
+    }
+
+    protected static function getFieldsSchema(): Forms\Components\Repeater
+    {
+        return Forms\Components\Repeater::make('fields')
+            ->orderable()
+            ->itemLabel(function (array $state) {
+                if (blank($state['title'])) {
+                    return null;
+                }
+
+                $label = $state['title'];
+
+                if (filled($state['type'])) {
+                    $type = $state['type'] instanceof FieldType
+                        ? $state['type']->value
+                        : $state['type'];
+
+                    $label .= ' (' . Str::headline($type) . ')';
+                }
+
+                return $label;
+            })
+            ->minItems(1)
+            ->columns(['sm' => 3])
+            ->collapsible()
+            ->schema([
+                Forms\Components\TextInput::make('title')
+                    ->required()
+                    ->lazy()
+                    ->columnSpan(['sm' => 3]),
+                Forms\Components\TextInput::make('state_name')
+                    ->columnSpan(['sm' => 2])
+                    ->disabled(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
+                        $record->schema->sections,
+                        fn (SectionData $section) => Arr::first(
+                            $section->fields,
+                            fn (FieldData $field) => $field->state_name === $state,
+                        )
+                    ))),
+                Forms\Components\Select::make('type')
+                    ->reactive()
+                    ->options(
+                        collect(FieldType::cases())
+                            ->mapWithKeys(fn (FieldType $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                            ->sort()
+                            ->toArray()
+                    )
+                    ->required()
+                    ->disabled(fn (?Blueprint $record, Closure $get) => (bool) ($record && Arr::first(
+                        $record->schema->sections,
+                        fn (SectionData $section) => Arr::first(
+                            $section->fields,
+                            fn (FieldData $field) => $field->state_name === $get('state_name'),
+                        )
+                    )))
+                    ->afterStateUpdated(
+                        fn (Forms\Components\Select $component) => $component->getContainer()
+                            ->getComponent(fn (Component $component) => $component->getId() === 'field-options')
+                            ?->getChildComponentContainer()
+                            ->fill()
+                    ),
+                Forms\Components\TextInput::make('rules')
+                    ->columnSpan(['sm' => 3])
+                    ->afterStateHydrated(function (Closure $set, ?array $state): void {
+                        $set('rules', implode('|', $state ?? []));
+                    })
+                    ->dehydrateStateUsing(function (?string $state): array {
+                        return $state !== null
+                            ? Str::of($state)->split('/\|/')
+                                ->map(fn (string $rule) => trim($rule))
+                                ->toArray()
+                            : [];
+                    })
+                    ->helperText(new HtmlString(<<<HTML
+                            Rules should be separated with "|". Available rules can be found on <a href="https://laravel.com/docs/validation#available-validation-rules" class="text-primary-500" target="_blank" rel="noopener noreferrer">Laravel's Documentation</a>.
+                        HTML)),
+                Forms\Components\Section::make('Field Options')
+                    ->id('field-options')
+                    ->collapsible()
+                    ->when(fn (Forms\Components\Section $component, array $state) => (filled($state['type'] ?? null) && count($component->getChildComponents()) > 0))
+                    ->columns(['sm' => 2])
+                    ->schema(fn (array $state) => self::getFieldOptionSchema(
+                        $state['type'] instanceof FieldType
+                            ? $state['type']
+                            : FieldType::tryFrom($state['type'] ?? '')
+                    )),
+            ]);
+    }
+
+    protected static function getFieldOptionSchema(?FieldType $fieldType): array
+    {
+        return match ($fieldType) {
+            FieldType::DATETIME => [
+                Forms\Components\DateTimePicker::make('min')
+                    ->timezone(Auth::user()?->timezone),
+                Forms\Components\DateTimePicker::make('max')
+                    ->timezone(Auth::user()?->timezone),
+                Forms\Components\TextInput::make('format')
+                    ->helperText(new HtmlString(<<<HTML
+                            See <a href="https://www.php.net/manual/en/datetime.format.php" class="text-primary-500" target="_blank" rel="noopener noreferrer">PHP's Date/Time Format</a> for available options.
+                        HTML)),
+            ],
+            FieldType::FILE => [
+                Forms\Components\Toggle::make('multiple')
+                    ->reactive(),
+                Forms\Components\Toggle::make('reorder'),
+                Forms\Components\TextInput::make('accept')
+                    ->afterStateHydrated(function (Closure $set, ?array $state): void {
+                        $set('accept', implode(',', $state ?? []));
+                    })
+                    ->dehydrateStateUsing(function (string|null $state): array {
+                        if ($state === null) {
+                            return [];
+                        }
+
+                        return Str::contains($state, ',')
+                            ? Str::of($state)->split('/\,/')
+                                ->map(fn (string $rule) => trim($rule))
+                                ->toArray()
+                            : [$state];
+                    })
+                    ->columnSpan(2),
+                Forms\Components\TextInput::make('min_size')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('max_size')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('min_files')
+                    ->numeric()
+                    ->integer()
+                    ->when(fn (Closure $get) => $get('multiple') === true)
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('max_files')
+                    ->numeric()
+                    ->integer()
+                    ->when(fn (Closure $get) => $get('multiple') === true)
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+            ],
+            FieldType::MARKDOWN => [
+                Forms\Components\CheckboxList::make('buttons')
+                    ->options(
+                        collect(MarkdownButton::cases())
+                            ->mapWithKeys(fn (MarkdownButton $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                            ->toArray()
+                    )
+                    ->default(fn (Forms\Components\CheckboxList $component) => array_keys($component->getOptions()))
+                    ->columns([
+                        'sm' => 2,
+                        'md' => 4,
+                    ])
+                    ->columnSpan(['sm' => 2]),
+            ],
+            FieldType::RICHTEXT => [
+                Forms\Components\CheckboxList::make('buttons')
+                    ->options(
+                        collect(RichtextButton::cases())
+                            ->mapWithKeys(fn (RichtextButton $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                            ->toArray()
+                    )
+                    ->default(fn (Forms\Components\CheckboxList $component) => array_keys($component->getOptions()))
+                    ->columns([
+                        'sm' => 2,
+                        'md' => 4,
+                    ])
+                    ->columnSpan(['sm' => 2]),
+            ],
+            FieldType::SELECT => [
+                Forms\Components\Toggle::make('multiple'),
+                Forms\Components\Repeater::make('options')
+                    ->collapsible()
+                    ->orderable()
+                    ->itemLabel(fn (array $state) => $state['title'] ?? null)
+                    ->columnSpan(['sm' => 2])
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('value'),
+                        Forms\Components\TextInput::make('label'),
+                    ]),
+            ],
+            FieldType::TEXTAREA => [
+                Forms\Components\TextInput::make('min_length')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('max_length')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('rows')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('cols')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+            ],
+            FieldType::TEXT,
+            FieldType::EMAIL,
+            FieldType::TEL,
+            FieldType::URL,
+            FieldType::PASSWORD => [
+                Forms\Components\TextInput::make('min_length')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('max_length')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+            ],
+            FieldType::NUMBER => [
+                Forms\Components\TextInput::make('min')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('max')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('step')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+            ],
+            FieldType::TOGGLE => [],
+            FieldType::REPEATER => [
+                Forms\Components\TextInput::make('min')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('max')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                self::getFieldsSchema()
+                    ->columnSpanFull(),
+            ],
+            default => [],
+        };
     }
 }

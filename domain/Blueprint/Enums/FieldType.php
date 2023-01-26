@@ -7,6 +7,7 @@ namespace Domain\Blueprint\Enums;
 use Domain\Blueprint\DataTransferObjects\DatetimeFieldData;
 use Domain\Blueprint\DataTransferObjects\FileFieldData;
 use Domain\Blueprint\DataTransferObjects\MarkdownFieldData;
+use Domain\Blueprint\DataTransferObjects\RepeaterFieldData;
 use Domain\Blueprint\DataTransferObjects\RichtextFieldData;
 use Domain\Blueprint\DataTransferObjects\SelectFieldData;
 use Domain\Blueprint\DataTransferObjects\TextareaFieldData;
@@ -29,6 +30,7 @@ enum FieldType: string
     case URL = 'url';
     case PASSWORD = 'password';
     case TOGGLE = 'toggle';
+    case REPEATER = 'repeater';
 
     public function getFieldDataClass(): string
     {
@@ -46,6 +48,7 @@ enum FieldType: string
             self::URL,
             self::PASSWORD => TextFieldData::class,
             self::TOGGLE => ToggleFieldData::class,
+            self::REPEATER => RepeaterFieldData::class,
             default => throw new InvalidArgumentException("`FieldData` class for `{$this->value}` is not specified.")
         };
     }
