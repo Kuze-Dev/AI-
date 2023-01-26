@@ -1,9 +1,9 @@
 <x-tables::empty-state icon="heroicon-o-x">
     <x-slot name="heading">
         @if($guard)
-            @trans('No Avilable Permissions for the selected guard')
+            @lang('No Avilable Permissions for the selected guard')
         @else
-            @trans('Please select a guard')
+            @lang('Please select a guard')
         @endIf
     </x-slot>
 

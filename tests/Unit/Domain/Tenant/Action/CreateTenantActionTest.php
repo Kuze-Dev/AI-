@@ -10,10 +10,12 @@ use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertModelExists;
 
 it('can create tenant', function () {
-    $tenant = app(CreateTenantAction::class)->execute(new TenantData(
-        name: 'Test',
-        domains: ['test.com'],
-    ));
+    $tenant = app(CreateTenantAction::class)->execute(TenantData::fromArray([
+        'name' => 'Test',
+        'domains' => [
+            ['domain' => 'test.com'],
+        ],
+    ]));
 
     assertModelExists($tenant);
     assertDatabaseHas(Domain::class, ['domain' => 'test.com']);

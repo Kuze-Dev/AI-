@@ -9,13 +9,18 @@ use Domain\Tenant\Models\Tenant;
 
 class CreateTenantAction
 {
+    public function __construct(
+        protected CreateDomainAction $createDomain,
+    ) {
+    }
+
     public function execute(TenantData $tenantData): Tenant
     {
         /** @var Tenant $tenant */
         $tenant = Tenant::create(['name' => $tenantData->name]);
 
         foreach ($tenantData->domains as $domain) {
-            $tenant->createDomain(['domain' => $domain]);
+            $this->createDomain->execute($tenant, $domain);
         }
 
         return $tenant;

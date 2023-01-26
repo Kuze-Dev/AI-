@@ -11,7 +11,6 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
-use Saade\FilamentLaravelLog\Pages\ViewLog;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -23,7 +22,18 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         \Domain\Admin\Models\Admin::class => \App\Policies\AdminPolicy::class,
         \Spatie\Permission\Models\Role::class => \App\Policies\RolePolicy::class,
+        \Spatie\Activitylog\Models\Activity::class => \App\Policies\ActivityPolicy::class,
         \Domain\Tenant\Models\Tenant::class => \App\Policies\TenantPolicy::class,
+        \Domain\Blueprint\Models\Blueprint::class => \App\Policies\BlueprintPolicy::class,
+        \Domain\Menu\Models\Menu::class => \App\Policies\MenuPolicy::class,
+        \Domain\Page\Models\Page::class => \App\Policies\PagePolicy::class,
+        \Domain\Page\Models\Slice::class => \App\Policies\SlicePolicy::class,
+        \Domain\Form\Models\Form::class => \App\Policies\FormPolicy::class,
+        \Domain\Form\Models\FormSubmission::class => \App\Policies\FormSubmissionPolicy::class,
+        \Domain\Taxonomy\Models\Taxonomy::class => \App\Policies\TaxonomyPolicy::class,
+        \Domain\Taxonomy\Models\TaxonomyTerm::class => \App\Policies\TaxonomyTermPolicy::class,
+        \Domain\Collection\Models\Collection::class => \App\Policies\CollectionPolicy::class,
+        \Domain\Collection\Models\CollectionEntry::class => \App\Policies\CollectionEntryPolicy::class,
     ];
 
     /**
@@ -38,8 +48,6 @@ class AuthServiceProvider extends ServiceProvider
 
         /** @see https://freek.dev/1325-when-to-use-gateafter-in-laravel */
         Gate::after(fn ($user) => $user instanceof Admin ? $user->hasRole(config('domain.role.super_admin')) : null);
-
-        ViewLog::can(fn (Admin $admin) => $admin->hasRole(config('domain.role.super_admin')));
     }
 
     protected function configureNotificationUrls(): void

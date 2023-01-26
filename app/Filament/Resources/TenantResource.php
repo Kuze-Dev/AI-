@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Resources\TenantResource\Pages;
+use App\Filament\Rules\FullyQualifiedDomainNameRule;
 use Domain\Tenant\Models\Tenant;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -12,6 +14,8 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Unique;
+use Stancl\Tenancy\Database\Models\Domain;
 
 class TenantResource extends Resource
 {
@@ -37,11 +41,23 @@ class TenantResource extends Resource
                 Forms\Components\Section::make(trans('Domains'))
                     ->schema([
                         Forms\Components\Repeater::make('domains')
-                            ->relationship('domains')
+                            ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Tenant $record, ?array $state) {
+                                $component->state($record?->domains->toArray() ?? $state);
+                            })
+                            ->disableItemMovement()
                             ->minItems(1)
                             ->schema([
                                 Forms\Components\TextInput::make('domain')
-                                    ->required(),
+                                    ->required()
+                                    ->unique(
+                                        'domains',
+                                        callback: fn (?Tenant $record, Unique $rule, ?string $state) => $rule
+                                            ->when(
+                                                $record?->domains->firstWhere('domain', $state),
+                                                fn (Unique $rule, ?Domain $domain) => $rule->ignore($domain)
+                                            ),
+                                    )
+                                    ->rules([new FullyQualifiedDomainNameRule()]),
                             ]),
                     ]),
             ]);
@@ -72,6 +88,13 @@ class TenantResource extends Resource
             'index' => Pages\ListTenants::route('/'),
             'create' => Pages\CreateTenant::route('/create'),
             'edit' => Pages\EditTenant::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            ActivitiesRelationManager::class,
         ];
     }
 }

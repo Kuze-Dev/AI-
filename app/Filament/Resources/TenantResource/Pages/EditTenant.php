@@ -11,6 +11,8 @@ use Domain\Tenant\Models\Tenant;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class EditTenant extends EditRecord
 {
@@ -23,9 +25,12 @@ class EditTenant extends EditRecord
         ];
     }
 
-    /** @param Tenant $record */
+    /**
+     * @param Tenant $record
+     * @throws Throwable
+     */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return app(UpdateTenantAction::class)->execute($record, new TenantData(...$data));
+        return DB::transaction(fn () => app(UpdateTenantAction::class)->execute($record, TenantData::fromArray($data)));
     }
 }

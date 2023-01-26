@@ -2,26 +2,19 @@
 
 declare(strict_types=1);
 
-/*
-|--------------------------------------------------------------------------
-| Test Case
-|--------------------------------------------------------------------------
-|
-| The closure you provide to your test functions is always bound to a specific PHPUnit test
-| case class. By default, that class is "PHPUnit\Framework\TestCase". Of course, you may
-| need to change it using the "uses()" function to bind a different classes or traits.
-|
-*/
-
 use Database\Seeders\Auth\PermissionSeeder;
 use Database\Seeders\Auth\RoleSeeder;
 use Domain\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Spatie\Permission\PermissionRegistrar;
+use Tests\Fixtures\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
-use Tests\Fixtures\User;
+use Illuminate\Support\Facades\Mail;
 
 use function Pest\Laravel\seed;
 
@@ -32,19 +25,28 @@ uses(
 )
     ->beforeEach(function () {
         Http::preventStrayRequests();
+        Mail::fake();
 
         foreach (array_keys(config('filesystems.disks')) as $disk) {
             Storage::fake($disk);
         }
 
-        seed([
-            PermissionSeeder::class,
-            RoleSeeder::class,
-        ]);
+        Event::listen(MigrationsEnded::class, function () {
+            if ( ! tenancy()->initialized) {
+                seed([
+                    PermissionSeeder::class,
+                    RoleSeeder::class,
+                ]);
+            }
+            app(PermissionRegistrar::class)->forgetCachedPermissions();
+        });
 
         config()->set('tenancy.database.prefix', 'test_');
     })
-    ->afterEach(fn () => Tenant::all()->each->delete())
+    ->afterEach(function () {
+        tenancy()->end();
+        Tenant::all()->each->delete();
+    })
     ->in('Feature');
 
 uses(
@@ -53,6 +55,13 @@ uses(
     Illuminate\Foundation\Testing\LazilyRefreshDatabase::class,
 )
     ->beforeEach(function () {
+        Http::preventStrayRequests();
+        Mail::fake();
+
+        foreach (array_keys(config('filesystems.disks')) as $disk) {
+            Storage::fake($disk);
+        }
+
         DB::connection()->getSchemaBuilder()->create('test_users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
@@ -64,5 +73,8 @@ uses(
 
         config()->set('tenancy.database.prefix', 'test_');
     })
-    ->afterEach(fn () => Tenant::all()->each->delete())
+    ->afterEach(function () {
+        tenancy()->end();
+        Tenant::all()->each->delete();
+    })
     ->in('Unit');
