@@ -43,6 +43,7 @@ class CollectionResource extends Resource
         return ['name', 'collectionEntries.title'];
     }
 
+    /** @return Builder<Model> */
     protected static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->withCount('collectionEntries');

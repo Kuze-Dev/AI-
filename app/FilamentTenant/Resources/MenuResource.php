@@ -39,6 +39,7 @@ class MenuResource extends Resource
         return ['name', 'nodes.url', 'nodes.label'];
     }
 
+    /** @return Builder<Model> */
     protected static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->withCount('nodes');

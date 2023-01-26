@@ -65,6 +65,7 @@ class CollectionEntryResource extends Resource
         return self::getUrl('edit', [$record->collection, $record]);
     }
 
+    /** @return Builder<Model> */
     protected static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->with('collection');
