@@ -55,7 +55,7 @@ class MenuResource extends Resource
     {
         return app(static::getModel())
             ->resolveRouteBindingQuery(static::getEloquentQuery(), $key, static::getRecordRouteKeyName())
-            ->with('parentNodes.children')
+            ->with('nodeTrees')
             ->first();
     }
 
@@ -80,7 +80,7 @@ class MenuResource extends Resource
                     ->schema([
                         Tree::make('nodes')
                             ->formatStateUsing(
-                                fn (?Menu $record, ?array $state) => $record?->parentNodes
+                                fn (?Menu $record, ?array $state) => $record?->nodeTrees
                                     ->mapWithKeys(self::mapNodeWithNormalizedKey(...))
                                     ->toArray() ?? $state ?? []
                             )

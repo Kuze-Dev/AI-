@@ -24,6 +24,7 @@ class MenuController
 
     public function show(string $menu): MenuResource
     {
+
         return MenuResource::make(
             QueryBuilder::for(Menu::whereSlug($menu))
                 ->allowedIncludes(['nodeTrees.children'])

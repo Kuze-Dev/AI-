@@ -27,7 +27,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Menu\Models\Node[] $nodes
  * @property-read int|null $nodes_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Menu\Models\Node[] $parentNodes
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Menu\Models\Node[] $nodeTrees
  * @property-read int|null $parent_nodes_count
  * @method static \Illuminate\Database\Eloquent\Builder|Menu newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Menu newQuery()
@@ -65,9 +65,9 @@ class Menu extends Model implements IsActivitySubject
     }
 
     /** @return HasMany<Node> */
-    public function parentNodes(): HasMany
+    public function nodeTrees(): HasMany
     {
-        return $this->nodes()->whereNull('parent_id');
+        return $this->nodes()->whereNull('parent_id')->with('children');
     }
 
     /** @return HasMany<Node> */
