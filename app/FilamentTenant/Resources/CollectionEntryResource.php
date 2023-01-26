@@ -23,6 +23,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class CollectionEntryResource extends Resource
 {
@@ -55,6 +57,16 @@ class CollectionEntryResource extends Resource
                     }
                 });
         };
+    }
+
+    public static function getGlobalSearchResultUrl(Model $record): ?string
+    {
+        return self::getUrl('edit', [$record->collection, $record]);
+    }
+
+    protected static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with('collection');
     }
 
     public static function form(Form $form): Form
