@@ -16,6 +16,12 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
+/**
+ * Domain\Collection\Models\CollectionEntry
+ *
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Collection\Models\Collection[] $collection
+ *
+ */
 class CollectionEntry extends Model implements IsActivitySubject
 {
     use LogsActivity;

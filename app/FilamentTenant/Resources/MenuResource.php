@@ -44,7 +44,7 @@ class MenuResource extends Resource
         return parent::getGlobalSearchEloquentQuery()->withCount('nodes');
     }
 
-    /** @param Collection $record */
+    /** @param Menu $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         return [
