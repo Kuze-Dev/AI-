@@ -48,8 +48,11 @@ class FormResource extends Resource
                             $set('slug', Str::slug($state));
                         }),
                     Forms\Components\Select::make('blueprint_id')
-                        ->relationship('blueprint', 'name')
-                        ->saveRelationshipsUsing(null)
+                        ->options(
+                            fn () => Blueprint::orderBy('name')
+                                ->pluck('name', 'id')
+                                ->toArray()
+                        )
                         ->disabled(fn (?FormModel $record) => $record !== null)
                         ->required()
                         ->exists(Blueprint::class, 'id')
