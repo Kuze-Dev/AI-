@@ -23,6 +23,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Support\Str;
 
 class CollectionEntryResource extends Resource
 {
@@ -69,11 +70,16 @@ class CollectionEntryResource extends Resource
                                 ->unique(
                                     callback: fn ($livewire, Unique $rule) => $rule->where('collection_id', $livewire->ownerRecord->id),
                                     ignoreRecord: true
-                                )
+                                )->debounce()
+                                ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
+                                    if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
+                                        $set('slug', Str::slug($state));
+                                    }
+                                })
                                 ->required(),
                             Forms\Components\TextInput::make('slug')
                                 ->unique(ignoreRecord: true)
-                                ->disabled(fn (?CollectionEntry $record) => $record !== null),
+                                ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('title'))),
                         ]),
                         SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
                     ])
