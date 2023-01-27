@@ -47,14 +47,14 @@ class CollectionResource extends Resource
             ->schema([
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
-                    ->unique(ignoreRecord: true)
-                    ->debounce()
-                    ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
-                        if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
-                            $set('slug', Str::slug($state));
-                        }
-                    })
-                    ->required(),
+                        ->unique(ignoreRecord: true)
+                        ->debounce()
+                        ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
+                            if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
+                                $set('slug', Str::slug($state));
+                            }
+                        })
+                        ->required(),
                     Forms\Components\TextInput::make('slug')
                         // ->required()
                         ->unique(ignoreRecord: true)
