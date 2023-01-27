@@ -9,6 +9,7 @@ use Domain\Blueprint\DataTransferObjects\DatetimeFieldData;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\FileFieldData;
 use Domain\Blueprint\DataTransferObjects\MarkdownFieldData;
+use Domain\Blueprint\DataTransferObjects\RepeaterFieldData;
 use Domain\Blueprint\DataTransferObjects\RichtextFieldData;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
 use Domain\Blueprint\DataTransferObjects\SectionData;
@@ -24,6 +25,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -105,7 +107,8 @@ class SchemaFormBuilder extends Component
             TextareaFieldData::class => $this->makeTextAreaComponent($field),
             TextFieldData::class => $this->makeTextInputComponent($field),
             ToggleFieldData::class => Toggle::make($field->state_name),
-            default => throw new InvalidArgumentException('Cannot generate field component for `'.$field::class.'` as its not supported.'),
+            RepeaterFieldData::class => $this->makeRepeaterComponent($field),
+            default => throw new InvalidArgumentException('Cannot generate field component for `' . $field::class . '` as its not supported.'),
         };
 
         return $fieldComponent
@@ -200,5 +203,22 @@ class SchemaFormBuilder extends Component
         return $textInput
             ->minLength(fn () => $textFieldData->min_length)
             ->maxLength(fn () => $textFieldData->max_length);
+    }
+
+    private function makeRepeaterComponent(RepeaterFieldData $repeaterFieldData): Repeater
+    {
+        $repeater = Repeater::make($repeaterFieldData->state_name)
+            ->collapsible()
+            ->schema(array_map(fn (FieldData $field) => $this->generateFieldComponent($field), $repeaterFieldData->fields));
+
+        if ($repeaterFieldData->min) {
+            $repeater->minItems($repeaterFieldData->min);
+        }
+
+        if ($repeaterFieldData->max) {
+            $repeater->maxItems($repeaterFieldData->max);
+        }
+
+        return $repeater;
     }
 }

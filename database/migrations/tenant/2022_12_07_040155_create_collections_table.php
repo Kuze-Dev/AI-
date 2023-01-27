@@ -25,12 +25,14 @@ return new class () extends Migration {
         Schema::create('collection_entries', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(CollectionModel::class)->constrained();
-            $table->string('title')->unique();
-            $table->string('slug')->unique();
+            $table->string('title');
+            $table->string('slug')->index();
             $table->dateTime('published_at')->nullable();
             $table->json('data');
             $table->bigInteger('order')->nullable();
             $table->timestamps();
+
+            $table->unique(['collection_id', 'title']);
         });
 
         Schema::create('collection_taxonomy', function (Blueprint $table) {
