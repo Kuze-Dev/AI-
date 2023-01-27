@@ -14,7 +14,7 @@ beforeEach(function () {
     loginAsSuperAdmin();
 });
 
-it('collection resource must be globaly searchable', function () {
+it('can globally search', function () {
     $taxonomy = TaxonomyFactory::new()
         ->createOne();
 

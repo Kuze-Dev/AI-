@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\FilamentTenant\Resources\FormResource;
 use Filament\Facades\Filament;
 use Domain\Form\Database\Factories\FormFactory;
 
@@ -11,17 +12,14 @@ beforeEach(function () {
     loginAsSuperAdmin();
 });
 
-it('form resource must be globaly searchable', function () {
-    $data = FormFactory::new()
+it('can globally search', function () {
+    $form = FormFactory::new()
         ->withDummyBlueprint()
-        ->create();
+        ->createOne();
 
     $results = Filament::getGlobalSearchProvider()
-        ->getResults($data->name);
+        ->getResults($form->name);
 
-    expect(
-        route('filament-tenant.resources.forms.edit', $data->getRouteKey())
-    )->toEqual(
-        $results->getCategories()['forms']->first()->url
-    );
+    expect($results->getCategories()['forms']->first()->url)
+        ->toEqual(FormResource::getUrl('edit', [$form]));
 });
