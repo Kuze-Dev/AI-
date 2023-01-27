@@ -24,7 +24,7 @@ return new class () extends Migration {
         Schema::create('slices', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(BlueprintModel::class)->constrained();
+            $table->foreignIdFor(BlueprintModel::class);
 
             $table->string('name')->unique();
             $table->string('component')->unique();
@@ -35,8 +35,8 @@ return new class () extends Migration {
         Schema::create('slice_contents', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(Slice::class)->constrained();
-            $table->foreignIdFor(Page::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Slice::class);
+            $table->foreignIdFor(Page::class);
 
             $table->json('data')->nullable();
             $table->unsignedInteger('order');
