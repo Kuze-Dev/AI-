@@ -20,7 +20,6 @@ class UpdateFormAction
     public function execute(Form $form, FormData $formData): Form
     {
         $form->update([
-            'blueprint_id' => $formData->blueprint_id,
             'name' => $formData->name,
             'slug' => $formData->slug,
             'store_submission' => $formData->store_submission,

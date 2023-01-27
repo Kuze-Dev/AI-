@@ -48,18 +48,16 @@ class FormResource extends Resource
                             $set('slug', Str::slug($state));
                         }),
                     Forms\Components\Select::make('blueprint_id')
-                        ->relationship('blueprint', 'name')
-                        ->saveRelationshipsUsing(null)
+                        ->options(
+                            fn () => Blueprint::orderBy('name')
+                                ->pluck('name', 'id')
+                                ->toArray()
+                        )
+                        ->disabled(fn (?FormModel $record) => $record !== null)
                         ->required()
                         ->exists(Blueprint::class, 'id')
                         ->searchable()
-                        ->preload()
-                        ->reactive()
-                        ->helperText(function (?FormModel $record, ?string $state) {
-                            if ($record !== null && $record->blueprint_id !== (int) $state) {
-                                return trans('Modifying the blueprint will reset all the form\'s content.');
-                            }
-                        }),
+                        ->preload(),
                     Forms\Components\Toggle::make('store_submission'),
                 ]),
                 Forms\Components\Card::make([
