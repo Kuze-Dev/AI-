@@ -44,6 +44,7 @@ class TenantResource extends Resource
                             ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Tenant $record, ?array $state) {
                                 $component->state($record?->domains->toArray() ?? $state);
                             })
+                            ->disableItemMovement()
                             ->minItems(1)
                             ->schema([
                                 Forms\Components\TextInput::make('domain')
