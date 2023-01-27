@@ -43,7 +43,7 @@ class CollectionResource extends Resource
         return ['name', 'collectionEntries.title'];
     }
 
-    /** @return Builder<Model> */
+    /** @return Builder<Collection> */
     protected static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->withCount('collectionEntries');
@@ -52,9 +52,7 @@ class CollectionResource extends Resource
     /** @param Collection $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
-        return [
-            trans('Total Entries') => $record->collection_entries_count,
-        ];
+        return [trans('Total Entries') => $record->collection_entries_count];
     }
 
     /**
