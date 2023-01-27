@@ -6,12 +6,13 @@ namespace App\Forms\Components;
 
 use Filament\Forms\Components\Component;
 use Closure;
+use Domain\Blueprint\DataTransferObjects\SchemaData;
 
 class SchemaInterpolations extends Component
 {
-    protected string $view = 'forms.components.schema_interpolation';
+    protected string $view = 'forms.components.schema-interpolations';
 
-    protected Closure|null $schemaData = null;
+    protected SchemaData|Closure|null $schemaData = null;
 
     final public function __construct(string $name, Closure|null $schemaData)
     {
@@ -31,14 +32,14 @@ class SchemaInterpolations extends Component
         return $static;
     }
 
-    public function schemaData(Closure $schemaData = null): self
+    public function schemaData(SchemaData|Closure $schemaData = null): self
     {
         $this->schemaData = $schemaData;
 
         return $this;
     }
 
-    public function getSchemaData(): array
+    public function getSchemaData(): ?SchemaData
     {
         return $this->evaluate($this->schemaData);
     }

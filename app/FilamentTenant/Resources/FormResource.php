@@ -58,19 +58,18 @@ class FormResource extends Resource
                         ->required()
                         ->exists(Blueprint::class, 'id')
                         ->searchable()
+                        ->reactive()
                         ->preload(),
                     Forms\Components\Toggle::make('store_submission'),
                 ]),
                 Forms\Components\Card::make([
                     Forms\Components\Section::make('Available Values')
                         ->schema([
-                            \App\Forms\Components\SchemaInterpolations::make(
-                                'data',
-                                fn (Closure $get) => ! is_null($get('blueprint_id')) ? Blueprint::where('id', $get('blueprint_id'))->firstorfail()->toArray() : []
-                            ),
+                            \App\Forms\Components\SchemaInterpolations::make('data')
+                                ->schemaData(fn (Closure $get) => Blueprint::where('id', $get('blueprint_id'))->first()?->schema),
                         ])
                         ->columnSpan(['md' => 1])
-                        ->extraAttributes(['class' => 'md:order-last md:sticky top-[5.5rem]']),
+                        ->extraAttributes(['class' => 'md:sticky top-[5.5rem]']),
                     Forms\Components\Repeater::make('form_email_notifications')
                         ->afterStateHydrated(fn (Forms\Components\Repeater $component, ?FormModel $record) => $component->state($record?->formEmailNotifications->toArray() ?? []))
                         ->nullable()
@@ -138,7 +137,6 @@ class FormResource extends Resource
                                 ->required()
                                 ->columnSpanFull(),
                         ])
-                        ->extraAttributes(['class' => 'md:order-first'])
                         ->columnSpan(['md' => 3]),
                 ])->columns(4),
             ]);
