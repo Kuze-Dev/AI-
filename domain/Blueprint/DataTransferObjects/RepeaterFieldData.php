@@ -17,7 +17,7 @@ class RepeaterFieldData extends FieldData
         public readonly string $title,
         public readonly string $state_name,
         public readonly array $fields,
-        public readonly FieldType $type = FieldType::RELATED_RESOURCE,
+        public readonly FieldType $type = FieldType::REPEATER,
         public readonly array $rules = [],
         public readonly ?int $min = null,
         public readonly ?int $max = null,
