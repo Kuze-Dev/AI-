@@ -16,7 +16,7 @@ class Dashboard extends BaseDashboard
     {
         return [
             AccountWidget::class,
-            FilamentInfoWidget::class
+            FilamentInfoWidget::class,
         ];
     }
 }
