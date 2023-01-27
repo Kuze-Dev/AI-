@@ -20,10 +20,9 @@ use Spatie\Sluggable\SlugOptions;
  * @property string $name
  * @property string $slug
  * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\SupparentNodesport\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
  * @property-read int|null $activities_count
- * @property-read int $nodes_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Menu\Models\Node[] $nodes
  * @property-read int|null $nodes_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Menu\Models\Node[] $parentNodes

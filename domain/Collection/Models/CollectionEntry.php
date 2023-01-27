@@ -19,8 +19,34 @@ use Spatie\Sluggable\SlugOptions;
 /**
  * Domain\Collection\Models\CollectionEntry
  *
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Collection\Models\Collection[] $collection
- *
+ * @property int $id
+ * @property int $collection_id
+ * @property string $title
+ * @property string $slug
+ * @property \Illuminate\Support\Carbon|null $published_at
+ * @property array $data
+ * @property int|null $order
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read int|null $activities_count
+ * @property-read \Domain\Collection\Models\Collection $collection
+ * @property-read \Illuminate\Database\Eloquent\Collection|TaxonomyTerm[] $taxonomyTerms
+ * @property-read int|null $taxonomy_terms_count
+ * @method static CollectionEntryBuilder|CollectionEntry newModelQuery()
+ * @method static CollectionEntryBuilder|CollectionEntry newQuery()
+ * @method static CollectionEntryBuilder|CollectionEntry query()
+ * @method static CollectionEntryBuilder|CollectionEntry whereCollectionId($value)
+ * @method static CollectionEntryBuilder|CollectionEntry whereCreatedAt($value)
+ * @method static CollectionEntryBuilder|CollectionEntry whereData($value)
+ * @method static CollectionEntryBuilder|CollectionEntry whereId($value)
+ * @method static CollectionEntryBuilder|CollectionEntry whereOrder($value)
+ * @method static CollectionEntryBuilder|CollectionEntry wherePublishStatus(?\Domain\Collection\Enums\PublishBehavior $publishBehavior = null, ?string $timezone = null)
+ * @method static CollectionEntryBuilder|CollectionEntry wherePublishedAt($value)
+ * @method static CollectionEntryBuilder|CollectionEntry whereSlug($value)
+ * @method static CollectionEntryBuilder|CollectionEntry whereTitle($value)
+ * @method static CollectionEntryBuilder|CollectionEntry whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 class CollectionEntry extends Model implements IsActivitySubject
 {
