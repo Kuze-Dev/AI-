@@ -17,8 +17,10 @@ use Filament\Tables;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Taxonomy\Models\Taxonomy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 
 class CollectionResource extends Resource
 {
@@ -35,6 +37,23 @@ class CollectionResource extends Resource
 
     /** @var string|null */
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'collectionEntries.title'];
+    }
+
+    /** @return Builder<Collection> */
+    protected static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->withCount('collectionEntries');
+    }
+
+    /** @param Collection $record */
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [trans('Total Entries') => $record->collection_entries_count];
+    }
 
     /**
      * @param Form $form

@@ -22,7 +22,35 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 /**
  * Domain\Collection\Models\Collection
  *
+ * @property int $id
+ * @property string $blueprint_id
+ * @property string $name
+ * @property string $slug
+ * @property PublishBehavior|null $future_publish_date_behavior
+ * @property PublishBehavior|null $past_publish_date_behavior
  * @property bool $is_sortable
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read int|null $activities_count
+ * @property-read Blueprint $blueprint
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Collection\Models\CollectionEntry[] $collectionEntries
+ * @property-read int|null $collection_entries_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|Taxonomy[] $taxonomies
+ * @property-read int|null $taxonomies_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection whereBlueprintId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection whereFuturePublishDateBehavior($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection whereIsSortable($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection wherePastPublishDateBehavior($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 class Collection extends Model implements IsActivitySubject
 {
