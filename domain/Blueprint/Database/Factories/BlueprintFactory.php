@@ -7,7 +7,6 @@ namespace Domain\Blueprint\Database\Factories;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Enums\FieldType;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Arr;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Blueprint\Models\Blueprint>
@@ -64,7 +63,7 @@ class BlueprintFactory extends Factory
             $definition['schema']['sections'][count($definition['schema']['sections']) - 1]['fields'][] = array_merge(
                 [
                     'title' => fake()->word(),
-                    'type' => Arr::random(FieldType::cases()),
+                    'type' => FieldType::TEXT,
                 ],
                 $attributes
             );
