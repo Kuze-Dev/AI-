@@ -7,11 +7,7 @@ namespace App\HttpTenantApi\Resources;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @property-read string $label
- * @property-read string $url
- * @property-read int $sort
- * @property-read string $target
- * @property-read array $childs
+ * @mixin \Domain\Menu\Models\Node
  */
 class NodeResource extends JsonApiResource
 {

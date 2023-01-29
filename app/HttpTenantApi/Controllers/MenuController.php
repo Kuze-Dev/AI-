@@ -17,7 +17,10 @@ class MenuController
     {
         return MenuResource::collection(
             QueryBuilder::for(Menu::query())
-                ->allowedFilters(['name', 'slug'])
+                ->allowedFilters([
+                    'name',
+                    'slug',
+                ])
                 ->jsonPaginate()
         );
     }
@@ -26,7 +29,7 @@ class MenuController
     {
         return MenuResource::make(
             QueryBuilder::for(Menu::whereSlug($menu))
-                ->allowedIncludes(['nodeTrees.children'])
+                ->allowedIncludes(['nodes.children'])
                 ->firstOrFail()
         );
     }

@@ -21,7 +21,7 @@ class MenuResource extends JsonApiResource
     public function toRelationships($request): array
     {
         return [
-            'nodeTrees' => fn () => NodeResource::collection($this->nodeTrees),
+            'nodes' => fn () => NodeResource::collection($this->nodes),
         ];
     }
 }
