@@ -141,11 +141,12 @@ class FormResource extends Resource
                                 ->required()
                                 ->default(function ($livewire) {
                                     if ($livewire->data['blueprint_id']) {
-                                        $blueprint = Blueprint::where('id', $livewire->data['blueprint_id'])->first()?->schema;
+                                        /** @var Blueprint $blueprint */
+                                        $blueprint = Blueprint::where('id', $livewire->data['blueprint_id'])->first();
 
                                         $interpolations = '';
 
-                                        foreach ($blueprint->sections as $section) {
+                                        foreach ($blueprint->schema->sections as $section) {
                                             foreach ($section->fields as $field) {
                                                 $interpolations = $interpolations.ucfirst($field->title).':  '.'{{'.'$'.$section->state_name ."['". $field->state_name ."']}}". '<br/>';
                                             }
