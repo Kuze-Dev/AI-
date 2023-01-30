@@ -135,6 +135,31 @@ class FormResource extends Resource
                                 ->columnSpanFull(),
                             Forms\Components\MarkdownEditor::make('template')
                                 ->required()
+                                ->default(function ($livewire) {
+                                    if ($livewire->data['blueprint_id']) {
+                                        $blueprint = Blueprint::where('id', $livewire->data['blueprint_id'])->first()?->schema;
+
+                                        $interpolations = '';
+
+                                        foreach ((collect($blueprint->sections)) as $section) {
+                                            foreach ((collect($section->fields)) as $field) {
+                                                $interpolations = $interpolations.ucfirst($field->title).':  '.'{{'.'$'.$section->state_name ."['". $field->state_name ."']}}". '<br/>';
+                                            }
+                                        }
+                                        $template = "<br/>Hi<br/><br/>We've received a new submission:<br/><br/>".$interpolations;
+
+                                        $template = str_replace(PHP_EOL, '', $template);
+                                        $template = str_ireplace(['<br />', '<br>', '<br/>'], PHP_EOL, $template);
+
+                                        $str = <<<blade
+                                              $template
+
+
+                                            blade;
+
+                                        return $str;
+                                    }
+                                })
                                 ->columnSpanFull(),
                         ])
                         ->columnSpan(['md' => 3]),
