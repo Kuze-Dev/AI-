@@ -32,10 +32,20 @@ it('can list Menus', function () {
 });
 
 it('can delete Menu', function () {
-    $menu = MenuFactory::new()->createOne();
+    $menu = MenuFactory::new()
+        ->has(NodeFactory::new())
+        ->createOne();
+    $node = $menu->nodes->first();
+    $nestedNode = NodeFactory::new([
+        'menu_id' => $menu->id,
+        'parent_id' => $node->id,
+    ])->createOne();
 
     livewire(ListMenus::class)
-        ->callTableAction(DeleteAction::class, $menu);
+        ->callTableAction(DeleteAction::class, $menu)
+        ->assertOk();
 
     assertModelMissing($menu);
+    assertModelMissing($node);
+    assertModelMissing($nestedNode);
 });

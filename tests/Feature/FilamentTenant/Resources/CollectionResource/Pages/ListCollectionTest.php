@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\CollectionResource\Pages\ListCollection;
+use Domain\Collection\Database\Factories\CollectionEntryFactory;
 use Domain\Collection\Database\Factories\CollectionFactory;
+use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
@@ -52,25 +54,31 @@ it('can list collections', function () {
 });
 
 it('can delete collection', function () {
-    $taxonomy = TaxonomyFactory::new()
-        ->createOne();
-
     $collection = CollectionFactory::new()
+        ->has(TaxonomyFactory::new())
         ->withDummyBlueprint()
         ->createOne();
-
-    $collection->taxonomies()->attach([$taxonomy->getKey()]);
+    $taxonomy = $collection->taxonomies->first();
 
     livewire(ListCollection::class)
         ->callTableAction(DeleteAction::class, $collection)
         ->assertOk();
 
     assertModelMissing($collection);
-    assertDatabaseMissing(
-        'collection_taxonomy',
-        [
-            'taxonomy_id' => $taxonomy->getKey(),
-            'collection_id' => $collection->getKey(),
-        ]
-    );
+    assertDatabaseMissing('collection_taxonomy', [
+        'collection_id' => $collection->id,
+        'taxonomy_id' => $taxonomy->id,
+    ]);
 });
+
+it('can not delete collection with existing entries', function () {
+    $collection = CollectionFactory::new()
+        ->has(TaxonomyFactory::new())
+        ->has(CollectionEntryFactory::new())
+        ->withDummyBlueprint()
+        ->createOne();
+
+    livewire(ListCollection::class)
+        ->callTableAction(DeleteAction::class, $collection)
+        ->assertOk();
+})->throws(DeleteRestrictedException::class);
