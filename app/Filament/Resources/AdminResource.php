@@ -52,19 +52,19 @@ class AdminResource extends Resource
                         ->required(),
                     Forms\Components\TextInput::make('email')
                         ->required()
-                        ->label("Email " . (!config('domain.admin.can_change_email') ? '(Email update is currently disabled.)' : ''))
+                        ->label('Email ' . ( ! config('domain.admin.can_change_email') ? '(Email update is currently disabled.)' : ''))
                         ->disabled(config('domain.admin.can_change_email') ? false : true),
                     Forms\Components\TextInput::make('password')
                         ->password()
                         ->required()
                         ->rule(Password::default())
-                        ->visible(fn (?Admin $record) => $record === null || !$record->exists),
+                        ->visible(fn (?Admin $record) => $record === null || ! $record->exists),
                     Forms\Components\TextInput::make('password_confirmation')
                         ->required()
                         ->password()
                         ->same('password')
                         ->dehydrated(false)
-                        ->visible(fn (?Admin $record) => $record === null || !$record->exists),
+                        ->visible(fn (?Admin $record) => $record === null || ! $record->exists),
                     Forms\Components\Select::make('timezone')
                         ->options(collect(timezone_identifiers_list())->mapWithKeys(fn (string $timezone) => [$timezone => $timezone]))
                         ->searchable()
