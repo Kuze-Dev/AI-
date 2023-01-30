@@ -8,6 +8,7 @@ use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Arr;
+use Exception;
 
 class CheckDatabaseConnection implements DataAwareRule, InvokableRule
 {
@@ -44,7 +45,7 @@ class CheckDatabaseConnection implements DataAwareRule, InvokableRule
                 'username' => $this->data['username'],
                 'password' => $this->data['password'],
             ])->getPdo();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $fail('Cannot connect with the database.');
         }
     }
