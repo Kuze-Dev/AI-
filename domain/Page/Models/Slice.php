@@ -6,8 +6,11 @@ namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -35,9 +38,11 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|Slice whereUpdatedAt($value)
  * @mixin \Eloquent
  */
+#[OnDeleteRestrict(['sliceContents'])]
 class Slice extends Model implements IsActivitySubject
 {
     use LogsActivity;
+    use ConstraintsRelationships;
 
     protected $fillable = [
         'blueprint_id',
@@ -57,6 +62,12 @@ class Slice extends Model implements IsActivitySubject
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
+    }
+
+    /** @return HasMany<SliceContent> */
+    public function sliceContents(): HasMany
+    {
+        return $this->hasMany(SliceContent::class);
     }
 
     public function getActivitySubjectDescription(Activity $activity): string

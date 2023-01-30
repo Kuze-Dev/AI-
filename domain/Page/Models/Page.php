@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
@@ -35,10 +37,12 @@ use Spatie\Sluggable\SlugOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|Page whereUpdatedAt($value)
  * @mixin \Eloquent
  */
+#[OnDeleteCascade(['sliceContents'])]
 class Page extends Model implements IsActivitySubject
 {
     use LogsActivity;
     use HasSlug;
+    use ConstraintsRelationships;
 
     protected $fillable = [
         'name',
