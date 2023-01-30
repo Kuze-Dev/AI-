@@ -145,8 +145,8 @@ class FormResource extends Resource
 
                                         $interpolations = '';
 
-                                        foreach ((collect($blueprint->sections)) as $section) {
-                                            foreach ((collect($section->fields)) as $field) {
+                                        foreach ($blueprint->sections as $section) {
+                                            foreach ($section->fields as $field) {
                                                 $interpolations = $interpolations.ucfirst($field->title).':  '.'{{'.'$'.$section->state_name ."['". $field->state_name ."']}}". '<br/>';
                                             }
                                         }
