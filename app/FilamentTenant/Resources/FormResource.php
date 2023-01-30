@@ -82,6 +82,7 @@ class FormResource extends Resource
                                         ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
                                             $component->state(implode(',', $state ?? []));
                                         })
+
                                         ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
                                             ? Str::of($state)
                                                 ->split('/\,/')
@@ -117,8 +118,10 @@ class FormResource extends Resource
                                 ])
                                 ->columns(3),
                             Forms\Components\TextInput::make('sender')
+                                ->helperText('This field accepts value interpolations. Multiple values should be separated by commas (,)')
                                 ->required(),
                             Forms\Components\TextInput::make('reply_to')
+                                ->helperText('This field accepts value interpolations. Multiple values should be separated by commas (,)')
                                 ->nullable()
                                 ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
                                     $component->state(implode('|', $state ?? []));
@@ -131,6 +134,7 @@ class FormResource extends Resource
                                     : ($state ?? [])),
                             Forms\Components\TextInput::make('subject')
                                 ->required()
+                                ->helperText('This field accepts value interpolations. Multiple values should be separated by commas (,)')
                                 ->nullable()
                                 ->columnSpanFull(),
                             Forms\Components\MarkdownEditor::make('template')
