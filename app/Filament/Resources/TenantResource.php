@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Resources\TenantResource\Pages;
+use App\Filament\Rules\CheckDatabaseConnection;
 use App\Filament\Rules\FullyQualifiedDomainNameRule;
 use Domain\Tenant\Models\Tenant;
 use Filament\Forms;
@@ -44,7 +45,8 @@ class TenantResource extends Resource
                         Forms\Components\TextInput::make('host')
                             ->required(fn (?Tenant $record) => $record === null)
                             ->columnSpan(['md' => 3])
-                            ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('db_host'))),
+                            ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('db_host')))
+                            ->rule(new CheckDatabaseConnection('data.database')),
                         Forms\Components\TextInput::make('port')
                             ->required(fn (?Tenant $record) => $record === null)
                             ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('db_port'))),
