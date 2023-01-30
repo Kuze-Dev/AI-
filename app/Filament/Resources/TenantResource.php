@@ -36,6 +36,7 @@ class TenantResource extends Resource
             ->schema([
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
+                        ->unique('tenants', 'name')
                         ->required(),
                 ]),
                 Forms\Components\Section::make(trans('Domains'))
