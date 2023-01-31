@@ -14,21 +14,10 @@ beforeEach(function () {
 });
 
 it('can list collections', function () {
-    $blueprint = BlueprintFactory::new()
-        ->withDummySchema()
-        ->createOne();
-
-    $taxonomy = TaxonomyFactory::new()
-        ->createOne();
-
-    $collections = CollectionFactory::new()
-        ->for($blueprint)
+    CollectionFactory::new()
+        ->withDummyBlueprint()
         ->count(10)
         ->create();
-
-    foreach ($collections as $collection) {
-        $collection->taxonomies()->attach([$taxonomy->getKey()]);
-    }
 
     getJson('api/collections')
         ->assertOk()
@@ -42,21 +31,11 @@ it('can list collections', function () {
 });
 
 it('can list collections with taxonomies', function () {
-    $blueprint = BlueprintFactory::new()
-        ->withDummySchema()
-        ->createOne();
-
-    $taxonomy = TaxonomyFactory::new()
-        ->createOne();
-
-    $collections = CollectionFactory::new()
-        ->for($blueprint)
+    CollectionFactory::new()
+        ->withDummyBlueprint()
+        ->has(TaxonomyFactory::new())
         ->count(10)
         ->create();
-
-    foreach ($collections as $collection) {
-        $collection->taxonomies()->attach([$taxonomy->getKey()]);
-    }
 
     getJson('api/collections?include=taxonomies')
         ->assertOk()
@@ -71,26 +50,42 @@ it('can list collections with taxonomies', function () {
 });
 
 it('can show a collection', function () {
-    $blueprint = BlueprintFactory::new()
-        ->withDummySchema()
-        ->createOne();
-
-    $taxonomy = TaxonomyFactory::new()
-        ->createOne();
-
     $collection = CollectionFactory::new()
-        ->for($blueprint)
+        ->withDummyBlueprint()
+        ->has(TaxonomyFactory::new())
         ->createOne();
-
-    $collection->taxonomies()->attach([$taxonomy->getKey()]);
 
     getJson('api/collections/' . $collection->getRouteKey())
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($collection) {
             $json
                 ->where('data.type', 'collections')
-                ->where('data.id', Str::slug($collection->name))
+                ->where('data.id', $collection->getRouteKey())
                 ->where('data.attributes.name', $collection->name)
                 ->etc();
         });
 });
+
+it('can show a collection with includes', function (string $include) {
+    $collection = CollectionFactory::new()
+        ->withDummyBlueprint()
+        ->has(TaxonomyFactory::new())
+        ->createOne();
+
+    getJson("api/collections/{$collection->getRouteKey()}?" . http_build_query(['include' => $include]))
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) use ($collection, $include) {
+            $json
+                ->where('data.type', 'collections')
+                ->where('data.id', $collection->getRouteKey())
+                ->where('data.attributes.name', $collection->name)
+                ->has(
+                    'included',
+                    callback: fn (AssertableJson $json) => $json->where('type', $include)->etc()
+                )
+                ->etc();
+        });
+})->with([
+    'taxonomies',
+    'slugHistories',
+]);

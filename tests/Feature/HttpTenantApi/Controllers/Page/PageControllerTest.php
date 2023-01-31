@@ -29,22 +29,6 @@ it('can list pages', function () {
         });
 });
 
-it('can show a page', function () {
-    $page = PageFactory::new()
-        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
-        ->createOne();
-
-    getJson('api/pages/' . $page->getRouteKey())
-        ->assertOk()
-        ->assertJson(function (AssertableJson $json) use ($page) {
-            $json
-                ->where('data.type', 'pages')
-                ->where('data.id', Str::slug($page->name))
-                ->where('data.attributes.name', $page->name)
-                ->etc();
-        });
-});
-
 it('can filter pages', function ($attribute) {
     $pages = PageFactory::new()
         ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
@@ -68,3 +52,26 @@ it('can filter pages', function ($attribute) {
             });
     }
 })->with(['name', 'slug']);
+
+it('can show a page with includes', function (string $include) {
+    $page = PageFactory::new()
+        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
+        ->createOne();
+
+    getJson("api/pages/{$page->getRouteKey()}?" . http_build_query(['include' => $include]))
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) use ($page, $include) {
+            $json
+                ->where('data.type', 'pages')
+                ->where('data.id', Str::slug($page->name))
+                ->where('data.attributes.name', $page->name)
+                ->has(
+                    'included',
+                    callback: fn (AssertableJson $json) => $json->where('type', $include)->etc()
+                )
+                ->etc();
+        });
+})->with([
+    'sliceContents',
+    'slugHistories',
+]);
