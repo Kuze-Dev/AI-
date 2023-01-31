@@ -104,8 +104,8 @@ it('can update collection slug', function () {
     ]);
     assertDatabaseCount(SlugHistory::class, 2);
     assertDatabaseHas(SlugHistory::class, [
-        'sluggable_type' => $collection->getMorphClass(),
-        'sluggable_id' => $collection->id,
+        'model_type' => $collection->getMorphClass(),
+        'model_id' => $collection->id,
         'slug' => 'test-collection-updated',
     ]);
 });

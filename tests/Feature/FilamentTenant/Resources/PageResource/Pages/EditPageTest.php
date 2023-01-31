@@ -102,8 +102,8 @@ it('can edit page slug', function () {
     ]);
     assertDatabaseCount(SlugHistory::class, 2);
     assertDatabaseHas(SlugHistory::class, [
-        'sluggable_type' => $page->getMorphClass(),
-        'sluggable_id' => $page->id,
+        'model_type' => $page->getMorphClass(),
+        'model_id' => $page->id,
         'slug' => 'new-foo',
     ]);
 });

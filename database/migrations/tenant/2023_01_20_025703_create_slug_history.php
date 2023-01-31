@@ -17,7 +17,7 @@ return new class () extends Migration {
         Schema::create('slug_histories', function (Blueprint $table) {
             $table->id();
             $table->string('slug')->index();
-            $table->morphs('sluggable');
+            $table->morphs('model');
             $table->timestamps();
         });
     }

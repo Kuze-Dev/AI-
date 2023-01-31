@@ -55,8 +55,8 @@ it('can create page', function () {
         'data' => json_encode(['name' => 'foo']),
     ]);
     assertDatabaseHas(SlugHistory::class, [
-        'sluggable_type' => $page->getMorphClass(),
-        'sluggable_id' => $page->id,
+        'model_type' => $page->getMorphClass(),
+        'model_id' => $page->id,
     ]);
 });
 

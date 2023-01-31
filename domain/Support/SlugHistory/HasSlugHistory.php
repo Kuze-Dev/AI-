@@ -14,22 +14,22 @@ trait HasSlugHistory
     {
         static::saved(function (self $model) {
             $slug = SlugHistory::where('slug', $model->slug)
-                ->where('sluggable_type', $model->getMorphClass())
+                ->where('model_type', $model->getMorphClass())
                 ->first();
 
             if ($slug !== null) {
-                $slug->sluggable_id = $model->id;
+                $slug->model_id = $model->id;
                 $slug->save();
             } else {
-                $model->sluggable()->create(['slug' => $model->slug]);
+                $model->slugHistories()->create(['slug' => $model->slug]);
             }
         });
     }
 
     /** @return MorphMany<SlugHistory> */
-    public function sluggable(): MorphMany
+    public function slugHistories(): MorphMany
     {
-        return $this->morphMany(SlugHistory::class, 'sluggable');
+        return $this->morphMany(SlugHistory::class, 'model');
     }
 
     /**
@@ -45,6 +45,6 @@ trait HasSlugHistory
          * The next line is ignore due to the framework's inconsistent typings
          */
         return $query->where($field ?? $this->getRouteKeyName(), $value)
-            ->orWhereRelation('sluggable', 'slug', $value);
+            ->orWhereRelation('slugHistories', 'slug', $value);
     }
 }

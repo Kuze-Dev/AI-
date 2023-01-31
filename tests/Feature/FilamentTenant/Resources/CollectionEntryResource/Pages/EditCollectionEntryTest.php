@@ -151,8 +151,8 @@ it('can edit collection entry slug', function () {
     ]);
     assertDatabaseCount(SlugHistory::class, 3); // 1 (for collection) + 2 (for collection entry)
     assertDatabaseHas(SlugHistory::class, [
-        'sluggable_type' => $collectionEntry->getMorphClass(),
-        'sluggable_id' => $collectionEntry->id,
+        'model_type' => $collectionEntry->getMorphClass(),
+        'model_id' => $collectionEntry->id,
         'slug' => 'new-foo',
     ]);
 });

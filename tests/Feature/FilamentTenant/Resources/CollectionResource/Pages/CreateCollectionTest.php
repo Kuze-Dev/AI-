@@ -51,8 +51,8 @@ it('can create collection', function () {
         'is_sortable' => true,
     ]);
     assertDatabaseHas(SlugHistory::class, [
-        'sluggable_type' => $collection->getMorphClass(),
-        'sluggable_id' => $collection->id,
+        'model_type' => $collection->getMorphClass(),
+        'model_id' => $collection->id,
     ]);
 });
 

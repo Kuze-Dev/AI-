@@ -32,8 +32,8 @@ use Spatie\Sluggable\SlugOptions;
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
  * @property-read int|null $activities_count
  * @property-read \Domain\Collection\Models\Collection $collection
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $sluggable
- * @property-read int|null $sluggable_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $slugHistories
+ * @property-read int|null $slug_histories_count
  * @property-read \Illuminate\Database\Eloquent\Collection|TaxonomyTerm[] $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
  * @method static CollectionEntryBuilder|CollectionEntry newModelQuery()
