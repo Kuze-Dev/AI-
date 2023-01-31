@@ -6,9 +6,12 @@ use App\FilamentTenant\Resources\PageResource\Pages\CreatePage;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\Models\Page;
+use Domain\Page\Models\SliceContent;
+use Domain\Support\SlugHistory\SlugHistory;
 use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
@@ -29,7 +32,7 @@ it('can create page', function () {
         ->createOne()
         ->getKey();
 
-    livewire(CreatePage::class)
+    $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
             'slice_contents' => [
@@ -41,9 +44,20 @@ it('can create page', function () {
         ])
         ->call('create')
         ->assertHasNoFormErrors()
-        ->assertOk();
+        ->assertOk()
+        ->instance()
+        ->record;
 
-    assertDatabaseCount(Page::class, 1);
+    assertDatabaseHas(Page::class, ['name' => 'Test']);
+    assertDatabaseHas(SliceContent::class, [
+        'page_id' => $page->id,
+        'slice_id' => $sliceId,
+        'data' => json_encode(['name' => 'foo']),
+    ]);
+    assertDatabaseHas(SlugHistory::class, [
+        'sluggable_type' => $page->getMorphClass(),
+        'sluggable_id' => $page->id,
+    ]);
 });
 
 it('can not create page with same name', function () {

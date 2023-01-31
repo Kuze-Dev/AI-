@@ -11,8 +11,10 @@ use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
+use Domain\Support\SlugHistory\SlugHistory;
 use Filament\Facades\Filament;
 
+use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Livewire\livewire;
@@ -23,16 +25,11 @@ beforeEach(function () {
     loginAsSuperAdmin();
 });
 
-it('can edit collection entry', function () {
+it('can render collection entry', function () {
     $taxonomy = TaxonomyFactory::new()
         ->createOne();
 
-    $taxonomyTermsInitial = TaxonomyTermFactory::new()
-        ->for($taxonomy)
-        ->count(2)
-        ->create();
-
-    $taxonomyTermsForUpdate = TaxonomyTermFactory::new()
+    $taxonomyTerms = TaxonomyTermFactory::new()
         ->for($taxonomy)
         ->count(2)
         ->create();
@@ -48,153 +45,149 @@ it('can edit collection entry', function () {
             'future_publish_date_behavior' => 'public',
             'past_publish_date_behavior' => 'unlisted',
         ]);
+
     $collection->taxonomies()->attach([$taxonomy->getKey()]);
+
+    $collectionEntry = CollectionEntryFactory::new()
+        ->for($collection)
+        ->createOne([
+            'title' => 'Foo',
+            'published_at' => Carbon::now(),
+            'data' => ['main' => ['header' => 'Foo']],
+        ]);
+
+    $collectionEntry->taxonomyTerms()->attach($taxonomyTerms);
+
+    livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
+        ->assertFormSet([
+            'title' => $collectionEntry->title,
+            'published_at' => (string) $collectionEntry->published_at->timezone(Auth::user()->timezone),
+            'data' => $collectionEntry->data,
+            'taxonomies' => [
+                $taxonomy->getKey() => $taxonomyTerms->pluck('id')->toArray(),
+            ],
+        ]);
+});
+
+it('can edit collection entry', function () {
+    $collection = CollectionFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->has(TaxonomyFactory::new())
+        ->createOne([
+            'name' => 'Test Collection',
+            'future_publish_date_behavior' => 'public',
+            'past_publish_date_behavior' => 'unlisted',
+        ]);
+
+    $taxonomyTerms = TaxonomyTermFactory::new()
+        ->for($collection->taxonomies->first())
+        ->count(2)
+        ->create();
+
+    $collectionEntry = CollectionEntryFactory::new()
+        ->for($collection)
+        ->createOne([
+            'title' => 'Foo',
+            'data' => ['main' => ['header' => 'Foo']],
+        ]);
 
     $dateTime = Carbon::now();
 
-    $originalData = [
-        'title' => 'Test',
-        'slug' => 'test',
-        'published_at' => $dateTime,
-        'data' => json_encode(['main' => ['header' => 'Foo']]),
-    ];
-
-    $collectionEntry = CollectionEntryFactory::new()
-        ->for(
-            $collection
-        )
-        ->createOne($originalData);
-
-    $collectionEntry->taxonomyTerms()->attach($taxonomyTermsInitial->pluck('id'));
-
-    $newData = [
-        'title' => 'Test update',
-        'data' => ['main' => ['header' => 'Foo updated']],
-        'taxonomies' => [
-            $taxonomy->getKey() => $taxonomyTermsForUpdate->pluck('id'),
-        ],
-    ];
-
     livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
-        ->fillForm(
-            $newData
-        )
+        ->fillForm([
+            'title' => 'New Foo',
+            'published_at' => $dateTime,
+            'data' => ['main' => ['header' => 'Foo updated']],
+            'taxonomies' => [
+                $collection->taxonomies->first()->id => $taxonomyTerms->pluck('id'),
+            ],
+        ])
         ->call('save')
         ->assertOk()
         ->assertHasNoFormErrors();
 
-    $latestCollectionEntry = CollectionEntry::latest()->first();
-
-    // Check if terms has been removed from collection entry
-    foreach ($taxonomyTermsInitial as $initialTerms) {
-        assertDatabaseMissing(
-            'collection_entry_taxonomy_term',
-            [
-                'taxonomy_term_id' => $initialTerms->getKey(),
-                'collection_entry_id' => $latestCollectionEntry->getKey(),
-            ]
-        );
+    assertDatabaseHas(CollectionEntry::class, [
+        'title' => 'New Foo',
+        'published_at' => $dateTime,
+        'data' => json_encode(['main' => ['header' => 'Foo updated']]),
+    ]);
+    foreach ($taxonomyTerms as $taxonomyTerm) {
+        assertDatabaseHas('collection_entry_taxonomy_term', [
+            'taxonomy_term_id' => $taxonomyTerm->getKey(),
+            'collection_entry_id' => $collectionEntry->getKey(),
+        ]);
     }
+});
 
-    // Check if the newly assigned taxonomy terms
-    // has been saved to the database
-    foreach ($taxonomyTermsForUpdate as $updatedTerms) {
-        assertDatabaseHas(
-            'collection_entry_taxonomy_term',
-            [
-                'taxonomy_term_id' => $updatedTerms->getKey(),
-                'collection_entry_id' => $latestCollectionEntry->getKey(),
-            ]
-        );
-    }
+it('can edit collection entry slug', function () {
+    $collection = CollectionFactory::new(['name' => 'Test Collection'])
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->createOne();
 
-    assertDatabaseHas(
-        CollectionEntry::class,
-        [
-            'title' => 'Test update',
-            'data' => json_encode(['main' => ['header' => 'Foo updated']]),
-        ]
-    );
+    $collectionEntry = CollectionEntryFactory::new()
+        ->for($collection)
+        ->createOne([
+            'title' => 'Foo',
+            'data' => ['main' => ['header' => 'Foo']],
+        ]);
+
+    livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
+        ->fillForm(['slug' => 'new-foo'])
+        ->call('save')
+        ->assertOk()
+        ->assertHasNoFormErrors();
+
+    assertDatabaseHas(CollectionEntry::class, [
+        'id' => $collectionEntry->id,
+        'slug' => 'new-foo',
+    ]);
+    assertDatabaseCount(SlugHistory::class, 3); // 1 (for collection) + 2 (for collection entry)
+    assertDatabaseHas(SlugHistory::class, [
+        'sluggable_type' => $collectionEntry->getMorphClass(),
+        'sluggable_id' => $collectionEntry->id,
+        'slug' => 'new-foo',
+    ]);
 });
 
 it('can edit collection entry to have no taxonomy terms attached', function () {
-    $taxonomy = TaxonomyFactory::new()
-        ->createOne();
-
-    $taxonomyTermsInitial = TaxonomyTermFactory::new()
-        ->for($taxonomy)
-        ->count(2)
-        ->create();
-
-    $taxonomyTermsForUpdate = TaxonomyTermFactory::new()
-        ->for($taxonomy)
-        ->count(2)
-        ->create();
-
-    $collection = CollectionFactory::new()
+    $collection = CollectionFactory::new(['name' => 'Test Collection'])
         ->for(
             BlueprintFactory::new()
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
         )
-        ->createOne([
-            'name' => 'Test Collection',
-            'future_publish_date_behavior' => 'public',
-            'past_publish_date_behavior' => 'unlisted',
-        ]);
-    $collection->taxonomies()->attach([$taxonomy->getKey()]);
-
-    $dateTime = Carbon::now();
-
-    $originalData = [
-        'title' => 'Test',
-        'slug' => 'test',
-        'published_at' => $dateTime,
-        'data' => json_encode(['main' => ['header' => 'Foo']]),
-    ];
+        ->has(TaxonomyFactory::new())
+        ->createOne();
 
     $collectionEntry = CollectionEntryFactory::new()
-        ->for(
-            $collection
+        ->for($collection)
+        ->has(
+            TaxonomyTermFactory::new()
+                ->for($collection->taxonomies->first())
+                ->count(2)
         )
-        ->createOne($originalData);
-
-    $collectionEntry->taxonomyTerms()->attach($taxonomyTermsInitial->pluck('id'));
-
-    $newData = [
-        'title' => 'Test update',
-        'data' => ['main' => ['header' => 'Foo updated']],
-        'taxonomies' => [
-            $taxonomy->getKey() => [],
-        ],
-    ];
+        ->createOne([
+            'title' => 'Test',
+            'data' => json_encode(['main' => ['header' => 'Foo']]),
+        ]);
 
     livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
-        ->fillForm(
-            $newData
-        )
+        ->fillForm([
+            'taxonomies' => [
+                $collection->taxonomies->first()->id => [],
+            ],
+        ])
         ->call('save')
         ->assertOk()
         ->assertHasNoFormErrors();
 
-    $latestCollectionEntry = CollectionEntry::latest()->first();
-
-    // Check if terms has been removed from collection entry
-    foreach ($taxonomyTermsInitial as $initialTerms) {
-        assertDatabaseMissing(
-            'collection_entry_taxonomy_term',
-            [
-                'taxonomy_term_id' => $initialTerms->getKey(),
-                'collection_entry_id' => $latestCollectionEntry->getKey(),
-            ]
-        );
-    }
-
-    assertDatabaseHas(
-        CollectionEntry::class,
-        [
-            'title' => 'Test update',
-            'data' => json_encode(['main' => ['header' => 'Foo updated']]),
-        ]
-    );
+    assertDatabaseMissing('collection_entry_taxonomy_term', ['collection_entry_id' => $collectionEntry->getKey()]);
 });

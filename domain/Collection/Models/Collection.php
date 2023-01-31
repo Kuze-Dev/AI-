@@ -79,10 +79,9 @@ class Collection extends Model implements IsActivitySubject
      * to a specific data type.
      */
     protected $casts = [
-        'data' => 'array',
-        'is_sortable' => 'boolean',
         'past_publish_date_behavior' => PublishBehavior::class,
         'future_publish_date_behavior' => PublishBehavior::class,
+        'is_sortable' => 'boolean',
     ];
 
     /** @return LogOptions */

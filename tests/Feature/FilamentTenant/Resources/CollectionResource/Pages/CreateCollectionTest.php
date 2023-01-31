@@ -5,12 +5,11 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\CollectionResource\Pages\CreateCollection;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Collection\Models\Collection;
+use Domain\Support\SlugHistory\SlugHistory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Filament\Facades\Filament;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
@@ -30,91 +29,34 @@ it('can create collection', function () {
         ->withDummySchema()
         ->createOne();
 
-    $taxonomy = TaxonomyFactory::new()
-        ->createOne();
-
-    livewire(CreateCollection::class)
+    $collection = livewire(CreateCollection::class)
         ->fillForm([
             'name' => 'Test Collection',
             'blueprint_id' => $blueprint->getKey(),
-            'taxonomies' => [$taxonomy->getKey()],
+            'display_publish_dates' => true,
             'future_publish_date_behavior' => 'public',
             'past_publish_date_behavior' => 'unlisted',
+            'is_sortable' => true,
         ])
         ->call('create')
-        ->assertHasNoFormErrors();
+        ->assertHasNoFormErrors()
+        ->instance()
+        ->record;
 
-    assertDatabaseCount(Collection::class, 1);
-
-    assertDatabaseHas(
-        'collection_taxonomy',
-        [
-            'taxonomy_id' => $taxonomy->getKey(),
-            'collection_id' => Collection::latest()->first()->getKey(),
-        ]
-    );
+    assertDatabaseHas(Collection::class, [
+        'name' => 'Test Collection',
+        'blueprint_id' => $blueprint->getKey(),
+        'future_publish_date_behavior' => 'public',
+        'past_publish_date_behavior' => 'unlisted',
+        'is_sortable' => true,
+    ]);
+    assertDatabaseHas(SlugHistory::class, [
+        'sluggable_type' => $collection->getMorphClass(),
+        'sluggable_id' => $collection->id,
+    ]);
 });
 
-it('can create collection with no taxonomy', function () {
-    $blueprint = BlueprintFactory::new()
-        ->withDummySchema()
-        ->createOne();
-
-    $taxonomy = TaxonomyFactory::new()
-        ->createOne();
-
-    livewire(CreateCollection::class)
-        ->fillForm([
-            'name' => 'Test Collection',
-            'blueprint_id' => $blueprint->getKey(),
-            'future_publish_date_behavior' => 'public',
-            'past_publish_date_behavior' => 'unlisted',
-        ])
-        ->call('create')
-        ->assertHasNoFormErrors();
-
-    assertDatabaseCount(Collection::class, 1);
-
-    assertDatabaseMissing(
-        'collection_taxonomy',
-        [
-            'taxonomy_id' => $taxonomy->getKey(),
-            'collection_id' => Collection::latest()->first()->getKey(),
-        ]
-    );
-});
-
-it('can create collection with single taxonomy', function () {
-    $blueprint = BlueprintFactory::new()
-        ->withDummySchema()
-        ->createOne();
-
-    $taxonomy = TaxonomyFactory::new()
-        ->create();
-
-    livewire(CreateCollection::class)
-        ->fillForm([
-            'name' => 'Test Collection',
-            'blueprint_id' => $blueprint->getKey(),
-            'taxonomies' => [$taxonomy->getKey()],
-            'future_publish_date_behavior' => 'public',
-            'past_publish_date_behavior' => 'unlisted',
-        ])
-        ->call('create')
-        ->assertHasNoFormErrors();
-
-    assertDatabaseCount(Collection::class, 1);
-
-    assertDatabaseHas(
-        'collection_taxonomy',
-        [
-            'taxonomy_id' => $taxonomy->getKey(),
-            'collection_id' => Collection::latest()->first()->getKey(),
-        ]
-    );
-});
-
-it('can create collection with multiple taxonomy', function () {
+it('can create collection with taxonomies', function () {
     $blueprint = BlueprintFactory::new()
         ->withDummySchema()
         ->createOne();
@@ -128,14 +70,14 @@ it('can create collection with multiple taxonomy', function () {
             'name' => 'Test Collection',
             'blueprint_id' => $blueprint->getKey(),
             'taxonomies' => $taxonomies->pluck('id')->toArray(),
-            'future_publish_date_behavior' => 'public',
-            'past_publish_date_behavior' => 'unlisted',
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
-    assertDatabaseCount(Collection::class, 1);
-
+    assertDatabaseHas(Collection::class, [
+        'name' => 'Test Collection',
+        'blueprint_id' => $blueprint->getKey(),
+    ]);
     foreach ($taxonomies as $taxonomy) {
         assertDatabaseHas(
             'collection_taxonomy',
