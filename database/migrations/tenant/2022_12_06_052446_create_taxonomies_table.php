@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Domain\Taxonomy\Models\Taxonomy as TaxonomyModel;
 
 return new class () extends Migration {
     public function up(): void
@@ -19,11 +18,12 @@ return new class () extends Migration {
 
         Schema::create('taxonomy_terms', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(TaxonomyModel::class)->constrained();
+            $table->bigInteger('taxonomy_id')->unsigned()->index();
+            $table->bigInteger('parent_id')->unsigned()->nullable()->index();
             $table->string('name')->unique();
             $table->string('slug')->unique();
             $table->text('description')->nullable();
-            $table->unsignedInteger('order')->default(1);
+            $table->integer('order')->unsigned();
             $table->timestamps();
         });
     }
