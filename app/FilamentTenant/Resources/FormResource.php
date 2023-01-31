@@ -82,6 +82,7 @@ class FormResource extends Resource
                                         ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
                                             $component->state(implode(',', $state ?? []));
                                         })
+
                                         ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
                                             ? Str::of($state)
                                                 ->split('/\,/')
@@ -119,9 +120,10 @@ class FormResource extends Resource
                             Forms\Components\TextInput::make('sender')
                                 ->required(),
                             Forms\Components\TextInput::make('reply_to')
+                                ->helperText('Seperated by comma')
                                 ->nullable()
                                 ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
-                                    $component->state(implode('|', $state ?? []));
+                                    $component->state(implode(',', $state ?? []));
                                 })
                                 ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
                                     ? Str::of($state)
@@ -135,6 +137,29 @@ class FormResource extends Resource
                                 ->columnSpanFull(),
                             Forms\Components\MarkdownEditor::make('template')
                                 ->required()
+                                ->default(function (Closure $get) {
+                                    $blueprint = Blueprint::whereId($get('../../blueprint_id'))->first();
+
+                                    if ($blueprint === null) {
+                                        return '';
+                                    }
+
+                                    $interpolations = '';
+
+                                    foreach ($blueprint->schema->sections as $section) {
+                                        foreach ($section->fields as $field) {
+                                            $interpolations = "{$interpolations}{$field->title}: {{ \${$section->state_name}['{$field->state_name}'] }}\n";
+                                        }
+                                    }
+
+                                    return <<<markdown
+                                        Hi,
+
+                                        We've received a new submission:
+
+                                        {$interpolations}
+                                        markdown;
+                                })
                                 ->columnSpanFull(),
                         ])
                         ->columnSpan(['md' => 3]),

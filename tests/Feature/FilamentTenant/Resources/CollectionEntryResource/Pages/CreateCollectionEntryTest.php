@@ -10,10 +10,10 @@ use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
+use Domain\Support\SlugHistory\SlugHistory;
 use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
@@ -23,6 +23,41 @@ beforeEach(function () {
 });
 
 it('can create collection entry', function () {
+    $collection = CollectionFactory::new(['name' => 'Test Collection'])
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->createOne();
+
+    $collectionEntry = livewire(CreateCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey()])
+        ->assertOk()
+        ->fillForm([
+            'title' => 'Test',
+            'data' => ['main' => ['header' => 'Foo']],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(
+        CollectionEntry::class,
+        [
+            'id' => $collection->id,
+            'title' => 'Test',
+            'slug' => 'test',
+            'data' => json_encode(['main' => ['header' => 'Foo']]),
+        ]
+    );
+    assertDatabaseHas(SlugHistory::class, [
+        'model_type' => $collectionEntry->getMorphClass(),
+        'model_id' => $collectionEntry->id,
+    ]);
+});
+
+it('can create collection entry with taxonomy terms', function () {
     $taxonomy = TaxonomyFactory::new()
         ->createOne();
 
@@ -30,21 +65,15 @@ it('can create collection entry', function () {
         ->for($taxonomy)
         ->createOne();
 
-    $collection = CollectionFactory::new()
+    $collection = CollectionFactory::new(['name' => 'Test Collection'])
         ->for(
             BlueprintFactory::new()
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
         )
-        ->createOne([
-            'name' => 'Test Collection',
-            'future_publish_date_behavior' => 'public',
-            'past_publish_date_behavior' => 'unlisted',
-        ]);
+        ->createOne(['name' => 'Test Collection']);
 
     $collection->taxonomies()->attach([$taxonomy->getKey()]);
-
-    $dateTime = Carbon::now();
 
     livewire(CreateCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey()])
         ->assertOk()
@@ -57,7 +86,6 @@ it('can create collection entry', function () {
                 ],
             ],
             'data' => ['main' => ['header' => 'Foo']],
-            'published_at' => $dateTime,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
@@ -68,11 +96,9 @@ it('can create collection entry', function () {
             'id' => $collection->id,
             'title' => 'Test',
             'slug' => 'test',
-            'published_at' => $dateTime,
             'data' => json_encode(['main' => ['header' => 'Foo']]),
         ]
     );
-
     assertDatabaseHas(
         'collection_entry_taxonomy_term',
         [
@@ -82,14 +108,7 @@ it('can create collection entry', function () {
     );
 });
 
-it('can create collection entry with no taxonomy terms', function () {
-    $taxonomy = TaxonomyFactory::new()
-        ->createOne();
-
-    $taxonomyTerm = TaxonomyTermFactory::new()
-        ->for($taxonomy)
-        ->createOne();
-
+it('can create collection entry with publish date', function () {
     $collection = CollectionFactory::new()
         ->for(
             BlueprintFactory::new()
@@ -101,8 +120,6 @@ it('can create collection entry with no taxonomy terms', function () {
             'future_publish_date_behavior' => 'public',
             'past_publish_date_behavior' => 'unlisted',
         ]);
-
-    $collection->taxonomies()->attach([$taxonomy->getKey()]);
 
     $dateTime = Carbon::now();
 
@@ -125,65 +142,6 @@ it('can create collection entry with no taxonomy terms', function () {
             'slug' => 'test',
             'published_at' => $dateTime,
             'data' => json_encode(['main' => ['header' => 'Foo']]),
-        ]
-    );
-
-    assertDatabaseMissing(
-        'collection_entry_taxonomy_term',
-        [
-            'taxonomy_term_id' => $taxonomyTerm->getKey(),
-            'collection_entry_id' => CollectionEntry::latest()->first()->getKey(),
-        ]
-    );
-});
-
-it('can create collection entry with no publish date', function () {
-    $taxonomy = TaxonomyFactory::new()
-        ->createOne();
-
-    $taxonomyTerm = TaxonomyTermFactory::new()
-        ->for($taxonomy)
-        ->createOne();
-
-    $collection = CollectionFactory::new()
-        ->for(
-            BlueprintFactory::new()
-                ->addSchemaSection(['title' => 'Main'])
-                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
-        )
-        ->createOne([
-            'name' => 'Test Collection',
-            'future_publish_date_behavior' => 'public',
-            'past_publish_date_behavior' => 'unlisted',
-        ]);
-
-    $collection->taxonomies()->attach([$taxonomy->getKey()]);
-
-    livewire(CreateCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey()])
-        ->assertOk()
-        ->fillForm([
-            'title' => 'Test',
-            'slug' => 'test',
-            'data' => ['main' => ['header' => 'Foo']],
-        ])
-        ->call('create')
-        ->assertHasNoFormErrors();
-
-    assertDatabaseHas(
-        CollectionEntry::class,
-        [
-            'id' => $collection->id,
-            'title' => 'Test',
-            'slug' => 'test',
-            'data' => json_encode(['main' => ['header' => 'Foo']]),
-        ]
-    );
-
-    assertDatabaseMissing(
-        'collection_entry_taxonomy_term',
-        [
-            'taxonomy_term_id' => $taxonomyTerm->getKey(),
-            'collection_entry_id' => CollectionEntry::latest()->first()->getKey(),
         ]
     );
 });
