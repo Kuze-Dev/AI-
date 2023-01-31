@@ -10,27 +10,14 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait HasSlugHistory
 {
-    public static function boot(): void
+    public static function bootHasSlugHistory(): void
     {
-        parent::boot();
-
-        static::created(function ($model) {
+        static::saved(function (self $model) {
             $slug = SlugHistory::where('slug', $model->slug)
-                ->where('sluggable_type', $model->getMorphClass())->first();
+                ->where('sluggable_type', $model->getMorphClass())
+                ->first();
 
-            if ( ! empty($slug)) {
-                $slug->sluggable_id = $model->id;
-                $slug->save();
-            } else {
-                $model->sluggable()->create(['slug' => $model->slug]);
-            }
-        });
-
-        static::updated(function ($model) {
-            $slug = SlugHistory::where('slug', $model->slug)
-                ->where('sluggable_type', $model->getMorphClass())->first();
-
-            if ( ! empty($slug)) {
+            if ($slug !== null) {
                 $slug->sluggable_id = $model->id;
                 $slug->save();
             } else {
@@ -45,11 +32,11 @@ trait HasSlugHistory
         return $this->morphMany(SlugHistory::class, 'sluggable');
     }
 
-   /**
-    * @param static|Builder<static>|Relation<static> $query
-    *
-    * @return Relation<static>|Builder<static>
-    */
+    /**
+     * @param static|Builder<static>|Relation<static> $query
+     *
+     * @return Relation<static>|Builder<static>
+     */
     public function resolveRouteBindingQuery($query, $value, $field = null): Relation|Builder
     {
         /**
