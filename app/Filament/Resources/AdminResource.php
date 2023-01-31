@@ -187,7 +187,6 @@ class AdminResource extends Resource
                 Tables\Actions\EditAction::make()
                     ->authorize('update'),
                 Tables\Actions\DeleteAction::make()
-                    ->modalSubheading(trans('Are you sure you want to delete this record?'))
                     ->authorize('delete'),
                 Tables\Actions\RestoreAction::make()
                     ->authorize('restore'),
