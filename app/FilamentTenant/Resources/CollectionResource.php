@@ -75,7 +75,6 @@ class CollectionResource extends Resource
                         })
                         ->required(),
                     Forms\Components\TextInput::make('slug')
-                        // ->required()
                         ->unique(ignoreRecord: true)
                         ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                     Forms\Components\Select::make('blueprint_id')

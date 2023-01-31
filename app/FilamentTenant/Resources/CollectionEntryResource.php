@@ -90,7 +90,8 @@ class CollectionEntryResource extends Resource
                                 ->unique(
                                     callback: fn ($livewire, Unique $rule) => $rule->where('collection_id', $livewire->ownerRecord->id),
                                     ignoreRecord: true
-                                )->debounce()
+                                )
+                                ->debounce()
                                 ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
                                     if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
                                         $set('slug', Str::slug($state));
