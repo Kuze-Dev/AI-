@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Collection\Database\Factories\CollectionFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Illuminate\Testing\Fluent\AssertableJson;

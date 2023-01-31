@@ -28,7 +28,7 @@ class PageController
             QueryBuilder::for(Page::whereSlug($page))
                 ->allowedIncludes([
                     'sliceContents.slice',
-                    'slugHistories'
+                    'slugHistories',
                 ])
                 ->firstOrFail()
         );
