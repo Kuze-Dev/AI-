@@ -26,7 +26,10 @@ class PageController
     {
         return PageResource::make(
             QueryBuilder::for(Page::whereSlug($page))
-                ->allowedIncludes(['sliceContents.slice'])
+                ->allowedIncludes([
+                    'sliceContents.slice',
+                    'slugHistories',
+                ])
                 ->firstOrFail()
         );
     }
