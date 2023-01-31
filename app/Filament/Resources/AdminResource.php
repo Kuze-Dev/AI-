@@ -51,19 +51,23 @@ class AdminResource extends Resource
                     Forms\Components\TextInput::make('last_name')
                         ->required(),
                     Forms\Components\TextInput::make('email')
+                        ->email()
                         ->required()
-                        ->helperText( ! config('domain.admin.can_change_email') ? 'Email modification is currently disabled.' : '')
                         ->disabled( ! config('domain.admin.can_change_email')),
                     Forms\Components\TextInput::make('password')
                         ->password()
                         ->required()
                         ->rule(Password::default())
+                        ->helperText(
+                            fn () => config('app.env') == 'local' || config('app.env') == 'testing' ? trans('Password must be at least 4 characters.') : trans('Password must be at least eight characters, have 1 special character, 1 upper case and 1 lowercase.')
+                        )
                         ->visible(fn (?Admin $record) => $record === null || ! $record->exists),
                     Forms\Components\TextInput::make('password_confirmation')
                         ->required()
                         ->password()
                         ->same('password')
                         ->dehydrated(false)
+                        ->rule(Password::default())
                         ->visible(fn (?Admin $record) => $record === null || ! $record->exists),
                     Forms\Components\Select::make('timezone')
                         ->options(collect(timezone_identifiers_list())->mapWithKeys(fn (string $timezone) => [$timezone => $timezone]))
@@ -180,6 +184,7 @@ class AdminResource extends Resource
                 Tables\Actions\EditAction::make()
                     ->authorize('update'),
                 Tables\Actions\DeleteAction::make()
+                    ->modalSubheading(trans('Are you sure you want to delete this record?'))
                     ->authorize('delete'),
                 Tables\Actions\RestoreAction::make()
                     ->authorize('restore'),
