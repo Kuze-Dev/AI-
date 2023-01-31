@@ -15,17 +15,32 @@ use Spatie\Activitylog\Traits\LogsActivity;
  *
  * @property int $id
  * @property int $form_id
- * @property array $to
- * @property array|null $cc
- * @property array|null $bcc
+ * @property array|null $to
+ * @property array|null|null $cc
+ * @property array|null|null $bcc
  * @property string $sender
- * @property array|null $reply_to
+ * @property array|null|null $reply_to
+ * @property string $subject
  * @property string $template
- *
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Activitylog\Models\Activity[] $activities
+ * @property-read int|null $activities_count
  * @property-read \Domain\Form\Models\Form $form
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification query()
+ * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereBcc($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereCc($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereFormId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereReplyTo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereSender($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereSubject($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereTemplate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereTo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class FormEmailNotification extends Model
