@@ -48,6 +48,7 @@ class Page extends Model implements IsActivitySubject
     protected $fillable = [
         'name',
         'slug',
+        'url',
     ];
 
     public function getActivitylogOptions(): LogOptions
