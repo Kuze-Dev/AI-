@@ -23,6 +23,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class CollectionEntryResource extends Resource
 {
@@ -57,6 +60,24 @@ class CollectionEntryResource extends Resource
         };
     }
 
+    /** @param CollectionEntry $record */
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [trans('Collection') => $record->collection->name];
+    }
+
+    /** @param CollectionEntry $record */
+    public static function getGlobalSearchResultUrl(Model $record): ?string
+    {
+        return self::getUrl('edit', [$record->collection, $record]);
+    }
+
+    /** @return Builder<CollectionEntry> */
+    protected static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with('collection');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -70,10 +91,16 @@ class CollectionEntryResource extends Resource
                                     callback: fn ($livewire, Unique $rule) => $rule->where('collection_id', $livewire->ownerRecord->id),
                                     ignoreRecord: true
                                 )
+                                ->debounce()
+                                ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
+                                    if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
+                                        $set('slug', Str::slug($state));
+                                    }
+                                })
                                 ->required(),
                             Forms\Components\TextInput::make('slug')
                                 ->unique(ignoreRecord: true)
-                                ->disabled(fn (?CollectionEntry $record) => $record !== null),
+                                ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('title'))),
                         ]),
                         SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
                     ])

@@ -16,8 +16,9 @@ use Filament\Tables;
 use Filament\Forms;
 use Illuminate\Support\Str;
 use Closure;
-
 use Filament\Resources\RelationManagers\RelationGroup;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class TaxonomyResource extends Resource
 {
@@ -29,9 +30,23 @@ class TaxonomyResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
 
+    protected static ?string $recordTitleAttribute = 'name';
+
     public static function getGloballySearchableAttributes(): array
     {
-        return ['name'];
+        return ['name', 'taxonomyTerms.name'];
+    }
+
+    /** @param Taxonomy $record */
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [trans('Total terms') => $record->taxonomy_terms_count];
+    }
+
+    /** @return Builder<Taxonomy> */
+    protected static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->withCount('taxonomyTerms');
     }
 
     public static function form(Form $form): Form

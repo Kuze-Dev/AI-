@@ -17,8 +17,10 @@ use Filament\Tables;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Taxonomy\Models\Taxonomy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 
 class CollectionResource extends Resource
 {
@@ -36,6 +38,23 @@ class CollectionResource extends Resource
     /** @var string|null */
     protected static ?string $recordTitleAttribute = 'name';
 
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'collectionEntries.title'];
+    }
+
+    /** @return Builder<Collection> */
+    protected static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->withCount('collectionEntries');
+    }
+
+    /** @param Collection $record */
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [trans('Total Entries') => $record->collection_entries_count];
+    }
+
     /**
      * @param Form $form
      *
@@ -48,10 +67,16 @@ class CollectionResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
+                        ->debounce()
+                        ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
+                            if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
+                                $set('slug', Str::slug($state));
+                            }
+                        })
                         ->required(),
                     Forms\Components\TextInput::make('slug')
                         ->unique(ignoreRecord: true)
-                        ->disabled(fn (?Collection $record) => $record !== null),
+                        ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                     Forms\Components\Select::make('blueprint_id')
                         ->required()
                         ->options(

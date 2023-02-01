@@ -23,8 +23,15 @@ class CollectionController
         );
     }
 
-    public function show(Collection $collection): CollectionResource
+    public function show(string $collection): CollectionResource
     {
-        return CollectionResource::make($collection);
+        return CollectionResource::make(
+            QueryBuilder::for(Collection::whereSlug($collection))
+                ->allowedIncludes([
+                    'taxonomies',
+                    'slugHistories',
+                ])
+                ->firstOrFail()
+        );
     }
 }
