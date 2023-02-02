@@ -32,13 +32,16 @@ class TenancyServiceProvider extends ServiceProvider
             Events\CreatingTenant::class => [],
             Events\TenantCreated::class => [
                 function (Events\TenantCreated $event) {
+                    /** @var Tenant $tenant */
+                    $tenant = $event->tenant;
+
                     Bus::chain([
-                        new CreateDatabase($event->tenant),
-                        new Jobs\MigrateDatabase($event->tenant),
-                        new Jobs\SeedDatabase($event->tenant),
-                        new CreateS3Bucket($event->tenant),
+                        new CreateDatabase($tenant),
+                        new Jobs\MigrateDatabase($tenant),
+                        new Jobs\SeedDatabase($tenant),
+                        new CreateS3Bucket($tenant),
                     ])->dispatch();
-                }
+                },
             ],
             Events\SavingTenant::class => [],
             Events\TenantSaved::class => [],
