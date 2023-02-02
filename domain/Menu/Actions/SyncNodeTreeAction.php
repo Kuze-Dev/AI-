@@ -77,7 +77,6 @@ class SyncNodeTreeAction
 
     protected function inlineChildren(NodeData $nodeData): array
     {
-        // dd($nodeData);
         if ( ! empty($nodeData->children)) {
             $children = Arr::map($nodeData->children, $this->inlineChildren(...));
         }
