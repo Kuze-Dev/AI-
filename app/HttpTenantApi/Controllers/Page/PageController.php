@@ -17,7 +17,7 @@ class PageController
     {
         return PageResource::collection(
             QueryBuilder::for(Page::query())
-                ->allowedFilters(['name', 'slug', 'url'])
+                ->allowedFilters(['name', 'slug'])
                 ->jsonPaginate()
         );
     }

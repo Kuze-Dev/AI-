@@ -22,6 +22,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property int $id
  * @property string $name
  * @property string $slug
+ * @property string $route_url
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
@@ -51,7 +52,7 @@ class Page extends Model implements IsActivitySubject
     protected $fillable = [
         'name',
         'slug',
-        'url',
+        'route_url',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -90,8 +91,11 @@ class Page extends Model implements IsActivitySubject
     /** @return Attribute<string, static> */
     protected function qualifiedRouteUrl(): Attribute
     {
-        return Attribute::get(fn () => Blade::render(Blade::compileEchos(
-            $this->url ?: $this->slug
-        ), ['slug' => $this->slug]));
+        return Attribute::get(fn () => Blade::render(
+            Blade::compileEchos($this->route_url),
+            [
+                'slug' => $this->slug,
+            ]
+        ));
     }
 }

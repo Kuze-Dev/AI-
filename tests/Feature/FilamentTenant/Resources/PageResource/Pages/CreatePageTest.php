@@ -35,6 +35,7 @@ it('can create page', function () {
     $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
+            'url' => 'test-url',
             'slice_contents' => [
                 [
                     'slice_id' => $sliceId,
@@ -86,30 +87,4 @@ it('can not create page with same name', function () {
         ->assertOk();
 
     assertDatabaseCount(Page::class, 1);
-});
-
-it('can create page with url', function () {
-    $sliceId = SliceFactory::new()
-        ->withDummyBlueprint()
-        ->createOne()
-        ->getKey();
-
-    $page = livewire(CreatePage::class)
-        ->fillForm([
-            'name' => 'Test',
-            'url' => 'test-url',
-            'slice_contents' => [
-                [
-                    'slice_id' => $sliceId,
-                    'data' => ['name' => 'Bar'],
-                ],
-            ],
-        ])
-        ->call('create')
-        ->assertHasNoFormErrors()
-        ->assertOk()
-        ->instance()
-        ->record;
-
-    assertDatabaseHas(Page::class, ['name' => 'Test', 'url' => 'test-url']);
 });
