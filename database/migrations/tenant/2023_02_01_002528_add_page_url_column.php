@@ -27,7 +27,7 @@ return new class () extends Migration {
     public function down()
     {
         Schema::table('pages', function (Blueprint $table) {
-            $table->dropIfExists('url');
+            $table->dropColumn('url');
         });
     }
 };
