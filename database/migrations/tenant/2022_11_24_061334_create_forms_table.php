@@ -14,7 +14,7 @@ return new class () extends Migration {
         Schema::create('forms', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(BlueprintModel::class);
+            $table->foreignIdFor(BlueprintModel::class)->index();
 
             $table->string('name')->unique();
             $table->string('slug')->unique();
@@ -27,7 +27,7 @@ return new class () extends Migration {
         Schema::create('form_email_notifications', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(Form::class);
+            $table->foreignIdFor(Form::class)->index();
 
             $table->string('to');
             $table->string('cc')->nullable();
@@ -43,7 +43,7 @@ return new class () extends Migration {
         Schema::create('form_submissions', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(Form::class);
+            $table->foreignIdFor(Form::class)->index();
 
             $table->json('data');
 

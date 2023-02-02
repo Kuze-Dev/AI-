@@ -19,7 +19,7 @@ class CreateDomainsTable extends Migration
         Schema::create('domains', function (Blueprint $table) {
             $table->id();
             $table->string('domain', 255)->unique();
-            $table->foreignIdFor(Tenant::class);
+            $table->foreignIdFor(Tenant::class)->index();
 
             $table->timestamps();
         });

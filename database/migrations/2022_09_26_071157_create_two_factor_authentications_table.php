@@ -25,7 +25,7 @@ return new class () extends Migration {
 
         Schema::create('recovery_codes', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(TwoFactorAuthentication::class);
+            $table->foreignIdFor(TwoFactorAuthentication::class)->index();
             $table->string('code');
             $table->timestamp('used_at')->nullable();
             $table->timestamps();
@@ -33,7 +33,7 @@ return new class () extends Migration {
 
         Schema::create('safe_devices', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(TwoFactorAuthentication::class);
+            $table->foreignIdFor(TwoFactorAuthentication::class)->index();
             $table->string('ip');
             $table->text('user_agent');
             $table->string('remember_token', 100);

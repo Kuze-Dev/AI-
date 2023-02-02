@@ -19,7 +19,7 @@ return new class () extends Migration {
 
         Schema::create('taxonomy_terms', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Taxonomy::class);
+            $table->foreignIdFor(Taxonomy::class)->index();
             $table->string('name')->unique();
             $table->string('slug')->unique();
             $table->text('description')->nullable();
