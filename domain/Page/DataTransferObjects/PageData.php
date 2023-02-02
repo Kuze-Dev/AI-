@@ -10,6 +10,7 @@ class PageData
         public readonly string $name,
         public readonly array $slice_contents = [],
         public readonly ?string $slug = null,
+        public readonly ?string $url = null,
     ) {
     }
 
@@ -26,6 +27,7 @@ class PageData
                 $data['slice_contents'] ?? []
             ),
             slug: $data['slug'] ?? null,
+            url: $data['url'] ?? null,
         );
     }
 }

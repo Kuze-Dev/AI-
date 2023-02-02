@@ -6,8 +6,10 @@ namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Support\SlugHistory\HasSlugHistory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Blade;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -82,5 +84,12 @@ class Page extends Model implements IsActivitySubject
             ->preventOverwrite()
             ->doNotGenerateSlugsOnUpdate()
             ->saveSlugsTo($this->getRouteKeyName());
+    }
+
+    protected function qualifiedRouteUrl(): Attribute
+    {
+        return new Attribute(fn () => Blade::render(Blade::compileEchos(
+            $this->url ?: $this->slug
+        ), ['slug' => $this->slug]));
     }
 }

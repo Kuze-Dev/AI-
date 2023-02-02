@@ -25,7 +25,7 @@ class PageController
     public function show(string $page): PageResource
     {
         return PageResource::make(
-            QueryBuilder::for(Page::whereSlug($page))
+            QueryBuilder::for(Page::whereSlug($page)->orWhere('url', $page))
                 ->allowedIncludes([
                     'sliceContents.slice',
                     'slugHistories',

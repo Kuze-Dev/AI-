@@ -23,6 +23,7 @@ class UpdatePageAction
         $page->update([
             'name' => $pageData->name,
             'slug' => $pageData->slug,
+            'url' => $pageData->url,
         ]);
 
         foreach ($page->sliceContents->whereNotIn('id', Arr::pluck($pageData->slice_contents, 'id')) as $domain) {

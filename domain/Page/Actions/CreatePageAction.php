@@ -19,6 +19,7 @@ class CreatePageAction
         $page = Page::create([
             'name' => $pageData->name,
             'slug' => $pageData->slug,
+            'url' => $pageData->url,
         ]);
 
         foreach ($pageData->slice_contents as $sliceContentData) {
