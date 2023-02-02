@@ -8,13 +8,14 @@ use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Arr;
-use Exception;
+use PDOException;
 
 class CheckDatabaseConnection implements DataAwareRule, InvokableRule
 {
     protected array $data = [];
 
     public function __construct(
+        protected string $connectionTemplate,
         protected string $databaseArrayPath
     ) {
     }
@@ -27,8 +28,6 @@ class CheckDatabaseConnection implements DataAwareRule, InvokableRule
     }
 
     /**
-     * Run the validation rule.
-     *
      * @param  string  $attribute
      * @param  mixed  $value
      * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
@@ -36,16 +35,27 @@ class CheckDatabaseConnection implements DataAwareRule, InvokableRule
      */
     public function __invoke($attribute, $value, $fail): void
     {
+        if (config("database.connections.{$this->connectionTemplate}.driver") === 'sqlite') {
+            return;
+        }
+
+        $connectionConfig = config("database.connections.{$this->connectionTemplate}");
+
         try {
-            app(ConnectionFactory::class)->make([
-                'driver' => 'mysql',
-                'host' => $this->data['host'],
-                'port' => $this->data['port'],
-                'database' => $this->data['name'],
-                'username' => $this->data['username'],
-                'password' => $this->data['password'],
-            ])->getPdo();
-        } catch (Exception $e) {
+            app(ConnectionFactory::class)->make(
+                array_merge(
+                    $connectionConfig,
+                    [
+                        'host' => $this->data['host'],
+                        'port' => $this->data['port'],
+                        'database' => $this->data['name'],
+                        'username' => $this->data['username'],
+                        'password' => $this->data['password'],
+                    ]
+                )
+            )->getPdo();
+        } catch (PDOException $e) {
+            report($e);
             $fail('Cannot connect with the database.');
         }
     }
