@@ -12,12 +12,9 @@ use Livewire\FileUploadConfiguration;
 
 class BucketManager
 {
-    protected S3Client $s3Client;
-
     public function __construct(
         protected readonly Tenant $tenant
     ) {
-        $this->s3Client = $this->makeS3Client();
     }
 
     public function makeS3Client(): S3Client
@@ -38,7 +35,7 @@ class BucketManager
 
     public function bucketExists(): bool
     {
-        $result = $this->s3Client->listBuckets();
+        $result = $this->makeS3Client()->listBuckets();
 
         $buckets = Arr::pluck($result['Buckets'], 'Name');
 
@@ -47,7 +44,7 @@ class BucketManager
 
     public function createBucket(): void
     {
-        $this->s3Client->createBucket(['Bucket' => $this->tenant->getInternal('bucket')]);
+        $this->makeS3Client()->createBucket(['Bucket' => $this->tenant->getInternal('bucket')]);
     }
 
     public function configureBucket(): void
@@ -55,7 +52,7 @@ class BucketManager
         $bucket = $this->tenant->getInternal('bucket');
 
         // temporarily uploaded file cleanup from Livewire.
-        $this->s3Client->putBucketLifecycleConfiguration([
+        $this->makeS3Client()->putBucketLifecycleConfiguration([
             'Bucket' => $bucket,
             'LifecycleConfiguration' => [
                 'Rules' => [
@@ -69,7 +66,7 @@ class BucketManager
         ]);
 
         try {
-            $this->s3Client->putBucketCors([
+            $this->makeS3Client()->putBucketCors([
                 'Bucket' => $bucket,
                 'CORSConfiguration' => [
                     'CORSRules' => [
@@ -99,6 +96,6 @@ class BucketManager
 
     public function deleteBucket(): void
     {
-        $this->s3Client->deleteBucket(['Bucket' => $this->tenant->getInternal('bucket')]);
+        $this->makeS3Client()->deleteBucket(['Bucket' => $this->tenant->getInternal('bucket')]);
     }
 }

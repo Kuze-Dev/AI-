@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Tenancy\Jobs\CreateDatabase;
 use App\Tenancy\Jobs\CreateS3Bucket;
 use App\Tenancy\Jobs\DeleteS3Bucket;
 use Domain\Tenant\Models\Tenant;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -29,18 +31,14 @@ class TenancyServiceProvider extends ServiceProvider
             // Tenant events
             Events\CreatingTenant::class => [],
             Events\TenantCreated::class => [
-                JobPipeline::make([
-                    Jobs\CreateDatabase::class,
-                    Jobs\MigrateDatabase::class,
-                    Jobs\SeedDatabase::class,
-                    CreateS3Bucket::class,
-
-                    // Your own jobs to prepare the tenant.
-                    // Provision API keys, create S3 buckets, anything you want!
-
-                ])->send(function (Events\TenantCreated $event) {
-                    return $event->tenant;
-                })->shouldBeQueued(true),
+                function (Events\TenantCreated $event) {
+                    Bus::chain([
+                        new CreateDatabase($event->tenant),
+                        new Jobs\MigrateDatabase($event->tenant),
+                        new Jobs\SeedDatabase($event->tenant),
+                        new CreateS3Bucket($event->tenant),
+                    ])->dispatch();
+                }
             ],
             Events\SavingTenant::class => [],
             Events\TenantSaved::class => [],
