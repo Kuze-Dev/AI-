@@ -88,7 +88,7 @@ class Page extends Model implements IsActivitySubject
 
     protected function qualifiedRouteUrl(): Attribute
     {
-        return new Attribute(fn () => Blade::render(Blade::compileEchos(
+        return Attribute::get(fn () => Blade::render(Blade::compileEchos(
             $this->url ?: $this->slug
         ), ['slug' => $this->slug]));
     }
