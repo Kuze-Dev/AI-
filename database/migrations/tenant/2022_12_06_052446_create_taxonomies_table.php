@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -18,12 +20,12 @@ return new class () extends Migration {
 
         Schema::create('taxonomy_terms', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('taxonomy_id')->unsigned()->index();
-            $table->bigInteger('parent_id')->unsigned()->nullable()->index();
+            $table->foreignIdFor(Taxonomy::class)->index();
+            $table->foreignIdFor(TaxonomyTerm::class, 'parent_id')->nullable()->index();
             $table->string('name')->unique();
             $table->string('slug')->unique();
             $table->text('description')->nullable();
-            $table->integer('order')->unsigned();
+            $table->unsignedInteger('order');
             $table->timestamps();
         });
     }
