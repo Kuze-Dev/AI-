@@ -32,3 +32,34 @@ it('can create page', function () {
 
     assertDatabaseCount(Taxonomy::class, 1);
 });
+
+it('can create term', function () {
+    livewire(CreateTaxonomy::class)
+        ->fillForm([
+            'name' => 'Test Main Menu',
+            'terms' => [
+                [
+                    'name' => 'Test Home',
+                    'slug' => 'test-home',
+                    'description' => 'Sample Text',
+                ],
+                [
+                    'name' => 'Test 2 Home',
+                    'slug' => 'test-2-home',
+                    'description' => 'Sample Text',
+                    'childs' => [
+                        [
+                            'name' => 'Test 3 Home',
+                            'slug' => 'test-3-home',
+                            'description' => 'Sample Text',
+                        ],
+                        [
+                            'name' => 'Test 4 Home',
+                            'slug' => 'test-4-home',
+                            'description' => 'Sample Text',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+});
