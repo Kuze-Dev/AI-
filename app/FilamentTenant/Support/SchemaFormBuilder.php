@@ -9,6 +9,7 @@ use Domain\Blueprint\DataTransferObjects\DatetimeFieldData;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\FileFieldData;
 use Domain\Blueprint\DataTransferObjects\MarkdownFieldData;
+use Domain\Blueprint\DataTransferObjects\RelatedResourceFieldData;
 use Domain\Blueprint\DataTransferObjects\RepeaterFieldData;
 use Domain\Blueprint\DataTransferObjects\RichtextFieldData;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
@@ -32,6 +33,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
@@ -108,6 +110,7 @@ class SchemaFormBuilder extends Component
             TextFieldData::class => $this->makeTextInputComponent($field),
             ToggleFieldData::class => Toggle::make($field->state_name),
             RepeaterFieldData::class => $this->makeRepeaterComponent($field),
+            RelatedResourceFieldData::class => $this->makeRelatedResourceComponent($field),
             default => throw new InvalidArgumentException('Cannot generate field component for `' . $field::class . '` as its not supported.'),
         };
 
@@ -220,5 +223,35 @@ class SchemaFormBuilder extends Component
         }
 
         return $repeater;
+    }
+
+    private function makeRelatedResourceComponent(RelatedResourceFieldData $relatedResourceFieldData): Select
+    {
+        $modelClass = Relation::getMorphedModel($relatedResourceFieldData->resource);
+        $relatedResourceModelConfig = config("domain.blueprint.related_resources.models.{$modelClass}", []);
+        /** @var \Illuminate\Database\Eloquent\Model */
+        $model = (new $modelClass());
+        $modelQuery = $model->query();
+
+        foreach ($relatedResourceFieldData->relation_scopes as $relationName => $value) {
+            /** @var Relation<\Illuminate\Database\Eloquent\Model> $relationship */
+            $relationship = $model->{$relationName}();
+
+            $modelQuery->whereRelation($relationName, $relationship->getRelated()->getKeyName(), $value);
+        }
+
+        $component = Select::make($relatedResourceFieldData->state_name)
+            ->options($modelQuery->pluck($relatedResourceModelConfig['title_column'], $model->getKeyName()))
+            ->multiple($relatedResourceFieldData->multiple);
+
+        if ($relatedResourceFieldData->min) {
+            $component->minItems($relatedResourceFieldData->min);
+        }
+
+        if ($relatedResourceFieldData->max) {
+            $component->maxItems($relatedResourceFieldData->max);
+        }
+
+        return $component;
     }
 }

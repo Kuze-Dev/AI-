@@ -342,6 +342,7 @@ class BlueprintResource extends Resource
                     ->columnSpanFull()
                     ->options(
                         collect(config('domain.blueprint.related_resources.models', []))
+                            ->keys()
                             ->mapWithKeys(
                                 function (string $model) {
                                     /** @var class-string<\Illuminate\Database\Eloquent\Model> $model */
@@ -369,8 +370,8 @@ class BlueprintResource extends Resource
                     ->columnSpanFull()
                     ->hidden(function (Closure $get) {
                         $resource = $get('resource');
-                        $model = Relation::getMorphedModel($resource);
-                        $relationScopes = config("domain.blueprint.related_resources.relation_scopes.{$model}", []);
+                        $modelClass = Relation::getMorphedModel($resource);
+                        $relationScopes = config("domain.blueprint.related_resources.relation_scopes.{$modelClass}", []);
 
                         return count($relationScopes) <= 0;
                     })
