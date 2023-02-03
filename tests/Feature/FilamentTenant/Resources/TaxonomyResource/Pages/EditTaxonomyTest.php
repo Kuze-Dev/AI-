@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\FilamentTenant\Resources\TaxonomyResource\Pages\EditTaxonomy;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
+use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Models\Taxonomy;
 use Filament\Facades\Filament;
 
@@ -17,7 +18,9 @@ beforeEach(function () {
 });
 
 it('can render page', function () {
-    $taxonomy = TaxonomyFactory::new()->createOne();
+    $taxonomy = TaxonomyFactory::new()
+        ->has(TaxonomyTermFactory::new(), 'taxonomyTerms')
+        ->createOne();
 
     livewire(EditTaxonomy::class, ['record' => $taxonomy->getRouteKey()])
         ->assertFormExists()
@@ -27,19 +30,45 @@ it('can render page', function () {
 });
 
 it('can edit page', function () {
-    $taxonomy = TaxonomyFactory::new()->createOne(['name' => 'old name']);
+    $taxonomy = TaxonomyFactory::new()
+        ->has(TaxonomyTermFactory::new(), 'taxonomyTerms')
+        ->createOne();
 
     livewire(EditTaxonomy::class, ['record' => $taxonomy->getRouteKey()])
-        ->fillForm(['name' => 'new name', ])
+        ->fillForm([
+            'name' => 'Test Edit Term',
+            'terms' => [
+                [
+                    'name' => 'Test Edit Home',
+                    'slug' => 'test-edit-home',
+                    'description' => 'Sample Text',
+                ],
+                [
+                    'name' => 'Test 2 Edit Home',
+                    'slug' => 'test-2-edit-home',
+                    'description' => 'Sample Text',
+                    'childs' => [
+                        [
+                            'name' => 'Test 3 Edit Home',
+                            'slug' => 'test-3-edit-home',
+                            'description' => 'Sample Text',
+                        ],
+                        [
+                            'name' => 'Test 4 Edit Home',
+                            'slug' => 'test-4-edit-home',
+                            'description' => 'Sample Text',
+                        ],
+                    ],
+                ],
+            ],
+        ])
         ->call('save')
-        ->assertHasNoFormErrors()
-        ->assertOk();
+        ->assertHasNoFormErrors();
 
     assertDatabaseHas(
         Taxonomy::class,
         [
-            'id' => $taxonomy->id,
-            'name' => 'new name',
+            'name' => 'Test Edit Term',
         ]
     );
 });

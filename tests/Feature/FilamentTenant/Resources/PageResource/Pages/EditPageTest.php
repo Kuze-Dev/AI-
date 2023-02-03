@@ -9,8 +9,10 @@ use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\SliceContent;
+use Domain\Support\SlugHistory\SlugHistory;
 use Filament\Facades\Filament;
 
+use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -70,5 +72,38 @@ it('can edit page', function () {
         'page_id' => $page->id,
         'slice_id' => $page->sliceContents->first()->slice_id,
         'data' => json_encode(['main' => ['header' => 'Bar']]),
+    ]);
+});
+
+it('can edit page slug', function () {
+    $page = PageFactory::new(['slug' => 'foo'])
+        ->addSliceContent(
+            SliceFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+                ),
+            ['data' => ['main' => ['header' => 'Foo']]]
+        )
+        ->createOne();
+
+    livewire(EditPage::class, ['record' => $page->getRouteKey()])
+        ->fillForm([
+            'slug' => 'new-foo',
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors()
+        ->assertOk();
+
+    assertDatabaseHas(Page::class, [
+        'id' => $page->id,
+        'slug' => 'new-foo',
+    ]);
+    assertDatabaseCount(SlugHistory::class, 2);
+    assertDatabaseHas(SlugHistory::class, [
+        'model_type' => $page->getMorphClass(),
+        'model_id' => $page->id,
+        'slug' => 'new-foo',
     ]);
 });

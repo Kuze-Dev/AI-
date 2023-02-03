@@ -53,6 +53,7 @@ class AdminResource extends Resource
                     Forms\Components\TextInput::make('email')
                         ->email()
                         ->required()
+                        ->helperText( ! config('domain.admin.can_change_email') ? 'Email modification is currently disabled.' : '')
                         ->disabled( ! config('domain.admin.can_change_email')),
                     Forms\Components\TextInput::make('password')
                         ->password()
@@ -184,7 +185,6 @@ class AdminResource extends Resource
                 Tables\Actions\EditAction::make()
                     ->authorize('update'),
                 Tables\Actions\DeleteAction::make()
-                    ->modalSubheading(trans('Are you sure you want to delete this record?'))
                     ->authorize('delete'),
                 Tables\Actions\RestoreAction::make()
                     ->authorize('restore'),
