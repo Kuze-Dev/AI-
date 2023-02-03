@@ -1,16 +1,13 @@
-<x-dynamic-component
-    :component="$getFieldWrapperView()"
-    :state-path="$getStatePath()"
->
+<x-dynamic-component :component="$getFieldWrapperView()" :state-path="$getStatePath()">
     @php
         $schemaData = $getSchemaData();
     @endphp
 
-    <code>
+    <code style="overflow-wrap: anywhere;">
         @if ($schemaData !== null)
-            @foreach($schemaData->sections as $section)
+            @foreach ($schemaData->sections as $section)
                 @foreach ($section->fields as $field)
-                    <?php echo'{{ $'?>{{$section->state_name}}<?php echo "['";?>{{$field->state_name}}<?php echo "'] }}";?>
+                    <?php echo '{{ $'; ?>{{ $section->state_name }}<?php echo "['"; ?>{{ $field->state_name }}<?php echo "'] }}"; ?>
                     <br>
                 @endforeach
             @endforeach
