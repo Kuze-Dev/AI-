@@ -20,4 +20,12 @@ class CollectionEntryResource extends JsonApiResource
             'published_at' => $this->published_at,
         ];
     }
+
+    public function toRelationships($request): array
+    {
+        return [
+            'taxonomyTerms' => fn () => TaxonomyTermResource::collection($this->taxonomyTerms),
+            'slugHistories' => fn () => SlugHistoryResource::collection($this->slugHistories),
+        ];
+    }
 }

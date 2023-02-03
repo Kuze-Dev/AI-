@@ -37,8 +37,18 @@ class CollectionEntryController
         );
     }
 
-    public function show(Collection $collection, CollectionEntry $collectionEntry): CollectionEntryResource
+    public function show(string $collection, string $collectionEntry): CollectionEntryResource
     {
-        return CollectionEntryResource::make($collectionEntry);
+        return CollectionEntryResource::make(
+            QueryBuilder::for(
+                CollectionEntry::whereSlug($collectionEntry)
+                    ->whereRelation('collection', 'slug', $collection)
+            )
+                ->allowedIncludes([
+                    'taxonomyTerms',
+                    'slugHistories',
+                ])
+                ->firstOrFail()
+        );
     }
 }

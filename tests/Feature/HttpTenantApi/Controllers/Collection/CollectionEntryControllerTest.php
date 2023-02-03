@@ -17,34 +17,25 @@ beforeEach(function () {
 });
 
 it('can list collection entries', function () {
-    $taxonomy = TaxonomyFactory::new()
-        ->createOne();
-
-    $taxonomyTerms = TaxonomyTermFactory::new()
-        ->for($taxonomy)
-        ->count(5)
-        ->create();
-
     $collection = CollectionFactory::new()
         ->for(
             BlueprintFactory::new()
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
         )
+        ->has(TaxonomyFactory::new())
         ->createOne();
 
-    $collection->taxonomies()->attach([$taxonomy->getKey()]);
-
-    $collectionEntries = CollectionEntryFactory::new()
+    CollectionEntryFactory::new()
         ->for($collection)
+        ->has(
+            TaxonomyTermFactory::new()
+                ->for($collection->taxonomies->first())
+        )
         ->count(10)
         ->create([
             'data' => ['main' => ['header' => 'Foo']],
         ]);
-
-    foreach ($collectionEntries as $entry) {
-        $entry->taxonomyTerms()->attach($taxonomyTerms->pluck('id'));
-    }
 
     getJson("api/collections/{$collection->getRouteKey()}/entries")
         ->assertOk()
@@ -57,37 +48,68 @@ it('can list collection entries', function () {
 });
 
 it('can show collection entry', function () {
-    $taxonomy = TaxonomyFactory::new()
-        ->createOne();
-
-    $taxonomyTerms = TaxonomyTermFactory::new()
-        ->for($taxonomy)
-        ->count(5)
-        ->createOne();
-
     $collection = CollectionFactory::new()
         ->for(
             BlueprintFactory::new()
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
         )
+        ->has(TaxonomyFactory::new())
         ->createOne();
-
-    $collection->taxonomies()->attach([$taxonomy->getKey()]);
 
     $collectionEntry = CollectionEntryFactory::new()
         ->for($collection)
+        ->has(
+            TaxonomyTermFactory::new()
+                ->for($collection->taxonomies->first())
+        )
         ->createOne([
             'data' => ['main' => ['header' => 'Foo']],
         ]);
 
-    $collectionEntry->taxonomyTerms()->attach($taxonomyTerms->pluck('id'));
-
     getJson("api/collections/{$collection->getRouteKey()}/entries/{$collectionEntry->getRouteKey()}")
         ->assertOk()
-        ->assertJson(function (AssertableJson $json) {
+        ->assertJson(function (AssertableJson $json) use ($collectionEntry) {
             $json->where('data.type', 'collectionEntries')
-                ->whereType('data.attributes.title', 'string')
+                ->where('data.id', $collectionEntry->getRouteKey())
+                ->where('data.attributes.title', $collectionEntry->title)
                 ->etc();
         });
 });
+
+it('can show collection entry with includes', function (string $include) {
+    $collection = CollectionFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->has(TaxonomyFactory::new())
+        ->createOne();
+
+    $collectionEntry = CollectionEntryFactory::new()
+        ->for($collection)
+        ->has(
+            TaxonomyTermFactory::new()
+                ->for($collection->taxonomies->first())
+        )
+        ->createOne([
+            'data' => ['main' => ['header' => 'Foo']],
+        ]);
+
+    getJson("api/collections/{$collection->getRouteKey()}/entries/{$collectionEntry->getRouteKey()}?" . http_build_query(['include' => $include]))
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) use ($collectionEntry, $include) {
+            $json->where('data.type', 'collectionEntries')
+                ->where('data.id', $collectionEntry->getRouteKey())
+                ->where('data.attributes.title', $collectionEntry->title)
+                ->has(
+                    'included',
+                    callback: fn (AssertableJson $json) => $json->where('type', $include)->etc()
+                )
+                ->etc();
+        });
+})->with([
+    'taxonomyTerms',
+    'slugHistories',
+]);

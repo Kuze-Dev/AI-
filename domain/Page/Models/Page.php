@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Support\SlugHistory\HasSlugHistory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
@@ -25,6 +26,8 @@ use Spatie\Sluggable\SlugOptions;
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Page\Models\SliceContent[] $sliceContents
  * @property-read int|null $slice_contents_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $slugHistories
+ * @property-read int|null $slug_histories_count
  * @method static \Illuminate\Database\Eloquent\Builder|Page newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page query()
@@ -35,10 +38,12 @@ use Spatie\Sluggable\SlugOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|Page whereUpdatedAt($value)
  * @mixin \Eloquent
  */
+
 class Page extends Model implements IsActivitySubject
 {
     use LogsActivity;
     use HasSlug;
+    use HasSlugHistory;
 
     protected $fillable = [
         'name',
