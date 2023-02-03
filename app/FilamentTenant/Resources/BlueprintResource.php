@@ -20,6 +20,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -136,7 +137,7 @@ class BlueprintResource extends Resource
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->lazy()
-                    ->columnSpan(['sm' => 3]),
+                    ->columnSpanFull(),
                 Forms\Components\TextInput::make('state_name')
                     ->columnSpan(['sm' => 2])
                     ->disabled(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
@@ -169,7 +170,7 @@ class BlueprintResource extends Resource
                             ->fill()
                     ),
                 Forms\Components\TextInput::make('rules')
-                    ->columnSpan(['sm' => 3])
+                    ->columnSpanFull()
                     ->afterStateHydrated(function (Closure $set, ?array $state): void {
                         $set('rules', implode('|', $state ?? []));
                     })
@@ -228,7 +229,7 @@ class BlueprintResource extends Resource
                                 ->toArray()
                             : [$state];
                     })
-                    ->columnSpan(2),
+                    ->columnSpanFull(),
                 Forms\Components\TextInput::make('min_size')
                     ->numeric()
                     ->integer()
@@ -260,7 +261,7 @@ class BlueprintResource extends Resource
                         'sm' => 2,
                         'md' => 4,
                     ])
-                    ->columnSpan(['sm' => 2]),
+                    ->columnSpanFull(),
             ],
             FieldType::RICHTEXT => [
                 Forms\Components\CheckboxList::make('buttons')
@@ -274,7 +275,7 @@ class BlueprintResource extends Resource
                         'sm' => 2,
                         'md' => 4,
                     ])
-                    ->columnSpan(['sm' => 2]),
+                    ->columnSpanFull(),
             ],
             FieldType::SELECT => [
                 Forms\Components\Toggle::make('multiple'),
@@ -282,7 +283,7 @@ class BlueprintResource extends Resource
                     ->collapsible()
                     ->orderable()
                     ->itemLabel(fn (array $state) => $state['title'] ?? null)
-                    ->columnSpan(['sm' => 2])
+                    ->columnSpanFull()
                     ->columns(2)
                     ->schema([
                         Forms\Components\TextInput::make('value'),
@@ -336,6 +337,67 @@ class BlueprintResource extends Resource
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
             ],
             FieldType::TOGGLE => [],
+            FieldType::RELATED_RESOURCE => [
+                Forms\Components\Select::make('resource')
+                    ->columnSpanFull()
+                    ->options(
+                        collect(config('domain.blueprint.related_resources.models', []))
+                            ->mapWithKeys(
+                                function (string $model) {
+                                    /** @var class-string<\Illuminate\Database\Eloquent\Model> $model */
+                                    return [(new $model())->getMorphClass() => Str::of($model)->classBasename()->headline()];
+                                }
+                            )
+                            ->sort()
+                            ->toArray()
+                    )
+                    ->reactive(),
+                Forms\Components\Toggle::make('multiple')
+                    ->reactive()
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('min')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
+                    ->when(fn (Closure $get) => $get('multiple') === true),
+                Forms\Components\TextInput::make('max')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
+                    ->when(fn (Closure $get) => $get('multiple') === true),
+                Forms\Components\Group::make()
+                    ->columnSpanFull()
+                    ->hidden(function (Closure $get) {
+                        $resource = $get('resource');
+                        $model = Relation::getMorphedModel($resource);
+                        $relationScopes = config("domain.blueprint.related_resources.relation_scopes.{$model}", []);
+
+                        return count($relationScopes) <= 0;
+                    })
+                    ->schema(function (Closure $get) {
+                        $resource = $get('resource');
+                        $modelClass = Relation::getMorphedModel($resource);
+                        $relationScopes = config("domain.blueprint.related_resources.relation_scopes.{$modelClass}", []);
+
+                        $schema = [];
+
+                        foreach ($relationScopes as $relationName => $options) {
+                            /** @var Relation<\Illuminate\Database\Eloquent\Model> $relationship */
+                            $relationship = (new $modelClass())->{$relationName}();
+                            $relatedModel = $relationship->getRelated();
+
+                            $schema[] = Forms\Components\Select::make("relation_scopes.$relationName")
+                                ->label(Str::headline($relationName))
+                                ->options(
+                                    $relatedModel->query()
+                                        ->pluck($options['title_column'], $relatedModel->getKeyName())
+                                        ->toArray()
+                                );
+                        }
+
+                        return $schema;
+                    }),
+            ],
             FieldType::REPEATER => [
                 Forms\Components\TextInput::make('min')
                     ->numeric()
