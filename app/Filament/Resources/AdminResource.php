@@ -53,8 +53,8 @@ class AdminResource extends Resource
                     Forms\Components\TextInput::make('email')
                         ->email()
                         ->required()
-                        ->label(fn ($record) => ('Email ' . ($record == null ? '' : ( ! config('domain.admin.can_change_email') ? '(Email update is currently disabled.)' : ''))))
-                        ->disabled(fn ($record) => ($record == null ? false : (config('domain.admin.can_change_email') ? false : true))),
+                        ->helperText(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email') ? 'Email update is currently disabled.' : '')
+                        ->disabled(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email')),
                     Forms\Components\TextInput::make('password')
                         ->password()
                         ->required()
