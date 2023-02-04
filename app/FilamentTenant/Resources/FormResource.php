@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\FormResource\Pages;
 use App\FilamentTenant\Resources\FormResource\RelationManagers\FormSubmissionsRelationManager;
+use App\FilamentTenant\Support\SchemaInterpolations;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Form\Models\Form as FormModel;
@@ -65,7 +66,7 @@ class FormResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\Section::make('Available Values')
                         ->schema([
-                            \App\Forms\Components\SchemaInterpolations::make('data')
+                            SchemaInterpolations::make('data')
                                 ->schemaData(fn (Closure $get) => Blueprint::where('id', $get('blueprint_id'))->first()?->schema),
                         ])
                         ->columnSpan(['md' => 1])
