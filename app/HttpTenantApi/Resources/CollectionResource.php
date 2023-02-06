@@ -18,7 +18,6 @@ class CollectionResource extends JsonApiResource
             'past_publish_date_behavior' => $this->past_publish_date_behavior,
             'future_publish_date_behavior' => $this->future_publish_date_behavior,
             'is_sortable' => $this->is_sortable,
-            'route_url'   => $this->qualified_route_url,
         ];
     }
 
