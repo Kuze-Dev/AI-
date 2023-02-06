@@ -52,7 +52,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder|TaxonomyTerm whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-#[OnDeleteCascade(['collectionEntries'])]
+#[OnDeleteCascade(['collectionEntries', 'children'])]
 class TaxonomyTerm extends Model implements IsActivitySubject, Sortable
 {
     use HasSlug;

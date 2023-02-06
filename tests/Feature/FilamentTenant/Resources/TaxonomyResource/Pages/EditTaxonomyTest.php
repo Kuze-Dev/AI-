@@ -47,7 +47,7 @@ it('can edit page', function () {
                     'name' => 'Test 2 Edit Home',
                     'slug' => 'test-2-edit-home',
                     'description' => 'Sample Text',
-                    'childs' => [
+                    'children' => [
                         [
                             'name' => 'Test 3 Edit Home',
                             'slug' => 'test-3-edit-home',
