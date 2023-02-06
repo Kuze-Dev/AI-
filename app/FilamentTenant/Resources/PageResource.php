@@ -55,8 +55,8 @@ class PageResource extends Resource
                     ->unique(ignoreRecord: true)
                     ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                 Forms\Components\TextInput::make('route_url')
-                    ->unique(ignoreRecord: true),
-
+                    ->required()
+                    ->helperText('Use "{{ $slug }}" to insert the current slug.'),
             ]),
             Forms\Components\Section::make(trans('Slices'))
                 ->schema([

@@ -55,9 +55,7 @@ it('can update collection', function () {
     $taxonomy = TaxonomyFactory::new()
         ->createOne();
 
-    $collection = CollectionFactory::new(
-        ['name' => 'Test Collection', 'route_url' => 'test-collection']
-    )
+    $collection = CollectionFactory::new(['name' => 'Test Collection'])
         ->for(
             BlueprintFactory::new()
                 ->addSchemaSection(['title' => 'Main'])
@@ -83,6 +81,7 @@ it('can update collection', function () {
         'future_publish_date_behavior' => 'private',
         'past_publish_date_behavior' => 'unlisted',
         'is_sortable' => true,
+        'route_url' => 'test-collection',
     ]);
     assertDatabaseHas('collection_taxonomy', [
         'taxonomy_id' => $taxonomy->getKey(),
