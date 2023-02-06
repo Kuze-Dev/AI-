@@ -21,7 +21,7 @@ class CollectionFactory extends Factory
     /** Define values of model instance. */
     public function definition(): array
     {
-        $name = $this->faker->word();
+        $name = $this->faker->unique()->word();
 
         return [
             'blueprint_id' => null,
