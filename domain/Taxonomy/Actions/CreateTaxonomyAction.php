@@ -11,9 +11,11 @@ class CreateTaxonomyAction
 {
     public function execute(TaxonomyData $taxonomyData): Taxonomy
     {
-        return Taxonomy::create([
+        $taxonomy = Taxonomy::create([
             'name' => $taxonomyData->name,
             'slug' => $taxonomyData->slug,
         ]);
+
+        return $taxonomy;
     }
 }
