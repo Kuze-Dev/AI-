@@ -56,7 +56,8 @@ it('can update collection', function () {
         ->createOne();
 
     $collection = CollectionFactory::new(
-        ['name' => 'Test Collection','route_url' => 'test-collection'])
+        ['name' => 'Test Collection', 'route_url' => 'test-collection']
+    )
         ->for(
             BlueprintFactory::new()
                 ->addSchemaSection(['title' => 'Main'])

@@ -19,7 +19,9 @@ class PageFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'route_url' => $this->faker->word(),
+            'route_url' => substr(str_shuffle(
+                str_repeat('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', mt_rand(1, 8))
+            ), 1, 8),
         ];
     }
 
