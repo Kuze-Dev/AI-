@@ -35,6 +35,7 @@ it('can create page', function () {
     $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
+            'route_url' => 'test-url',
             'slice_contents' => [
                 [
                     'slice_id' => $sliceId,

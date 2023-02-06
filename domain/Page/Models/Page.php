@@ -6,8 +6,10 @@ namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Support\SlugHistory\HasSlugHistory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Blade;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -20,6 +22,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property int $id
  * @property string $name
  * @property string $slug
+ * @property string $route_url
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
@@ -28,6 +31,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property-read int|null $slice_contents_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $slugHistories
  * @property-read int|null $slug_histories_count
+ * @property-read string|null $qualified_route_url
  * @method static \Illuminate\Database\Eloquent\Builder|Page newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page query()
@@ -48,6 +52,7 @@ class Page extends Model implements IsActivitySubject
     protected $fillable = [
         'name',
         'slug',
+        'route_url',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -81,5 +86,16 @@ class Page extends Model implements IsActivitySubject
             ->preventOverwrite()
             ->doNotGenerateSlugsOnUpdate()
             ->saveSlugsTo($this->getRouteKeyName());
+    }
+
+    /** @return Attribute<string, static> */
+    protected function qualifiedRouteUrl(): Attribute
+    {
+        return Attribute::get(fn () => Blade::render(
+            Blade::compileEchos($this->route_url),
+            [
+                'slug' => $this->slug,
+            ]
+        ));
     }
 }

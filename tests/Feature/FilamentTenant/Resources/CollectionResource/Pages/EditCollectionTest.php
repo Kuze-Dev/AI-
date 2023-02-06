@@ -69,6 +69,7 @@ it('can update collection', function () {
             'future_publish_date_behavior' => 'private',
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
+            'route_url' => 'test-collection',
             'taxonomies' => [$taxonomy->getKey()],
         ])
         ->call('save')
@@ -80,6 +81,7 @@ it('can update collection', function () {
         'future_publish_date_behavior' => 'private',
         'past_publish_date_behavior' => 'unlisted',
         'is_sortable' => true,
+        'route_url' => 'test-collection',
     ]);
     assertDatabaseHas('collection_taxonomy', [
         'taxonomy_id' => $taxonomy->getKey(),

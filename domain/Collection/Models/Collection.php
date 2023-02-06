@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string $blueprint_id
  * @property string $name
  * @property string $slug
+ * @property string $route_url
  * @property PublishBehavior|null $future_publish_date_behavior
  * @property PublishBehavior|null $past_publish_date_behavior
  * @property bool $is_sortable
@@ -72,6 +73,7 @@ class Collection extends Model implements IsActivitySubject
         'past_publish_date_behavior',
         'future_publish_date_behavior',
         'is_sortable',
+        'route_url',
     ];
 
     /**

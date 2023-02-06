@@ -18,6 +18,7 @@ class CollectionEntryResource extends JsonApiResource
             'data' => $this->data,
             'order' => $this->order,
             'published_at' => $this->published_at,
+            'route_url' => $this->qualified_route_url,
         ];
     }
 
