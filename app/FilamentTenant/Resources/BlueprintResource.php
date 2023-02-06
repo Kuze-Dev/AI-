@@ -341,7 +341,7 @@ class BlueprintResource extends Resource
                 Forms\Components\Select::make('resource')
                     ->columnSpanFull()
                     ->options(
-                        collect(config('domain.blueprint.related_resources.models', []))
+                        collect(config('domain.blueprint.related_resources', []))
                             ->keys()
                             ->mapWithKeys(
                                 function (string $model) {
@@ -369,29 +369,26 @@ class BlueprintResource extends Resource
                 Forms\Components\Group::make()
                     ->columnSpanFull()
                     ->hidden(function (Closure $get) {
-                        $resource = $get('resource');
-                        $modelClass = Relation::getMorphedModel($resource);
-                        $relationScopes = config("domain.blueprint.related_resources.relation_scopes.{$modelClass}", []);
+                        $modelClass = Relation::getMorphedModel($get('resource'));
+                        $relationScopes = config("domain.blueprint.related_resources.{$modelClass}.relation_scopes", []);
 
                         return count($relationScopes) <= 0;
                     })
                     ->schema(function (Closure $get) {
-                        $resource = $get('resource');
-                        $modelClass = Relation::getMorphedModel($resource);
-                        $relationScopes = config("domain.blueprint.related_resources.relation_scopes.{$modelClass}", []);
+                        $modelClass = Relation::getMorphedModel($get('resource'));
+                        $relationScopes = config("domain.blueprint.related_resources.{$modelClass}.relation_scopes", []);
 
                         $schema = [];
 
                         foreach ($relationScopes as $relationName => $options) {
-                            /** @var Relation<\Illuminate\Database\Eloquent\Model> $relationship */
-                            $relationship = (new $modelClass())->{$relationName}();
-                            $relatedModel = $relationship->getRelated();
+                            /** @var \Illuminate\Database\Eloquent\Model $related */
+                            $related = (new $modelClass())->{$relationName}()->getRelated();
 
                             $schema[] = Forms\Components\Select::make("relation_scopes.$relationName")
                                 ->label(Str::headline($relationName))
                                 ->options(
-                                    $relatedModel->query()
-                                        ->pluck($options['title_column'], $relatedModel->getKeyName())
+                                    $related->query()
+                                        ->pluck($options['title_column'], $related->getKeyName())
                                         ->toArray()
                                 );
                         }

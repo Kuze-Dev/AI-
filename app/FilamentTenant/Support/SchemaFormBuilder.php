@@ -33,7 +33,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
@@ -227,21 +226,12 @@ class SchemaFormBuilder extends Component
 
     private function makeRelatedResourceComponent(RelatedResourceFieldData $relatedResourceFieldData): Select
     {
-        $modelClass = Relation::getMorphedModel($relatedResourceFieldData->resource);
-        $relatedResourceModelConfig = config("domain.blueprint.related_resources.models.{$modelClass}", []);
-        /** @var \Illuminate\Database\Eloquent\Model */
-        $model = (new $modelClass());
-        $modelQuery = $model->query();
-
-        foreach ($relatedResourceFieldData->relation_scopes as $relationName => $value) {
-            /** @var Relation<\Illuminate\Database\Eloquent\Model> $relationship */
-            $relationship = $model->{$relationName}();
-
-            $modelQuery->whereRelation($relationName, $relationship->getRelated()->getKeyName(), $value);
-        }
+        $relatedResourceModelConfig = $relatedResourceFieldData->getRelatedModelConfig();
+        $related = $relatedResourceFieldData->getRelatedModelInstance();
+        $relatedQuery = $relatedResourceFieldData->getRelatedResourceQuery();
 
         $component = Select::make($relatedResourceFieldData->state_name)
-            ->options($modelQuery->pluck($relatedResourceModelConfig['title_column'], $model->getKeyName()))
+            ->options($relatedQuery->pluck($relatedResourceModelConfig['title_column'], $related->getKeyName()))
             ->multiple($relatedResourceFieldData->multiple);
 
         if ($relatedResourceFieldData->min) {
