@@ -44,7 +44,7 @@ class PageResource extends Resource
             Forms\Components\Card::make([
                 Forms\Components\TextInput::make('name')
                     ->unique(ignoreRecord: true)
-                    ->debounce()
+                    ->lazy()
                     ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
                         if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
                             $set('slug', Str::slug($state));
