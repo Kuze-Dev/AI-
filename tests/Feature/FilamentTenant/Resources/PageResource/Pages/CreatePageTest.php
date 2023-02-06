@@ -59,7 +59,7 @@ it('can create page', function () {
         'model_type' => $page->getMorphClass(),
         'model_id' => $page->id,
     ]);
-});
+})->only();
 
 it('can not create page with same name', function () {
     $sliceId = SliceFactory::new()

@@ -55,7 +55,8 @@ it('can update collection', function () {
     $taxonomy = TaxonomyFactory::new()
         ->createOne();
 
-    $collection = CollectionFactory::new(['name' => 'Test Collection'])
+    $collection = CollectionFactory::new(
+        ['name' => 'Test Collection','route_url' => 'test-collection'])
         ->for(
             BlueprintFactory::new()
                 ->addSchemaSection(['title' => 'Main'])
@@ -69,6 +70,7 @@ it('can update collection', function () {
             'future_publish_date_behavior' => 'private',
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
+            'route_url' => 'test-collection',
             'taxonomies' => [$taxonomy->getKey()],
         ])
         ->call('save')

@@ -54,7 +54,8 @@ class PageResource extends Resource
                 Forms\Components\TextInput::make('slug')
                     ->unique(ignoreRecord: true)
                     ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
-                Forms\Components\TextInput::make('url'),
+                Forms\Components\TextInput::make('route_url')
+                    ->unique(ignoreRecord: true),
 
             ]),
             Forms\Components\Section::make(trans('Slices'))
