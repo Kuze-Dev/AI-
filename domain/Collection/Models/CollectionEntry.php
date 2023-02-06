@@ -38,6 +38,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
  * @property-read int|null $slug_histories_count
  * @property-read \Illuminate\Database\Eloquent\Collection|TaxonomyTerm[] $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
+ * @property-read string|null $qualified_route_url
  * @method static CollectionEntryBuilder|CollectionEntry newModelQuery()
  * @method static CollectionEntryBuilder|CollectionEntry newQuery()
  * @method static CollectionEntryBuilder|CollectionEntry query()
