@@ -26,6 +26,7 @@ class CollectionFactory extends Factory
             'past_publish_date_behavior' => PublishBehavior::PRIVATE,
             'future_publish_date_behavior' => PublishBehavior::PUBLIC,
             'is_sortable' => (bool) rand(0, 1),
+            'route_url' => $this->faker->word(),
         ];
     }
 

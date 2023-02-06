@@ -88,6 +88,8 @@ class CollectionResource extends Resource
                         ->searchable()
                         ->preload()
                         ->disabled(fn (?Collection $record) => $record !== null),
+                    Forms\Components\TextInput::make('route_url')
+                        ->unique(ignoreRecord: true),
                     Forms\Components\Select::make('taxonomies')
                         ->multiple()
                         ->options(

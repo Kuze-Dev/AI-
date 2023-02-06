@@ -72,6 +72,7 @@ class Collection extends Model implements IsActivitySubject
         'past_publish_date_behavior',
         'future_publish_date_behavior',
         'is_sortable',
+        'route_url',
     ];
 
     /**

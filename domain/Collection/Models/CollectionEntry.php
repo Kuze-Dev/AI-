@@ -15,7 +15,9 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
+use Illuminate\Support\Facades\Blade;
 use Spatie\Sluggable\SlugOptions;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 /**
  * Domain\Collection\Models\CollectionEntry
@@ -140,4 +142,15 @@ class CollectionEntry extends Model implements IsActivitySubject
     {
         return new CollectionEntryBuilder($query);
     }
+
+      /** @return Attribute<string, static> */
+      protected function qualifiedRouteUrl(): Attribute
+      {
+          return Attribute::get(fn () => Blade::render(
+              Blade::compileEchos($this->collection->route_url .'/'.$this->slug),
+              [
+                  'slug' => $this->slug,
+              ]
+          ));
+      }
 }
