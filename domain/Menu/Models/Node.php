@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Domain\Menu\Models;
 
 use Domain\Menu\Enums\Target;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -42,9 +44,11 @@ use Spatie\EloquentSortable\SortableTrait;
  * @method static Builder|Node whereUrl($value)
  * @mixin \Eloquent
  */
+#[OnDeleteCascade(['children'])]
 class Node extends Model implements Sortable
 {
     use SortableTrait;
+    use ConstraintsRelationships;
 
     protected $fillable = [
         'menu_id',

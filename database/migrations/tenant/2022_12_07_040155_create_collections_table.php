@@ -1,11 +1,15 @@
 <?php
 
 declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Domain\Blueprint\Models\Blueprint as BlueprintModel;
-use Domain\Collection\Models\Collection as CollectionModel;
+use Domain\Collection\Models\Collection;
+use Domain\Collection\Models\CollectionEntry;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
 
 return new class () extends Migration {
     /** Run the migrations. */
@@ -13,7 +17,7 @@ return new class () extends Migration {
     {
         Schema::create('collections', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(BlueprintModel::class)->constrained();
+            $table->foreignIdFor(BlueprintModel::class)->index();
             $table->string('name')->unique();
             $table->string('slug')->unique();
             $table->string('future_publish_date_behavior')->nullable();
@@ -25,12 +29,12 @@ return new class () extends Migration {
 
         Schema::create('collection_entries', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(CollectionModel::class)->constrained();
+            $table->foreignIdFor(Collection::class)->index();
             $table->string('title');
             $table->string('slug')->index();
             $table->dateTime('published_at')->nullable();
             $table->json('data');
-            $table->bigInteger('order')->nullable();
+            $table->unsignedInteger('order')->nullable();
             $table->timestamps();
 
             $table->unique(['collection_id', 'title']);
@@ -38,30 +42,14 @@ return new class () extends Migration {
 
         Schema::create('collection_taxonomy', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('collection_id')->unsigned();
-            $table->unsignedBigInteger('taxonomy_id')->unsigned();
-            $table->foreign('collection_id')
-                ->references('id')
-                ->on('collections')
-                ->onDelete('cascade');
-            $table->foreign('taxonomy_id')
-                ->references('id')
-                ->on('taxonomies')
-                ->onDelete('cascade');
+            $table->foreignIdFor(Collection::class)->index();
+            $table->foreignIdFor(Taxonomy::class)->index();
         });
 
         Schema::create('collection_entry_taxonomy_term', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBiginteger('taxonomy_term_id')->unsigned();
-            $table->unsignedBiginteger('collection_entry_id')->unsigned();
-            $table->foreign('taxonomy_term_id')
-                ->references('id')
-                ->on('taxonomy_terms')
-                ->onDelete('cascade');
-            $table->foreign('collection_entry_id')
-                ->references('id')
-                ->on('collection_entries')
-                ->onDelete('cascade');
+            $table->foreignIdFor(CollectionEntry::class)->index();
+            $table->foreignIdFor(TaxonomyTerm::class)->index();
         });
     }
 

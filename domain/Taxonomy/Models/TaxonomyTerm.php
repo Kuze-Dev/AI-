@@ -6,6 +6,8 @@ namespace Domain\Taxonomy\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Collection\Models\CollectionEntry;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -50,11 +52,13 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder|TaxonomyTerm whereUpdatedAt($value)
  * @mixin \Eloquent
  */
+#[OnDeleteCascade(['collectionEntries', 'children'])]
 class TaxonomyTerm extends Model implements IsActivitySubject, Sortable
 {
     use HasSlug;
     use LogsActivity;
     use SortableTrait;
+    use ConstraintsRelationships;
 
     protected $fillable = [
         'taxonomy_id',

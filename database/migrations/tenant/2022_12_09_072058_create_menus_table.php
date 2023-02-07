@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Domain\Menu\Models\Menu;
+use Domain\Menu\Models\Node;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -24,11 +26,11 @@ return new class () extends Migration {
         Schema::create('nodes', function (Blueprint $table) {
             $table->id();
             $table->string('label');
-            $table->bigInteger('menu_id')->unsigned()->index();
-            $table->bigInteger('parent_id')->unsigned()->nullable()->index();
+            $table->foreignIdFor(Menu::class)->index();
+            $table->foreignIdFor(Node::class, 'parent_id')->nullable()->index();
             $table->string('url')->nullable();
             $table->string('target');
-            $table->integer('order')->unsigned();
+            $table->unsignedInteger('order');
             $table->timestamps();
         });
     }

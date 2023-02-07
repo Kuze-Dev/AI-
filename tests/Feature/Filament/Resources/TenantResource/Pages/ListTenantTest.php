@@ -16,17 +16,21 @@ it('can render page', function () {
 });
 
 it('can list tenants', function () {
-    $tenants = TenantFactory::new()->count(5)->create();
+    $tenants = TenantFactory::new()
+        ->count(5)
+        ->create();
 
-    livewire(ListTenants::class)
-        ->assertCanSeeTableRecords($tenants);
+    livewire(ListTenants::class)->assertCanSeeTableRecords($tenants);
 });
 
 it('can delete tenant', function () {
-    $tenant = TenantFactory::new()->createOne();
+    $tenant = TenantFactory::new()
+        ->withDomains()
+        ->createOne();
+    $domain = $tenant->domains->first();
 
-    livewire(ListTenants::class)
-        ->callTableAction(DeleteAction::class, $tenant);
+    livewire(ListTenants::class)->callTableAction(DeleteAction::class, $tenant);
 
     assertModelMissing($tenant);
+    assertModelMissing($domain);
 });

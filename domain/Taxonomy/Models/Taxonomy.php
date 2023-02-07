@@ -6,6 +6,9 @@ namespace Domain\Taxonomy\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Collection\Models\Collection;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -39,10 +42,15 @@ use Spatie\Sluggable\SlugOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy whereUpdatedAt($value)
  * @mixin \Eloquent
  */
+#[
+    OnDeleteCascade(['taxonomyTerms']),
+    OnDeleteRestrict(['collections'])
+]
 class Taxonomy extends Model implements IsActivitySubject
 {
     use HasSlug;
     use LogsActivity;
+    use ConstraintsRelationships;
 
     protected $fillable = [
         'name',

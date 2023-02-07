@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Domain\Tenant\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -38,11 +40,13 @@ use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
  * @method static \Illuminate\Database\Eloquent\Builder|Tenant whereUpdatedAt($value)
  * @mixin \Eloquent
  */
+#[OnDeleteCascade(['domains'])]
 class Tenant extends BaseTenant implements TenantWithDatabase, IsActivitySubject
 {
     use HasDatabase;
     use HasDomains;
     use LogsActivity;
+    use ConstraintsRelationships;
 
     public function getActivitylogOptions(): LogOptions
     {

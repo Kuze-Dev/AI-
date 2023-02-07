@@ -7,6 +7,8 @@ namespace Domain\Collection\Models;
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Support\SlugHistory\HasSlugHistory;
 use Domain\Collection\Models\Builders\CollectionEntryBuilder;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -54,11 +56,13 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
  * @method static CollectionEntryBuilder|CollectionEntry whereUpdatedAt($value)
  * @mixin \Eloquent
  */
+#[OnDeleteCascade(['taxonomyTerms'])]
 class CollectionEntry extends Model implements IsActivitySubject
 {
     use LogsActivity;
     use HasSlug;
     use HasSlugHistory;
+    use ConstraintsRelationships;
 
     /**
      * Declare columns
