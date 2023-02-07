@@ -33,6 +33,7 @@ class CollectionEntryController
                     'order',
                     'published_at',
                 ])
+                ->with('collection.blueprint')
                 ->jsonPaginate()
         );
     }
@@ -48,6 +49,7 @@ class CollectionEntryController
                     'taxonomyTerms',
                     'slugHistories',
                 ])
+                ->with('collection.blueprint')
                 ->firstOrFail()
         );
     }
