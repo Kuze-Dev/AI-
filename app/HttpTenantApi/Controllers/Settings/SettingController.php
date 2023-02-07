@@ -17,15 +17,13 @@ class SettingController
         $resource = null;
 
         foreach ($settingsContainer->getSettingClasses() as $settingsClass) {
-            $resource = match ($group) {
-                #add here new settings resource
-                'site' => SiteSettingResource::make(app($settingsClass)),
+            if ($settingsClass::group() == $group) {
+                $resource = match ($group) {
+                    #add here new settings resource
+                    'site' => SiteSettingResource::make(app($settingsClass)),
 
-                default => null,
-            };
-
-            if ($resource) {
-                break;
+                    default => null,
+                };
             }
         }
 
