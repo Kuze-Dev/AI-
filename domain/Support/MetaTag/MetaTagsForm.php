@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Support\MetaTag;
 use Filament\Forms;
+use Livewire\TemporaryUploadedFile;
 
-trait MetaTagsForm 
+class MetaTagsForm 
 {
-    public static function metaTagsForm()
+    public static function formBuilder()
     {
         return Forms\Components\Section::make('Meta Tags')
             ->schema([
@@ -18,8 +19,14 @@ trait MetaTagsForm
                 Forms\Components\TextInput::make('meta_author')
                     ->label('Author'),
                 Forms\Components\Textarea::make('meta_description')
-                    ->label('Description')
-
+                    ->label('Description'),
+                Forms\Components\FileUpload::make('meta_image')
+                    ->label('Image')
+                    ->acceptedFileTypes(['image/png', 'image/webp', 'image/jpg', 'image/jpeg'])
+                    ->maxSize(1_000)
+                    ->getUploadedFileNameForStorageUsing(static function (TemporaryUploadedFile $file) {
+                        return 'image.'.$file->extension();
+                    })
             ]);
     }
 }

@@ -26,7 +26,6 @@ use Illuminate\Database\Eloquent\Model;
 class CollectionResource extends Resource
 {
     use ContextualResource;
-    use MetaTagsForm;
 
     /** @var string|null */
     protected static ?string $model = Collection::class;
@@ -145,7 +144,7 @@ class CollectionResource extends Resource
                             ->reactive(),
                     ]),
                 ]),
-                self::metaTagsForm()
+                MetaTagsForm::formBuilder()
             ]);
     }
 
