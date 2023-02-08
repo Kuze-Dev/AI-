@@ -16,6 +16,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Domain\Collection\Enums\PublishBehavior;
+use Domain\Support\MetaTag\HasMetaTags;
 use Domain\Support\SlugHistory\HasSlugHistory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -60,6 +61,7 @@ class Collection extends Model implements IsActivitySubject
     use LogsActivity;
     use HasSlug;
     use HasSlugHistory;
+    use HasMetaTags;
 
     /**
      * Declare columns

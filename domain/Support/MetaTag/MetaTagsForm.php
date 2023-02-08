@@ -9,16 +9,17 @@ trait MetaTagsForm
 {
     public static function metaTagsForm()
     {
-        return Forms\Components\Card::make([
-            Forms\Components\TextInput::make('title'),
-            Forms\Components\TextInput::make('keywords'),
-            Forms\Components\TextInput::make('author'),
-            Forms\Components\Textarea::make('description')
-        ]);
-    }
+        return Forms\Components\Section::make('Meta Tags')
+            ->schema([
+                Forms\Components\TextInput::make('meta_title')
+                    ->label('Title'),
+                Forms\Components\TextInput::make('meta_keywords')
+                    ->label('Keywords'),
+                Forms\Components\TextInput::make('meta_author')
+                    ->label('Author'),
+                Forms\Components\Textarea::make('meta_description')
+                    ->label('Description')
 
-    public function taggable()
-    {
-        return $this->morphTo();
+            ]);
     }
 }
