@@ -61,9 +61,11 @@ class TaxonomyTerm extends Model implements IsActivitySubject, Sortable
         'parent_id',
         'name',
         'slug',
-        'description',
+        'data',
         'order',
     ];
+
+    protected $casts = ['data' => 'array'];
 
     public function getActivitylogOptions(): LogOptions
     {

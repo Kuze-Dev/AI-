@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Domain\Taxonomy\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Blueprint\Models\Blueprint;
 use Domain\Collection\Models\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\Models\Activity;
@@ -47,6 +49,7 @@ class Taxonomy extends Model implements IsActivitySubject
     protected $fillable = [
         'name',
         'slug',
+        'blueprint_id',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -60,6 +63,12 @@ class Taxonomy extends Model implements IsActivitySubject
     public function getActivitySubjectDescription(Activity $activity): string
     {
         return 'Taxonomy: '.$this->name;
+    }
+
+    /** @return BelongsTo<Blueprint, Taxonomy> */
+    public function blueprint(): BelongsTo
+    {
+        return $this->belongsTo(Blueprint::class);
     }
 
      /** @return HasMany<TaxonomyTerm> */

@@ -19,6 +19,8 @@ use Filament\Forms;
 use Illuminate\Support\Str;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
+use App\FilamentTenant\Support\SchemaFormBuilder;
+use Domain\Blueprint\Models\Blueprint;
 
 class TaxonomyResource extends Resource
 {
@@ -42,6 +44,12 @@ class TaxonomyResource extends Resource
     {
         return [trans('Total terms') => $record->taxonomy_terms_count];
     }
+
+    // /** @param Taxonomy $record */
+    // public static function getGlobalSearchResultUrl(Model $record): ?string
+    // {
+    //     return self::getUrl('edit', [$record->taxonomy, $record]);
+    // }
 
     /** @return Builder<Taxonomy> */
     protected static function getGlobalSearchEloquentQuery(): Builder
@@ -73,7 +81,19 @@ class TaxonomyResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->rules('alpha_dash')
                         ->disabled(),
+                    Forms\Components\Select::make('blueprint_id')
+                        ->required()
+                        ->options(
+                            fn () => Blueprint::orderBy('name')
+                                ->pluck('name', 'id')
+                                ->toArray()
+                        )
+                        ->exists(Blueprint::class, 'id')
+                        ->searchable()
+                        ->preload()
+                        ->disabled(fn (?Taxonomy $record) => $record !== null),
                 ]),
+
                 Forms\Components\Section::make(trans('Terms'))->schema([
                     Tree::make('terms')
                         ->formatStateUsing(
@@ -96,7 +116,7 @@ class TaxonomyResource extends Resource
                                         ->unique(ignoreRecord: true)
                                         ->rules('alpha_dash')
                                         ->disabled(),
-                                    Forms\Components\MarkdownEditor::make('description'),
+                                    SchemaFormBuilder::make('data', fn (Taxonomy $record) => $record->blueprint?->schema),
                                 ]),
                         ]),
 
