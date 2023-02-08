@@ -26,6 +26,10 @@ class CreatePageAction
             $this->createSliceContent->execute($page, $sliceContentData);
         }
 
+        $page->metaTags()->create([
+            'title' => $page->name
+        ]);
+
         return $page;
     }
 }

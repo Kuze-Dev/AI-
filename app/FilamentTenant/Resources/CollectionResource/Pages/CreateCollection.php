@@ -25,7 +25,7 @@ class CreateCollection extends CreateRecord
     protected function handleRecordCreation(array $data): Model
     {
         return DB::transaction(function () use ($data) {
-            return app(CreateCollectionAction::class)
+            $collection = app(CreateCollectionAction::class)
                 ->execute(new CollectionData(
                     name: $data['name'],
                     slug: $data['slug'],
@@ -36,6 +36,15 @@ class CreateCollection extends CreateRecord
                     future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
                     route_url: $data['route_url'],
                 ));
+            app(CreateMetaTagsAction::class)
+                ->execute(new MetaTagData(
+                    model : $collection,
+                    meta_title: $data['meta_title'],
+                    meta_author: $data['meta_author'],
+                    meta_description: $data['meta_description'],
+                    meta_keywords: $data['meta_keywords']
+                ));
+            return $collection;
         });
 
         // fn () => app(CreateCollectionAction::class)

@@ -24,10 +24,6 @@ class CreateCollectionAction
 
         $collection->taxonomies()
             ->attach($collectionData->taxonomies);
-        
-        $collection->metaTags()->create([
-            'title' => $collectionData->name
-        ]);
 
         return $collection;
     }

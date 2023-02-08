@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 namespace Domain\Support\MetaTag;
+
+use Closure;
 use Filament\Forms;
 use Livewire\TemporaryUploadedFile;
 
@@ -13,13 +15,33 @@ class MetaTagsForm
         return Forms\Components\Section::make('Meta Tags')
             ->schema([
                 Forms\Components\TextInput::make('meta_title')
-                    ->label('Title'),
+                    ->unique(ignoreRecord: true)
+                    ->lazy()
+                    ->label('Title')
+                    ->afterStateHydrated(function ($component, $record): void {
+                        $component->state($record ? $record->metaTags->first()->title : '');
+                    }),
                 Forms\Components\TextInput::make('meta_keywords')
-                    ->label('Keywords'),
+                    ->unique(ignoreRecord: true)
+                    ->lazy()
+                    ->label('Keywords')
+                    ->afterStateHydrated(function ($component, $record): void {
+                        $component->state($record ? $record->metaTags->first()->keywords : '');
+                    }),
                 Forms\Components\TextInput::make('meta_author')
-                    ->label('Author'),
+                    ->unique(ignoreRecord: true)
+                    ->lazy()
+                    ->label('Author')
+                    ->afterStateHydrated(function ($component, $record): void {
+                        $component->state($record ? $record->metaTags->first()->author : '');
+                    }),
                 Forms\Components\Textarea::make('meta_description')
-                    ->label('Description'),
+                    ->unique(ignoreRecord: true)
+                    ->lazy()
+                    ->label('Description')
+                    ->afterStateHydrated(function ($component, $record): void {
+                        $component->state($record ? $record->metaTags->first()->description : '');
+                    }),
                 Forms\Components\FileUpload::make('meta_image')
                     ->label('Image')
                     ->acceptedFileTypes(['image/png', 'image/webp', 'image/jpg', 'image/jpeg'])
