@@ -111,7 +111,7 @@ class PageResource extends Resource
                                 ->schemaData(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->blueprint->schema),
                         ]),
                 ]),
-            MetaTagsForm::formBuilder()
+            MetaTagsForm::formBuilder(),
         ]);
     }
 

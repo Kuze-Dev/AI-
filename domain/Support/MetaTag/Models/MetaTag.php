@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Domain\Support\MetaTag\Models;
+
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
@@ -14,20 +15,18 @@ class MetaTag extends Model implements IsActivitySubject
     use LogsActivity;
 
     /**
-     * Declare columns 
-     * that are mass assignable. 
+     * Declare columns
+     * that are mass assignable.
      */
     protected $fillable = [
         'title',
         'author',
         'description',
         'author',
-        'keywords'
+        'keywords',
     ];
 
-    /**
-     * @return LogOptions
-     */
+    /** @return LogOptions */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -36,9 +35,7 @@ class MetaTag extends Model implements IsActivitySubject
             ->dontSubmitEmptyLogs();
     }
 
-    /**
-     * Specify activity log description.
-     */
+    /** Specify activity log description. */
     public function getActivitySubjectDescription(Activity $activity): string
     {
         return 'Meta tags: '.$this->title;
@@ -46,6 +43,6 @@ class MetaTag extends Model implements IsActivitySubject
 
     public function taggable()
     {
-        return $this->morphTo();   
+        return $this->morphTo();
     }
 }

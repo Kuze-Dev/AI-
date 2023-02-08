@@ -27,7 +27,7 @@ class CreatePageAction
         }
 
         $page->metaTags()->create([
-            'title' => $page->name
+            'title' => $page->name,
         ]);
 
         return $page;

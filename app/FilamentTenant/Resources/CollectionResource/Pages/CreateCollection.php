@@ -44,6 +44,7 @@ class CreateCollection extends CreateRecord
                     meta_description: $data['meta_description'],
                     meta_keywords: $data['meta_keywords']
                 ));
+
             return $collection;
         });
 

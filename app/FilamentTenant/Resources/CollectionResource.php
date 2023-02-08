@@ -144,7 +144,7 @@ class CollectionResource extends Resource
                             ->reactive(),
                     ]),
                 ]),
-                MetaTagsForm::formBuilder()
+                MetaTagsForm::formBuilder(),
             ]);
     }
 

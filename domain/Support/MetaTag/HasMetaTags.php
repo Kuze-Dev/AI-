@@ -6,7 +6,7 @@ namespace Domain\Support\MetaTag;
 
 use Domain\Support\MetaTag\Models\MetaTag;
 
-trait HasMetaTags 
+trait HasMetaTags
 {
     public function metaTags()
     {

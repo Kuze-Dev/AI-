@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Support\MetaTag;
 
-use Closure;
 use Filament\Forms;
 use Livewire\TemporaryUploadedFile;
 
-class MetaTagsForm 
+class MetaTagsForm
 {
     public static function formBuilder()
     {
@@ -48,7 +47,7 @@ class MetaTagsForm
                     ->maxSize(1_000)
                     ->getUploadedFileNameForStorageUsing(static function (TemporaryUploadedFile $file) {
                         return 'image.'.$file->extension();
-                    })
+                    }),
             ]);
     }
 }

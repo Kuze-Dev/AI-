@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
@@ -15,6 +15,5 @@ class MetaTagData
         public readonly ?string $meta_description = null,
         public readonly ?string $meta_keywords = null
     ) {
-        
     }
 }

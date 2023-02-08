@@ -61,7 +61,7 @@ class AppServiceProvider extends ServiceProvider
             Collection::class,
             CollectionEntry::class,
             SlugHistory::class,
-            MetaTag::class
+            MetaTag::class,
         ]);
 
         Password::defaults(
