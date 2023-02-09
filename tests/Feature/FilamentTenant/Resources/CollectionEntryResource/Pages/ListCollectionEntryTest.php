@@ -8,7 +8,6 @@ use Domain\Collection\Database\Factories\CollectionFactory;
 use Domain\Collection\Models\CollectionEntry;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
-use Domain\Taxonomy\Models\Taxonomy;
 use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 
@@ -49,13 +48,16 @@ it('can list collection entries', function () {
 it('can delete collection entry', function () {
     $collection = CollectionFactory::new()
         ->withDummyBlueprint()
-        ->has(TaxonomyFactory::new())
+        ->has(
+            TaxonomyFactory::new()
+                ->withDummyBlueprint()
+        )
         ->createOne();
     $collectionEntry = CollectionEntryFactory::new()
         ->for($collection)
         ->has(
             TaxonomyTermFactory::new()
-                ->for(Taxonomy::first())
+                ->for($collection->taxonomies->first())
         )
         ->createOne();
 

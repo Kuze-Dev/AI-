@@ -23,7 +23,10 @@ it('fetch list with taxonomy', function () {
         )
         ->createOne();
 
-    TaxonomyTermFactory::new()->for($taxonomy)->count(10)->create();
+    TaxonomyTermFactory::new(['data' => ['main' => ['description' => 'Foo']]])
+        ->for($taxonomy)
+        ->count(10)
+        ->create();
 
     getJson("api/taxonomies/{$taxonomy->getRouteKey()}/terms")
         ->assertOk()
@@ -31,6 +34,7 @@ it('fetch list with taxonomy', function () {
             $json->count('data', 10)
                 ->where('data.0.type', 'taxonomyTerms')
                 ->whereType('data.0.attributes.name', 'string')
+                ->whereType('data.0.attributes.data', 'array')
                 ->etc();
         });
 });
@@ -44,13 +48,16 @@ it('fetch show taxonomyTerms with taxonomy', function () {
         )
         ->createOne();
 
-    $taxonomyTerm = TaxonomyTermFactory::new()->for($taxonomy)->createOne();
+    $taxonomyTerm = TaxonomyTermFactory::new(['data' => ['main' => ['description' => 'Foo']]])
+        ->for($taxonomy)
+        ->createOne();
 
     getJson("api/taxonomies/{$taxonomy->getRouteKey()}/terms/{$taxonomyTerm->getRouteKey()}")
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json->where('data.type', 'taxonomyTerms')
                 ->whereType('data.attributes.name', 'string')
+                ->whereType('data.attributes.data', 'array')
                 ->etc();
         });
 });

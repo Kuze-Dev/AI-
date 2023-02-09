@@ -3,10 +3,7 @@
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
-use Domain\Blueprint\Database\Factories\BlueprintFactory;
-use Domain\Blueprint\Enums\FieldType;
 use Domain\Collection\Database\Factories\CollectionFactory;
-use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 
 beforeEach(function () {
     testInTenantContext();
@@ -15,15 +12,8 @@ beforeEach(function () {
 });
 
 it('can globally search', function () {
-    $taxonomy = TaxonomyFactory::new()
-        ->createOne();
-
     $collection = CollectionFactory::new()
-        ->for(
-            BlueprintFactory::new()
-                ->addSchemaSection(['title' => 'Main'])
-                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
-        )
+        ->withDummyBlueprint()
         ->createOne([
             'name' => 'Test Collection',
             'future_publish_date_behavior' => 'private',
@@ -31,17 +21,12 @@ it('can globally search', function () {
             'is_sortable' => true,
         ]);
 
-    $collection->taxonomies()
-        ->attach([
-            $taxonomy->getKey(),
-        ]);
+    $result = Filament::getGlobalSearchProvider()
+        ->getResults($collection->name)
+        ->getCategories()['collections']
+        ->first();
 
-    $results = Filament::getGlobalSearchProvider()
-        ->getResults($collection->name);
-
-    expect(
+    expect($result->url)->toEqual(
         route('filament-tenant.resources.collections.edit', $collection->getRouteKey())
-    )->toEqual(
-        $results->getCategories()['collections']->first()->url
     );
 });
