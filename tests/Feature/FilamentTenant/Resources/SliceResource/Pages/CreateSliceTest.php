@@ -84,3 +84,30 @@ it('can not create slice with same component', function () {
         ->assertHasFormErrors(['component' => 'unique'])
         ->assertOk();
 });
+
+it('can create slice with default content', function () {
+    $blueprint = BlueprintFactory::new()
+        ->withDummySchema()
+        ->createOne();
+
+    livewire(CreateSlice::class)
+        ->fillForm([
+            'name' => 'Test',
+            'component' => 'Test',
+            'blueprint_id' => $blueprint->id,
+            'is_fixed_content' => true,
+            'data' => [
+                'name' => 'Foobar',
+            ],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk();
+
+    assertDatabaseHas(Slice::class, [
+        'name' => 'Test',
+        'component' => 'Test',
+        'blueprint_id' => $blueprint->id,
+        'is_fixed_content' => true,
+    ]);
+});
