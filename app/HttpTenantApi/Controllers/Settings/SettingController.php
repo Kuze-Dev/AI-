@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Settings;
 
-use App\HttpTenantApi\Resources\SettingsApiResources\SiteSettingResource;
+use App\HttpTenantApi\Resources\SettingsApiResources\SettingResource;
 use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\RouteAttributes\Attributes\Get;
 use TiMacDonald\JsonApi\JsonApiResource;
@@ -17,14 +17,8 @@ class SettingController
         $resource = null;
 
         foreach ($settingsContainer->getSettingClasses() as $settingsClass) {
-            if ($settingsClass::group() == $group) {
-                $resource = match ($group) {
-                    #add here new settings resource
-                    'site' => SiteSettingResource::make(app($settingsClass)),
-
-                    default => null,
-                };
-            }
+            ($settingsClass::group() == $group) ?
+                $resource = SettingResource::make(app($settingsClass)) : null;
         }
 
         if ( ! $resource) {

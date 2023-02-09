@@ -13,27 +13,20 @@ use TiMacDonald\JsonApi\JsonApiResource;
  * @property-read string $logo
  * @property-read string $favicon
  */
-class SiteSettingResource extends JsonApiResource
+class SettingResource extends JsonApiResource
 {
     public function toId($request): string
     {
-        return $request->group;
+        return $this->resource::group();
     }
 
     public function toType($request): string
     {
-        return 'Settings';
+        return 'settings';
     }
 
     public function toAttributes($request): array
     {
-        return [
-            'name' => $this->name,
-            'description' => $this->description,
-            'author' => $this->author,
-            'logo' => $this->logo,
-            'favicon' => $this->favicon,
-
-        ];
+        return $this->resource->toArray();
     }
 }
