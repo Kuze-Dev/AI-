@@ -6,7 +6,6 @@ namespace App\HttpTenantApi\Resources;
 
 use TiMacDonald\JsonApi\JsonApiResource;
 
-
 class SettingResource extends JsonApiResource
 {
     public function toId($request): string
