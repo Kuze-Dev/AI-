@@ -26,7 +26,6 @@ return new class () extends Migration {
             $table->foreignIdFor(TaxonomyTerm::class, 'parent_id')->nullable()->index();
             $table->string('name')->unique();
             $table->string('slug')->unique();
-            // $table->text('description')->nullable();
             $table->json('data');
             $table->unsignedInteger('order');
             $table->timestamps();

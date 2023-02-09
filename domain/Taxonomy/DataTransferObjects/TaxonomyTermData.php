@@ -8,9 +8,9 @@ class TaxonomyTermData
 {
     public function __construct(
         public readonly string $name,
+        public readonly array $data,
         public readonly ?string $slug = null,
         public readonly ?int $id = null,
-        public readonly ?array $data = [],
         public readonly ?array $children = [],
     ) {
     }
@@ -19,9 +19,9 @@ class TaxonomyTermData
     {
         return new self(
             name: $data['name'],
+            data: $data['data'],
             slug:$data['slug'] ?? null,
             id: $data['id'] ?? null,
-            data: $data['data'] ?? null,
             children: array_map(fn (array $child) => self::fromArray($child), $data['children'] ?? [])
         );
     }

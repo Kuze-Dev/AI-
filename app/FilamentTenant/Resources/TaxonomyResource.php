@@ -87,7 +87,6 @@ class TaxonomyResource extends Resource
                         ->preload()
                         ->disabled(fn (?Taxonomy $record) => $record !== null),
                 ]),
-
                 Forms\Components\Section::make(trans('Terms'))->schema([
                     Tree::make('terms')
                         ->formatStateUsing(
@@ -110,7 +109,7 @@ class TaxonomyResource extends Resource
                                         ->unique(ignoreRecord: true)
                                         ->rules('alpha_dash')
                                         ->disabled(),
-                                    SchemaFormBuilder::make('data', fn (Taxonomy $record) => $record->blueprint?->schema),
+                                    SchemaFormBuilder::make('data', fn (Taxonomy $record) => $record->blueprint->schema),
                                 ]),
                         ]),
 
