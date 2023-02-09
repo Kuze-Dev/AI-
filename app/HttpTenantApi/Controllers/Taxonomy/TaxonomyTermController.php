@@ -17,14 +17,15 @@ class TaxonomyTermController
     public function index(Taxonomy $taxonomy): JsonApiResourceCollection
     {
         return TaxonomyTermResource::collection(
-            QueryBuilder::for($taxonomy->taxonomyTerms()->select(['taxonomy_id', 'name', 'slug', 'description']))
+            QueryBuilder::for($taxonomy->taxonomyTerms())
                 ->allowedFilters(['name', 'slug'])
+                ->with('taxonomy')
                 ->jsonPaginate()
         );
     }
 
     public function show(Taxonomy $taxonomy, TaxonomyTerm $taxonomyTerm): TaxonomyTermResource
     {
-        return TaxonomyTermResource::make($taxonomyTerm);
+        return TaxonomyTermResource::make($taxonomyTerm->load('taxonomy'));
     }
 }

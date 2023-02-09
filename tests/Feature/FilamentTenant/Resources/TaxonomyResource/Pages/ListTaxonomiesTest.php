@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\TaxonomyResource\Pages\ListTaxonomies;
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Blueprint\Enums\FieldType;
 use Domain\Collection\Database\Factories\CollectionFactory;
 use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
@@ -27,6 +29,7 @@ it('can render page', function () {
 
 it('can list taxonomys', function () {
     $taxonomies = TaxonomyFactory::new()
+        ->withDummyBlueprint()
         ->count(5)
         ->create();
 
@@ -37,20 +40,26 @@ it('can list taxonomys', function () {
 
 it('can delete taxonomy', function () {
     $taxonomy = TaxonomyFactory::new()
-        ->has(TaxonomyTermFactory::new())
-        ->createOne();
-    $taxonomyTerm = $taxonomy->taxonomyTerms->first();
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+        )
+        ->has(TaxonomyTermFactory::new(['data' => ['main' => ['desciption' => 'Foo']]]))
+        ->createOne()
+        ->load('taxonomyTerms');
 
     livewire(ListTaxonomies::class)
         ->callTableAction(DeleteAction::class, $taxonomy)
         ->assertOk();
 
     assertModelMissing($taxonomy);
-    assertModelMissing($taxonomyTerm);
+    assertModelMissing($taxonomy->taxonomyTerms->first());
 });
 
 it('can\'t delete taxonomy with existing collections', function () {
     $taxonomy = TaxonomyFactory::new()
+        ->withDummyBlueprint()
         ->createOne();
 
     CollectionFactory::new()

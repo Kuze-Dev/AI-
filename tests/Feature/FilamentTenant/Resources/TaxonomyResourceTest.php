@@ -15,6 +15,7 @@ beforeEach(function () {
 
 it('can globally search', function () {
     $taxonomy = TaxonomyFactory::new()
+        ->withDummyBlueprint()
         ->createOne();
 
     $results = Filament::getGlobalSearchProvider()
@@ -26,6 +27,7 @@ it('can globally search', function () {
 
 it('can globally search using taxonomy term name', function () {
     $taxonomy = TaxonomyFactory::new()
+        ->withDummyBlueprint()
         ->has(TaxonomyTermFactory::new())
         ->createOne();
 
