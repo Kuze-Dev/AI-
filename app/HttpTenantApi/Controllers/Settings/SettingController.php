@@ -17,6 +17,7 @@ class SettingController
         /** @var class-string<\Spatie\LaravelSettings\Settings>|null */
         $settingClass = $settingsContainer->getSettingClasses()
             ->first(fn (string $settingsClass) => $settingsClass::group() === $group);
+
         if ($settingClass === null) {
             abort(404);
         }
