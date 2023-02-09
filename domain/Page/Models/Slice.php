@@ -48,6 +48,12 @@ class Slice extends Model implements IsActivitySubject
         'blueprint_id',
         'name',
         'component',
+        'is_fixed_content',
+        'data'
+    ];
+
+    protected $casts = [
+        'data' => 'array',
     ];
 
     public function getActivitylogOptions(): LogOptions
