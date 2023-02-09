@@ -82,6 +82,7 @@ class PageResource extends Resource
                         ->itemLabel(fn (array $state) => self::getCachedSlices()->firstWhere('id', $state['slice_id'])?->name)
                         ->disableLabel()
                         ->minItems(1)
+                        ->collapsed()
                         ->collapsible()
                         ->orderable('order')
                         ->schema([
