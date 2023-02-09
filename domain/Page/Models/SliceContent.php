@@ -46,7 +46,7 @@ class SliceContent extends Model implements Sortable
     ];
 
     protected $with = [
-        'slice'
+        'slice',
     ];
 
     protected $casts = [
@@ -65,8 +65,9 @@ class SliceContent extends Model implements Sortable
         return static::query()->where('page_id', $this->page_id);
     }
 
+    /** @return Attribute<array|Slice|null, static> */
     protected function data(): Attribute
     {
-        return Attribute::get( fn() => $this->slice->is_fixed_content ? $this->slice->data : $this->slice);
+        return Attribute::get(fn () => $this->slice->is_fixed_content ? $this->slice->data : $this->slice);
     }
 }

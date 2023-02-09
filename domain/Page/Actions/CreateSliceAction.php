@@ -15,7 +15,7 @@ class CreateSliceAction
             'name' => $sliceData->name,
             'component' => $sliceData->component,
             'blueprint_id' => $sliceData->blueprint_id,
-            'data'      => $sliceData->data,
+            'data' => $sliceData->data,
             'is_fixed_content' => $sliceData->is_fixed_content,
         ]);
     }

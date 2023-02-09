@@ -49,7 +49,7 @@ class Slice extends Model implements IsActivitySubject
         'name',
         'component',
         'is_fixed_content',
-        'data'
+        'data',
     ];
 
     protected $casts = [

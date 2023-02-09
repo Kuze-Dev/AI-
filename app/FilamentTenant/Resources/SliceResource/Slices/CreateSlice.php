@@ -26,7 +26,7 @@ class CreateSlice extends CreateRecord
                     component: $data['component'],
                     blueprint_id: $data['blueprint_id'],
                     is_fixed_content: $data['is_fixed_content'],
-                    data: $data['data'],
+                    data: $data['data'] ?? null,
                 ))
         );
     }

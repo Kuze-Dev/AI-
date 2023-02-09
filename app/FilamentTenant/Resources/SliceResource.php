@@ -18,6 +18,7 @@ use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 use Closure;
+
 class SliceResource extends Resource
 {
     use ContextualResource;
@@ -60,7 +61,7 @@ class SliceResource extends Resource
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
                     ->hidden(fn (Closure $get) => $get('is_fixed_content') ? false : true)
-                    ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()->schema : null),
+                    ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
             ]),
         ]);
     }

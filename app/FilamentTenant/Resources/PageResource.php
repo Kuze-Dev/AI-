@@ -62,7 +62,6 @@ class PageResource extends Resource
                 ->schema([
                     Forms\Components\Repeater::make('slice_contents')
                         ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Page $record, ?array $state) {
-                           
                             if ($record === null || $record->sliceContents->isEmpty()) {
                                 $component->state($state ?? []);
 
@@ -99,28 +98,21 @@ class PageResource extends Resource
                                 ->exists(Slice::class, 'id')
                                 ->searchable()
                                 ->reactive()
-                                ->afterStateUpdated( function (Forms\Components\Select $component, $state) {
-                                    $slice = Slice::find($state);
+                                ->afterStateUpdated(function (Forms\Components\Select $component, $state) {
+                                    $slice = self::getCachedSlices()->firstWhere('id', $state);
 
                                     $component->getContainer()
                                         ->getComponent(fn (Component $component) => $component->getId() === 'schema-form')
                                         ?->getChildComponentContainer()
                                         ->fill($slice?->is_fixed_content ? $slice->data : []);
                                 })
-                                ->dehydrateStateUsing(fn (string|int $state) => (int) $state), 
-                                    // fn (Forms\Components\Select $component) => $component->getContainer()
-                                    //     ->getComponent(fn (Component $component) => $component->getId() === 'schema-form')
-                                    //     ?->getChildComponentContainer()
-                                    //     ->fill()
-                                // )
-                                // ->dehydrateStateUsing(fn (string|int $state) => (int) $state),
-                                SchemaFormBuilder::make('data')
+                                ->dehydrateStateUsing(fn (string|int $state) => (int) $state),
+                            SchemaFormBuilder::make('data')
                                 ->id('schema-form')
-                                ->disabled(fn (Closure $get) => Slice::find($get('slice_id'))?->is_fixed_content ?? false)
+                                ->dehydrated(fn (Closure $get) => ! (self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->is_fixed_content))
+                                ->disabled(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->is_fixed_content ?? false)
                                 ->schemaData(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->blueprint->schema),
-                            // SchemaFormBuilder::make('data')
-                            //     ->id('schema-form')
-                            //     ->schemaData(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->blueprint->schema),
+
                         ]),
                 ]),
         ]);
