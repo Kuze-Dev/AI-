@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\TaxonomyResource;
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Blueprint\Enums\FieldType;
 use Filament\Facades\Filament;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
@@ -15,6 +17,11 @@ beforeEach(function () {
 
 it('can globally search', function () {
     $taxonomy = TaxonomyFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+        )
         ->createOne();
 
     $results = Filament::getGlobalSearchProvider()
@@ -26,6 +33,11 @@ it('can globally search', function () {
 
 it('can globally search using taxonomy term name', function () {
     $taxonomy = TaxonomyFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+        )
         ->has(TaxonomyTermFactory::new())
         ->createOne();
 

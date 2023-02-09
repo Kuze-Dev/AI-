@@ -45,12 +45,6 @@ class TaxonomyResource extends Resource
         return [trans('Total terms') => $record->taxonomy_terms_count];
     }
 
-    // /** @param Taxonomy $record */
-    // public static function getGlobalSearchResultUrl(Model $record): ?string
-    // {
-    //     return self::getUrl('edit', [$record->taxonomy, $record]);
-    // }
-
     /** @return Builder<Taxonomy> */
     protected static function getGlobalSearchEloquentQuery(): Builder
     {

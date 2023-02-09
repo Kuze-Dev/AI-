@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Blueprint\Enums\FieldType;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -12,7 +15,13 @@ beforeEach(function () {
 });
 
 it('fetch list with taxonomy', function () {
-    $taxonomy = TaxonomyFactory::new()->createOne();
+    $taxonomy = TaxonomyFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+        )
+        ->createOne();
 
     TaxonomyTermFactory::new()->for($taxonomy)->count(10)->create();
 
@@ -27,7 +36,13 @@ it('fetch list with taxonomy', function () {
 });
 
 it('fetch show taxonomyTerms with taxonomy', function () {
-    $taxonomy = TaxonomyFactory::new()->createOne();
+    $taxonomy = TaxonomyFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+        )
+        ->createOne();
 
     $taxonomyTerm = TaxonomyTermFactory::new()->for($taxonomy)->createOne();
 
