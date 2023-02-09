@@ -24,19 +24,24 @@ use Spatie\Sluggable\SlugOptions;
  * Domain\Taxonomy\Models\Taxonomy
  *
  * @property int $id
+ * @property string $blueprint_id
  * @property string $name
  * @property string $slug
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
  * @property-read int|null $activities_count
+ * @property-read Blueprint $blueprint
  * @property-read \Illuminate\Database\Eloquent\Collection|Collection[] $collections
  * @property-read int|null $collections_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Taxonomy\Models\TaxonomyTerm[] $parentTerms
+ * @property-read int|null $parent_terms_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Taxonomy\Models\TaxonomyTerm[] $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy whereBlueprintId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy whereName($value)

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Taxonomy\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Collection\Models\CollectionEntry;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -12,10 +11,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 use Spatie\Sluggable\HasSlug;
@@ -26,37 +21,38 @@ use Illuminate\Database\Eloquent\Builder;
  * Domain\Taxonomy\Models\TaxonomyTerm
  *
  * @property int $id
- * @property string $taxonomy_id
- * @property int $name
+ * @property int $taxonomy_id
  * @property int|null $parent_id
- * @property string|null $slug
- * @property string|null $description
+ * @property string $name
+ * @property string $slug
+ * @property array $data
  * @property int $order
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|TaxonomyTerm[] $children
  * @property-read int|null $children_count
- * @property-read \Domain\Taxonomy\Models\Taxonomy|null $taxonomy
+ * @property-read \Illuminate\Database\Eloquent\Collection|CollectionEntry[] $collectionEntries
+ * @property-read int|null $collection_entries_count
+ * @property-read \Domain\Taxonomy\Models\Taxonomy $taxonomy
  * @method static Builder|TaxonomyTerm newModelQuery()
  * @method static Builder|TaxonomyTerm newQuery()
  * @method static Builder|TaxonomyTerm ordered(string $direction = 'asc')
  * @method static Builder|TaxonomyTerm query()
  * @method static Builder|TaxonomyTerm whereCreatedAt($value)
+ * @method static Builder|TaxonomyTerm whereData($value)
  * @method static Builder|TaxonomyTerm whereId($value)
- * @method static Builder|TaxonomyTerm whereTaxonomyId($value)
+ * @method static Builder|TaxonomyTerm whereName($value)
  * @method static Builder|TaxonomyTerm whereOrder($value)
  * @method static Builder|TaxonomyTerm whereParentId($value)
- * @method static Builder|TaxonomyTerm whereName($value)
  * @method static Builder|TaxonomyTerm whereSlug($value)
- * @method static Builder|TaxonomyTerm whereDescription($value)
+ * @method static Builder|TaxonomyTerm whereTaxonomyId($value)
  * @method static Builder|TaxonomyTerm whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['collectionEntries', 'children'])]
-class TaxonomyTerm extends Model implements IsActivitySubject, Sortable
+class TaxonomyTerm extends Model implements Sortable
 {
     use HasSlug;
-    use LogsActivity;
     use SortableTrait;
     use ConstraintsRelationships;
 
@@ -70,19 +66,6 @@ class TaxonomyTerm extends Model implements IsActivitySubject, Sortable
     ];
 
     protected $casts = ['data' => 'array'];
-
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logFillable()
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
-    }
-
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Taxonomy Term: '.$this->name;
-    }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\Taxonomy, \Domain\Taxonomy\Models\TaxonomyTerm> */
     public function taxonomy(): BelongsTo
