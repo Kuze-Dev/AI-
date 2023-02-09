@@ -61,13 +61,17 @@ it('can edit page', function () {
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
+            'route_url' => 'test-url',
             'slice_contents.record-1.data.main.header' => 'Bar',
         ])
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk();
 
-    assertDatabaseHas(Page::class, ['name' => 'Test']);
+    assertDatabaseHas(Page::class, [
+        'name' => 'Test',
+        'route_url' => 'test-url',
+    ]);
     assertDatabaseHas(SliceContent::class, [
         'page_id' => $page->id,
         'slice_id' => $page->sliceContents->first()->slice_id,

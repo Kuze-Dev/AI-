@@ -68,7 +68,7 @@ it('can edit page', function () {
                             'description' => 'Gwapa siya',
                         ],
                     ],
-                    'childs' => [
+                    'children' => [
                         [
                             'name' => 'Test 3 Edit Home',
                             'slug' => 'test-3-edit-home',

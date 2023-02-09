@@ -25,6 +25,7 @@ it('can update page', function () {
             PageData::fromArray([
                 'name' => 'Foo',
                 'slug' => 'foo',
+                'route_url' => 'foo',
                 'slice_contents' => [
                     [
                         'slice_id' => $page->sliceContents->first()->slice_id,

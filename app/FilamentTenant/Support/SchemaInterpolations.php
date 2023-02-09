@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Forms\Components;
+namespace App\FilamentTenant\Support;
 
 use Filament\Forms\Components\Component;
 use Closure;
@@ -10,7 +10,7 @@ use Domain\Blueprint\DataTransferObjects\SchemaData;
 
 class SchemaInterpolations extends Component
 {
-    protected string $view = 'forms.components.schema-interpolations';
+    protected string $view = 'filament.forms.schema-interpolations';
 
     protected SchemaData|Closure|null $schemaData = null;
 
@@ -42,5 +42,18 @@ class SchemaInterpolations extends Component
     public function getSchemaData(): ?SchemaData
     {
         return $this->evaluate($this->schemaData);
+    }
+
+    public function getInterpolations(): array
+    {
+        $interpolations = [];
+
+        foreach ($this->getSchemaData()?->sections ?? [] as $section) {
+            foreach ($section->fields as $field) {
+                $interpolations[] = "{{ \${$section->state_name}[{$field->state_name}] }}";
+            }
+        }
+
+        return $interpolations;
     }
 }

@@ -37,10 +37,12 @@ it('can delete page', function () {
     $page = PageFactory::new()
         ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
         ->createOne();
+    $sliceContent = $page->sliceContents->first();
 
     livewire(ListPages::class)
         ->callTableAction(DeleteAction::class, $page)
         ->assertOk();
 
     assertModelMissing($page);
+    assertModelMissing($sliceContent);
 });

@@ -43,7 +43,7 @@ it('can edit menu', function () {
                         'label' => 'Test Edit Node',
                         'url' => 'https://test-edit-node.com',
                         'target' => '_blank',
-                        'childs' => [
+                        'children' => [
                             [
                                 'label' => 'Test Edit Child',
                                 'url' => 'https://test-edit-child.com',

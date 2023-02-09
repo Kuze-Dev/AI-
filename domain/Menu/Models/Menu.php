@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Domain\Menu\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
@@ -37,10 +39,12 @@ use Spatie\Sluggable\SlugOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|Menu whereUpdatedAt($value)
  * @mixin \Eloquent
  */
+#[OnDeleteCascade(['parentNodes'])]
 class Menu extends Model implements IsActivitySubject
 {
     use HasSlug;
     use LogsActivity;
+    use ConstraintsRelationships;
 
     protected $fillable = [
         'name',
