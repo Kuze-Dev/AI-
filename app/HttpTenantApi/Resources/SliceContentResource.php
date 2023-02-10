@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
+use App\HttpTenantApi\Resources\Concerns\TransformsSchemaPayload;
+use Domain\Blueprint\DataTransferObjects\SchemaData;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
@@ -11,10 +13,12 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class SliceContentResource extends JsonApiResource
 {
+    use TransformsSchemaPayload;
+
     public function toAttributes($request): array
     {
         return  [
-            'data' => $this->slice->is_fixed_content ? $this->slice->data : $this->data,
+            'data' => $this->transformSchemaPayload($this->slice->is_fixed_content ? $this->slice->data : $this->data ?? []),
             'order' => $this->order,
         ];
     }
@@ -24,5 +28,10 @@ class SliceContentResource extends JsonApiResource
         return [
             'slice' => fn () => SliceResource::make($this->slice),
         ];
+    }
+
+    protected function getSchemaData(): SchemaData
+    {
+        return $this->slice->blueprint->schema;
     }
 }

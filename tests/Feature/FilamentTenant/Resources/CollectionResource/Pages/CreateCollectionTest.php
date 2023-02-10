@@ -64,6 +64,7 @@ it('can create collection with taxonomies', function () {
         ->createOne();
 
     $taxonomies = TaxonomyFactory::new()
+        ->withDummyBlueprint()
         ->count(2)
         ->create();
 

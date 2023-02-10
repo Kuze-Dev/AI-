@@ -60,7 +60,7 @@ class SyncTermTreeAction
             'name' => $termData->name,
             'slug' => $termData->slug,
             'parent_id' => $parentTerm?->id,
-            'description' => $termData->description,
+            'data' => $termData->data,
         ])->save();
 
         if ( ! empty($termData->children)) {

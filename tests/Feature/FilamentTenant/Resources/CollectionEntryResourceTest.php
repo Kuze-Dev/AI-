@@ -6,10 +6,7 @@ use Filament\Facades\Filament;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Collection\Database\Factories\CollectionFactory;
-use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
-use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Collection\Database\Factories\CollectionEntryFactory;
-use Carbon\Carbon;
 
 beforeEach(function () {
     testInTenantContext();
@@ -18,58 +15,24 @@ beforeEach(function () {
 });
 
 it('can globally search', function () {
-    $taxonomy = TaxonomyFactory::new()
-        ->createOne();
-
-    $taxonomyTermsInitial = TaxonomyTermFactory::new()
-        ->for($taxonomy)
-        ->count(2)
-        ->create();
-
-    $taxonomyTermsForUpdate = TaxonomyTermFactory::new()
-        ->for($taxonomy)
-        ->count(2)
-        ->create();
-
-    $collection = CollectionFactory::new()
-        ->for(
-            BlueprintFactory::new()
-                ->addSchemaSection(['title' => 'Main'])
-                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
-        )
-        ->createOne([
-            'name' => 'Test Collection',
-            'future_publish_date_behavior' => 'public',
-            'past_publish_date_behavior' => 'unlisted',
-        ]);
-    $collection->taxonomies()->attach([$taxonomy->getKey()]);
-
-    $dateTime = Carbon::now();
-
-    $originalData = [
-        'title' => 'Test',
-        'slug' => 'test',
-        'published_at' => $dateTime,
-        'data' => json_encode(['main' => ['header' => 'Foo']]),
-    ];
-
     $collectionEntry = CollectionEntryFactory::new()
-        ->for(
-            $collection
-        )
-        ->createOne($originalData);
+        ->for(CollectionFactory::new()
+            ->for(
+                BlueprintFactory::new()
+                    ->addSchemaSection(['title' => 'Main'])
+                    ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+            ))
+        ->createOne(['data' => ['main' => ['header' => 'Foo']]]);
 
-    $collectionEntry->taxonomyTerms()->attach($taxonomyTermsInitial->pluck('id'));
+    $result = Filament::getGlobalSearchProvider()
+        ->getResults($collectionEntry->title)
+        ->getCategories()['collection entries']
+        ->first();
 
-    $results = Filament::getGlobalSearchProvider()
-        ->getResults($collectionEntry->title);
-
-    expect(
+    expect($result->url)->toEqual(
         route('filament-tenant.resources.collections.entries.edit', [
-            'ownerRecord' => $collection,
+            'ownerRecord' => $collectionEntry->collection,
             'record' => $collectionEntry,
         ])
-    )->toEqual(
-        $results->getCategories()['collection entries']->first()->url
     );
 });

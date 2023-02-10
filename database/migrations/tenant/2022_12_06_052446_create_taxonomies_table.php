@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Domain\Blueprint\Models\Blueprint as ModelsBlueprint;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Migrations\Migration;
@@ -13,6 +14,7 @@ return new class () extends Migration {
     {
         Schema::create('taxonomies', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(ModelsBlueprint::class)->index();
             $table->string('name')->unique();
             $table->string('slug')->unique();
             $table->timestamps();
@@ -24,7 +26,7 @@ return new class () extends Migration {
             $table->foreignIdFor(TaxonomyTerm::class, 'parent_id')->nullable()->index();
             $table->string('name')->unique();
             $table->string('slug')->unique();
-            $table->text('description')->nullable();
+            $table->json('data');
             $table->unsignedInteger('order');
             $table->timestamps();
         });

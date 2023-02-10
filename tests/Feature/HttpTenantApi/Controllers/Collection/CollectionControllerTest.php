@@ -32,7 +32,10 @@ it('can list collections', function () {
 it('can list collections with taxonomies', function () {
     CollectionFactory::new()
         ->withDummyBlueprint()
-        ->has(TaxonomyFactory::new())
+        ->has(
+            TaxonomyFactory::new()
+                ->withDummyBlueprint()
+        )
         ->count(10)
         ->create();
 
@@ -51,7 +54,6 @@ it('can list collections with taxonomies', function () {
 it('can show a collection', function () {
     $collection = CollectionFactory::new()
         ->withDummyBlueprint()
-        ->has(TaxonomyFactory::new())
         ->createOne();
 
     getJson('api/collections/' . $collection->getRouteKey())
@@ -68,7 +70,10 @@ it('can show a collection', function () {
 it('can show a collection with includes', function (string $include) {
     $collection = CollectionFactory::new()
         ->withDummyBlueprint()
-        ->has(TaxonomyFactory::new())
+        ->has(
+            TaxonomyFactory::new()
+                ->withDummyBlueprint()
+        )
         ->createOne();
 
     getJson("api/collections/{$collection->getRouteKey()}?" . http_build_query(['include' => $include]))

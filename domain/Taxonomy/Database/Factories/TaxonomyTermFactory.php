@@ -20,8 +20,8 @@ class TaxonomyTermFactory extends Factory
             'taxonomy_id' => null,
             'parent_id' => null,
             'name' => $this->faker->name(),
-            'description' => $this->faker->paragraph(),
             'order' => null,
+            'data' => [],
         ];
     }
 }

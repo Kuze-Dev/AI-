@@ -4,20 +4,27 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
+use App\HttpTenantApi\Resources\Concerns\TransformsSchemaPayload;
+use Domain\Blueprint\DataTransferObjects\SchemaData;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @property-read string $name
- * @property-read string|null $description
- * @property-read \Domain\Taxonomy\Models\Taxonomy $taxonomy
+ * @mixin \Domain\Taxonomy\Models\TaxonomyTerm
  */
 class TaxonomyTermResource extends JsonApiResource
 {
+    use TransformsSchemaPayload;
+
     public function toAttributes($request): array
     {
         return  [
             'name' => $this->name,
-            'description' => $this->description,
+            'data' => $this->transformSchemaPayload($this->data),
         ];
+    }
+
+    protected function getSchemaData(): SchemaData
+    {
+        return $this->taxonomy->blueprint->schema;
     }
 }
