@@ -173,4 +173,4 @@ it('page slice with default value column data must be dehydrated', function () {
         'page_id' => $page->id,
         'data' => null,
     ]);
-})->only();
+});
