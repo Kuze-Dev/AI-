@@ -143,6 +143,7 @@ it('page slice with default value will fill the slices fields', function () {
 });
 
 it('page slice with default value column data must be dehydrated', function () {
+
     $page = PageFactory::new(['slug' => 'foo'])
         ->addSliceContent(
             SliceFactory::new(
@@ -172,4 +173,4 @@ it('page slice with default value column data must be dehydrated', function () {
         'page_id' => $page->id,
         'data' => null,
     ]);
-});
+})->only();

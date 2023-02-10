@@ -65,9 +65,10 @@ class SliceContent extends Model implements Sortable
         return static::query()->where('page_id', $this->page_id);
     }
 
-    /** @return Attribute<array|null, static> */
-    protected function data(): Attribute
-    {
-        return Attribute::get(fn () => $this->slice->is_fixed_content ? $this->slice->data : $this->attributes['data']);
-    }
+    // /** @return Attribute<array|null, static> */
+    // protected function data(): Attribute
+    // {
+    //     // return Attribute::get(fn () => $this->attributes[])
+    //     return Attribute::get(fn () => $this->slice->is_fixed_content ? $this->slice->data : $this->attributes['data']);
+    // }
 }
