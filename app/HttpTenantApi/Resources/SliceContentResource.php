@@ -18,7 +18,7 @@ class SliceContentResource extends JsonApiResource
     public function toAttributes($request): array
     {
         return  [
-            'data' => $this->transformSchemaPayload( ($this->slice->is_fixed_content ? $this->slice->data : $this->data ) ?? []),
+            'data' => $this->transformSchemaPayload(($this->slice->is_fixed_content ? $this->slice->data : $this->data) ?? []),
             'order' => $this->order,
         ];
     }
