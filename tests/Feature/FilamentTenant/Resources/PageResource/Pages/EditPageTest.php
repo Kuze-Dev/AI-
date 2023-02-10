@@ -114,7 +114,7 @@ it('can edit page slug', function () {
 });
 
 it('page slice with default value will fill the slices fields', function () {
-    $page = PageFactory::new(['slug' => 'foo'])
+    $page = PageFactory::new()
         ->addSliceContent(
             SliceFactory::new(
                 [
