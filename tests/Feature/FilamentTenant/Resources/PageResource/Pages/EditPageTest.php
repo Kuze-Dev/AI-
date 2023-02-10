@@ -95,6 +95,7 @@ it('can edit page slug', function () {
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'slug' => 'new-foo',
+            'slice_contents.record-1.data.main.header' => 'Bar',
         ])
         ->call('save')
         ->assertHasNoFormErrors()
