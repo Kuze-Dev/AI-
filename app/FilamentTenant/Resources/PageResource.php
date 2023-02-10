@@ -105,7 +105,7 @@ class PageResource extends Resource
                                         $component->getContainer()
                                             ->getComponent(fn (Component $component) => $component->getId() === 'schema-form')
                                             ?->getChildComponentContainer()
-                                            ->fill($slice?->is_fixed_content ? $slice->data : []);
+                                            ->fill($slice->data);
                                     }
                                 })
                                 ->afterStateUpdated(function (Forms\Components\Select $component, $state) {
