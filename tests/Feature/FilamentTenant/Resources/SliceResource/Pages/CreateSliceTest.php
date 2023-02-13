@@ -112,6 +112,6 @@ it('can create slice with default content', function () {
         'component' => 'Test',
         'blueprint_id' => $blueprint->id,
         'is_fixed_content' => true,
-        'data' => json_encode(['main' => ['title' => 'Foobar']])
+        'data' => json_encode(['main' => ['title' => 'Foobar']]),
     ]);
 });
