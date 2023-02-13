@@ -14,6 +14,7 @@ use App\FilamentTenant\Resources\CollectionResource;
 use Carbon\Carbon;
 use Domain\Collection\Actions\UpdateCollectionEntryAction;
 use Domain\Collection\Models\Collection;
+use Domain\Support\MetaTag\DataTransferObjects\MetaTagData;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\DeleteAction;
 
@@ -105,7 +106,13 @@ class EditCollectionEntry extends EditRecord
                     slug: $data['slug'],
                     taxonomy_terms: $data['taxonomy_terms'] ?? [],
                     published_at: isset($data['published_at']) ? Carbon::parse($data['published_at']) : null,
-                    data: $data['data']
+                    data: $data['data'],
+                    meta_tags: new MetaTagData(
+                        title: $data['meta_tags']['title'],
+                        author: $data['meta_tags']['author'],
+                        description: $data['meta_tags']['description'],
+                        keywords: $data['meta_tags']['keywords'],
+                    )
                 ))
         );
     }

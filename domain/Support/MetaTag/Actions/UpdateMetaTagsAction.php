@@ -9,17 +9,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class UpdateMetaTagsAction
 {
-    public function execute(MetaTagData $metaTagData): Model
+    public function execute(Model $model, MetaTagData $metaTagData): Model
     {
-        $metaTags = $metaTagData->model->metaTags()
-            ->first()
+        $model->metaTags
             ->update([
-                'title' => $metaTagData->meta_title == null ? $metaTagData->model->slug : $metaTagData->meta_title,
-                'description' => $metaTagData->meta_description,
-                'author' => $metaTagData->meta_author,
-                'keywords' => $metaTagData->meta_keywords,
+                'title' => $metaTagData->title == null ? $model->slug : $metaTagData->title,
+                'description' => $metaTagData->description,
+                'author' => $metaTagData->author,
+                'keywords' => $metaTagData->keywords,
             ]);
 
-        return $metaTags;
+        return $model;
     }
 }

@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Domain\Collection\Models\Collection;
+use Domain\Support\MetaTag\DataTransferObjects\MetaTagData;
 
 class CreateCollectionEntry extends CreateRecord
 {
@@ -69,7 +70,13 @@ class CreateCollectionEntry extends CreateRecord
                     slug: $data['slug'],
                     published_at: isset($data['published_at']) ? Carbon::parse($data['published_at']) : null,
                     taxonomy_terms: $data['taxonomy_terms'] ?? [],
-                    data: $data['data']
+                    data: $data['data'],
+                    meta_tags: new MetaTagData(
+                        title: $data['meta_tags']['title'],
+                        author: $data['meta_tags']['author'],
+                        description: $data['meta_tags']['description'],
+                        keywords: $data['meta_tags']['keywords'],
+                    )
                 ))
         );
     }

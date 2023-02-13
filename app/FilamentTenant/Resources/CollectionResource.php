@@ -16,7 +16,6 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
-use Domain\Support\MetaTag\MetaTagsForm;
 use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -144,7 +143,6 @@ class CollectionResource extends Resource
                             ->reactive(),
                     ]),
                 ]),
-                MetaTagsForm::formBuilder(),
             ]);
     }
 

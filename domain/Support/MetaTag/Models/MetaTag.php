@@ -6,6 +6,7 @@ namespace Domain\Support\MetaTag\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -41,7 +42,8 @@ class MetaTag extends Model implements IsActivitySubject
         return 'Meta tags: '.$this->title;
     }
 
-    public function taggable()
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model, \Domain\Support\MetaTag\Models\MetaTag> */
+    public function taggable(): MorphTo
     {
         return $this->morphTo();
     }
