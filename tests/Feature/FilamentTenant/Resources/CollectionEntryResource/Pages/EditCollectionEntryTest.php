@@ -96,9 +96,18 @@ it('can edit collection entry', function () {
             'data' => ['main' => ['header' => 'Foo']],
         ]);
 
+    $metaDataData = [
+        'title' => $collectionEntry->slug,
+        'description' => 'Foo description',
+        'author' => 'Foo author',
+        'keywords' => 'Foo keywords',
+    ];
+
+    $collectionEntry->metaData()->create($metaDataData);
+    
     $dateTime = Carbon::now();
 
-    livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
+    $updatedCollectionEntry = livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
         ->fillForm([
             'title' => 'New Foo',
             'published_at' => $dateTime,
@@ -106,16 +115,37 @@ it('can edit collection entry', function () {
             'taxonomies' => [
                 $collection->taxonomies->first()->id => $taxonomyTerms->pluck('id'),
             ],
+            'meta_data' => [
+                'title' => '',
+                'description' => '',
+                'author' => '',
+                'keywords' => '',
+            ],
         ])
         ->call('save')
         ->assertOk()
-        ->assertHasNoFormErrors();
+        ->assertHasNoFormErrors()
+        ->instance()
+        ->record;
 
     assertDatabaseHas(CollectionEntry::class, [
         'title' => 'New Foo',
         'published_at' => $dateTime,
         'data' => json_encode(['main' => ['header' => 'Foo updated']]),
     ]);
+
+    assertDatabaseHas(
+        MetaData::class,
+        [
+            'title' => $updatedCollectionEntry->slug,
+            'description' => null,
+            'author' => null,
+            'keywords' => null, 
+            'taggable_type' => $updatedCollectionEntry->getMorphClass(),
+            'taggable_id' => $updatedCollectionEntry->id,
+        ]
+    );
+
     foreach ($taxonomyTerms as $taxonomyTerm) {
         assertDatabaseHas('collection_entry_taxonomy_term', [
             'taxonomy_term_id' => $taxonomyTerm->getKey(),
@@ -140,11 +170,22 @@ it('can edit collection entry slug', function () {
             'data' => ['main' => ['header' => 'Foo']],
         ]);
 
+    $metaDataData = [
+        'title' => $collectionEntry->slug,
+        'description' => 'Foo description',
+        'author' => 'Foo author',
+        'keywords' => 'Foo keywords',
+    ];
+
+    $collectionEntry->metaData()->create($metaDataData);
+
     livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
         ->fillForm(['slug' => 'new-foo'])
         ->call('save')
         ->assertOk()
-        ->assertHasNoFormErrors();
+        ->assertHasNoFormErrors()
+        ->instance()
+        ->record;
 
     assertDatabaseHas(CollectionEntry::class, [
         'id' => $collectionEntry->id,
@@ -179,6 +220,15 @@ it('can edit collection entry to have no taxonomy terms attached', function () {
             'title' => 'Test',
             'data' => json_encode(['main' => ['header' => 'Foo']]),
         ]);
+
+    $metaDataData = [
+        'title' => $collectionEntry->slug,
+        'description' => 'Foo description',
+        'author' => 'Foo author',
+        'keywords' => 'Foo keywords',
+    ];
+
+    $collectionEntry->metaData()->create($metaDataData);
 
     livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
         ->fillForm([

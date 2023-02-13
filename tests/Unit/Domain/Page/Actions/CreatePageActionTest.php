@@ -7,6 +7,7 @@ use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\SliceContent;
+use Domain\Support\MetaData\Models\MetaData;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -29,10 +30,27 @@ it('can create page', function () {
                     'data' => ['name' => 'foo'],
                 ],
             ],
+            'meta_data' => [
+                'title' => 'foo',
+                'author' => '',
+                'keywords' => '',
+                'description' => '',
+            ]
         ]));
 
     assertDatabaseCount(Page::class, 1);
     assertDatabaseCount(SliceContent::class, 1);
+    assertDatabaseHas(
+        MetaData::class,
+        [
+            'title' => 'foo',
+            'author' => '',
+            'keywords' => '',
+            'description' => '',
+            'taggable_type' => $page->getMorphClass(),
+            'taggable_id' => $page->id,
+        ]
+    );
     assertDatabaseHas(Page::class, ['name' => 'Foo']);
     assertDatabaseHas(SliceContent::class, [
         'page_id' => $page->id,

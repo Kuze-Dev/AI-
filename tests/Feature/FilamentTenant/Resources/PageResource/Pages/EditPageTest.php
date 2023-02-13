@@ -9,6 +9,7 @@ use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\SliceContent;
+use Domain\Support\MetaData\Models\MetaData;
 use Domain\Support\SlugHistory\SlugHistory;
 use Filament\Facades\Filament;
 
@@ -58,11 +59,28 @@ it('can edit page', function () {
         )
         ->createOne();
 
+    $metaDataData = [
+        'title' => $page->slug,
+        'description' => 'Foo description',
+        'author' => 'Foo author',
+        'keywords' => 'Foo keywords',
+    ];
+
+    $page->metaData()->create($metaDataData);
+    
+    $updatedMetaDataData = [
+        'title' => 'Foo title updated',
+        'description' => 'Foo description updated',
+        'author' => 'Foo author updated',
+        'keywords' => 'Foo keywords updated',
+    ];
+
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
             'route_url' => 'test-url',
             'slice_contents.record-1.data.main.header' => 'Bar',
+            'meta_data' => $updatedMetaDataData
         ])
         ->call('save')
         ->assertHasNoFormErrors()
@@ -72,6 +90,18 @@ it('can edit page', function () {
         'name' => 'Test',
         'route_url' => 'test-url',
     ]);
+
+    assertDatabaseHas(
+        MetaData::class,
+        array_merge(
+            $updatedMetaDataData,
+            [
+                'taggable_type' => $page->getMorphClass(),
+                'taggable_id' => $page->id
+            ]
+        )
+    );
+
     assertDatabaseHas(SliceContent::class, [
         'page_id' => $page->id,
         'slice_id' => $page->sliceContents->first()->slice_id,
@@ -92,6 +122,15 @@ it('can edit page slug', function () {
         )
         ->createOne();
 
+    $metaDataData = [
+        'title' => $page->slug,
+        'description' => 'Foo description',
+        'author' => 'Foo author',
+        'keywords' => 'Foo keywords',
+    ];
+
+    $page->metaData()->create($metaDataData);
+    
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'slug' => 'new-foo',
