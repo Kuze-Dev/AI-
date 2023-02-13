@@ -42,7 +42,7 @@ class MetaData extends Model implements IsActivitySubject
         return 'Meta tags: '.$this->title;
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model, \Domain\Support\MetaTag\Models\MetaTag> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model, \Domain\Support\MetaData\Models\MetaData> */
     public function taggable(): MorphTo
     {
         return $this->morphTo();

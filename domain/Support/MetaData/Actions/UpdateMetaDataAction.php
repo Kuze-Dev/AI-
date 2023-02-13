@@ -11,7 +11,7 @@ class UpdateMetaDataAction
 {
     public function execute(Model $model, MetaDataData $metaDataData): Model
     {
-        $model->metaTags
+        $model->metaData
             ->update([
                 'title' => $metaDataData->title == null ? $model->slug : $metaDataData->title,
                 'description' => $metaDataData->description,

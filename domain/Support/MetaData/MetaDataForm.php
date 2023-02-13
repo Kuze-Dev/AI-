@@ -16,7 +16,7 @@ class MetaDataForm extends Section
 
         $this->statePath('meta_data');
 
-        $this->afterStateHydrated(fn ($component, $record) => $component->state($record?->metaTags?->toArray() ?? []));
+        $this->afterStateHydrated(fn ($component, $record) => $component->state($record?->metaData?->toArray() ?? []));
 
         $this->schema([
             Forms\Components\TextInput::make('title')

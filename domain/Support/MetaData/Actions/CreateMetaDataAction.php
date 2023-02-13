@@ -11,7 +11,7 @@ class CreateMetaDataAction
 {
     public function execute(Model $model, MetaDataData $metaDataData): Model
     {
-        $model->metaTags()
+        $model->metaData()
             ->create([
                 'title' => $metaDataData->title == null ? $model->slug : $metaDataData->title,
                 'description' => $metaDataData->description,
