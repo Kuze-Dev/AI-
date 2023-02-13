@@ -23,24 +23,15 @@ class BlueprintFactory extends Factory
         ];
     }
 
-    public function withDummySchema(?array $sections = [], ?array $fields = []): self
+    public function withDummySchema(): self
     {
         $instance = $this;
 
-        if ( ! empty($sections)) {
-            foreach ($sections as $key => $section) {
-                $instance = $instance->addSchemaSection($section ?? [])
-                    ->addSchemaField($fields[$key] ?? []);
-            }
-        } else {
-            if ( ! empty($fields)) {
-                foreach ($fields as $field) {
-                    $instance = $instance->addSchemaSection()
-                        ->addSchemaField($field);
-                }
-            } else {
-                $instance = $instance->addSchemaSection()
-                    ->addSchemaField();
+        foreach (range(1, rand(1, 3)) as $i) {
+            $instance = $instance->addSchemaSection();
+
+            foreach (range(1, rand(1, 3)) as $i) {
+                $instance = $instance->addSchemaField();
             }
         }
 

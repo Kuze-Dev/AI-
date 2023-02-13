@@ -26,19 +26,7 @@ it('can render page', function () {
 
 it('can create slice', function () {
     $blueprint = BlueprintFactory::new()
-        ->withDummySchema(
-            sections: [
-                [
-                    'title' => 'Main',
-                ],
-            ],
-            fields:[
-                [
-                    'title' => 'Title',
-                    'type' => FieldType::TEXT,
-                ],
-            ]
-        )
+        ->withDummySchema()
         ->createOne();
 
     livewire(CreateSlice::class)
@@ -100,7 +88,11 @@ it('can not create slice with same component', function () {
 
 it('can create slice with default content', function () {
     $blueprint = BlueprintFactory::new()
-        ->withDummySchema()
+        ->addSchemaSection(['title' => 'Main'])
+        ->addSchemaField([
+            'title' => 'Title',
+            'type' => FieldType::TEXT,
+        ])
         ->createOne();
 
     livewire(CreateSlice::class)
@@ -109,9 +101,7 @@ it('can create slice with default content', function () {
             'component' => 'Test',
             'blueprint_id' => $blueprint->id,
             'is_fixed_content' => true,
-            'data' => [
-                'name' => 'Foobar',
-            ],
+            'data' => ['main' => ['title' => 'Foobar']],
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -122,5 +112,6 @@ it('can create slice with default content', function () {
         'component' => 'Test',
         'blueprint_id' => $blueprint->id,
         'is_fixed_content' => true,
+        'data' => json_encode(['main' => ['title' => 'Foobar']])
     ]);
 });
