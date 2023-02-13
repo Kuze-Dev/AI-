@@ -47,7 +47,7 @@ it('can update page', function () {
                     'author' => 'foo author updated',
                     'keywords' => 'foo keywords updated',
                     'description' => 'foo description updated',
-                ]
+                ],
             ])
         );
 

@@ -191,11 +191,10 @@ it('can create collection entry with default meta data title', function () {
         [
             'title' => 'test',
             'taggable_type' => $collectionEntry->getMorphClass(),
-            'taggable_id' => $collectionEntry->getKey()
+            'taggable_id' => $collectionEntry->getKey(),
         ]
     );
 });
-
 
 it('can create collection entry with filled meta data', function () {
     $collection = CollectionFactory::new()
@@ -216,7 +215,7 @@ it('can create collection entry with filled meta data', function () {
         'title' => 'Test Meta Data Title',
         'keywords' => 'Test Meta Data Keywords',
         'author' => 'Test Meta Data Author',
-        'description' => 'Test Meta Data Description'
+        'description' => 'Test Meta Data Description',
     ];
 
     $collectionEntry = livewire(CreateCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey()])
@@ -226,7 +225,7 @@ it('can create collection entry with filled meta data', function () {
             'slug' => 'test',
             'published_at' => $dateTime,
             'data' => ['main' => ['header' => 'Foo']],
-            'meta_data' => $meta_data
+            'meta_data' => $meta_data,
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -255,4 +254,3 @@ it('can create collection entry with filled meta data', function () {
         )
     );
 });
-

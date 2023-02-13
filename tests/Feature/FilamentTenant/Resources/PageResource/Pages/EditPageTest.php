@@ -67,7 +67,7 @@ it('can edit page', function () {
     ];
 
     $page->metaData()->create($metaDataData);
-    
+
     $updatedMetaDataData = [
         'title' => 'Foo title updated',
         'description' => 'Foo description updated',
@@ -80,7 +80,7 @@ it('can edit page', function () {
             'name' => 'Test',
             'route_url' => 'test-url',
             'slice_contents.record-1.data.main.header' => 'Bar',
-            'meta_data' => $updatedMetaDataData
+            'meta_data' => $updatedMetaDataData,
         ])
         ->call('save')
         ->assertHasNoFormErrors()
@@ -97,7 +97,7 @@ it('can edit page', function () {
             $updatedMetaDataData,
             [
                 'taggable_type' => $page->getMorphClass(),
-                'taggable_id' => $page->id
+                'taggable_id' => $page->id,
             ]
         )
     );
@@ -130,7 +130,7 @@ it('can edit page slug', function () {
     ];
 
     $page->metaData()->create($metaDataData);
-    
+
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'slug' => 'new-foo',

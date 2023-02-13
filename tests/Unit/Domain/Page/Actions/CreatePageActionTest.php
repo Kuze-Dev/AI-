@@ -35,7 +35,7 @@ it('can create page', function () {
                 'author' => '',
                 'keywords' => '',
                 'description' => '',
-            ]
+            ],
         ]));
 
     assertDatabaseCount(Page::class, 1);

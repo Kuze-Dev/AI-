@@ -104,7 +104,7 @@ it('can edit collection entry', function () {
     ];
 
     $collectionEntry->metaData()->create($metaDataData);
-    
+
     $dateTime = Carbon::now();
 
     $updatedCollectionEntry = livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
@@ -140,7 +140,7 @@ it('can edit collection entry', function () {
             'title' => $updatedCollectionEntry->slug,
             'description' => null,
             'author' => null,
-            'keywords' => null, 
+            'keywords' => null,
             'taggable_type' => $updatedCollectionEntry->getMorphClass(),
             'taggable_id' => $updatedCollectionEntry->id,
         ]
@@ -328,8 +328,6 @@ it('can edit collection entry meta data', function () {
         ]);
     }
 });
-
-
 
 it('can edit collection entry to have no meta data filled', function () {
     $collection = CollectionFactory::new()
