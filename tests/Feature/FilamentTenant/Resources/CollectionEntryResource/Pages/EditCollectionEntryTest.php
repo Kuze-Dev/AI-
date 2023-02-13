@@ -11,6 +11,7 @@ use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
+use Domain\Support\MetaData\Models\MetaData;
 use Domain\Support\SlugHistory\SlugHistory;
 use Filament\Facades\Filament;
 
@@ -190,4 +191,177 @@ it('can edit collection entry to have no taxonomy terms attached', function () {
         ->assertHasNoFormErrors();
 
     assertDatabaseMissing('collection_entry_taxonomy_term', ['collection_entry_id' => $collectionEntry->getKey()]);
+});
+
+it('can edit collection entry meta data', function () {
+    $collection = CollectionFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->has(TaxonomyFactory::new())
+        ->createOne([
+            'name' => 'Test Collection',
+            'future_publish_date_behavior' => 'public',
+            'past_publish_date_behavior' => 'unlisted',
+        ]);
+
+    $taxonomyTerms = TaxonomyTermFactory::new()
+        ->for($collection->taxonomies->first())
+        ->count(2)
+        ->create();
+
+    $collectionEntry = CollectionEntryFactory::new()
+        ->for($collection)
+        ->createOne([
+            'title' => 'Foo',
+            'data' => ['main' => ['header' => 'Foo']],
+        ]);
+
+    $metaDataData = [
+        'title' => $collectionEntry->slug,
+        'description' => 'Foo description',
+        'author' => 'Foo author',
+        'keywords' => 'Foo keywords',
+    ];
+
+    $collectionEntry->metaData()->create($metaDataData);
+
+    $dateTime = Carbon::now();
+
+    $updatedMetaData = [
+        'title' => 'Updated foo title',
+        'description' => 'Updated foo description',
+        'author' => 'Updated foo author',
+        'keywords' => 'Updated foo keywords',
+    ];
+
+    $updatedCollectionEntry = livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
+        ->fillForm([
+            'title' => 'Updated Foo',
+            'slug' => 'updated-foo',
+            'published_at' => $dateTime,
+            'data' => ['main' => ['header' => 'Foo updated']],
+            'taxonomies' => [
+                $collection->taxonomies->first()->id => $taxonomyTerms->pluck('id'),
+            ],
+            'meta_data' => $updatedMetaData,
+        ])
+        ->call('save')
+        ->assertOk()
+        ->assertHasNoFormErrors()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(CollectionEntry::class, [
+        'title' => 'Updated Foo',
+        'published_at' => $dateTime,
+        'data' => json_encode(['main' => ['header' => 'Foo updated']]),
+    ]);
+
+    assertDatabaseHas(
+        MetaData::class,
+        array_merge(
+            $updatedMetaData,
+            [
+                'taggable_type' => $updatedCollectionEntry->getMorphClass(),
+                'taggable_id' => $updatedCollectionEntry->id,
+            ]
+        )
+    );
+
+    foreach ($taxonomyTerms as $taxonomyTerm) {
+        assertDatabaseHas('collection_entry_taxonomy_term', [
+            'taxonomy_term_id' => $taxonomyTerm->getKey(),
+            'collection_entry_id' => $collectionEntry->getKey(),
+        ]);
+    }
+});
+
+
+
+it('can edit collection entry to have no meta data filled', function () {
+    $collection = CollectionFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->has(TaxonomyFactory::new())
+        ->createOne([
+            'name' => 'Test Collection',
+            'future_publish_date_behavior' => 'public',
+            'past_publish_date_behavior' => 'unlisted',
+        ]);
+
+    $taxonomyTerms = TaxonomyTermFactory::new()
+        ->for($collection->taxonomies->first())
+        ->count(2)
+        ->create();
+
+    $collectionEntry = CollectionEntryFactory::new()
+        ->for($collection)
+        ->createOne([
+            'title' => 'Foo',
+            'data' => ['main' => ['header' => 'Foo']],
+        ]);
+
+    $metaDataData = [
+        'title' => $collectionEntry->slug,
+        'description' => 'Foo description',
+        'author' => 'Foo author',
+        'keywords' => 'Foo keywords',
+    ];
+
+    $collectionEntry->metaData()->create($metaDataData);
+
+    $dateTime = Carbon::now();
+
+    $updatedCollectionEntry = livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
+        ->fillForm([
+            'title' => 'New Foo',
+            'slug' => 'new-foo',
+            'published_at' => $dateTime,
+            'data' => ['main' => ['header' => 'Foo updated']],
+            'taxonomies' => [
+                $collection->taxonomies->first()->id => $taxonomyTerms->pluck('id'),
+            ],
+            'meta_data' => [
+                'title' => '',
+                'description' => '',
+                'author' => '',
+                'keywords' => '',
+            ],
+        ])
+        ->call('save')
+        ->assertOk()
+        ->assertHasNoFormErrors()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(CollectionEntry::class, [
+        'title' => 'New Foo',
+        'published_at' => $dateTime,
+        'data' => json_encode(['main' => ['header' => 'Foo updated']]),
+    ]);
+
+    assertDatabaseHas(
+        MetaData::class,
+        [
+            'title' => $updatedCollectionEntry->slug,
+            'description' => null,
+            'author' => null,
+            'keywords' => null,
+            'taggable_type' => $updatedCollectionEntry->getMorphClass(),
+            'taggable_id' => $updatedCollectionEntry->id,
+        ]
+    );
+
+    foreach ($taxonomyTerms as $taxonomyTerm) {
+        assertDatabaseHas('collection_entry_taxonomy_term', [
+            'taxonomy_term_id' => $taxonomyTerm->getKey(),
+            'collection_entry_id' => $collectionEntry->getKey(),
+        ]);
+    }
 });
