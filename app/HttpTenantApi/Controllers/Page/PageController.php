@@ -24,13 +24,18 @@ class PageController
 
     public function show(string $page): PageResource
     {
-        return PageResource::make(
-            QueryBuilder::for(Page::whereSlug($page))
-                ->allowedIncludes([
-                    'sliceContents.slice',
-                    'slugHistories',
-                ])
-                ->firstOrFail()
-        );
+        /** @var Page */
+        $page = QueryBuilder::for(Page::whereSlug($page))
+            ->allowedIncludes([
+                'sliceContents.slice',
+                'slugHistories',
+            ])
+            ->firstOrFail();
+
+        if ($page->relationLoaded('sliceContents')) {
+            $page->loadMissing('sliceContents.slice.blueprint');
+        }
+
+        return PageResource::make($page);
     }
 }

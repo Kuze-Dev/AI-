@@ -44,7 +44,7 @@ class PageResource extends Resource
             Forms\Components\Card::make([
                 Forms\Components\TextInput::make('name')
                     ->unique(ignoreRecord: true)
-                    ->debounce()
+                    ->lazy()
                     ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
                         if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
                             $set('slug', Str::slug($state));
@@ -54,6 +54,9 @@ class PageResource extends Resource
                 Forms\Components\TextInput::make('slug')
                     ->unique(ignoreRecord: true)
                     ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
+                Forms\Components\TextInput::make('route_url')
+                    ->required()
+                    ->helperText('Use "{{ $slug }}" to insert the current slug.'),
             ]),
             Forms\Components\Section::make(trans('Slices'))
                 ->schema([
@@ -79,7 +82,7 @@ class PageResource extends Resource
                         ->itemLabel(fn (array $state) => self::getCachedSlices()->firstWhere('id', $state['slice_id'])?->name)
                         ->disableLabel()
                         ->minItems(1)
-                        ->collapsible()
+                        ->collapsed(fn (string $context) => $context === 'edit')
                         ->orderable('order')
                         ->schema([
                             Forms\Components\Select::make('slice_id')

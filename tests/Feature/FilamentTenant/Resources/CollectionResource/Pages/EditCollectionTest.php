@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\CollectionResource\Pages\EditCollection;
-use Domain\Blueprint\Database\Factories\BlueprintFactory;
-use Domain\Blueprint\Enums\FieldType;
 use Domain\Collection\Database\Factories\CollectionFactory;
 use Domain\Collection\Models\Collection;
 use Domain\Support\SlugHistory\SlugHistory;
@@ -23,14 +21,11 @@ beforeEach(function () {
 });
 
 it('can render collection', function () {
-    $taxonomy = TaxonomyFactory::new()
-        ->createOne();
-
     $collection = CollectionFactory::new()
-        ->for(
-            BlueprintFactory::new()
-                ->addSchemaSection(['title' => 'Main'])
-                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        ->withDummyBlueprint()
+        ->has(
+            TaxonomyFactory::new()
+                ->withDummyBlueprint()
         )
         ->createOne([
             'name' => 'Test Collection',
@@ -47,20 +42,18 @@ it('can render collection', function () {
             'future_publish_date_behavior' => 'private',
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
+            'taxonomies' => $collection->taxonomies->pluck('id')->toArray(),
         ])
         ->assertOk();
 });
 
 it('can update collection', function () {
     $taxonomy = TaxonomyFactory::new()
+        ->withDummyBlueprint()
         ->createOne();
 
     $collection = CollectionFactory::new(['name' => 'Test Collection'])
-        ->for(
-            BlueprintFactory::new()
-                ->addSchemaSection(['title' => 'Main'])
-                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
-        )
+        ->withDummyBlueprint()
         ->createOne();
 
     livewire(EditCollection::class, ['record' => $collection->getRouteKey()])
@@ -69,6 +62,7 @@ it('can update collection', function () {
             'future_publish_date_behavior' => 'private',
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
+            'route_url' => 'test-collection',
             'taxonomies' => [$taxonomy->getKey()],
         ])
         ->call('save')
@@ -80,6 +74,7 @@ it('can update collection', function () {
         'future_publish_date_behavior' => 'private',
         'past_publish_date_behavior' => 'unlisted',
         'is_sortable' => true,
+        'route_url' => 'test-collection',
     ]);
     assertDatabaseHas('collection_taxonomy', [
         'taxonomy_id' => $taxonomy->getKey(),
@@ -139,7 +134,10 @@ it('can update collection to have no publish date behavior', function () {
 it('can update collection to have no taxonomy attached', function () {
     $collection = CollectionFactory::new(['name' => 'Test Collection'])
         ->withDummyBlueprint()
-        ->has(TaxonomyFactory::new())
+        ->has(
+            TaxonomyFactory::new()
+                ->withDummyBlueprint()
+        )
         ->createOne();
 
     assertDatabaseHas('collection_taxonomy', ['collection_id' => $collection->id]);

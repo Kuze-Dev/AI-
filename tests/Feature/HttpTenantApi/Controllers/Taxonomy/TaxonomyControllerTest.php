@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Blueprint\Enums\FieldType;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
 
@@ -11,6 +14,11 @@ beforeEach(function () {
 });
 it('return list', function () {
     TaxonomyFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+        )
         ->count(10)
         ->create();
     getJson('api/taxonomies')
@@ -26,6 +34,11 @@ it('return list', function () {
 
 it('show', function () {
     $taxonomy = TaxonomyFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+        )
         ->createOne(['name' => 'My Taxonomy Title']);
 
     getJson('api/taxonomies/'.$taxonomy->getRouteKey())
@@ -41,6 +54,11 @@ it('show', function () {
 
 it('filter', function () {
     $taxonomies = TaxonomyFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+        )
         ->count(2)
         ->sequence(
             ['name' => 'page 1'],

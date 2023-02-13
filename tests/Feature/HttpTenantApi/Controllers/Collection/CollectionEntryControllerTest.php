@@ -23,13 +23,20 @@ it('can list collection entries', function () {
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
         )
-        ->has(TaxonomyFactory::new())
+        ->has(
+            TaxonomyFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+                )
+        )
         ->createOne();
 
     CollectionEntryFactory::new()
         ->for($collection)
         ->has(
-            TaxonomyTermFactory::new()
+            TaxonomyTermFactory::new(['data' => ['main' => ['desciption' => 'Foo']]])
                 ->for($collection->taxonomies->first())
         )
         ->count(10)
@@ -54,18 +61,11 @@ it('can show collection entry', function () {
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
         )
-        ->has(TaxonomyFactory::new())
         ->createOne();
 
     $collectionEntry = CollectionEntryFactory::new()
         ->for($collection)
-        ->has(
-            TaxonomyTermFactory::new()
-                ->for($collection->taxonomies->first())
-        )
-        ->createOne([
-            'data' => ['main' => ['header' => 'Foo']],
-        ]);
+        ->createOne(['data' => ['main' => ['header' => 'Foo']]]);
 
     getJson("api/collections/{$collection->getRouteKey()}/entries/{$collectionEntry->getRouteKey()}")
         ->assertOk()
@@ -73,6 +73,7 @@ it('can show collection entry', function () {
             $json->where('data.type', 'collectionEntries')
                 ->where('data.id', $collectionEntry->getRouteKey())
                 ->where('data.attributes.title', $collectionEntry->title)
+                ->where('data.attributes.route_url', $collectionEntry->qualified_route_url)
                 ->etc();
         });
 });
@@ -84,13 +85,20 @@ it('can show collection entry with includes', function (string $include) {
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
         )
-        ->has(TaxonomyFactory::new())
+        ->has(
+            TaxonomyFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+                )
+        )
         ->createOne();
 
     $collectionEntry = CollectionEntryFactory::new()
         ->for($collection)
         ->has(
-            TaxonomyTermFactory::new()
+            TaxonomyTermFactory::new(['data' => ['main' => ['desciption' => 'Foo']]])
                 ->for($collection->taxonomies->first())
         )
         ->createOne([

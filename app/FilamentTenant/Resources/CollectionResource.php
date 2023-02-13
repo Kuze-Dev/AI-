@@ -67,7 +67,7 @@ class CollectionResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
-                        ->debounce()
+                        ->lazy()
                         ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
                             if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
                                 $set('slug', Str::slug($state));
@@ -88,6 +88,10 @@ class CollectionResource extends Resource
                         ->searchable()
                         ->preload()
                         ->disabled(fn (?Collection $record) => $record !== null),
+                    Forms\Components\TextInput::make('route_url')
+                        ->required()
+                        ->unique(ignoreRecord: true)
+                        ->helperText('Use "{{ $slug }}" to insert the collection entry\'s slug.'),
                     Forms\Components\Select::make('taxonomies')
                         ->multiple()
                         ->options(

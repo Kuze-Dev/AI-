@@ -20,7 +20,10 @@ class CollectionEntryController
     public function index(Collection $collection): JsonApiResourceCollection
     {
         return CollectionEntryResource::collection(
-            QueryBuilder::for($collection->collectionEntries())
+            QueryBuilder::for(
+                $collection->collectionEntries()
+                    ->with('collection')
+            )
                 ->allowedFilters([
                     'title',
                     'slug',
@@ -33,6 +36,7 @@ class CollectionEntryController
                     'order',
                     'published_at',
                 ])
+                ->with('collection.blueprint')
                 ->jsonPaginate()
         );
     }
@@ -48,6 +52,7 @@ class CollectionEntryController
                     'taxonomyTerms',
                     'slugHistories',
                 ])
+                ->with('collection.blueprint')
                 ->firstOrFail()
         );
     }

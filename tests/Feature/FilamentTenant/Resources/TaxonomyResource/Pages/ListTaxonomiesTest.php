@@ -3,7 +3,12 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\TaxonomyResource\Pages\ListTaxonomies;
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Blueprint\Enums\FieldType;
+use Domain\Collection\Database\Factories\CollectionFactory;
+use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
+use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Filament\Facades\Filament;
 
 use Filament\Pages\Actions\DeleteAction;
@@ -22,8 +27,9 @@ it('can render page', function () {
         ->assertOk();
 });
 
-it('can list pages', function () {
+it('can list taxonomys', function () {
     $taxonomies = TaxonomyFactory::new()
+        ->withDummyBlueprint()
         ->count(5)
         ->create();
 
@@ -32,13 +38,36 @@ it('can list pages', function () {
         ->assertOk();
 });
 
-it('can delete page', function () {
+it('can delete taxonomy', function () {
     $taxonomy = TaxonomyFactory::new()
-        ->createOne();
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+        )
+        ->has(TaxonomyTermFactory::new(['data' => ['main' => ['desciption' => 'Foo']]]))
+        ->createOne()
+        ->load('taxonomyTerms');
 
     livewire(ListTaxonomies::class)
         ->callTableAction(DeleteAction::class, $taxonomy)
         ->assertOk();
 
     assertModelMissing($taxonomy);
+    assertModelMissing($taxonomy->taxonomyTerms->first());
 });
+
+it('can\'t delete taxonomy with existing collections', function () {
+    $taxonomy = TaxonomyFactory::new()
+        ->withDummyBlueprint()
+        ->createOne();
+
+    CollectionFactory::new()
+        ->withDummyBlueprint()
+        ->createOne()
+        ->taxonomies()
+        ->attach($taxonomy);
+
+    livewire(ListTaxonomies::class)
+        ->callTableAction(DeleteAction::class, $taxonomy);
+})->throws(DeleteRestrictedException::class);

@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Domain\Role\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -34,9 +37,14 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|Role whereUpdatedAt($value)
  * @mixin \Eloquent
  */
+#[
+    OnDeleteCascade(['permissions']),
+    OnDeleteRestrict(['users'])
+]
 class Role extends \Spatie\Permission\Models\Role implements IsActivitySubject
 {
     use LogsActivity;
+    use ConstraintsRelationships;
 
     public function getActivitylogOptions(): LogOptions
     {
