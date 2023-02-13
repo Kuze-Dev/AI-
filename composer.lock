@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bab818296d99b2a72dfcfaa77622ff4d",
+    "content-hash": "b3139c759992055f9755bec878f6d934",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -8960,27 +8960,33 @@
         },
         {
             "name": "timacdonald/json-api",
-            "version": "dev-main",
+            "version": "v1.0.0-beta.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/timacdonald/json-api.git",
-                "reference": "504b055f16e38f6629a85293a2c31b33e7c089fc"
+                "reference": "d7484504846b19ea84781838be5087a449fb0999"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/timacdonald/json-api/zipball/504b055f16e38f6629a85293a2c31b33e7c089fc",
-                "reference": "504b055f16e38f6629a85293a2c31b33e7c089fc",
+                "url": "https://api.github.com/repos/timacdonald/json-api/zipball/d7484504846b19ea84781838be5087a449fb0999",
+                "reference": "d7484504846b19ea84781838be5087a449fb0999",
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "^9.0",
-                "php": "^8.0"
+                "illuminate/collections": "^8.73.2 || ^9.0 || 10.x-dev",
+                "illuminate/database": "^8.73.2 || ^9.0 || 10.x-dev",
+                "illuminate/http": "^8.73.2 || ^9.0 || 10.x-dev",
+                "illuminate/support": "^8.73.2 || ^9.0 || 10.x-dev",
+                "php": "^8.0 || ^8.1 || ^8.2",
+                "symfony/http-kernel": "^5.0 || ^6.0"
             },
             "require-dev": {
-                "bamarni/composer-bin-plugin": "^1.4",
-                "phpunit/php-invoker": "^3.1"
+                "friendsofphp/php-cs-fixer": "^3.13",
+                "laravel/framework": "^8.73.2 || ^9.0 || 10.x-dev",
+                "opis/json-schema": "^2.3",
+                "orchestra/testbench": "^6.0 || ^7.0 || 8.x-dev",
+                "phpunit/phpunit": "^9.0"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -9011,7 +9017,7 @@
                 "issues": "https://github.com/timacdonald/json-api/issues",
                 "source": "https://github.com/timacdonald/json-api/releases/latest"
             },
-            "time": "2023-01-09T21:46:09+00:00"
+            "time": "2023-01-28T02:27:38+00:00"
         },
         {
             "name": "victord11/ssl-certification-health-check",
@@ -13638,9 +13644,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "timacdonald/json-api": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
