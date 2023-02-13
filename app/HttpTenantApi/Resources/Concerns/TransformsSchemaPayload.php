@@ -45,8 +45,10 @@ trait TransformsSchemaPayload
         if ($field instanceof RepeaterFieldData) {
             $transformed = [];
 
-            foreach ($field->fields as $field) {
-                $transformed[$field->state_name] = $this->transformField($value[$field->state_name], $field);
+            foreach ($value as $index => $item) {
+                foreach ($field->fields as $childField) {
+                    $transformed[$index][$childField->state_name] = $this->transformField($item[$childField->state_name] ?? null, $childField);
+                }
             }
 
             return $transformed;
