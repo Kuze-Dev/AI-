@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Domain\Support\MetaTag;
+namespace Domain\Support\MetaData;
 
-use Domain\Support\MetaTag\Models\MetaTag;
+use Domain\Support\MetaData\Models\MetaData;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
-trait HasMetaTags
+trait HasMetaData
 {
     /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Domain\Support\MetaTag\Models\MetaTag> */
     public function metaTags(): MorphOne
     {
-        return $this->morphOne(MetaTag::class, 'taggable');
+        return $this->morphOne(MetaData::class, 'taggable');
     }
 }

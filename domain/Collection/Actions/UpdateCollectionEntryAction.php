@@ -6,12 +6,12 @@ namespace Domain\Collection\Actions;
 
 use Domain\Collection\DataTransferObjects\CollectionEntryData;
 use Domain\Collection\Models\CollectionEntry;
-use Domain\Support\MetaTag\Actions\UpdateMetaTagsAction;
+use Domain\Support\MetaData\Actions\UpdateMetaDataAction;
 
 class UpdateCollectionEntryAction
 {
     public function __construct(
-        protected UpdateMetaTagsAction $updateMetaTags
+        protected UpdateMetaDataAction $updateMetaData
     ) {
     }
 
@@ -28,7 +28,7 @@ class UpdateCollectionEntryAction
             'data' => $collectionEntryData->data,
         ]);
 
-        $this->updateMetaTags->execute($collectionEntry, $collectionEntryData->meta_tags);
+        $this->updateMetaData->execute($collectionEntry, $collectionEntryData->meta_tags);
 
         $collectionEntry->taxonomyTerms()
             ->sync($collectionEntryData->taxonomy_terms);

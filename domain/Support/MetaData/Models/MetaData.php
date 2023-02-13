@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Support\MetaTag\Models;
+namespace Domain\Support\MetaData\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +11,7 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class MetaTag extends Model implements IsActivitySubject
+class MetaData extends Model implements IsActivitySubject
 {
     use LogsActivity;
 

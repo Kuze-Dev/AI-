@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
-use Domain\Support\MetaTag\HasMetaTags;
+use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\SlugHistory\HasSlugHistory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -49,7 +49,7 @@ class Page extends Model implements IsActivitySubject
     use LogsActivity;
     use HasSlug;
     use HasSlugHistory;
-    use HasMetaTags;
+    use HasMetaData;
 
     protected $fillable = [
         'name',

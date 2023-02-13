@@ -14,7 +14,7 @@ return new class () extends Migration {
      */
     public function up()
     {
-        Schema::create('meta_tags', function (Blueprint $table) {
+        Schema::create('meta_data', function (Blueprint $table) {
             $table->id();
             $table->morphs('taggable');
             $table->string('title')->nullable();

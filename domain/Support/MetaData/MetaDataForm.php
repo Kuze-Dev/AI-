@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Domain\Support\MetaTag;
+namespace Domain\Support\MetaData;
 
 use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Livewire\TemporaryUploadedFile;
 
-class MetaTagsForm extends Section
+class MetaDataForm extends Section
 {
     public function setUp(): void
     {

@@ -16,7 +16,7 @@ use Domain\Form\Models\FormSubmission;
 use Domain\Page\Models\Page;
 use Domain\Support\SlugHistory\SlugHistory;
 use Domain\Page\Models\Slice;
-use Domain\Support\MetaTag\Models\MetaTag;
+use Domain\Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
@@ -61,7 +61,7 @@ class AppServiceProvider extends ServiceProvider
             Collection::class,
             CollectionEntry::class,
             SlugHistory::class,
-            MetaTag::class,
+            MetaData::class,
         ]);
 
         Password::defaults(

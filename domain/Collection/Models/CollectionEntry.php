@@ -7,7 +7,7 @@ namespace Domain\Collection\Models;
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Support\SlugHistory\HasSlugHistory;
 use Domain\Collection\Models\Builders\CollectionEntryBuilder;
-use Domain\Support\MetaTag\HasMetaTags;
+use Domain\Support\MetaData\HasMetaData;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -53,14 +53,14 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
  * @method static CollectionEntryBuilder|CollectionEntry whereSlug($value)
  * @method static CollectionEntryBuilder|CollectionEntry whereTitle($value)
  * @method static CollectionEntryBuilder|CollectionEntry whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @mixin \EloquentHasMetaData
  */
 class CollectionEntry extends Model implements IsActivitySubject
 {
     use LogsActivity;
     use HasSlug;
     use HasSlugHistory;
-    use HasMetaTags;
+    use HasMetaData;
 
     /**
      * Declare columns

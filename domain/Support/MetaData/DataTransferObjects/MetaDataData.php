@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Domain\Support\MetaTag\DataTransferObjects;
+namespace Domain\Support\MetaData\DataTransferObjects;
 
-class MetaTagData
+class MetaDataData
 {
     public function __construct(
         public readonly ?string $title = null,
