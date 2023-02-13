@@ -54,6 +54,7 @@ class Slice extends Model implements IsActivitySubject
 
     protected $casts = [
         'data' => 'array',
+        'is_fixed_content' => 'bool',
     ];
 
     public function getActivitylogOptions(): LogOptions

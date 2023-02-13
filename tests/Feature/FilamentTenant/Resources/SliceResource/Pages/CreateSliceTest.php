@@ -7,6 +7,7 @@ use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\Models\Slice;
 use Filament\Facades\Filament;
+use Domain\Blueprint\Enums\FieldType;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
@@ -25,7 +26,19 @@ it('can render page', function () {
 
 it('can create slice', function () {
     $blueprint = BlueprintFactory::new()
-        ->withDummySchema()
+        ->withDummySchema(
+            sections: [
+                [
+                    'title' => 'Main',
+                ],
+            ],
+            fields:[
+                [
+                    'title' => 'Title',
+                    'type' => FieldType::TEXT,
+                ],
+            ]
+        )
         ->createOne();
 
     livewire(CreateSlice::class)
