@@ -192,7 +192,8 @@ class SchemaFormBuilder extends Component
 
         $textInput = match ($textFieldData->type) {
             FieldType::EMAIL => TextInput::make($textFieldData->state_name)
-                ->email(),
+                ->email()
+                ->rules('email:rfc,dns'),
             FieldType::TEL => TextInput::make($textFieldData->state_name)
                 ->tel(),
             FieldType::URL => TextInput::make($textFieldData->state_name)
