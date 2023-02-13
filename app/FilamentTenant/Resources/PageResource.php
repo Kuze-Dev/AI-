@@ -98,16 +98,6 @@ class PageResource extends Resource
                                 ->exists(Slice::class, 'id')
                                 ->searchable()
                                 ->reactive()
-                                ->afterStateHydrated(function (Forms\Components\Select $component, $state) {
-                                    $slice = self::getCachedSlices()->firstWhere('id', $state);
-
-                                    if ($slice?->is_fixed_content) {
-                                        $component->getContainer()
-                                            ->getComponent(fn (Component $component) => $component->getId() === 'schema-form')
-                                            ?->getChildComponentContainer()
-                                            ->fill($slice->data);
-                                    }
-                                })
                                 ->afterStateUpdated(function (Forms\Components\Select $component, $state) {
                                     $slice = self::getCachedSlices()->firstWhere('id', $state);
 
