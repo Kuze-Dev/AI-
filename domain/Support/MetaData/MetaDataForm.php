@@ -14,7 +14,7 @@ class MetaDataForm extends Section
     {
         parent::setUp();
 
-        $this->statePath('meta_tags');
+        $this->statePath('meta_data');
 
         $this->afterStateHydrated(fn ($component, $record) => $component->state($record?->metaTags?->toArray() ?? []));
 

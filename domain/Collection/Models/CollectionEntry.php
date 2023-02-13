@@ -53,7 +53,6 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
  * @method static CollectionEntryBuilder|CollectionEntry whereSlug($value)
  * @method static CollectionEntryBuilder|CollectionEntry whereTitle($value)
  * @method static CollectionEntryBuilder|CollectionEntry whereUpdatedAt($value)
- * @mixin \EloquentHasMetaData
  */
 class CollectionEntry extends Model implements IsActivitySubject
 {

@@ -71,11 +71,11 @@ class CreateCollectionEntry extends CreateRecord
                     published_at: isset($data['published_at']) ? Carbon::parse($data['published_at']) : null,
                     taxonomy_terms: $data['taxonomy_terms'] ?? [],
                     data: $data['data'],
-                    meta_tags: new MetaDataData(
-                        title: $data['meta_tags']['title'],
-                        author: $data['meta_tags']['author'],
-                        description: $data['meta_tags']['description'],
-                        keywords: $data['meta_tags']['keywords'],
+                    meta_data: new MetaDataData(
+                        title: $data['meta_data']['title'],
+                        author: $data['meta_data']['author'],
+                        description: $data['meta_data']['description'],
+                        keywords: $data['meta_data']['keywords'],
                     )
                 ))
         );

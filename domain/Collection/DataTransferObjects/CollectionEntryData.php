@@ -10,7 +10,7 @@ use Domain\Support\MetaData\DataTransferObjects\MetaDataData;
 class CollectionEntryData
 {
     public function __construct(
-        public readonly MetaDataData $meta_tags,
+        public readonly MetaDataData $meta_data,
         public readonly string $title,
         public readonly ?string $slug = null,
         public readonly array $taxonomy_terms = [],

@@ -8,7 +8,6 @@ use Domain\Collection\DataTransferObjects\CollectionEntryData;
 use Domain\Collection\Models\Collection;
 use Domain\Collection\Models\CollectionEntry;
 use Domain\Support\MetaData\Actions\CreateMetaDataAction;
-use Domain\Support\MetaTag\Actions\CreateMetaTagsAction;
 
 class CreateCollectionEntryAction
 {
@@ -28,7 +27,7 @@ class CreateCollectionEntryAction
                 'published_at' => $collectionEntryData->published_at,
             ]);
 
-        $this->createMetaData->execute($collectionEntry, $collectionEntryData->meta_tags);
+        $this->createMetaData->execute($collectionEntry, $collectionEntryData->meta_data);
 
         $collectionEntry->taxonomyTerms()
             ->attach($collectionEntryData->taxonomy_terms);

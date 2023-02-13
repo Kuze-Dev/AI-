@@ -28,7 +28,7 @@ class UpdateCollectionEntryAction
             'data' => $collectionEntryData->data,
         ]);
 
-        $this->updateMetaData->execute($collectionEntry, $collectionEntryData->meta_tags);
+        $this->updateMetaData->execute($collectionEntry, $collectionEntryData->meta_data);
 
         $collectionEntry->taxonomyTerms()
             ->sync($collectionEntryData->taxonomy_terms);

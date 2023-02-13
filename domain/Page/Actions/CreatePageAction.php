@@ -6,13 +6,13 @@ namespace Domain\Page\Actions;
 
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
-use Domain\Support\MetaTag\Actions\CreateMetaTagsAction;
+use Domain\Support\MetaData\Actions\CreateMetaDataAction;
 
 class CreatePageAction
 {
     public function __construct(
         protected CreateSliceContentAction $createSliceContent,
-        protected CreateMetaTagsAction $createMetaTags
+        protected CreateMetaDataAction $createMetaTags
     ) {
     }
 
@@ -24,7 +24,7 @@ class CreatePageAction
             'route_url' => $pageData->route_url,
         ]);
 
-        $this->createMetaTags->execute($page, $pageData->meta_tags);
+        $this->createMetaTags->execute($page, $pageData->meta_data);
 
         foreach ($pageData->slice_contents as $sliceContentData) {
             $this->createSliceContent->execute($page, $sliceContentData);

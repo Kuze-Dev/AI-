@@ -12,7 +12,7 @@ use Closure;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Slice;
 use Domain\Page\Models\SliceContent;
-use Domain\Support\MetaTag\MetaTagsForm;
+use Domain\Support\MetaData\MetaDataForm;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -111,7 +111,7 @@ class PageResource extends Resource
                                 ->schemaData(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->blueprint->schema),
                         ]),
                 ]),
-            MetaTagsForm::make('Meta Data'),
+            MetaDataForm::make('Meta Data'),
         ]);
     }
 
