@@ -10,6 +10,7 @@ use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
+use Domain\Support\MetaData\Models\MetaData;
 use Domain\Support\SlugHistory\SlugHistory;
 use Filament\Facades\Filament;
 
@@ -145,3 +146,113 @@ it('can create collection entry with publish date', function () {
         ]
     );
 });
+
+it('can create collection entry with default meta data title', function () {
+    $collection = CollectionFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->createOne([
+            'name' => 'Test Collection',
+            'future_publish_date_behavior' => 'public',
+            'past_publish_date_behavior' => 'unlisted',
+        ]);
+
+    $dateTime = Carbon::now();
+
+    $collectionEntry = livewire(CreateCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey()])
+        ->assertOk()
+        ->fillForm([
+            'title' => 'Test',
+            'slug' => 'test',
+            'published_at' => $dateTime,
+            'data' => ['main' => ['header' => 'Foo']],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(
+        CollectionEntry::class,
+        [
+            'id' => $collection->id,
+            'title' => 'Test',
+            'slug' => 'test',
+            'published_at' => $dateTime,
+            'data' => json_encode(['main' => ['header' => 'Foo']]),
+        ]
+    );
+
+    assertDatabaseHas(
+        MetaData::class,
+        [
+            'title' => 'test',
+            'taggable_type' => $collectionEntry->getMorphClass(),
+            'taggable_id' => $collectionEntry->getKey()
+        ]
+    );
+});
+
+
+it('can create collection entry with filled meta data', function () {
+    $collection = CollectionFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->createOne([
+            'name' => 'Test Collection',
+            'future_publish_date_behavior' => 'public',
+            'past_publish_date_behavior' => 'unlisted',
+        ]);
+
+    $dateTime = Carbon::now();
+
+    $meta_data = [
+        'title' => 'Test Meta Data Title',
+        'keywords' => 'Test Meta Data Keywords',
+        'author' => 'Test Meta Data Author',
+        'description' => 'Test Meta Data Description'
+    ];
+
+    $collectionEntry = livewire(CreateCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey()])
+        ->assertOk()
+        ->fillForm([
+            'title' => 'Test',
+            'slug' => 'test',
+            'published_at' => $dateTime,
+            'data' => ['main' => ['header' => 'Foo']],
+            'meta_data' => $meta_data
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(
+        CollectionEntry::class,
+        [
+            'id' => $collection->id,
+            'title' => 'Test',
+            'slug' => 'test',
+            'published_at' => $dateTime,
+            'data' => json_encode(['main' => ['header' => 'Foo']]),
+        ]
+    );
+
+    assertDatabaseHas(
+        MetaData::class,
+        array_merge(
+            $meta_data,
+            [
+                'taggable_type' => $collectionEntry->getMorphClass(),
+                'taggable_id' => $collectionEntry->id,
+            ]
+        )
+    );
+});
+
