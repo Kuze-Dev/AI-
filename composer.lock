@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b3139c759992055f9755bec878f6d934",
+    "content-hash": "d09c952f8d9faf8af26380409e5ca5ef",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -8960,16 +8960,16 @@
         },
         {
             "name": "timacdonald/json-api",
-            "version": "v1.0.0-beta.2",
+            "version": "v1.0.0-beta.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/timacdonald/json-api.git",
-                "reference": "d7484504846b19ea84781838be5087a449fb0999"
+                "reference": "deb13fa2d3375f50a1aec8fb90c822161ce2f364"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/timacdonald/json-api/zipball/d7484504846b19ea84781838be5087a449fb0999",
-                "reference": "d7484504846b19ea84781838be5087a449fb0999",
+                "url": "https://api.github.com/repos/timacdonald/json-api/zipball/deb13fa2d3375f50a1aec8fb90c822161ce2f364",
+                "reference": "deb13fa2d3375f50a1aec8fb90c822161ce2f364",
                 "shasum": ""
             },
             "require": {
@@ -9017,7 +9017,7 @@
                 "issues": "https://github.com/timacdonald/json-api/issues",
                 "source": "https://github.com/timacdonald/json-api/releases/latest"
             },
-            "time": "2023-01-28T02:27:38+00:00"
+            "time": "2023-02-14T03:29:31+00:00"
         },
         {
             "name": "victord11/ssl-certification-health-check",
