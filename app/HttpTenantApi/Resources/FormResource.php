@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
+use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
@@ -12,14 +13,14 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class FormResource extends JsonApiResource
 {
-    public function toAttributes($request): array
+    public function toAttributes(Request $request): array
     {
         return  [
             'name' => $this->name,
         ];
     }
 
-    public function toRelationships($request): array
+    public function toRelationships(Request $request): array
     {
         return [
             'blueprint' => fn () => BlueprintResource::make($this->blueprint),

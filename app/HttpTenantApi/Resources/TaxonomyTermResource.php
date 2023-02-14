@@ -6,6 +6,7 @@ namespace App\HttpTenantApi\Resources;
 
 use App\HttpTenantApi\Resources\Concerns\TransformsSchemaPayload;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
+use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
@@ -15,7 +16,7 @@ class TaxonomyTermResource extends JsonApiResource
 {
     use TransformsSchemaPayload;
 
-    public function toAttributes($request): array
+    public function toAttributes(Request $request): array
     {
         return  [
             'name' => $this->name,
