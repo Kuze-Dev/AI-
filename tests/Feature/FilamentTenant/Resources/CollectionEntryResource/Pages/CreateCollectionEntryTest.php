@@ -189,7 +189,7 @@ it('can create collection entry with default meta data title', function () {
     assertDatabaseHas(
         MetaData::class,
         [
-            'title' => 'test',
+            'title' => 'Test',
             'taggable_type' => $collectionEntry->getMorphClass(),
             'taggable_id' => $collectionEntry->getKey(),
         ]

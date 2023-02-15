@@ -137,7 +137,7 @@ it('can edit collection entry', function () {
     assertDatabaseHas(
         MetaData::class,
         [
-            'title' => $updatedCollectionEntry->slug,
+            'title' => 'New Foo',
             'description' => null,
             'author' => null,
             'keywords' => null,
@@ -397,7 +397,7 @@ it('can edit collection entry to have no meta data filled', function () {
     assertDatabaseHas(
         MetaData::class,
         [
-            'title' => $updatedCollectionEntry->slug,
+            'title' => 'New Foo',
             'description' => null,
             'author' => null,
             'keywords' => null,
