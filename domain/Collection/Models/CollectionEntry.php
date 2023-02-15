@@ -19,6 +19,7 @@ use Spatie\Sluggable\HasSlug;
 use Illuminate\Support\Facades\Blade;
 use Spatie\Sluggable\SlugOptions;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 
 /**
  * Domain\Collection\Models\CollectionEntry
@@ -54,7 +55,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
  * @method static CollectionEntryBuilder|CollectionEntry whereTitle($value)
  * @method static CollectionEntryBuilder|CollectionEntry whereUpdatedAt($value)
  */
-class CollectionEntry extends Model implements IsActivitySubject
+class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataContract
 {
     use LogsActivity;
     use HasSlug;
@@ -91,6 +92,19 @@ class CollectionEntry extends Model implements IsActivitySubject
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
+    }
+
+    /**
+     * Define default reference 
+     * for meta data properties.
+     * 
+     * @return array
+     */
+    public function defaultMetaData(): array 
+    {
+        return [
+            'title' => $this->title
+        ];
     }
 
     /**

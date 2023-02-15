@@ -11,6 +11,9 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+/**
+ * @property-read \Illuminate\Database\Eloquent\Collection|MetaData[] $metaData
+ */
 class MetaData extends Model implements IsActivitySubject
 {
     use LogsActivity;
