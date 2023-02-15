@@ -17,6 +17,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
+
 /**
  * Domain\Page\Models\Page
  *
@@ -58,15 +59,15 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
     ];
 
     /**
-     * Define default reference 
+     * Define default reference
      * for meta data properties.
-     * 
+     *
      * @return array
      */
-    public function defaultMetaData(): array 
+    public function defaultMetaData(): array
     {
         return [
-            'title' => $this->name
+            'title' => $this->name,
         ];
     }
 

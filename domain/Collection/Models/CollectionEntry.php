@@ -95,15 +95,15 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
     }
 
     /**
-     * Define default reference 
+     * Define default reference
      * for meta data properties.
-     * 
+     *
      * @return array
      */
-    public function defaultMetaData(): array 
+    public function defaultMetaData(): array
     {
         return [
-            'title' => $this->title
+            'title' => $this->title,
         ];
     }
 

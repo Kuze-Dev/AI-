@@ -12,7 +12,7 @@ class UpdateMetaDataAction
 {
     public function execute(Model&HasMetaData $model, MetaDataData $metaDataData): Model
     {
-        $model->metaData
+        $model->metaData()
             ->update([
                 'title' => $metaDataData->title ?? $model->defaultMetaData()['title'] ?? null,
                 'description' => $metaDataData->description,
