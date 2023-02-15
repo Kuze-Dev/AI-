@@ -11,6 +11,8 @@ use Domain\Auth\Contracts\HasActiveState as HasActiveStateContract;
 use Domain\Auth\Contracts\TwoFactorAuthenticatable as TwoFactorAuthenticatableContract;
 use Domain\Auth\HasActiveState;
 use Domain\Auth\TwoFactorAuthenticatable;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -81,6 +83,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static \Illuminate\Database\Query\Builder|Admin withoutTrashed()
  * @mixin \Eloquent
  */
+#[OnDeleteCascade(['twoFactorAuthentication', 'roles', 'permissions', 'tokens'])]
 class Admin extends Authenticatable implements MustVerifyEmail, HasName, TwoFactorAuthenticatableContract, FilamentUser, HasActiveStateContract, IsActivitySubject
 {
     use HasApiTokens;
@@ -90,6 +93,7 @@ class Admin extends Authenticatable implements MustVerifyEmail, HasName, TwoFact
     use TwoFactorAuthenticatable;
     use HasActiveState;
     use LogsActivity;
+    use ConstraintsRelationships;
 
     protected $fillable = [
         'first_name',

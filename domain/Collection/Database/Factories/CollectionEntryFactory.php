@@ -20,6 +20,7 @@ class CollectionEntryFactory extends Factory
     {
         return [
             'title' => $this->faker->name(),
+            'data' => [],
         ];
     }
 }

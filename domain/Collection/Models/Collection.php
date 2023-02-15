@@ -16,6 +16,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Domain\Collection\Enums\PublishBehavior;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Domain\Support\SlugHistory\HasSlugHistory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -55,11 +58,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Collection whereUpdatedAt($value)
  * @mixin \Eloquent
  */
+#[
+    OnDeleteCascade(['taxonomies']),
+    OnDeleteRestrict(['collectionEntries'])
+]
 class Collection extends Model implements IsActivitySubject
 {
     use LogsActivity;
     use HasSlug;
     use HasSlugHistory;
+    use ConstraintsRelationships;
 
     /**
      * Declare columns
@@ -95,12 +103,12 @@ class Collection extends Model implements IsActivitySubject
             ->dontSubmitEmptyLogs();
     }
 
-     /**
-      * Declare relationship of
-      * current model to blueprint.
-      *
-      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Collection\Models\Collection>
-      */
+    /**
+     * Declare relationship of
+     * current model to blueprint.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Collection\Models\Collection>
+     */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);

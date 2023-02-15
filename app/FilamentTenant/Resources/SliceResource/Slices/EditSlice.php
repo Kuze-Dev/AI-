@@ -40,6 +40,8 @@ class EditSlice extends EditRecord
                         name: $data['name'],
                         component: $data['component'],
                         blueprint_id: $data['blueprint_id'],
+                        is_fixed_content: $data['is_fixed_content'],
+                        data: $data['data'] ?? null,
                     )
                 )
         );

@@ -6,6 +6,8 @@ namespace Domain\Form\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -44,10 +46,12 @@ use Spatie\Sluggable\SlugOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|Form whereUpdatedAt($value)
  * @mixin \Eloquent
  */
+#[OnDeleteCascade(['formEmailNotifications', 'formSubmissions'])]
 class Form extends Model implements IsActivitySubject
 {
     use HasSlug;
     use LogsActivity;
+    use ConstraintsRelationships;
 
     protected $fillable = [
         'blueprint_id',

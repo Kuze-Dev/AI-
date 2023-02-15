@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Page\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -44,8 +45,8 @@ class SliceContent extends Model implements Sortable
         'order',
     ];
 
-    protected $casts = [
-        'data' => 'array',
+    protected $with = [
+        'slice',
     ];
 
     /** @return BelongsTo<Slice, SliceContent> */
@@ -58,5 +59,14 @@ class SliceContent extends Model implements Sortable
     public function buildSortQuery(): Builder
     {
         return static::query()->where('page_id', $this->page_id);
+    }
+
+    /** @return Attribute<array|null, static> */
+    protected function data(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $this->slice->is_fixed_content ? $this->slice->data : json_decode($value ?? '', true),
+            set: fn (?array $value) => $this->slice->is_fixed_content ? null : json_encode($value)
+        );
     }
 }

@@ -9,6 +9,7 @@ use Domain\Blueprint\DataTransferObjects\DatetimeFieldData;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\FileFieldData;
 use Domain\Blueprint\DataTransferObjects\MarkdownFieldData;
+use Domain\Blueprint\DataTransferObjects\RelatedResourceFieldData;
 use Domain\Blueprint\DataTransferObjects\RepeaterFieldData;
 use Domain\Blueprint\DataTransferObjects\RichtextFieldData;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
@@ -108,6 +109,7 @@ class SchemaFormBuilder extends Component
             TextFieldData::class => $this->makeTextInputComponent($field),
             ToggleFieldData::class => Toggle::make($field->state_name),
             RepeaterFieldData::class => $this->makeRepeaterComponent($field),
+            RelatedResourceFieldData::class => $this->makeRelatedResourceComponent($field),
             default => throw new InvalidArgumentException('Cannot generate field component for `' . $field::class . '` as its not supported.'),
         };
 
@@ -140,7 +142,9 @@ class SchemaFormBuilder extends Component
         if ($fileFieldData->multiple) {
             $fileUpload->multiple($fileFieldData->multiple)
                 ->minFiles($fileFieldData->min_files)
-                ->maxFiles($fileFieldData->max_files);
+                ->maxFiles($fileFieldData->max_files)
+                ->panelLayout('grid')
+                ->imagePreviewHeight('256');
         }
 
         if ($fileFieldData->reorder) {
@@ -220,5 +224,26 @@ class SchemaFormBuilder extends Component
         }
 
         return $repeater;
+    }
+
+    private function makeRelatedResourceComponent(RelatedResourceFieldData $relatedResourceFieldData): Select
+    {
+        $relatedResourceModelConfig = $relatedResourceFieldData->getRelatedModelConfig();
+        $related = $relatedResourceFieldData->getRelatedModelInstance();
+        $relatedQuery = $relatedResourceFieldData->getRelatedResourceQuery();
+
+        $component = Select::make($relatedResourceFieldData->state_name)
+            ->options($relatedQuery->pluck($relatedResourceModelConfig['title_column'], $related->getKeyName()))
+            ->multiple($relatedResourceFieldData->multiple);
+
+        if ($relatedResourceFieldData->min) {
+            $component->minItems($relatedResourceFieldData->min);
+        }
+
+        if ($relatedResourceFieldData->max) {
+            $component->maxItems($relatedResourceFieldData->max);
+        }
+
+        return $component;
     }
 }

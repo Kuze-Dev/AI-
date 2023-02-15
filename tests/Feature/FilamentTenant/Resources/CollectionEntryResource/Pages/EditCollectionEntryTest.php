@@ -27,19 +27,19 @@ beforeEach(function () {
 });
 
 it('can render collection entry', function () {
-    $taxonomy = TaxonomyFactory::new()
-        ->createOne();
-
-    $taxonomyTerms = TaxonomyTermFactory::new()
-        ->for($taxonomy)
-        ->count(2)
-        ->create();
-
     $collection = CollectionFactory::new()
         ->for(
             BlueprintFactory::new()
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->has(
+            TaxonomyFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+                )
         )
         ->createOne([
             'name' => 'Test Collection',
@@ -47,17 +47,18 @@ it('can render collection entry', function () {
             'past_publish_date_behavior' => 'unlisted',
         ]);
 
-    $collection->taxonomies()->attach([$taxonomy->getKey()]);
-
     $collectionEntry = CollectionEntryFactory::new()
         ->for($collection)
+        ->has(
+            TaxonomyTermFactory::new(['data' => ['description' => 'test']])
+                ->for($collection->taxonomies->first())
+                ->count(2)
+        )
         ->createOne([
             'title' => 'Foo',
             'published_at' => Carbon::now(),
             'data' => ['main' => ['header' => 'Foo']],
         ]);
-
-    $collectionEntry->taxonomyTerms()->attach($taxonomyTerms);
 
     livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
         ->assertFormSet([
@@ -65,7 +66,7 @@ it('can render collection entry', function () {
             'published_at' => (string) $collectionEntry->published_at->timezone(Auth::user()->timezone),
             'data' => $collectionEntry->data,
             'taxonomies' => [
-                $taxonomy->getKey() => $taxonomyTerms->pluck('id')->toArray(),
+                $collection->taxonomies->first()->id => $collectionEntry->taxonomyTerms->pluck('id')->toArray(),
             ],
         ]);
 });
@@ -77,20 +78,27 @@ it('can edit collection entry', function () {
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
         )
-        ->has(TaxonomyFactory::new())
+        ->has(
+            TaxonomyFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+                )
+        )
         ->createOne([
             'name' => 'Test Collection',
             'future_publish_date_behavior' => 'public',
             'past_publish_date_behavior' => 'unlisted',
         ]);
 
-    $taxonomyTerms = TaxonomyTermFactory::new()
-        ->for($collection->taxonomies->first())
-        ->count(2)
-        ->create();
-
     $collectionEntry = CollectionEntryFactory::new()
         ->for($collection)
+        ->has(
+            TaxonomyTermFactory::new(['data' => ['description' => 'test']])
+                ->for($collection->taxonomies->first())
+                ->count(2)
+        )
         ->createOne([
             'title' => 'Foo',
             'data' => ['main' => ['header' => 'Foo']],
@@ -113,7 +121,7 @@ it('can edit collection entry', function () {
             'published_at' => $dateTime,
             'data' => ['main' => ['header' => 'Foo updated']],
             'taxonomies' => [
-                $collection->taxonomies->first()->id => $taxonomyTerms->pluck('id'),
+                $collection->taxonomies->first()->id => $collectionEntry->taxonomyTerms->pluck('id'),
             ],
             'meta_data' => [
                 'title' => '',
@@ -146,7 +154,7 @@ it('can edit collection entry', function () {
         ]
     );
 
-    foreach ($taxonomyTerms as $taxonomyTerm) {
+    foreach ($collectionEntry->taxonomyTerms as $taxonomyTerm) {
         assertDatabaseHas('collection_entry_taxonomy_term', [
             'taxonomy_term_id' => $taxonomyTerm->getKey(),
             'collection_entry_id' => $collectionEntry->getKey(),
@@ -200,25 +208,32 @@ it('can edit collection entry slug', function () {
 });
 
 it('can edit collection entry to have no taxonomy terms attached', function () {
-    $collection = CollectionFactory::new(['name' => 'Test Collection'])
+    $collection = CollectionFactory::new()
         ->for(
             BlueprintFactory::new()
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
         )
-        ->has(TaxonomyFactory::new())
+        ->has(
+            TaxonomyFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+                )
+        )
         ->createOne();
 
     $collectionEntry = CollectionEntryFactory::new()
         ->for($collection)
         ->has(
-            TaxonomyTermFactory::new()
+            TaxonomyTermFactory::new(['data' => ['description' => 'test']])
                 ->for($collection->taxonomies->first())
                 ->count(2)
         )
         ->createOne([
-            'title' => 'Test',
-            'data' => json_encode(['main' => ['header' => 'Foo']]),
+            'title' => 'Foo',
+            'data' => ['main' => ['header' => 'Foo']],
         ]);
 
     $metaDataData = [

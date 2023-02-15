@@ -83,7 +83,7 @@ class PageResource extends Resource
                         ->itemLabel(fn (array $state) => self::getCachedSlices()->firstWhere('id', $state['slice_id'])?->name)
                         ->disableLabel()
                         ->minItems(1)
-                        ->collapsible()
+                        ->collapsed(fn (string $context) => $context === 'edit')
                         ->orderable('order')
                         ->schema([
                             Forms\Components\Select::make('slice_id')
@@ -99,16 +99,21 @@ class PageResource extends Resource
                                 ->exists(Slice::class, 'id')
                                 ->searchable()
                                 ->reactive()
-                                ->afterStateUpdated(
-                                    fn (Forms\Components\Select $component) => $component->getContainer()
+                                ->afterStateUpdated(function (Forms\Components\Select $component, $state) {
+                                    $slice = self::getCachedSlices()->firstWhere('id', $state);
+
+                                    $component->getContainer()
                                         ->getComponent(fn (Component $component) => $component->getId() === 'schema-form')
                                         ?->getChildComponentContainer()
-                                        ->fill()
-                                )
+                                        ->fill($slice?->is_fixed_content ? $slice->data : []);
+                                })
                                 ->dehydrateStateUsing(fn (string|int $state) => (int) $state),
                             SchemaFormBuilder::make('data')
                                 ->id('schema-form')
+                                ->dehydrated(fn (Closure $get) => ! (self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->is_fixed_content))
+                                ->disabled(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->is_fixed_content ?? false)
                                 ->schemaData(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->blueprint->schema),
+
                         ]),
                 ]),
             MetaDataForm::make('Meta Data'),

@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Resources\TenantResource\Pages;
+use App\Filament\Rules\CheckDatabaseConnection;
 use App\Filament\Rules\FullyQualifiedDomainNameRule;
 use Domain\Tenant\Models\Tenant;
 use Filament\Forms;
@@ -39,6 +40,34 @@ class TenantResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->required(),
                 ]),
+                Forms\Components\Section::make(trans('Database'))
+                    ->statePath('database')
+                    ->schema([
+                        Forms\Components\TextInput::make('host')
+                            ->required(fn (?Tenant $record) => $record === null)
+                            ->columnSpan(['md' => 3])
+                            ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('db_host')))
+                            ->rule(new CheckDatabaseConnection(config('tenancy.database.template_tenant_connection'), 'data.database')),
+                        Forms\Components\TextInput::make('port')
+                            ->required(fn (?Tenant $record) => $record === null)
+                            ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('db_port'))),
+                        Forms\Components\TextInput::make('name')
+                            ->required(fn (?Tenant $record) => $record === null)
+                            ->columnSpanFull()
+                            ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('db_name'))),
+                        Forms\Components\TextInput::make('username')
+                            ->required(fn (?Tenant $record) => $record === null)
+                            ->columnSpan(['md' => 2])
+                            ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('db_username'))),
+                        Forms\Components\TextInput::make('password')
+                            ->password()
+                            ->required(fn (?Tenant $record) => $record === null)
+                            ->columnSpan(['md' => 2])
+                            ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record ? 'nice try, but we won\'t show the password' : null)),
+                    ])
+                    ->columns(['md' => 4])
+                    ->disabledOn('edit')
+                    ->dehydrated(fn (string $context) => $context !== 'edit'),
                 Forms\Components\Section::make(trans('Domains'))
                     ->schema([
                         Forms\Components\Repeater::make('domains')

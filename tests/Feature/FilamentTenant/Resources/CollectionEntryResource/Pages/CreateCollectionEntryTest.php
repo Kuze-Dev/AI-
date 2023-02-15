@@ -59,37 +59,38 @@ it('can create collection entry', function () {
 });
 
 it('can create collection entry with taxonomy terms', function () {
-    $taxonomy = TaxonomyFactory::new()
-        ->createOne();
-
-    $taxonomyTerm = TaxonomyTermFactory::new()
-        ->for($taxonomy)
-        ->createOne();
-
     $collection = CollectionFactory::new(['name' => 'Test Collection'])
         ->for(
             BlueprintFactory::new()
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
         )
+        ->has(
+            TaxonomyFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+                )
+                ->has(TaxonomyTermFactory::new(['data' => ['description' => 'test']]))
+        )
         ->createOne(['name' => 'Test Collection']);
 
-    $collection->taxonomies()->attach([$taxonomy->getKey()]);
+    $taxonomy = $collection->taxonomies->first();
+    $taxonomyTerm = $taxonomy->taxonomyTerms->first();
 
-    livewire(CreateCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey()])
+    $collectionEntry = livewire(CreateCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey()])
         ->assertOk()
         ->fillForm([
             'title' => 'Test',
             'slug' => 'test',
-            'taxonomies' => [
-                $taxonomy->getKey() => [
-                    $taxonomyTerm->getKey(),
-                ],
-            ],
+            "taxonomies.{$taxonomy->getKey()}" => [$taxonomyTerm->getKey()],
             'data' => ['main' => ['header' => 'Foo']],
         ])
         ->call('create')
-        ->assertHasNoFormErrors();
+        ->assertHasNoFormErrors()
+        ->instance()
+        ->record;
 
     assertDatabaseHas(
         CollectionEntry::class,
@@ -104,7 +105,7 @@ it('can create collection entry with taxonomy terms', function () {
         'collection_entry_taxonomy_term',
         [
             'taxonomy_term_id' => $taxonomyTerm->getKey(),
-            'collection_entry_id' => CollectionEntry::latest()->first()->getKey(),
+            'collection_entry_id' => $collectionEntry->getKey(),
         ]
     );
 });

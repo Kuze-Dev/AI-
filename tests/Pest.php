@@ -42,6 +42,7 @@ uses(
         });
 
         config()->set('tenancy.database.prefix', 'test_');
+        config()->set('tenancy.database.template_tenant_connection', 'sqlite');
     })
     ->afterEach(function () {
         tenancy()->end();
@@ -72,6 +73,7 @@ uses(
         Relation::morphMap(['test_user' => User::class]);
 
         config()->set('tenancy.database.prefix', 'test_');
+        config()->set('tenancy.database.template_tenant_connection', 'sqlite');
     })
     ->afterEach(function () {
         tenancy()->end();

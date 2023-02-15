@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
+use App\HttpTenantApi\Resources\Concerns\TransformsSchemaPayload;
+use Domain\Blueprint\DataTransferObjects\SchemaData;
+use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
@@ -11,22 +14,30 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class CollectionEntryResource extends JsonApiResource
 {
-    public function toAttributes($request): array
+    use TransformsSchemaPayload;
+
+    public function toAttributes(Request $request): array
     {
         return [
             'title' => $this->title,
-            'data' => $this->data,
+            'data' => $this->transformSchemaPayload($this->data),
             'order' => $this->order,
             'published_at' => $this->published_at,
             'route_url' => $this->qualified_route_url,
         ];
     }
 
-    public function toRelationships($request): array
+    /** @return array<string, callable> */
+    public function toRelationships(Request $request): array
     {
         return [
             'taxonomyTerms' => fn () => TaxonomyTermResource::collection($this->taxonomyTerms),
             'slugHistories' => fn () => SlugHistoryResource::collection($this->slugHistories),
         ];
+    }
+
+    protected function getSchemaData(): SchemaData
+    {
+        return $this->collection->blueprint->schema;
     }
 }

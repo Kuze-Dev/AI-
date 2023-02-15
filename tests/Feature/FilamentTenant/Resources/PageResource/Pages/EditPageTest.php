@@ -134,6 +134,7 @@ it('can edit page slug', function () {
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'slug' => 'new-foo',
+            'slice_contents.record-1.data.main.header' => 'Bar',
         ])
         ->call('save')
         ->assertHasNoFormErrors()
@@ -148,5 +149,66 @@ it('can edit page slug', function () {
         'model_type' => $page->getMorphClass(),
         'model_id' => $page->id,
         'slug' => 'new-foo',
+    ]);
+});
+
+it('page slice with default value will fill the slices fields', function () {
+    $page = PageFactory::new()
+        ->addSliceContent(
+            SliceFactory::new(
+                [
+                    'is_fixed_content' => true,
+                    'data' => ['main' => ['header' => 'Foo']],
+                ]
+            )
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+                ),
+            ['data' => null]
+        )
+        ->createOne();
+
+    livewire(EditPage::class, ['record' => $page->getRouteKey()])
+        ->fillForm([
+            'slug' => 'new-foo',
+        ])
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->assertFormSet([
+            'slice_contents.record-1.data.main.header' => 'Foo',
+        ]);
+});
+
+it('page slice with default value column data must be dehydrated', function () {
+    $page = PageFactory::new(['slug' => 'foo'])
+        ->addSliceContent(
+            SliceFactory::new(
+                [
+                    'is_fixed_content' => true,
+                    'data' => ['main' => ['header' => 'Foo']],
+                ]
+            )
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+                ),
+            ['data' => null]
+        )
+        ->createOne();
+
+    livewire(EditPage::class, ['record' => $page->getRouteKey()])
+        ->fillForm([
+            'slug' => 'new-foo',
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors()
+        ->assertOk();
+
+    assertDatabaseHas(SliceContent::class, [
+        'page_id' => $page->id,
+        'data' => null,
     ]);
 });

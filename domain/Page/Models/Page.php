@@ -6,6 +6,8 @@ namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Support\MetaData\HasMetaData;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Domain\Support\SlugHistory\HasSlugHistory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -45,12 +47,14 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @mixin \Eloquent
  */
 
+#[OnDeleteCascade(['sliceContents'])]
 class Page extends Model implements IsActivitySubject, HasMetaDataContract
 {
     use LogsActivity;
     use HasSlug;
     use HasSlugHistory;
     use HasMetaData;
+    use ConstraintsRelationships;
 
     protected $fillable = [
         'name',

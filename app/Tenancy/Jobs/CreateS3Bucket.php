@@ -20,12 +20,9 @@ class CreateS3Bucket implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    protected BucketManager $bucketManager;
-
     public function __construct(
         protected Tenant $tenant
     ) {
-        $this->bucketManager = new BucketManager($tenant);
     }
 
     public function handle(): void
@@ -40,11 +37,13 @@ class CreateS3Bucket implements ShouldQueue
             return;
         }
 
-        if ( ! $this->bucketManager->bucketExists()) {
-            $this->bucketManager->createBucket();
+        $bucketManager = new BucketManager($this->tenant);
+
+        if ( ! $bucketManager->bucketExists()) {
+            $bucketManager->createBucket();
         }
 
-        $this->bucketManager->configureBucket();
+        $bucketManager->configureBucket();
     }
 
     protected function generateBucketName(): string

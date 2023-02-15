@@ -14,6 +14,8 @@ class UpdateSliceAction
         $slice->update([
             'name' => $sliceData->name,
             'component' => $sliceData->component,
+            'data' => $sliceData->data,
+            'is_fixed_content' => $sliceData->is_fixed_content,
         ]);
 
         return $slice;
