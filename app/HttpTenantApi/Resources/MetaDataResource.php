@@ -15,7 +15,7 @@ class MetaDataResource extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         return [
-            'title' => $this->name,
+            'title' => $this->title,
             'author' => $this->description,
             'keywords' => $this->keywords,
             'description' => $this->description,
