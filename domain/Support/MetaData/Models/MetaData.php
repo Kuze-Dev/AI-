@@ -26,7 +26,6 @@ class MetaData extends Model implements IsActivitySubject
         'title',
         'author',
         'description',
-        'author',
         'keywords',
     ];
 
