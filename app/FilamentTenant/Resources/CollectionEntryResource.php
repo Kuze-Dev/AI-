@@ -16,7 +16,7 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
 use Closure;
 use Domain\Collection\Models\CollectionEntry;
-use Domain\Support\MetaData\MetaDataForm;
+use App\FilamentTenant\Support\MetaDataForm;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Facades\Filament;

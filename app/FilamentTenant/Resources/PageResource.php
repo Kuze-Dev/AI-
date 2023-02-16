@@ -12,7 +12,7 @@ use Closure;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Slice;
 use Domain\Page\Models\SliceContent;
-use Domain\Support\MetaData\MetaDataForm;
+use App\FilamentTenant\Support\MetaDataForm;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
