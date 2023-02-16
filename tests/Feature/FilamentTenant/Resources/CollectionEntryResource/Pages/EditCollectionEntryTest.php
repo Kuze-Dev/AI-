@@ -259,13 +259,13 @@ it('can edit collection entry to have no taxonomy terms attached', function () {
 });
 
 it('can edit collection entry meta data', function () {
+    $blueprint = BlueprintFactory::new()
+        ->addSchemaSection(['title' => 'Main'])
+        ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT]);
+
     $collection = CollectionFactory::new()
-        ->for(
-            BlueprintFactory::new()
-                ->addSchemaSection(['title' => 'Main'])
-                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
-        )
-        ->has(TaxonomyFactory::new())
+        ->for($blueprint)
+        ->has(TaxonomyFactory::new()->for($blueprint))
         ->createOne([
             'name' => 'Test Collection',
             'future_publish_date_behavior' => 'public',
@@ -345,13 +345,13 @@ it('can edit collection entry meta data', function () {
 });
 
 it('can edit collection entry to have no meta data filled', function () {
+    $blueprint = BlueprintFactory::new()
+        ->addSchemaSection(['title' => 'Main'])
+        ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT]);
+
     $collection = CollectionFactory::new()
-        ->for(
-            BlueprintFactory::new()
-                ->addSchemaSection(['title' => 'Main'])
-                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
-        )
-        ->has(TaxonomyFactory::new())
+        ->for($blueprint)
+        ->has(TaxonomyFactory::new()->for($blueprint))
         ->createOne([
             'name' => 'Test Collection',
             'future_publish_date_behavior' => 'public',
