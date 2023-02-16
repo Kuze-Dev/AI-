@@ -12,12 +12,14 @@ class CreateMetaDataAction
 {
     public function execute(Model&HasMetaData $model, MetaDataData $metaDataData): Model
     {
+        $defaults = $model->defaultMetaData();
+
         $model->metaData()
             ->create([
-                'title' => $metaDataData->title ?? $model->defaultMetaData()['title'] ?? null,
-                'description' => $metaDataData->description,
-                'author' => $metaDataData->author,
-                'keywords' => $metaDataData->keywords,
+                'title' => $metaDataData->title ?? $defaults['title'] ?? null,
+                'description' => $metaDataData->description ?? $defaults['description'] ?? null,
+                'author' => $metaDataData->author ?? $defaults['author'] ?? null,
+                'keywords' => $metaDataData->keywords ?? $defaults['keywords'] ?? null,
             ]);
 
         return $model;
