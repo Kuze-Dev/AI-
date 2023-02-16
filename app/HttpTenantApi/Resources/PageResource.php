@@ -26,7 +26,7 @@ class PageResource extends JsonApiResource
         return [
             'sliceContents' => fn () => SliceContentResource::collection($this->sliceContents),
             'slugHistories' => fn () => SlugHistoryResource::collection($this->slugHistories),
-            'metaData' => fn () => MetaDataResource::make($this->metaData)
+            'metaData' => fn () => MetaDataResource::make($this->metaData),
         ];
     }
 }

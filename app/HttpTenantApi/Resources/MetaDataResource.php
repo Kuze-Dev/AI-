@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
@@ -18,7 +18,7 @@ class MetaDataResource extends JsonApiResource
             'title' => $this->name,
             'author' => $this->description,
             'keywords' => $this->keywords,
-            'description' => $this->description 
+            'description' => $this->description,
         ];
     }
 }

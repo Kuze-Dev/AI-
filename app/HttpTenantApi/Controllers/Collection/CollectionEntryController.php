@@ -51,7 +51,7 @@ class CollectionEntryController
                 ->allowedIncludes([
                     'taxonomyTerms',
                     'slugHistories',
-                    'metaData'
+                    'metaData',
                 ])
                 ->with('collection.blueprint')
                 ->firstOrFail()
