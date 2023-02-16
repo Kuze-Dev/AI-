@@ -21,7 +21,7 @@ class PageData
             slice_contents: array_map(
                 fn (array $sliceContentData) => new SliceContentData(
                     slice_id: $sliceContentData['slice_id'],
-                    data: $sliceContentData['data'],
+                    data: $sliceContentData['data'] ?? null,
                     id: $sliceContentData['id'] ?? null,
                 ),
                 $data['slice_contents'] ?? []

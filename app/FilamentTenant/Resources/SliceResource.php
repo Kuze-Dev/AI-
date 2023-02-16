@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
+use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Page\Models\Slice;
@@ -16,6 +17,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
 use Exception;
+use Closure;
 
 class SliceResource extends Resource
 {
@@ -48,8 +50,18 @@ class SliceResource extends Resource
                     ->required()
                     ->exists(Blueprint::class, 'id')
                     ->searchable()
+                    ->reactive()
                     ->preload()
                     ->disabled(fn (?Slice $record) => $record !== null),
+                Forms\Components\Toggle::make('is_fixed_content')
+                    ->inline(false)
+                    ->hidden(fn (Closure $get) => $get('blueprint_id') ? false : true)
+                    ->helperText('If enabled, the content below will serve as the default for all related pages')
+                    ->reactive(),
+                SchemaFormBuilder::make('data')
+                    ->id('schema-form')
+                    ->hidden(fn (Closure $get) => $get('is_fixed_content') ? false : true)
+                    ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
             ]),
         ]);
     }

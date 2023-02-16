@@ -8,7 +8,7 @@ class SliceContentData
 {
     public function __construct(
         public readonly int $slice_id,
-        public readonly array $data,
+        public readonly ?array $data = null,
         public readonly ?int $id = null,
     ) {
     }

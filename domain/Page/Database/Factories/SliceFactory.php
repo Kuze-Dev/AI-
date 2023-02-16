@@ -23,6 +23,8 @@ class SliceFactory extends Factory
 
         return [
             'blueprint_id' => null,
+            'data' => null,
+            'is_fixed_content' => false,
             'name' => $name,
             'component' => Str::camel($name),
         ];

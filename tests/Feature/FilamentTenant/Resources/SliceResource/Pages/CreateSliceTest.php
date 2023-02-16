@@ -7,6 +7,7 @@ use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\Models\Slice;
 use Filament\Facades\Filament;
+use Domain\Blueprint\Enums\FieldType;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
@@ -83,4 +84,34 @@ it('can not create slice with same component', function () {
         ->call('create')
         ->assertHasFormErrors(['component' => 'unique'])
         ->assertOk();
+});
+
+it('can create slice with default content', function () {
+    $blueprint = BlueprintFactory::new()
+        ->addSchemaSection(['title' => 'Main'])
+        ->addSchemaField([
+            'title' => 'Title',
+            'type' => FieldType::TEXT,
+        ])
+        ->createOne();
+
+    livewire(CreateSlice::class)
+        ->fillForm([
+            'name' => 'Test',
+            'component' => 'Test',
+            'blueprint_id' => $blueprint->id,
+            'is_fixed_content' => true,
+            'data' => ['main' => ['title' => 'Foobar']],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk();
+
+    assertDatabaseHas(Slice::class, [
+        'name' => 'Test',
+        'component' => 'Test',
+        'blueprint_id' => $blueprint->id,
+        'is_fixed_content' => true,
+        'data' => json_encode(['main' => ['title' => 'Foobar']]),
+    ]);
 });
