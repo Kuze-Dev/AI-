@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\Globals\Actions;
 
-use Domain\Collection\Models\Collection;
+use Domain\Globals\Models\Globals;
 
 class DeleteGlobalsAction
 {
     /** Execute a delete collection query. */
-    public function execute(Collection $collection): ?bool
+    public function execute(Globals $globals): ?bool
     {
-        return $collection->delete();
+        return $globals->delete();
     }
 }

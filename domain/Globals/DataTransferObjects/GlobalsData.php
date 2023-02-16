@@ -15,4 +15,14 @@ class GlobalsData
 
     ) {
     }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            name: $data['name'],
+            slug: $data['slug'],
+            blueprint_id: $data['blueprint_id'],
+            data: $data['data'],
+        );
+    }
 }

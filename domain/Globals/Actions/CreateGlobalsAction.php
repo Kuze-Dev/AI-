@@ -4,14 +4,24 @@ declare(strict_types=1);
 
 namespace Domain\Globals\Actions;
 
+
 use Domain\Globals\DataTransferObjects\GlobalsData;
 use Domain\Globals\Models\Globals;
 
 class CreateGlobalsAction
 {
     /** Execute create collection query. */
-    public function execute(GlobalsData $globalData): Collection
+    public function execute(GlobalsData $globalData): Globals
     {
-          dd($globalData);
+
+
+        $globals = Globals::create([
+            'name' => $globalData->name,
+            'slug' => $globalData->slug,
+            'blueprint_id' => $globalData->blueprint_id,
+            'data' => $globalData->data,
+        ]);
+
+        return $globals;
     }
 }

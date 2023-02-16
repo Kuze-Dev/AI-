@@ -27,7 +27,6 @@ class Globals extends Model implements IsActivitySubject
 {
     use LogsActivity;
     use HasSlug;
-    use HasSlugHistory;
     use ConstraintsRelationships;
 
     protected $table = 'globals';
@@ -43,6 +42,9 @@ class Globals extends Model implements IsActivitySubject
         
     ];
 
+    protected $casts = [
+        'data' => 'array',
+    ];
     
 
     /** @return LogOptions */
@@ -58,7 +60,7 @@ class Globals extends Model implements IsActivitySubject
      * Declare relationship of
      * current model to blueprint.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Collection\Models\Collection>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Globals\Models\Globals>
      */
     public function blueprint(): BelongsTo
     {

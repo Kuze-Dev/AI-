@@ -4,29 +4,26 @@ declare(strict_types=1);
 
 namespace Domain\Globals\Actions;
 
-use Domain\Collection\DataTransferObjects\CollectionData;
-use Domain\Collection\Models\Collection;
 
+use Domain\Globals\DataTransferObjects\GlobalsData;
+use Domain\Globals\Models\Globals;
 class UpdateGlobalsAction
 {
     /**
      * Execute operations for updating
      * collection and save collection query.
      */
-    public function execute(Collection $collection, CollectionData $collectionData): Collection
+    public function execute(Globals $globals, GlobalsData $globalData): Globals
     {
-        $collection->update([
-            'name' => $collectionData->name,
-            'slug' => $collectionData->slug,
-            'past_publish_date_behavior' => $collectionData->past_publish_date_behavior,
-            'future_publish_date_behavior' => $collectionData->future_publish_date_behavior,
-            'is_sortable' => $collectionData->is_sortable,
-            'route_url' => $collectionData->route_url,
+        
+        $globals->update([
+            'name' => $globalData->name,
+            'slug' => $globalData->slug,
+            'blueprint_id' => $globalData->blueprint_id,
+            'data' => $globalData->data,
         ]);
 
-        $collection->taxonomies()
-            ->sync($collectionData->taxonomies);
-
-        return $collection;
+        return $globals;
+        
     }
 }
