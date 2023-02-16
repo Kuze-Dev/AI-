@@ -13,7 +13,7 @@ class AdminRequestFactory extends RequestFactory
         return [
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
-            'email' => $this->faker->safeEmail(),
+            'email' => 'test@user.com',
             'password' => 'new-password',
             'password_confirmation' => 'new-password',
             'active' => true,
