@@ -47,7 +47,7 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @mixin \Eloquent
  */
 
-#[OnDeleteCascade(['sliceContents'])]
+#[OnDeleteCascade(['sliceContents', 'metaData'])]
 class Page extends Model implements IsActivitySubject, HasMetaDataContract
 {
     use LogsActivity;
