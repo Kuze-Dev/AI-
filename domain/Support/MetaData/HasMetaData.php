@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 trait HasMetaData
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Domain\Support\MetaData\Models\MetaData> */
+    /** @return MorphOne<MetaData> */
     public function metaData(): MorphOne
     {
         return $this->morphOne(MetaData::class, 'taggable');
