@@ -13,6 +13,7 @@ use Domain\Collection\Models\CollectionEntry;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
+use Domain\Globals\Models\Globals;
 use Domain\Page\Models\Page;
 use Domain\Support\SlugHistory\SlugHistory;
 use Domain\Page\Models\Slice;
@@ -61,6 +62,7 @@ class AppServiceProvider extends ServiceProvider
             Collection::class,
             CollectionEntry::class,
             SlugHistory::class,
+            Globals::class,
             MetaData::class,
         ]);
 
