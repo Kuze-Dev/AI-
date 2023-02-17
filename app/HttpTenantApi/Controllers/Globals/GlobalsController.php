@@ -26,9 +26,6 @@ class GlobalsController
     {
         /** @var Globals */
         $global = QueryBuilder::for(Globals::whereSlug($global))
-            ->allowedIncludes([
-                'slugHistories',
-            ])
             ->firstOrFail();
 
         return GlobalsResource::make($global);
