@@ -18,7 +18,6 @@ class UpdateGlobalsAction
         $globals->update([
             'name' => $globalData->name,
             'slug' => $globalData->slug,
-            'blueprint_id' => $globalData->blueprint_id,
             'data' => $globalData->data,
         ]);
 
