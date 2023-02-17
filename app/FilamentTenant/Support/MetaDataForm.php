@@ -19,20 +19,11 @@ class MetaDataForm extends Section
         $this->afterStateHydrated(fn ($component, $record) => $component->state($record?->metaData?->toArray() ?? []));
 
         $this->schema([
-            Forms\Components\TextInput::make('title')
-                ->lazy()
-                ->label('Title'),
-            Forms\Components\TextInput::make('keywords')
-                ->lazy()
-                ->label('Keywords'),
-            Forms\Components\TextInput::make('author')
-                ->lazy()
-                ->label('Author'),
-            Forms\Components\Textarea::make('description')
-                ->lazy()
-                ->label('Description'),
+            Forms\Components\TextInput::make('title'),
+            Forms\Components\TextInput::make('keywords'),
+            Forms\Components\TextInput::make('author'),
+            Forms\Components\Textarea::make('description'),
             Forms\Components\FileUpload::make('image')
-                ->label('Image')
                 ->acceptedFileTypes(['image/png', 'image/webp', 'image/jpg', 'image/jpeg'])
                 ->maxSize(1_000)
                 ->getUploadedFileNameForStorageUsing(static function (TemporaryUploadedFile $file) {
