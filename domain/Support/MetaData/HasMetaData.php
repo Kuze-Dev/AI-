@@ -12,6 +12,6 @@ trait HasMetaData
     /** @return MorphOne<MetaData> */
     public function metaData(): MorphOne
     {
-        return $this->morphOne(MetaData::class, 'taggable');
+        return $this->morphOne(MetaData::class, 'model');
     }
 }

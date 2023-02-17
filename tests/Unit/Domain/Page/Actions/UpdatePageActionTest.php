@@ -60,8 +60,8 @@ it('can update page', function () {
             'author' => 'foo author updated',
             'keywords' => 'foo keywords updated',
             'description' => 'foo description updated',
-            'taggable_type' => $page->getMorphClass(),
-            'taggable_id' => $page->id,
+            'model_type' => $page->getMorphClass(),
+            'model_id' => $page->id,
         ]
     );
     assertDatabaseHas(Page::class, ['name' => 'Foo']);

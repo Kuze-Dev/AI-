@@ -191,8 +191,8 @@ it('can create collection entry with default meta data title', function () {
         MetaData::class,
         [
             'title' => 'Test',
-            'taggable_type' => $collectionEntry->getMorphClass(),
-            'taggable_id' => $collectionEntry->getKey(),
+            'model_type' => $collectionEntry->getMorphClass(),
+            'model_id' => $collectionEntry->getKey(),
         ]
     );
 });
@@ -249,8 +249,8 @@ it('can create collection entry with filled meta data', function () {
         array_merge(
             $meta_data,
             [
-                'taggable_type' => $collectionEntry->getMorphClass(),
-                'taggable_id' => $collectionEntry->id,
+                'model_type' => $collectionEntry->getMorphClass(),
+                'model_id' => $collectionEntry->id,
             ]
         )
     );

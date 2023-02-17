@@ -16,7 +16,7 @@ return new class () extends Migration {
     {
         Schema::create('meta_data', function (Blueprint $table) {
             $table->id();
-            $table->morphs('taggable');
+            $table->morphs('model');
             $table->string('title')->nullable();
             $table->string('author')->nullable();
             $table->text('description')->nullable();

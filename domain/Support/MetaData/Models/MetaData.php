@@ -29,7 +29,6 @@ class MetaData extends Model implements IsActivitySubject
         'keywords',
     ];
 
-    /** @return LogOptions */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -44,8 +43,8 @@ class MetaData extends Model implements IsActivitySubject
         return 'Meta tags: '.$this->title;
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model, \Domain\Support\MetaData\Models\MetaData> */
-    public function taggable(): MorphTo
+    /** @return MorphTo<Model, self> */
+    public function model(): MorphTo
     {
         return $this->morphTo();
     }

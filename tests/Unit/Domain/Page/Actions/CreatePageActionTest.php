@@ -47,8 +47,8 @@ it('can create page', function () {
             'author' => '',
             'keywords' => '',
             'description' => '',
-            'taggable_type' => $page->getMorphClass(),
-            'taggable_id' => $page->id,
+            'model_type' => $page->getMorphClass(),
+            'model_id' => $page->id,
         ]
     );
     assertDatabaseHas(Page::class, ['name' => 'Foo']);

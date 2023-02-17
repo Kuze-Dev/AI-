@@ -149,8 +149,8 @@ it('can edit collection entry', function () {
             'description' => null,
             'author' => null,
             'keywords' => null,
-            'taggable_type' => $updatedCollectionEntry->getMorphClass(),
-            'taggable_id' => $updatedCollectionEntry->id,
+            'model_type' => $updatedCollectionEntry->getMorphClass(),
+            'model_id' => $updatedCollectionEntry->id,
         ]
     );
 
@@ -330,8 +330,8 @@ it('can edit collection entry meta data', function () {
         array_merge(
             $updatedMetaData,
             [
-                'taggable_type' => $updatedCollectionEntry->getMorphClass(),
-                'taggable_id' => $updatedCollectionEntry->id,
+                'model_type' => $updatedCollectionEntry->getMorphClass(),
+                'model_id' => $updatedCollectionEntry->id,
             ]
         )
     );
@@ -416,8 +416,8 @@ it('can edit collection entry to have no meta data filled', function () {
             'description' => null,
             'author' => null,
             'keywords' => null,
-            'taggable_type' => $updatedCollectionEntry->getMorphClass(),
-            'taggable_id' => $updatedCollectionEntry->id,
+            'model_type' => $updatedCollectionEntry->getMorphClass(),
+            'model_id' => $updatedCollectionEntry->id,
         ]
     );
 
