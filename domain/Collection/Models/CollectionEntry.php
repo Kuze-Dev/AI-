@@ -38,6 +38,7 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
  * @property-read int|null $activities_count
  * @property-read \Domain\Collection\Models\Collection $collection
+ * @property-read \Domain\Support\MetaData\Models\MetaData $metaData
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $slugHistories
  * @property-read int|null $slug_histories_count
  * @property-read \Illuminate\Database\Eloquent\Collection|TaxonomyTerm[] $taxonomyTerms
@@ -56,6 +57,7 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @method static CollectionEntryBuilder|CollectionEntry whereSlug($value)
  * @method static CollectionEntryBuilder|CollectionEntry whereTitle($value)
  * @method static CollectionEntryBuilder|CollectionEntry whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 #[OnDeleteCascade(['taxonomyTerms', 'metaData'])]
 class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataContract
