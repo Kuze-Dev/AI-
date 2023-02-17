@@ -6,6 +6,7 @@ namespace App\HttpTenantApi\Resources;
 
 use App\HttpTenantApi\Resources\Concerns\TransformsSchemaPayload;
 use Illuminate\Http\Request;
+use Domain\Blueprint\DataTransferObjects\SchemaData;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
@@ -22,5 +23,10 @@ class GlobalsResource extends JsonApiResource
             'slug' => $this->slug,
             'data' => $this->transformSchemaPayload($this->data ?? []),
         ];
+    }
+
+    protected function getSchemaData(): SchemaData
+    {
+        return $this->blueprint->schema;
     }
 }
