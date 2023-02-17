@@ -57,7 +57,7 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @method static CollectionEntryBuilder|CollectionEntry whereTitle($value)
  * @method static CollectionEntryBuilder|CollectionEntry whereUpdatedAt($value)
  */
-#[OnDeleteCascade(['taxonomyTerms'])]
+#[OnDeleteCascade(['taxonomyTerms', 'metaData'])]
 class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataContract
 {
     use LogsActivity;
