@@ -14,6 +14,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+
 /**
  * Domain\Globals\Models\Globals
  *

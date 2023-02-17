@@ -20,5 +20,4 @@ class GlobalsResource extends JsonApiResource
             'data' => $this->data,
         ];
     }
-
 }
