@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Global\Database\Factories;
+namespace Domain\Globals\Database\Factories;
 
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Globals\Models\Globals;
@@ -10,9 +10,9 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Collection\Models\Collection>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Globals\Models\Globals>
  */
-class GlobalFactory extends Factory
+class GlobalsFactory extends Factory
 {
     /** Specify reference model. */
     protected $model = Globals::class;
@@ -23,14 +23,10 @@ class GlobalFactory extends Factory
         $name = $this->faker->unique()->word();
 
         return [
-            'blueprint_id' => null,
             'name' => $name,
-            'past_publish_date_behavior' => PublishBehavior::PRIVATE,
-            'future_publish_date_behavior' => PublishBehavior::PUBLIC,
-            'is_sortable' => (bool) rand(0, 1),
-            'route_url' => function (array $attributes) {
-                return '/'.Str::slug($attributes['name']).'/{{$slug}}';
-            },
+            'slug' => Str::slug($name),
+            'blueprint_id' => null,
+            'data' => null,
         ];
     }
 

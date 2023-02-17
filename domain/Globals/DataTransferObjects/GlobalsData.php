@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Globals\DataTransferObjects;
 
-
 class GlobalsData
 {
     public function __construct(
@@ -12,7 +11,6 @@ class GlobalsData
         public readonly string $slug,
         public readonly string $blueprint_id,
         public readonly ?array $data = null,
-
     ) {
     }
 

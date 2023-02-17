@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Resources\GlobalsResource\Pages;
 
 use App\FilamentTenant\Resources\GlobalsResource;

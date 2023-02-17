@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Resources\GlobalsResource\Pages;
 
 use App\FilamentTenant\Resources\GlobalsResource;
@@ -10,7 +12,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Domain\Globals\DataTransferObjects\GlobalsData;
 use Throwable;
-use Exception;
 
 class EditGlobals extends EditRecord
 {
@@ -22,13 +23,13 @@ class EditGlobals extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
       /**
-     * @param \Domain\Globals\Models\Globals $record
-     * @throws Throwable
-     */
+       * @param \Domain\Globals\Models\Globals $record
+       * @throws Throwable
+       */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-
         return DB::transaction(
             fn () => app(UpdateGlobalsAction::class)
                 ->execute(

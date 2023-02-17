@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Globals\Actions;
 
-
 use Domain\Globals\DataTransferObjects\GlobalsData;
 use Domain\Globals\Models\Globals;
+
 class UpdateGlobalsAction
 {
     /**
@@ -15,7 +15,6 @@ class UpdateGlobalsAction
      */
     public function execute(Globals $globals, GlobalsData $globalData): Globals
     {
-        
         $globals->update([
             'name' => $globalData->name,
             'slug' => $globalData->slug,
@@ -24,6 +23,5 @@ class UpdateGlobalsAction
         ]);
 
         return $globals;
-        
     }
 }
