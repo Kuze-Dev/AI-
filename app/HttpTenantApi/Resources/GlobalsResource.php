@@ -21,11 +21,4 @@ class GlobalsResource extends JsonApiResource
         ];
     }
 
-    /** @return array<string, callable> */
-    public function toRelationships(Request $request): array
-    {
-        return [
-            'slugHistories' => fn () => SlugHistoryResource::collection($this->slugHistories),
-        ];
-    }
 }
