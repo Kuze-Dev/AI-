@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @mixin \Domain\Page\Models\Page
+ * @mixin \Domain\Globals\Models\Globals
  */
 class GlobalsResource extends JsonApiResource
 {
@@ -21,12 +21,11 @@ class GlobalsResource extends JsonApiResource
         ];
     }
 
-    // /** @return array<string, callable> */
-    // public function toRelationships(Request $request): array
-    // {
-    //     return [
-    //         // 'sliceContents' => fn () => SliceContentResource::collection($this->sliceContents),
-    //         // 'slugHistories' => fn () => SlugHistoryResource::collection($this->slugHistories),
-    //     ];
-    // }
+    /** @return array<string, callable> */
+    public function toRelationships(Request $request): array
+    {
+        return [
+            'slugHistories' => fn () => SlugHistoryResource::collection($this->slugHistories),
+        ];
+    }
 }

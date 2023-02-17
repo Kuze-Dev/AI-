@@ -24,15 +24,14 @@ class GlobalsController
 
     public function show(string $global): GlobalsResource
     {
-        /** @var Page */
-        $global = QueryBuilder::for(Globals::whereSlug($page))
+        /** @var Globals */
+        $global = QueryBuilder::for(Globals::whereSlug($global))
             ->allowedIncludes([
-                'sliceContents.slice',
                 'slugHistories',
             ])
             ->firstOrFail();
 
 
-        return GlobalsResource::make($page);
+        return GlobalsResource::make($global);
     }
 }
