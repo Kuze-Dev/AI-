@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Domain\Support\SlugHistory\HasSlugHistory;
@@ -17,6 +18,7 @@ use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 
 /**
  * Domain\Page\Models\Page
@@ -29,6 +31,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
  * @property-read int|null $activities_count
+ * @property-read \Domain\Support\MetaData\Models\MetaData $metaData
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Page\Models\SliceContent[] $sliceContents
  * @property-read int|null $slice_contents_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $slugHistories
@@ -40,16 +43,19 @@ use Spatie\Sluggable\SlugOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|Page whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Page whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Page whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Page whereRouteUrl($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Page whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Page whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-#[OnDeleteCascade(['sliceContents'])]
-class Page extends Model implements IsActivitySubject
+
+#[OnDeleteCascade(['sliceContents', 'metaData'])]
+class Page extends Model implements IsActivitySubject, HasMetaDataContract
 {
     use LogsActivity;
     use HasSlug;
     use HasSlugHistory;
+    use HasMetaData;
     use ConstraintsRelationships;
 
     protected $fillable = [
@@ -57,6 +63,19 @@ class Page extends Model implements IsActivitySubject
         'slug',
         'route_url',
     ];
+
+    /**
+     * Define default reference
+     * for meta data properties.
+     *
+     * @return array
+     */
+    public function defaultMetaData(): array
+    {
+        return [
+            'title' => $this->name,
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

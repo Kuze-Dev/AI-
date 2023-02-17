@@ -16,6 +16,7 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
 use Closure;
 use Domain\Collection\Models\CollectionEntry;
+use App\FilamentTenant\Support\MetaDataForm;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Facades\Filament;
@@ -141,6 +142,7 @@ class CollectionEntryResource extends Resource
                 ])
                     ->columnSpan(['lg' => 1])
                     ->when(fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray()) || $livewire->ownerRecord->hasPublishDates()),
+                MetaDataForm::make('Meta Data'),
             ]);
     }
 

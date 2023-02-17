@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use App\FilamentTenant\Resources\CollectionEntryResource;
 use App\FilamentTenant\Resources\CollectionResource;
-use Carbon\Carbon;
 use Domain\Collection\Actions\UpdateCollectionEntryAction;
 use Domain\Collection\Models\Collection;
 use Filament\Pages\Actions;
@@ -100,13 +99,7 @@ class EditCollectionEntry extends EditRecord
     {
         return DB::transaction(
             fn () => app(UpdateCollectionEntryAction::class)
-                ->execute($this->record, new CollectionEntryData(
-                    title: $data['title'],
-                    slug: $data['slug'],
-                    taxonomy_terms: $data['taxonomy_terms'] ?? [],
-                    published_at: isset($data['published_at']) ? Carbon::parse($data['published_at']) : null,
-                    data: $data['data']
-                ))
+                ->execute($this->record, CollectionEntryData::fromArray($data))
         );
     }
 }

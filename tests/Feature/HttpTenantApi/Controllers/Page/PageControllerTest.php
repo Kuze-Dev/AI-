@@ -58,6 +58,13 @@ it('can show a page with includes', function (string $include) {
         ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
         ->createOne();
 
+    $page->metaData()->create([
+        'title' => $page->name,
+        'description' => 'Foo description',
+        'author' => 'Foo author',
+        'keywords' => 'Foo keywords',
+    ]);
+
     getJson("api/pages/{$page->getRouteKey()}?" . http_build_query(['include' => $include]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($page, $include) {
@@ -75,4 +82,5 @@ it('can show a page with includes', function (string $include) {
 })->with([
     'sliceContents',
     'slugHistories',
+    'metaData',
 ]);
