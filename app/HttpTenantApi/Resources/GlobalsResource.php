@@ -25,6 +25,13 @@ class GlobalsResource extends JsonApiResource
         ];
     }
 
+    public function toRelationships(Request $request): array
+    {
+        return [
+            'blueprint' => fn () => BlueprintResource::make($this->blueprint),
+        ];
+    }
+
     protected function getSchemaData(): SchemaData
     {
         return $this->blueprint->schema;

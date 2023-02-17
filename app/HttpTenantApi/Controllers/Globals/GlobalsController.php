@@ -16,8 +16,9 @@ class GlobalsController
     public function index(): JsonApiResourceCollection
     {
         return GlobalsResource::collection(
-            QueryBuilder::for(Globals::query())
+            QueryBuilder::for(Globals::with('blueprint'))
                 ->allowedFilters(['name', 'slug'])
+                ->allowedIncludes('blueprint')
                 ->jsonPaginate()
         );
     }
