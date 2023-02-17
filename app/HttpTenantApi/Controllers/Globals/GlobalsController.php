@@ -31,7 +31,6 @@ class GlobalsController
             ])
             ->firstOrFail();
 
-
         return GlobalsResource::make($global);
     }
 }

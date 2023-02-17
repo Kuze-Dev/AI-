@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 use Domain\Globals\Database\Factories\GlobalsFactory;
-use Domain\Page\Database\Factories\PageFactory;
-use Domain\Page\Database\Factories\SliceFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
 
 use function Pest\Laravel\getJson;

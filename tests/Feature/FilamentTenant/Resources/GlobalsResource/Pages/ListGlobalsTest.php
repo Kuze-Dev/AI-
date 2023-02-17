@@ -29,10 +29,9 @@ it('can list globals', function () {
 });
 
 it('can delete globals', function () {
-
     $record = GlobalsFactory::new()
-            ->withDummyBlueprint()
-            ->createOne();
+        ->withDummyBlueprint()
+        ->createOne();
 
     livewire(ListGlobals::class)
         ->callTableAction(DeleteAction::class, $record)

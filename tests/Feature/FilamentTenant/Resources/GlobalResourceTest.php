@@ -6,7 +6,6 @@ use App\FilamentTenant\Resources\GlobalsResource;
 use Domain\Globals\Database\Factories\GlobalsFactory;
 use Filament\Facades\Filament;
 
-
 beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
@@ -14,7 +13,6 @@ beforeEach(function () {
 });
 
 it('can globally search', function () {
-
     $record = GlobalsFactory::new()->withDummyBlueprint()->createOne();
 
     $results = Filament::getGlobalSearchProvider()
