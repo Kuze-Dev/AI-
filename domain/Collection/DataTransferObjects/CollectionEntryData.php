@@ -28,10 +28,10 @@ class CollectionEntryData
             taxonomy_terms: $data['taxonomy_terms'] ?? [],
             data: $data['data'],
             meta_data: new MetaDataData(
-                title: $data['meta_data']['title'],
-                author: $data['meta_data']['author'],
-                description: $data['meta_data']['description'],
-                keywords: $data['meta_data']['keywords'],
+                title: $data['meta_data']['title'] ?? null,
+                author: $data['meta_data']['author'] ?? null,
+                description: $data['meta_data']['description'] ?? null,
+                keywords: $data['meta_data']['keywords'] ?? null,
             )
         );
     }

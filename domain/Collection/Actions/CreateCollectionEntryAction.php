@@ -19,9 +19,7 @@ class CreateCollectionEntryAction
     /** Execute create collection entry query. */
     public function execute(Collection $collection, CollectionEntryData $collectionEntryData): CollectionEntry
     {
-        /**
-         * @var CollectionEntry $collectionEntry
-         */
+        /** @var CollectionEntry $collectionEntry */
         $collectionEntry = $collection->collectionEntries()
             ->create([
                 'title' => $collectionEntryData->title,
