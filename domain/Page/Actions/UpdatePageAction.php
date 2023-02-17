@@ -7,6 +7,7 @@ namespace Domain\Page\Actions;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\SliceContent;
+use Domain\Support\MetaData\Actions\UpdateMetaDataAction;
 use Illuminate\Support\Arr;
 
 class UpdatePageAction
@@ -15,6 +16,7 @@ class UpdatePageAction
         protected CreateSliceContentAction $createSliceContent,
         protected UpdateSliceContentAction $updateSliceContent,
         protected DeleteSliceContentAction $deleteSliceContent,
+        protected UpdateMetaDataAction $updateMetaData,
     ) {
     }
 
@@ -25,6 +27,8 @@ class UpdatePageAction
             'slug' => $pageData->slug,
             'route_url' => $pageData->route_url,
         ]);
+
+        $this->updateMetaData->execute($page, $pageData->meta_data);
 
         foreach ($page->sliceContents->whereNotIn('id', Arr::pluck($pageData->slice_contents, 'id')) as $domain) {
             $this->deleteSliceContent->execute($domain);

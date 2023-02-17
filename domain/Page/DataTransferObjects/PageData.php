@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Domain\Page\DataTransferObjects;
 
+use Domain\Support\MetaData\DataTransferObjects\MetaDataData;
+
 class PageData
 {
     public function __construct(
         public readonly string $name,
         public readonly string $route_url,
+        public readonly MetaDataData $meta_data,
         public readonly array $slice_contents = [],
-        public readonly ?string $slug = null,
+        public readonly ?string $slug = null
     ) {
     }
 
@@ -28,6 +31,12 @@ class PageData
             ),
             slug: $data['slug'] ?? null,
             route_url: $data['route_url'],
+            meta_data: new MetaDataData(
+                title: $data['meta_data']['title'] ?? null,
+                author: $data['meta_data']['author'] ?? null,
+                description: $data['meta_data']['description'] ?? null,
+                keywords: $data['meta_data']['keywords'] ?? null,
+            )
         );
     }
 }
