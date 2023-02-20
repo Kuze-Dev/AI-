@@ -29,7 +29,7 @@ class MenuController
     {
         return MenuResource::make(
             QueryBuilder::for(Menu::whereSlug($menu))
-                ->allowedIncludes(['nodes.children'])
+                ->allowedIncludes(['nodes.children', 'parentNodes.children'])
                 ->firstOrFail()
         );
     }

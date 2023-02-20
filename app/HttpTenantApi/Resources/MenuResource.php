@@ -24,6 +24,7 @@ class MenuResource extends JsonApiResource
     {
         return [
             'nodes' => fn () => NodeResource::collection($this->nodes),
+            'parentNodes' => fn () => NodeResource::collection($this->parentNodes),
         ];
     }
 }
