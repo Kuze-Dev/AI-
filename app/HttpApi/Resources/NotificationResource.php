@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpApi\Resources;
 
+use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
@@ -13,7 +14,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class NotificationResource extends JsonApiResource
 {
-    public function toAttributes($request): array
+    public function toAttributes(Request $request): array
     {
         return [
             'data' => $this->data,

@@ -29,6 +29,7 @@ class PageController
             ->allowedIncludes([
                 'sliceContents.slice',
                 'slugHistories',
+                'metaData',
             ])
             ->firstOrFail();
 

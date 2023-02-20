@@ -7,6 +7,7 @@ namespace Domain\Collection\Models;
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Support\SlugHistory\HasSlugHistory;
 use Domain\Collection\Models\Builders\CollectionEntryBuilder;
+use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Domain\Taxonomy\Models\TaxonomyTerm;
@@ -20,6 +21,7 @@ use Spatie\Sluggable\HasSlug;
 use Illuminate\Support\Facades\Blade;
 use Spatie\Sluggable\SlugOptions;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 
 /**
  * Domain\Collection\Models\CollectionEntry
@@ -36,6 +38,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
  * @property-read int|null $activities_count
  * @property-read \Domain\Collection\Models\Collection $collection
+ * @property-read \Domain\Support\MetaData\Models\MetaData $metaData
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $slugHistories
  * @property-read int|null $slug_histories_count
  * @property-read \Illuminate\Database\Eloquent\Collection|TaxonomyTerm[] $taxonomyTerms
@@ -56,12 +59,13 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
  * @method static CollectionEntryBuilder|CollectionEntry whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-#[OnDeleteCascade(['taxonomyTerms'])]
-class CollectionEntry extends Model implements IsActivitySubject
+#[OnDeleteCascade(['taxonomyTerms', 'metaData'])]
+class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataContract
 {
     use LogsActivity;
     use HasSlug;
     use HasSlugHistory;
+    use HasMetaData;
     use ConstraintsRelationships;
 
     /**
@@ -94,6 +98,19 @@ class CollectionEntry extends Model implements IsActivitySubject
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
+    }
+
+    /**
+     * Define default reference
+     * for meta data properties.
+     *
+     * @return array
+     */
+    public function defaultMetaData(): array
+    {
+        return [
+            'title' => $this->title,
+        ];
     }
 
     /**

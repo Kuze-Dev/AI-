@@ -105,6 +105,13 @@ it('can show collection entry with includes', function (string $include) {
             'data' => ['main' => ['header' => 'Foo']],
         ]);
 
+    $collectionEntry->metaData()->create([
+        'title' => $collectionEntry->title,
+        'description' => 'Foo description',
+        'author' => 'Foo author',
+        'keywords' => 'Foo keywords',
+    ]);
+
     getJson("api/collections/{$collection->getRouteKey()}/entries/{$collectionEntry->getRouteKey()}?" . http_build_query(['include' => $include]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($collectionEntry, $include) {
@@ -120,4 +127,5 @@ it('can show collection entry with includes', function (string $include) {
 })->with([
     'taxonomyTerms',
     'slugHistories',
+    'metaData',
 ]);

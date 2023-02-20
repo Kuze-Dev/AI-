@@ -6,6 +6,7 @@ namespace Domain\Page\Database\Factories;
 
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Slice;
+use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -26,5 +27,10 @@ class PageFactory extends Factory
     public function addSliceContent(Slice|SliceFactory $slice, array $attributes = []): self
     {
         return $this->has(SliceContentFactory::new($attributes)->for($slice));
+    }
+
+    public function configure(): self
+    {
+        return $this->has(MetaDataFactory::new(), 'metaData');
     }
 }

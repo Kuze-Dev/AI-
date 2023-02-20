@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
+use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
@@ -12,7 +13,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class BlueprintResource extends JsonApiResource
 {
-    public function toAttributes($request): array
+    public function toAttributes(Request $request): array
     {
         return  [
             'name' => $this->name,

@@ -29,7 +29,7 @@
         "spatie/laravel-route-attributes": "^1.11",
         "spatie/laravel-sluggable": "^3.4",
         "stancl/tenancy": "^3.6",
-        "timacdonald/json-api": "1.0.0-beta.2",
+        "timacdonald/json-api": "1.0.0-beta.3",
         "victord11/ssl-certification-health-check": "^1.0"
     },
     "require-dev": {

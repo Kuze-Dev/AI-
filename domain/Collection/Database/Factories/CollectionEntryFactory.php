@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Collection\Database\Factories;
 
 use Domain\Collection\Models\CollectionEntry;
+use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,5 +23,10 @@ class CollectionEntryFactory extends Factory
             'title' => $this->faker->name(),
             'data' => [],
         ];
+    }
+
+    public function configure(): self
+    {
+        return $this->has(MetaDataFactory::new());
     }
 }

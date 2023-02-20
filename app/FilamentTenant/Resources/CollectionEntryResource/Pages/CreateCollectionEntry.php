@@ -6,7 +6,6 @@ namespace App\FilamentTenant\Resources\CollectionEntryResource\Pages;
 
 use App\FilamentTenant\Resources\CollectionEntryResource;
 use App\FilamentTenant\Resources\CollectionResource;
-use Carbon\Carbon;
 use Domain\Collection\Actions\CreateCollectionEntryAction;
 use Domain\Collection\DataTransferObjects\CollectionEntryData;
 use Filament\Resources\Pages\CreateRecord;
@@ -64,13 +63,7 @@ class CreateCollectionEntry extends CreateRecord
     {
         return DB::transaction(
             fn () => app(CreateCollectionEntryAction::class)
-                ->execute($this->ownerRecord, new CollectionEntryData(
-                    title: $data['title'],
-                    slug: $data['slug'],
-                    published_at: isset($data['published_at']) ? Carbon::parse($data['published_at']) : null,
-                    taxonomy_terms: $data['taxonomy_terms'] ?? [],
-                    data: $data['data']
-                ))
+                ->execute($this->ownerRecord, CollectionEntryData::fromArray($data))
         );
     }
 

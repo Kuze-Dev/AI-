@@ -5,14 +5,13 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\CollectionEntryResource\Pages\ListCollectionEntry;
 use Domain\Collection\Database\Factories\CollectionEntryFactory;
 use Domain\Collection\Database\Factories\CollectionFactory;
-use Domain\Collection\Models\CollectionEntry;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseMissing;
+use function Pest\Laravel\assertModelMissing;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
@@ -62,14 +61,16 @@ it('can delete collection entry', function () {
         ->createOne();
 
     $taxonomyTerm = $collectionEntry->taxonomyTerms->first();
+    $metaData = $collectionEntry->metaData;
 
     livewire(ListCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey()])
         ->callTableAction(DeleteAction::class, $collectionEntry)
         ->assertOk();
 
-    assertDatabaseCount(CollectionEntry::class, 0);
+    assertModelMissing($collectionEntry);
     assertDatabaseMissing('collection_entry_taxonomy_term', [
         'collection_entry_id' => $collectionEntry->id,
         'taxonomy_term_id' => $taxonomyTerm->id,
     ]);
+    assertModelMissing($metaData);
 });
