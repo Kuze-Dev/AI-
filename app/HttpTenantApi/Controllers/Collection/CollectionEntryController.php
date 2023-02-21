@@ -22,7 +22,6 @@ class CollectionEntryController
         return CollectionEntryResource::collection(
             QueryBuilder::for(
                 $collection->collectionEntries()
-                    ->with('collection')
             )
                 ->allowedFilters([
                     'title',
@@ -36,7 +35,6 @@ class CollectionEntryController
                     'order',
                     'published_at',
                 ])
-                ->with('collection.blueprint')
                 ->jsonPaginate()
         );
     }
@@ -53,7 +51,6 @@ class CollectionEntryController
                     'slugHistories',
                     'metaData',
                 ])
-                ->with('collection.blueprint')
                 ->firstOrFail()
         );
     }
