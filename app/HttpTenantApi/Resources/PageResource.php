@@ -8,16 +8,25 @@ use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @property-read string $name
- * @property-read array|null $data
+ * @mixin \Domain\Page\Models\Page
  */
 class PageResource extends JsonApiResource
 {
-    protected function toAttributes(Request $request): array
+    public function toAttributes(Request $request): array
     {
         return  [
             'name' => $this->name,
-            'data' => $this->data,
+            'route_url' => $this->qualified_route_url,
+        ];
+    }
+
+    /** @return array<string, callable> */
+    public function toRelationships(Request $request): array
+    {
+        return [
+            'sliceContents' => fn () => SliceContentResource::collection($this->sliceContents),
+            'slugHistories' => fn () => SlugHistoryResource::collection($this->slugHistories),
+            'metaData' => fn () => MetaDataResource::make($this->metaData),
         ];
     }
 }

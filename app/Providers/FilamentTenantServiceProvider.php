@@ -13,6 +13,7 @@ use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\UserMenuItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Vite;
 
 class FilamentTenantServiceProvider extends ContextServiceProvider
 {
@@ -34,6 +35,10 @@ class FilamentTenantServiceProvider extends ContextServiceProvider
                     ->icon('heroicon-s-lock-closed'),
                 NavigationGroup::make('System')
                     ->icon('heroicon-s-exclamation'),
+            ]);
+
+            Filament::registerStyles([
+                Vite::asset('resources/css/app.css'),
             ]);
         });
 

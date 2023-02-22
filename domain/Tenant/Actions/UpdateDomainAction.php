@@ -11,6 +11,7 @@ class UpdateDomainAction
 {
     public function execute(Domain $domain, DomainData $domainData): Domain
     {
+        $domain->loadMissing('tenant');
         $domain->update(['domain' => $domainData->domain]);
 
         return $domain;

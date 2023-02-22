@@ -6,10 +6,18 @@ namespace App\Providers;
 
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Menu\Models\Menu;
+use Domain\Menu\Models\Node;
+use Domain\Collection\Models\Collection;
+use Domain\Collection\Models\CollectionEntry;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
+use Domain\Globals\Models\Globals;
 use Domain\Page\Models\Page;
+use Domain\Support\SlugHistory\SlugHistory;
+use Domain\Page\Models\Slice;
+use Domain\Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
@@ -43,11 +51,19 @@ class AppServiceProvider extends ServiceProvider
             config('tenancy.tenant_model'),
             Blueprint::class,
             Page::class,
+            Slice::class,
+            Menu::class,
+            Node::class,
             Form::class,
             FormSubmission::class,
             FormEmailNotification::class,
             Taxonomy::class,
             TaxonomyTerm::class,
+            Collection::class,
+            CollectionEntry::class,
+            SlugHistory::class,
+            Globals::class,
+            MetaData::class,
         ]);
 
         Password::defaults(
@@ -63,6 +79,6 @@ class AppServiceProvider extends ServiceProvider
                     )
         );
 
-        JsonApiResource::resolveIdUsing(fn (Model $resource): string => $resource->getRouteKey());
+        JsonApiResource::resolveIdUsing(fn (Model $resource): string => (string) $resource->getRouteKey());
     }
 }

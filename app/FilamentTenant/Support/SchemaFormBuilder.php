@@ -9,6 +9,8 @@ use Domain\Blueprint\DataTransferObjects\DatetimeFieldData;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\FileFieldData;
 use Domain\Blueprint\DataTransferObjects\MarkdownFieldData;
+use Domain\Blueprint\DataTransferObjects\RelatedResourceFieldData;
+use Domain\Blueprint\DataTransferObjects\RepeaterFieldData;
 use Domain\Blueprint\DataTransferObjects\RichtextFieldData;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
 use Domain\Blueprint\DataTransferObjects\SectionData;
@@ -20,11 +22,11 @@ use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
 use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Concerns\EntanglesStateWithSingularRelationship;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -36,22 +38,23 @@ use InvalidArgumentException;
 
 class SchemaFormBuilder extends Component
 {
-    use EntanglesStateWithSingularRelationship;
-
     protected string $view = 'forms::components.group';
 
-    final public function __construct(string $name, SchemaData|Closure $schema)
+    protected SchemaData|Closure|null $schemaData = null;
+
+    final public function __construct(string $name, SchemaData|Closure|null $schemaData)
     {
         $this->statePath($name);
-        $this->schema(fn () => $this->generateFormSchema($this->evaluate($schema)));
+        $this->schemaData($schemaData);
     }
 
-    public static function make(string $name, SchemaData|callable $schema): static
+    public static function make(string $name, SchemaData|Closure $schemaData = null): static
     {
         $static = app(static::class, [
             'name' => $name,
-            'schema' => $schema,
+            'schemaData' => $schemaData,
         ]);
+
         $static->configure();
 
         return $static;
@@ -64,9 +67,23 @@ class SchemaFormBuilder extends Component
         $this->columnSpan('full');
     }
 
-    private function generateFormSchema(SchemaData $schema): array
+    public function schemaData(SchemaData|Closure $schemaData = null): self
     {
-        return array_map(fn (SectionData $section) => $this->generateSectionSchema($section), $schema->sections);
+        $this->schemaData = $schemaData;
+
+        return $this;
+    }
+
+    public function getSchemaData(): ?SchemaData
+    {
+        return $this->evaluate($this->schemaData);
+    }
+
+    public function getChildComponents(): array
+    {
+        return ($schema = $this->getSchemaData())
+            ? array_map(fn (SectionData $section) => $this->generateSectionSchema($section), $schema->sections)
+            : [];
     }
 
     private function generateSectionSchema(SectionData $section): Section
@@ -91,7 +108,9 @@ class SchemaFormBuilder extends Component
             TextareaFieldData::class => $this->makeTextAreaComponent($field),
             TextFieldData::class => $this->makeTextInputComponent($field),
             ToggleFieldData::class => Toggle::make($field->state_name),
-            default => throw new InvalidArgumentException('Cannot generate field component for `'.$field::class.'` as its not supported.'),
+            RepeaterFieldData::class => $this->makeRepeaterComponent($field),
+            RelatedResourceFieldData::class => $this->makeRelatedResourceComponent($field),
+            default => throw new InvalidArgumentException('Cannot generate field component for `' . $field::class . '` as its not supported.'),
         };
 
         return $fieldComponent
@@ -118,13 +137,14 @@ class SchemaFormBuilder extends Component
 
     private function makeFileUploadComponent(FileFieldData $fileFieldData): FileUpload
     {
-        $fileUpload = FileUpload::make($fileFieldData->state_name)
-            ->getUploadedFileUrlUsing(fn (string $file) => tenant_asset($file));
+        $fileUpload = FileUpload::make($fileFieldData->state_name);
 
         if ($fileFieldData->multiple) {
             $fileUpload->multiple($fileFieldData->multiple)
                 ->minFiles($fileFieldData->min_files)
-                ->maxFiles($fileFieldData->max_files);
+                ->maxFiles($fileFieldData->max_files)
+                ->panelLayout('grid')
+                ->imagePreviewHeight('256');
         }
 
         if ($fileFieldData->reorder) {
@@ -187,5 +207,43 @@ class SchemaFormBuilder extends Component
         return $textInput
             ->minLength(fn () => $textFieldData->min_length)
             ->maxLength(fn () => $textFieldData->max_length);
+    }
+
+    private function makeRepeaterComponent(RepeaterFieldData $repeaterFieldData): Repeater
+    {
+        $repeater = Repeater::make($repeaterFieldData->state_name)
+            ->collapsible()
+            ->schema(array_map(fn (FieldData $field) => $this->generateFieldComponent($field), $repeaterFieldData->fields));
+
+        if ($repeaterFieldData->min) {
+            $repeater->minItems($repeaterFieldData->min);
+        }
+
+        if ($repeaterFieldData->max) {
+            $repeater->maxItems($repeaterFieldData->max);
+        }
+
+        return $repeater;
+    }
+
+    private function makeRelatedResourceComponent(RelatedResourceFieldData $relatedResourceFieldData): Select
+    {
+        $relatedResourceModelConfig = $relatedResourceFieldData->getRelatedModelConfig();
+        $related = $relatedResourceFieldData->getRelatedModelInstance();
+        $relatedQuery = $relatedResourceFieldData->getRelatedResourceQuery();
+
+        $component = Select::make($relatedResourceFieldData->state_name)
+            ->options($relatedQuery->pluck($relatedResourceModelConfig['title_column'], $related->getKeyName()))
+            ->multiple($relatedResourceFieldData->multiple);
+
+        if ($relatedResourceFieldData->min) {
+            $component->minItems($relatedResourceFieldData->min);
+        }
+
+        if ($relatedResourceFieldData->max) {
+            $component->maxItems($relatedResourceFieldData->max);
+        }
+
+        return $component;
     }
 }

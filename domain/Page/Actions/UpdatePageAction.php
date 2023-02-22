@@ -6,21 +6,42 @@ namespace Domain\Page\Actions;
 
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
+use Domain\Page\Models\SliceContent;
+use Domain\Support\MetaData\Actions\UpdateMetaDataAction;
+use Illuminate\Support\Arr;
 
 class UpdatePageAction
 {
+    public function __construct(
+        protected CreateSliceContentAction $createSliceContent,
+        protected UpdateSliceContentAction $updateSliceContent,
+        protected DeleteSliceContentAction $deleteSliceContent,
+        protected UpdateMetaDataAction $updateMetaData,
+    ) {
+    }
+
     public function execute(Page $page, PageData $pageData): Page
     {
-        $page->fill([
+        $page->update([
             'name' => $pageData->name,
-            'blueprint_id' => $pageData->blueprint_id,
+            'slug' => $pageData->slug,
+            'route_url' => $pageData->route_url,
         ]);
 
-        if ($page->isDirty('blueprint_id')) {
-            $page->data = null;
+        $this->updateMetaData->execute($page, $pageData->meta_data);
+
+        foreach ($page->sliceContents->whereNotIn('id', Arr::pluck($pageData->slice_contents, 'id')) as $domain) {
+            $this->deleteSliceContent->execute($domain);
         }
 
-        $page->save();
+        $sliceContentIds = array_map(
+            fn ($sliceContentData) => ($sliceContent = $page->sliceContents->firstWhere('id', $sliceContentData->id))
+                ? $this->updateSliceContent->execute($sliceContent, $sliceContentData)->id
+                : $this->createSliceContent->execute($page, $sliceContentData)->id,
+            $pageData->slice_contents
+        );
+
+        SliceContent::setNewOrder($sliceContentIds);
 
         return $page;
     }

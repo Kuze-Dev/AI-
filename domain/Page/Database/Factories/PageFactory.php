@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Page\Database\Factories;
 
-use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Page\Models\Page;
+use Domain\Page\Models\Slice;
+use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,14 +19,18 @@ class PageFactory extends Factory
     public function definition(): array
     {
         return [
-            'blueprint_id' => null,
             'name' => $this->faker->name(),
-            'data' => null,
+            'route_url' => '/{{$slug}}',
         ];
     }
 
-    public function withDummyBlueprint(): self
+    public function addSliceContent(Slice|SliceFactory $slice, array $attributes = []): self
     {
-        return $this->for(BlueprintFactory::new()->withDummySchema());
+        return $this->has(SliceContentFactory::new($attributes)->for($slice));
+    }
+
+    public function configure(): self
+    {
+        return $this->has(MetaDataFactory::new(), 'metaData');
     }
 }

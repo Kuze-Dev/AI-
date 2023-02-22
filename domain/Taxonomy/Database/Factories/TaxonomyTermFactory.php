@@ -17,8 +17,11 @@ class TaxonomyTermFactory extends Factory
     public function definition(): array
     {
         return [
+            'taxonomy_id' => null,
+            'parent_id' => null,
             'name' => $this->faker->name(),
-            'description' => $this->faker->paragraph(),
+            'order' => null,
+            'data' => [],
         ];
     }
 }

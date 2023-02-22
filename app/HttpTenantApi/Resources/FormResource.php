@@ -13,14 +13,14 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class FormResource extends JsonApiResource
 {
-    protected function toAttributes(Request $request): array
+    public function toAttributes(Request $request): array
     {
         return  [
             'name' => $this->name,
         ];
     }
 
-    protected function toRelationships(Request $request): array
+    public function toRelationships(Request $request): array
     {
         return [
             'blueprint' => fn () => BlueprintResource::make($this->blueprint),

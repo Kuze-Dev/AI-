@@ -13,7 +13,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class BlueprintResource extends JsonApiResource
 {
-    protected function toAttributes(Request $request): array
+    public function toAttributes(Request $request): array
     {
         return  [
             'name' => $this->name,
