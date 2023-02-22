@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use TiMacDonald\JsonApi\JsonApiResource;
 use InvalidArgumentException;
+use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 trait TransformsSchemaPayload
 {
@@ -59,9 +60,12 @@ trait TransformsSchemaPayload
 
             $resourceClass = $this->guessModelResource($field->getRelatedModelInstance());
 
-            return $related instanceof Collection
+            /** @var JsonApiResource|JsonApiResourceCollection */
+            $jsonApiResource = $related instanceof Collection
                 ? $resourceClass::collection($related)
                 : $resourceClass::make($related);
+
+            return $jsonApiResource->withIncludePrefix($field->resource);
         }
 
         return $value;

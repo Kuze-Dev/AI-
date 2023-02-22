@@ -34,6 +34,7 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Taxonomy\Models\TaxonomyTerm::class => \App\Policies\TaxonomyTermPolicy::class,
         \Domain\Collection\Models\Collection::class => \App\Policies\CollectionPolicy::class,
         \Domain\Collection\Models\CollectionEntry::class => \App\Policies\CollectionEntryPolicy::class,
+        \Domain\Globals\Models\Globals::class => \App\Policies\GlobalsPolicy::class,
     ];
 
     /**

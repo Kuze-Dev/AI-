@@ -101,7 +101,7 @@ class MenuResource extends Resource
                                             )
                                             ->columnSpan(['md' => 1]),
                                         Forms\Components\TextInput::make('url')
-                                            ->url()
+                                            ->type('url')
                                             ->placeholder('https://example.com')
                                             ->columnSpanFull(),
                                     ]),

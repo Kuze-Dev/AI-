@@ -6,7 +6,9 @@ namespace App\HttpTenantApi\Resources;
 
 use App\HttpTenantApi\Resources\Concerns\TransformsSchemaPayload;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
@@ -34,5 +36,18 @@ class SliceContentResource extends JsonApiResource
     protected function getSchemaData(): SchemaData
     {
         return $this->slice->blueprint->schema;
+    }
+
+    public static function newCollection(mixed $resource)
+    {
+        if ($resource instanceof Collection) {
+            $resource->loadMissing('slice.blueprint');
+        }
+
+        if ($resource instanceof LengthAwarePaginator && $resource->getCollection() instanceof Collection) {
+            $resource->getCollection()->loadMissing('slice.blueprint');
+        }
+
+        return parent::newCollection($resource);
     }
 }
