@@ -141,6 +141,7 @@ class SchemaFormBuilder extends Component
 
         if ($fileFieldData->multiple) {
             $fileUpload->multiple($fileFieldData->multiple)
+                ->appendFiles()
                 ->minFiles($fileFieldData->min_files)
                 ->maxFiles($fileFieldData->max_files)
                 ->panelLayout('grid')

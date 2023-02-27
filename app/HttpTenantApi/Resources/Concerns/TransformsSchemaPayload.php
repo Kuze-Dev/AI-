@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Resources\Concerns;
 
 use Domain\Blueprint\DataTransferObjects\FieldData;
+use Domain\Blueprint\DataTransferObjects\FileFieldData;
 use Domain\Blueprint\DataTransferObjects\RelatedResourceFieldData;
 use Domain\Blueprint\DataTransferObjects\RepeaterFieldData;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
 use Domain\Blueprint\DataTransferObjects\SectionData;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 use TiMacDonald\JsonApi\JsonApiResource;
 use InvalidArgumentException;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
@@ -66,6 +68,12 @@ trait TransformsSchemaPayload
                 : $resourceClass::make($related);
 
             return $jsonApiResource->withIncludePrefix($field->resource);
+        }
+
+        if ($field instanceof FileFieldData) {
+            return $field->multiple && is_array($value)
+                ? array_map(fn ($item) => Storage::url($item), $value)
+                : Storage::url($value);
         }
 
         return $value;

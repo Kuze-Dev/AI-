@@ -50,7 +50,7 @@ class SchemaInterpolations extends Component
 
         foreach ($this->getSchemaData()?->sections ?? [] as $section) {
             foreach ($section->fields as $field) {
-                $interpolations[] = "{{ \${$section->state_name}[{$field->state_name}] }}";
+                $interpolations[] = "{{ \${$section->state_name}['{$field->state_name}'] }}";
             }
         }
 

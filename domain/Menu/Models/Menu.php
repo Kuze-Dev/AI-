@@ -67,7 +67,7 @@ class Menu extends Model implements IsActivitySubject
     /** @return HasMany<Node> */
     public function parentNodes(): HasMany
     {
-        return $this->nodes()->whereNull('parent_id');
+        return $this->nodes()->whereNull('parent_id')->ordered();
     }
 
     /** @return HasMany<Node> */

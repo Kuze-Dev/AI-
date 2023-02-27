@@ -87,7 +87,7 @@ class Taxonomy extends Model implements IsActivitySubject
      /** @return HasMany<TaxonomyTerm> */
      public function parentTerms(): HasMany
      {
-         return $this->taxonomyTerms()->whereNull('parent_id');
+         return $this->taxonomyTerms()->whereNull('parent_id')->ordered();
      }
 
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Taxonomy\Models\TaxonomyTerm> */
