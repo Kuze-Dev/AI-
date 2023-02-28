@@ -186,6 +186,18 @@ class CollectionEntryResource extends Resource
                                 fn (Builder $query, $date): Builder => $query->whereDate('published_at', '<=', $date)
                             );
                     }),
+                Tables\Filters\SelectFilter::make('month')
+                    ->options(
+                        self::monthOrder()
+                    )
+                    ->query(function(Builder $query, array $data) {
+                        return $query->when(
+                            filled($data['value']),
+                            function (Builder $query) use ($data) {
+                                $query->whereMonth('published_at', $data['value']);
+                            }
+                        );
+                    })
 
             ])
             ->reorderable('order')
@@ -198,6 +210,27 @@ class CollectionEntryResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ])
             ->defaultSort('order');
+    }
+
+    /**
+     * @return array
+     */
+    public static function monthOrder(): array
+    {
+        return [
+            '1' => 'January',
+            '2' => 'February',
+            '3' => 'March', 
+            '4' => 'April',
+            '5' => 'May',
+            '6' => 'June',
+            '7' => 'July',
+            '8' => 'August',
+            '9' => 'September',
+            '10' => 'October',
+            '11' => 'November',
+            '12' => 'December'
+        ];
     }
 
     /** @return array */
