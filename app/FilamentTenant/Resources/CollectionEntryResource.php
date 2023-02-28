@@ -168,6 +168,26 @@ class CollectionEntryResource extends Resource
                     ->toggleable()
                     ->toggledHiddenByDefault(),
             ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('taxonomies'),
+                Tables\Filters\Filter::make('date_range')
+                    ->form([
+                        Forms\Components\DatePicker::make('published_from'),
+                        Forms\Components\DatePicker::make('published_to')
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['published_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('published_at', '>=', $date)
+                            )
+                            ->when(
+                                $data['published_to'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('published_at', '<=', $date)
+                            );
+                    }),
+
+            ])
             ->reorderable('order')
             ->actions([
                 Tables\Actions\EditAction::make()
