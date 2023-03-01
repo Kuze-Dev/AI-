@@ -45,6 +45,10 @@ trait TransformsSchemaPayload
 
     private function transformField(mixed $value, FieldData $field): mixed
     {
+        if ($value === null) {
+            return null;
+        }
+
         if ($field instanceof RepeaterFieldData) {
             $transformed = [];
 
