@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Resources\MenuResource\Pages;
-use App\FilamentTenant\Support\Tree;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
-use Domain\Menu\Enums\Target;
+use Filament\Forms;
+use Filament\Tables;
+use Illuminate\Support\Str;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
-use Filament\Forms;
 use Filament\Resources\Form;
-use Filament\Resources\Resource;
+use Domain\Menu\Enums\Target;
 use Filament\Resources\Table;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Model;
+use Filament\Resources\Resource;
+use App\FilamentTenant\Support\Tree;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\CheckboxList;
+use App\FilamentTenant\Resources\MenuResource\Pages;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class MenuResource extends Resource
 {
@@ -75,6 +76,10 @@ class MenuResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->rules('alpha_dash')
                         ->disabled(),
+                    Forms\Components\Card::make([
+                        CheckboxList::make('sites')
+                            ->relationship('sites', 'name'),
+                    ]),
                 ]),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([

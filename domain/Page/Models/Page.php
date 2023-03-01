@@ -4,21 +4,23 @@ declare(strict_types=1);
 
 namespace Domain\Page\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
-use Domain\Support\MetaData\HasMetaData;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
-use Domain\Support\SlugHistory\HasSlugHistory;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Blade;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Domain\Site\Models\Site;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Spatie\Activitylog\LogOptions;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Models\Activity;
+use Domain\Support\MetaData\HasMetaData;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Domain\Support\SlugHistory\HasSlugHistory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
+use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 
 /**
  * Domain\Page\Models\Page
@@ -119,5 +121,10 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
                 'slug' => $this->slug,
             ]
         ));
+    }
+
+    public function sites(): BelongsToMany
+    {
+        return $this->belongsToMany(Site::class);
     }
 }

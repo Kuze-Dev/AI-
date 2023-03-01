@@ -4,22 +4,23 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Support\SchemaFormBuilder;
+use Closure;
+use Filament\Forms;
+use Filament\Tables;
+use Illuminate\Support\Str;
+use Filament\Resources\Form;
+use Filament\Resources\Table;
+use Filament\Resources\Resource;
+use Domain\Globals\Models\Globals;
+use Illuminate\Support\Facades\Auth;
 use Domain\Blueprint\Models\Blueprint;
-use App\FilamentTenant\Resources\GlobalsResource\Pages\CreateGlobals;
+use Filament\Forms\Components\CheckboxList;
+use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\EditGlobals;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\ListGlobals;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Domain\Globals\Models\Globals;
-use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
-use Illuminate\Support\Facades\Auth;
-use Closure;
-use Illuminate\Support\Str;
+use App\FilamentTenant\Resources\GlobalsResource\Pages\CreateGlobals;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class GlobalsResource extends Resource
 {
@@ -51,6 +52,10 @@ class GlobalsResource extends Resource
                 Forms\Components\TextInput::make('slug')
                     ->unique(ignoreRecord: true)
                     ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
+                Forms\Components\Card::make([
+                    CheckboxList::make('sites')
+                        ->relationship('sites', 'name'),
+                ]),
                 Forms\Components\Select::make('blueprint_id')
                     ->options(
                         fn () => Blueprint::orderBy('name')

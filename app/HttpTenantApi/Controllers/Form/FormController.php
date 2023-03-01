@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Form;
 
-use App\Http\Controllers\Controller;
-use App\HttpTenantApi\Resources\FormResource;
 use Domain\Form\Models\Form;
+use App\Http\Controllers\Controller;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
+use App\HttpTenantApi\Resources\FormResource;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
@@ -19,7 +20,7 @@ class FormController extends Controller
         return FormResource::collection(
             QueryBuilder::for(Form::query()->select(['blueprint_id', 'name',  'slug']))
                 ->allowedIncludes('blueprint')
-                ->allowedFilters(['name'])
+                ->allowedFilters(['name', AllowedFilter::exact('sites.id')])
                 ->jsonPaginate()
         );
     }

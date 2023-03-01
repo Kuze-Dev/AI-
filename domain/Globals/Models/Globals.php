@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Domain\Globals\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
-use Domain\Blueprint\Models\Blueprint;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Domain\Site\Models\Site;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Spatie\Activitylog\LogOptions;
+use Domain\Blueprint\Models\Blueprint;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 
 /**
  * Domain\Globals\Models\Globals
@@ -81,6 +83,11 @@ class Globals extends Model implements IsActivitySubject
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
+    }
+
+    public function sites(): BelongsToMany
+    {
+        return $this->belongsToMany(Site::class);
     }
 
     /** Specify activity log description. */

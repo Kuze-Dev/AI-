@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Domain\Menu\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Domain\Site\Models\Site;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Spatie\Activitylog\LogOptions;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 
 /**
  * Domain\Menu\Models\Menu
@@ -74,6 +76,11 @@ class Menu extends Model implements IsActivitySubject
     public function nodes(): HasMany
     {
         return $this->hasMany(Node::class);
+    }
+
+    public function sites(): BelongsToMany
+    {
+        return $this->belongsToMany(Site::class);
     }
 
     public function getRouteKeyName(): string

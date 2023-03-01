@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace Domain\Form\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
-use Domain\Blueprint\Models\Blueprint;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Domain\Site\Models\Site;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Spatie\Activitylog\LogOptions;
+use Domain\Blueprint\Models\Blueprint;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 
 /**
  * Domain\Form\Models\Form
@@ -107,5 +109,10 @@ class Form extends Model implements IsActivitySubject
             ->preventOverwrite()
             ->doNotGenerateSlugsOnUpdate()
             ->saveSlugsTo($this->getRouteKeyName());
+    }
+
+    public function sites(): BelongsToMany
+    {
+        return $this->belongsToMany(Site::class);
     }
 }

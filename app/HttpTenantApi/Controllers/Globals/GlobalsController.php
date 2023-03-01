@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Globals;
 
-use App\HttpTenantApi\Resources\GlobalsResource;
 use Domain\Globals\Models\Globals;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
+use App\HttpTenantApi\Resources\GlobalsResource;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
@@ -17,7 +18,7 @@ class GlobalsController
     {
         return GlobalsResource::collection(
             QueryBuilder::for(Globals::with('blueprint'))
-                ->allowedFilters(['name', 'slug'])
+                ->allowedFilters(['name', 'slug', AllowedFilter::exact('collection.sites.id')])
                 ->allowedIncludes('blueprint')
                 ->jsonPaginate()
         );

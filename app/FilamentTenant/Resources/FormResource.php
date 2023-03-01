@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Resources\FormResource\Pages;
-use App\FilamentTenant\Resources\FormResource\RelationManagers\FormSubmissionsRelationManager;
-use App\FilamentTenant\Support\SchemaInterpolations;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Closure;
+use Exception;
+use Filament\Forms;
+use Filament\Tables;
+use Illuminate\Support\Str;
+use Filament\Resources\Form;
+use Filament\Resources\Table;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Form\Models\Form as FormModel;
-use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
-use Illuminate\Support\Facades\Auth;
-use Exception;
+use Filament\Forms\Components\CheckboxList;
+use App\FilamentTenant\Resources\FormResource\Pages;
+use App\FilamentTenant\Support\SchemaInterpolations;
 use Filament\Resources\RelationManagers\RelationGroup;
-use Illuminate\Support\Str;
-use Closure;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use App\FilamentTenant\Resources\FormResource\RelationManagers\FormSubmissionsRelationManager;
 
 class FormResource extends Resource
 {
@@ -62,6 +63,10 @@ class FormResource extends Resource
                         ->reactive()
                         ->preload(),
                     Forms\Components\Toggle::make('store_submission'),
+                    Forms\Components\Card::make([
+                        CheckboxList::make('sites')
+                            ->relationship('sites', 'name'),
+                    ]),
                 ]),
                 Forms\Components\Card::make([
                     Forms\Components\Section::make('Available Values')

@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace Domain\Collection\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
-use Domain\Blueprint\Models\Blueprint;
-use Domain\Taxonomy\Models\Taxonomy;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Domain\Site\Models\Site;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Spatie\Activitylog\LogOptions;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Blueprint\Models\Blueprint;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Domain\Collection\Enums\PublishBehavior;
+use Domain\Support\SlugHistory\HasSlugHistory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
-use Domain\Support\SlugHistory\HasSlugHistory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 
 /**
  * Domain\Collection\Models\Collection
@@ -165,5 +166,10 @@ class Collection extends Model implements IsActivitySubject
     public function hasPublishDates(): bool
     {
         return $this->past_publish_date_behavior || $this->future_publish_date_behavior;
+    }
+
+    public function sites(): BelongsToMany
+    {
+        return $this->belongsToMany(Site::class);
     }
 }
