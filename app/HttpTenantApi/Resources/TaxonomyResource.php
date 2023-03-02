@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @property-read string $name
+ * @mixin \Domain\Taxonomy\Models\Taxonomy
  */
 class TaxonomyResource extends JsonApiResource
 {

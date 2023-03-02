@@ -22,10 +22,10 @@ class TaxonomyController
         );
     }
 
-    public function show(Taxonomy $taxonomy): TaxonomyResource
+    public function show(string $taxonomy): TaxonomyResource
     {
         return TaxonomyResource::make(
-            QueryBuilder::for(Taxonomy::whereSlug($taxonomy->slug)->with([
+            QueryBuilder::for(Taxonomy::whereSlug($taxonomy)->with([
                 'parentTerms.taxonomy',
                 'taxonomyTerms.taxonomy',
             ]))->allowedIncludes(['taxonomyTerms', 'parentTerms'])
