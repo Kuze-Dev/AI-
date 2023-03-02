@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Filament\Pages\Settings\Settings;
-use Spatie\LaravelSettings\SettingsContainer;
+use App\Settings\SiteSettings;
 
 use function Pest\Laravel\get;
 
@@ -14,14 +14,7 @@ it('can render page', function () {
         ->assertOk();
 });
 
-it('can render page by groups', function () {
-    foreach (
-        app(SettingsContainer::class)
-            ->getSettingClasses()
-            ->map(fn (string $setting): string => app($setting)::group())
-        as $group
-    ) {
-        get(Settings::getUrl().'/'.$group)
-            ->assertOk();
-    }
-});
+it('can render page by groups', function (string $settingClass) {
+    get(Settings::getUrl() . '/' . $settingClass::group())
+        ->assertOk();
+})->with([SiteSettings::class]);
