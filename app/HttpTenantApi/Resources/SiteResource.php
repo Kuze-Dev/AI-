@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @mixin \Domain\Page\Models\Site
+ * @mixin \Domain\Site\Models\Site
  */
 class SiteResource extends JsonApiResource
 {

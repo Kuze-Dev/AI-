@@ -137,6 +137,17 @@ class Collection extends Model implements IsActivitySubject
         return $this->belongsToMany(Taxonomy::class);
     }
 
+    /**
+     * Declare relationship of
+     * current model to site.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Site\Models\Site>
+     */
+    public function sites(): BelongsToMany
+    {
+        return $this->belongsToMany(Site::class);
+    }
+
     /** Specify activity log description. */
     public function getActivitySubjectDescription(Activity $activity): string
     {
@@ -166,10 +177,5 @@ class Collection extends Model implements IsActivitySubject
     public function hasPublishDates(): bool
     {
         return $this->past_publish_date_behavior || $this->future_publish_date_behavior;
-    }
-
-    public function sites(): BelongsToMany
-    {
-        return $this->belongsToMany(Site::class);
     }
 }

@@ -93,6 +93,17 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
         return $this->hasMany(SliceContent::class);
     }
 
+    /**
+     * Declare relationship of
+     * current model to site.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Site\Models\Site>
+     */
+    public function sites(): BelongsToMany
+    {
+        return $this->belongsToMany(Site::class);
+    }
+
     public function getActivitySubjectDescription(Activity $activity): string
     {
         return 'Page: '.$this->name;
@@ -121,10 +132,5 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
                 'slug' => $this->slug,
             ]
         ));
-    }
-
-    public function sites(): BelongsToMany
-    {
-        return $this->belongsToMany(Site::class);
     }
 }

@@ -60,6 +60,7 @@ class SiteResource extends Resource
             ]);
     }
 
+    /** @return Builder<Site> */
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()

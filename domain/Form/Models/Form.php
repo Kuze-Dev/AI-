@@ -97,6 +97,17 @@ class Form extends Model implements IsActivitySubject
         return $this->hasMany(FormSubmission::class);
     }
 
+    /**
+     * Declare relationship of
+     * current model to site.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Site\Models\Site>
+     */
+    public function sites(): BelongsToMany
+    {
+        return $this->belongsToMany(Site::class);
+    }
+
     public function getRouteKeyName(): string
     {
         return 'slug';
@@ -109,10 +120,5 @@ class Form extends Model implements IsActivitySubject
             ->preventOverwrite()
             ->doNotGenerateSlugsOnUpdate()
             ->saveSlugsTo($this->getRouteKeyName());
-    }
-
-    public function sites(): BelongsToMany
-    {
-        return $this->belongsToMany(Site::class);
     }
 }

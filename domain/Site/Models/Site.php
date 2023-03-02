@@ -57,11 +57,23 @@ class Site extends Model implements IsActivitySubject
         return 'Site: ' . $this->name;
     }
 
+    /**
+     * Declare relationship of
+     * current model to site.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Collection\Models\Collection>
+     */
     public function collections(): BelongsToMany
     {
         return $this->belongsToMany(Collection::class);
     }
 
+    /**
+     * Declare relationship of
+     * current model to site.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Page\Models\Page>
+     */
     public function pages(): BelongsToMany
     {
         return $this->belongsToMany(Page::class);

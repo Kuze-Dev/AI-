@@ -78,6 +78,12 @@ class Menu extends Model implements IsActivitySubject
         return $this->hasMany(Node::class);
     }
 
+    /**
+     * Declare relationship of
+     * current model to site.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Site\Models\Site>
+     */
     public function sites(): BelongsToMany
     {
         return $this->belongsToMany(Site::class);
