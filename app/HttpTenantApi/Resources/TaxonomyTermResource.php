@@ -24,6 +24,14 @@ class TaxonomyTermResource extends JsonApiResource
         ];
     }
 
+       /** @return array<string, callable> */
+       public function toRelationships(Request $request): array
+       {
+           return [
+               'children' => fn () => TaxonomyTermResource::collection($this->children),
+           ];
+       }
+
     protected function getSchemaData(): SchemaData
     {
         return $this->taxonomy->blueprint->schema;

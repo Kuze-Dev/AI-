@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
+use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
 
 use function Pest\Laravel\getJson;
@@ -89,3 +90,31 @@ it('filter', function () {
             });
     }
 });
+
+it('can show taxonomy with includes', function (string $include) {
+    $taxonomy = TaxonomyFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+        )
+        ->has(TaxonomyTermFactory::new())
+        ->create();
+
+    getJson("api/taxonomies/{$taxonomy->getRouteKey()}?" . http_build_query(['include' => $include]))
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) use ($taxonomy, $include) {
+            $json
+                ->where('data.type', 'taxonomies')
+                ->where('data.id', Str::slug($taxonomy->name))
+                ->where('data.attributes.name', $taxonomy->name)
+                ->has(
+                    'included',
+                    callback: fn (AssertableJson $json) => $json->where('type', $include === 'parentTerms' ? 'taxonomyTerms' : $include)->etc()
+                )
+                ->etc();
+        });
+})->with([
+    'taxonomyTerms',
+    'parentTerms',
+]);
