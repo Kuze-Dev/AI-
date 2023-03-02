@@ -18,4 +18,13 @@ class TaxonomyResource extends JsonApiResource
             'name' => $this->name,
         ];
     }
+
+     /** @return array<string, callable> */
+     public function toRelationships(Request $request): array
+     {
+         return [
+             'taxonomyTerms' => fn () => TaxonomyTermResource::collection($this->taxonomyTerms),
+             'parentTerms' => fn () => TaxonomyTermResource::collection($this->parentTerms),
+         ];
+     }
 }
