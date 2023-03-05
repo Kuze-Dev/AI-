@@ -19,6 +19,9 @@ class CreateGlobalsAction
             'data' => $globalData->data,
         ]);
 
+        $globals->sites()
+            ->attach($globalData->sites);
+
         return $globals;
     }
 }

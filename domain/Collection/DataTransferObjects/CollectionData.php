@@ -13,6 +13,7 @@ class CollectionData
         public readonly string $blueprint_id,
         public readonly string $route_url,
         public readonly array $taxonomies = [],
+        public readonly array $sites = [],
         public readonly ?string $slug = null,
         public readonly ?PublishBehavior $past_publish_date_behavior = null,
         public readonly ?PublishBehavior $future_publish_date_behavior = null,

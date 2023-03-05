@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Site\Database\Factories\SiteFactory;
 use Domain\Form\Actions\CreateFormAction;
 use Domain\Form\DataTransferObjects\FormData;
 use Domain\Form\Models\Form;
@@ -17,11 +18,13 @@ it('store', function () {
     $blueprint = BlueprintFactory::new()
         ->withDummySchema()
         ->createOne();
+    $site = SiteFactory::new()
+        ->createOne();
 
     assertDatabaseCount(Form::class, 0);
     assertDatabaseCount(FormEmailNotification::class, 0);
 
-    app(CreateFormAction::class)
+    $form = app(CreateFormAction::class)
         ->execute(FormData::fromArray([
             'blueprint_id' => $blueprint->getKey(),
             'name' => 'Test',
@@ -34,6 +37,7 @@ it('store', function () {
                     'template' => 'Foo Template',
                 ],
             ],
+            'sites' => [$site->id],
         ]));
 
     assertDatabaseCount(Form::class, 1);
@@ -49,4 +53,6 @@ it('store', function () {
         'subject' => 'Foo Subject',
         'template' => 'Foo Template',
     ]);
+
+    expect($form->sites->pluck('id'))->toContain($site->id);
 });

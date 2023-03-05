@@ -47,6 +47,9 @@ class UpdatePageAction
 
         SliceContent::setNewOrder($sliceContentIds);
 
+        $page->sites()
+            ->sync($pageData->sites);
+
         return $page;
     }
 }

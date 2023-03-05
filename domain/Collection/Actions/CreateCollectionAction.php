@@ -25,6 +25,9 @@ class CreateCollectionAction
         $collection->taxonomies()
             ->attach($collectionData->taxonomies);
 
+        $collection->sites()
+            ->attach($collectionData->sites);
+
         return $collection;
     }
 }

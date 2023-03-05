@@ -2,22 +2,27 @@
 
 declare(strict_types=1);
 
-use Domain\Page\Actions\UpdatePageAction;
-use Domain\Page\Database\Factories\PageFactory;
-use Domain\Page\Database\Factories\SliceFactory;
-use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\SliceContent;
+use Domain\Page\Actions\UpdatePageAction;
 use Domain\Support\MetaData\Models\MetaData;
+use Domain\Page\DataTransferObjects\PageData;
+use Domain\Page\Database\Factories\PageFactory;
+use Domain\Site\Database\Factories\SiteFactory;
 
-use function Pest\Laravel\assertDatabaseCount;
+use Domain\Page\Database\Factories\SliceFactory;
+
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseCount;
 
 beforeEach(fn () => testInTenantContext());
 
 it('can update page', function () {
     $page = PageFactory::new()
         ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
+        ->createOne();
+
+    $site = SiteFactory::new()
         ->createOne();
 
     $metaDataData = [
@@ -48,6 +53,7 @@ it('can update page', function () {
                     'keywords' => 'foo keywords updated',
                     'description' => 'foo description updated',
                 ],
+                'sites' => [$site->id],
             ])
         );
 
@@ -70,4 +76,6 @@ it('can update page', function () {
         'slice_id' => $page->sliceContents->first()->slice_id,
         'data' => json_encode(['name' => 'foo']),
     ]);
+
+    expect($page->sites->pluck('id'))->toContain($site->id);
 });

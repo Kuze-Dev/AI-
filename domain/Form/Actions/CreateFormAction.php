@@ -27,6 +27,9 @@ class CreateFormAction
             $this->createFormEmailNotification->execute($form, $formEmailNotification);
         }
 
+        $form->sites()
+            ->attach($formData->sites);
+
         return $form;
     }
 }

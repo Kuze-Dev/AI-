@@ -11,6 +11,7 @@ class GlobalsData
         public readonly string $slug,
         public readonly string $blueprint_id,
         public readonly ?array $data = null,
+        public readonly array $sites = [],
     ) {
     }
 
@@ -21,6 +22,7 @@ class GlobalsData
             slug: $data['slug'],
             blueprint_id: $data['blueprint_id'],
             data: $data['data'],
+            sites: $data['sites'],
         );
     }
 }

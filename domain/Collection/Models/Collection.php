@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Collection\Models;
 
-use Domain\Site\Models\Site;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Activitylog\LogOptions;
@@ -22,6 +21,7 @@ use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Site\Traits\Sites;
 
 /**
  * Domain\Collection\Models\Collection
@@ -69,6 +69,7 @@ class Collection extends Model implements IsActivitySubject
     use HasSlug;
     use HasSlugHistory;
     use ConstraintsRelationships;
+    use Sites;
 
     /**
      * Declare columns
@@ -135,17 +136,6 @@ class Collection extends Model implements IsActivitySubject
     public function taxonomies(): BelongsToMany
     {
         return $this->belongsToMany(Taxonomy::class);
-    }
-
-    /**
-     * Declare relationship of
-     * current model to site.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Site\Models\Site>
-     */
-    public function sites(): BelongsToMany
-    {
-        return $this->belongsToMany(Site::class);
     }
 
     /** Specify activity log description. */

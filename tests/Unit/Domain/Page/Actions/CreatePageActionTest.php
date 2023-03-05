@@ -2,15 +2,17 @@
 
 declare(strict_types=1);
 
-use Domain\Page\Actions\CreatePageAction;
-use Domain\Page\Database\Factories\SliceFactory;
-use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\SliceContent;
+use Domain\Page\Actions\CreatePageAction;
 use Domain\Support\MetaData\Models\MetaData;
+use Domain\Page\DataTransferObjects\PageData;
+use Domain\Site\Database\Factories\SiteFactory;
 
-use function Pest\Laravel\assertDatabaseCount;
+use Domain\Page\Database\Factories\SliceFactory;
+
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseCount;
 
 beforeEach(fn () => testInTenantContext());
 
@@ -19,6 +21,9 @@ it('can create page', function () {
         ->withDummyBlueprint()
         ->createOne()
         ->getKey();
+
+    $site = SiteFactory::new()
+        ->createOne();
 
     $page = app(CreatePageAction::class)
         ->execute(PageData::fromArray([
@@ -36,6 +41,7 @@ it('can create page', function () {
                 'keywords' => '',
                 'description' => '',
             ],
+            'sites' => [$site->id],
         ]));
 
     assertDatabaseCount(Page::class, 1);
@@ -57,4 +63,6 @@ it('can create page', function () {
         'slice_id' => $sliceId,
         'data' => json_encode(['name' => 'foo']),
     ]);
+
+    expect($page->sites->pluck('id'))->toContain($site->id);
 });

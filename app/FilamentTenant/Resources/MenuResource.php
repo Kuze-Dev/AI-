@@ -10,6 +10,7 @@ use Filament\Tables;
 use Illuminate\Support\Str;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
+use Domain\Site\Models\Site;
 use Filament\Resources\Form;
 use Domain\Menu\Enums\Target;
 use Filament\Resources\Table;
@@ -78,7 +79,25 @@ class MenuResource extends Resource
                         ->disabled(),
                     Forms\Components\Card::make([
                         CheckboxList::make('sites')
-                            ->relationship('sites', 'name'),
+                            ->options(
+                                fn () => Site::orderBy('name')
+                                    ->pluck('name', 'id')
+                                    ->toArray()
+                            )
+                            ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Menu $record): void {
+                                if ( ! $record) {
+                                    $component->state([]);
+
+                                    return;
+                                }
+
+                                $component->state(
+                                    $record->sites->pluck('id')
+                                        ->intersect(array_keys($component->getOptions()))
+                                        ->values()
+                                        ->toArray()
+                                );
+                            }),
                     ]),
                 ]),
                 Forms\Components\Section::make(trans('Nodes'))

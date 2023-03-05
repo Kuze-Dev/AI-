@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Page\Models;
 
-use Domain\Site\Models\Site;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Activitylog\LogOptions;
@@ -16,11 +15,11 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Domain\Support\SlugHistory\HasSlugHistory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Site\Traits\Sites;
 
 /**
  * Domain\Page\Models\Page
@@ -59,6 +58,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
     use HasSlugHistory;
     use HasMetaData;
     use ConstraintsRelationships;
+    use Sites;
 
     protected $fillable = [
         'name',
@@ -91,17 +91,6 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
     public function sliceContents(): HasMany
     {
         return $this->hasMany(SliceContent::class);
-    }
-
-    /**
-     * Declare relationship of
-     * current model to site.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Site\Models\Site>
-     */
-    public function sites(): BelongsToMany
-    {
-        return $this->belongsToMany(Site::class);
     }
 
     public function getActivitySubjectDescription(Activity $activity): string

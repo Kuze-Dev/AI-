@@ -41,6 +41,7 @@ class EditCollection extends EditRecord
                 ->execute($record, new CollectionData(
                     name: $data['name'],
                     taxonomies: $data['taxonomies'],
+                    sites: $data['sites'],
                     blueprint_id: $data['blueprint_id'],
                     slug: $data['slug'],
                     is_sortable: $data['is_sortable'],

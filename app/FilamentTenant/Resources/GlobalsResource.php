@@ -8,6 +8,7 @@ use Closure;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Support\Str;
+use Domain\Site\Models\Site;
 use Filament\Resources\Form;
 use Filament\Resources\Table;
 use Filament\Resources\Resource;
@@ -54,7 +55,25 @@ class GlobalsResource extends Resource
                     ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                 Forms\Components\Card::make([
                     CheckboxList::make('sites')
-                        ->relationship('sites', 'name'),
+                        ->options(
+                            fn () => Site::orderBy('name')
+                                ->pluck('name', 'id')
+                                ->toArray()
+                        )
+                        ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Globals $record): void {
+                            if ( ! $record) {
+                                $component->state([]);
+
+                                return;
+                            }
+
+                            $component->state(
+                                $record->sites->pluck('id')
+                                    ->intersect(array_keys($component->getOptions()))
+                                    ->values()
+                                    ->toArray()
+                            );
+                        }),
                 ]),
                 Forms\Components\Select::make('blueprint_id')
                     ->options(

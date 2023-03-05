@@ -13,7 +13,8 @@ class PageData
         public readonly string $route_url,
         public readonly MetaDataData $meta_data,
         public readonly array $slice_contents = [],
-        public readonly ?string $slug = null
+        public readonly ?string $slug = null,
+        public readonly array $sites = []
     ) {
     }
 
@@ -36,7 +37,8 @@ class PageData
                 author: $data['meta_data']['author'] ?? null,
                 description: $data['meta_data']['description'] ?? null,
                 keywords: $data['meta_data']['keywords'] ?? null,
-            )
+            ),
+            sites: $data['sites']
         );
     }
 }

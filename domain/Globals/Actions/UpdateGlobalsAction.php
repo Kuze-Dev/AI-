@@ -21,6 +21,9 @@ class UpdateGlobalsAction
             'data' => $globalData->data,
         ]);
 
+        $globals->sites()
+            ->sync($globalData->sites);
+
         return $globals;
     }
 }

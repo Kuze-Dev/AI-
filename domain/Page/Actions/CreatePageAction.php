@@ -30,6 +30,9 @@ class CreatePageAction
             $this->createSliceContent->execute($page, $sliceContentData);
         }
 
+        $page->sites()
+            ->attach($pageData->sites);
+
         return $page;
     }
 }

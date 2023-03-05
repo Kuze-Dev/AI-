@@ -13,6 +13,7 @@ class FormData
         public readonly bool $store_submission,
         public readonly ?string $slug = null,
         public readonly array $form_email_notifications = [],
+        public readonly array $sites = [],
     ) {
     }
 
@@ -36,6 +37,7 @@ class FormData
                 ),
                 $data['form_email_notifications'] ?? []
             ),
+            sites: $data['sites']
         );
     }
 }

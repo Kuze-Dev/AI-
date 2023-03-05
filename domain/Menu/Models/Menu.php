@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Menu\Models;
 
-use Domain\Site\Models\Site;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Activitylog\LogOptions;
@@ -12,10 +11,10 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Site\Traits\Sites;
 
 /**
  * Domain\Menu\Models\Menu
@@ -47,6 +46,7 @@ class Menu extends Model implements IsActivitySubject
     use HasSlug;
     use LogsActivity;
     use ConstraintsRelationships;
+    use Sites;
 
     protected $fillable = [
         'name',
@@ -76,17 +76,6 @@ class Menu extends Model implements IsActivitySubject
     public function nodes(): HasMany
     {
         return $this->hasMany(Node::class);
-    }
-
-    /**
-     * Declare relationship of
-     * current model to site.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Site\Models\Site>
-     */
-    public function sites(): BelongsToMany
-    {
-        return $this->belongsToMany(Site::class);
     }
 
     public function getRouteKeyName(): string

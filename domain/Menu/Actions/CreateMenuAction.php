@@ -16,6 +16,9 @@ class CreateMenuAction
             'slug' => $menuData->slug,
         ]);
 
+        $menu->sites()
+            ->attach($menuData->sites);
+
         return $menu;
     }
 }

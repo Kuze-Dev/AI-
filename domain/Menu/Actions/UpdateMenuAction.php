@@ -23,6 +23,9 @@ class UpdateMenuAction
 
         $this->syncNodeAction->execute($menu, $menuData->nodes);
 
+        $menu->sites()
+            ->sync($menuData->sites);
+
         return $menu;
     }
 }

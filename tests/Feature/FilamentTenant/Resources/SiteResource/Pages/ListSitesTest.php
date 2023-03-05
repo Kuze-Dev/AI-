@@ -34,18 +34,6 @@ it('can list pages', function () {
         ->assertOk();
 });
 
-it('can create site and validate if given name is unique', function () {
-    livewire(ListSites::class)
-        ->callPageAction('create', ['name' => 'Site 1'])
-        ->callPageAction('create', ['name' => 'Site 2'])
-        ->assertHasNoFormErrors()
-        ->callPageAction('create', ['name' => 'Site 2'])
-        ->assertHasFormErrors();
-
-    assertDatabaseHas(Site::class, ['name' => 'Site 1']);
-    assertDatabaseCount(Site::class, 2);
-});
-
 it('can edit site', function () {
     livewire(ListSites::class)
         ->callPageAction('create', ['name' => 'Site 1'])

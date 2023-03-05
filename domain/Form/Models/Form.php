@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Form\Models;
 
-use Domain\Site\Models\Site;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Activitylog\LogOptions;
@@ -14,10 +13,10 @@ use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Site\Traits\Sites;
 
 /**
  * Domain\Form\Models\Form
@@ -54,6 +53,7 @@ class Form extends Model implements IsActivitySubject
     use HasSlug;
     use LogsActivity;
     use ConstraintsRelationships;
+    use Sites;
 
     protected $fillable = [
         'blueprint_id',
@@ -95,17 +95,6 @@ class Form extends Model implements IsActivitySubject
     public function formSubmissions(): HasMany
     {
         return $this->hasMany(FormSubmission::class);
-    }
-
-    /**
-     * Declare relationship of
-     * current model to site.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Site\Models\Site>
-     */
-    public function sites(): BelongsToMany
-    {
-        return $this->belongsToMany(Site::class);
     }
 
     public function getRouteKeyName(): string
