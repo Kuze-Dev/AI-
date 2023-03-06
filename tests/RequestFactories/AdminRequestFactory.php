@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\RequestFactories;
 
+use Illuminate\Support\Str;
 use Worksome\RequestFactories\RequestFactory;
 
 class AdminRequestFactory extends RequestFactory
@@ -13,7 +14,12 @@ class AdminRequestFactory extends RequestFactory
         return [
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
-            'email' => 'test@user.com',
+            'email' => function (array $attributes) {
+                $firstName = Str::of($attributes['first_name'])->camel();
+                $lastName = Str::of($attributes['last_name'])->camel();
+
+                return "{$firstName}.{$lastName}@fake.com";
+            },
             'password' => 'new-password',
             'password_confirmation' => 'new-password',
             'active' => true,
