@@ -35,7 +35,7 @@ class RouteServiceProvider extends ServiceProvider
                 Route::middleware('web')
                     ->domain($domain)
                     ->group(function () {
-                        Route::view('/', 'welcome');
+                        Route::view('/', 'web.welcome');
                     });
             }
         });

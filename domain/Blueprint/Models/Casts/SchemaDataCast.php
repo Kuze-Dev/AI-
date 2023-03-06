@@ -7,6 +7,9 @@ namespace Domain\Blueprint\Models\Casts;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
+/**
+ * @implements CastsAttributes<SchemaData, string>
+ */
 class SchemaDataCast implements CastsAttributes
 {
     /**
@@ -24,7 +27,7 @@ class SchemaDataCast implements CastsAttributes
 
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  array  $value
+     * @param  ?array  $value
      */
     public function set($model, string $key, $value, array $attributes): string
     {

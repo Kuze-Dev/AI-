@@ -26,7 +26,7 @@ use Eloquent;
  * @property string $authenticatable_type
  * @property int $authenticatable_id
  * @property string|null $enabled_at
- * @property mixed|null $secret
+ * @property string $secret
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Model|Eloquent $authenticatable
