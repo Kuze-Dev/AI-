@@ -13,7 +13,6 @@ use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\UserMenuItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Vite;
 
 class FilamentTenantServiceProvider extends ContextServiceProvider
 {
