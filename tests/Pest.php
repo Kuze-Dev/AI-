@@ -15,6 +15,7 @@ use Tests\Fixtures\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\ParallelTesting;
 
 use function Pest\Laravel\seed;
 
@@ -41,7 +42,12 @@ uses(
             app(PermissionRegistrar::class)->forgetCachedPermissions();
         });
 
-        config()->set('tenancy.database.prefix', 'test_');
+        config()->set(
+            'tenancy.database.prefix',
+            ($token = ParallelTesting::token())
+                ? "test_{$token}_"
+                : 'test_'
+        );
         config()->set('tenancy.database.template_tenant_connection', 'sqlite');
     })
     ->afterEach(function () {
@@ -72,7 +78,12 @@ uses(
 
         Relation::morphMap(['test_user' => User::class]);
 
-        config()->set('tenancy.database.prefix', 'test_');
+        config()->set(
+            'tenancy.database.prefix',
+            ($token = ParallelTesting::token())
+                ? "test_{$token}_"
+                : 'test_'
+        );
         config()->set('tenancy.database.template_tenant_connection', 'sqlite');
     })
     ->afterEach(function () {

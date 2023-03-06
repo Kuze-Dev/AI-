@@ -15,6 +15,7 @@ return [
     'directories' => [
         app_path('Http/Controllers'),
         app_path('HttpApi/Controllers') => [
+            // 'domain' => parse_url(env('APP_URL', ''), PHP_URL_HOST),
             'prefix' => 'api',
             'as' => 'api.',
             'middleware' => 'api',

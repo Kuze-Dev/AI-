@@ -5,14 +5,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Halcyon Laravel | SaaS Boilerplate</title>
+    <title>Halcyon Laravel | Tall Boilerplate</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap" rel="stylesheet">
 
-    @vite('resources/css/app.css')
+    @vite('resources/css/web/app.css')
 </head>
 
 <body class="bg-gradient-to-r from-gray-100 via-white to-gray-100">
@@ -90,11 +90,11 @@
         <div class="prose-lg max-w-none text-center">
             <h1>
                 Halcyon Laravel<br>
-                SaaS Boilerplate
+                TALL Boilerplate
             </h1>
             <p>
-                Build SaaS platforms with ease. Serve a single running application to multiple customers. <br>
-                They wouldn't even notice they're running in a single server!
+                Great minds come to one to produce a lovely product to help ease development time of projects.<br>
+                We love it, and we know you'll do too!
             </p>
         </div>
 

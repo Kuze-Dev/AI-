@@ -36,10 +36,6 @@ class FilamentTenantServiceProvider extends ContextServiceProvider
                 NavigationGroup::make('System')
                     ->icon('heroicon-s-exclamation'),
             ]);
-
-            Filament::registerStyles([
-                Vite::asset('resources/css/app.css'),
-            ]);
         });
 
         $this->registerRoutes();
