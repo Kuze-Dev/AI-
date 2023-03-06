@@ -8,6 +8,7 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\Filament\Resources\AdminResource\Pages;
 use Domain\Admin\Models\Admin;
 use Domain\Auth\Actions\ForgotPasswordAction;
+use Domain\Auth\Actions\SendEmailVerificationAction;
 use Domain\Role\Models\Role;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -195,7 +196,15 @@ class AdminResource extends Resource
                     Tables\Actions\Action::make('resend-verification')
                         ->requiresConfirmation()
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
-                            $record->sendEmailVerificationNotification();
+                            $result = app(SendEmailVerificationAction::class)->execute($record);
+
+                            if ($result->failed()) {
+                                $action->failureNotificationTitle($result->getMessage())
+                                    ->failure();
+
+                                return;
+                            }
+
                             $action->success();
                         })
                         ->authorize('resendVerification'),
