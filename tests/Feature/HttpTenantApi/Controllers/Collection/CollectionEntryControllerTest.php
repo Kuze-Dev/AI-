@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
-use Domain\Collection\Database\Factories\CollectionEntryFactory;
-use Domain\Collection\Database\Factories\CollectionFactory;
-use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
-use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Domain\Site\Database\Factories\SiteFactory;
+use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Collection\Database\Factories\CollectionFactory;
+use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
+
+use Domain\Collection\Database\Factories\CollectionEntryFactory;
 
 use function Pest\Laravel\getJson;
 
@@ -129,3 +131,72 @@ it('can show collection entry with includes', function (string $include) {
     'slugHistories',
     'metaData',
 ]);
+
+it('can list collection entry of specific site', function () {
+    $site = SiteFactory::new()
+        ->createOne();
+
+    $collection = CollectionFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->has(
+            TaxonomyFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+                )
+        )
+        ->hasAttached($site)
+        ->createOne();
+
+    CollectionEntryFactory::new()
+        ->for($collection)
+        ->has(
+            TaxonomyTermFactory::new(['data' => ['main' => ['desciption' => 'Foo']]])
+                ->for($collection->taxonomies->first())
+        )
+        ->count(1)
+        ->create([
+            'data' => ['main' => ['header' => 'Foo']],
+        ]);
+
+    $collection2 = CollectionFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->has(
+            TaxonomyFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+                )
+        )
+        ->createOne();
+
+    CollectionEntryFactory::new()
+        ->for($collection2)
+        ->has(
+            TaxonomyTermFactory::new(['data' => ['main' => ['desciption' => 'Foo']]])
+                ->for($collection2->taxonomies->first())
+        )
+        ->count(2)
+        ->create([
+            'data' => ['main' => ['header' => 'Foo']],
+        ]);
+
+    getJson("api/collections/{$collection->getRouteKey()}/entries?filter[collection.sites.id]={$site->id}")
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) {
+            $json->count('data', 1)
+                ->where('data.0.type', 'collectionEntries')
+                ->whereType('data.0.attributes.title', 'string')
+                ->etc();
+        });
+});

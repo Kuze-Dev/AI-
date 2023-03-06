@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-use Domain\Collection\Database\Factories\CollectionFactory;
-use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Domain\Site\Database\Factories\SiteFactory;
+use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
+
+use Domain\Collection\Database\Factories\CollectionFactory;
 
 use function Pest\Laravel\getJson;
 
@@ -93,3 +95,31 @@ it('can show a collection with includes', function (string $include) {
     'taxonomies',
     'slugHistories',
 ]);
+
+it('can list collections of specific site', function () {
+    CollectionFactory::new()
+        ->withDummyBlueprint()
+        ->count(1)
+        ->create();
+
+    $site = SiteFactory::new()
+        ->createOne();
+
+    CollectionFactory::new()
+        ->withDummyBlueprint()
+        ->hasAttached(
+            $site
+        )
+        ->count(1)
+        ->create();
+
+    getJson("api/collections?filter[sites.id]={$site->id}")
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) {
+            $json
+                ->count('data', 1)
+                ->where('data.0.type', 'collections')
+                ->whereType('data.0.attributes.name', 'string')
+                ->etc();
+        });
+});

@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use Illuminate\Testing\Fluent\AssertableJson;
 use Domain\Menu\Database\Factories\MenuFactory;
 use Domain\Menu\Database\Factories\NodeFactory;
-use Illuminate\Testing\Fluent\AssertableJson;
+
+use Domain\Site\Database\Factories\SiteFactory;
 
 use function Pest\Laravel\getJson;
 
@@ -103,3 +105,32 @@ it('can show menu with includes', function (string $include) {
     'nodes',
     'parentNodes',
 ]);
+
+it('can list menus of specific site', function () {
+    $site = SiteFactory::new()->createOne();
+    MenuFactory::new()
+        ->has(
+            NodeFactory::new()
+                ->count(3)
+        )
+        ->hasAttached($site)
+        ->count(1)
+        ->create();
+    MenuFactory::new()
+        ->has(
+            NodeFactory::new()
+                ->count(3)
+        )
+        ->count(2)
+        ->create();
+
+    getJson("api/menus?filter[sites.id]={$site->id}")
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) {
+            $json
+                ->count('data', 1)
+                ->where('data.0.type', 'menus')
+                ->whereType('data.0.attributes.name', 'string')
+                ->etc();
+        });
+});

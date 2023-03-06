@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Collection\Database\Factories;
 
-use Domain\Blueprint\Database\Factories\BlueprintFactory;
-use Domain\Collection\Enums\PublishBehavior;
-use Domain\Collection\Models\Collection;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use Domain\Collection\Models\Collection;
+use Domain\Collection\Enums\PublishBehavior;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Collection\Models\Collection>

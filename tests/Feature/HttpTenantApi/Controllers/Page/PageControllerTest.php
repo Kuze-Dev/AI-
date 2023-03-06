@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-use Domain\Page\Database\Factories\PageFactory;
-use Domain\Page\Database\Factories\SliceFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Domain\Page\Database\Factories\PageFactory;
+use Domain\Site\Database\Factories\SiteFactory;
+
+use Domain\Page\Database\Factories\SliceFactory;
 
 use function Pest\Laravel\getJson;
 
@@ -84,3 +86,26 @@ it('can show a page with includes', function (string $include) {
     'slugHistories',
     'metaData',
 ]);
+
+it('can list pages of specific site', function () {
+    $site = SiteFactory::new()->createOne();
+    PageFactory::new()
+        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
+        ->hasAttached($site)
+        ->count(1)
+        ->create();
+    PageFactory::new()
+        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
+        ->count(2)
+        ->create();
+
+    getJson("api/pages?filter[sites.id]={$site->id}")
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) {
+            $json
+                ->count('data', 1)
+                ->where('data.0.type', 'pages')
+                ->whereType('data.0.attributes.name', 'string')
+                ->etc();
+        });
+});

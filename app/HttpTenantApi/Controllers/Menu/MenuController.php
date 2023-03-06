@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Menu;
 
-use App\HttpTenantApi\Resources\MenuResource;
 use Domain\Menu\Models\Menu;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
+use App\HttpTenantApi\Resources\MenuResource;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
@@ -20,6 +21,7 @@ class MenuController
                 ->allowedFilters([
                     'name',
                     'slug',
+                    AllowedFilter::exact('sites.id'),
                 ])
                 ->jsonPaginate()
         );
