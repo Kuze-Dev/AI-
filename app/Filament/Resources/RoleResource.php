@@ -222,7 +222,7 @@ class RoleResource extends Resource
 
     private static function refreshSelectAllState(Closure $get, Closure $set): void
     {
-        $set('select_all', self::$permissionGroups->keys()->every(fn (string $groupName) => $get($groupName)));
+        $set('select_all', self::$permissionGroups->every(fn (PermissionGroup $permissionGroup, string $groupName) => $get($groupName)));
     }
 
     private static function refreshPermissionGroupState(string $groupName, PermissionGroup $permissionGroup, Closure $get, Closure $set): void
