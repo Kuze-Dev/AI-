@@ -10,4 +10,14 @@ use App\FilamentTenant\Pages\Settings\Concerns\ContextualSettingsPage;
 class SiteSettings extends BaseSiteSettings
 {
     use ContextualSettingsPage;
+
+    protected function getBreadcrumbs(): array
+    {
+        $breadcrumb = $this->getBreadcrumb();
+
+        return array_merge(
+            [route('filament-tenant.pages.settings') => trans('Settings')],
+            (filled($breadcrumb) ? [$breadcrumb] : [])
+        );
+    }
 }

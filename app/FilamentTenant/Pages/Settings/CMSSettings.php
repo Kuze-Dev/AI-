@@ -39,4 +39,14 @@ class CMSSettings extends BaseSettings
             ]),
         ];
     }
+
+    protected function getBreadcrumbs(): array
+    {
+        $breadcrumb = $this->getBreadcrumb();
+
+        return array_merge(
+            [route('filament-tenant.pages.settings') => trans('Settings')],
+            (filled($breadcrumb) ? [$breadcrumb] : [])
+        );
+    }
 }
