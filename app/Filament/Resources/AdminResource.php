@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Permission;
+use STS\FilamentImpersonate\Impersonate;
 
 class AdminResource extends Resource
 {
@@ -53,8 +54,8 @@ class AdminResource extends Resource
                         ->required(),
                     Forms\Components\TextInput::make('email')
                         ->email()
-                        ->required()
                         ->rules('email:rfc,dns')
+                        ->required()
                         ->helperText(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email') ? 'Email update is currently disabled.' : '')
                         ->disabled(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email')),
                     Forms\Components\TextInput::make('password')
@@ -62,7 +63,9 @@ class AdminResource extends Resource
                         ->required()
                         ->rule(Password::default())
                         ->helperText(
-                            fn () => config('app.env') == 'local' || config('app.env') == 'testing' ? trans('Password must be at least 4 characters.') : trans('Password must be at least 8 characters, have 1 special character, 1 number, 1 upper case and 1 lower case.')
+                            fn () => config('app.env') === 'local' || config('app.env') === 'testing'
+                                ? trans('Password must be at least 4 characters.')
+                                : trans('Password must be at least 8 characters, have 1 special character, 1 number, 1 upper case and 1 lower case.')
                         )
                         ->visible(fn (?Admin $record) => $record === null || ! $record->exists),
                     Forms\Components\TextInput::make('password_confirmation')
@@ -73,7 +76,11 @@ class AdminResource extends Resource
                         ->rule(Password::default())
                         ->visible(fn (?Admin $record) => $record === null || ! $record->exists),
                     Forms\Components\Select::make('timezone')
-                        ->options(collect(timezone_identifiers_list())->mapWithKeys(fn (string $timezone) => [$timezone => $timezone]))
+                        ->options(
+                            collect(timezone_identifiers_list())
+                                ->mapWithKeys(fn (string $timezone) => [$timezone => $timezone])
+                                ->toArray()
+                        )
                         ->searchable()
                         ->default(config('domain.admin.default_timezone')),
                 ])
@@ -224,6 +231,10 @@ class AdminResource extends Resource
                             $action->success();
                         })
                         ->authorize('sendPasswordReset'),
+                    Impersonate::make()
+                        ->guard('admin')
+                        ->redirectTo(route('filament.pages.dashboard'))
+                        ->authorize('impersonate'),
                 ]),
             ])
             ->bulkActions([])

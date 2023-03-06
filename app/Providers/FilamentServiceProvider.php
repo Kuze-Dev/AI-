@@ -15,6 +15,7 @@ use Domain\Admin\Models\Admin;
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Saade\FilamentLaravelLog\Pages\ViewLog;
 
@@ -28,6 +29,8 @@ class FilamentServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Filament::serving(function () {
+            Filament::registerViteTheme('resources/css/filament/app.css');
+
             if (Filament::currentContext() !== 'filament') {
                 return;
             }
@@ -49,12 +52,17 @@ class FilamentServiceProvider extends ServiceProvider
                             href="https://halcyonwebdesign.com.ph/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="hover:text-primary-500 transition"
+                            class="transition hover:text-primary-500"
                         >
                             Halcyon Web Design
                         </a>
                     </p>
                 HTML,
+        );
+
+        Filament::registerRenderHook(
+            'head.end',
+            fn () => Vite::withEntryPoints(['resources/js/filament/app.js'])->toHtml(),
         );
 
         ViewLog::can(fn (?Admin $admin) => $admin?->hasRole(config('domain.role.super_admin')));

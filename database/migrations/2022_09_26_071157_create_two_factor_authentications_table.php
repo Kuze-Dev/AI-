@@ -19,7 +19,7 @@ return new class () extends Migration {
             $table->id();
             $table->morphs('authenticatable', '2fa_auth_type_auth_id_index');
             $table->timestamp('enabled_at')->nullable();
-            $table->string('secret')->nullable();
+            $table->string('secret');
             $table->timestamps();
         });
 
