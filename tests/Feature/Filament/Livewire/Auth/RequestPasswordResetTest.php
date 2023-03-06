@@ -12,10 +12,10 @@ it('can render request password reset', function () {
 });
 
 it('can request password reset', function () {
-    AdminFactory::new(['email' => 'test@user'])->create();
+    AdminFactory::new(['email' => 'test@user.com'])->create();
 
     livewire(RequestPasswordReset::class)
-        ->fill(['email' => 'test@user'])
+        ->fill(['email' => 'test@user.com'])
         ->call('sendResetPasswordRequest')
         ->assertHasNoFormErrors()
         ->assertNotified();
