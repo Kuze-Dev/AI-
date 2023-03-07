@@ -29,7 +29,7 @@ definitions:
         name: Analyse
         script:
           - *setup-script
-          - composer analyse -- --memory-limit -1
+          - composer analyse -- --memory-limit=-1
         caches:
           - composer
           - phpstan
@@ -43,18 +43,18 @@ definitions:
         name: Test
         script:
           - *setup-script
-          - composer test -- -d memory_limit=-1
+          - composer test -- --ci
 
 pipelines:
   branches:
-    master:
+    develop:
       - parallel:
           - step: *check-format
           - step: *analyse
           - step: *test
 
   pull-requests:
-    "**":
+    '**':
       - parallel:
           - step: *check-format
           - step: *analyse

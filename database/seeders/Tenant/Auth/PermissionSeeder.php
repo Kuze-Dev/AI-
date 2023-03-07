@@ -23,9 +23,23 @@ class PermissionSeeder extends BasePermissionSeeder
                     customPermissions: [
                         'resendVerification',
                         'sendPasswordReset',
+                        'impersonate',
                     ]
                 ),
                 ...$this->generateFilamentResourcePermissions('role', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('activity', only: ['viewAny', 'view']),
+                ...$this->generatePermissionGroup('settings', ['site', 'cms']),
+                ...$this->generateFilamentResourcePermissions('blueprint', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('menu', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('page', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('slice', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('form', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('formSubmission', only: ['viewAny', 'view']),
+                ...$this->generateFilamentResourcePermissions('taxonomy', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('taxonomyTerm', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('collection', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('collectionEntry', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('globals', except: ['deleteAny']),
             ],
         ];
     }

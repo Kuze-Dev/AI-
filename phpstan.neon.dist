@@ -6,7 +6,7 @@ parameters:
     tmpDir: build/phpstan
 
     stubFiles:
-        - stubs/Permission.stub
+        - phpstan-stubs/Permission.stub
 
     paths:
         - app
@@ -25,3 +25,4 @@ parameters:
     checkOctaneCompatibility: true
     checkModelProperties: true
     checkMissingIterableValueType: false
+

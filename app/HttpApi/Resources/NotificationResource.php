@@ -14,7 +14,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class NotificationResource extends JsonApiResource
 {
-    protected function toAttributes(Request $request): array
+    public function toAttributes(Request $request): array
     {
         return [
             'data' => $this->data,

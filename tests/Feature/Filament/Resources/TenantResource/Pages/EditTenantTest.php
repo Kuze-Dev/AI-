@@ -11,7 +11,7 @@ use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
-beforeEach(fn () => loginAsAdmin());
+beforeEach(fn () => loginAsSuperAdmin());
 
 it('can render page', function () {
     $tenant = TenantFactory::new()->createOne();
@@ -21,24 +21,22 @@ it('can render page', function () {
         ->assertSuccessful()
         ->assertFormSet([
             'name' => $tenant->name,
-            'domains' => $tenant->domains->only('domain')->toArray(),
+            'domains' => $tenant->domains->toArray(),
         ]);
 });
 
 it('can edit tenant', function () {
-    $tenant = TenantFactory::new()->withDomains('foo')->createOne();
+    $tenant = TenantFactory::new()->withDomains()->createOne();
 
     livewire(EditTenant::class, ['record' => $tenant->getKey()])
         ->fillForm([
             'name' => 'Test',
-            'domains' => [
-                ['domain' => 'test'],
-            ],
+            'domains.0.domain' => 'test.localhost',
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     assertDatabaseHas(Tenant::class, ['name' => 'Test']);
-    assertDatabaseHas(Domain::class, ['domain' => 'test']);
+    assertDatabaseHas(Domain::class, ['domain' => 'test.localhost']);
     assertDatabaseCount(Domain::class, 1);
 });

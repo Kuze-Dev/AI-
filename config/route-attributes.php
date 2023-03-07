@@ -15,18 +15,20 @@ return [
     'directories' => [
         app_path('Http/Controllers'),
         app_path('HttpApi/Controllers') => [
-           'prefix' => 'api',
-           'middleware' => 'api',
+            'domain' => parse_url(env('APP_URL', ''), PHP_URL_HOST),
+            'prefix' => 'api',
+            'as' => 'api.',
+            'middleware' => 'api',
         ],
         // app_path('HttpTenant/Controllers') => [
         //     'as' => 'tenant.',
         //     'middleware' => ['tenant', 'web'],
         // ],
-        // app_path('HttpTenantApi/Controllers') => [
-        //     'prefix' => 'api',
-        //     'as' => 'tenant.api',
-        //     'middleware' => ['tenant', 'api'],
-        // ],
+        app_path('HttpTenantApi/Controllers') => [
+            'prefix' => 'api',
+            'as' => 'tenant.api.',
+            'middleware' => ['tenant', 'api'],
+        ],
     ],
 
     /**

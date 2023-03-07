@@ -4,7 +4,7 @@ return [
     /**
      * Secure the page behind a custom policy.
      */
-    'authorization' => false,
+    'authorization' => true,
 
     /**
      * The directory(ies) containing the log files.
@@ -44,7 +44,7 @@ return [
     /**
      * Navigation slug.
      */
-    'slug' => 'system-logs',
+    'slug' => 'logs',
 
     /**
      * Maximum amount of lines that editor will render.

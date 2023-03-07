@@ -80,8 +80,10 @@ class RoleResource extends Resource
                     ->options(self::getGuards()->mapWithKeys(fn (string $guardName) => [$guardName => $guardName])),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->authorize('update'),
+                Tables\Actions\DeleteAction::make()
+                    ->authorize('delete'),
             ])
             ->bulkActions([])
             ->defaultSort('created_at', 'desc');
@@ -184,14 +186,23 @@ class RoleResource extends Resource
                                             ->columns(2)
                                             ->reactive()
                                             ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Role $record) use ($permissionGroup): void {
-                                                debug($record);
+                                                if ( ! $record) {
+                                                    $component->state([]);
+
+                                                    return;
+                                                }
+
+                                                if ($record->hasPermissionTo($permissionGroup->main)) {
+                                                    $component->state(array_keys($component->getOptions()));
+
+                                                    return;
+                                                }
+
                                                 $component->state(
-                                                    $record?->hasPermissionTo($permissionGroup->main)
-                                                        ? array_keys($component->getOptions())
-                                                        : $record?->permissions->pluck('id')
-                                                            ->intersect(array_keys($component->getOptions()))
-                                                            ->values()
-                                                            ->toArray()
+                                                    $record->permissions->pluck('id')
+                                                        ->intersect(array_keys($component->getOptions()))
+                                                        ->values()
+                                                        ->toArray()
                                                 );
                                             })
                                             ->afterStateUpdated(function (Closure $get, Closure $set) use ($groupName, $permissionGroup): void {
@@ -211,7 +222,7 @@ class RoleResource extends Resource
 
     private static function refreshSelectAllState(Closure $get, Closure $set): void
     {
-        $set('select_all', self::$permissionGroups->keys()->every(fn (string $groupName) => $get($groupName)));
+        $set('select_all', self::$permissionGroups->every(fn (PermissionGroup $permissionGroup, string $groupName) => $get($groupName)));
     }
 
     private static function refreshPermissionGroupState(string $groupName, PermissionGroup $permissionGroup, Closure $get, Closure $set): void

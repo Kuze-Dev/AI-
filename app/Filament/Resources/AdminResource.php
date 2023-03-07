@@ -8,6 +8,7 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\Filament\Resources\AdminResource\Pages;
 use Domain\Admin\Models\Admin;
 use Domain\Auth\Actions\ForgotPasswordAction;
+use Domain\Role\Models\Role;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -17,6 +18,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
+use Spatie\Permission\Models\Permission;
+use STS\FilamentImpersonate\Impersonate;
 
 class AdminResource extends Resource
 {
@@ -49,20 +52,34 @@ class AdminResource extends Resource
                     Forms\Components\TextInput::make('last_name')
                         ->required(),
                     Forms\Components\TextInput::make('email')
-                        ->required(),
+                        ->email()
+                        ->rules('email:rfc,dns')
+                        ->required()
+                        ->helperText(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email') ? 'Email update is currently disabled.' : '')
+                        ->disabled(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email')),
                     Forms\Components\TextInput::make('password')
                         ->password()
                         ->required()
                         ->rule(Password::default())
+                        ->helperText(
+                            fn () => config('app.env') === 'local' || config('app.env') === 'testing'
+                                ? trans('Password must be at least 4 characters.')
+                                : trans('Password must be at least 8 characters, have 1 special character, 1 number, 1 upper case and 1 lower case.')
+                        )
                         ->visible(fn (?Admin $record) => $record === null || ! $record->exists),
                     Forms\Components\TextInput::make('password_confirmation')
                         ->required()
                         ->password()
                         ->same('password')
                         ->dehydrated(false)
+                        ->rule(Password::default())
                         ->visible(fn (?Admin $record) => $record === null || ! $record->exists),
                     Forms\Components\Select::make('timezone')
-                        ->options(collect(timezone_identifiers_list())->mapWithKeys(fn (string $timezone) => [$timezone => $timezone]))
+                        ->options(
+                            collect(timezone_identifiers_list())
+                                ->mapWithKeys(fn (string $timezone) => [$timezone => $timezone])
+                                ->toArray()
+                        )
                         ->searchable()
                         ->default(config('domain.admin.default_timezone')),
                 ])
@@ -76,17 +93,25 @@ class AdminResource extends Resource
                     Forms\Components\Section::make(trans('Access'))
                         ->schema([
                             Forms\Components\Select::make('roles')
-                                ->relationship('roles', 'name')
-                                ->saveRelationshipsUsing(null)
-                                ->dehydrated(true)
                                 ->multiple()
-                                ->preload(),
+                                ->options(
+                                    fn () => Role::orderBy('name')
+                                        ->pluck('name', 'id')
+                                        ->toArray()
+                                )
+                                ->afterStateHydrated(function (Forms\Components\Select $component, ?Admin $record): void {
+                                    $component->state($record ? $record->roles->pluck('id')->toArray() : []);
+                                }),
                             Forms\Components\Select::make('permissions')
-                                ->relationship('permissions', 'name')
-                                ->saveRelationshipsUsing(null)
-                                ->dehydrated(true)
                                 ->multiple()
-                                ->preload(),
+                                ->options(
+                                    fn () => Permission::orderBy('name')
+                                        ->pluck('name', 'id')
+                                        ->toArray()
+                                )
+                                ->afterStateHydrated(function (Forms\Components\Select $component, ?Admin $record): void {
+                                    $component->state($record ? $record->permissions->pluck('id')->toArray() : []);
+                                }),
                         ]),
                 ])
                     ->columnSpan(['lg' => 1]),
@@ -180,7 +205,7 @@ class AdminResource extends Resource
                             $record->sendEmailVerificationNotification();
                             $action->success();
                         })
-                        ->authorize(fn (Admin $record) => Auth::user()?->can('resendVerification', $record) ?? false),
+                        ->authorize('resendVerification'),
                     Tables\Actions\Action::make('send-password-reset')
                         ->requiresConfirmation()
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
@@ -188,7 +213,7 @@ class AdminResource extends Resource
                                 ->execute($record->email, 'admin');
 
                             if ($result->failed()) {
-                                $action->failureNotificationMessage($result->getMessage())
+                                $action->failureNotificationTitle($result->getMessage())
                                     ->failure();
 
                                 return;
@@ -197,6 +222,10 @@ class AdminResource extends Resource
                             $action->success();
                         })
                         ->authorize('sendPasswordReset'),
+                    Impersonate::make()
+                        ->guard('admin')
+                        ->redirectTo(route('filament.pages.dashboard'))
+                        ->authorize('impersonate'),
                 ]),
             ])
             ->bulkActions([])

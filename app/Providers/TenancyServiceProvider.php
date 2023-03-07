@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Jobs\CreateFrameworkDirectoriesForTenant;
+use App\Tenancy\Jobs\CreateDatabase;
+use App\Tenancy\Jobs\CreateS3Bucket;
+use App\Tenancy\Jobs\DeleteS3Bucket;
 use Domain\Tenant\Models\Tenant;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -28,18 +31,17 @@ class TenancyServiceProvider extends ServiceProvider
             // Tenant events
             Events\CreatingTenant::class => [],
             Events\TenantCreated::class => [
-                JobPipeline::make([
-                    Jobs\CreateDatabase::class,
-                    Jobs\MigrateDatabase::class,
-                    Jobs\SeedDatabase::class,
-                    CreateFrameworkDirectoriesForTenant::class,
+                function (Events\TenantCreated $event) {
+                    /** @var Tenant $tenant */
+                    $tenant = $event->tenant;
 
-                    // Your own jobs to prepare the tenant.
-                    // Provision API keys, create S3 buckets, anything you want!
-
-                ])->send(function (Events\TenantCreated $event) {
-                    return $event->tenant;
-                })->shouldBeQueued($this->app->isProduction()),
+                    Bus::chain([
+                        new CreateDatabase($tenant),
+                        new Jobs\MigrateDatabase($tenant),
+                        new Jobs\SeedDatabase($tenant),
+                        new CreateS3Bucket($tenant),
+                    ])->dispatch();
+                },
             ],
             Events\SavingTenant::class => [],
             Events\TenantSaved::class => [],
@@ -49,6 +51,7 @@ class TenancyServiceProvider extends ServiceProvider
             Events\TenantDeleted::class => [
                 JobPipeline::make([
                     Jobs\DeleteDatabase::class,
+                    DeleteS3Bucket::class,
                 ])->send(function (Events\TenantDeleted $event) {
                     return $event->tenant;
                 })->shouldBeQueued($this->app->isProduction()),
@@ -123,7 +126,7 @@ class TenancyServiceProvider extends ServiceProvider
             ],
         ];
 
-        DatabaseConfig::generateDatabaseNamesUsing(fn (Tenant $tenant) => config('tenancy.database.prefix').Str::snake($tenant->name).config('tenancy.database.suffix'));
+        DatabaseConfig::generateDatabaseNamesUsing(fn (Tenant $tenant) => config('tenancy.database.prefix').Str::of($tenant->name)->lower()->snake().config('tenancy.database.suffix'));
 
         TenantAssetsController::$tenancyMiddleware = 'tenant';
     }

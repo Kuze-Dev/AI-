@@ -8,7 +8,7 @@ use Domain\Tenant\Models\Tenant;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Livewire\livewire;
 
-beforeEach(fn () => loginAsAdmin());
+beforeEach(fn () => loginAsSuperAdmin());
 
 it('can render page', function () {
     livewire(CreateTenant::class)
@@ -20,8 +20,15 @@ it('can create tenant', function () {
     livewire(CreateTenant::class)
         ->fillForm([
             'name' => 'Test',
+            'database' => [
+                'host' => 'test',
+                'port' => '3306 ',
+                'name' => 'test',
+                'username' => 'test',
+                'password' => 'test',
+            ],
             'domains' => [
-                ['domain' => 'test'],
+                ['domain' => 'test.localhost'],
             ],
         ])
         ->call('create')

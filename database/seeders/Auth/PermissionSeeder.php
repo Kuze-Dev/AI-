@@ -24,9 +24,12 @@ class PermissionSeeder extends BasePermissionSeeder
                     customPermissions: [
                         'resendVerification',
                         'sendPasswordReset',
+                        'impersonate',
                     ]
                 ),
                 ...$this->generateFilamentResourcePermissions('role', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('activity', only: ['viewAny', 'view']),
+                ...$this->generatePermissionGroup('settings', ['site']),
             ],
         ];
     }

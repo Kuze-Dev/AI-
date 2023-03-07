@@ -1,0 +1,41 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Domain\Globals\Database\Factories;
+
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Globals\Models\Globals;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Globals\Models\Globals>
+ */
+class GlobalsFactory extends Factory
+{
+    /** Specify reference model. */
+    protected $model = Globals::class;
+
+    /** Define values of model instance. */
+    public function definition(): array
+    {
+        $name = $this->faker->unique()->word();
+
+        return [
+            'name' => $name,
+            'slug' => Str::slug($name),
+            'blueprint_id' => null,
+            'data' => null,
+        ];
+    }
+
+    /**
+     * Bind a blueprint record
+     * to current model.
+     */
+    public function withDummyBlueprint(): self
+    {
+        return $this->for(BlueprintFactory::new()->withDummySchema());
+    }
+}

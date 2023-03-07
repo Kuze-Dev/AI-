@@ -6,10 +6,34 @@ namespace Domain\Tenant\DataTransferObjects;
 
 class TenantData
 {
-    /** @param array<string> $domains */
+    /** @param array<DomainData> $domains */
     public function __construct(
         public readonly string $name,
+        public readonly ?DatabaseData $database = null,
         public readonly array $domains = [],
     ) {
+    }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            name: $data['name'],
+            database: filled($data['database'] ?? null)
+                ? new DatabaseData(
+                    host: $data['database']['host'],
+                    port: $data['database']['port'],
+                    name: $data['database']['name'],
+                    username: $data['database']['username'],
+                    password: $data['database']['password'],
+                )
+                : null,
+            domains: array_map(
+                fn ($data) => new DomainData(
+                    id: $data['id'] ?? null,
+                    domain: $data['domain'],
+                ),
+                $data['domains']
+            )
+        );
     }
 }

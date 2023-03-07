@@ -9,44 +9,42 @@ use App\FilamentTenant\Middleware\Authenticate;
 use Artificertech\FilamentMultiContext\ContextServiceProvider;
 use Artificertech\FilamentMultiContext\Http\Middleware\ApplyContext;
 use Filament\Facades\Filament;
+use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\UserMenuItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Livewire\Livewire;
 
 class FilamentTenantServiceProvider extends ContextServiceProvider
 {
-    /** @var array<string, class-string> */
-    protected array $livewireComponents;
-
     public static string $name = 'filament-tenant';
 
     public function packageBooted(): void
     {
         parent::packageBooted();
 
-        $this->bootLivewireComponents();
-
-        $this->registerRoutes();
-
         Filament::serving(function () {
-            // TODO: Move to `getUserMenuItems()` after PR is merged https://github.com/artificertech/filament-multi-context/pull/27
             if (Filament::currentContext() !== static::$name) {
                 return;
             }
 
-            Filament::registerUserMenuItems([
-                'logout' => UserMenuItem::make()->url(route('filament-tenant.auth.logout')),
+            Filament::registerNavigationGroups([
+                NavigationGroup::make('CMS')
+                    ->icon('heroicon-s-document-text'),
+                NavigationGroup::make('Access')
+                    ->icon('heroicon-s-lock-closed'),
+                NavigationGroup::make('System')
+                    ->icon('heroicon-s-exclamation'),
             ]);
         });
+
+        $this->registerRoutes();
     }
 
-    // TODO: Remove after PR is merged https://github.com/artificertech/filament-multi-context/pull/26
-    protected function bootLivewireComponents(): void
+    protected function getUserMenuItems(): array
     {
-        foreach (array_merge($this->livewireComponents) as $alias => $class) {
-            Livewire::component($alias, $class);
-        }
+        return [
+            'logout' => UserMenuItem::make()->url(route('filament-tenant.auth.logout')),
+        ];
     }
 
     protected function registerRoutes(): void

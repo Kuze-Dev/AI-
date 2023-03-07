@@ -11,10 +11,13 @@ use App\Filament\Livewire\Auth\RequestPasswordReset;
 use App\Filament\Livewire\Auth\ResetPassword;
 use App\Filament\Livewire\Auth\TwoFactorAuthentication;
 use App\Filament\Livewire\Auth\VerifyEmail;
+use Domain\Admin\Models\Admin;
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Saade\FilamentLaravelLog\Pages\ViewLog;
 
 /** @property \Illuminate\Foundation\Application $app */
 class FilamentServiceProvider extends ServiceProvider
@@ -26,11 +29,15 @@ class FilamentServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Filament::serving(function () {
-            Filament::registerNavigationGroups([
+            Filament::registerViteTheme('resources/css/filament/app.css');
 
+            if (Filament::currentContext() !== 'filament') {
+                return;
+            }
+
+            Filament::registerNavigationGroups([
                 NavigationGroup::make('Access')
                     ->icon('heroicon-s-lock-closed'),
-
                 NavigationGroup::make('System')
                     ->icon('heroicon-s-exclamation'),
             ]);
@@ -45,13 +52,20 @@ class FilamentServiceProvider extends ServiceProvider
                             href="https://halcyonwebdesign.com.ph/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="hover:text-primary-500 transition"
+                            class="transition hover:text-primary-500"
                         >
                             Halcyon Web Design
                         </a>
                     </p>
                 HTML,
         );
+
+        Filament::registerRenderHook(
+            'head.end',
+            fn () => Vite::withEntryPoints(['resources/js/filament/app.js'])->toHtml(),
+        );
+
+        ViewLog::can(fn (?Admin $admin) => $admin?->hasRole(config('domain.role.super_admin')));
 
         $this->registerRoutes();
     }

@@ -34,8 +34,8 @@ class ResetPassword extends Component implements HasForms
     public function mount(Request $request): void
     {
         $this->form->fill([
-            'email' => (string) $request->get('email'),
-            'token' => (string) $request->route('token'),
+            'email' => $request->get('email', ''),
+            'token' => $request->route('token', ''),
         ]);
     }
 
@@ -72,6 +72,11 @@ class ResetPassword extends Component implements HasForms
                 ->password()
                 ->required()
                 ->rule(Password::default())
+                ->helperText(
+                    fn () => config('app.env') === 'local' || config('app.env') === 'testing'
+                        ? trans('Password must be at least 4 characters.')
+                        : trans('Password must be at least 8 characters, have 1 special character, 1 number, 1 upper case and 1 lower case.')
+                )
                 ->autocomplete('new-password'),
             TextInput::make('password_confirmation')
                 ->default('')

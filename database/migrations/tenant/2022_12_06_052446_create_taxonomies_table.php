@@ -1,0 +1,40 @@
+<?php
+
+declare(strict_types=1);
+
+use Domain\Blueprint\Models\Blueprint as ModelsBlueprint;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class () extends Migration {
+    public function up(): void
+    {
+        Schema::create('taxonomies', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(ModelsBlueprint::class)->index();
+            $table->string('name')->unique();
+            $table->string('slug')->unique();
+            $table->timestamps();
+        });
+
+        Schema::create('taxonomy_terms', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(Taxonomy::class)->index();
+            $table->foreignIdFor(TaxonomyTerm::class, 'parent_id')->nullable()->index();
+            $table->string('name')->unique();
+            $table->string('slug')->unique();
+            $table->json('data');
+            $table->unsignedInteger('order');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('taxonomy_terms');
+        Schema::dropIfExists('taxonomies');
+    }
+};
