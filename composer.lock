@@ -6135,16 +6135,16 @@
         },
         {
             "name": "spatie/laravel-route-attributes",
-            "version": "1.18.0",
+            "version": "1.18.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-route-attributes.git",
-                "reference": "f43aad7e00695d64e28b24c24364190898ee6cd5"
+                "reference": "32bab5ff183a02ed48f198eedea32506f7eed1a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-route-attributes/zipball/f43aad7e00695d64e28b24c24364190898ee6cd5",
-                "reference": "f43aad7e00695d64e28b24c24364190898ee6cd5",
+                "url": "https://api.github.com/repos/spatie/laravel-route-attributes/zipball/32bab5ff183a02ed48f198eedea32506f7eed1a9",
+                "reference": "32bab5ff183a02ed48f198eedea32506f7eed1a9",
                 "shasum": ""
             },
             "require": {
@@ -6190,7 +6190,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-route-attributes/issues",
-                "source": "https://github.com/spatie/laravel-route-attributes/tree/1.18.0"
+                "source": "https://github.com/spatie/laravel-route-attributes/tree/1.18.1"
             },
             "funding": [
                 {
@@ -6202,7 +6202,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2023-02-09T15:32:42+00:00"
+            "time": "2023-03-06T07:23:24+00:00"
         },
         {
             "name": "spatie/laravel-settings",
