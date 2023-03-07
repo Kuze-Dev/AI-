@@ -203,15 +203,8 @@ class AdminResource extends Resource
                     Tables\Actions\Action::make('resend-verification')
                         ->requiresConfirmation()
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
-                            $result = app(SendEmailVerificationAction::class)->execute($record);
 
-                            if ($result->failed()) {
-                                $action->failureNotificationTitle($result->getMessage())
-                                    ->failure();
-
-                                return;
-                            }
-
+                            $record->sendEmailVerificationNotification();
                             $action->success();
                         })
                         ->authorize('resendVerification'),
