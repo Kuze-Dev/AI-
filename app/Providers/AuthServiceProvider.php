@@ -55,25 +55,34 @@ class AuthServiceProvider extends ServiceProvider
     {
         VerifyEmailNotification::createUrlUsing(function (mixed $notifiable) {
             if ($notifiable instanceof Admin) {
-                return URL::temporarySignedRoute(
-                    'filament.auth.verification.verify',
-                    now()->addMinutes(Config::get('auth.verification.expire', 60)),
-                    [
-                        'id' => $notifiable->getKey(),
-                        'hash' => sha1($notifiable->getEmailForVerification()),
-                    ]
-                );
+                return (env('APP_ENV') != 'local' ? 'https://' : 'http://').tenancy()->tenant->domains->first()->domain.
+                        URL::temporarySignedRoute(
+                            (
+                                tenancy()->initialized ?
+                                    'filament-tenant.auth.verification.verify' :
+                                    'filament.auth.verification.verify'
+                            ),
+                            now()->addMinutes(Config::get('auth.verification.expire', 60)),
+                            [
+                                'id' => $notifiable->getKey(),
+                                'hash' => sha1($notifiable->getEmailForVerification()),
+                            ],
+                            false
+                        );
             }
         });
 
         ResetPasswordNotification::createUrlUsing(function (mixed $notifiable, string $token) {
             if ($notifiable instanceof Admin) {
-                return URL::route(
+              return (env('APP_ENV') != 'local' ? 'https://' : 'http://').tenancy()->tenant->domains->first()->domain.URL::route(
+                    tenancy()->initialized ?
+                    'filament-tenant.auth.password.reset' :
                     'filament.auth.password.reset',
                     [
                         'token' => $token,
                         'email' => $notifiable->getEmailForPasswordReset(),
-                    ]
+                    ],
+                    false
                 );
             }
         });
