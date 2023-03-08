@@ -55,35 +55,44 @@ class AuthServiceProvider extends ServiceProvider
     {
         VerifyEmailNotification::createUrlUsing(function (mixed $notifiable) {
             if ($notifiable instanceof Admin) {
-                return (env('APP_ENV') != 'local' ? 'https://' : 'http://').tenancy()->tenant->domains->first()->domain.
-                        URL::temporarySignedRoute(
-                            (
-                                tenancy()->initialized ?
-                                    'filament-tenant.auth.verification.verify' :
-                                    'filament.auth.verification.verify'
-                            ),
-                            now()->addMinutes(Config::get('auth.verification.expire', 60)),
-                            [
-                                'id' => $notifiable->getKey(),
-                                'hash' => sha1($notifiable->getEmailForVerification()),
-                            ],
-                            false
-                        );
+                $url = tenancy()->initialized ?
+                    (env('APP_ENV') != 'local' ? 'https://' : 'http://') . tenancy()->tenant->domains->first()->domain :
+                    url('/', secure: env('APP_ENV') != 'local');
+
+                $routeName = tenancy()->initialized
+                    ? 'filament-tenant.auth.verification.verify'
+                    : 'filament.auth.verification.verify';
+
+                $url .= URL::temporarySignedRoute(
+                    $routeName,
+                    now()->addMinutes(Config::get('auth.verification.expire', 60)),
+                    [
+                        'id' => $notifiable->getKey(),
+                        'hash' => sha1($notifiable->getEmailForVerification()),
+                    ],
+                    false
+                );
+
+                return $url;
             }
         });
 
         ResetPasswordNotification::createUrlUsing(function (mixed $notifiable, string $token) {
             if ($notifiable instanceof Admin) {
-              return (env('APP_ENV') != 'local' ? 'https://' : 'http://').tenancy()->tenant->domains->first()->domain.URL::route(
-                    tenancy()->initialized ?
-                    'filament-tenant.auth.password.reset' :
-                    'filament.auth.password.reset',
-                    [
-                        'token' => $token,
-                        'email' => $notifiable->getEmailForPasswordReset(),
-                    ],
-                    false
-                );
+                $url = tenancy()->initialized ?
+                (env('APP_ENV') != 'local' ? 'https://' : 'http://') . tenancy()->tenant->domains->first()->domain :
+                url('/', secure: env('APP_ENV') != 'local');
+
+                $routeName = tenancy()->initialized
+                    ? 'filament-tenant.auth.password.reset'
+                    : 'filament.auth.password.reset';
+
+                $url .= URL::route($routeName, [
+                    'token' => $token,
+                    'email' => $notifiable->getEmailForPasswordReset(),
+                ], false);
+
+                return $url;
             }
         });
     }
