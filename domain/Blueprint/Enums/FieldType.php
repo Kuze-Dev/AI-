@@ -14,7 +14,6 @@ use Domain\Blueprint\DataTransferObjects\SelectFieldData;
 use Domain\Blueprint\DataTransferObjects\TextareaFieldData;
 use Domain\Blueprint\DataTransferObjects\TextFieldData;
 use Domain\Blueprint\DataTransferObjects\ToggleFieldData;
-use InvalidArgumentException;
 
 enum FieldType: string
 {
@@ -52,7 +51,6 @@ enum FieldType: string
             self::TOGGLE => ToggleFieldData::class,
             self::RELATED_RESOURCE => RelatedResourceFieldData::class,
             self::REPEATER => RepeaterFieldData::class,
-            default => throw new InvalidArgumentException("`FieldData` class for `{$this->value}` is not specified.")
         };
     }
 }

@@ -51,6 +51,7 @@ class RequestPasswordReset extends Component implements HasForms
             TextInput::make('email')
                 ->default('')
                 ->email()
+                ->rules('email:rfc,dns')
                 ->required()
                 ->autocomplete(),
         ];
