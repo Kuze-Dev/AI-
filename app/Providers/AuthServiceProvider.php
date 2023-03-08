@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use Domain\Admin\Models\Admin;
+use Domain\Tenant\Models\Tenant;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Auth\Notifications\VerifyEmail as VerifyEmailNotification;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -55,9 +56,16 @@ class AuthServiceProvider extends ServiceProvider
     {
         VerifyEmailNotification::createUrlUsing(function (mixed $notifiable) {
             if ($notifiable instanceof Admin) {
-                $url = tenancy()->initialized ?
-                    (env('APP_ENV') != 'local' ? 'https://' : 'http://') . tenancy()->tenant->domains->first()->domain :
-                    url('/', secure: env('APP_ENV') != 'local');
+                // tenancy()->tenant->domains?->first()?->domain;
+
+                if (tenancy()->initialized) {
+                    /** @var Tenant */
+                    $tenant = tenancy()->tenant;
+
+                    $url = (env('APP_ENV') != 'local' ? 'https://' : 'http://') . $tenant->domains->first()?->domain;
+                } else {
+                    $url = url('/', secure: env('APP_ENV') != 'local');
+                }
 
                 $routeName = tenancy()->initialized
                     ? 'filament-tenant.auth.verification.verify'
@@ -79,9 +87,14 @@ class AuthServiceProvider extends ServiceProvider
 
         ResetPasswordNotification::createUrlUsing(function (mixed $notifiable, string $token) {
             if ($notifiable instanceof Admin) {
-                $url = tenancy()->initialized ?
-                (env('APP_ENV') != 'local' ? 'https://' : 'http://') . tenancy()->tenant->domains->first()->domain :
-                url('/', secure: env('APP_ENV') != 'local');
+                if (tenancy()->initialized) {
+                    /** @var Tenant */
+                    $tenant = tenancy()->tenant;
+
+                    $url = (env('APP_ENV') != 'local' ? 'https://' : 'http://') . $tenant->domains->first()?->domain;
+                } else {
+                    $url = url('/', secure: env('APP_ENV') != 'local');
+                }
 
                 $routeName = tenancy()->initialized
                     ? 'filament-tenant.auth.password.reset'
