@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use Closure;
 use Domain\Collection\Models\CollectionEntry;
 use App\FilamentTenant\Support\MetaDataForm;
+use Carbon\CarbonImmutable;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Facades\Filament;
@@ -170,10 +171,26 @@ class CollectionEntryResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('taxonomies'),
+                Tables\Filters\Filter::make('filter_year')
+                    ->form([
+                        Forms\Components\TextInput::make('published_year')
+                            ->placeholder('Published year')
+                            ->numeric()
+                    ])->query(function (Builder $query, array $data): Builder {
+                        $selectedYear = CarbonImmutable::create($data['published_year']);
+                        $yearStart = $selectedYear->startOfYear()->startOfDay()->toDateTimeString();
+                        $yearEnd = $selectedYear->endOfYear()->endOfDay()->toDateTimeString();
+                        return $query->when(
+                            filled($data['published_year']),
+                            fn (Builder $query) => $query->whereBetween('published_at', [$yearStart, $yearEnd])
+                        );
+                    }),
                 Tables\Filters\Filter::make('date_range')
                     ->form([
-                        Forms\Components\DatePicker::make('published_from'),
+                        Forms\Components\DatePicker::make('published_from')
+                            ->placeholder('Start Date'),
                         Forms\Components\DatePicker::make('published_to')
+                            ->placeholder('End Date'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -188,16 +205,16 @@ class CollectionEntryResource extends Resource
                     }),
                 Tables\Filters\SelectFilter::make('month')
                     ->options(
-                        self::monthOrder()
+                        array_map(fn (int $intMonth) => \Carbon\Carbon::now()->month($intMonth)->format('F'), range(1, 12))
                     )
                     ->query(function(Builder $query, array $data) {
                         return $query->when(
                             filled($data['value']),
                             function (Builder $query) use ($data) {
-                                $query->whereMonth('published_at', $data['value']);
+                                return $query->whereMonth('published_at', '=', intval($data['value']));
                             }
                         );
-                    })
+                    }),
 
             ])
             ->reorderable('order')

@@ -30,6 +30,22 @@ class CollectionEntryController
                         'publish_status',
                         fn (CollectionEntryBuilder $query, $value) => $query->wherePublishStatus(PublishBehavior::tryFrom($value))
                     ),
+                    AllowedFilter::callback(
+                        'date_range',
+                        fn (CollectionEntryBuilder $query, $value) => $query->whereDateRange($value)
+                    ),
+                    AllowedFilter::callback(
+                        'year',
+                        fn (CollectionEntryBuilder $query, $value) => $query->whereEntryYear($value)
+                    ),
+                    AllowedFilter::callback(
+                        'month',
+                        fn (CollectionEntryBuilder $query, $value) => $query->whereEntryMonth($value)
+                    ),
+                    AllowedFilter::callback(
+                        'taxonomy',
+                        fn (CollectionEntryBuilder $query, $value) => $query->whereTaxonomyTerm($value)
+                    )
                 ])
                 ->allowedSorts([
                     'order',
