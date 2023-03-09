@@ -56,8 +56,6 @@ class AuthServiceProvider extends ServiceProvider
     {
         VerifyEmailNotification::createUrlUsing(function (mixed $notifiable) {
             if ($notifiable instanceof Admin) {
-                // tenancy()->tenant->domains?->first()?->domain;
-
                 if (tenancy()->initialized) {
                     /** @var Tenant */
                     $tenant = tenancy()->tenant;
