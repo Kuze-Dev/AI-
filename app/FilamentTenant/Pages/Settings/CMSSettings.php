@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Pages\Settings;
 
-use App\Filament\Pages\Settings\BaseSettings;
-use App\FilamentTenant\Pages\Settings\Concerns\ContextualSettingsPage;
 use App\FilamentTenant\Widgets\DeployStaticSite;
 use App\Settings\CMSSettings as SettingsCMSSettings;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\TextInput;
 
-class CMSSettings extends BaseSettings
+class CMSSettings extends TenantBaseSettings
 {
-    use ContextualSettingsPage;
-
     protected static string $settings = SettingsCMSSettings::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';

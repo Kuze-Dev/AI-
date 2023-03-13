@@ -75,7 +75,7 @@ class AdminPolicy
 
     public function resendVerification(User $user, Admin $admin): bool
     {
-        if ($admin->hasVerifiedEmail()) {
+        if ($admin->hasVerifiedEmail() || ! is_null($admin->deleted_at)) {
             return false;
         }
 
@@ -84,6 +84,10 @@ class AdminPolicy
 
     public function sendPasswordReset(User $user, Admin $admin): bool
     {
+        if ( ! is_null($admin->deleted_at)) {
+            return false;
+        }
+
         return $this->checkWildcardPermissions($user);
     }
 
