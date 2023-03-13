@@ -132,10 +132,7 @@ it('can show collection entry with includes', function (string $include) {
     'metaData',
 ]);
 
-it('can list collection entry of specific site', function () {
-    $site = SiteFactory::new()
-        ->createOne();
-
+it('can list collection entries of specific site', function () {
     $collection = CollectionFactory::new()
         ->for(
             BlueprintFactory::new()
@@ -150,7 +147,9 @@ it('can list collection entry of specific site', function () {
                         ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
                 )
         )
-        ->hasAttached($site)
+        ->createOne();
+
+    $site = SiteFactory::new()
         ->createOne();
 
     CollectionEntryFactory::new()
@@ -159,39 +158,24 @@ it('can list collection entry of specific site', function () {
             TaxonomyTermFactory::new(['data' => ['main' => ['desciption' => 'Foo']]])
                 ->for($collection->taxonomies->first())
         )
-        ->count(1)
-        ->create([
-            'data' => ['main' => ['header' => 'Foo']],
-        ]);
-
-    $collection2 = CollectionFactory::new()
-        ->for(
-            BlueprintFactory::new()
-                ->addSchemaSection(['title' => 'Main'])
-                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
-        )
-        ->has(
-            TaxonomyFactory::new()
-                ->for(
-                    BlueprintFactory::new()
-                        ->addSchemaSection(['title' => 'Main'])
-                        ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
-                )
-        )
-        ->createOne();
-
-    CollectionEntryFactory::new()
-        ->for($collection2)
-        ->has(
-            TaxonomyTermFactory::new(['data' => ['main' => ['desciption' => 'Foo']]])
-                ->for($collection2->taxonomies->first())
-        )
         ->count(2)
         ->create([
             'data' => ['main' => ['header' => 'Foo']],
         ]);
 
-    getJson("api/collections/{$collection->getRouteKey()}/entries?filter[collection.sites.id]={$site->id}")
+    CollectionEntryFactory::new()
+        ->for($collection)
+        ->has(
+            TaxonomyTermFactory::new(['data' => ['main' => ['desciption' => 'Foo']]])
+                ->for($collection->taxonomies->first())
+        )
+        ->hasAttached($site)
+        ->count(1)
+        ->create([
+            'data' => ['main' => ['header' => 'Foo']],
+        ]);
+
+    getJson("api/collections/{$collection->getRouteKey()}/entries?filter[sites.id]={$site->id}")
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json->count('data', 1)

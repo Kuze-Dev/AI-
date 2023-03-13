@@ -15,7 +15,6 @@ use Filament\Resources\Resource;
 use Domain\Globals\Models\Globals;
 use Illuminate\Support\Facades\Auth;
 use Domain\Blueprint\Models\Blueprint;
-use Filament\Forms\Components\CheckboxList;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\EditGlobals;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\ListGlobals;
@@ -54,7 +53,7 @@ class GlobalsResource extends Resource
                     ->unique(ignoreRecord: true)
                     ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                 Forms\Components\Card::make([
-                    CheckboxList::make('sites')
+                    Forms\Components\CheckboxList::make('sites')
                         ->options(
                             fn () => Site::orderBy('name')
                                 ->pluck('name', 'id')

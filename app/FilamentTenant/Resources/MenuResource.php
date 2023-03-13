@@ -19,7 +19,6 @@ use App\FilamentTenant\Support\Tree;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\CheckboxList;
 use App\FilamentTenant\Resources\MenuResource\Pages;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
@@ -78,7 +77,7 @@ class MenuResource extends Resource
                         ->rules('alpha_dash')
                         ->disabled(),
                     Forms\Components\Card::make([
-                        CheckboxList::make('sites')
+                        Forms\Components\CheckboxList::make('sites')
                             ->options(
                                 fn () => Site::orderBy('name')
                                     ->pluck('name', 'id')

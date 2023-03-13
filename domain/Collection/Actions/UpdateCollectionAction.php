@@ -27,9 +27,6 @@ class UpdateCollectionAction
         $collection->taxonomies()
             ->sync($collectionData->taxonomies);
 
-        $collection->sites()
-            ->sync($collectionData->sites);
-
         return $collection;
     }
 }

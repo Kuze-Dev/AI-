@@ -74,3 +74,18 @@ it('can delete collection entry', function () {
     ]);
     assertModelMissing($metaData);
 });
+
+it('can list collection entries of specific site', function () {
+    $collection = CollectionFactory::new()
+        ->withDummyBlueprint()
+        ->createOne();
+
+    $collectionEntries = CollectionEntryFactory::new()
+        ->for($collection)
+        ->count(5)
+        ->create();
+
+    livewire(ListCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey()])
+        ->assertCanSeeTableRecords($collectionEntries)
+        ->assertOk();
+});

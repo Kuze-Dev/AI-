@@ -8,7 +8,6 @@ use Closure;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Support\Str;
-use Domain\Site\Models\Site;
 use Filament\Resources\Form;
 use Filament\Resources\Table;
 use Filament\Resources\Resource;
@@ -19,7 +18,6 @@ use Domain\Blueprint\Models\Blueprint;
 use Illuminate\Database\Eloquent\Model;
 use Domain\Collection\Models\Collection;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\CheckboxList;
 use Domain\Collection\Enums\PublishBehavior;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
@@ -105,29 +103,6 @@ class CollectionResource extends Resource
                         ->afterStateHydrated(function (Forms\Components\Select $component, ?Collection $record) {
                             $component->state($record ? $record->taxonomies->pluck('id')->toArray() : []);
                         }),
-
-                    Forms\Components\Card::make([
-                        CheckboxList::make('sites')
-                            ->options(
-                                fn () => Site::orderBy('name')
-                                    ->pluck('name', 'id')
-                                    ->toArray()
-                            )
-                            ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Collection $record): void {
-                                if ( ! $record) {
-                                    $component->state([]);
-
-                                    return;
-                                }
-
-                                $component->state(
-                                    $record->sites->pluck('id')
-                                        ->intersect(array_keys($component->getOptions()))
-                                        ->values()
-                                        ->toArray()
-                                );
-                            }),
-                    ]),
 
                     Forms\Components\Card::make([
                         Forms\Components\Toggle::make('display_publish_dates')

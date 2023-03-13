@@ -37,6 +37,9 @@ class UpdateCollectionEntryAction
         $collectionEntry->taxonomyTerms()
             ->sync($collectionEntryData->taxonomy_terms);
 
+        $collectionEntry->sites()
+            ->sync($collectionEntryData->sites);
+
         return $collectionEntry;
     }
 }

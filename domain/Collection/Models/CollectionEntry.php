@@ -4,24 +4,25 @@ declare(strict_types=1);
 
 namespace Domain\Collection\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
-use Domain\Support\SlugHistory\HasSlugHistory;
-use Domain\Collection\Models\Builders\CollectionEntryBuilder;
-use Domain\Support\MetaData\HasMetaData;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
-use Domain\Taxonomy\Models\TaxonomyTerm;
+use Domain\Site\Traits\Sites;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
+use Spatie\Activitylog\LogOptions;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Models\Activity;
+use Domain\Support\MetaData\HasMetaData;
+use Domain\Taxonomy\Models\TaxonomyTerm;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Domain\Support\SlugHistory\HasSlugHistory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Sluggable\HasSlug;
-use Illuminate\Support\Facades\Blade;
-use Spatie\Sluggable\SlugOptions;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use Domain\Collection\Models\Builders\CollectionEntryBuilder;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
+use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 
 /**
  * Domain\Collection\Models\CollectionEntry
@@ -67,6 +68,7 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
     use HasSlugHistory;
     use HasMetaData;
     use ConstraintsRelationships;
+    use Sites;
 
     /**
      * Declare columns

@@ -30,7 +30,7 @@ class CollectionEntryController
                         'publish_status',
                         fn (CollectionEntryBuilder $query, $value) => $query->wherePublishStatus(PublishBehavior::tryFrom($value))
                     ),
-                    AllowedFilter::exact('collection.sites.id'),
+                    AllowedFilter::exact('sites.id'),
                 ])
                 ->allowedSorts([
                     'order',

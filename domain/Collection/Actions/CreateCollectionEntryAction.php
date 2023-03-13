@@ -33,6 +33,9 @@ class CreateCollectionEntryAction
         $collectionEntry->taxonomyTerms()
             ->attach($collectionEntryData->taxonomy_terms);
 
+        $collectionEntry->sites()
+            ->attach($collectionEntryData->sites);
+
         return $collectionEntry;
     }
 }

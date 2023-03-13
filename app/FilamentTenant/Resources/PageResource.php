@@ -19,7 +19,6 @@ use App\FilamentTenant\Resources;
 use Domain\Page\Models\SliceContent;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Component;
-use Filament\Forms\Components\CheckboxList;
 use App\FilamentTenant\Support\MetaDataForm;
 use Illuminate\Database\Eloquent\Collection;
 use App\FilamentTenant\Support\SchemaFormBuilder;
@@ -61,7 +60,7 @@ class PageResource extends Resource
                     ->required()
                     ->helperText('Use "{{ $slug }}" to insert the current slug.'),
                 Forms\Components\Card::make([
-                    CheckboxList::make('sites')
+                    Forms\Components\CheckboxList::make('sites')
                         ->options(
                             fn () => Site::orderBy('name')
                                 ->pluck('name', 'id')

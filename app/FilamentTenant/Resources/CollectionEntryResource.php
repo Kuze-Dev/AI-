@@ -4,29 +4,30 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Resources;
-use App\FilamentTenant\Support\SchemaFormBuilder;
-use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Carbon\Carbon;
 use Closure;
-use Domain\Collection\Models\CollectionEntry;
-use App\FilamentTenant\Support\MetaDataForm;
-use Domain\Taxonomy\Models\Taxonomy;
-use Domain\Taxonomy\Models\TaxonomyTerm;
-use Filament\Facades\Filament;
+use Carbon\Carbon;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Domain\Site\Models\Site;
+use Filament\Resources\Form;
+use Filament\Resources\Table;
+use Filament\Facades\Filament;
+use Filament\Resources\Resource;
+use App\FilamentTenant\Resources;
+use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Validation\Rules\Unique;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\Rules\Unique;
+use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Builder;
+use App\FilamentTenant\Support\MetaDataForm;
+use Domain\Collection\Models\CollectionEntry;
+use App\FilamentTenant\Support\SchemaFormBuilder;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class CollectionEntryResource extends Resource
 {
@@ -112,6 +113,28 @@ class CollectionEntryResource extends Resource
                                 : 'full'
                         );
                     }),
+                Forms\Components\Card::make([
+                    Forms\Components\CheckboxList::make('sites')
+                        ->options(
+                            fn () => Site::orderBy('name')
+                                ->pluck('name', 'id')
+                                ->toArray()
+                        )
+                        ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?CollectionEntry $record): void {
+                            if ( ! $record) {
+                                $component->state([]);
+
+                                return;
+                            }
+
+                            $component->state(
+                                $record->sites->pluck('id')
+                                    ->intersect(array_keys($component->getOptions()))
+                                    ->values()
+                                    ->toArray()
+                            );
+                        }),
+                ]),
                 Forms\Components\Card::make([
                     Forms\Components\DateTimePicker::make('published_at')
                         ->minDate(Carbon::now()->startOfDay())

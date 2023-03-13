@@ -16,6 +16,7 @@ class CollectionEntryData
         public readonly array $taxonomy_terms = [],
         public readonly ?Carbon $published_at = null,
         public readonly array $data = [],
+        public readonly array $sites = [],
     ) {
     }
 
@@ -32,7 +33,8 @@ class CollectionEntryData
                 author: $data['meta_data']['author'] ?? null,
                 description: $data['meta_data']['description'] ?? null,
                 keywords: $data['meta_data']['keywords'] ?? null,
-            )
+            ),
+            sites: $data['sites'],
         );
     }
 }

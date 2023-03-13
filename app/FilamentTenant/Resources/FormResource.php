@@ -16,7 +16,6 @@ use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Form\Models\Form as FormModel;
-use Filament\Forms\Components\CheckboxList;
 use App\FilamentTenant\Resources\FormResource\Pages;
 use App\FilamentTenant\Support\SchemaInterpolations;
 use Filament\Resources\RelationManagers\RelationGroup;
@@ -65,7 +64,7 @@ class FormResource extends Resource
                         ->preload(),
                     Forms\Components\Toggle::make('store_submission'),
                     Forms\Components\Card::make([
-                        CheckboxList::make('sites')
+                        Forms\Components\CheckboxList::make('sites')
                             ->options(
                                 fn () => Site::orderBy('name')
                                     ->pluck('name', 'id')
