@@ -36,6 +36,7 @@ class PageData
                 author: $data['meta_data']['author'] ?? null,
                 description: $data['meta_data']['description'] ?? null,
                 keywords: $data['meta_data']['keywords'] ?? null,
+                image: $data['meta_data']['image'] ?? null,
             )
         );
     }
