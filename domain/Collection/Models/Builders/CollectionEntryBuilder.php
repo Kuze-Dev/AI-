@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace Domain\Collection\Models\Builders;
 
 use Carbon\Carbon;
-use Carbon\CarbonImmutable;
 use Domain\Collection\Enums\PublishBehavior;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Builder<\Domain\Collection\Models\CollectionEntry>
+ * @template TModelClass of \Domain\Collection\Models\CollectionEntry
+ * @extends Builder<TModelClass>
  */
 class CollectionEntryBuilder extends Builder
 {
+    /** @return self<\Domain\Collection\Models\CollectionEntry> */
     public function wherePublishStatus(PublishBehavior $publishBehavior = null, string $timezone = null): self
     {
         return $this->where(
@@ -29,51 +30,55 @@ class CollectionEntryBuilder extends Builder
         );
     }
 
-    public function whereDateRange(array $publishedAtRange, string $timezone = null): self
+    /** @return self<\Domain\Collection\Models\CollectionEntry> */
+    public function wherePublishedAtRange(Carbon $publishedAtFrom = null, Carbon $publishedAtEnd = null): self
     {
-        $start = CarbonImmutable::parse($publishedAtRange[0])
-            ->timezone($timezone)
-            ->startOfDay();
-        
-        $end = CarbonImmutable::parse($publishedAtRange[1])
-            ->timezone($timezone)
-            ->endOfDay();
-
-        return $this->whereBetween('published_at', [$start, $end]);
+        return $this
+            ->when(
+                $publishedAtFrom,
+                fn (self $query, $date): self => $query->whereDate('published_at', '>=', $date)
+            )
+            ->when(
+                $publishedAtEnd,
+                fn (self $query, $date): self => $query->whereDate('published_at', '<=', $date)
+            );
     }
 
-    public function whereEntryYear(string $publishedYear): self 
+    /** @return self<\Domain\Collection\Models\CollectionEntry> */
+    public function wherePublishedAtYearMonth(int $year, int $month = null, string $timezone = null): self
     {
-        $selectedYear = CarbonImmutable::create(intval($publishedYear));
-        
-        $yearStart = $selectedYear->startOfYear()->startOfDay()->toDateTimeString();
-        $yearEnd = $selectedYear->endOfYear()->endOfDay()->toDateTimeString();
+        $selectedDate = tap(
+            Carbon::now()->year($year),
+            fn (Carbon $date) => $month
+                ? $date->month($month)
+                : $date
+        )
+            ->toImmutable()
+            ->timezone($timezone ?? config('app.timezone', 'UTC'));
 
-        return $this->whereBetween('published_at', [$yearStart, $yearEnd]);
+        return blank($month)
+            ? $this->whereBetween('published_at', [$selectedDate->startOfYear(), $selectedDate->endOfYear()])
+            : $this->whereBetween('published_at', [$selectedDate->startOfMonth(), $selectedDate->endOfMonth()]);
     }
 
-    public function whereEntryMonth(string $month): self 
-    {   
-        return $this->whereMonth('published_at', $month);
-    }
-
-    public function whereTaxonomyTerm(array $taxonomyTerm): self 
+    /** @return self<\Domain\Collection\Models\CollectionEntry> */
+    public function whereTaxonomyTerm(array $taxonomyTerm): self
     {
         return $this->whereHas(
             'taxonomyTerms',
             function (Builder $query) use ($taxonomyTerm) {
                 $query->when(
-                    !is_array($taxonomyTerm[key($taxonomyTerm)]),
+                    ! is_array($taxonomyTerm[key($taxonomyTerm)]),
                     fn ($query) => $query->where('slug', $taxonomyTerm[key($taxonomyTerm)])
                 )
-                ->when(
-                    is_array($taxonomyTerm[key($taxonomyTerm)]),
-                    fn ($query) => $query->whereIn('slug', $taxonomyTerm[key($taxonomyTerm)])
-                )
-                ->whereHas(
-                    'taxonomy',
-                    fn ($query) => $query->where('slug', key($taxonomyTerm))
-                );
+                    ->when(
+                        is_array($taxonomyTerm[key($taxonomyTerm)]),
+                        fn ($query) => $query->whereIn('slug', $taxonomyTerm[key($taxonomyTerm)])
+                    )
+                    ->whereHas(
+                        'taxonomy',
+                        fn ($query) => $query->where('slug', key($taxonomyTerm))
+                    );
             }
         );
     }

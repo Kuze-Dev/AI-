@@ -160,6 +160,7 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
         return 'slug';
     }
 
+    /** @return CollectionEntryBuilder<self> */
     public function newEloquentBuilder($query): CollectionEntryBuilder
     {
         return new CollectionEntryBuilder($query);

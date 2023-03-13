@@ -9,6 +9,7 @@ use Domain\Collection\Enums\PublishBehavior;
 use Domain\Collection\Models\Builders\CollectionEntryBuilder;
 use Domain\Collection\Models\Collection;
 use Domain\Collection\Models\CollectionEntry;
+use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
@@ -32,20 +33,20 @@ class CollectionEntryController
                     ),
                     AllowedFilter::callback(
                         'date_range',
-                        fn (CollectionEntryBuilder $query, $value) => $query->whereDateRange($value)
+                        fn (CollectionEntryBuilder $query, $value) => $query->wherePublishedAtRange($value)
                     ),
                     AllowedFilter::callback(
-                        'year',
-                        fn (CollectionEntryBuilder $query, $value) => $query->whereEntryYear($value)
-                    ),
-                    AllowedFilter::callback(
-                        'month',
-                        fn (CollectionEntryBuilder $query, $value) => $query->whereEntryMonth($value)
+                        'year_month',
+                        function (CollectionEntryBuilder $query, string|array $value) {
+                            $value = Arr::wrap($value);
+
+                            return $query->wherePublishedAtYearMonth((int) $value[0], filled($value[1] ?? null) ? (int) $value[1] : null);
+                        },
                     ),
                     AllowedFilter::callback(
                         'taxonomy',
                         fn (CollectionEntryBuilder $query, $value) => $query->whereTaxonomyTerm($value)
-                    )
+                    ),
                 ])
                 ->allowedSorts([
                     'order',

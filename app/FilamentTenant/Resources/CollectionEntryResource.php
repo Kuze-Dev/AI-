@@ -17,7 +17,7 @@ use Carbon\Carbon;
 use Closure;
 use Domain\Collection\Models\CollectionEntry;
 use App\FilamentTenant\Support\MetaDataForm;
-use Carbon\CarbonImmutable;
+use Domain\Collection\Models\Builders\CollectionEntryBuilder;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Facades\Filament;
@@ -28,7 +28,6 @@ use Illuminate\Validation\Rules\Unique;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Livewire;
 
 class CollectionEntryResource extends Resource
 {
@@ -161,6 +160,10 @@ class CollectionEntryResource extends Resource
                 Tables\Columns\TagsColumn::make('taxonomyTerms.name')
                     ->limit()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('published_at')
+                    ->date(timezone: Auth::user()?->timezone)
+                    ->sortable()
+                    ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -171,20 +174,55 @@ class CollectionEntryResource extends Resource
                     ->toggledHiddenByDefault(),
             ])
             ->filters([
-                Tables\Filters\Filter::make('filter_year')
+                Tables\Filters\Filter::make('taxonomies')
+                    ->form(fn ($livewire) => $livewire->ownerRecord->taxonomies->map(
+                        fn (Taxonomy $taxonomy) => Forms\Components\Select::make($taxonomy->name)
+                            ->statePath('taxonomies.' . $taxonomy->id)
+                            ->multiple()
+                            ->options(
+                                $taxonomy->taxonomyTerms->sortBy('name')
+                                    ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->id => $term->name])
+                                    ->toArray()
+                            )
+                    )->toArray())
+                    ->query(function (Builder $query, array $data): Builder {
+                        foreach ($data['taxonomies'] as $taxonomyId => $taxonomyTermIds) {
+                            if (filled($taxonomyTermIds)) {
+                                $query->whereHas(
+                                    'taxonomyTerms',
+                                    fn ($query) => $query->whereIn('taxonomy_terms.id', $taxonomyTermIds)
+                                        ->where('taxonomy_id', $taxonomyId)
+                                );
+                            }
+                        }
+
+                        return $query;
+                    })
+                    ->visible(fn ($livewire) => $livewire->ownerRecord->taxonomies->isNotEmpty()),
+                Tables\Filters\Filter::make('year_month')
                     ->form([
                         Forms\Components\TextInput::make('published_year')
-                            ->placeholder('Published year')
                             ->numeric()
-                    ])->query(function (Builder $query, array $data): Builder {
-                        $selectedYear = CarbonImmutable::create($data['published_year']);
-                        $yearStart = $selectedYear->startOfYear()->startOfDay()->toDateTimeString();
-                        $yearEnd = $selectedYear->endOfYear()->endOfDay()->toDateTimeString();
+                            ->debounce(),
+                        Forms\Components\Select::make('published_month')
+                            ->options(
+                                collect(range(1, 12))
+                                    ->mapWithKeys(fn (int $month) => [$month => Carbon::now()->month($month)->format('F')])
+                                    ->toArray()
+                            )
+                            ->hidden(fn (Closure $get) => blank($get('published_year'))),
+                    ])
+                    ->query(function (CollectionEntryBuilder $query, array $data): Builder {
                         return $query->when(
                             filled($data['published_year']),
-                            fn (Builder $query) => $query->whereBetween('published_at', [$yearStart, $yearEnd])
+                            fn ($query) => $query->wherePublishedAtYearMonth(
+                                (int) $data['published_year'],
+                                filled($data['published_month']) ? (int) $data['published_month'] : null,
+                                Auth::user()?->timezone
+                            )
                         );
-                    }),
+                    })
+                    ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
                 Tables\Filters\Filter::make('date_range')
                     ->form([
                         Forms\Components\DatePicker::make('published_from')
@@ -192,71 +230,13 @@ class CollectionEntryResource extends Resource
                         Forms\Components\DatePicker::make('published_to')
                             ->placeholder('End Date'),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['published_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('published_at', '>=', $date)
-                            )
-                            ->when(
-                                $data['published_to'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('published_at', '<=', $date)
-                            );
-                    }),
-                Tables\Filters\SelectFilter::make('month')
-                    ->options(
-                        array_map(fn (int $intMonth) => \Carbon\Carbon::now()->month($intMonth)->format('F'), range(1, 12))
-                    )
-                    ->query(function(Builder $query, array $data) {
-                        return $query->when(
-                            filled($data['value']),
-                            function (Builder $query) use ($data) {
-                                return $query->whereMonth('published_at', '=', intval($data['value']));
-                            }
+                    ->query(function (CollectionEntryBuilder $query, array $data): Builder {
+                        return $query->wherePublishedAtRange(
+                            $data['published_from'] ? Carbon::parse($data['published_from']) : null,
+                            $data['published_to'] ? Carbon::parse($data['published_to']) : null,
                         );
-                    }),
-                Tables\Filters\Filter::make('taxonomies')
-                    ->form([
-                        Forms\Components\Group::make()
-                        ->statePath('taxonomies')
-                        ->schema(
-                            fn ($livewire) => $livewire->ownerRecord->taxonomies->map(
-                                fn (Taxonomy $taxonomy) => Forms\Components\Select::make($taxonomy->name)
-                                    ->statePath((string) $taxonomy->id)
-                                    ->multiple()
-                                    ->options(
-                                        $taxonomy->taxonomyTerms->sortBy('name')
-                                            ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->id => $term->name])
-                                            ->toArray()
-                                    )
-                            )->toArray()
-                        )
-                        ->dehydrated(false),
-                    ])
-                    ->query(function (Builder $query, $livewire, array $data) {
-
-                        $terms_ids = [];
-                        foreach($data['taxonomies'] as $terms) { 
-                            if (!empty($terms)) {
-                                array_push($terms_ids, $terms);
-                            }
-                        }
-
-                        $query->when(
-                            !empty($terms_ids),
-                            fn ($query) => 
-                            $query->whereHas(
-                                'taxonomyTerms',
-                                function ($query) use ($data, $terms_ids) {
-                                    return $query->whereIn('taxonomy_term_id', $terms_ids[0]);
-                                }
-                            )
-                        )
-                        ->whereHas(
-                            'collection',
-                            fn ($query) => $query->where('id', $livewire->ownerRecord->id)
-                        )->get();
                     })
+                    ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
             ])
             ->reorderable('order')
             ->actions([
