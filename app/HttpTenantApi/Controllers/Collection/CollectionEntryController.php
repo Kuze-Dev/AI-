@@ -49,6 +49,7 @@ class CollectionEntryController
                 ])
                 ->allowedSorts([
                     'order',
+                    'title',
                     'published_at',
                 ])
                 ->jsonPaginate()

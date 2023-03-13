@@ -28,6 +28,7 @@ use Illuminate\Validation\Rules\Unique;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Livewire;
 
 class CollectionEntryResource extends Resource
 {
@@ -170,7 +171,6 @@ class CollectionEntryResource extends Resource
                     ->toggledHiddenByDefault(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('taxonomies'),
                 Tables\Filters\Filter::make('filter_year')
                     ->form([
                         Forms\Components\TextInput::make('published_year')
@@ -215,7 +215,48 @@ class CollectionEntryResource extends Resource
                             }
                         );
                     }),
+                Tables\Filters\Filter::make('taxonomies')
+                    ->form([
+                        Forms\Components\Group::make()
+                        ->statePath('taxonomies')
+                        ->schema(
+                            fn ($livewire) => $livewire->ownerRecord->taxonomies->map(
+                                fn (Taxonomy $taxonomy) => Forms\Components\Select::make($taxonomy->name)
+                                    ->statePath((string) $taxonomy->id)
+                                    ->multiple()
+                                    ->options(
+                                        $taxonomy->taxonomyTerms->sortBy('name')
+                                            ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->id => $term->name])
+                                            ->toArray()
+                                    )
+                            )->toArray()
+                        )
+                        ->dehydrated(false),
+                    ])
+                    ->query(function (Builder $query, $livewire, array $data) {
 
+                        $terms_ids = [];
+                        foreach($data['taxonomies'] as $terms) { 
+                            if (!empty($terms)) {
+                                array_push($terms_ids, $terms);
+                            }
+                        }
+
+                        $query->when(
+                            !empty($terms_ids),
+                            fn ($query) => 
+                            $query->whereHas(
+                                'taxonomyTerms',
+                                function ($query) use ($data, $terms_ids) {
+                                    return $query->whereIn('taxonomy_term_id', $terms_ids[0]);
+                                }
+                            )
+                        )
+                        ->whereHas(
+                            'collection',
+                            fn ($query) => $query->where('id', $livewire->ownerRecord->id)
+                        )->get();
+                    })
             ])
             ->reorderable('order')
             ->actions([
@@ -227,27 +268,6 @@ class CollectionEntryResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ])
             ->defaultSort('order');
-    }
-
-    /**
-     * @return array
-     */
-    public static function monthOrder(): array
-    {
-        return [
-            '1' => 'January',
-            '2' => 'February',
-            '3' => 'March', 
-            '4' => 'April',
-            '5' => 'May',
-            '6' => 'June',
-            '7' => 'July',
-            '8' => 'August',
-            '9' => 'September',
-            '10' => 'October',
-            '11' => 'November',
-            '12' => 'December'
-        ];
     }
 
     /** @return array */

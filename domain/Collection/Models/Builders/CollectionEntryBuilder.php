@@ -42,9 +42,9 @@ class CollectionEntryBuilder extends Builder
         return $this->whereBetween('published_at', [$start, $end]);
     }
 
-    public function whereEntryYear(string|int $publishedYear, string $timezone = null): self 
+    public function whereEntryYear(string $publishedYear): self 
     {
-        $selectedYear = CarbonImmutable::create($publishedYear);
+        $selectedYear = CarbonImmutable::create(intval($publishedYear));
         
         $yearStart = $selectedYear->startOfYear()->startOfDay()->toDateTimeString();
         $yearEnd = $selectedYear->endOfYear()->endOfDay()->toDateTimeString();
@@ -52,12 +52,12 @@ class CollectionEntryBuilder extends Builder
         return $this->whereBetween('published_at', [$yearStart, $yearEnd]);
     }
 
-    public function whereEntryMonth(string|int $month): self 
+    public function whereEntryMonth(string $month): self 
     {   
         return $this->whereMonth('published_at', $month);
     }
 
-    public function whereTaxonomyTerm($taxonomyTerm): self 
+    public function whereTaxonomyTerm(array $taxonomyTerm): self 
     {
         return $this->whereHas(
             'taxonomyTerms',
