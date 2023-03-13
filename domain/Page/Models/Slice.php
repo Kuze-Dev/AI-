@@ -48,6 +48,7 @@ class Slice extends Model implements IsActivitySubject
         'blueprint_id',
         'name',
         'component',
+        'image',
         'is_fixed_content',
         'data',
     ];

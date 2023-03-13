@@ -14,6 +14,7 @@ class CreateSliceAction
         return Slice::create([
             'name' => $sliceData->name,
             'component' => $sliceData->component,
+            'image' => $sliceData->image,
             'blueprint_id' => $sliceData->blueprint_id,
             'data' => $sliceData->data,
             'is_fixed_content' => $sliceData->is_fixed_content,

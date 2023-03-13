@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use Closure;
+use Exception;
+use Filament\Forms;
+use Filament\Tables;
+use Filament\Resources\Form;
+use Domain\Page\Models\Slice;
+use Filament\Resources\Table;
+use Filament\Resources\Resource;
 use App\FilamentTenant\Resources;
+use Livewire\TemporaryUploadedFile;
+use Illuminate\Support\Facades\Auth;
+use Domain\Blueprint\Models\Blueprint;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Domain\Blueprint\Models\Blueprint;
-use Domain\Page\Models\Slice;
-use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
-use Illuminate\Support\Facades\Auth;
-use Exception;
-use Closure;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class SliceResource extends Resource
 {
@@ -40,6 +41,10 @@ class SliceResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('component')
                     ->unique(ignoreRecord: true)
+                    ->required(),
+                Forms\Components\FileUpload::make('image')
+                    ->acceptedFileTypes(['image/png', 'image/webp', 'image/jpg', 'image/jpeg'])
+                    ->maxSize(1_000)
                     ->required(),
                 Forms\Components\Select::make('blueprint_id')
                     ->options(
