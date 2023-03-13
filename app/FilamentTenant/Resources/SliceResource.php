@@ -13,7 +13,6 @@ use Domain\Page\Models\Slice;
 use Filament\Resources\Table;
 use Filament\Resources\Resource;
 use App\FilamentTenant\Resources;
-use Livewire\TemporaryUploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Domain\Blueprint\Models\Blueprint;
 use App\FilamentTenant\Support\SchemaFormBuilder;
@@ -44,8 +43,7 @@ class SliceResource extends Resource
                     ->required(),
                 Forms\Components\FileUpload::make('image')
                     ->acceptedFileTypes(['image/png', 'image/webp', 'image/jpg', 'image/jpeg'])
-                    ->maxSize(1_000)
-                    ->required(),
+                    ->maxSize(1_000),
                 Forms\Components\Select::make('blueprint_id')
                     ->options(
                         fn () => Blueprint::orderBy('name')

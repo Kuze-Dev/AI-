@@ -86,28 +86,6 @@ class PageResource extends Resource
                         ->collapsed(fn (string $context) => $context === 'edit')
                         ->orderable('order')
                         ->schema([
-                            // Forms\Components\Select::make('slice_id')
-                            //     ->label('Slice')
-                            //     ->options(
-                            //         self::getCachedSlices()
-                            //             ->sortBy('name')
-                            //             ->pluck('name', 'id')
-                            //             ->toArray()
-                            //     )
-                            //     ->hidden(fn (?Page $record, Closure $get) => $record && $record->sliceContents->firstWhere('id', $get('id')))
-                            //     ->required()
-                            //     ->exists(Slice::class, 'id')
-                            //     ->searchable()
-                            //     ->reactive()
-                            //     ->afterStateUpdated(function (Forms\Components\Select $component, $state) {
-                            //         $slice = self::getCachedSlices()->firstWhere('id', $state);
-
-                            //         $component->getContainer()
-                            //             ->getComponent(fn (Component $component) => $component->getId() === 'schema-form')
-                            //             ?->getChildComponentContainer()
-                            //             ->fill($slice?->is_fixed_content ? $slice->data : []);
-                            //     })
-                            //     ->dehydrateStateUsing(fn (string|int $state) => (int) $state),
                             Forms\Components\ViewField::make('slice_id')
                                 ->label('Slice')
                                 ->view('filament.forms.components.slice-picker')
@@ -120,7 +98,6 @@ class PageResource extends Resource
                                 ->reactive()
                                 ->afterStateUpdated(function ($component, $state) {
                                     $slice = self::getCachedSlices()->firstWhere('id', $state);
-
                                     $component->getContainer()
                                         ->getComponent(fn ($component) => $component->getId() === 'schema-form')
                                         ?->getChildComponentContainer()
@@ -128,7 +105,7 @@ class PageResource extends Resource
                                 }),
                             SchemaFormBuilder::make('data')
                                 ->id('schema-form')
-                                ->dehydrated(fn (Closure $get) => !(self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->is_fixed_content))
+                                ->dehydrated(fn (Closure $get) => ! (self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->is_fixed_content))
                                 ->disabled(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->is_fixed_content ?? false)
                                 ->schemaData(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->blueprint->schema),
 
@@ -188,7 +165,7 @@ class PageResource extends Resource
     /** @return Collection<int, Slice> $cachedSlices */
     protected static function getCachedSlices(): Collection
     {
-        if (!isset(self::$cachedSlices)) {
+        if ( ! isset(self::$cachedSlices)) {
             self::$cachedSlices = Slice::with('blueprint')->get();
         }
 
