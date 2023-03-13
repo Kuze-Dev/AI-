@@ -62,22 +62,15 @@ class CollectionEntryBuilder extends Builder
     }
 
     /** @return self<\Domain\Collection\Models\CollectionEntry> */
-    public function whereTaxonomyTerm(array $taxonomyTerm): self
+    public function whereTaxonomyTerms(string $taxonomy, array $terms): self
     {
         return $this->whereHas(
             'taxonomyTerms',
-            function (Builder $query) use ($taxonomyTerm) {
-                $query->when(
-                    ! is_array($taxonomyTerm[key($taxonomyTerm)]),
-                    fn ($query) => $query->where('slug', $taxonomyTerm[key($taxonomyTerm)])
-                )
-                    ->when(
-                        is_array($taxonomyTerm[key($taxonomyTerm)]),
-                        fn ($query) => $query->whereIn('slug', $taxonomyTerm[key($taxonomyTerm)])
-                    )
+            function (Builder $query) use ($taxonomy, $terms) {
+                $query->whereIn('slug', $terms)
                     ->whereHas(
                         'taxonomy',
-                        fn ($query) => $query->where('slug', key($taxonomyTerm))
+                        fn ($query) => $query->where('slug', $taxonomy)
                     );
             }
         );

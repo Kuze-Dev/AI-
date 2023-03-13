@@ -177,22 +177,18 @@ class CollectionEntryResource extends Resource
                 Tables\Filters\Filter::make('taxonomies')
                     ->form(fn ($livewire) => $livewire->ownerRecord->taxonomies->map(
                         fn (Taxonomy $taxonomy) => Forms\Components\Select::make($taxonomy->name)
-                            ->statePath('taxonomies.' . $taxonomy->id)
+                            ->statePath('taxonomies.' . $taxonomy->slug)
                             ->multiple()
                             ->options(
                                 $taxonomy->taxonomyTerms->sortBy('name')
-                                    ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->id => $term->name])
+                                    ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->slug => $term->name])
                                     ->toArray()
                             )
                     )->toArray())
-                    ->query(function (Builder $query, array $data): Builder {
-                        foreach ($data['taxonomies'] as $taxonomyId => $taxonomyTermIds) {
-                            if (filled($taxonomyTermIds)) {
-                                $query->whereHas(
-                                    'taxonomyTerms',
-                                    fn ($query) => $query->whereIn('taxonomy_terms.id', $taxonomyTermIds)
-                                        ->where('taxonomy_id', $taxonomyId)
-                                );
+                    ->query(function (CollectionEntryBuilder $query, array $data): Builder {
+                        foreach ($data['taxonomies'] as $taxonomySlug => $taxonomyTermSlugs) {
+                            if (filled($taxonomyTermSlugs)) {
+                                $query->whereTaxonomyTerms($taxonomySlug, $taxonomyTermSlugs);
                             }
                         }
 

@@ -40,12 +40,18 @@ class CollectionEntryController
                         function (CollectionEntryBuilder $query, string|array $value) {
                             $value = Arr::wrap($value);
 
-                            return $query->wherePublishedAtYearMonth((int) $value[0], filled($value[1] ?? null) ? (int) $value[1] : null);
+                            $query->wherePublishedAtYearMonth((int) $value[0], filled($value[1] ?? null) ? (int) $value[1] : null);
                         },
                     ),
                     AllowedFilter::callback(
-                        'taxonomy',
-                        fn (CollectionEntryBuilder $query, $value) => $query->whereTaxonomyTerm($value)
+                        'taxonomies',
+                        function (CollectionEntryBuilder $query, array $value) {
+                            foreach ($value as $taxonomySlug => $taxonomyTermSlugs) {
+                                if (filled($taxonomyTermSlugs)) {
+                                    $query->whereTaxonomyTerms($taxonomySlug, Arr::wrap($taxonomyTermSlugs));
+                                }
+                            }
+                        }
                     ),
                 ])
                 ->allowedSorts([
