@@ -161,7 +161,7 @@ class CollectionEntryResource extends Resource
                     ->limit()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('published_at')
-                    ->date(timezone: Auth::user()?->timezone)
+                    ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable()
                     ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
                 Tables\Columns\TextColumn::make('updated_at')
