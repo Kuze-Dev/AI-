@@ -60,16 +60,14 @@ class AuthServiceProvider extends ServiceProvider
                     /** @var Tenant */
                     $tenant = tenancy()->tenant;
 
-                    $url = (env('APP_ENV') != 'local' ? 'https://' : 'http://') . $tenant->domains->first()?->domain;
+                    $hostName = (app()->environment() != 'local' ? 'https://' : 'http://') . $tenant->domains->first()?->domain;
+                    $routeName = 'filament-tenant.auth.verification.verify';
                 } else {
-                    $url = url('/', secure: env('APP_ENV') != 'local');
+                    $hostName = url('/', secure: app()->environment() != 'local');
+                    $routeName = 'filament.auth.verification.verify';
                 }
 
-                $routeName = tenancy()->initialized
-                    ? 'filament-tenant.auth.verification.verify'
-                    : 'filament.auth.verification.verify';
-
-                $url .= URL::temporarySignedRoute(
+                return $hostName . URL::temporarySignedRoute(
                     $routeName,
                     now()->addMinutes(Config::get('auth.verification.expire', 60)),
                     [
@@ -78,8 +76,6 @@ class AuthServiceProvider extends ServiceProvider
                     ],
                     false
                 );
-
-                return $url;
             }
         });
 
@@ -89,21 +85,21 @@ class AuthServiceProvider extends ServiceProvider
                     /** @var Tenant */
                     $tenant = tenancy()->tenant;
 
-                    $url = (env('APP_ENV') != 'local' ? 'https://' : 'http://') . $tenant->domains->first()?->domain;
+                    $hostName = (app()->environment() != 'local' ? 'https://' : 'http://') . $tenant->domains->first()?->domain;
+                    $routeName = 'filament-tenant.auth.password.reset';
                 } else {
-                    $url = url('/', secure: env('APP_ENV') != 'local');
+                    $hostName = url('/', secure: app()->environment() != 'local');
+                    $routeName = 'filament.auth.password.reset';
                 }
 
-                $routeName = tenancy()->initialized
-                    ? 'filament-tenant.auth.password.reset'
-                    : 'filament.auth.password.reset';
-
-                $url .= URL::route($routeName, [
-                    'token' => $token,
-                    'email' => $notifiable->getEmailForPasswordReset(),
-                ], false);
-
-                return $url;
+                return $hostName . URL::route(
+                    $routeName,
+                    [
+                        'token' => $token,
+                        'email' => $notifiable->getEmailForPasswordReset(),
+                    ],
+                    false
+                );
             }
         });
     }

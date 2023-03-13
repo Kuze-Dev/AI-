@@ -6,9 +6,8 @@ namespace Domain\Admin\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Auth\Notifications\VerifyEmail as BaseVerifyMail;
 
-class VerifyEmail extends BaseVerifyMail implements ShouldQueue
+class VerifyEmail extends \Illuminate\Auth\Notifications\VerifyEmail implements ShouldQueue
 {
     use Queueable;
 }
