@@ -60,10 +60,10 @@ class AuthServiceProvider extends ServiceProvider
                     /** @var Tenant */
                     $tenant = tenancy()->tenant;
 
-                    $hostName = (app()->environment() != 'local' ? 'https://' : 'http://') . $tenant->domains->first()?->domain;
+                    $hostName = (app()->environment('local') ? 'https://' : 'http://') . $tenant->domains->first()?->domain;
                     $routeName = 'filament-tenant.auth.verification.verify';
                 } else {
-                    $hostName = url('/', secure: app()->environment() != 'local');
+                    $hostName = url('/', secure: app()->environment('local'));
                     $routeName = 'filament.auth.verification.verify';
                 }
 
@@ -85,10 +85,10 @@ class AuthServiceProvider extends ServiceProvider
                     /** @var Tenant */
                     $tenant = tenancy()->tenant;
 
-                    $hostName = (app()->environment() != 'local' ? 'https://' : 'http://') . $tenant->domains->first()?->domain;
+                    $hostName = (app()->environment('local') ? 'https://' : 'http://') . $tenant->domains->first()?->domain;
                     $routeName = 'filament-tenant.auth.password.reset';
                 } else {
-                    $hostName = url('/', secure: app()->environment() != 'local');
+                    $hostName = url('/', secure: app()->environment('local'));
                     $routeName = 'filament.auth.password.reset';
                 }
 
