@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Rules;
 
 use Illuminate\Contracts\Validation\InvokableRule;
+use Closure;
 
 class FullyQualifiedDomainNameRule implements InvokableRule
 {
@@ -13,7 +14,7 @@ class FullyQualifiedDomainNameRule implements InvokableRule
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     * @param  Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      * @return void
      */
     public function __invoke($attribute, $value, $fail): void

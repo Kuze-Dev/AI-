@@ -8,11 +8,14 @@ use Filament\Pages\Actions\DeleteAction;
 use Filament\Pages\Actions\ForceDeleteAction;
 use Filament\Pages\Actions\RestoreAction;
 use Filament\Tables\Filters\TrashedFilter;
+use STS\FilamentImpersonate\Impersonate;
 
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Laravel\assertNotSoftDeleted;
 use function Pest\Laravel\assertSoftDeleted;
 use function Pest\Livewire\livewire;
+use function PHPUnit\Framework\assertEquals;
+use function PHPUnit\Framework\assertNotEquals;
 
 beforeEach(fn () => loginAsSuperAdmin());
 
@@ -73,4 +76,18 @@ it('can force delete', function () {
         ->callTableAction(ForceDeleteAction::class, $admin);
 
     assertModelMissing($admin);
+});
+
+it('can impersonate', function () {
+    loginAsAdmin()->givePermissionTo('admin.viewAny', 'admin.impersonate');
+
+    $admin = AdminFactory::new()->createOne();
+
+    assertNotEquals($admin->getKey(), auth()->id());
+
+    livewire(ListAdmins::class)
+        ->assertOK()
+        ->callTableAction(Impersonate::class, $admin);
+
+    assertEquals($admin->getKey(), auth()->id());
 });

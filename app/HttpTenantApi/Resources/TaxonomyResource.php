@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @property-read string $name
+ * @mixin \Domain\Taxonomy\Models\Taxonomy
  */
 class TaxonomyResource extends JsonApiResource
 {
@@ -18,4 +18,13 @@ class TaxonomyResource extends JsonApiResource
             'name' => $this->name,
         ];
     }
+
+     /** @return array<string, callable> */
+     public function toRelationships(Request $request): array
+     {
+         return [
+             'taxonomyTerms' => fn () => TaxonomyTermResource::collection($this->taxonomyTerms),
+             'parentTerms' => fn () => TaxonomyTermResource::collection($this->parentTerms),
+         ];
+     }
 }
