@@ -22,8 +22,14 @@ class TaxonomyController
         );
     }
 
-    public function show(Taxonomy $taxonomy): TaxonomyResource
+    public function show(string $taxonomy): TaxonomyResource
     {
-        return TaxonomyResource::make($taxonomy);
+        return TaxonomyResource::make(
+            QueryBuilder::for(Taxonomy::whereSlug($taxonomy)->with([
+                'parentTerms.taxonomy',
+                'taxonomyTerms.taxonomy',
+            ]))->allowedIncludes(['taxonomyTerms', 'parentTerms'])
+                ->firstOrFail()
+        );
     }
 }

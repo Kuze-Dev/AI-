@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Pages;
 
 use App\FilamentTenant\Widgets\AccountWidget;
+use App\FilamentTenant\Widgets\DeployStaticSite;
 use Artificertech\FilamentMultiContext\Concerns\ContextualPage;
 use Filament\Pages\Dashboard as BaseDashboard;
-use Filament\Widgets\FilamentInfoWidget;
 
 class Dashboard extends BaseDashboard
 {
@@ -19,7 +19,7 @@ class Dashboard extends BaseDashboard
     {
         return [
             AccountWidget::class,
-            FilamentInfoWidget::class,
+            DeployStaticSite::class,
         ];
     }
 }
