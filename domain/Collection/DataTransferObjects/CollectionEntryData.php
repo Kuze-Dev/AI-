@@ -27,12 +27,7 @@ class CollectionEntryData
             published_at: isset($data['published_at']) ? Carbon::parse($data['published_at']) : null,
             taxonomy_terms: $data['taxonomy_terms'] ?? [],
             data: $data['data'],
-            meta_data: new MetaDataData(
-                title: $data['meta_data']['title'] ?? null,
-                author: $data['meta_data']['author'] ?? null,
-                description: $data['meta_data']['description'] ?? null,
-                keywords: $data['meta_data']['keywords'] ?? null,
-            )
+            meta_data: MetaDataData::fromArray($data['meta_data'])
         );
     }
 }

@@ -16,4 +16,15 @@ class MetaDataData
         public readonly UploadedFile|string|null $image = null,
     ) {
     }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            title: $data['title'] ?? null,
+            author: $data['author'] ?? null,
+            description: $data['description'] ?? null,
+            keywords: $data['keywords'] ?? null,
+            image: $data['image'] ?? null,
+        );
+    }
 }
