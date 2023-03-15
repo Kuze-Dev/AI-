@@ -28,9 +28,9 @@ class MetaDataForm extends Section
                 ->formatStateUsing(fn ($record) => $record?->metaData?->description),
             Forms\Components\FileUpload::make('image')
                 ->formatStateUsing(function ($record) {
-                    return $record->metaData->getMedia('image')
+                    return $record?->metaData->getMedia('image')
                         ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                        ->toArray();
+                        ->toArray() ?? [];
                 })
                 ->image()
                 ->beforeStateDehydrated(null)
