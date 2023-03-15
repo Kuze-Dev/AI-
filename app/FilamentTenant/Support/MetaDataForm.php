@@ -19,13 +19,13 @@ class MetaDataForm extends Section
 
         $this->schema([
             Forms\Components\TextInput::make('title')
-                ->afterStateHydrated(fn ($component, $record) => $component->state($record?->metaData?->title)),
+                ->formatStateUsing(fn ($record) => $record?->metaData?->title),
             Forms\Components\TextInput::make('keywords')
-                ->afterStateHydrated(fn ($component, $record) => $component->state($record?->metaData?->keywords)),
+                ->formatStateUsing(fn ($record) => $record?->metaData?->keywords),
             Forms\Components\TextInput::make('author')
-                ->afterStateHydrated(fn ($component, $record) => $component->state($record?->metaData?->author)),
+                ->formatStateUsing(fn ($record) => $record?->metaData?->author),
             Forms\Components\Textarea::make('description')
-                ->afterStateHydrated(fn ($component, $record) => $component->state($record?->metaData?->description)),
+                ->formatStateUsing(fn ($record) => $record?->metaData?->description),
             Forms\Components\FileUpload::make('image')
                 ->formatStateUsing(function ($record) {
                     return $record->metaData->getMedia('image')
@@ -50,13 +50,6 @@ class MetaDataForm extends Section
                     }
 
                     return $media?->getUrl();
-                })
-                ->deleteUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file) {
-                    if ( ! $file) {
-                        return;
-                    }
-
-                    $component->state([]);
                 }),
         ]);
     }
