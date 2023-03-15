@@ -149,7 +149,7 @@ class FilamentServiceProvider extends ServiceProvider
                 "Are you sure you want to {$verb} :count :resource?",
                 [
                     'resource' => $action->getPluralModelLabel(),
-                    'count' => $action->getRecords()?->count() ?? 0
+                    'count' => $action->getRecords()?->count() ?? 0,
                 ]
             )
         );
