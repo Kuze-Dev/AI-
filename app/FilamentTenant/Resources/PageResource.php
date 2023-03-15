@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use Closure;
+use Exception;
+use Filament\Forms;
+use Filament\Tables;
+use Illuminate\Support\Str;
+use Domain\Page\Models\Page;
+use Filament\Resources\Form;
+use Domain\Page\Models\Slice;
+use Filament\Resources\Table;
+use Filament\Resources\Resource;
 use App\FilamentTenant\Resources;
+use Domain\Page\Models\SliceContent;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use App\FilamentTenant\Support\MetaDataForm;
+use Illuminate\Database\Eloquent\Collection;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Closure;
-use Domain\Page\Models\Page;
-use Domain\Page\Models\Slice;
-use Domain\Page\Models\SliceContent;
-use App\FilamentTenant\Support\MetaDataForm;
-use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
-use Illuminate\Support\Facades\Auth;
-use Exception;
-use Filament\Forms\Components\Component;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Str;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class PageResource extends Resource
 {
@@ -92,7 +92,18 @@ class PageResource extends Resource
                                 ->viewData([
                                     'slices' => self::getCachedSlices()
                                         ->sortBy('name')
-                                        ->map->only('id', 'name', 'image')
+                                        ->map(function ($slice) {
+                                            $image = $slice['image'];
+                                            if ($image) {
+                                                $image = Storage::disk('s3')->url($image);
+                                            }
+
+                                            return [
+                                                'id' => $slice['id'],
+                                                'name' => $slice['name'],
+                                                'image' => $image,
+                                            ];
+                                        })
                                         ->toArray(),
                                 ])
                                 ->reactive()
