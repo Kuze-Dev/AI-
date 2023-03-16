@@ -281,7 +281,7 @@ it('can edit collection entry meta data', function () {
                 $collection->taxonomies->first()->id => $taxonomyTerms->pluck('id'),
             ],
             'meta_data' => $metaData,
-            'meta_data.image.0' => $metaDataImage
+            'meta_data.image.0' => $metaDataImage,
         ])
         ->call('save')
         ->assertOk()

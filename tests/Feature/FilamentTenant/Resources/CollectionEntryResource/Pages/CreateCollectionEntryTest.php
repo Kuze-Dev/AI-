@@ -189,7 +189,7 @@ it('can create collection entry with meta data', function () {
             'published_at' => $dateTime,
             'data' => ['main' => ['header' => 'Foo']],
             'meta_data' => $metaData,
-            'meta_data.image.0' => $metaDataImage
+            'meta_data.image.0' => $metaDataImage,
         ])
         ->call('create')
         ->assertHasNoFormErrors()

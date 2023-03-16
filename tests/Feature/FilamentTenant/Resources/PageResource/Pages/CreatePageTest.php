@@ -125,7 +125,7 @@ it('can create page with meta data', function () {
                 ],
             ],
             'meta_data' => $metaData,
-            'meta_data.image.0' => $metaDataImage
+            'meta_data.image.0' => $metaDataImage,
         ])
         ->call('create')
         ->assertHasNoFormErrors()

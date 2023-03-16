@@ -81,7 +81,7 @@ it('can edit page', function () {
             'route_url' => 'test-url',
             'slice_contents.record-1.data.main.header' => 'Bar',
             'meta_data' => $metaData,
-            'meta_data.image.0' => $metaDataImage
+            'meta_data.image.0' => $metaDataImage,
         ])
         ->call('save')
         ->assertHasNoFormErrors()
