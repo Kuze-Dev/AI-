@@ -8,6 +8,8 @@ use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\Models\Slice;
 use Filament\Facades\Filament;
 use Domain\Blueprint\Enums\FieldType;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
@@ -113,5 +115,42 @@ it('can create slice with default content', function () {
         'blueprint_id' => $blueprint->id,
         'is_fixed_content' => true,
         'data' => json_encode(['main' => ['title' => 'Foobar']]),
+    ]);
+});
+
+it('can create slice with image', function () {
+    $blueprint = BlueprintFactory::new()
+        ->withDummySchema()
+        ->createOne();
+
+    // Prepare the storage and create a temporary image file.
+    Storage::fake('public');
+    $image = UploadedFile::fake()->image('test_image.jpg');
+
+    livewire(CreateSlice::class)
+        ->fillForm([
+            'name' => 'Test',
+            'component' => 'Test',
+            'blueprint_id' => $blueprint->id,
+            'image' => $image, // Add image to form data.
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk();
+
+    // Retrieve the created slice to get the stored image path.
+    $createdSlice = Slice::where([
+        'name' => 'Test',
+        'component' => 'Test',
+        'blueprint_id' => $blueprint->id,
+    ])->first();
+
+    // Assert the image exists in the storage and in the image column.
+    Storage::disk('public')->assertExists($createdSlice->image);
+    assertDatabaseHas(Slice::class, [
+        'name' => 'Test',
+        'component' => 'Test',
+        'blueprint_id' => $blueprint->id,
+        'image' => $createdSlice->image,
     ]);
 });
