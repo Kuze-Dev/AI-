@@ -37,6 +37,7 @@ return new class () extends Migration {
             $table->timestamps();
 
             $table->unique(['collection_id', 'title']);
+            $table->unique(['collection_id', 'slug']);
         });
 
         Schema::create('collection_taxonomy', function (Blueprint $table) {
