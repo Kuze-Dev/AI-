@@ -19,7 +19,6 @@ use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 
 /**
