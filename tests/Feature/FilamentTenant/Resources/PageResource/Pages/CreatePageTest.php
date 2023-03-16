@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\PageResource\Pages\CreatePage;
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Blueprint\Enums\FieldType;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\Models\Page;
@@ -51,7 +53,10 @@ it('can create page', function () {
         ->instance()
         ->record;
 
-    assertDatabaseHas(Page::class, ['name' => 'Test']);
+    assertDatabaseHas(Page::class, [
+        'name' => 'Test',
+        'slug' => 'test',
+    ]);
     assertDatabaseHas(SliceContent::class, [
         'page_id' => $page->id,
         'slice_id' => $sliceId,

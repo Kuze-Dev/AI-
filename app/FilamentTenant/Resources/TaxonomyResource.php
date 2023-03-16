@@ -16,8 +16,6 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms;
-use Illuminate\Support\Str;
-use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Domain\Blueprint\Models\Blueprint;
@@ -65,16 +63,8 @@ class TaxonomyResource extends Resource
             ->schema([
                 Forms\Components\Card::make()->schema([
                     Forms\Components\TextInput::make('name')
-                        ->reactive()
-                        ->afterStateUpdated(function (Closure $set, $state) {
-                            $set('slug', Str::slug($state));
-                        })->required()
-                        ->unique(ignoreRecord: true),
-                    Forms\Components\TextInput::make('slug')->required()
-                        ->disabled(fn (?Taxonomy $record) => $record !== null)
                         ->unique(ignoreRecord: true)
-                        ->rules('alpha_dash')
-                        ->disabled(),
+                        ->required(),
                     Forms\Components\Select::make('blueprint_id')
                         ->required()
                         ->options(
@@ -99,16 +89,8 @@ class TaxonomyResource extends Resource
                             Forms\Components\Grid::make(['md' => 1])
                                 ->schema([
                                     Forms\Components\TextInput::make('name')
-                                        ->reactive()
-                                        ->afterStateUpdated(function (Closure $set, $state) {
-                                            $set('slug', Str::slug($state));
-                                        })->required()
-                                        ->unique(ignoreRecord: true),
-                                    Forms\Components\TextInput::make('slug')->required()
-                                        ->disabled(fn (?TaxonomyTerm $record) => $record !== null)
                                         ->unique(ignoreRecord: true)
-                                        ->rules('alpha_dash')
-                                        ->disabled(),
+                                        ->required(),
                                     SchemaFormBuilder::make('data', fn (Taxonomy $record) => $record->blueprint->schema),
                                 ]),
                         ]),

@@ -19,8 +19,8 @@ class TaxonomyData
     {
         return new self(
             name: $data['name'],
-            slug: $data['slug'],
             blueprint_id: $data['blueprint_id'],
+            slug: $data['slug'] ?? null,
             terms: array_map(fn (array $termDate) => TaxonomyTermData::fromArray($termDate), $data['terms'] ?? []),
         );
     }

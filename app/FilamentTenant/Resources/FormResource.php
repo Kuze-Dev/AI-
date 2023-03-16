@@ -42,13 +42,6 @@ class FormResource extends Resource
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
                         ->required(),
-                    Forms\Components\TextInput::make('slug')
-                        ->unique(ignoreRecord: true)
-                        ->rules('alpha_dash')
-                        ->disabled(fn (?FormModel $record) => $record !== null)
-                        ->afterStateUpdated(function ($state, $set) {
-                            $set('slug', Str::slug($state));
-                        }),
                     Forms\Components\Select::make('blueprint_id')
                         ->options(
                             fn () => Blueprint::orderBy('name')

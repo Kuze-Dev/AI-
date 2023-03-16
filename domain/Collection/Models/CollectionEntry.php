@@ -145,7 +145,6 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
         return SlugOptions::create()
             ->generateSlugsFrom('title')
             ->preventOverwrite()
-            ->doNotGenerateSlugsOnUpdate()
             ->saveSlugsTo($this->getRouteKeyName());
     }
 

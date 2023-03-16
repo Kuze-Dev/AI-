@@ -101,7 +101,6 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
         return SlugOptions::create()
             ->generateSlugsFrom('name')
             ->preventOverwrite()
-            ->doNotGenerateSlugsOnUpdate()
             ->saveSlugsTo($this->getRouteKeyName());
     }
 }

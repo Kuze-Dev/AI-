@@ -22,7 +22,6 @@ use Illuminate\Support\Facades\Auth;
 use Exception;
 use Filament\Forms\Components\Component;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Str;
 
 class PageResource extends Resource
 {
@@ -45,16 +44,7 @@ class PageResource extends Resource
             Forms\Components\Card::make([
                 Forms\Components\TextInput::make('name')
                     ->unique(ignoreRecord: true)
-                    ->lazy()
-                    ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
-                        if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
-                            $set('slug', Str::slug($state));
-                        }
-                    })
                     ->required(),
-                Forms\Components\TextInput::make('slug')
-                    ->unique(ignoreRecord: true)
-                    ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
             ]),
             Forms\Components\Section::make(trans('Slices'))
                 ->schema([

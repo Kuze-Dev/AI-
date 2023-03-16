@@ -8,7 +8,6 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources\MenuResource\Pages;
 use App\FilamentTenant\Support\Tree;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Closure;
 use Domain\Menu\Enums\Target;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
@@ -65,16 +64,8 @@ class MenuResource extends Resource
             ->schema([
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
-                        ->required()
-                        ->reactive()
-                        ->afterStateUpdated(function (Closure $set, $state) {
-                            $set('slug', Str::slug($state));
-                        }),
-                    Forms\Components\TextInput::make('slug')->required()
-                        ->disabled(fn (?Menu $record) => $record !== null)
                         ->unique(ignoreRecord: true)
-                        ->rules('alpha_dash')
-                        ->disabled(),
+                        ->required(),
                 ]),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([

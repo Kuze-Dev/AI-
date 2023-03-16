@@ -67,16 +67,7 @@ class CollectionResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
-                        ->lazy()
-                        ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
-                            if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
-                                $set('slug', Str::slug($state));
-                            }
-                        })
                         ->required(),
-                    Forms\Components\TextInput::make('slug')
-                        ->unique(ignoreRecord: true)
-                        ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                     Forms\Components\Select::make('blueprint_id')
                         ->required()
                         ->options(
