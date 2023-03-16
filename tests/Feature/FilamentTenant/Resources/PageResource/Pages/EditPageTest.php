@@ -9,9 +9,11 @@ use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\SliceContent;
+use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
 use Domain\Support\MetaData\Models\MetaData;
 use Domain\Support\SlugHistory\SlugHistory;
 use Filament\Facades\Filament;
+use Illuminate\Http\UploadedFile;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -57,30 +59,29 @@ it('can edit page', function () {
                 ),
             ['data' => ['main' => ['header' => 'Foo']]]
         )
+        ->has(MetaDataFactory::new([
+            'title' => 'Foo title',
+            'description' => 'Foo description',
+            'author' => 'Foo author',
+            'keywords' => 'Foo keywords',
+        ]))
         ->createOne();
 
-    $metaDataData = [
-        'title' => $page->slug,
-        'description' => 'Foo description',
-        'author' => 'Foo author',
-        'keywords' => 'Foo keywords',
-    ];
-
-    $page->metaData()->create($metaDataData);
-
-    $updatedMetaDataData = [
+    $metaData = [
         'title' => 'Foo title updated',
         'description' => 'Foo description updated',
         'author' => 'Foo author updated',
         'keywords' => 'Foo keywords updated',
     ];
+    $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
             'route_url' => 'test-url',
             'slice_contents.record-1.data.main.header' => 'Bar',
-            'meta_data' => $updatedMetaDataData,
+            'meta_data' => $metaData,
+            'meta_data.image.0' => $metaDataImage
         ])
         ->call('save')
         ->assertHasNoFormErrors()
@@ -94,13 +95,18 @@ it('can edit page', function () {
     assertDatabaseHas(
         MetaData::class,
         array_merge(
-            $updatedMetaDataData,
+            $metaData,
             [
                 'model_type' => $page->getMorphClass(),
                 'model_id' => $page->id,
             ]
         )
     );
+
+    assertDatabaseHas(Media::class, [
+        'file_name' => $metaDataImage->getClientOriginalName(),
+        'mime_type' => $metaDataImage->getMimeType(),
+    ]);
 
     assertDatabaseHas(SliceContent::class, [
         'page_id' => $page->id,
