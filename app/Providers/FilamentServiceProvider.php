@@ -146,9 +146,9 @@ class FilamentServiceProvider extends ServiceProvider
     {
         return fn (TableActions\BulkAction $action) => $action->modalSubheading(
             fn (TableActions\BulkAction $action) => trans(
-                "Are you sure you want to {$verb} :count :resource?",
+                "Are you sure you want to {$verb} :count :resource/s?",
                 [
-                    'resource' => $action->getPluralModelLabel(),
+                    'resource' => $action->getModelLabel(),
                     'count' => $action->getRecords()?->count() ?? 0,
                 ]
             )
