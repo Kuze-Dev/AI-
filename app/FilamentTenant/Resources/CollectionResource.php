@@ -142,7 +142,8 @@ class CollectionResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('blueprint.name')
                     ->sortable()
                     ->searchable()
