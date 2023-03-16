@@ -21,7 +21,6 @@ class UpdateCollectionAction
             'past_publish_date_behavior' => $collectionData->past_publish_date_behavior,
             'future_publish_date_behavior' => $collectionData->future_publish_date_behavior,
             'is_sortable' => $collectionData->is_sortable,
-            'route_url' => $collectionData->route_url,
         ]);
 
         $collection->taxonomies()

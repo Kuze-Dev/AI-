@@ -88,10 +88,6 @@ class CollectionResource extends Resource
                         ->searchable()
                         ->preload()
                         ->disabled(fn (?Collection $record) => $record !== null),
-                    Forms\Components\TextInput::make('route_url')
-                        ->required()
-                        ->unique(ignoreRecord: true)
-                        ->helperText('Use "{{ $slug }}" to insert the collection entry\'s slug.'),
                     Forms\Components\Select::make('taxonomies')
                         ->multiple()
                         ->options(

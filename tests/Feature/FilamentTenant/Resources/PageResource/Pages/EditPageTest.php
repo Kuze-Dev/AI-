@@ -78,7 +78,6 @@ it('can edit page', function () {
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
-            'route_url' => 'test-url',
             'slice_contents.record-1.data.main.header' => 'Bar',
             'meta_data' => $metaData,
             'meta_data.image.0' => $metaDataImage,
@@ -87,10 +86,7 @@ it('can edit page', function () {
         ->assertHasNoFormErrors()
         ->assertOk();
 
-    assertDatabaseHas(Page::class, [
-        'name' => 'Test',
-        'route_url' => 'test-url',
-    ]);
+    assertDatabaseHas(Page::class, ['name' => 'Test']);
 
     assertDatabaseHas(
         MetaData::class,

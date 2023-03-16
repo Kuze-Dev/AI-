@@ -46,7 +46,6 @@ class EditCollection extends EditRecord
                     is_sortable: $data['is_sortable'],
                     past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
                     future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
-                    route_url: $data['route_url'],
                 ))
         );
     }

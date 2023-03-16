@@ -23,7 +23,6 @@ return new class () extends Migration {
             $table->string('future_publish_date_behavior')->nullable();
             $table->string('past_publish_date_behavior')->nullable();
             $table->boolean('is_sortable')->default(false);
-            $table->string('route_url')->unique();
             $table->timestamps();
         });
 
