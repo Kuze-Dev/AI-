@@ -24,7 +24,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rules\Unique;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -92,16 +91,7 @@ class CollectionEntryResource extends Resource
                                     callback: fn ($livewire, Unique $rule) => $rule->where('collection_id', $livewire->ownerRecord->id),
                                     ignoreRecord: true
                                 )
-                                ->lazy()
-                                ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
-                                    if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
-                                        $set('slug', Str::slug($state));
-                                    }
-                                })
                                 ->required(),
-                            Forms\Components\TextInput::make('slug')
-                                ->unique(ignoreRecord: true)
-                                ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('title'))),
                         ]),
                         SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
                     ])
@@ -155,7 +145,8 @@ class CollectionEntryResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TagsColumn::make('taxonomyTerms.name')
                     ->limit()
                     ->searchable(),

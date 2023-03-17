@@ -36,7 +36,6 @@ class EditGlobals extends EditRecord
                     $record,
                     new GlobalsData(
                         name: $data['name'],
-                        slug: $data['slug'],
                         blueprint_id: $data['blueprint_id'],
                         data: $data['data'],
                     )

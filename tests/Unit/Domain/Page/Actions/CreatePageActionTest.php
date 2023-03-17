@@ -23,7 +23,6 @@ it('can create page', function () {
     $page = app(CreatePageAction::class)
         ->execute(PageData::fromArray([
             'name' => 'Foo',
-            'route_url' => 'foo',
             'slice_contents' => [
                 [
                     'slice_id' => $sliceId,

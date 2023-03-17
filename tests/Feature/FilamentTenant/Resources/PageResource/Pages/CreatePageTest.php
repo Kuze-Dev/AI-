@@ -38,7 +38,6 @@ it('can create page', function () {
     $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
-            'route_url' => 'test-url',
             'slice_contents' => [
                 [
                     'slice_id' => $sliceId,
@@ -52,7 +51,10 @@ it('can create page', function () {
         ->instance()
         ->record;
 
-    assertDatabaseHas(Page::class, ['name' => 'Test']);
+    assertDatabaseHas(Page::class, [
+        'name' => 'Test',
+        'slug' => 'test',
+    ]);
     assertDatabaseHas(SliceContent::class, [
         'page_id' => $page->id,
         'slice_id' => $sliceId,

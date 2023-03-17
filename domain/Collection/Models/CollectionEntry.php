@@ -18,9 +18,7 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
-use Illuminate\Support\Facades\Blade;
 use Spatie\Sluggable\SlugOptions;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 
 /**
@@ -43,7 +41,6 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property-read int|null $slug_histories_count
  * @property-read \Illuminate\Database\Eloquent\Collection|TaxonomyTerm[] $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
- * @property-read string|null $qualified_route_url
  * @method static CollectionEntryBuilder|CollectionEntry newModelQuery()
  * @method static CollectionEntryBuilder|CollectionEntry newQuery()
  * @method static CollectionEntryBuilder|CollectionEntry query()
@@ -147,7 +144,6 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
         return SlugOptions::create()
             ->generateSlugsFrom('title')
             ->preventOverwrite()
-            ->doNotGenerateSlugsOnUpdate()
             ->saveSlugsTo($this->getRouteKeyName());
     }
 
@@ -164,15 +160,4 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
     {
         return new CollectionEntryBuilder($query);
     }
-
-      /** @return Attribute<string, static> */
-      protected function qualifiedRouteUrl(): Attribute
-      {
-          return Attribute::get(fn () => Blade::render(
-              Blade::compileEchos($this->collection->route_url .'/'.$this->slug),
-              [
-                  'slug' => $this->slug,
-              ]
-          ));
-      }
 }

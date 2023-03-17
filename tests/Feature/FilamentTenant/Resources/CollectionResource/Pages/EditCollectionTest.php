@@ -9,7 +9,6 @@ use Domain\Support\SlugHistory\SlugHistory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Filament\Facades\Filament;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Livewire\livewire;
@@ -62,7 +61,6 @@ it('can update collection', function () {
             'future_publish_date_behavior' => 'private',
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
-            'route_url' => 'test-collection',
             'taxonomies' => [$taxonomy->getKey()],
         ])
         ->call('save')
@@ -71,33 +69,15 @@ it('can update collection', function () {
 
     assertDatabaseHas(Collection::class, [
         'name' => 'Test Collection Updated',
+        'slug' => 'test-collection-updated',
         'future_publish_date_behavior' => 'private',
         'past_publish_date_behavior' => 'unlisted',
         'is_sortable' => true,
-        'route_url' => 'test-collection',
     ]);
     assertDatabaseHas('collection_taxonomy', [
         'taxonomy_id' => $taxonomy->getKey(),
         'collection_id' => $collection->getKey(),
     ]);
-});
-
-it('can update collection slug', function () {
-    $collection = CollectionFactory::new(['name' => 'Test Collection'])
-        ->withDummyBlueprint()
-        ->createOne();
-
-    livewire(EditCollection::class, ['record' => $collection->getRouteKey()])
-        ->fillForm(['slug' => 'test-collection-updated'])
-        ->call('save')
-        ->assertHasNoFormErrors()
-        ->assertOk();
-
-    assertDatabaseHas(Collection::class, [
-        'id' => $collection->id,
-        'slug' => 'test-collection-updated',
-    ]);
-    assertDatabaseCount(SlugHistory::class, 2);
     assertDatabaseHas(SlugHistory::class, [
         'model_type' => $collection->getMorphClass(),
         'model_id' => $collection->id,
