@@ -10,10 +10,9 @@ class PageData
 {
     public function __construct(
         public readonly string $name,
-        public readonly string $route_url,
         public readonly MetaDataData $meta_data,
+        public readonly ?string $slug = null,
         public readonly array $slice_contents = [],
-        public readonly ?string $slug = null
     ) {
     }
 
@@ -21,6 +20,7 @@ class PageData
     {
         return new self(
             name: $data['name'],
+            slug: $data['slug'] ?? null,
             slice_contents: array_map(
                 fn (array $sliceContentData) => new SliceContentData(
                     slice_id: $sliceContentData['slice_id'],
@@ -29,14 +29,7 @@ class PageData
                 ),
                 $data['slice_contents'] ?? []
             ),
-            slug: $data['slug'] ?? null,
-            route_url: $data['route_url'],
-            meta_data: new MetaDataData(
-                title: $data['meta_data']['title'] ?? null,
-                author: $data['meta_data']['author'] ?? null,
-                description: $data['meta_data']['description'] ?? null,
-                keywords: $data['meta_data']['keywords'] ?? null,
-            )
+            meta_data: MetaDataData::fromArray($data['meta_data'])
         );
     }
 }

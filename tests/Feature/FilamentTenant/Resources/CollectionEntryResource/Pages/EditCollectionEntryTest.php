@@ -11,11 +11,12 @@ use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
+use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
 use Domain\Support\MetaData\Models\MetaData;
 use Domain\Support\SlugHistory\SlugHistory;
 use Filament\Facades\Filament;
+use Illuminate\Http\UploadedFile;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Livewire\livewire;
@@ -99,19 +100,11 @@ it('can edit collection entry', function () {
                 ->for($collection->taxonomies->first())
                 ->count(2)
         )
+        ->has(MetaDataFactory::new(['title' => 'Foo']))
         ->createOne([
             'title' => 'Foo',
             'data' => ['main' => ['header' => 'Foo']],
         ]);
-
-    $metaDataData = [
-        'title' => $collectionEntry->slug,
-        'description' => 'Foo description',
-        'author' => 'Foo author',
-        'keywords' => 'Foo keywords',
-    ];
-
-    $collectionEntry->metaData()->create($metaDataData);
 
     $dateTime = Carbon::now();
 
@@ -120,9 +113,7 @@ it('can edit collection entry', function () {
             'title' => 'New Foo',
             'published_at' => $dateTime,
             'data' => ['main' => ['header' => 'Foo updated']],
-            'taxonomies' => [
-                $collection->taxonomies->first()->id => $collectionEntry->taxonomyTerms->pluck('id'),
-            ],
+            'taxonomies' => [$collection->taxonomies->first()->id => $collectionEntry->taxonomyTerms->pluck('id')],
             'meta_data' => [
                 'title' => '',
                 'description' => '',
@@ -138,10 +129,15 @@ it('can edit collection entry', function () {
 
     assertDatabaseHas(CollectionEntry::class, [
         'title' => 'New Foo',
+        'slug' => 'new-foo',
         'published_at' => $dateTime,
         'data' => json_encode(['main' => ['header' => 'Foo updated']]),
     ]);
-
+    assertDatabaseHas(SlugHistory::class, [
+        'model_type' => $collectionEntry->getMorphClass(),
+        'model_id' => $collectionEntry->id,
+        'slug' => 'new-foo',
+    ]);
     assertDatabaseHas(
         MetaData::class,
         [
@@ -160,51 +156,6 @@ it('can edit collection entry', function () {
             'collection_entry_id' => $collectionEntry->getKey(),
         ]);
     }
-});
-
-it('can edit collection entry slug', function () {
-    $collection = CollectionFactory::new(['name' => 'Test Collection'])
-        ->for(
-            BlueprintFactory::new()
-                ->addSchemaSection(['title' => 'Main'])
-                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
-        )
-        ->createOne();
-
-    $collectionEntry = CollectionEntryFactory::new()
-        ->for($collection)
-        ->createOne([
-            'title' => 'Foo',
-            'data' => ['main' => ['header' => 'Foo']],
-        ]);
-
-    $metaDataData = [
-        'title' => $collectionEntry->slug,
-        'description' => 'Foo description',
-        'author' => 'Foo author',
-        'keywords' => 'Foo keywords',
-    ];
-
-    $collectionEntry->metaData()->create($metaDataData);
-
-    livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
-        ->fillForm(['slug' => 'new-foo'])
-        ->call('save')
-        ->assertOk()
-        ->assertHasNoFormErrors()
-        ->instance()
-        ->record;
-
-    assertDatabaseHas(CollectionEntry::class, [
-        'id' => $collectionEntry->id,
-        'slug' => 'new-foo',
-    ]);
-    assertDatabaseCount(SlugHistory::class, 3); // 1 (for collection) + 2 (for collection entry)
-    assertDatabaseHas(SlugHistory::class, [
-        'model_type' => $collectionEntry->getMorphClass(),
-        'model_id' => $collectionEntry->id,
-        'slug' => 'new-foo',
-    ]);
 });
 
 it('can edit collection entry to have no taxonomy terms attached', function () {
@@ -235,15 +186,6 @@ it('can edit collection entry to have no taxonomy terms attached', function () {
             'title' => 'Foo',
             'data' => ['main' => ['header' => 'Foo']],
         ]);
-
-    $metaDataData = [
-        'title' => $collectionEntry->slug,
-        'description' => 'Foo description',
-        'author' => 'Foo author',
-        'keywords' => 'Foo keywords',
-    ];
-
-    $collectionEntry->metaData()->create($metaDataData);
 
     livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
         ->fillForm([
@@ -279,39 +221,32 @@ it('can edit collection entry meta data', function () {
 
     $collectionEntry = CollectionEntryFactory::new()
         ->for($collection)
+        ->has(MetaDataFactory::new(['title' => 'Foo']))
         ->createOne([
             'title' => 'Foo',
             'data' => ['main' => ['header' => 'Foo']],
         ]);
 
-    $metaDataData = [
-        'title' => $collectionEntry->slug,
-        'description' => 'Foo description',
-        'author' => 'Foo author',
-        'keywords' => 'Foo keywords',
-    ];
-
-    $collectionEntry->metaData()->create($metaDataData);
-
     $dateTime = Carbon::now();
 
-    $updatedMetaData = [
+    $metaData = [
         'title' => 'Updated foo title',
         'description' => 'Updated foo description',
         'author' => 'Updated foo author',
         'keywords' => 'Updated foo keywords',
     ];
+    $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
 
     $updatedCollectionEntry = livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
         ->fillForm([
             'title' => 'Updated Foo',
-            'slug' => 'updated-foo',
             'published_at' => $dateTime,
             'data' => ['main' => ['header' => 'Foo updated']],
             'taxonomies' => [
                 $collection->taxonomies->first()->id => $taxonomyTerms->pluck('id'),
             ],
-            'meta_data' => $updatedMetaData,
+            'meta_data' => $metaData,
+            'meta_data.image.0' => $metaDataImage,
         ])
         ->call('save')
         ->assertOk()
@@ -328,7 +263,7 @@ it('can edit collection entry meta data', function () {
     assertDatabaseHas(
         MetaData::class,
         array_merge(
-            $updatedMetaData,
+            $metaData,
             [
                 'model_type' => $updatedCollectionEntry->getMorphClass(),
                 'model_id' => $updatedCollectionEntry->id,
@@ -336,90 +271,10 @@ it('can edit collection entry meta data', function () {
         )
     );
 
-    foreach ($taxonomyTerms as $taxonomyTerm) {
-        assertDatabaseHas('collection_entry_taxonomy_term', [
-            'taxonomy_term_id' => $taxonomyTerm->getKey(),
-            'collection_entry_id' => $collectionEntry->getKey(),
-        ]);
-    }
-});
-
-it('can edit collection entry to have no meta data filled', function () {
-    $blueprint = BlueprintFactory::new()
-        ->addSchemaSection(['title' => 'Main'])
-        ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT]);
-
-    $collection = CollectionFactory::new()
-        ->for($blueprint)
-        ->has(TaxonomyFactory::new()->for($blueprint))
-        ->createOne([
-            'name' => 'Test Collection',
-            'future_publish_date_behavior' => 'public',
-            'past_publish_date_behavior' => 'unlisted',
-        ]);
-
-    $taxonomyTerms = TaxonomyTermFactory::new()
-        ->for($collection->taxonomies->first())
-        ->count(2)
-        ->create();
-
-    $collectionEntry = CollectionEntryFactory::new()
-        ->for($collection)
-        ->createOne([
-            'title' => 'Foo',
-            'data' => ['main' => ['header' => 'Foo']],
-        ]);
-
-    $metaDataData = [
-        'title' => $collectionEntry->slug,
-        'description' => 'Foo description',
-        'author' => 'Foo author',
-        'keywords' => 'Foo keywords',
-    ];
-
-    $collectionEntry->metaData()->create($metaDataData);
-
-    $dateTime = Carbon::now();
-
-    $updatedCollectionEntry = livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
-        ->fillForm([
-            'title' => 'New Foo',
-            'slug' => 'new-foo',
-            'published_at' => $dateTime,
-            'data' => ['main' => ['header' => 'Foo updated']],
-            'taxonomies' => [
-                $collection->taxonomies->first()->id => $taxonomyTerms->pluck('id'),
-            ],
-            'meta_data' => [
-                'title' => '',
-                'description' => '',
-                'author' => '',
-                'keywords' => '',
-            ],
-        ])
-        ->call('save')
-        ->assertOk()
-        ->assertHasNoFormErrors()
-        ->instance()
-        ->record;
-
-    assertDatabaseHas(CollectionEntry::class, [
-        'title' => 'New Foo',
-        'published_at' => $dateTime,
-        'data' => json_encode(['main' => ['header' => 'Foo updated']]),
+    assertDatabaseHas(Media::class, [
+        'file_name' => $metaDataImage->getClientOriginalName(),
+        'mime_type' => $metaDataImage->getMimeType(),
     ]);
-
-    assertDatabaseHas(
-        MetaData::class,
-        [
-            'title' => 'New Foo',
-            'description' => null,
-            'author' => null,
-            'keywords' => null,
-            'model_type' => $updatedCollectionEntry->getMorphClass(),
-            'model_id' => $updatedCollectionEntry->id,
-        ]
-    );
 
     foreach ($taxonomyTerms as $taxonomyTerm) {
         assertDatabaseHas('collection_entry_taxonomy_term', [

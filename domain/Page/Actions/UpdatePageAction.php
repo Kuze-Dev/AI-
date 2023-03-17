@@ -27,7 +27,6 @@ class UpdatePageAction
         $page->update([
             'name' => $pageData->name,
             'slug' => $pageData->slug,
-            'route_url' => $pageData->route_url,
         ]);
 
         $page->metaData()->exists()

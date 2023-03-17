@@ -16,7 +16,6 @@ class PageResource extends JsonApiResource
     {
         return  [
             'name' => $this->name,
-            'route_url' => $this->qualified_route_url,
         ];
     }
 

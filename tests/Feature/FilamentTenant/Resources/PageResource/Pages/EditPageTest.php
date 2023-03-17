@@ -9,11 +9,12 @@ use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\SliceContent;
+use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
 use Domain\Support\MetaData\Models\MetaData;
 use Domain\Support\SlugHistory\SlugHistory;
 use Filament\Facades\Filament;
+use Illuminate\Http\UploadedFile;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -57,30 +58,28 @@ it('can edit page', function () {
                 ),
             ['data' => ['main' => ['header' => 'Foo']]]
         )
+        ->has(MetaDataFactory::new([
+            'title' => 'Foo title',
+            'description' => 'Foo description',
+            'author' => 'Foo author',
+            'keywords' => 'Foo keywords',
+        ]))
         ->createOne();
 
-    $metaDataData = [
-        'title' => $page->slug,
-        'description' => 'Foo description',
-        'author' => 'Foo author',
-        'keywords' => 'Foo keywords',
-    ];
-
-    $page->metaData()->create($metaDataData);
-
-    $updatedMetaDataData = [
+    $metaData = [
         'title' => 'Foo title updated',
         'description' => 'Foo description updated',
         'author' => 'Foo author updated',
         'keywords' => 'Foo keywords updated',
     ];
+    $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
-            'route_url' => 'test-url',
             'slice_contents.record-1.data.main.header' => 'Bar',
-            'meta_data' => $updatedMetaDataData,
+            'meta_data' => $metaData,
+            'meta_data.image.0' => $metaDataImage,
         ])
         ->call('save')
         ->assertHasNoFormErrors()
@@ -88,67 +87,31 @@ it('can edit page', function () {
 
     assertDatabaseHas(Page::class, [
         'name' => 'Test',
-        'route_url' => 'test-url',
+        'slug' => 'test',
     ]);
-
+    assertDatabaseHas(SliceContent::class, [
+        'page_id' => $page->id,
+        'slice_id' => $page->sliceContents->first()->slice_id,
+        'data' => json_encode(['main' => ['header' => 'Bar']]),
+    ]);
     assertDatabaseHas(
         MetaData::class,
         array_merge(
-            $updatedMetaDataData,
+            $metaData,
             [
                 'model_type' => $page->getMorphClass(),
                 'model_id' => $page->id,
             ]
         )
     );
-
-    assertDatabaseHas(SliceContent::class, [
-        'page_id' => $page->id,
-        'slice_id' => $page->sliceContents->first()->slice_id,
-        'data' => json_encode(['main' => ['header' => 'Bar']]),
+    assertDatabaseHas(Media::class, [
+        'file_name' => $metaDataImage->getClientOriginalName(),
+        'mime_type' => $metaDataImage->getMimeType(),
     ]);
-});
-
-it('can edit page slug', function () {
-    $page = PageFactory::new(['slug' => 'foo'])
-        ->addSliceContent(
-            SliceFactory::new()
-                ->for(
-                    BlueprintFactory::new()
-                        ->addSchemaSection(['title' => 'Main'])
-                        ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
-                ),
-            ['data' => ['main' => ['header' => 'Foo']]]
-        )
-        ->createOne();
-
-    $metaDataData = [
-        'title' => $page->slug,
-        'description' => 'Foo description',
-        'author' => 'Foo author',
-        'keywords' => 'Foo keywords',
-    ];
-
-    $page->metaData()->create($metaDataData);
-
-    livewire(EditPage::class, ['record' => $page->getRouteKey()])
-        ->fillForm([
-            'slug' => 'new-foo',
-            'slice_contents.record-1.data.main.header' => 'Bar',
-        ])
-        ->call('save')
-        ->assertHasNoFormErrors()
-        ->assertOk();
-
-    assertDatabaseHas(Page::class, [
-        'id' => $page->id,
-        'slug' => 'new-foo',
-    ]);
-    assertDatabaseCount(SlugHistory::class, 2);
     assertDatabaseHas(SlugHistory::class, [
         'model_type' => $page->getMorphClass(),
         'model_id' => $page->id,
-        'slug' => 'new-foo',
+        'slug' => 'test',
     ]);
 });
 
@@ -171,10 +134,6 @@ it('page slice with default value will fill the slices fields', function () {
         ->createOne();
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
-        ->fillForm([
-            'slug' => 'new-foo',
-        ])
-        ->assertHasNoFormErrors()
         ->assertOk()
         ->assertFormSet([
             'slice_contents.record-1.data.main.header' => 'Foo',
@@ -182,7 +141,7 @@ it('page slice with default value will fill the slices fields', function () {
 });
 
 it('page slice with default value column data must be dehydrated', function () {
-    $page = PageFactory::new(['slug' => 'foo'])
+    $page = PageFactory::new()
         ->addSliceContent(
             SliceFactory::new(
                 [
@@ -200,9 +159,6 @@ it('page slice with default value column data must be dehydrated', function () {
         ->createOne();
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
-        ->fillForm([
-            'slug' => 'new-foo',
-        ])
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk();

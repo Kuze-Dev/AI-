@@ -7,8 +7,11 @@ use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\SliceContent;
+use Domain\Support\MetaData\Models\MetaData;
 use Domain\Support\SlugHistory\SlugHistory;
 use Filament\Facades\Filament;
+use Illuminate\Http\UploadedFile;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -35,7 +38,6 @@ it('can create page', function () {
     $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
-            'route_url' => 'test-url',
             'slice_contents' => [
                 [
                     'slice_id' => $sliceId,
@@ -49,12 +51,23 @@ it('can create page', function () {
         ->instance()
         ->record;
 
-    assertDatabaseHas(Page::class, ['name' => 'Test']);
+    assertDatabaseHas(Page::class, [
+        'name' => 'Test',
+        'slug' => 'test',
+    ]);
     assertDatabaseHas(SliceContent::class, [
         'page_id' => $page->id,
         'slice_id' => $sliceId,
         'data' => json_encode(['name' => 'foo']),
     ]);
+    assertDatabaseHas(
+        MetaData::class,
+        [
+            'title' => $page->name,
+            'model_type' => $page->getMorphClass(),
+            'model_id' => $page->getKey(),
+        ]
+    );
     assertDatabaseHas(SlugHistory::class, [
         'model_type' => $page->getMorphClass(),
         'model_id' => $page->id,
@@ -87,4 +100,63 @@ it('can not create page with same name', function () {
         ->assertOk();
 
     assertDatabaseCount(Page::class, 1);
+});
+
+it('can create page with meta data', function () {
+    $sliceId = SliceFactory::new()
+        ->withDummyBlueprint()
+        ->createOne()
+        ->getKey();
+
+    $metaData = [
+        'title' => 'Test Title',
+        'keywords' => 'Test Keywords',
+        'author' => 'Test Author',
+        'description' => 'Test Description',
+    ];
+    $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
+
+    $page = livewire(CreatePage::class)
+        ->fillForm([
+            'name' => 'Test',
+            'route_url' => 'test-url',
+            'slice_contents' => [
+                [
+                    'slice_id' => $sliceId,
+                    'data' => ['name' => 'foo'],
+                ],
+            ],
+            'meta_data' => $metaData,
+            'meta_data.image.0' => $metaDataImage,
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(Page::class, ['name' => 'Test']);
+    assertDatabaseHas(SliceContent::class, [
+        'page_id' => $page->id,
+        'slice_id' => $sliceId,
+        'data' => json_encode(['name' => 'foo']),
+    ]);
+    assertDatabaseHas(
+        MetaData::class,
+        array_merge(
+            $metaData,
+            [
+                'model_type' => $page->getMorphClass(),
+                'model_id' => $page->id,
+            ]
+        )
+    );
+    assertDatabaseHas(Media::class, [
+        'file_name' => $metaDataImage->getClientOriginalName(),
+        'mime_type' => $metaDataImage->getMimeType(),
+    ]);
+    assertDatabaseHas(SlugHistory::class, [
+        'model_type' => $page->getMorphClass(),
+        'model_id' => $page->id,
+    ]);
 });

@@ -100,7 +100,6 @@ class TaxonomyTerm extends Model implements Sortable
         return SlugOptions::create()
             ->generateSlugsFrom('name')
             ->preventOverwrite()
-            ->doNotGenerateSlugsOnUpdate()
             ->saveSlugsTo($this->getRouteKeyName());
     }
 
