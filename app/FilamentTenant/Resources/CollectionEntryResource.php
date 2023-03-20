@@ -127,14 +127,14 @@ class CollectionEntryResource extends Resource
                     Forms\Components\Hidden::make('taxonomy_terms')
                         ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                 ])
-                    // ->columnSpan(['lg' => 2])
+
                     ->when(fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray()) || $livewire->ownerRecord->hasPublishDates()),
                     ])->columnSpan(2),
-                // Forms\Components\Card::make([
+
                     MetaDataForm::make('Meta Data')
                     ->columnSpan(1)
                     ->extraAttributes(['class' => 'md:sticky top-[5.5rem]']) ,
-                    // ])->columnSpan(1),
+          
             ])
             ->columns(3);
     }

@@ -25,6 +25,7 @@ class MetaDataForm extends Section
             Forms\Components\TextInput::make('author')
                 ->formatStateUsing(fn ($record) => $record?->metaData?->author),
             Forms\Components\Textarea::make('description')
+                ->maxLength(150)
                 ->formatStateUsing(fn ($record) => $record?->metaData?->description),
             Forms\Components\FileUpload::make('image')
                 ->formatStateUsing(function ($record) {
@@ -51,6 +52,8 @@ class MetaDataForm extends Section
 
                     return $media?->getUrl();
                 }),
+            Forms\Components\TextInput::make('alt_image')
+                ->formatStateUsing(fn ($record) => $record?->metaData?->alt_image),
         ]);
     }
 }

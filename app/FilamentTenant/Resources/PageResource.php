@@ -40,8 +40,15 @@ class PageResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form->schema([
-            Forms\Components\Card::make([
+        return $form
+            ->columns(3)
+            ->schema([
+                Forms\Components\Group::make()
+                ->schema([
+
+               
+            Forms\Components\Section::make(trans('General Information'))
+            ->schema([
                 Forms\Components\TextInput::make('name')
                     ->unique(ignoreRecord: true)
                     ->required(),
@@ -103,7 +110,10 @@ class PageResource extends Resource
 
                         ]),
                 ]),
-            MetaDataForm::make('Meta Data'),
+            ])->columnSpan(2),
+            MetaDataForm::make('Meta Data')
+            ->columnSpan(1)
+            ->extraAttributes(['class' => 'md:sticky top-[5.5rem]']) ,
         ]);
     }
 
