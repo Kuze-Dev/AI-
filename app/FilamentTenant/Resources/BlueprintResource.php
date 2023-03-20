@@ -340,7 +340,7 @@ class BlueprintResource extends Resource
             FieldType::RELATED_RESOURCE => [
                 Forms\Components\Select::make('resource')
                     ->columnSpanFull()
-                    ->reactive()
+                    ->lazy()
                     ->afterStateUpdated(function (Closure $set) {
                         $set('relation_scopes',[]);
                     })
