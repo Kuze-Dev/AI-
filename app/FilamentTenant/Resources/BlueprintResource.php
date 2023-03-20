@@ -342,7 +342,7 @@ class BlueprintResource extends Resource
                     ->columnSpanFull()
                     ->lazy()
                     ->afterStateUpdated(function (Closure $set) {
-                        $set('relation_scopes',[]);
+                        $set('relation_scopes', []);
                     })
                     ->options(
                         collect(config('domain.blueprint.related_resources', []))
