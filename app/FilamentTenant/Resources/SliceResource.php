@@ -42,7 +42,7 @@ class SliceResource extends Resource
                     ->required(),
                 Forms\Components\FileUpload::make('image')
                     ->acceptedFileTypes(['image/png', 'image/webp', 'image/jpg', 'image/jpeg'])
-                    ->maxSize(1_000),
+                    ->maxSize(5_000),
                 Forms\Components\Select::make('blueprint_id')
                     ->options(
                         fn () => Blueprint::orderBy('name')
