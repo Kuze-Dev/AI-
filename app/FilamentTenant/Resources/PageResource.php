@@ -47,8 +47,7 @@ class PageResource extends Resource
                 Forms\Components\Group::make()
                     ->schema([
 
-                        Forms\Components\Section::make(trans('General Information'))
-                            ->schema([
+                        Forms\Components\Card::make([
                                 Forms\Components\TextInput::make('name')
                                     ->unique(ignoreRecord: true)
                                     ->lazy()
