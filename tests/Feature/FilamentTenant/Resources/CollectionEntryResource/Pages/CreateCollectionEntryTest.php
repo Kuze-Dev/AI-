@@ -93,6 +93,7 @@ it('can create collection entry with taxonomy terms', function () {
         ->assertOk()
         ->fillForm([
             'title' => 'Test',
+            'slug' => 'test',
             "taxonomies.{$taxonomy->getKey()}" => [$taxonomyTerm->getKey()],
             'data' => ['main' => ['header' => 'Foo']],
         ])
@@ -138,6 +139,7 @@ it('can create collection entry with publish date', function () {
         ->assertOk()
         ->fillForm([
             'title' => 'Test',
+            'slug' => 'test',
             'published_at' => $dateTime,
             'data' => ['main' => ['header' => 'Foo']],
         ])
@@ -183,6 +185,7 @@ it('can create collection entry with meta data', function () {
         ->assertOk()
         ->fillForm([
             'title' => 'Test',
+            'slug' => 'test',
             'published_at' => $dateTime,
             'data' => ['main' => ['header' => 'Foo']],
             'meta_data' => $metaData,

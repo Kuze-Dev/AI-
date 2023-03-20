@@ -8,6 +8,7 @@ use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Collection\Enums\PublishBehavior;
 use Domain\Collection\Models\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Collection\Models\Collection>
@@ -20,12 +21,17 @@ class CollectionFactory extends Factory
     /** Define values of model instance. */
     public function definition(): array
     {
+        $name = $this->faker->unique()->word();
+
         return [
             'blueprint_id' => null,
-            'name' => $this->faker->name(),
+            'name' => $name,
             'past_publish_date_behavior' => PublishBehavior::PRIVATE,
             'future_publish_date_behavior' => PublishBehavior::PUBLIC,
             'is_sortable' => (bool) rand(0, 1),
+            'route_url' => function (array $attributes) {
+                return '/'.Str::slug($attributes['name']).'/{{$slug}}';
+            },
         ];
     }
 

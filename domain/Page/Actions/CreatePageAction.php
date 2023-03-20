@@ -21,6 +21,7 @@ class CreatePageAction
         $page = Page::create([
             'name' => $pageData->name,
             'slug' => $pageData->slug,
+            'route_url' => $pageData->route_url,
         ]);
 
         $this->createMetaTags->execute($page, $pageData->meta_data);

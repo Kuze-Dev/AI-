@@ -73,6 +73,7 @@ it('can show collection entry', function () {
             $json->where('data.type', 'collectionEntries')
                 ->where('data.id', $collectionEntry->getRouteKey())
                 ->where('data.attributes.title', $collectionEntry->title)
+                ->where('data.attributes.route_url', $collectionEntry->qualified_route_url)
                 ->etc();
         });
 });

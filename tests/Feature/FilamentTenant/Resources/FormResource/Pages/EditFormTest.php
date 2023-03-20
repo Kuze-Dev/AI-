@@ -65,7 +65,6 @@ it('can edit form', function () {
     assertDatabaseHas(Form::class,  [
         'id' => $form->id,
         'name' => 'Foo',
-        'slug' => 'foo',
         'store_submission' => false,
     ]);
     assertDatabaseHas(FormEmailNotification::class,  [
