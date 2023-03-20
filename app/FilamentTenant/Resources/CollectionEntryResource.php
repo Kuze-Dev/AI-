@@ -83,9 +83,11 @@ class CollectionEntryResource extends Resource
         return $form
             ->columns(3)
             ->schema([
+                Forms\Components\Group::make([
                 Forms\Components\Group::make()
                     ->schema([
-                        Forms\Components\Card::make([
+                        Forms\Components\Section::make(trans('General Information'))
+                        ->schema([
                             Forms\Components\TextInput::make('title')
                                 ->unique(
                                     callback: fn ($livewire, Unique $rule) => $rule->where('collection_id', $livewire->ownerRecord->id),
@@ -94,15 +96,10 @@ class CollectionEntryResource extends Resource
                                 ->required(),
                         ]),
                         SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
-                    ])
-                    ->tap(function (Forms\Components\Group $component) {
-                        $component->columnSpan(
-                            fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray()) || $livewire->ownerRecord->hasPublishDates()
-                                ? 2
-                                : 'full'
-                        );
-                    }),
-                Forms\Components\Card::make([
+                    ]),
+                  
+                Forms\Components\Section::make('Publishing')
+                ->schema([
                     Forms\Components\DateTimePicker::make('published_at')
                         ->minDate(Carbon::now()->startOfDay())
                         ->timezone(Auth::user()?->timezone)
@@ -130,10 +127,16 @@ class CollectionEntryResource extends Resource
                     Forms\Components\Hidden::make('taxonomy_terms')
                         ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                 ])
-                    ->columnSpan(['lg' => 1])
+                    // ->columnSpan(['lg' => 2])
                     ->when(fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray()) || $livewire->ownerRecord->hasPublishDates()),
-                MetaDataForm::make('Meta Data'),
-            ]);
+                    ])->columnSpan(2),
+                // Forms\Components\Card::make([
+                    MetaDataForm::make('Meta Data')
+                    ->columnSpan(1)
+                    ->extraAttributes(['class' => 'md:sticky top-[5.5rem]']) ,
+                    // ])->columnSpan(1),
+            ])
+            ->columns(3);
     }
 
     public static function table(Table $table): Table

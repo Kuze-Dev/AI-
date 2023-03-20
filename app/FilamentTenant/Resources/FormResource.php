@@ -63,7 +63,7 @@ class FormResource extends Resource
                                 ->schemaData(fn (Closure $get) => Blueprint::where('id', $get('blueprint_id'))->first()?->schema),
                         ])
                         ->columnSpan(['md' => 1])
-                        ->extraAttributes(['class' => 'md:sticky top-[5.5rem]']),
+                        ->extraAttributes(['class' => 'sticky top-[5.5rem]']),
                     Forms\Components\Repeater::make('form_email_notifications')
                         ->afterStateHydrated(fn (Forms\Components\Repeater $component, ?FormModel $record) => $component->state($record?->formEmailNotifications->toArray() ?? []))
                         ->nullable()

@@ -22,10 +22,10 @@ class MetaDataForm extends Section
                 ->formatStateUsing(fn ($record) => $record?->metaData?->title),
             Forms\Components\TextInput::make('keywords')
                 ->formatStateUsing(fn ($record) => $record?->metaData?->keywords),
-            Forms\Components\TextInput::make('author')
-                ->formatStateUsing(fn ($record) => $record?->metaData?->author),
-            Forms\Components\Textarea::make('description')
-                ->formatStateUsing(fn ($record) => $record?->metaData?->description),
+            // Forms\Components\TextInput::make('author')
+            //     ->formatStateUsing(fn ($record) => $record?->metaData?->author),
+            // Forms\Components\Textarea::make('description')
+            //     ->formatStateUsing(fn ($record) => $record?->metaData?->description),
             Forms\Components\FileUpload::make('image')
                 ->formatStateUsing(function ($record) {
                     return $record?->metaData->getMedia('image')
