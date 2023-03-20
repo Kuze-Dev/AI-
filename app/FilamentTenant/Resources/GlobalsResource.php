@@ -19,6 +19,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
 use Closure;
+use Illuminate\Support\Str;
 
 class GlobalsResource extends Resource
 {
@@ -40,7 +41,16 @@ class GlobalsResource extends Resource
             Forms\Components\Card::make([
                 Forms\Components\TextInput::make('name')
                     ->unique(ignoreRecord: true)
+                    ->lazy()
+                    ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
+                        if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
+                            $set('slug', Str::slug($state));
+                        }
+                    })
                     ->required(),
+                Forms\Components\TextInput::make('slug')
+                    ->unique(ignoreRecord: true)
+                    ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                 Forms\Components\Select::make('blueprint_id')
                     ->options(
                         fn () => Blueprint::orderBy('name')

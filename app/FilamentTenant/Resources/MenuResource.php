@@ -8,6 +8,7 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources\MenuResource\Pages;
 use App\FilamentTenant\Support\Tree;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Closure;
 use Domain\Menu\Enums\Target;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
@@ -64,8 +65,16 @@ class MenuResource extends Resource
             ->schema([
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
+                        ->required()
+                        ->reactive()
+                        ->afterStateUpdated(function (Closure $set, $state) {
+                            $set('slug', Str::slug($state));
+                        }),
+                    Forms\Components\TextInput::make('slug')->required()
+                        ->disabled(fn (?Menu $record) => $record !== null)
                         ->unique(ignoreRecord: true)
-                        ->required(),
+                        ->rules('alpha_dash')
+                        ->disabled(),
                 ]),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([
@@ -109,10 +118,7 @@ class MenuResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->sortable()
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('slug'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),

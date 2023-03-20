@@ -20,7 +20,9 @@ class CollectionEntryController
     public function index(Collection $collection): JsonApiResourceCollection
     {
         return CollectionEntryResource::collection(
-            QueryBuilder::for($collection->collectionEntries())
+            QueryBuilder::for(
+                $collection->collectionEntries()
+            )
                 ->allowedFilters([
                     'title',
                     'slug',

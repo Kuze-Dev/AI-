@@ -23,6 +23,7 @@ return new class () extends Migration {
             $table->string('future_publish_date_behavior')->nullable();
             $table->string('past_publish_date_behavior')->nullable();
             $table->boolean('is_sortable')->default(false);
+            $table->string('route_url')->unique();
             $table->timestamps();
         });
 
@@ -37,7 +38,6 @@ return new class () extends Migration {
             $table->timestamps();
 
             $table->unique(['collection_id', 'title']);
-            $table->unique(['collection_id', 'slug']);
         });
 
         Schema::create('collection_taxonomy', function (Blueprint $table) {

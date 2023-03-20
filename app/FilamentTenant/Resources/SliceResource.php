@@ -39,7 +39,6 @@ class SliceResource extends Resource
                     ->unique(ignoreRecord: true)
                     ->required(),
                 Forms\Components\TextInput::make('component')
-                    ->unique(ignoreRecord: true)
                     ->required(),
                 Forms\Components\Select::make('blueprint_id')
                     ->options(

@@ -21,6 +21,7 @@ class CreateGlobals extends CreateRecord
             fn () => app(CreateGlobalsAction::class)->execute(
                 new GlobalsData(
                     name: $data['name'],
+                    slug: $data['slug'],
                     blueprint_id: $data['blueprint_id'],
                     data: $data['data'],
                 )
