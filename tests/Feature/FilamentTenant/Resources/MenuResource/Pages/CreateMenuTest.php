@@ -40,7 +40,7 @@ it('can create menu', function () {
                     'model_type' => '',
                     'model_id' => '',
                     'children' => [
-                        
+
                         [
                             'label' => 'Test About Child',
                             'url' => 'https://test-url-about-child.com',

@@ -69,7 +69,7 @@ class SyncNodeTreeAction
         if ( ! empty($nodeData->children)) {
             $this->syncNodes($nodeData->children, $node);
         }
-        
+
         return $node;
     }
 
@@ -84,7 +84,6 @@ class SyncNodeTreeAction
             $children = Arr::map($nodeData->children, $this->inlineChildren(...));
         }
 
-        
         return [$nodeData, ...Arr::collapse($children ?? [])];
     }
 }

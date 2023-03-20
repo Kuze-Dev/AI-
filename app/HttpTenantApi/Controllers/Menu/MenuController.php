@@ -32,7 +32,7 @@ class MenuController
                 ->allowedIncludes(['nodes.children', 'parentNodes.children'])
                 ->firstOrFail()
         );
-        
+
         return $test;
     }
 }
