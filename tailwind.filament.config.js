@@ -7,6 +7,8 @@ module.exports = {
         "./resources/*/filament/**/*.blade.php",
         "./resources/*/filament/**/*.js",
         './vendor/filament/**/*.blade.php',
+        "./app/Filament/**/*.php",
+        "./app/FilamentTenant/**/*.php",
     ],
     darkMode: 'class',
     theme: {
