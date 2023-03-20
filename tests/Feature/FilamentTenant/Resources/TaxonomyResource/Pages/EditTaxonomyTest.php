@@ -52,6 +52,7 @@ it('can edit page', function () {
             'terms' => [
                 [
                     'name' => 'Test Edit Home',
+                    'slug' => 'test-edit-home',
                     'data' => [
                         'main' => [
                             'description' => 'Gwapa siya',
@@ -61,6 +62,7 @@ it('can edit page', function () {
                 ],
                 [
                     'name' => 'Test 2 Edit Home',
+                    'slug' => 'test-2-edit-home',
                     'data' => [
                         'main' => [
                             'description' => 'Gwapa siya',
@@ -69,6 +71,7 @@ it('can edit page', function () {
                     'children' => [
                         [
                             'name' => 'Test 3 Edit Home',
+                            'slug' => 'test-3-edit-home',
                             'data' => [
                                 'main' => [
                                     'description' => 'Gwapa siya',
@@ -77,6 +80,7 @@ it('can edit page', function () {
                         ],
                         [
                             'name' => 'Test 4 Edit Home',
+                            'slug' => 'test-4-edit-home',
                             'data' => [
                                 'main' => [
                                     'description' => 'Gwapa siya',
@@ -94,7 +98,6 @@ it('can edit page', function () {
         Taxonomy::class,
         [
             'name' => 'Test Edit Term',
-            'slug' => 'test-edit-term',
         ]
     );
 });

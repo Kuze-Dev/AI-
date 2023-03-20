@@ -17,6 +17,7 @@ use Domain\Support\SlugHistory\SlugHistory;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 
+use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Livewire\livewire;
@@ -113,7 +114,9 @@ it('can edit collection entry', function () {
             'title' => 'New Foo',
             'published_at' => $dateTime,
             'data' => ['main' => ['header' => 'Foo updated']],
-            'taxonomies' => [$collection->taxonomies->first()->id => $collectionEntry->taxonomyTerms->pluck('id')],
+            'taxonomies' => [
+                $collection->taxonomies->first()->id => $collectionEntry->taxonomyTerms->pluck('id'),
+            ],
             'meta_data' => [
                 'title' => '',
                 'description' => '',
@@ -129,15 +132,10 @@ it('can edit collection entry', function () {
 
     assertDatabaseHas(CollectionEntry::class, [
         'title' => 'New Foo',
-        'slug' => 'new-foo',
         'published_at' => $dateTime,
         'data' => json_encode(['main' => ['header' => 'Foo updated']]),
     ]);
-    assertDatabaseHas(SlugHistory::class, [
-        'model_type' => $collectionEntry->getMorphClass(),
-        'model_id' => $collectionEntry->id,
-        'slug' => 'new-foo',
-    ]);
+
     assertDatabaseHas(
         MetaData::class,
         [
@@ -156,6 +154,42 @@ it('can edit collection entry', function () {
             'collection_entry_id' => $collectionEntry->getKey(),
         ]);
     }
+});
+
+it('can edit collection entry slug', function () {
+    $collection = CollectionFactory::new(['name' => 'Test Collection'])
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->createOne();
+
+    $collectionEntry = CollectionEntryFactory::new()
+        ->for($collection)
+        ->createOne([
+            'title' => 'Foo',
+            'data' => ['main' => ['header' => 'Foo']],
+        ]);
+
+    livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
+        ->fillForm(['slug' => 'new-foo'])
+        ->call('save')
+        ->assertOk()
+        ->assertHasNoFormErrors()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(CollectionEntry::class, [
+        'id' => $collectionEntry->id,
+        'slug' => 'new-foo',
+    ]);
+    assertDatabaseCount(SlugHistory::class, 3); // 1 (for collection) + 2 (for collection entry)
+    assertDatabaseHas(SlugHistory::class, [
+        'model_type' => $collectionEntry->getMorphClass(),
+        'model_id' => $collectionEntry->id,
+        'slug' => 'new-foo',
+    ]);
 });
 
 it('can edit collection entry to have no taxonomy terms attached', function () {
@@ -240,6 +274,7 @@ it('can edit collection entry meta data', function () {
     $updatedCollectionEntry = livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
         ->fillForm([
             'title' => 'Updated Foo',
+            'slug' => 'updated-foo',
             'published_at' => $dateTime,
             'data' => ['main' => ['header' => 'Foo updated']],
             'taxonomies' => [

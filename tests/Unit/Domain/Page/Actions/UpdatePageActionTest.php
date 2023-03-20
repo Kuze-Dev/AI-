@@ -21,7 +21,7 @@ it('can update page', function () {
         ->createOne();
 
     $metaDataData = [
-        'title' => $page->title,
+        'title' => $page->slug,
         'description' => 'Foo description',
         'author' => 'Foo author',
         'keywords' => 'Foo keywords',
@@ -34,6 +34,8 @@ it('can update page', function () {
             $page,
             PageData::fromArray([
                 'name' => 'Foo',
+                'slug' => 'foo',
+                'route_url' => 'foo',
                 'slice_contents' => [
                     [
                         'slice_id' => $page->sliceContents->first()->slice_id,
