@@ -352,6 +352,10 @@ class BlueprintResource extends Resource
             FieldType::RELATED_RESOURCE => [
                 Forms\Components\Select::make('resource')
                     ->columnSpanFull()
+                    ->lazy()
+                    ->afterStateUpdated(function (Closure $set) {
+                        $set('relation_scopes', []);
+                    })
                     ->options(
                         collect(config('domain.blueprint.related_resources', []))
                             ->keys()
