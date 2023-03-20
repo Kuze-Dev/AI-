@@ -45,89 +45,88 @@ class PageResource extends Resource
             ->columns(3)
             ->schema([
                 Forms\Components\Group::make()
-                ->schema([
+                    ->schema([
 
-               
-            Forms\Components\Section::make(trans('General Information'))
-            ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->unique(ignoreRecord: true)
-                    ->lazy()
-                    ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
-                        if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
-                            $set('slug', Str::slug($state));
-                        }
-                    })
-                    ->required(),
-                Forms\Components\TextInput::make('slug')
-                    ->unique(ignoreRecord: true)
-                    ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
-                Forms\Components\TextInput::make('route_url')
-                    ->required()
-                    ->helperText('Use "{{ $slug }}" to insert the current slug.'),
-            ]),
-            Forms\Components\Section::make(trans('Slices'))
-                ->schema([
-                    Forms\Components\Repeater::make('slice_contents')
-                        ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Page $record, ?array $state) {
-                            if ($record === null || $record->sliceContents->isEmpty()) {
-                                $component->state($state ?? []);
+                        Forms\Components\Section::make(trans('General Information'))
+                            ->schema([
+                                Forms\Components\TextInput::make('name')
+                                    ->unique(ignoreRecord: true)
+                                    ->lazy()
+                                    ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
+                                        if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
+                                            $set('slug', Str::slug($state));
+                                        }
+                                    })
+                                    ->required(),
+                                Forms\Components\TextInput::make('slug')
+                                    ->unique(ignoreRecord: true)
+                                    ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
+                                Forms\Components\TextInput::make('route_url')
+                                    ->required()
+                                    ->helperText('Use "{{ $slug }}" to insert the current slug.'),
+                            ]),
+                        Forms\Components\Section::make(trans('Slices'))
+                            ->schema([
+                                Forms\Components\Repeater::make('slice_contents')
+                                    ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Page $record, ?array $state) {
+                                        if ($record === null || $record->sliceContents->isEmpty()) {
+                                            $component->state($state ?? []);
 
-                                return;
-                            }
+                                            return;
+                                        }
 
-                            $component->state(
-                                $record->sliceContents->sortBy('order')
-                                    ->mapWithKeys(fn (SliceContent $item) => ["record-{$item->getKey()}" => $item])
-                                    ->toArray()
-                            );
+                                        $component->state(
+                                            $record->sliceContents->sortBy('order')
+                                                ->mapWithKeys(fn (SliceContent $item) => ["record-{$item->getKey()}" => $item])
+                                                ->toArray()
+                                        );
 
-                            // WORKAROUND: Force after state hydrate after setting the new state
-                            foreach ($component->getChildComponentContainers() as $componentContainer) {
-                                $componentContainer->callAfterStateHydrated();
-                            }
-                        })
-                        ->itemLabel(fn (array $state) => self::getCachedSlices()->firstWhere('id', $state['slice_id'])?->name)
-                        ->disableLabel()
-                        ->minItems(1)
-                        ->collapsed(fn (string $context) => $context === 'edit')
-                        ->orderable('order')
-                        ->schema([
-                            Forms\Components\Select::make('slice_id')
-                                ->label('Slice')
-                                ->options(
-                                    self::getCachedSlices()
-                                        ->sortBy('name')
-                                        ->pluck('name', 'id')
-                                        ->toArray()
-                                )
-                                ->hidden(fn (?Page $record, Closure $get) => $record && $record->sliceContents->firstWhere('id', $get('id')))
-                                ->required()
-                                ->exists(Slice::class, 'id')
-                                ->searchable()
-                                ->reactive()
-                                ->afterStateUpdated(function (Forms\Components\Select $component, $state) {
-                                    $slice = self::getCachedSlices()->firstWhere('id', $state);
+                                        // WORKAROUND: Force after state hydrate after setting the new state
+                                        foreach ($component->getChildComponentContainers() as $componentContainer) {
+                                            $componentContainer->callAfterStateHydrated();
+                                        }
+                                    })
+                                    ->itemLabel(fn (array $state) => self::getCachedSlices()->firstWhere('id', $state['slice_id'])?->name)
+                                    ->disableLabel()
+                                    ->minItems(1)
+                                    ->collapsed(fn (string $context) => $context === 'edit')
+                                    ->orderable('order')
+                                    ->schema([
+                                        Forms\Components\Select::make('slice_id')
+                                            ->label('Slice')
+                                            ->options(
+                                                self::getCachedSlices()
+                                                    ->sortBy('name')
+                                                    ->pluck('name', 'id')
+                                                    ->toArray()
+                                            )
+                                            ->hidden(fn (?Page $record, Closure $get) => $record && $record->sliceContents->firstWhere('id', $get('id')))
+                                            ->required()
+                                            ->exists(Slice::class, 'id')
+                                            ->searchable()
+                                            ->reactive()
+                                            ->afterStateUpdated(function (Forms\Components\Select $component, $state) {
+                                                $slice = self::getCachedSlices()->firstWhere('id', $state);
 
-                                    $component->getContainer()
-                                        ->getComponent(fn (Component $component) => $component->getId() === 'schema-form')
-                                        ?->getChildComponentContainer()
-                                        ->fill($slice?->is_fixed_content ? $slice->data : []);
-                                })
-                                ->dehydrateStateUsing(fn (string|int $state) => (int) $state),
-                            SchemaFormBuilder::make('data')
-                                ->id('schema-form')
-                                ->dehydrated(fn (Closure $get) => ! (self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->is_fixed_content))
-                                ->disabled(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->is_fixed_content ?? false)
-                                ->schemaData(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->blueprint->schema),
+                                                $component->getContainer()
+                                                    ->getComponent(fn (Component $component) => $component->getId() === 'schema-form')
+                                                    ?->getChildComponentContainer()
+                                                    ->fill($slice?->is_fixed_content ? $slice->data : []);
+                                            })
+                                            ->dehydrateStateUsing(fn (string|int $state) => (int) $state),
+                                        SchemaFormBuilder::make('data')
+                                            ->id('schema-form')
+                                            ->dehydrated(fn (Closure $get) => ! (self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->is_fixed_content))
+                                            ->disabled(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->is_fixed_content ?? false)
+                                            ->schemaData(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->blueprint->schema),
 
-                        ]),
-                ]),
-            ])->columnSpan(2),
-            MetaDataForm::make('Meta Data')
-            ->columnSpan(1)
-            ->extraAttributes(['class' => 'md:sticky top-[5.5rem]']) ,
-        ]);
+                                    ]),
+                            ]),
+                    ])->columnSpan(2),
+                MetaDataForm::make('Meta Data')
+                    ->columnSpan(1)
+                    ->extraAttributes(['class' => 'md:sticky top-[5.5rem]']),
+            ]);
     }
 
     /** @throws Exception */
