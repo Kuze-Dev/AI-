@@ -39,7 +39,7 @@ class FilamentTenantServiceProvider extends ContextServiceProvider
 
             Filament::registerRenderHook(
                 'body.start',
-                static fn (): string => Blade::render("<x-filament-impersonate::banner/>")
+                static fn (): string => Blade::render('<x-filament-impersonate::banner/>')
             );
         });
 
