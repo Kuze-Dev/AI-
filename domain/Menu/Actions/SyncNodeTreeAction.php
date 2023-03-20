@@ -60,13 +60,16 @@ class SyncNodeTreeAction
             'label' => $nodeData->label,
             'target' => $nodeData->target,
             'parent_id' => $parentNode?->id,
-            'url' => $nodeData->url,
+            'type' => $nodeData->type,
+            'url' => $nodeData->type == 'url' ? $nodeData->url : null,
+            'model_type' => $nodeData->type == 'resource' ? $nodeData->model_type : null,
+            'model_id' => $nodeData->type == 'resource' ? $nodeData->model_id : null,
         ])->save();
 
         if ( ! empty($nodeData->children)) {
             $this->syncNodes($nodeData->children, $node);
         }
-
+        
         return $node;
     }
 
@@ -81,6 +84,7 @@ class SyncNodeTreeAction
             $children = Arr::map($nodeData->children, $this->inlineChildren(...));
         }
 
+        
         return [$nodeData, ...Arr::collapse($children ?? [])];
     }
 }

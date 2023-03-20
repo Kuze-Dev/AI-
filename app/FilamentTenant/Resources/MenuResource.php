@@ -9,9 +9,12 @@ use App\FilamentTenant\Resources\MenuResource\Pages;
 use App\FilamentTenant\Support\Tree;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
+use Domain\Collection\Models\Collection;
+use Domain\Collection\Models\CollectionEntry;
 use Domain\Menu\Enums\Target;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
+use Domain\Page\Models\Page;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -21,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class MenuResource extends Resource
 {
@@ -100,10 +104,59 @@ class MenuResource extends Resource
                                                     ->toArray()
                                             )
                                             ->columnSpan(['md' => 1]),
-                                        Forms\Components\TextInput::make('url')
-                                            ->inputMode('url')
-                                            ->placeholder('https://example.com')
-                                            ->columnSpanFull(),
+                                        Forms\Components\Card::make([
+                                            Forms\Components\Radio::make('type')
+                                                ->reactive()
+                                                ->options([
+                                                    'url' => trans('URL'),
+                                                    'resource' => trans('Resource'),
+                                                ]),
+                                            Forms\Components\Group::make()
+                                                ->visible(fn (Closure $get) => filled($get('type')))
+                                                ->schema(
+                                                    fn (Closure $get) => match ($get('type')) {
+                                                        'url' => [
+                                                            Forms\Components\TextInput::make('url')
+                                                                ->inputMode('url')
+                                                                ->placeholder('https://example.com'),
+                                                        ],
+                                                        'resource' => [
+                                                            Forms\Components\Select::make('model_type')
+                                                                ->label(trans('Resource'))
+                                                                ->options(
+                                                                    collect([
+                                                                        Page::class,
+                                                                        Collection::class,
+                                                                        CollectionEntry::class,
+                                                                    ])
+                                                                        ->mapWithKeys(
+                                                                            function (string $model) {
+                                                                                /** @var class-string<\Illuminate\Database\Eloquent\Model> $model */
+                                                                                return [(new $model())->getMorphClass() => Str::of($model)->classBasename()->headline()];
+                                                                            }
+                                                                        )
+                                                                        ->sort()
+                                                                        ->toArray()
+                                                                )
+                                                                ->lazy(),
+                                                            Forms\Components\Select::make('model_id')
+                                                                ->label(fn (Closure $get) => (string) Str::of(Relation::getMorphedModel($get('model_type')))->classBasename()->headline())
+                                                                ->options(
+                                                                    function (Closure $get) {
+                                                                        $modeClass = Relation::getMorphedModel($get('model_type'));
+
+                                                                        return match ($modeClass) {
+                                                                            CollectionEntry::class => $modeClass::pluck('title', 'id')->toArray(),
+                                                                            default => $modeClass::pluck('name', 'id')->toArray()
+                                                                        };
+                                                                    }
+                                                                )
+                                                                ->visible(fn (Closure $get) => filled($get('model_type'))),
+                                                        ],
+                                                        default => []
+                                                    }
+                                                ),
+                                        ]),
                                     ]),
                             ]),
                     ])

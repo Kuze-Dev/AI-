@@ -27,10 +27,12 @@ class MenuController
 
     public function show(string $menu): MenuResource
     {
-        return MenuResource::make(
+        $test = MenuResource::make(
             QueryBuilder::for(Menu::whereSlug($menu))
                 ->allowedIncludes(['nodes.children', 'parentNodes.children'])
                 ->firstOrFail()
         );
+        
+        return $test;
     }
 }

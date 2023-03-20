@@ -13,6 +13,9 @@ class NodeData
         public readonly Target $target,
         public readonly ?int $id = null,
         public readonly ?string $url = null,
+        public readonly ?string $model_type = null,
+        public readonly ?string $model_id = null,
+        public readonly ?string $type = null,
         public readonly ?array $children = [],
     ) {
     }
@@ -22,7 +25,10 @@ class NodeData
         return new self(
             label: $data['label'],
             id: $data['id'] ?? null,
-            url: $data['url'],
+            url: $data['url'] ?? null,
+            model_type: $data['model_type'] ?? null,
+            model_id: $data['model_id'] ?? null,
+            type: $data['type'] ?? null,
             target: Target::from($data['target']),
             children: array_map(fn (array $child) => self::fromArray($child), $data['children'] ?? [])
         );

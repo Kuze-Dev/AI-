@@ -43,11 +43,17 @@ it('can edit menu', function () {
                         'label' => 'Test Edit Node',
                         'url' => 'https://test-edit-node.com',
                         'target' => '_blank',
+                        'model_type' => '',
+                        'model_id' => '',
+                        'type' => 'url',
                         'children' => [
                             [
                                 'label' => 'Test Edit Child',
-                                'url' => 'https://test-edit-child.com',
+                                'url' => '',
                                 'target' => '_blank',
+                                'model_type' => 'pages',
+                                'model_id' => '1',
+                                'type' => 'resource',
                             ],
                         ],
                     ],

@@ -23,6 +23,9 @@ class NodeFactory extends Factory
             'label' => fake()->word(),
             'target' => Target::self,
             'url' => fake()->url(),
+            'model_type' => fake()->word(),
+            'model_id' => null,
+            'type' => null,
             'order' => null,
         ];
     }

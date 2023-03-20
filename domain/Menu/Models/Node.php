@@ -56,7 +56,10 @@ class Node extends Model implements Sortable
         'label',
         'target',
         'url',
+        'model_type',
+        'model_id',
         'order',
+        'type',
     ];
 
     protected $casts = [

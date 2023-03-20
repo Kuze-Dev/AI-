@@ -25,26 +25,47 @@ it('can create menu', function () {
             'name' => 'Test Main Menu',
             'nodes' => [
                 [
-                    'name' => 'Test Home',
+                    'label' => 'Test Home',
                     'url' => 'https://test-url-home.com',
                     'target' => '_blank',
+                    'model_type' => '',
+                    'model_id' => '',
+                    'type' => 'url',
                 ],
                 [
-                    'name' => 'Test About',
+                    'label' => 'Test About',
                     'url' => 'https://test-url-about.com',
                     'target' => '_blank',
-                    'childs' => [
+                    'type' => 'url',
+                    'model_type' => '',
+                    'model_id' => '',
+                    'children' => [
+                        
                         [
-                            'name' => 'Test About Child',
+                            'label' => 'Test About Child',
                             'url' => 'https://test-url-about-child.com',
                             'target' => '_blank',
+                            'model_type' => '',
+                            'model_id' => ' ',
+                            'type' => 'url',
                         ],
                         [
-                            'name' => 'Test About Child 2',
-                            'url' => 'https://test-url-about-child-2.com',
+                            'label' => 'Test About Child 2',
+                            'url' => '',
                             'target' => '_blank',
+                            'model_type' => 'pages',
+                            'model_id' => '1',
+                            'type' => 'resource',
                         ],
                     ],
+                ],
+                [
+                    'label' => 'Test Contact',
+                    'url' => '',
+                    'target' => '_blank',
+                    'model_type' => 'pages',
+                    'model_id' => '1',
+                    'type' => 'resource',
                 ],
             ],
         ]);
