@@ -46,7 +46,6 @@ class PageResource extends Resource
             ->schema([
                 Forms\Components\Group::make()
                     ->schema([
-
                         Forms\Components\Card::make([
                             Forms\Components\TextInput::make('name')
                                 ->unique(ignoreRecord: true)

@@ -85,28 +85,23 @@ class CollectionEntryResource extends Resource
             ->columns(3)
             ->schema([
                 Forms\Components\Group::make([
-                    Forms\Components\Group::make()
-                        ->schema([
-                            Forms\Components\Card::make([
-                                Forms\Components\TextInput::make('title')
-                                    ->unique(
-                                        callback: fn ($livewire, Unique $rule) => $rule->where('collection_id', $livewire->ownerRecord->id),
-                                        ignoreRecord: true
-                                    )
-                                    ->lazy()
-                                    ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
-                                        if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
-                                            $set('slug', Str::slug($state));
-                                        }
-                                    })
-                                    ->required(),
-                                Forms\Components\TextInput::make('slug')
-                                    ->unique(ignoreRecord: true)
-                                    ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('title'))),
-                            ]),
-                            SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
-                        ]),
-
+                    Forms\Components\Card::make([
+                        Forms\Components\TextInput::make('title')
+                            ->unique(
+                                callback: fn ($livewire, Unique $rule) => $rule->where('collection_id', $livewire->ownerRecord->id),
+                                ignoreRecord: true
+                            )
+                            ->lazy()
+                            ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
+                                if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
+                                    $set('slug', Str::slug($state));
+                                }
+                            })
+                            ->required(),
+                        Forms\Components\TextInput::make('slug')
+                            ->unique(ignoreRecord: true)
+                            ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('title'))),
+                    ]),
                     Forms\Components\Section::make(trans('Taxonomies'))
                         ->schema([
                             Forms\Components\Group::make()
@@ -131,15 +126,17 @@ class CollectionEntryResource extends Resource
                                 ->dehydrated(false),
                             Forms\Components\Hidden::make('taxonomy_terms')
                                 ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
-                        ])->when(fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray())),
-
+                        ])
+                        ->when(fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray())),
                     Forms\Components\Section::make(trans('Publishing'))
                         ->schema([
                             Forms\Components\DateTimePicker::make('published_at')
                                 ->minDate(Carbon::now()->startOfDay())
                                 ->timezone(Auth::user()?->timezone),
 
-                        ])->when(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
+                        ])
+                        ->when(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
+                        SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
                 ])->columnSpan(2),
 
                 MetaDataForm::make('Meta Data')
