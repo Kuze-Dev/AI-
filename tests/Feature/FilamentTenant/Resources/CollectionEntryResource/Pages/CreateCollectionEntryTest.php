@@ -13,6 +13,8 @@ use Domain\Blueprint\Enums\FieldType;
 use Domain\Support\MetaData\Models\MetaData;
 use Domain\Support\SlugHistory\SlugHistory;
 use Filament\Facades\Filament;
+use Illuminate\Http\UploadedFile;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
@@ -50,6 +52,14 @@ it('can create collection entry', function () {
             'title' => 'Test',
             'slug' => 'test',
             'data' => json_encode(['main' => ['header' => 'Foo']]),
+        ]
+    );
+    assertDatabaseHas(
+        MetaData::class,
+        [
+            'title' => $collectionEntry->title,
+            'model_type' => $collectionEntry->getMorphClass(),
+            'model_id' => $collectionEntry->getKey(),
         ]
     );
     assertDatabaseHas(SlugHistory::class, [
@@ -148,7 +158,7 @@ it('can create collection entry with publish date', function () {
     );
 });
 
-it('can create collection entry with default meta data title', function () {
+it('can create collection entry with meta data', function () {
     $collection = CollectionFactory::new()
         ->for(
             BlueprintFactory::new()
@@ -163,61 +173,13 @@ it('can create collection entry with default meta data title', function () {
 
     $dateTime = Carbon::now();
 
-    $collectionEntry = livewire(CreateCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey()])
-        ->assertOk()
-        ->fillForm([
-            'title' => 'Test',
-            'slug' => 'test',
-            'published_at' => $dateTime,
-            'data' => ['main' => ['header' => 'Foo']],
-        ])
-        ->call('create')
-        ->assertHasNoFormErrors()
-        ->instance()
-        ->record;
-
-    assertDatabaseHas(
-        CollectionEntry::class,
-        [
-            'id' => $collection->id,
-            'title' => 'Test',
-            'slug' => 'test',
-            'published_at' => $dateTime,
-            'data' => json_encode(['main' => ['header' => 'Foo']]),
-        ]
-    );
-
-    assertDatabaseHas(
-        MetaData::class,
-        [
-            'title' => 'Test',
-            'model_type' => $collectionEntry->getMorphClass(),
-            'model_id' => $collectionEntry->getKey(),
-        ]
-    );
-});
-
-it('can create collection entry with filled meta data', function () {
-    $collection = CollectionFactory::new()
-        ->for(
-            BlueprintFactory::new()
-                ->addSchemaSection(['title' => 'Main'])
-                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
-        )
-        ->createOne([
-            'name' => 'Test Collection',
-            'future_publish_date_behavior' => 'public',
-            'past_publish_date_behavior' => 'unlisted',
-        ]);
-
-    $dateTime = Carbon::now();
-
-    $meta_data = [
+    $metaData = [
         'title' => 'Test Meta Data Title',
         'keywords' => 'Test Meta Data Keywords',
         'author' => 'Test Meta Data Author',
         'description' => 'Test Meta Data Description',
     ];
+    $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
 
     $collectionEntry = livewire(CreateCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey()])
         ->assertOk()
@@ -226,7 +188,8 @@ it('can create collection entry with filled meta data', function () {
             'slug' => 'test',
             'published_at' => $dateTime,
             'data' => ['main' => ['header' => 'Foo']],
-            'meta_data' => $meta_data,
+            'meta_data' => $metaData,
+            'meta_data.image.0' => $metaDataImage,
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -243,15 +206,18 @@ it('can create collection entry with filled meta data', function () {
             'data' => json_encode(['main' => ['header' => 'Foo']]),
         ]
     );
-
     assertDatabaseHas(
         MetaData::class,
         array_merge(
-            $meta_data,
+            $metaData,
             [
                 'model_type' => $collectionEntry->getMorphClass(),
                 'model_id' => $collectionEntry->id,
             ]
         )
     );
+    assertDatabaseHas(Media::class, [
+        'file_name' => $metaDataImage->getClientOriginalName(),
+        'mime_type' => $metaDataImage->getMimeType(),
+    ]);
 });

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use Domain\Admin\Models\Admin;
+use Domain\Tenant\Models\Tenant;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Auth\Notifications\VerifyEmail as VerifyEmailNotification;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -55,25 +56,49 @@ class AuthServiceProvider extends ServiceProvider
     {
         VerifyEmailNotification::createUrlUsing(function (mixed $notifiable) {
             if ($notifiable instanceof Admin) {
-                return URL::temporarySignedRoute(
-                    'filament.auth.verification.verify',
+                if (tenancy()->initialized) {
+                    /** @var Tenant */
+                    $tenant = tenancy()->tenant;
+
+                    $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;
+                    $routeName = 'filament-tenant.auth.verification.verify';
+                } else {
+                    $hostName = url('/', secure: app()->environment('local'));
+                    $routeName = 'filament.auth.verification.verify';
+                }
+
+                return $hostName . URL::temporarySignedRoute(
+                    $routeName,
                     now()->addMinutes(Config::get('auth.verification.expire', 60)),
                     [
                         'id' => $notifiable->getKey(),
                         'hash' => sha1($notifiable->getEmailForVerification()),
-                    ]
+                    ],
+                    false
                 );
             }
         });
 
         ResetPasswordNotification::createUrlUsing(function (mixed $notifiable, string $token) {
             if ($notifiable instanceof Admin) {
-                return URL::route(
-                    'filament.auth.password.reset',
+                if (tenancy()->initialized) {
+                    /** @var Tenant */
+                    $tenant = tenancy()->tenant;
+
+                    $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;
+                    $routeName = 'filament-tenant.auth.password.reset';
+                } else {
+                    $hostName = url('/', secure: app()->environment('local'));
+                    $routeName = 'filament.auth.password.reset';
+                }
+
+                return $hostName . URL::route(
+                    $routeName,
                     [
                         'token' => $token,
                         'email' => $notifiable->getEmailForPasswordReset(),
-                    ]
+                    ],
+                    false
                 );
             }
         });

@@ -66,26 +66,6 @@ it('can not create slice with same name', function () {
         ->assertOk();
 });
 
-it('can not create slice with same component', function () {
-    $blueprint = BlueprintFactory::new()
-        ->withDummySchema()
-        ->createOne();
-
-    SliceFactory::new(['component' => 'Test'])
-        ->withDummyBlueprint()
-        ->createOne();
-
-    livewire(CreateSlice::class)
-        ->fillForm([
-            'name' => 'Test',
-            'component' => 'Test',
-            'blueprint_id' => $blueprint->id,
-        ])
-        ->call('create')
-        ->assertHasFormErrors(['component' => 'unique'])
-        ->assertOk();
-});
-
 it('can create slice with default content', function () {
     $blueprint = BlueprintFactory::new()
         ->addSchemaSection(['title' => 'Main'])

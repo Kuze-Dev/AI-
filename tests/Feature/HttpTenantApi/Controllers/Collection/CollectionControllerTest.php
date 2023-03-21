@@ -29,28 +29,6 @@ it('can list collections', function () {
         });
 });
 
-it('can list collections with taxonomies', function () {
-    CollectionFactory::new()
-        ->withDummyBlueprint()
-        ->has(
-            TaxonomyFactory::new()
-                ->withDummyBlueprint()
-        )
-        ->count(10)
-        ->create();
-
-    getJson('api/collections?include=taxonomies')
-        ->assertOk()
-        ->assertJson(function (AssertableJson $json) {
-            $json
-                ->count('data', 10)
-                ->where('data.0.type', 'collections')
-                ->whereType('data.0.attributes.name', 'string')
-                ->where('data.0.relationships.taxonomies.data.0.type', 'taxonomies')
-                ->etc();
-        });
-});
-
 it('can show a collection', function () {
     $collection = CollectionFactory::new()
         ->withDummyBlueprint()

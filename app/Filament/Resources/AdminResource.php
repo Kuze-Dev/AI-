@@ -224,7 +224,7 @@ class AdminResource extends Resource
                         ->authorize('sendPasswordReset'),
                     Impersonate::make()
                         ->guard('admin')
-                        ->redirectTo(route('filament.pages.dashboard'))
+                        ->redirectTo(route(tenancy()->initialized ? 'filament-tenant.pages.dashboard' : 'filament.pages.dashboard'))
                         ->authorize('impersonate'),
                 ]),
             ])

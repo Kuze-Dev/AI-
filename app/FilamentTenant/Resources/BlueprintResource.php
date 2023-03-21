@@ -278,7 +278,19 @@ class BlueprintResource extends Resource
                     ->columnSpanFull(),
             ],
             FieldType::SELECT => [
-                Forms\Components\Toggle::make('multiple'),
+                Forms\Components\Toggle::make('multiple')
+                    ->reactive()
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('min')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
+                    ->when(fn (Closure $get) => $get('multiple') === true),
+                Forms\Components\TextInput::make('max')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
+                    ->when(fn (Closure $get) => $get('multiple') === true),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
                     ->orderable()
@@ -340,6 +352,10 @@ class BlueprintResource extends Resource
             FieldType::RELATED_RESOURCE => [
                 Forms\Components\Select::make('resource')
                     ->columnSpanFull()
+                    ->lazy()
+                    ->afterStateUpdated(function (Closure $set) {
+                        $set('relation_scopes', []);
+                    })
                     ->options(
                         collect(config('domain.blueprint.related_resources', []))
                             ->keys()

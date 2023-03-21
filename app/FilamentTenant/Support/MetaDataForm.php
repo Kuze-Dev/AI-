@@ -6,7 +6,8 @@ namespace App\FilamentTenant\Support;
 
 use Filament\Forms;
 use Filament\Forms\Components\Section;
-use Livewire\TemporaryUploadedFile;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Throwable;
 
 class MetaDataForm extends Section
 {
@@ -16,18 +17,39 @@ class MetaDataForm extends Section
 
         $this->statePath('meta_data');
 
-        $this->afterStateHydrated(fn ($component, $record) => $component->state($record?->metaData?->toArray() ?? []));
-
         $this->schema([
-            Forms\Components\TextInput::make('title'),
-            Forms\Components\TextInput::make('keywords'),
-            Forms\Components\TextInput::make('author'),
-            Forms\Components\Textarea::make('description'),
+            Forms\Components\TextInput::make('title')
+                ->formatStateUsing(fn ($record) => $record?->metaData?->title),
+            Forms\Components\TextInput::make('keywords')
+                ->formatStateUsing(fn ($record) => $record?->metaData?->keywords),
+            Forms\Components\TextInput::make('author')
+                ->formatStateUsing(fn ($record) => $record?->metaData?->author),
+            Forms\Components\Textarea::make('description')
+                ->formatStateUsing(fn ($record) => $record?->metaData?->description),
             Forms\Components\FileUpload::make('image')
-                ->acceptedFileTypes(['image/png', 'image/webp', 'image/jpg', 'image/jpeg'])
-                ->maxSize(1_000)
-                ->getUploadedFileNameForStorageUsing(static function (TemporaryUploadedFile $file) {
-                    return 'image.'.$file->extension();
+                ->formatStateUsing(function ($record) {
+                    return $record?->metaData->getMedia('image')
+                        ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                        ->toArray() ?? [];
+                })
+                ->image()
+                ->beforeStateDehydrated(null)
+                ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
+                ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                    $mediaClass = config('media-library.media_model', Media::class);
+
+                    /** @var ?Media $media */
+                    $media = $mediaClass::findByUuid($file);
+
+                    if ($component->getVisibility() === 'private') {
+                        try {
+                            return $media?->getTemporaryUrl(now()->addMinutes(5));
+                        } catch (Throwable $exception) {
+                            // This driver does not support creating temporary URLs.
+                        }
+                    }
+
+                    return $media?->getUrl();
                 }),
         ]);
     }
