@@ -25,7 +25,7 @@ class MetaDataForm extends Section
             Forms\Components\TextInput::make('author')
                 ->formatStateUsing(fn ($record) => $record?->metaData?->author),
             Forms\Components\Textarea::make('description')
-                ->maxLength(fn () => 160)
+                ->maxLength(fn (int $value = 160) => $value)
                 ->formatStateUsing(fn ($record) => $record?->metaData?->description),
             Forms\Components\FileUpload::make('image')
                 ->formatStateUsing(function ($record) {
