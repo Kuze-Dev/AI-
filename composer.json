@@ -17,6 +17,7 @@
         "laravel/framework": "^9.28",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
+        "laravel/vapor-core": "^2.28",
         "league/flysystem-aws-s3-v3": "^3.0",
         "pragmarx/google2fa": "^8.0",
         "saade/filament-laravel-log": "^1.1",
