@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Domain\Menu\Enums\NodeType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,9 +16,13 @@ return new class () extends Migration {
     public function up()
     {
         Schema::table('nodes', function (Blueprint $table) {
-            $table->string('model_type')->nullable();
-            $table->string('model_id')->nullable();
-            $table->string('type')->nullable();
+            $table->after('parent_id', function (Blueprint $table) {
+                $table->nullableMorphs('model');
+            });
+
+            $table->after('target', function (Blueprint $table) {
+                $table->string('type')->default(NodeType::URL->value);
+            });
         });
     }
 
@@ -29,8 +34,7 @@ return new class () extends Migration {
     public function down()
     {
         Schema::table('nodes', function (Blueprint $table) {
-            $table->dropColumn('model_type');
-            $table->dropColumn('model_id');
+            $table->dropMorphs('model');
             $table->dropColumn('type');
         });
     }
