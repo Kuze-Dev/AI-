@@ -29,10 +29,7 @@ return new class () extends Migration {
             $table->foreignIdFor(Menu::class)->index();
             $table->foreignIdFor(Node::class, 'parent_id')->nullable()->index();
             $table->string('url')->nullable();
-            $table->string('model_type')->nullable();
-            $table->string('model_id')->nullable();
             $table->string('target');
-            $table->string('type')->nullable();
             $table->unsignedInteger('order');
             $table->timestamps();
         });
