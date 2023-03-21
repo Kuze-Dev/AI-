@@ -6,6 +6,7 @@ namespace Domain\Menu\Actions;
 
 use Arr;
 use Domain\Menu\DataTransferObjects\NodeData;
+use Domain\Menu\Enums\NodeType;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
 
@@ -59,11 +60,11 @@ class SyncNodeTreeAction
         $node->fill([
             'label' => $nodeData->label,
             'target' => $nodeData->target,
-            'parent_id' => $parentNode?->id,
             'type' => $nodeData->type,
-            'url' => $nodeData->type == 'url' ? $nodeData->url : null,
-            'model_type' => $nodeData->type == 'resource' ? $nodeData->model_type : null,
-            'model_id' => $nodeData->type == 'resource' ? $nodeData->model_id : null,
+            'parent_id' => $parentNode?->id,
+            'model_type' => $nodeData->type == NodeType::RESOURCE ? $nodeData->model_type : null,
+            'model_id' => $nodeData->type == NodeType::RESOURCE ? $nodeData->model_id : null,
+            'url' => $nodeData->type === NodeType::URL ? $nodeData->url : null,
         ])->save();
 
         if ( ! empty($nodeData->children)) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Menu\Models;
 
+use Domain\Menu\Enums\NodeType;
 use Domain\Menu\Enums\Target;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 
@@ -53,32 +55,43 @@ class Node extends Model implements Sortable
     protected $fillable = [
         'menu_id',
         'parent_id',
-        'label',
-        'target',
-        'url',
         'model_type',
         'model_id',
-        'order',
+        'label',
+        'target',
         'type',
+        'url',
+        'order',
+    ];
+
+    protected $with = [
+        'model',
     ];
 
     protected $casts = [
         'target' => Target::class,
+        'type' => NodeType::class,
     ];
 
-    /** @return BelongsTo<Menu, Node> */
+    /** @return BelongsTo<Menu, self> */
     public function menu(): BelongsTo
     {
         return $this->belongsTo(Menu::class);
     }
 
-    /** @return HasMany<Node> */
+    /** @return HasMany<self> */
     public function children(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id')->ordered()->with('children');
     }
 
-    /** @return Builder<Node> */
+    /** @return MorphTo<Model, self> */
+    public function model(): MorphTo
+    {
+        return $this->morphTo();
+    }
+
+    /** @return Builder<self> */
     public function buildSortQuery(): Builder
     {
         return static::query()->whereMenuId($this->menu_id)->whereParentId($this->parent_id);

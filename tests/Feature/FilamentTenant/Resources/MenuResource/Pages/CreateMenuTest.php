@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\MenuResource\Pages\CreateMenu;
+use Domain\Menu\Enums\NodeType;
+use Domain\Menu\Enums\Target;
 use Filament\Facades\Filament;
 
 use function Pest\Livewire\livewire;
@@ -26,46 +28,23 @@ it('can create menu', function () {
             'nodes' => [
                 [
                     'label' => 'Test Home',
+                    'target' => Target::BLANK->value,
+                    'type' => NodeType::URL->value,
                     'url' => 'https://test-url-home.com',
-                    'target' => '_blank',
-                    'model_type' => '',
-                    'model_id' => '',
-                    'type' => 'url',
-                ],
-                [
-                    'label' => 'Test About',
-                    'url' => 'https://test-url-about.com',
-                    'target' => '_blank',
-                    'type' => 'url',
-                    'model_type' => '',
-                    'model_id' => '',
                     'children' => [
-
                         [
-                            'label' => 'Test About Child',
-                            'url' => 'https://test-url-about-child.com',
-                            'target' => '_blank',
-                            'model_type' => '',
-                            'model_id' => ' ',
-                            'type' => 'url',
+                            'label' => 'Test Home',
+                            'target' => Target::BLANK->value,
+                            'type' => NodeType::URL->value,
+                            'url' => 'https://test-url-home.com',
                         ],
                         [
                             'label' => 'Test About Child 2',
-                            'url' => '',
-                            'target' => '_blank',
-                            'model_type' => 'pages',
-                            'model_id' => '1',
-                            'type' => 'resource',
+                            'target' => Target::BLANK->value,
+                            'type' => NodeType::URL->value,
+                            'url' => 'https://test-url-home.com',
                         ],
                     ],
-                ],
-                [
-                    'label' => 'Test Contact',
-                    'url' => '',
-                    'target' => '_blank',
-                    'model_type' => 'pages',
-                    'model_id' => '1',
-                    'type' => 'resource',
                 ],
             ],
         ]);
