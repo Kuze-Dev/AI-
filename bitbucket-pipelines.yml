@@ -44,6 +44,13 @@ definitions:
         script:
           - *setup-script
           - composer test -- --ci
+    - step: &deploy
+        <<: *common-step
+        name: Deploy
+        script:
+          - *setup-script
+          - composer require laravel/vapor-cli
+          - ./vendor/bin/vapor deploy $BITBUCKET_BRANCH --commit="$BITBUCKET_COMMIT"
 
 pipelines:
   branches:
@@ -52,9 +59,21 @@ pipelines:
           - step: *check-format
           - step: *analyse
           - step: *test
+    staging:
+      - parallel:
+          - step: *check-format
+          - step: *analyse
+          - step: *test
+      - step: *deploy
+    production:
+      - parallel:
+          - step: *check-format
+          - step: *analyse
+          - step: *test
+      - step: *deploy
 
   pull-requests:
-    '**':
+    "**":
       - parallel:
           - step: *check-format
           - step: *analyse
