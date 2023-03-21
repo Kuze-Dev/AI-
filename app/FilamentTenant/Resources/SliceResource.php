@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use Closure;
-use Exception;
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Resources\Form;
-use Domain\Page\Models\Slice;
-use Filament\Resources\Table;
-use Filament\Resources\Resource;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
-use Illuminate\Support\Facades\Auth;
-use Domain\Blueprint\Models\Blueprint;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use Domain\Blueprint\Models\Blueprint;
+use Domain\Page\Models\Slice;
+use Filament\Forms;
+use Filament\Resources\Form;
+use Filament\Resources\Resource;
+use Filament\Resources\Table;
+use Filament\Tables;
+use Filament\Tables\Filters\Layout;
+use Illuminate\Support\Facades\Auth;
+use Exception;
+use Closure;
 
 class SliceResource extends Resource
 {
@@ -98,6 +99,7 @@ class SliceResource extends Resource
                     ->searchable()
                     ->optionsLimit(20),
             ])
+            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

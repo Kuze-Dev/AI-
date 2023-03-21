@@ -15,6 +15,7 @@ use Domain\Page\Models\Slice;
 use Filament\Resources\Table;
 use Filament\Resources\Resource;
 use App\FilamentTenant\Resources;
+use Filament\Tables\Filters\Layout;
 use Domain\Page\Models\SliceContent;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -95,7 +96,7 @@ class PageResource extends Resource
                                         ->map(function ($slice) {
                                             $image = $slice['image'];
                                             if ($image) {
-                                                $image = Storage::disk('s3')->url($image);
+                                                $image = Storage::url($image);
                                             }
 
                                             return [
@@ -147,6 +148,7 @@ class PageResource extends Resource
                     ->toggledHiddenByDefault(),
             ])
             ->filters([])
+            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
