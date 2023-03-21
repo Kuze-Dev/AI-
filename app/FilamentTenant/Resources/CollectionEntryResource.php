@@ -12,6 +12,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Filters\Layout;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
 use Closure;
@@ -169,6 +170,7 @@ class CollectionEntryResource extends Resource
                     ->toggledHiddenByDefault(),
             ])
             ->reorderable('order')
+            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->url(fn ($livewire, CollectionEntry $record) => self::getUrl('edit', [$livewire->ownerRecord, $record])),

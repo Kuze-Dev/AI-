@@ -31,12 +31,7 @@ class PageData
             ),
             slug: $data['slug'] ?? null,
             route_url: $data['route_url'],
-            meta_data: new MetaDataData(
-                title: $data['meta_data']['title'] ?? null,
-                author: $data['meta_data']['author'] ?? null,
-                description: $data['meta_data']['description'] ?? null,
-                keywords: $data['meta_data']['keywords'] ?? null,
-            )
+            meta_data: MetaDataData::fromArray($data['meta_data'])
         );
     }
 }
