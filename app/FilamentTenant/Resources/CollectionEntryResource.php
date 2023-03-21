@@ -136,7 +136,7 @@ class CollectionEntryResource extends Resource
 
                         ])
                         ->when(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
-                        SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
+                    SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
                 ])->columnSpan(2),
 
                 MetaDataForm::make('Meta Data')
