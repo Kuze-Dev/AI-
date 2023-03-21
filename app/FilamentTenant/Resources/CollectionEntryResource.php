@@ -133,13 +133,13 @@ class CollectionEntryResource extends Resource
                                 ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                         ])->when(fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray())),
 
-                    Forms\Components\Section::make('Publishing')
+                    Forms\Components\Section::make(trns('Publishing'))
                         ->schema([
                             Forms\Components\DateTimePicker::make('published_at')
                                 ->minDate(Carbon::now()->startOfDay())
                                 ->timezone(Auth::user()?->timezone),
 
-                        ])->when(fn ($livewire) => ! $livewire->ownerRecord->hasPublishDates()),
+                        ])->when(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
                 ])->columnSpan(2),
 
                 MetaDataForm::make('Meta Data')
