@@ -47,7 +47,10 @@ class TenantResource extends Resource
                             ->required(fn (?Tenant $record) => $record === null)
                             ->columnSpan(['md' => 3])
                             ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('db_host')))
-                            ->rule(new CheckDatabaseConnection(config('tenancy.database.template_tenant_connection'), 'data.database')),
+                            ->rule(
+                                new CheckDatabaseConnection(config('tenancy.database.template_tenant_connection'), 'data.database'),
+                                fn (string $context) => $context === 'create'
+                            ),
                         Forms\Components\TextInput::make('port')
                             ->required(fn (?Tenant $record) => $record === null)
                             ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('db_port'))),
