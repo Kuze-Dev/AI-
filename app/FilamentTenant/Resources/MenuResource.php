@@ -106,7 +106,8 @@ class MenuResource extends Resource
                                             ->columnSpan(['md' => 1]),
                                         Forms\Components\Card::make([
                                             Forms\Components\Radio::make('type')
-                                                ->reactive()
+                                                ->lazy()
+                                                ->inline()
                                                 ->options([
                                                     'url' => trans('URL'),
                                                     'resource' => trans('Resource'),
@@ -140,16 +141,18 @@ class MenuResource extends Resource
                                                                 )
                                                                 ->lazy(),
                                                             Forms\Components\Select::make('model_id')
-                                                                ->label(fn (Closure $get) => (string) Str::of(Relation::getMorphedModel($get('model_type')))->classBasename()->headline())
+                                                                ->label(
+                                                                    fn (Closure $get) => ($modelClass = Relation::getMorphedModel($get('model_type')))
+                                                                        ? (string) Str::of($modelClass)->classBasename()->headline()
+                                                                        : null
+                                                                )
                                                                 ->options(
-                                                                    function (Closure $get) {
-                                                                        $modeClass = Relation::getMorphedModel($get('model_type'));
-
-                                                                        return match ($modeClass) {
+                                                                    fn (Closure $get) => ($modeClass = Relation::getMorphedModel($get('model_type')))
+                                                                        ? match ($modeClass) {
                                                                             CollectionEntry::class => $modeClass::pluck('title', 'id')->toArray(),
                                                                             default => $modeClass::pluck('name', 'id')->toArray()
-                                                                        };
-                                                                    }
+                                                                        }
+                                                                        : null
                                                                 )
                                                                 ->visible(fn (Closure $get) => filled($get('model_type'))),
                                                         ],
