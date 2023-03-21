@@ -9,6 +9,7 @@ use App\Filament\Resources\AdminResource\Pages;
 use Domain\Admin\Models\Admin;
 use Domain\Auth\Actions\ForgotPasswordAction;
 use Domain\Role\Models\Role;
+use Exception;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -204,8 +205,15 @@ class AdminResource extends Resource
                     Tables\Actions\Action::make('resend-verification')
                         ->requiresConfirmation()
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
-                            $record->sendEmailVerificationNotification();
-                            $action->success();
+                            try {
+                                $record->sendEmailVerificationNotification();
+                                $action
+                                    ->successNotificationTitle(trans('A fresh verification link has been sent to your email address.'))
+                                    ->success();
+                            } catch (Exception $e) {
+                                $action->failureNotificationTitle(trans('Failed to send verification link.'))
+                                    ->failure();
+                            }
                         })
                         ->authorize('resendVerification'),
                     Tables\Actions\Action::make('send-password-reset')
@@ -221,7 +229,9 @@ class AdminResource extends Resource
                                 return;
                             }
 
-                            $action->success();
+                            $action
+                                ->successNotificationTitle(trans('A password reset link has been sent to your email address.'))
+                                ->success();
                         })
                         ->authorize('sendPasswordReset'),
                     Impersonate::make()
