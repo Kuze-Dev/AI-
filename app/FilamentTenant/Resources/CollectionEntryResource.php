@@ -133,7 +133,7 @@ class CollectionEntryResource extends Resource
                                 ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                         ])->when(fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray())),
 
-                    Forms\Components\Section::make(trns('Publishing'))
+                    Forms\Components\Section::make(trans('Publishing'))
                         ->schema([
                             Forms\Components\DateTimePicker::make('published_at')
                                 ->minDate(Carbon::now()->startOfDay())
