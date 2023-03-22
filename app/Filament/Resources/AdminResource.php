@@ -14,6 +14,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
@@ -189,6 +190,7 @@ class AdminResource extends Resource
                         });
                     }),
             ])
+            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->authorize('update'),
