@@ -14,6 +14,7 @@ class MetaDataData
         public readonly ?string $description = null,
         public readonly ?string $keywords = null,
         public readonly UploadedFile|string|null $image = null,
+        public readonly ?string $image_alt_text = null,
     ) {
     }
 
@@ -25,6 +26,7 @@ class MetaDataData
             description: $data['description'] ?? null,
             keywords: $data['keywords'] ?? null,
             image: $data['image'] ?? null,
+            image_alt_text: $data['image_alt_text'] ?? null,
         );
     }
 }

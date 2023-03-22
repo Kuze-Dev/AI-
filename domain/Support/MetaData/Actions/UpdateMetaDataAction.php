@@ -29,10 +29,13 @@ class UpdateMetaDataAction
             $metaData->addMediaFromString($imageString)
                 ->usingFileName($metaDataData->image->getClientOriginalName())
                 ->usingName(pathinfo($metaDataData->image->getClientOriginalName(), PATHINFO_FILENAME))
+                ->withCustomProperties(['alt_text' => $metaDataData->image_alt_text])
                 ->toMediaCollection('image');
-        }
-
-        if ($metaDataData->image === null) {
+        } else if ($metaDataData->image !== null) {
+            $metaData->getFirstMedia('image')
+                ?->setCustomProperty('alt_text', $metaDataData->image_alt_text)
+                ->save();
+        } else {
             $metaData->clearMediaCollection('image');
         }
 

@@ -52,7 +52,6 @@ class MetaData extends Model implements HasMedia
         'author',
         'description',
         'keywords',
-        'alt_image',
     ];
 
     /** @return MorphTo<Model, self> */

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Support;
 
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -52,8 +53,9 @@ class MetaDataForm extends Section
 
                     return $media?->getUrl();
                 }),
-            Forms\Components\TextInput::make('alt_image')
-                ->formatStateUsing(fn ($record) => $record?->metaData?->alt_image),
+            Forms\Components\TextInput::make('image_alt_text')
+                ->visible(fn (Closure $get) => filled($get('image')))
+                ->formatStateUsing(fn ($record) => $record?->metaData->getFirstMedia('image')?->getCustomProperty('alt_text')),
         ]);
     }
 }
