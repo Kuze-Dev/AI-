@@ -31,7 +31,7 @@ class UpdateMetaDataAction
                 ->usingName(pathinfo($metaDataData->image->getClientOriginalName(), PATHINFO_FILENAME))
                 ->withCustomProperties(['alt_text' => $metaDataData->image_alt_text])
                 ->toMediaCollection('image');
-        } else if ($metaDataData->image !== null) {
+        } elseif ($metaDataData->image !== null) {
             $metaData->getFirstMedia('image')
                 ?->setCustomProperty('alt_text', $metaDataData->image_alt_text)
                 ->save();
