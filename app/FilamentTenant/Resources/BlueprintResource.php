@@ -20,6 +20,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -86,6 +87,7 @@ class BlueprintResource extends Resource
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
+            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
@@ -352,6 +354,10 @@ class BlueprintResource extends Resource
             FieldType::RELATED_RESOURCE => [
                 Forms\Components\Select::make('resource')
                     ->columnSpanFull()
+                    ->lazy()
+                    ->afterStateUpdated(function (Closure $set) {
+                        $set('relation_scopes', []);
+                    })
                     ->options(
                         collect(config('domain.blueprint.related_resources', []))
                             ->keys()

@@ -15,6 +15,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 use Closure;
@@ -95,6 +96,7 @@ class SliceResource extends Resource
                     ->searchable()
                     ->optionsLimit(20),
             ])
+            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

@@ -25,7 +25,7 @@ class MetaDataFactory extends Factory
             'title' => $this->faker->sentence(),
             'keywords' => implode(', ', Arr::wrap($this->faker->words())),
             'author' => $this->faker->name(),
-            'description' => $this->faker->paragraph(),
+            'description' => $this->faker->sentence(),
         ];
     }
 

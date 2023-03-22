@@ -12,6 +12,7 @@ use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\UserMenuItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 
 class FilamentTenantServiceProvider extends ContextServiceProvider
@@ -35,6 +36,11 @@ class FilamentTenantServiceProvider extends ContextServiceProvider
                 NavigationGroup::make('System')
                     ->icon('heroicon-s-exclamation'),
             ]);
+
+            Filament::registerRenderHook(
+                'body.start',
+                static fn (): string => Blade::render('<x-filament-impersonate::banner/>')
+            );
         });
 
         $this->registerRoutes();

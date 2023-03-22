@@ -12,6 +12,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Filters\Layout;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
 use Closure;
@@ -84,66 +85,67 @@ class CollectionEntryResource extends Resource
         return $form
             ->columns(3)
             ->schema([
-                Forms\Components\Group::make()
-                    ->schema([
-                        Forms\Components\Card::make([
-                            Forms\Components\TextInput::make('title')
-                                ->unique(
-                                    callback: fn ($livewire, Unique $rule) => $rule->where('collection_id', $livewire->ownerRecord->id),
-                                    ignoreRecord: true
+                Forms\Components\Group::make([
+                    Forms\Components\Card::make([
+                        Forms\Components\TextInput::make('title')
+                            ->unique(
+                                callback: fn ($livewire, Unique $rule) => $rule->where('collection_id', $livewire->ownerRecord->id),
+                                ignoreRecord: true
+                            )
+                            ->lazy()
+                            ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
+                                if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
+                                    $set('slug', Str::slug($state));
+                                }
+                            })
+                            ->required(),
+                        Forms\Components\TextInput::make('slug')
+                            ->unique(ignoreRecord: true)
+                            ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('title'))),
+                    ]),
+                    Forms\Components\Section::make(trans('Taxonomies'))
+                        ->schema([
+                            Forms\Components\Group::make()
+                                ->statePath('taxonomies')
+                                ->schema(
+                                    fn ($livewire) => $livewire->ownerRecord->taxonomies->map(
+                                        fn (Taxonomy $taxonomy) => Forms\Components\Select::make($taxonomy->name)
+                                            ->statePath((string) $taxonomy->id)
+                                            ->multiple()
+                                            ->options(
+                                                $taxonomy->taxonomyTerms->sortBy('name')
+                                                    ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->id => $term->name])
+                                                    ->toArray()
+                                            )
+                                            ->formatStateUsing(
+                                                fn (?CollectionEntry $record) => $record?->taxonomyTerms->where('taxonomy_id', $taxonomy->id)
+                                                    ->pluck('id')
+                                                    ->toArray() ?? []
+                                            )
+                                    )->toArray()
                                 )
-                                ->lazy()
-                                ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
-                                    if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
-                                        $set('slug', Str::slug($state));
-                                    }
-                                })
-                                ->required(),
-                            Forms\Components\TextInput::make('slug')
-                                ->unique(ignoreRecord: true)
-                                ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('title'))),
-                        ]),
-                        SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
-                    ])
-                    ->tap(function (Forms\Components\Group $component) {
-                        $component->columnSpan(
-                            fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray()) || $livewire->ownerRecord->hasPublishDates()
-                                ? 2
-                                : 'full'
-                        );
-                    }),
-                Forms\Components\Card::make([
-                    Forms\Components\DateTimePicker::make('published_at')
-                        ->minDate(Carbon::now()->startOfDay())
-                        ->timezone(Auth::user()?->timezone)
+                                ->dehydrated(false),
+                            Forms\Components\Hidden::make('taxonomy_terms')
+                                ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
+                        ])
+                        ->when(fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray())),
+                    Forms\Components\Section::make(trans('Publishing'))
+                        ->schema([
+                            Forms\Components\DateTimePicker::make('published_at')
+                                ->minDate(Carbon::now()->startOfDay())
+                                ->timezone(Auth::user()?->timezone),
+
+                        ])
                         ->when(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
-                    Forms\Components\Group::make()
-                        ->statePath('taxonomies')
-                        ->schema(
-                            fn ($livewire) => $livewire->ownerRecord->taxonomies->map(
-                                fn (Taxonomy $taxonomy) => Forms\Components\Select::make($taxonomy->name)
-                                    ->statePath((string) $taxonomy->id)
-                                    ->multiple()
-                                    ->options(
-                                        $taxonomy->taxonomyTerms->sortBy('name')
-                                            ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->id => $term->name])
-                                            ->toArray()
-                                    )
-                                    ->formatStateUsing(
-                                        fn (?CollectionEntry $record) => $record?->taxonomyTerms->where('taxonomy_id', $taxonomy->id)
-                                            ->pluck('id')
-                                            ->toArray() ?? []
-                                    )
-                            )->toArray()
-                        )
-                        ->dehydrated(false),
-                    Forms\Components\Hidden::make('taxonomy_terms')
-                        ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
-                ])
-                    ->columnSpan(['lg' => 1])
-                    ->when(fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray()) || $livewire->ownerRecord->hasPublishDates()),
-                MetaDataForm::make('Meta Data'),
-            ]);
+                    SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
+                ])->columnSpan(2),
+
+                MetaDataForm::make('Meta Data')
+                    ->columnSpan(1)
+                    ->extraAttributes(['class' => 'md:sticky top-[5.5rem]']),
+
+            ])
+            ->columns(3);
     }
 
     public static function table(Table $table): Table
@@ -169,6 +171,7 @@ class CollectionEntryResource extends Resource
                     ->toggledHiddenByDefault(),
             ])
             ->reorderable('order')
+            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->url(fn ($livewire, CollectionEntry $record) => self::getUrl('edit', [$livewire->ownerRecord, $record])),
