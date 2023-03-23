@@ -18,7 +18,7 @@ use Throwable;
 class EditTenant extends EditRecord
 {
     protected static string $resource = TenantResource::class;
-    
+
     protected function getActions(): array
     {
         return [

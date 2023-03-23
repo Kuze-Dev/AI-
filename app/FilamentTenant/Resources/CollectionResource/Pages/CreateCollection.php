@@ -32,7 +32,7 @@ class CreateCollection extends CreateRecord
     {
         return $this->getCachedActions();
     }
-    
+
     /**
      * Execute database transaction
      * for creating collections.

@@ -32,7 +32,7 @@ class CreateTenant extends CreateRecord
     {
         return $this->getCachedActions();
     }
-    
+
     /** @throws Throwable */
     public function handleRecordCreation(array $data): Model
     {

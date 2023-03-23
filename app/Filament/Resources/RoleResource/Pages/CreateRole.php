@@ -32,7 +32,7 @@ class CreateRole extends CreateRecord
     {
         return $this->getCachedActions();
     }
-    
+
     /** @throws Throwable */
     protected function handleRecordCreation(array $data): Model
     {

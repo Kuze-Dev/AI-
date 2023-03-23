@@ -59,7 +59,7 @@ abstract class BaseSettings extends SettingsPage
             return true;
         }
 
-        if (!PermissionGroup::make($settingsPermissions)->getParts()->contains(self::getSlug())) {
+        if ( ! PermissionGroup::make($settingsPermissions)->getParts()->contains(self::getSlug())) {
             return true;
         }
 
