@@ -11,11 +11,28 @@ use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Domain\Collection\Enums\PublishBehavior;
+use Filament\Pages\Actions\Action;
 
 class CreateCollection extends CreateRecord
 {
     protected static string $resource = CollectionResource::class;
 
+    protected function getActions(): array
+    {
+        return [
+            Action::make('create')
+                ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
+                ->action('create')
+                ->keyBindings(['mod+s']),
+            $this->getCreateAnotherFormAction(),
+        ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
+    }
+    
     /**
      * Execute database transaction
      * for creating collections.
