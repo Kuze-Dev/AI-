@@ -80,6 +80,7 @@ class RelatedResourceFieldData extends FieldData
             ? $this->getRelatedResourceQuery()
                 ->whereIn($related->getKeyName(), $value)
                 ->get()
+                ->sortBy(fn (Model $model) => array_search($model->getKey(), $value))
             : $this->getRelatedResourceQuery()
                 ->where($related->getKeyName(), $value)
                 ->first();
