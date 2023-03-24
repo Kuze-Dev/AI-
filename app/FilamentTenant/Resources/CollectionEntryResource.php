@@ -179,7 +179,7 @@ class CollectionEntryResource extends Resource
                 Tables\Filters\Filter::make('taxonomies')
                     ->form(fn ($livewire) => $livewire->ownerRecord->taxonomies->map(
                         fn (Taxonomy $taxonomy) => Forms\Components\Select::make($taxonomy->name)
-                            ->statePath('taxonomies.' . $taxonomy->slug)
+                            ->statePath($taxonomy->slug)
                             ->multiple()
                             ->options(
                                 $taxonomy->taxonomyTerms->sortBy('name')
@@ -188,7 +188,7 @@ class CollectionEntryResource extends Resource
                             )
                     )->toArray())
                     ->query(function (CollectionEntryBuilder $query, array $data): Builder {
-                        foreach ($data['taxonomies'] as $taxonomySlug => $taxonomyTermSlugs) {
+                        foreach ($data as $taxonomySlug => $taxonomyTermSlugs) {
                             if (filled($taxonomyTermSlugs)) {
                                 $query->whereTaxonomyTerms($taxonomySlug, $taxonomyTermSlugs);
                             }
@@ -197,43 +197,37 @@ class CollectionEntryResource extends Resource
                         return $query;
                     })
                     ->visible(fn ($livewire) => $livewire->ownerRecord->taxonomies->isNotEmpty()),
-                Tables\Filters\Filter::make('year_month')
+                Tables\Filters\Filter::make('published_at_year_month')
                     ->form([
-                        Forms\Components\TextInput::make('published_year')
+                        Forms\Components\TextInput::make('published_at_year')
                             ->numeric()
                             ->debounce(),
-                        Forms\Components\Select::make('published_month')
+                        Forms\Components\Select::make('published_at_month')
                             ->options(
                                 collect(range(1, 12))
                                     ->mapWithKeys(fn (int $month) => [$month => Carbon::now()->month($month)->format('F')])
                                     ->toArray()
                             )
-                            ->hidden(fn (Closure $get) => blank($get('published_year'))),
+                            ->disabled(fn (Closure $get) => blank($get('published_at_year')))
+                            ->helperText(fn (Closure $get) => blank($get('published_at_year')) ? 'Enter a published at year first.' : null),
                     ])
-                    ->query(function (CollectionEntryBuilder $query, array $data): Builder {
-                        return $query->when(
-                            filled($data['published_year']),
-                            fn ($query) => $query->wherePublishedAtYearMonth(
-                                (int) $data['published_year'],
-                                filled($data['published_month']) ? (int) $data['published_month'] : null,
-                                Auth::user()?->timezone
-                            )
-                        );
-                    })
+                    ->query(fn (CollectionEntryBuilder $query, array $data): Builder => $query->when(
+                        filled($data['published_at_year']),
+                        fn (CollectionEntryBuilder $query) => $query->wherePublishedAtYearMonth(
+                            (int) $data['published_at_year'],
+                            filled($data['published_at_month']) ? (int) $data['published_at_month'] : null
+                        )
+                    ))
                     ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
-                Tables\Filters\Filter::make('date_range')
+                Tables\Filters\Filter::make('published_at_range')
                     ->form([
-                        Forms\Components\DatePicker::make('published_from')
-                            ->placeholder('Start Date'),
-                        Forms\Components\DatePicker::make('published_to')
-                            ->placeholder('End Date'),
+                        Forms\Components\DatePicker::make('published_at_from'),
+                        Forms\Components\DatePicker::make('published_at_to'),
                     ])
-                    ->query(function (CollectionEntryBuilder $query, array $data): Builder {
-                        return $query->wherePublishedAtRange(
-                            $data['published_from'] ? Carbon::parse($data['published_from']) : null,
-                            $data['published_to'] ? Carbon::parse($data['published_to']) : null,
-                        );
-                    })
+                    ->query(fn (CollectionEntryBuilder $query, array $data): Builder => $query->wherePublishedAtRange(
+                        filled($data['published_at_from']) ? Carbon::parse($data['published_at_from']) : null,
+                        filled($data['published_at_to']) ? Carbon::parse($data['published_at_to']) : null,
+                    ))
                     ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
             ])
             ->reorderable('order')

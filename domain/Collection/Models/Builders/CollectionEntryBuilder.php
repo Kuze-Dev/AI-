@@ -31,11 +31,11 @@ class CollectionEntryBuilder extends Builder
     }
 
     /** @return self<\Domain\Collection\Models\CollectionEntry> */
-    public function wherePublishedAtRange(Carbon $publishedAtFrom = null, Carbon $publishedAtEnd = null): self
+    public function wherePublishedAtRange(Carbon $publishedAtStart = null, Carbon $publishedAtEnd = null): self
     {
         return $this
             ->when(
-                $publishedAtFrom,
+                $publishedAtStart,
                 fn (self $query, $date): self => $query->whereDate('published_at', '>=', $date)
             )
             ->when(
@@ -45,7 +45,7 @@ class CollectionEntryBuilder extends Builder
     }
 
     /** @return self<\Domain\Collection\Models\CollectionEntry> */
-    public function wherePublishedAtYearMonth(int $year, int $month = null, string $timezone = null): self
+    public function wherePublishedAtYearMonth(int $year, int $month = null): self
     {
         $selectedDate = tap(
             Carbon::now()->year($year),
@@ -53,8 +53,7 @@ class CollectionEntryBuilder extends Builder
                 ? $date->month($month)
                 : $date
         )
-            ->toImmutable()
-            ->timezone($timezone ?? config('app.timezone', 'UTC'));
+            ->toImmutable();
 
         return blank($month)
             ? $this->whereBetween('published_at', [$selectedDate->startOfYear(), $selectedDate->endOfYear()])
