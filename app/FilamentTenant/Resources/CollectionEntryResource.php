@@ -133,7 +133,6 @@ class CollectionEntryResource extends Resource
                     Forms\Components\Section::make(trans('Publishing'))
                         ->schema([
                             Forms\Components\DateTimePicker::make('published_at')
-                                ->minDate(Carbon::now()->startOfDay())
                                 ->timezone(Auth::user()?->timezone),
 
                         ])
