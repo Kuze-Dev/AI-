@@ -31,7 +31,7 @@ class FormSubmissionController extends Controller
 
         return response()
             ->json([
-                'message' => 'Successfully unread notification!',
+                'message' => 'Form submitted!',
             ], 201);
     }
 }

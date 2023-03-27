@@ -59,8 +59,9 @@ it('can update collection', function () {
     livewire(EditCollection::class, ['record' => $collection->getRouteKey()])
         ->fillForm([
             'name' => 'Test Collection Updated',
-            'future_publish_date_behavior' => 'private',
+            'display_publish_dates' => true,
             'past_publish_date_behavior' => 'unlisted',
+            'future_publish_date_behavior' => 'private',
             'is_sortable' => true,
             'route_url' => 'test-collection',
             'taxonomies' => [$taxonomy->getKey()],

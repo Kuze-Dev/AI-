@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Carbon\Carbon;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Collection\Database\Factories\CollectionEntryFactory;
@@ -50,6 +51,126 @@ it('can list collection entries', function () {
             $json->count('data', 10)
                 ->where('data.0.type', 'collectionEntries')
                 ->whereType('data.0.attributes.title', 'string')
+                ->etc();
+        });
+});
+
+it('can filter collection entries by published at start', function () {
+    $collection = CollectionFactory::new()
+        ->publishDateBehaviour()
+        ->withDummyBlueprint()
+        ->createOne();
+
+    CollectionEntryFactory::new()
+        ->for($collection)
+        ->count(2)
+        ->sequence(
+            ['published_at' => Carbon::now()->subWeeks(2)],
+            ['published_at' => Carbon::now()->addWeeks(2)],
+        )
+        ->create([]);
+
+    getJson("api/collections/{$collection->getRouteKey()}/entries?" . http_build_query(['filter' => ['published_at_start' => (string) Carbon::now()]]))
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) {
+            $json->count('data', 1)
+                ->where('data.0.type', 'collectionEntries')
+                ->etc();
+        });
+});
+
+it('can filter collection entries by published at end', function () {
+    $collection = CollectionFactory::new()
+        ->publishDateBehaviour()
+        ->withDummyBlueprint()
+        ->createOne();
+
+    CollectionEntryFactory::new()
+        ->for($collection)
+        ->count(2)
+        ->sequence(
+            ['published_at' => Carbon::now()->subWeeks(2)],
+            ['published_at' => Carbon::now()->addWeeks(2)],
+        )
+        ->create();
+
+    getJson("api/collections/{$collection->getRouteKey()}/entries?" . http_build_query(['filter' => ['published_at_end' => (string) Carbon::now()]]))
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) {
+            $json->count('data', 1)
+                ->where('data.0.type', 'collectionEntries')
+                ->etc();
+        });
+});
+
+it('can filter collection entries by published at year month', function () {
+    $collection = CollectionFactory::new()
+        ->publishDateBehaviour()
+        ->withDummyBlueprint()
+        ->createOne();
+
+    CollectionEntryFactory::new()
+        ->for($collection)
+        ->count(3)
+        ->sequence(
+            ['published_at' => Carbon::now()->subYear()],
+            ['published_at' => Carbon::now()->subMonth()],
+            ['published_at' => Carbon::now()],
+        )
+        ->create([]);
+
+    $queryDate = Carbon::now();
+
+    getJson("api/collections/{$collection->getRouteKey()}/entries?" . http_build_query(['filter' => ['published_at_year_month' => $queryDate->year]]))
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) {
+            $json->count('data', 2)
+                ->where('data.0.type', 'collectionEntries')
+                ->etc();
+        });
+
+    getJson("api/collections/{$collection->getRouteKey()}/entries?" . http_build_query(['filter' => ['published_at_year_month' => "{$queryDate->year},{$queryDate->month}"]]))
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) {
+            $json->count('data', 1)
+                ->where('data.0.type', 'collectionEntries')
+                ->etc();
+        });
+});
+
+it('can filter collection entries by taxonomies', function () {
+    $collection = CollectionFactory::new()
+        ->publishDateBehaviour()
+        ->withDummyBlueprint()
+        ->has(
+            TaxonomyFactory::new(['name' => 'Category'])
+                ->withDummyBlueprint()
+        )
+        ->createOne();
+
+    CollectionEntryFactory::new()
+        ->for($collection)
+        ->has(
+            TaxonomyTermFactory::new(['name' => 'Laravel'])
+                ->for($collection->taxonomies->first())
+        )
+        ->create();
+    CollectionEntryFactory::new()
+        ->for($collection)
+        ->has(
+            TaxonomyTermFactory::new(['name' => 'Livewire'])
+                ->for($collection->taxonomies->first())
+        )
+        ->create();
+    CollectionEntryFactory::new()
+        ->for($collection)
+        ->create();
+
+    getJson("api/collections/{$collection->getRouteKey()}/entries?" . http_build_query(['filter' => ['taxonomies' => ['category' => 'laravel']]]))
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) {
+            $json->count('data', 1)
+                ->where('data.0.type', 'collectionEntries')
                 ->etc();
         });
 });

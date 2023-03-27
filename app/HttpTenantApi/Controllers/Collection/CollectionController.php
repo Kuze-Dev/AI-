@@ -17,7 +17,10 @@ class CollectionController
     {
         return CollectionResource::collection(
             QueryBuilder::for(Collection::query())
-                ->allowedIncludes([])
+                ->allowedIncludes([
+                    'taxonomies',
+                    'slugHistories',
+                ])
                 ->allowedFilters(['name', 'slug'])
                 ->jsonPaginate()
         );
@@ -28,7 +31,7 @@ class CollectionController
         return CollectionResource::make(
             QueryBuilder::for(Collection::whereSlug($collection))
                 ->allowedIncludes([
-                    'taxonomies.taxonomyTerms',
+                    'taxonomies',
                     'slugHistories',
                 ])
                 ->firstOrFail()
