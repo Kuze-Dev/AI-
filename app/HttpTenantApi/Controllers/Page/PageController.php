@@ -18,6 +18,11 @@ class PageController
         return PageResource::collection(
             QueryBuilder::for(Page::query())
                 ->allowedFilters(['name', 'slug'])
+                ->allowedIncludes([
+                    'sliceContents.slice',
+                    'slugHistories',
+                    'metaData',
+                ])
                 ->jsonPaginate()
         );
     }
