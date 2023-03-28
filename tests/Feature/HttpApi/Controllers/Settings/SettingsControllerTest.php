@@ -8,7 +8,7 @@ use Illuminate\Testing\Fluent\AssertableJson;
 use function Pest\Laravel\getJson;
 
 it('can get settings', function ($settingsClass) {
-    /** @var \Spatie\LaravelSettings\Settings */
+    /** @var \Spatie\LaravelSettings\Settings $settings */
     $settings = app($settingsClass);
 
     getJson('api/settings/' . $settings::group())
