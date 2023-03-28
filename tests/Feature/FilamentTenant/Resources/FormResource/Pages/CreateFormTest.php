@@ -8,7 +8,6 @@ use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Filament\Facades\Filament;
 
-use function Pest\Faker\faker;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Livewire\livewire;
 
@@ -34,17 +33,17 @@ it('can create form', function () {
 
     livewire(CreateForm::class)
         ->fillForm([
-            'name' => faker()->sentence(2),
+            'name' => fake()->sentence(2),
             'blueprint_id' => $blueprint->getKey(),
             'form_email_notifications' => [
                 [
-                    'to' => [faker()->safeEmail()],
-                    'cc' => [faker()->safeEmail()],
-                    'bcc' => [faker()->safeEmail()],
-                    'sender' => faker()->safeEmail(),
-                    'reply_to' => [faker()->safeEmail()],
-                    'subject' => faker()->sentence(),
-                    'template' => faker()->paragraphs(asText: true),
+                    'to' => [fake()->safeEmail()],
+                    'cc' => [fake()->safeEmail()],
+                    'bcc' => [fake()->safeEmail()],
+                    'sender' => fake()->safeEmail(),
+                    'reply_to' => [fake()->safeEmail()],
+                    'subject' => fake()->sentence(),
+                    'template' => fake()->paragraphs(asText: true),
                 ],
             ],
         ])

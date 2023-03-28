@@ -38,14 +38,9 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Globals\Models\Globals::class => \App\Policies\GlobalsPolicy::class,
     ];
 
-    /**
-     * Register any authentication / authorization services.
-     *
-     * @return void
-     */
-    public function boot()
+    /** Register any authentication / authorization services. */
+    public function boot(): void
     {
-        $this->registerPolicies();
         $this->configureNotificationUrls();
 
         /** @see https://freek.dev/1325-when-to-use-gateafter-in-laravel */
