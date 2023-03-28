@@ -18,7 +18,6 @@ use App\FilamentTenant\Resources;
 use Filament\Tables\Filters\Layout;
 use Domain\Page\Models\SliceContent;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use App\FilamentTenant\Support\MetaDataForm;
 use Illuminate\Database\Eloquent\Collection;
 use App\FilamentTenant\Support\SchemaFormBuilder;
@@ -98,15 +97,10 @@ class PageResource extends Resource
                                                 'slices' => self::getCachedSlices()
                                                     ->sortBy('name')
                                                     ->map(function ($slice) {
-                                                        $image = $slice['image'];
-                                                        if ($image) {
-                                                            $image = Storage::url($image);
-                                                        }
-
                                                         return [
                                                             'id' => $slice['id'],
                                                             'name' => $slice['name'],
-                                                            'image' => $image,
+                                                            'image' => $slice->getFirstMediaUrl('image'),
                                                         ];
                                                     })
                                                     ->toArray(),
@@ -185,7 +179,7 @@ class PageResource extends Resource
     protected static function getCachedSlices(): Collection
     {
         if ( ! isset(self::$cachedSlices)) {
-            self::$cachedSlices = Slice::with('blueprint')->get();
+            self::$cachedSlices = Slice::with(['blueprint', 'media'])->get();
         }
 
         return self::$cachedSlices;

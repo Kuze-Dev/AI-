@@ -23,7 +23,7 @@ class MenuController
                 ])
                 ->allowedIncludes([
                     'nodes.children',
-                    'parentNodes.children'
+                    'parentNodes.children',
                 ])
                 ->jsonPaginate()
         );
@@ -35,7 +35,7 @@ class MenuController
             QueryBuilder::for(Menu::whereSlug($menu))
                 ->allowedIncludes([
                     'nodes.children',
-                    'parentNodes.children'
+                    'parentNodes.children',
                 ])
                 ->firstOrFail()
         );
