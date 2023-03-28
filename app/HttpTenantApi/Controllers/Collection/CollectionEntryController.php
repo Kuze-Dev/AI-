@@ -67,6 +67,11 @@ class CollectionEntryController
                     'title',
                     'published_at',
                 ])
+                ->allowedIncludes([
+                    'taxonomyTerms.taxonomy',
+                    'slugHistories',
+                    'metaData',
+                ])
                 ->jsonPaginate()
         );
     }
@@ -79,7 +84,7 @@ class CollectionEntryController
                     ->whereRelation('collection', 'slug', $collection)
             )
                 ->allowedIncludes([
-                    'taxonomyTerms',
+                    'taxonomyTerms.taxonomy',
                     'slugHistories',
                     'metaData',
                 ])
