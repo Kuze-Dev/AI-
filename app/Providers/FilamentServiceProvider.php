@@ -4,27 +4,27 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Filament\Livewire\Auth\AccountDeactivatedNotice;
+use App\Filament\Livewire\Auth\ConfirmPassword;
+use App\Filament\Livewire\Auth\EmailVerificationNotice;
+use App\Filament\Livewire\Auth\RequestPasswordReset;
+use App\Filament\Livewire\Auth\ResetPassword;
+use App\Filament\Livewire\Auth\TwoFactorAuthentication;
+use App\Filament\Livewire\Auth\VerifyEmail;
 use Closure;
-use Throwable;
-use Filament\Forms;
 use Domain\Admin\Models\Admin;
 use Filament\Facades\Filament;
-use Spatie\MediaLibrary\HasMedia;
-use Illuminate\Support\Facades\Vite;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\ServiceProvider;
+use Filament\Forms;
 use Filament\Navigation\NavigationGroup;
-use Filament\Pages\Actions as PageActions;
-use App\Filament\Livewire\Auth\VerifyEmail;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Vite;
+use Illuminate\Support\ServiceProvider;
 use Saade\FilamentLaravelLog\Pages\ViewLog;
+use Filament\Pages\Actions as PageActions;
 use Filament\Tables\Actions as TableActions;
-use App\Filament\Livewire\Auth\ResetPassword;
-use App\Filament\Livewire\Auth\ConfirmPassword;
-use App\Filament\Livewire\Auth\RequestPasswordReset;
+use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use App\Filament\Livewire\Auth\EmailVerificationNotice;
-use App\Filament\Livewire\Auth\TwoFactorAuthentication;
-use App\Filament\Livewire\Auth\AccountDeactivatedNotice;
+use Throwable;
 
 /** @property \Illuminate\Foundation\Application $app */
 class FilamentServiceProvider extends ServiceProvider
@@ -76,6 +76,8 @@ class FilamentServiceProvider extends ServiceProvider
 
         $this->registerRoutes();
 
+        $this->registerFormComponentMacros();
+
         $this->configureComponents();
     }
 
@@ -121,24 +123,12 @@ class FilamentServiceProvider extends ServiceProvider
             });
     }
 
-    protected function configureComponents(): void
+    protected function registerFormComponentMacros(): void
     {
-        PageActions\DeleteAction::configureUsing($this->createModalSubheadingConfiguration('delete'), isImportant: true);
-        PageActions\RestoreAction::configureUsing($this->createModalSubheadingConfiguration('restore'), isImportant: true);
-        PageActions\ForceDeleteAction::configureUsing($this->createModalSubheadingConfiguration('force delete'), isImportant: true);
-
-        TableActions\DeleteAction::configureUsing($this->createModalSubheadingConfiguration('delete'), isImportant: true);
-        TableActions\RestoreAction::configureUsing($this->createModalSubheadingConfiguration('restore'), isImportant: true);
-        TableActions\ForceDeleteAction::configureUsing($this->createModalSubheadingConfiguration('force delete'), isImportant: true);
-
-        TableActions\DeleteBulkAction::configureUsing($this->createBulkModalSubheadingConfiguration('delete'), isImportant: true);
-        TableActions\RestoreBulkAction::configureUsing($this->createBulkModalSubheadingConfiguration('restore'), isImportant: true);
-        TableActions\ForceDeleteBulkAction::configureUsing($this->createBulkModalSubheadingConfiguration('force delete'), isImportant: true);
-
         Forms\Components\FileUpload::macro('mediaLibraryCollection', function (string $collection) {
             /** @var Forms\Components\FileUpload $this */
             $this->multiple(
-                fn ($record) => $record && ! $record->getRegisteredMediaCollections()
+                fn ($record) => $record && !$record->getRegisteredMediaCollections()
                     ->firstWhere('name', $collection)
                     ->singleFile
             );
@@ -180,6 +170,21 @@ class FilamentServiceProvider extends ServiceProvider
 
             return $this;
         });
+    }
+
+    protected function configureComponents(): void
+    {
+        PageActions\DeleteAction::configureUsing($this->createModalSubheadingConfiguration('delete'), isImportant: true);
+        PageActions\RestoreAction::configureUsing($this->createModalSubheadingConfiguration('restore'), isImportant: true);
+        PageActions\ForceDeleteAction::configureUsing($this->createModalSubheadingConfiguration('force delete'), isImportant: true);
+
+        TableActions\DeleteAction::configureUsing($this->createModalSubheadingConfiguration('delete'), isImportant: true);
+        TableActions\RestoreAction::configureUsing($this->createModalSubheadingConfiguration('restore'), isImportant: true);
+        TableActions\ForceDeleteAction::configureUsing($this->createModalSubheadingConfiguration('force delete'), isImportant: true);
+
+        TableActions\DeleteBulkAction::configureUsing($this->createBulkModalSubheadingConfiguration('delete'), isImportant: true);
+        TableActions\RestoreBulkAction::configureUsing($this->createBulkModalSubheadingConfiguration('restore'), isImportant: true);
+        TableActions\ForceDeleteBulkAction::configureUsing($this->createBulkModalSubheadingConfiguration('force delete'), isImportant: true);
     }
 
     private function createModalSubheadingConfiguration(string $verb): Closure
