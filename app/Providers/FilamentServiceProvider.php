@@ -128,7 +128,7 @@ class FilamentServiceProvider extends ServiceProvider
         Forms\Components\FileUpload::macro('mediaLibraryCollection', function (string $collection) {
             /** @var Forms\Components\FileUpload $this */
             $this->multiple(
-                fn ($record) => $record && !$record->getRegisteredMediaCollections()
+                fn ($record) => $record && ! $record->getRegisteredMediaCollections()
                     ->firstWhere('name', $collection)
                     ->singleFile
             );
