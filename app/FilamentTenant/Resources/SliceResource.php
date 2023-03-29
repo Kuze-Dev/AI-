@@ -16,7 +16,6 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Filters\Layout;
-use Illuminate\Support\Facades\Auth;
 use Exception;
 use Closure;
 
@@ -73,25 +72,13 @@ class SliceResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->contentGrid([
+                'md' => 2,
+                'xl' => 2,
+            ])
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('component')
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('blueprint.name')
-                    ->sortable()
-                    ->searchable()
-                    ->url(fn (Slice $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable()
-                    ->toggleable()
-                    ->toggledHiddenByDefault(),
+                Tables\Columns\ViewColumn::make('image')
+                    ->view('filament.tables.components.slice-block'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('blueprint')

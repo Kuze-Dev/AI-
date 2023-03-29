@@ -8,7 +8,7 @@
                     <button type="button"
                         class="bg-transparent hover:border-bg-white border-2 border-gray-600 cursor-pointer rounded flex-shrink-0 mb-2 flex flex-col justify-center items-center"
                         style="width: 240px; height: 136px;" x-on:click="state = {{ $slice['id'] }}">
-                        <img class="h-full inline-block" src="{{ $slice['image'] }}" />
+                        <img class="h-full inline-block" src="{{ $slice['image'] }}" style="object-fit: contain;" />
                     </button>
                     <div class="w-full text-center text-sm">{{ $slice['name'] }}</div>
                 </div>
