@@ -23,10 +23,11 @@ beforeEach(function () {
     loginAsSuperAdmin();
 });
 
-it('can render page', function () {
+it('can render page and custom view', function () {
     livewire(CreatePage::class)
         ->assertFormExists()
-        ->assertOk();
+        ->assertOk()
+        ->assertSee('slice-picker-container');
 });
 
 it('can create page', function () {

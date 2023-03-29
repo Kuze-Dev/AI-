@@ -41,6 +41,9 @@ class SliceResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('component')
                     ->required(),
+                Forms\Components\FileUpload::make('image')
+                    ->mediaLibraryCollection('image')
+                    ->image(),
                 Forms\Components\Select::make('blueprint_id')
                     ->options(
                         fn () => Blueprint::orderBy('name')
