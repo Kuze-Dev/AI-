@@ -26,13 +26,28 @@ class CollectionFactory extends Factory
         return [
             'blueprint_id' => null,
             'name' => $name,
-            'past_publish_date_behavior' => PublishBehavior::PRIVATE,
-            'future_publish_date_behavior' => PublishBehavior::PUBLIC,
-            'is_sortable' => (bool) rand(0, 1),
+            'past_publish_date_behavior' => null,
+            'future_publish_date_behavior' => null,
+            'is_sortable' => false,
             'route_url' => function (array $attributes) {
-                return '/'.Str::slug($attributes['name']).'/{{$slug}}';
+                return '/' . Str::slug($attributes['name']) . '/{{$slug}}';
             },
         ];
+    }
+
+    public function publishDateBehaviour(
+        PublishBehavior $pastPublishDateBehaviour = PublishBehavior::PUBLIC,
+        PublishBehavior $futurePublishDateBehaviour = PublishBehavior::PRIVATE
+    ): self {
+        return $this->state([
+            'past_publish_date_behavior' => $pastPublishDateBehaviour,
+            'future_publish_date_behavior' => $futurePublishDateBehaviour,
+        ]);
+    }
+
+    public function sortable(bool $state = true): self
+    {
+        return $this->state(['is_sortable' => $state]);
     }
 
     /**

@@ -25,10 +25,10 @@ class GlobalsController
 
     public function show(string $global): GlobalsResource
     {
-        /** @var Globals */
-        $global = QueryBuilder::for(Globals::whereSlug($global))
-            ->firstOrFail();
-
-        return GlobalsResource::make($global);
+        return GlobalsResource::make(
+            QueryBuilder::for(Globals::whereSlug($global))
+                ->allowedIncludes('blueprint')
+                ->firstOrFail()
+        );
     }
 }

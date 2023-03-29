@@ -16,8 +16,14 @@ class TaxonomyController
     public function index(): JsonApiResourceCollection
     {
         return TaxonomyResource::collection(
-            QueryBuilder::for(Taxonomy::query()->select(['name', 'slug']))
+            QueryBuilder::for(Taxonomy::query())
                 ->allowedFilters(['name', 'slug'])
+                ->allowedIncludes([
+                    'parentTerms.children',
+                    'parentTerms.taxonomy',
+                    'taxonomyTerms.children',
+                    'taxonomyTerms.taxonomy',
+                ])
                 ->jsonPaginate()
         );
     }
@@ -25,10 +31,13 @@ class TaxonomyController
     public function show(string $taxonomy): TaxonomyResource
     {
         return TaxonomyResource::make(
-            QueryBuilder::for(Taxonomy::whereSlug($taxonomy)->with([
-                'parentTerms.taxonomy',
-                'taxonomyTerms.taxonomy',
-            ]))->allowedIncludes(['taxonomyTerms', 'parentTerms'])
+            QueryBuilder::for(Taxonomy::whereSlug($taxonomy))
+                ->allowedIncludes([
+                    'parentTerms.children',
+                    'parentTerms.taxonomy',
+                    'taxonomyTerms.children',
+                    'taxonomyTerms.taxonomy',
+                ])
                 ->firstOrFail()
         );
     }

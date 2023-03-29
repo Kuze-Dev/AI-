@@ -1,6 +1,18 @@
 # Release Notes
 
-## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.1.7)
+## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.0)
+
+## [v0.2.0](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.2.0%0Dv0.1.7)
+
+### Added
+
+- Success/fail prompt for resend verification action and request reset password.
+- Standardized `DeleteAction`, `RestoreAction`, and `ForceDeleteAction` confirmation prompt.
+
+### Changed
+
+- Upgrade to laravel 10.
+- Check if Admin is deleted for `resendVerification` and `sendPasswordReset` policy abilities.
 
 ## [v0.1.7](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.1.7%0Dv0.1.6)
 

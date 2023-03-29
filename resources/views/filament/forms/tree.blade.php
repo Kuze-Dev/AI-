@@ -43,7 +43,7 @@
                 ])
             @endforeach
         </div>
-        <div class="relative flex justify-center">
+        <div class="relative">
             <x-forms::button
                 :wire:click="'dispatchFormEvent(\'tree::createItem\', \'' . $getStatePath() . '\')'"
                 size="sm"
