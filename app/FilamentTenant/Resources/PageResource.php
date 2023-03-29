@@ -96,11 +96,12 @@ class PageResource extends Resource
                                             ->viewData([
                                                 'slices' => self::getCachedSlices()
                                                     ->sortBy('name')
-                                                    ->map(function ($slice) {
+                                                    ->mapWithKeys(function (Slice $slice) {
                                                         return [
-                                                            'id' => $slice['id'],
-                                                            'name' => $slice['name'],
-                                                            'image' => $slice->getFirstMediaUrl('image'),
+                                                            $slice->id => [
+                                                                'name' => $slice['name'],
+                                                                'image' => $slice->getFirstMediaUrl('image'),
+                                                            ],
                                                         ];
                                                     })
                                                     ->toArray(),
