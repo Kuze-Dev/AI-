@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 use App\FilamentTenant\Resources\SliceResource\Slices\CreateSlice;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Page\Database\Factories\SliceFactory;
