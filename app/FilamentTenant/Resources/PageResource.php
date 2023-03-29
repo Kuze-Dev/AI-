@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use Closure;
-use Exception;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Support\Str;
-use Domain\Page\Models\Page;
-use Filament\Resources\Form;
-use Domain\Page\Models\Slice;
-use Filament\Resources\Table;
-use Filament\Resources\Resource;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
-use Filament\Tables\Filters\Layout;
-use Domain\Page\Models\SliceContent;
-use Illuminate\Support\Facades\Auth;
 use App\FilamentTenant\Support\MetaDataForm;
-use Illuminate\Database\Eloquent\Collection;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use Closure;
+use Domain\Page\Models\Page;
+use Domain\Page\Models\Slice;
+use Domain\Page\Models\SliceContent;
+use Exception;
+use Filament\Forms;
+use Filament\Resources\Form;
+use Filament\Resources\Resource;
+use Filament\Resources\Table;
+use Filament\Tables;
+use Filament\Tables\Filters\Layout;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class PageResource extends Resource
 {
@@ -96,11 +96,12 @@ class PageResource extends Resource
                                             ->viewData([
                                                 'slices' => self::getCachedSlices()
                                                     ->sortBy('name')
-                                                    ->map(function ($slice) {
+                                                    ->mapWithKeys(function (Slice $slice) {
                                                         return [
-                                                            'id' => $slice['id'],
-                                                            'name' => $slice['name'],
-                                                            'image' => $slice->getFirstMediaUrl('image'),
+                                                            $slice->id => [
+                                                                'name' => $slice['name'],
+                                                                'image' => $slice->getFirstMediaUrl('image'),
+                                                            ],
                                                         ];
                                                     })
                                                     ->toArray(),

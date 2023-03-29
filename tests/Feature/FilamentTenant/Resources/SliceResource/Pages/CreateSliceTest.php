@@ -2,19 +2,17 @@
 
 declare(strict_types=1);
 
+use App\FilamentTenant\Resources\SliceResource\Slices\CreateSlice;
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\Models\Slice;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Domain\Blueprint\Enums\FieldType;
-use Illuminate\Support\Facades\Storage;
-use Domain\Page\Database\Factories\SliceFactory;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Domain\Blueprint\Database\Factories\BlueprintFactory;
 
-use App\FilamentTenant\Resources\SliceResource\Slices\CreateSlice;
-
-use function Pest\Livewire\livewire;
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();

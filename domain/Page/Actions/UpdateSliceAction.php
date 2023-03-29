@@ -24,10 +24,9 @@ class UpdateSliceAction
                 ->usingFileName($sliceData->image->getClientOriginalName())
                 ->usingName(pathinfo($sliceData->image->getClientOriginalName(), PATHINFO_FILENAME))
                 ->toMediaCollection('image');
-        } elseif ($sliceData->image !== null) {
-            $slice->getFirstMedia('image')
-                ?->save();
-        } else {
+        }
+
+        if ($sliceData->image === null) {
             $slice->clearMediaCollection('image');
         }
 
