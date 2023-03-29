@@ -109,7 +109,7 @@ it('can filter collection entries by published at year month', function () {
         ->withDummyBlueprint()
         ->createOne();
 
-    $entries = CollectionEntryFactory::new()
+    CollectionEntryFactory::new()
         ->for($collection)
         ->count(3)
         ->sequence(
@@ -118,8 +118,6 @@ it('can filter collection entries by published at year month', function () {
             ['published_at' => Carbon::now()],
         )
         ->create([]);
-
-    dd($entries->pluck('published_at'));
 
     $queryDate = Carbon::now();
 
