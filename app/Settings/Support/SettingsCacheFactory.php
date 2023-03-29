@@ -8,9 +8,9 @@ use Spatie\LaravelSettings\SettingsCache;
 
 class SettingsCacheFactory extends \Spatie\LaravelSettings\Support\SettingsCacheFactory
 {
-    protected function initializeCaches(): void
+    public function __construct()
     {
-        // ignore parent method
+        // to totally ignore initializeCaches()
     }
 
     public function build(?string $repository = null): SettingsCache

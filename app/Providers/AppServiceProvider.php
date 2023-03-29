@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Settings\Support\SettingsCacheFactory;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Menu\Models\Menu;
@@ -26,7 +25,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
-use Spatie\LaravelSettings\SettingsEventSubscriber;
 use Stancl\Tenancy\Database\Models\Tenant;
 use TiMacDonald\JsonApi\JsonApiResource;
 
@@ -35,17 +33,6 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        // modify cache for multiple tenant
-        $this->app->bind(
-            SettingsEventSubscriber::class,
-            \App\Settings\Subscriber\SettingsEventSubscriber::class
-        );
-        $this->app->bind(
-            SettingsCacheFactory::class,
-            fn () => new SettingsCacheFactory(
-                config('settings'),
-            )
-        );
     }
 
     public function boot(): void
