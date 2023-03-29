@@ -7,7 +7,9 @@ use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\Models\Slice;
 use Filament\Facades\Filament;
+use Illuminate\Http\UploadedFile;
 use Domain\Blueprint\Enums\FieldType;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
@@ -93,5 +95,37 @@ it('can create slice with default content', function () {
         'blueprint_id' => $blueprint->id,
         'is_fixed_content' => true,
         'data' => json_encode(['main' => ['title' => 'Foobar']]),
+    ]);
+});
+
+it('can create slice with image', function () {
+    $blueprint = BlueprintFactory::new()
+        ->withDummySchema()
+        ->createOne();
+
+    // Prepare the storage and create a temporary image file.
+    $image = UploadedFile::fake()->image('test_image.jpg');
+
+    livewire(CreateSlice::class)
+        ->fillForm([
+            'name' => 'Test',
+            'component' => 'Test',
+            'blueprint_id' => $blueprint->id,
+            'image' => $image, // Add image to form data.
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk();
+
+    // Assert the image exists in the storage and in the image column.
+    assertDatabaseHas(Slice::class, [
+        'name' => 'Test',
+        'component' => 'Test',
+        'blueprint_id' => $blueprint->id,
+    ]);
+
+    assertDatabaseHas(Media::class, [
+        'file_name' => $image->getClientOriginalName(),
+        'mime_type' => $image->getMimeType(),
     ]);
 });
