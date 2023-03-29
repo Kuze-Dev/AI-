@@ -57,11 +57,8 @@ class PageResource extends Resource
                                     }
                                 })
                                 ->required(),
-                            Forms\Components\TextInput::make('slug')
-                                ->unique(ignoreRecord: true)
-                                ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                             Forms\Components\TextInput::make('route_url')
-                                ->required()
+                                ->nullable()
                                 ->helperText('Use "{{ $slug }}" to insert the current slug.'),
                         ]),
                         Forms\Components\Section::make(trans('Slices'))
@@ -134,9 +131,6 @@ class PageResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('updated_at')

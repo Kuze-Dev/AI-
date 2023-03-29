@@ -8,7 +8,8 @@ use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
-use Domain\Support\SlugHistory\HasSlugHistory;
+use Domain\Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
+use Domain\Support\RouteUrl\HasRouteUrl;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -34,8 +35,6 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property-read \Domain\Support\MetaData\Models\MetaData $metaData
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Page\Models\SliceContent[] $sliceContents
  * @property-read int|null $slice_contents_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $slugHistories
- * @property-read int|null $slug_histories_count
  * @property-read string|null $qualified_route_url
  * @method static \Illuminate\Database\Eloquent\Builder|Page newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page newQuery()
@@ -49,12 +48,12 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @mixin \Eloquent
  */
 
-#[OnDeleteCascade(['sliceContents', 'metaData'])]
-class Page extends Model implements IsActivitySubject, HasMetaDataContract
+#[OnDeleteCascade(['sliceContents', 'metaData', 'routeUrls'])]
+class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasRouteUrlContract
 {
     use LogsActivity;
     use HasSlug;
-    use HasSlugHistory;
+    use HasRouteUrl;
     use HasMetaData;
     use ConstraintsRelationships;
 

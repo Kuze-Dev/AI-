@@ -19,7 +19,6 @@ use Domain\Collection\Enums\PublishBehavior;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
-use Domain\Support\SlugHistory\HasSlugHistory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
@@ -40,8 +39,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property-read Blueprint $blueprint
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Collection\Models\CollectionEntry[] $collectionEntries
  * @property-read int|null $collection_entries_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $slugHistories
- * @property-read int|null $slug_histories_count
  * @property-read \Illuminate\Database\Eloquent\Collection|Taxonomy[] $taxonomies
  * @property-read int|null $taxonomies_count
  * @method static \Illuminate\Database\Eloquent\Builder|Collection newModelQuery()
@@ -66,7 +63,6 @@ class Collection extends Model implements IsActivitySubject
 {
     use LogsActivity;
     use HasSlug;
-    use HasSlugHistory;
     use ConstraintsRelationships;
 
     /**

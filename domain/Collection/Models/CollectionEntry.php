@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Domain\Collection\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
-use Domain\Support\SlugHistory\HasSlugHistory;
 use Domain\Collection\Models\Builders\CollectionEntryBuilder;
 use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
@@ -39,8 +38,6 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property-read int|null $activities_count
  * @property-read \Domain\Collection\Models\Collection $collection
  * @property-read \Domain\Support\MetaData\Models\MetaData $metaData
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $slugHistories
- * @property-read int|null $slug_histories_count
  * @property-read \Illuminate\Database\Eloquent\Collection|TaxonomyTerm[] $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
  * @property-read string|null $qualified_route_url
@@ -64,7 +61,6 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
 {
     use LogsActivity;
     use HasSlug;
-    use HasSlugHistory;
     use HasMetaData;
     use ConstraintsRelationships;
 
