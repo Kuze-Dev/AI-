@@ -41,9 +41,6 @@ class SliceResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('component')
                     ->required(),
-                Forms\Components\FileUpload::make('image')
-                    ->mediaLibraryCollection('image')
-                    ->image(),
                 Forms\Components\Select::make('blueprint_id')
                     ->options(
                         fn () => Blueprint::orderBy('name')
@@ -56,6 +53,9 @@ class SliceResource extends Resource
                     ->reactive()
                     ->preload()
                     ->disabled(fn (?Slice $record) => $record !== null),
+                Forms\Components\FileUpload::make('image')
+                    ->mediaLibraryCollection('image')
+                    ->image(),
                 Forms\Components\Toggle::make('is_fixed_content')
                     ->inline(false)
                     ->hidden(fn (Closure $get) => $get('blueprint_id') ? false : true)
