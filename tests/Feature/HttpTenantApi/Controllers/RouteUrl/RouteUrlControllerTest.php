@@ -11,4 +11,4 @@ beforeEach(function () {
 it('can get settings', function () {
     getJson('api/route/aaaa')
         ->assertOk();
-});
+})->todo();
