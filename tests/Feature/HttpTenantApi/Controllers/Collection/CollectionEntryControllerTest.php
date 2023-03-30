@@ -114,7 +114,7 @@ it('can filter collection entries by published at year month', function () {
         ->count(3)
         ->sequence(
             ['published_at' => Carbon::now()->subYear()],
-            ['published_at' => Carbon::now()->subMonth()],
+            ['published_at' => Carbon::now()->subMonthNoOverflow()],
             ['published_at' => Carbon::now()],
         )
         ->create([]);

@@ -43,7 +43,7 @@ definitions:
         name: Test
         script:
           - *setup-script
-          - composer test -- --ci
+          - composer test -- --ci --passthru-php="-d memory_limit=-1"
 
 pipelines:
   branches:
