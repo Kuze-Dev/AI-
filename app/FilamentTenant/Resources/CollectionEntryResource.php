@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
+use App\FilamentTenant\Support\RouteUrlForm;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -100,9 +101,7 @@ class CollectionEntryResource extends Resource
                                 }
                             })
                             ->required(),
-                        Forms\Components\TextInput::make('slug')
-                            ->unique(ignoreRecord: true)
-                            ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('title'))),
+                        RouteUrlForm::make('Route Url'),
                     ]),
                     Forms\Components\Section::make(trans('Taxonomies'))
                         ->schema([

@@ -23,7 +23,7 @@ class CreateCollectionEntryAction
         $collectionEntry = $collection->collectionEntries()
             ->create([
                 'title' => $collectionEntryData->title,
-                'slug' => $collectionEntryData->slug,
+                'route_url' => $collectionEntryData->route_url,
                 'data' => $collectionEntryData->data,
                 'published_at' => $collectionEntryData->published_at,
             ]);

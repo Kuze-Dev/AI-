@@ -9,8 +9,6 @@ use Domain\Page\Models\Page;
 use Domain\Page\Models\SliceContent;
 use Domain\Support\MetaData\Actions\CreateMetaDataAction;
 use Domain\Support\MetaData\Actions\UpdateMetaDataAction;
-use Domain\Support\RouteUrl\Actions\UpdateRouteUrlAction;
-use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
 use Illuminate\Support\Arr;
 
 class UpdatePageAction
@@ -21,27 +19,15 @@ class UpdatePageAction
         protected DeleteSliceContentAction $deleteSliceContent,
         protected CreateMetaDataAction $createMetaData,
         protected UpdateMetaDataAction $updateMetaData,
-        protected UpdateRouteUrlAction $updateRouteUrl,
     ) {
     }
 
     public function execute(Page $page, PageData $pageData): Page
     {
-        $oldRouteUrl = $page->route_url;
-
         $page->update([
             'name' => $pageData->name,
-            'route_url' => $pageData->route_url ?? $page->{$page->getSlugOptions()->slugField},
+            'route_url' => $pageData->route_url,
         ]);
-
-        $this->updateRouteUrl->execute(
-            $page,
-            new RouteUrlData(
-                $page->route_url,
-                $pageData->route_url !== null &&
-                $oldRouteUrl !== $pageData->route_url
-            )
-        );
 
         $page->metaData()->exists()
             ? $this->updateMetaData->execute($page, $pageData->meta_data)

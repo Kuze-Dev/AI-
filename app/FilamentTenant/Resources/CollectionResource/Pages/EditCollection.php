@@ -42,7 +42,6 @@ class EditCollection extends EditRecord
                     name: $data['name'],
                     taxonomies: $data['taxonomies'],
                     blueprint_id: $data['blueprint_id'],
-                    slug: $data['slug'],
                     is_sortable: $data['is_sortable'],
                     past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
                     future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),

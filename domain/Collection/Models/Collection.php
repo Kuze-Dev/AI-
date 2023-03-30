@@ -6,6 +6,8 @@ namespace Domain\Collection\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
+use Domain\Support\RouteUrl\HasRouteUrl;
 use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -56,14 +58,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @mixin \Eloquent
  */
 #[
-    OnDeleteCascade(['taxonomies']),
+    OnDeleteCascade(['taxonomies', 'routeUrls']),
     OnDeleteRestrict(['collectionEntries'])
 ]
-class Collection extends Model implements IsActivitySubject
+class Collection extends Model implements IsActivitySubject, HasRouteUrlContract
 {
     use LogsActivity;
     use HasSlug;
     use ConstraintsRelationships;
+    use HasRouteUrl;
 
     /**
      * Declare columns
@@ -77,7 +80,6 @@ class Collection extends Model implements IsActivitySubject
         'past_publish_date_behavior',
         'future_publish_date_behavior',
         'is_sortable',
-        'route_url',
     ];
 
     /**
@@ -161,5 +163,10 @@ class Collection extends Model implements IsActivitySubject
     public function hasPublishDates(): bool
     {
         return $this->past_publish_date_behavior || $this->future_publish_date_behavior;
+    }
+
+    public function getRouteUrlDefaultUrl(): string
+    {
+        return $this->{$this->getSlugOptions()->slugField};
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\FilamentTenant\Support\RouteUrlForm;
 use Domain\Collection\Enums\PublishBehavior;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
@@ -75,9 +76,6 @@ class CollectionResource extends Resource
                             }
                         })
                         ->required(),
-                    Forms\Components\TextInput::make('slug')
-                        ->unique(ignoreRecord: true)
-                        ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                     Forms\Components\Select::make('blueprint_id')
                         ->required()
                         ->options(
@@ -89,10 +87,7 @@ class CollectionResource extends Resource
                         ->searchable()
                         ->preload()
                         ->disabled(fn (?Collection $record) => $record !== null),
-                    Forms\Components\TextInput::make('route_url')
-                        ->required()
-                        ->unique(ignoreRecord: true)
-                        ->helperText('Use "{{ $slug }}" to insert the collection entry\'s slug.'),
+                    RouteUrlForm::make('Route Url'),
                     Forms\Components\Select::make('taxonomies')
                         ->multiple()
                         ->options(

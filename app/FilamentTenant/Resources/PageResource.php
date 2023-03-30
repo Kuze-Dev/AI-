@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\MetaDataForm;
+use App\FilamentTenant\Support\RouteUrlForm;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
@@ -56,10 +57,8 @@ class PageResource extends Resource
                                     }
                                 })
                                 ->required(),
-                            Forms\Components\TextInput::make('route_url')
-                                ->nullable()
-                                ->helperText('Use "{{ $slug }}" to insert the current slug.'),
                         ]),
+                        RouteUrlForm::make('Route Url'),
                         Forms\Components\Section::make(trans('Slices'))
                             ->schema([
                                 Forms\Components\Repeater::make('slice_contents')

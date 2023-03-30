@@ -19,7 +19,10 @@ class UpdateRouteUrlAction
     {
         $routeUrl = self::getRouteUrl($model);
 
-        if ($routeUrl->url !== $routeUrlData->url) {
+        if (
+            $routeUrl->is_override !== $routeUrlData->is_override ||
+        $routeUrl->url !== $routeUrlData->url
+        ) {
             $this->createRouteUrl->execute($model, $routeUrlData);
         }
 

@@ -26,7 +26,6 @@ class CreateCollection extends CreateRecord
             fn () => app(CreateCollectionAction::class)
                 ->execute(new CollectionData(
                     name: $data['name'],
-                    slug: $data['slug'],
                     taxonomies: $data['taxonomies'],
                     blueprint_id: $data['blueprint_id'],
                     is_sortable: $data['is_sortable'],

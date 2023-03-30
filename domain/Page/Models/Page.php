@@ -60,7 +60,6 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasR
     protected $fillable = [
         'name',
         'slug',
-        'route_url',
     ];
 
     /**
@@ -118,5 +117,10 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasR
                 'slug' => $this->slug,
             ]
         ));
+    }
+
+    public function getRouteUrlDefaultUrl(): string
+    {
+        return $this->{$this->getSlugOptions()->slugField};
     }
 }

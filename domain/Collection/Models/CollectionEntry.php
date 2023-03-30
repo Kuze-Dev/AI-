@@ -9,6 +9,8 @@ use Domain\Collection\Models\Builders\CollectionEntryBuilder;
 use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Domain\Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
+use Domain\Support\RouteUrl\HasRouteUrl;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -56,13 +58,14 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @method static CollectionEntryBuilder|CollectionEntry whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-#[OnDeleteCascade(['taxonomyTerms', 'metaData'])]
-class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataContract
+#[OnDeleteCascade(['taxonomyTerms', 'metaData', 'routeUrls'])]
+class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataContract, HasRouteUrlContract
 {
     use LogsActivity;
     use HasSlug;
     use HasMetaData;
     use ConstraintsRelationships;
+    use HasRouteUrl;
 
     /**
      * Declare columns
@@ -172,4 +175,9 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
               ]
           ));
       }
+
+    public function getRouteUrlDefaultUrl(): string
+    {
+        return $this->{$this->getSlugOptions()->slugField};
+    }
 }
