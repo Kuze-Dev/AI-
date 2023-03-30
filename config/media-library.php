@@ -184,7 +184,8 @@ return [
          * ServerSideEncryption, Metadata, ACL, ContentEncoding
          */
         'extra_headers' => [
-            'CacheControl' => 'max-age=604800',
+            'CacheControl' => 'max-age=315360000',
+            'ACL' => 'public-read',
         ],
     ],
 
