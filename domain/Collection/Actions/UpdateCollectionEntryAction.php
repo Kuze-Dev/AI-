@@ -25,7 +25,6 @@ class UpdateCollectionEntryAction
     {
         $collectionEntry->update([
             'title' => $collectionEntryData->title,
-            'slug' => $collectionEntryData->slug,
             'published_at' => $collectionEntryData->published_at,
             'data' => $collectionEntryData->data,
         ]);

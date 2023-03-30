@@ -10,8 +10,8 @@ class PageData
 {
     public function __construct(
         public readonly string $name,
-        public readonly MetaDataData $meta_data,
         public readonly ?string $route_url = null,
+        public readonly MetaDataData $meta_data,
         public readonly array $slice_contents = [],
     ) {
     }
@@ -20,8 +20,6 @@ class PageData
     {
         return new self(
             name: $data['name'],
-            meta_data: MetaDataData::fromArray($data['meta_data']),
-            route_url: $data['route_url'] ?? null,
             slice_contents: array_map(
                 fn (array $sliceContentData) => new SliceContentData(
                     slice_id: $sliceContentData['slice_id'],
@@ -29,7 +27,9 @@ class PageData
                     id: $sliceContentData['id'] ?? null,
                 ),
                 $data['slice_contents'] ?? []
-            )
+            ),
+            route_url: $data['route_url'],
+            meta_data: MetaDataData::fromArray($data['meta_data'])
         );
     }
 }
