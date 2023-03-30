@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
  * Domain\Page\Models\Slice
@@ -39,10 +41,11 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @mixin \Eloquent
  */
 #[OnDeleteRestrict(['sliceContents'])]
-class Slice extends Model implements IsActivitySubject
+class Slice extends Model implements IsActivitySubject, HasMedia
 {
     use LogsActivity;
     use ConstraintsRelationships;
+    use InteractsWithMedia;
 
     protected $fillable = [
         'blueprint_id',
@@ -80,5 +83,11 @@ class Slice extends Model implements IsActivitySubject
     public function getActivitySubjectDescription(Activity $activity): string
     {
         return 'Slice: '.$this->name;
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')
+            ->singleFile();
     }
 }

@@ -41,6 +41,7 @@ class CreateSlice extends CreateRecord
                 ->execute(new SliceData(
                     name: $data['name'],
                     component: $data['component'],
+                    image: $data['image'],
                     blueprint_id: $data['blueprint_id'],
                     is_fixed_content: $data['is_fixed_content'],
                     data: $data['data'] ?? null,

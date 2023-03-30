@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Collection;
 
 use App\HttpTenantApi\Resources\CollectionEntryResource;
+use Carbon\Carbon;
 use Domain\Collection\Enums\PublishBehavior;
 use Domain\Collection\Models\Builders\CollectionEntryBuilder;
 use Domain\Collection\Models\Collection;
 use Domain\Collection\Models\CollectionEntry;
+use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
@@ -30,10 +32,45 @@ class CollectionEntryController
                         'publish_status',
                         fn (CollectionEntryBuilder $query, $value) => $query->wherePublishStatus(PublishBehavior::tryFrom($value))
                     ),
+                    AllowedFilter::callback(
+                        'published_at_start',
+                        fn (CollectionEntryBuilder $query, $value) => $query->wherePublishedAtRange(publishedAtStart: Carbon::parse($value))
+                    ),
+                    AllowedFilter::callback(
+                        'published_at_end',
+                        fn (CollectionEntryBuilder $query, $value) => $query->wherePublishedAtRange(publishedAtEnd: Carbon::parse($value))
+                    ),
+                    AllowedFilter::callback(
+                        'published_at_year_month',
+                        function (CollectionEntryBuilder $query, string|array $value) {
+                            $value = Arr::wrap($value);
+
+                            $year = (int) $value[0];
+                            $month = filled($value[1] ?? null) ? (int) $value[1] : null;
+
+                            $query->wherePublishedAtYearMonth($year, $month);
+                        },
+                    ),
+                    AllowedFilter::callback(
+                        'taxonomies',
+                        function (CollectionEntryBuilder $query, array $value) {
+                            foreach ($value as $taxonomySlug => $taxonomyTermSlugs) {
+                                if (filled($taxonomyTermSlugs)) {
+                                    $query->whereTaxonomyTerms($taxonomySlug, Arr::wrap($taxonomyTermSlugs));
+                                }
+                            }
+                        }
+                    ),
                 ])
                 ->allowedSorts([
                     'order',
+                    'title',
                     'published_at',
+                ])
+                ->allowedIncludes([
+                    'taxonomyTerms.taxonomy',
+                    'slugHistories',
+                    'metaData',
                 ])
                 ->jsonPaginate()
         );
@@ -47,7 +84,7 @@ class CollectionEntryController
                     ->whereRelation('collection', 'slug', $collection)
             )
                 ->allowedIncludes([
-                    'taxonomyTerms',
+                    'taxonomyTerms.taxonomy',
                     'slugHistories',
                     'metaData',
                 ])
