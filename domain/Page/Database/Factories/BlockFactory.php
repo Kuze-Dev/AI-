@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Domain\Page\Database\Factories;
 
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
-use Domain\Page\Models\Slice;
+use Domain\Page\Models\Block;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Page\Models\Slice>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Page\Models\Block>
  */
-class SliceFactory extends Factory
+class BlockFactory extends Factory
 {
-    protected $model = Slice::class;
+    protected $model = Block::class;
 
     public function definition(): array
     {

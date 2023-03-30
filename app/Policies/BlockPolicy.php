@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Policies\Concerns\ChecksWildcardPermissions;
-use Domain\Page\Models\Slice;
+use Domain\Page\Models\Block;
 use Illuminate\Foundation\Auth\User;
 
-class SlicePolicy
+class BlockPolicy
 {
     use ChecksWildcardPermissions;
 
@@ -17,7 +17,7 @@ class SlicePolicy
         return $this->checkWildcardPermissions($user);
     }
 
-    public function view(User $user, Slice $slice): bool
+    public function view(User $user, Block $block): bool
     {
         return $this->checkWildcardPermissions($user);
     }
@@ -27,12 +27,12 @@ class SlicePolicy
         return $this->checkWildcardPermissions($user);
     }
 
-    public function update(User $user, Slice $slice): bool
+    public function update(User $user, Block $block): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function delete(User $user, Slice $slice): bool
+    public function delete(User $user, Block $block): bool
     {
         return $this->checkWildcardPermissions($user);
     }

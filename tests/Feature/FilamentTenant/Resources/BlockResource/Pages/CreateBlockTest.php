@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\FilamentTenant\Resources\SliceResource\Slices\CreateSlice;
+use App\FilamentTenant\Resources\BlockResource\Blocks\CreateBlock;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
-use Domain\Page\Database\Factories\SliceFactory;
-use Domain\Page\Models\Slice;
+use Domain\Page\Database\Factories\BlockFactory;
+use Domain\Page\Models\Block;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Domain\Blueprint\Enums\FieldType;
@@ -21,17 +21,17 @@ beforeEach(function () {
 });
 
 it('can render page', function () {
-    livewire(CreateSlice::class)
+    livewire(CreateBlock::class)
         ->assertFormExists()
         ->assertOk();
 });
 
-it('can create slice', function () {
+it('can create block', function () {
     $blueprint = BlueprintFactory::new()
         ->withDummySchema()
         ->createOne();
 
-    livewire(CreateSlice::class)
+    livewire(CreateBlock::class)
         ->fillForm([
             'name' => 'Test',
             'component' => 'Test',
@@ -41,23 +41,23 @@ it('can create slice', function () {
         ->assertHasNoFormErrors()
         ->assertOk();
 
-    assertDatabaseHas(Slice::class, [
+    assertDatabaseHas(Block::class, [
         'name' => 'Test',
         'component' => 'Test',
         'blueprint_id' => $blueprint->id,
     ]);
 });
 
-it('can not create slice with same name', function () {
+it('can not create block with same name', function () {
     $blueprint = BlueprintFactory::new()
         ->withDummySchema()
         ->createOne();
 
-    SliceFactory::new(['name' => 'Test'])
+    BlockFactory::new(['name' => 'Test'])
         ->withDummyBlueprint()
         ->createOne();
 
-    livewire(CreateSlice::class)
+    livewire(CreateBlock::class)
         ->fillForm([
             'name' => 'Test',
             'component' => 'Test',
@@ -68,7 +68,7 @@ it('can not create slice with same name', function () {
         ->assertOk();
 });
 
-it('can create slice with default content', function () {
+it('can create block with default content', function () {
     $blueprint = BlueprintFactory::new()
         ->addSchemaSection(['title' => 'Main'])
         ->addSchemaField([
@@ -77,7 +77,7 @@ it('can create slice with default content', function () {
         ])
         ->createOne();
 
-    livewire(CreateSlice::class)
+    livewire(CreateBlock::class)
         ->fillForm([
             'name' => 'Test',
             'component' => 'Test',
@@ -89,7 +89,7 @@ it('can create slice with default content', function () {
         ->assertHasNoFormErrors()
         ->assertOk();
 
-    assertDatabaseHas(Slice::class, [
+    assertDatabaseHas(Block::class, [
         'name' => 'Test',
         'component' => 'Test',
         'blueprint_id' => $blueprint->id,
@@ -98,7 +98,7 @@ it('can create slice with default content', function () {
     ]);
 });
 
-it('can create slice with image', function () {
+it('can create block with image', function () {
     $blueprint = BlueprintFactory::new()
         ->withDummySchema()
         ->createOne();
@@ -106,7 +106,7 @@ it('can create slice with image', function () {
     // Prepare the storage and create a temporary image file.
     $image = UploadedFile::fake()->image('test_image.jpg');
 
-    livewire(CreateSlice::class)
+    livewire(CreateBlock::class)
         ->fillForm([
             'name' => 'Test',
             'component' => 'Test',
@@ -118,7 +118,7 @@ it('can create slice with image', function () {
         ->assertOk();
 
     // Assert the image exists in the storage and in the image column.
-    assertDatabaseHas(Slice::class, [
+    assertDatabaseHas(Block::class, [
         'name' => 'Test',
         'component' => 'Test',
         'blueprint_id' => $blueprint->id,

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\FilamentTenant\Resources\SliceResource;
+use App\FilamentTenant\Resources\BlockResource;
 use Filament\Facades\Filament;
-use Domain\Page\Database\Factories\SliceFactory;
+use Domain\Page\Database\Factories\BlockFactory;
 
 beforeEach(function () {
     testInTenantContext();
@@ -13,13 +13,13 @@ beforeEach(function () {
 });
 
 it('can globally search', function () {
-    $slice = SliceFactory::new()
+    $block = BlockFactory::new()
         ->withDummyBlueprint()
         ->createOne();
 
     $results = Filament::getGlobalSearchProvider()
-        ->getResults($slice->name);
+        ->getResults($block->name);
 
-    expect($results->getCategories()['slices']->first()->url)
-        ->toEqual(SliceResource::getUrl('edit', [$slice]));
+    expect($results->getCategories()['blocks']->first()->url)
+        ->toEqual(BlockResource::getUrl('edit', [$block]));
 });

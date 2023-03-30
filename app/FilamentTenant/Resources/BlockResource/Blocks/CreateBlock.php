@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-namespace App\FilamentTenant\Resources\SliceResource\Slices;
+namespace App\FilamentTenant\Resources\BlockResource\Blocks;
 
-use App\FilamentTenant\Resources\SliceResource;
-use Domain\Page\Actions\CreateSliceAction;
-use Domain\Page\DataTransferObjects\SliceData;
+use App\FilamentTenant\Resources\BlockResource;
+use Domain\Page\Actions\CreateBlockAction;
+use Domain\Page\DataTransferObjects\BlockData;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class CreateSlice extends CreateRecord
+class CreateBlock extends CreateRecord
 {
-    protected static string $resource = SliceResource::class;
+    protected static string $resource = BlockResource::class;
 
     /** @throws Throwable */
     protected function handleRecordCreation(array $data): Model
     {
         return DB::transaction(
-            fn () => app(CreateSliceAction::class)
-                ->execute(new SliceData(
+            fn () => app(CreateBlockAction::class)
+                ->execute(new BlockData(
                     name: $data['name'],
                     component: $data['component'],
                     image: $data['image'],

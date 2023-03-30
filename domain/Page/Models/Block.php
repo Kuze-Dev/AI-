@@ -18,7 +18,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
- * Domain\Page\Models\Slice
+ * Domain\Page\Models\Block
  *
  * @property int $id
  * @property string $blueprint_id
@@ -29,19 +29,19 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
  * @property-read int|null $activities_count
  * @property-read Blueprint $blueprint
- * @method static \Illuminate\Database\Eloquent\Builder|Slice newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Slice newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Slice query()
- * @method static \Illuminate\Database\Eloquent\Builder|Slice whereBlueprintId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Slice whereComponent($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Slice whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Slice whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Slice whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Slice whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Block newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Block newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Block query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Block whereBlueprintId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Block whereComponent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Block whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Block whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Block whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Block whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-#[OnDeleteRestrict(['sliceContents'])]
-class Slice extends Model implements IsActivitySubject, HasMedia
+#[OnDeleteRestrict(['blockContents'])]
+class Block extends Model implements IsActivitySubject, HasMedia
 {
     use LogsActivity;
     use ConstraintsRelationships;
@@ -68,21 +68,21 @@ class Slice extends Model implements IsActivitySubject, HasMedia
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return BelongsTo<Blueprint, Slice> */
+    /** @return BelongsTo<Blueprint, Block> */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
     }
 
-    /** @return HasMany<SliceContent> */
-    public function sliceContents(): HasMany
+    /** @return HasMany<BlockContent> */
+    public function blockContents(): HasMany
     {
-        return $this->hasMany(SliceContent::class);
+        return $this->hasMany(BlockContent::class);
     }
 
     public function getActivitySubjectDescription(Activity $activity): string
     {
-        return 'Slice: '.$this->name;
+        return 'Block: '.$this->name;
     }
 
     public function registerMediaCollections(): void

@@ -9,7 +9,7 @@ use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Blueprint\Models\Blueprint;
-use Domain\Page\Models\Slice;
+use Domain\Page\Models\Block;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -20,11 +20,11 @@ use Illuminate\Support\Facades\Auth;
 use Exception;
 use Closure;
 
-class SliceResource extends Resource
+class BlockResource extends Resource
 {
     use ContextualResource;
 
-    protected static ?string $model = Slice::class;
+    protected static ?string $model = Block::class;
 
     protected static ?string $navigationGroup = 'CMS';
 
@@ -52,7 +52,7 @@ class SliceResource extends Resource
                     ->searchable()
                     ->reactive()
                     ->preload()
-                    ->disabled(fn (?Slice $record) => $record !== null),
+                    ->disabled(fn (?Block $record) => $record !== null),
                 Forms\Components\FileUpload::make('image')
                     ->mediaLibraryCollection('image')
                     ->image(),
@@ -83,7 +83,7 @@ class SliceResource extends Resource
                 Tables\Columns\TextColumn::make('blueprint.name')
                     ->sortable()
                     ->searchable()
-                    ->url(fn (Slice $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
+                    ->url(fn (Block $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -120,9 +120,9 @@ class SliceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Resources\SliceResource\Slices\ListSlices::route('/'),
-            'create' => Resources\SliceResource\Slices\CreateSlice::route('/create'),
-            'edit' => Resources\SliceResource\Slices\EditSlice::route('/{record}/edit'),
+            'index' => Resources\BlockResource\Blocks\ListBlocks::route('/'),
+            'create' => Resources\BlockResource\Blocks\CreateBlock::route('/create'),
+            'edit' => Resources\BlockResource\Blocks\EditBlock::route('/{record}/edit'),
         ];
     }
 }

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\FilamentTenant\Resources\SliceResource\Slices\EditSlice;
-use Domain\Page\Database\Factories\SliceFactory;
-use Domain\Page\Models\Slice;
+use App\FilamentTenant\Resources\BlockResource\Blocks\EditBlock;
+use Domain\Page\Database\Factories\BlockFactory;
+use Domain\Page\Models\Block;
 use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -17,27 +17,27 @@ beforeEach(function () {
 });
 
 it('can render page', function () {
-    $slice = SliceFactory::new()
+    $block = BlockFactory::new()
         ->withDummyBlueprint()
         ->createOne();
 
-    livewire(EditSlice::class, ['record' => $slice->getRouteKey()])
+    livewire(EditBlock::class, ['record' => $block->getRouteKey()])
         ->assertSuccessful()
         ->assertFormExists()
         ->assertFormSet([
-            'name' => $slice->name,
-            'component' => $slice->component,
-            'blueprint_id' => $slice->blueprint_id,
+            'name' => $block->name,
+            'component' => $block->component,
+            'blueprint_id' => $block->blueprint_id,
         ])
         ->assertOk();
 });
 
 it('can edit page', function () {
-    $slice = SliceFactory::new()
+    $block = BlockFactory::new()
         ->withDummyBlueprint()
         ->createOne();
 
-    livewire(EditSlice::class, ['record' => $slice->getRouteKey()])
+    livewire(EditBlock::class, ['record' => $block->getRouteKey()])
         ->fillForm([
             'name' => 'Foo',
             'component' => 'Foo',
@@ -46,7 +46,7 @@ it('can edit page', function () {
         ->assertHasNoFormErrors()
         ->assertOk();
 
-    assertDatabaseHas(Slice::class, [
+    assertDatabaseHas(Block::class, [
         'name' => 'Foo',
         'component' => 'Foo',
     ]);

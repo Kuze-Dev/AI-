@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\FilamentTenant\Resources\SliceResource\Slices;
+namespace App\FilamentTenant\Resources\BlockResource\Blocks;
 
-use App\FilamentTenant\Resources\SliceResource;
+use App\FilamentTenant\Resources\BlockResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Exception;
 
-class ListSlices extends ListRecords
+class ListBlocks extends ListRecords
 {
-    protected static string $resource = SliceResource::class;
+    protected static string $resource = BlockResource::class;
 
     /** @throws Exception */
     protected function getActions(): array
