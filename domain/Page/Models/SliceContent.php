@@ -17,11 +17,11 @@ use Spatie\EloquentSortable\SortableTrait;
  * @property int $id
  * @property int $slice_id
  * @property int $page_id
- * @property array|null $data
+ * @property mixed|null $data
  * @property int $order
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Domain\Page\Models\Slice $slice
+ * @property-read \Domain\Page\Models\Slice|null $slice
  * @method static Builder|SliceContent newModelQuery()
  * @method static Builder|SliceContent newQuery()
  * @method static Builder|SliceContent ordered(string $direction = 'asc')

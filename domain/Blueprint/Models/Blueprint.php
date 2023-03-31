@@ -20,7 +20,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property \Domain\Blueprint\DataTransferObjects\SchemaData $schema
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @method static \Illuminate\Database\Eloquent\Builder|Blueprint newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Blueprint newQuery()

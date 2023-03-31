@@ -27,12 +27,12 @@ use Spatie\Sluggable\SlugOptions;
  * @property bool $store_submission
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read Blueprint $blueprint
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Form\Models\FormEmailNotification[] $formEmailNotifications
+ * @property-read Blueprint|null $blueprint
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Form\Models\FormEmailNotification> $formEmailNotifications
  * @property-read int|null $form_email_notifications_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Form\Models\FormSubmission[] $formSubmissions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Form\Models\FormSubmission> $formSubmissions
  * @property-read int|null $form_submissions_count
  * @method static \Illuminate\Database\Eloquent\Builder|Form newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Form newQuery()

@@ -46,20 +46,20 @@ use Spatie\Permission\Traits\HasRoles;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Permission\Models\Permission[] $permissions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
  * @property-read int|null $permissions_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Role\Models\Role[] $roles
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Role\Models\Role> $roles
  * @property-read int|null $roles_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Sanctum\PersonalAccessToken[] $tokens
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
  * @property-read \Domain\Auth\Model\TwoFactorAuthentication|null $twoFactorAuthentication
  * @method static \Illuminate\Database\Eloquent\Builder|Admin newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Admin newQuery()
- * @method static \Illuminate\Database\Query\Builder|Admin onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Admin onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Admin permission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder|Admin query()
  * @method static \Illuminate\Database\Eloquent\Builder|Admin role($roles, $guard = null)
@@ -79,8 +79,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static \Illuminate\Database\Eloquent\Builder|Admin whereTimezone($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Admin whereToBeLoggedOut($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Admin whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|Admin withTrashed()
- * @method static \Illuminate\Database\Query\Builder|Admin withoutTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Admin withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Admin withoutTrashed()
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['twoFactorAuthentication', 'roles', 'permissions', 'tokens'])]

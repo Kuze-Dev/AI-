@@ -29,11 +29,11 @@ use Illuminate\Database\Eloquent\Builder;
  * @property int $order
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|TaxonomyTerm[] $children
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $children
  * @property-read int|null $children_count
- * @property-read \Illuminate\Database\Eloquent\Collection|CollectionEntry[] $collectionEntries
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, CollectionEntry> $collectionEntries
  * @property-read int|null $collection_entries_count
- * @property-read \Domain\Taxonomy\Models\Taxonomy $taxonomy
+ * @property-read \Domain\Taxonomy\Models\Taxonomy|null $taxonomy
  * @method static Builder|TaxonomyTerm newModelQuery()
  * @method static Builder|TaxonomyTerm newQuery()
  * @method static Builder|TaxonomyTerm ordered(string $direction = 'asc')

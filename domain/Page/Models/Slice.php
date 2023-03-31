@@ -26,16 +26,24 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string $component
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property bool $is_fixed_content
+ * @property array|null $data
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read Blueprint $blueprint
+ * @property-read Blueprint|null $blueprint
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read int|null $media_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Page\Models\SliceContent> $sliceContents
+ * @property-read int|null $slice_contents_count
  * @method static \Illuminate\Database\Eloquent\Builder|Slice newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Slice newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Slice query()
  * @method static \Illuminate\Database\Eloquent\Builder|Slice whereBlueprintId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Slice whereComponent($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Slice whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Slice whereData($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Slice whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Slice whereIsFixedContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Slice whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Slice whereUpdatedAt($value)
  * @mixin \Eloquent

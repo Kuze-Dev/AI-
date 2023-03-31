@@ -26,13 +26,13 @@ use Eloquent;
  * @property string $authenticatable_type
  * @property int $authenticatable_id
  * @property string|null $enabled_at
- * @property string $secret
+ * @property mixed $secret
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Model|Eloquent $authenticatable
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Auth\Model\RecoveryCode[] $recoveryCodes
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Auth\Model\RecoveryCode> $recoveryCodes
  * @property-read int|null $recovery_codes_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Auth\Model\SafeDevice[] $safeDevices
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Auth\Model\SafeDevice> $safeDevices
  * @property-read int|null $safe_devices_count
  * @method static \Illuminate\Database\Eloquent\Builder|TwoFactorAuthentication newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TwoFactorAuthentication newQuery()
