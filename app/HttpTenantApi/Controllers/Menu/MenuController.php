@@ -21,6 +21,10 @@ class MenuController
                     'name',
                     'slug',
                 ])
+                ->allowedIncludes([
+                    'nodes.children',
+                    'parentNodes.children',
+                ])
                 ->jsonPaginate()
         );
     }
@@ -29,7 +33,10 @@ class MenuController
     {
         return MenuResource::make(
             QueryBuilder::for(Menu::whereSlug($menu))
-                ->allowedIncludes(['nodes.children', 'parentNodes.children'])
+                ->allowedIncludes([
+                    'nodes.children',
+                    'parentNodes.children',
+                ])
                 ->firstOrFail()
         );
     }

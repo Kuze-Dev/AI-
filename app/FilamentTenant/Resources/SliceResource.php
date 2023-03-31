@@ -15,6 +15,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 use Closure;
@@ -52,6 +53,9 @@ class SliceResource extends Resource
                     ->reactive()
                     ->preload()
                     ->disabled(fn (?Slice $record) => $record !== null),
+                Forms\Components\FileUpload::make('image')
+                    ->mediaLibraryCollection('image')
+                    ->image(),
                 Forms\Components\Toggle::make('is_fixed_content')
                     ->inline(false)
                     ->hidden(fn (Closure $get) => $get('blueprint_id') ? false : true)
@@ -95,6 +99,7 @@ class SliceResource extends Resource
                     ->searchable()
                     ->optionsLimit(20),
             ])
+            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

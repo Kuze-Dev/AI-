@@ -10,6 +10,7 @@ use Domain\Blueprint\DataTransferObjects\BlueprintData;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
 use Domain\Blueprint\Models\Blueprint;
 use Filament\Pages\Actions;
+use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -21,8 +22,17 @@ class EditBlueprint extends EditRecord
     protected function getActions(): array
     {
         return [
+            Action::make('save')
+                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->action('save')
+                ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
     }
 
     /** @param Blueprint $record */

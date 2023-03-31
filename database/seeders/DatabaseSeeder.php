@@ -13,12 +13,8 @@ use Illuminate\Support\Facades\Artisan;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     *
-     * @return void
-     */
-    public function run()
+    /** Seed the application's database. */
+    public function run(): void
     {
         Artisan::call(DropTenantDatabasesCommand::class);
 

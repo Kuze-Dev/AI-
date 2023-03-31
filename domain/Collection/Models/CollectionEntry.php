@@ -88,7 +88,7 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
      */
     protected $casts = [
         'data' => 'array',
-        'published_at' => 'date',
+        'published_at' => 'datetime',
     ];
 
     /** @return LogOptions */
@@ -160,6 +160,7 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
         return 'slug';
     }
 
+    /** @return CollectionEntryBuilder<self> */
     public function newEloquentBuilder($query): CollectionEntryBuilder
     {
         return new CollectionEntryBuilder($query);
