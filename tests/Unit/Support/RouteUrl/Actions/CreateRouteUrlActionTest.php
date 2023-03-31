@@ -22,6 +22,7 @@ beforeEach(function () {
             $table->id();
             $table->string('name');
             $table->routeUrl();
+            $table->string('slug')->unique();
             $table->timestamps();
         });
 
@@ -29,14 +30,14 @@ beforeEach(function () {
     assertDatabaseEmpty(RouteUrl::class);
 });
 
-it('create w/ default', function () {
+it('create w/o specify route_url', function () {
     $model = TestModelForRouteUrl::create([
         'name' => 'my awesome name',
     ]);
 
     expect($model)
         ->getRouteUrlUrl()
-        ->toBe('my awesome name')
+        ->toBe('my-awesome-name')
         ->getRouteUrlIsOverride()
         ->toBe(false);
 
@@ -44,19 +45,19 @@ it('create w/ default', function () {
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $model->getMorphClass(),
         'model_id' => $model->getKey(),
-        'url' => 'my awesome name',
+        'url' => 'my-awesome-name',
         'is_override' => false,
     ]);
 });
-it('create w/ custom but same as default', function () {
+it('create w/ specify route_url but same as default', function () {
     $model = TestModelForRouteUrl::create([
         'name' => 'my awesome name',
-        TestModelForRouteUrl::getRouteUrlUrlColumn() => 'my awesome name',
+        TestModelForRouteUrl::getRouteUrlUrlColumn() => 'my-awesome-name',
     ]);
 
     expect($model)
         ->getRouteUrlUrl()
-        ->toBe('my awesome name')
+        ->toBe('my-awesome-name')
         ->getRouteUrlIsOverride()
         ->toBe(false);
 
@@ -64,12 +65,12 @@ it('create w/ custom but same as default', function () {
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $model->getMorphClass(),
         'model_id' => $model->getKey(),
-        'url' => 'my awesome name',
+        'url' => 'my-awesome-name',
         'is_override' => false,
     ]);
 });
 
-it('create w/ override', function () {
+it('create w/ specify route_url', function () {
     $model = TestModelForRouteUrl::create([
         'name' => 'my awesome name',
         TestModelForRouteUrl::getRouteUrlUrlColumn() => 'im custom value',

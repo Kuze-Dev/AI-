@@ -40,8 +40,12 @@ trait HasRouteUrl
         if ( ! isset($this->casts[static::getRouteUrlIsOverrideColumn()])) {
             $this->casts[static::getRouteUrlIsOverrideColumn()] = 'bool';
         }
+
         if ( ! in_array(static::getRouteUrlUrlColumn(), $this->fillable)) {
             $this->fillable[] = static::getRouteUrlUrlColumn();
+        }
+        if ( ! in_array(static::getRouteUrlIsOverrideColumn(), $this->fillable)) {
+            $this->fillable[] = static::getRouteUrlIsOverrideColumn();
         }
     }
 
