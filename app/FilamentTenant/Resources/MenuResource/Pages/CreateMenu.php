@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Resources\MenuResource\Pages;
 use App\FilamentTenant\Resources\MenuResource;
 use Domain\Menu\Actions\CreateMenuAction;
 use Domain\Menu\DataTransferObjects\MenuData;
+use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +15,22 @@ use Illuminate\Support\Facades\DB;
 class CreateMenu extends CreateRecord
 {
     protected static string $resource = MenuResource::class;
+
+    protected function getActions(): array
+    {
+        return [
+            Action::make('create')
+                ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
+                ->action('create')
+                ->keyBindings(['mod+s']),
+            $this->getCreateAnotherFormAction(),
+        ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
+    }
 
     protected function handleRecordCreation(array $data): Model
     {

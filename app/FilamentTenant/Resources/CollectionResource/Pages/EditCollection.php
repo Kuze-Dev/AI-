@@ -13,6 +13,7 @@ use Filament\Pages\Actions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Domain\Collection\Models\Collection;
+use Filament\Pages\Actions\Action;
 
 class EditCollection extends EditRecord
 {
@@ -25,8 +26,17 @@ class EditCollection extends EditRecord
     protected function getActions(): array
     {
         return [
+            Action::make('save')
+                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->action('save')
+                ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
     }
 
     /**
