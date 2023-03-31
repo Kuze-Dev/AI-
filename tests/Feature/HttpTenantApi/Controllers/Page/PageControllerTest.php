@@ -81,6 +81,6 @@ it('can show a page with includes', function (string $include) {
         });
 })->with([
     'sliceContents',
-    'slugHistories',
+    'routeUrls',
     'metaData',
 ]);

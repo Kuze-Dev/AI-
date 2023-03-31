@@ -8,7 +8,7 @@ use Domain\Page\Database\Factories\SliceFactory;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\SliceContent;
 use Domain\Support\MetaData\Models\MetaData;
-use Domain\Support\SlugHistory\SlugHistory;
+use Domain\Support\RouteUrl\Models\RouteUrl;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -66,9 +66,11 @@ it('can create page', function () {
             'model_id' => $page->getKey(),
         ]
     );
-    assertDatabaseHas(SlugHistory::class, [
+    assertDatabaseHas(RouteUrl::class, [
         'model_type' => $page->getMorphClass(),
         'model_id' => $page->id,
+        'url' => 'test-url',
+        'is_override' => true,
     ]);
 });
 
@@ -153,8 +155,10 @@ it('can create page with meta data', function () {
         'file_name' => $metaDataImage->getClientOriginalName(),
         'mime_type' => $metaDataImage->getMimeType(),
     ]);
-    assertDatabaseHas(SlugHistory::class, [
+    assertDatabaseHas(RouteUrl::class, [
         'model_type' => $page->getMorphClass(),
         'model_id' => $page->id,
+        'url' => 'test-url',
+        'is_override' => true,
     ]);
 });

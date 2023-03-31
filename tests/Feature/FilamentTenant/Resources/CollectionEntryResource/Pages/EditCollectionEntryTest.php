@@ -7,13 +7,13 @@ use Carbon\Carbon;
 use Domain\Collection\Models\CollectionEntry;
 use Domain\Collection\Database\Factories\CollectionFactory;
 use Domain\Collection\Database\Factories\CollectionEntryFactory;
+use Domain\Support\RouteUrl\Models\RouteUrl;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
 use Domain\Support\MetaData\Models\MetaData;
-use Domain\Support\SlugHistory\SlugHistory;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 
@@ -156,7 +156,7 @@ it('can edit collection entry', function () {
     }
 });
 
-it('can edit collection entry slug', function () {
+it('can edit collection entry route_url', function () {
     $collection = CollectionFactory::new(['name' => 'Test Collection'])
         ->for(
             BlueprintFactory::new()
@@ -173,7 +173,7 @@ it('can edit collection entry slug', function () {
         ]);
 
     livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
-        ->fillForm(['slug' => 'new-foo'])
+        ->fillForm(['route_url' => 'new-foo'])
         ->call('save')
         ->assertOk()
         ->assertHasNoFormErrors()
@@ -182,13 +182,14 @@ it('can edit collection entry slug', function () {
 
     assertDatabaseHas(CollectionEntry::class, [
         'id' => $collectionEntry->id,
-        'slug' => 'new-foo',
+        'route_url' => 'new-foo',
     ]);
-    assertDatabaseCount(SlugHistory::class, 3); // 1 (for collection) + 2 (for collection entry)
-    assertDatabaseHas(SlugHistory::class, [
+    assertDatabaseCount(RouteUrl::class, 3); // 1 (for collection) + 2 (for collection entry)
+    assertDatabaseHas(RouteUrl::class, [
         'model_type' => $collectionEntry->getMorphClass(),
         'model_id' => $collectionEntry->id,
-        'slug' => 'new-foo',
+        'url' => 'new-foo',
+        'is_override' => true,
     ]);
 });
 

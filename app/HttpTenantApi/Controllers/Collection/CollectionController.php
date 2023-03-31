@@ -19,7 +19,7 @@ class CollectionController
             QueryBuilder::for(Collection::query())
                 ->allowedIncludes([
                     'taxonomies',
-                    'slugHistories',
+                    'routeUrls',
                 ])
                 ->allowedFilters(['name', 'slug'])
                 ->jsonPaginate()
@@ -32,7 +32,7 @@ class CollectionController
             QueryBuilder::for(Collection::whereSlug($collection))
                 ->allowedIncludes([
                     'taxonomies',
-                    'slugHistories',
+                    'routeUrls',
                 ])
                 ->firstOrFail()
         );

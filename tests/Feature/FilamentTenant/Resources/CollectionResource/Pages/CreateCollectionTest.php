@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\CollectionResource\Pages\CreateCollection;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Collection\Models\Collection;
-use Domain\Support\SlugHistory\SlugHistory;
+use Domain\Support\RouteUrl\Models\RouteUrl;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Filament\Facades\Filament;
 
@@ -29,6 +29,7 @@ it('can create collection', function () {
         ->withDummySchema()
         ->createOne();
 
+    /** @var Collection $collection */
     $collection = livewire(CreateCollection::class)
         ->fillForm([
             'name' => 'Test Collection',
@@ -37,7 +38,7 @@ it('can create collection', function () {
             'future_publish_date_behavior' => 'public',
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
-            'route_url' => 'test-collection',
+            'route_url' => 'test-collection', // override but same as default
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -52,9 +53,11 @@ it('can create collection', function () {
         'is_sortable' => true,
         'route_url' => 'test-collection',
     ]);
-    assertDatabaseHas(SlugHistory::class, [
+    assertDatabaseHas(RouteUrl::class, [
         'model_type' => $collection->getMorphClass(),
         'model_id' => $collection->id,
+        'url' => $collection->slug,
+        'is_override' => false,  // override but same as default
     ]);
 });
 

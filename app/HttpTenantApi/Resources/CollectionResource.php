@@ -27,7 +27,7 @@ class CollectionResource extends JsonApiResource
     {
         return [
             'taxonomies' => fn () => TaxonomyResource::collection($this->taxonomies),
-            'slugHistories' => fn () => SlugHistoryResource::collection($this->slugHistories),
+            'routeUrls' => fn () => RouteUrlResource::collection($this->routeUrls),
         ];
     }
 }

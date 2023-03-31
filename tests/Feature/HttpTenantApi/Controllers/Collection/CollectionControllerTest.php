@@ -69,5 +69,5 @@ it('can show a collection with includes', function (string $include) {
         });
 })->with([
     'taxonomies',
-    'slugHistories',
+    'routeUrls',
 ]);

@@ -247,6 +247,6 @@ it('can show collection entry with includes', function (string $include) {
         });
 })->with([
     'taxonomyTerms',
-    'slugHistories',
+    'routeUrls',
     'metaData',
 ]);

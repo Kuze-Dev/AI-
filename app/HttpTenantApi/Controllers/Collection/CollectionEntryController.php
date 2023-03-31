@@ -69,7 +69,7 @@ class CollectionEntryController
                 ])
                 ->allowedIncludes([
                     'taxonomyTerms.taxonomy',
-                    'slugHistories',
+                    'routeUrls',
                     'metaData',
                 ])
                 ->jsonPaginate()
@@ -85,7 +85,7 @@ class CollectionEntryController
             )
                 ->allowedIncludes([
                     'taxonomyTerms.taxonomy',
-                    'slugHistories',
+                    'routeUrls',
                     'metaData',
                 ])
                 ->firstOrFail()

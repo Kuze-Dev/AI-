@@ -27,6 +27,7 @@ class UpdateCollectionEntryAction
             'title' => $collectionEntryData->title,
             'published_at' => $collectionEntryData->published_at,
             'data' => $collectionEntryData->data,
+            'route_url' => $collectionEntryData->route_url,
         ]);
 
         $collectionEntry->metaData()->exists()

@@ -20,7 +20,7 @@ class PageController
                 ->allowedFilters(['name', 'slug'])
                 ->allowedIncludes([
                     'sliceContents.slice',
-                    'slugHistories',
+                    'routeUrls',
                     'metaData',
                 ])
                 ->jsonPaginate()
@@ -33,7 +33,7 @@ class PageController
             QueryBuilder::for(Page::whereSlug($page))
                 ->allowedIncludes([
                     'sliceContents.slice',
-                    'slugHistories',
+                    'routeUrls',
                     'metaData',
                 ])
                 ->firstOrFail()

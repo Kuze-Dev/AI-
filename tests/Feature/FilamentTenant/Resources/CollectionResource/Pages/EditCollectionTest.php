@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\CollectionResource\Pages\EditCollection;
 use Domain\Collection\Database\Factories\CollectionFactory;
 use Domain\Collection\Models\Collection;
-use Domain\Support\SlugHistory\SlugHistory;
+use Domain\Support\RouteUrl\Models\RouteUrl;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Filament\Facades\Filament;
 
@@ -83,26 +83,27 @@ it('can update collection', function () {
     ]);
 });
 
-it('can update collection slug', function () {
+it('can update collection route_url', function () {
     $collection = CollectionFactory::new(['name' => 'Test Collection'])
         ->withDummyBlueprint()
         ->createOne();
 
     livewire(EditCollection::class, ['record' => $collection->getRouteKey()])
-        ->fillForm(['slug' => 'test-collection-updated'])
+        ->fillForm(['route_url' => 'test-collection-updated'])
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk();
 
     assertDatabaseHas(Collection::class, [
         'id' => $collection->id,
-        'slug' => 'test-collection-updated',
+        'route_url' => 'test-collection-updated',
     ]);
-    assertDatabaseCount(SlugHistory::class, 2);
-    assertDatabaseHas(SlugHistory::class, [
+    assertDatabaseCount(RouteUrl::class, 2);
+    assertDatabaseHas(RouteUrl::class, [
         'model_type' => $collection->getMorphClass(),
         'model_id' => $collection->id,
-        'slug' => 'test-collection-updated',
+        'url' => 'test-collection-updated',
+        'is_override' => true,
     ]);
 });
 

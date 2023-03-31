@@ -34,7 +34,7 @@ class CollectionEntryResource extends JsonApiResource
     {
         return [
             'taxonomyTerms' => fn () => TaxonomyTermResource::collection($this->taxonomyTerms),
-            'slugHistories' => fn () => SlugHistoryResource::collection($this->slugHistories),
+            'routeUrls' => fn () => RouteUrlResource::collection($this->routeUrls),
             'metaData' => fn () => MetaDataResource::make($this->metaData),
         ];
     }

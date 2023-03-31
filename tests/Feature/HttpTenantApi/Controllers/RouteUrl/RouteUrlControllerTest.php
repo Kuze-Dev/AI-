@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use function Pest\Laravel\getJson;
 
+uses()->group('route_url');
+
 beforeEach(function () {
     testInTenantContext();
 });

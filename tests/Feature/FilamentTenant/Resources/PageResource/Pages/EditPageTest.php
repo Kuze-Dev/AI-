@@ -11,7 +11,7 @@ use Domain\Page\Models\Page;
 use Domain\Page\Models\SliceContent;
 use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
 use Domain\Support\MetaData\Models\MetaData;
-use Domain\Support\SlugHistory\SlugHistory;
+use Domain\Support\RouteUrl\Models\RouteUrl;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 
@@ -115,7 +115,7 @@ it('can edit page', function () {
     ]);
 });
 
-it('can edit page slug', function () {
+it('can edit page route_url', function () {
     $page = PageFactory::new(['slug' => 'foo'])
         ->addSliceContent(
             SliceFactory::new()
@@ -139,7 +139,7 @@ it('can edit page slug', function () {
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
-            'slug' => 'new-foo',
+            'route_url' => 'new-foo',
             'slice_contents.record-1.data.main.header' => 'Bar',
         ])
         ->call('save')
@@ -148,13 +148,14 @@ it('can edit page slug', function () {
 
     assertDatabaseHas(Page::class, [
         'id' => $page->id,
-        'slug' => 'new-foo',
+        'route_url' => 'new-foo',
     ]);
-    assertDatabaseCount(SlugHistory::class, 2);
-    assertDatabaseHas(SlugHistory::class, [
+    assertDatabaseCount(RouteUrl::class, 2);
+    assertDatabaseHas(RouteUrl::class, [
         'model_type' => $page->getMorphClass(),
         'model_id' => $page->id,
-        'slug' => 'new-foo',
+        'url' => 'new-foo',
+        'is_override' => true,
     ]);
 });
 

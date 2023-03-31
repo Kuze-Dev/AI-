@@ -6,12 +6,12 @@ use App\FilamentTenant\Resources\CollectionEntryResource\Pages\CreateCollectionE
 use Carbon\Carbon;
 use Domain\Collection\Models\CollectionEntry;
 use Domain\Collection\Database\Factories\CollectionFactory;
+use Domain\Support\RouteUrl\Models\RouteUrl;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Support\MetaData\Models\MetaData;
-use Domain\Support\SlugHistory\SlugHistory;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -26,6 +26,7 @@ beforeEach(function () {
 });
 
 it('can create collection entry', function () {
+    /** @var \Domain\Collection\Models\Collection $collection */
     $collection = CollectionFactory::new(['name' => 'Test Collection'])
         ->for(
             BlueprintFactory::new()
@@ -34,6 +35,7 @@ it('can create collection entry', function () {
         )
         ->createOne();
 
+    /** @var CollectionEntry $collectionEntry */
     $collectionEntry = livewire(CreateCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey()])
         ->assertOk()
         ->fillForm([
@@ -62,9 +64,11 @@ it('can create collection entry', function () {
             'model_id' => $collectionEntry->getKey(),
         ]
     );
-    assertDatabaseHas(SlugHistory::class, [
+    assertDatabaseHas(RouteUrl::class, [
         'model_type' => $collectionEntry->getMorphClass(),
         'model_id' => $collectionEntry->id,
+        'url' => $collectionEntry->slug,
+        'is_override' => false,
     ]);
 });
 
