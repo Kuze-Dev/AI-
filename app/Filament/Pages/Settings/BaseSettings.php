@@ -8,6 +8,7 @@ use App\Filament\Resources\RoleResource\Support\PermissionGroup;
 use Filament\Pages\SettingsPage;
 use Illuminate\Support\Facades\Route;
 use Closure;
+use Filament\Pages\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
@@ -26,6 +27,21 @@ abstract class BaseSettings extends SettingsPage
         abort_unless(self::authorizeAccess(), 403);
 
         parent::mount();
+    }
+
+    protected function getActions(): array
+    {
+        return [
+            Action::make('save')
+                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->action('save')
+                ->keyBindings(['mod+s']),
+        ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
     }
 
     public static function shouldShowSettingsCard(): bool
@@ -57,7 +73,7 @@ abstract class BaseSettings extends SettingsPage
 
     public static function getRouteName(): string
     {
-        return 'filament.pages.settings.'.self::getSlug();
+        return 'filament.pages.settings.' . self::getSlug();
     }
 
     protected function getBreadcrumb(): string
@@ -80,9 +96,9 @@ abstract class BaseSettings extends SettingsPage
         return function () {
             $slug = self::getSlug();
 
-            Route::get('settings/'.$slug, static::class)
+            Route::get('settings/' . $slug, static::class)
                 ->middleware(static::getMiddlewares())
-                ->name('settings.'.$slug);
+                ->name('settings.' . $slug);
         };
     }
 }
