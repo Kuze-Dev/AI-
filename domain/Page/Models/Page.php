@@ -27,17 +27,15 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property int $id
  * @property string $name
  * @property string $slug
- * @property string $route_url Manage by RouteUrl Domain
- * @property bool $route_url_is_override Manage by RouteUrl Domain
+ * @property string $route_url
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
+ * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
  * @property-read int|null $activities_count
- * @property-read \Domain\Support\MetaData\Models\MetaData|null $metaData
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Support\RouteUrl\Models\RouteUrl> $routeUrls
- * @property-read int|null $route_urls_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Page\Models\SliceContent> $sliceContents
+ * @property-read \Domain\Support\MetaData\Models\MetaData $metaData
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Page\Models\SliceContent[] $sliceContents
  * @property-read int|null $slice_contents_count
+ * @property-read string|null $qualified_route_url
  * @method static \Illuminate\Database\Eloquent\Builder|Page newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page query()
@@ -45,7 +43,6 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @method static \Illuminate\Database\Eloquent\Builder|Page whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Page whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Page whereRouteUrl($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Page whereRouteUrlIsOverride($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Page whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Page whereUpdatedAt($value)
  * @mixin \Eloquent

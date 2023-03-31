@@ -30,21 +30,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string $blueprint_id
  * @property string $name
  * @property string $slug
+ * @property string $route_url
  * @property PublishBehavior|null $future_publish_date_behavior
  * @property PublishBehavior|null $past_publish_date_behavior
  * @property bool $is_sortable
- * @property string $route_url Manage by RouteUrl Domain
- * @property bool $route_url_is_override Manage by RouteUrl Domain
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
+ * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
  * @property-read int|null $activities_count
- * @property-read Blueprint|null $blueprint
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Collection\Models\CollectionEntry> $collectionEntries
+ * @property-read Blueprint $blueprint
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Collection\Models\CollectionEntry[] $collectionEntries
  * @property-read int|null $collection_entries_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Support\RouteUrl\Models\RouteUrl> $routeUrls
- * @property-read int|null $route_urls_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Taxonomy> $taxonomies
+ * @property-read \Illuminate\Database\Eloquent\Collection|Taxonomy[] $taxonomies
  * @property-read int|null $taxonomies_count
  * @method static \Illuminate\Database\Eloquent\Builder|Collection newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Collection newQuery()
@@ -56,8 +53,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Collection whereIsSortable($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Collection whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Collection wherePastPublishDateBehavior($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Collection whereRouteUrl($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Collection whereRouteUrlIsOverride($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Collection whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Collection whereUpdatedAt($value)
  * @mixin \Eloquent
