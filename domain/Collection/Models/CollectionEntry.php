@@ -31,6 +31,7 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property int $collection_id
  * @property string $title
  * @property string $slug
+ * @property string $route_url
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property array $data
  * @property int|null $order

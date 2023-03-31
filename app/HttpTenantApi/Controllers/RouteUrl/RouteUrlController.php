@@ -11,7 +11,7 @@ use Spatie\RouteAttributes\Attributes\Get;
 class RouteUrlController
 {
     #[Get('/route/{routeUrl}')]
-    public function __invoke(string $routeUrl)
+    public function __invoke(string $routeUrl): RouteUrlResource
     {
         return RouteUrlResource::make(
             RouteUrl::where('url', $routeUrl)

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 interface HasRouteUrl
 {
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Domain\Support\RouteUrl\Models\RouteUrl> */
     public function routeUrls(): MorphMany;
 
     public function getRouteUrlDefaultUrl(): string;

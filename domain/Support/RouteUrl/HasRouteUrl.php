@@ -14,15 +14,16 @@ trait HasRouteUrl
 {
     public static function bootHasRouteUrl(): void
     {
-        static::creating(function (Model&Contracts\HasRouteUrl $model) {
-            /** @var static|Model&Contracts\HasRouteUrl $model */
-            $model->generateRouteUrlOnCreate();
-        });
+        $generate = function (Model&Contracts\HasRouteUrl $model) {
+            $model->{static::getRouteUrlIsOverrideColumn()} =
+                $model->{static::getRouteUrlUrlColumn()} !== null &&
+                $model->{static::getRouteUrlUrlColumn()} !== $model->getRouteUrlDefaultUrl();
 
-        static::updating(function (Model&Contracts\HasRouteUrl $model) {
-            /** @var static|Model&Contracts\HasRouteUrl $model */
-            $model->generateRouteUrlOnUpdate();
-        });
+            $model->{static::getRouteUrlUrlColumn()} ??= $model->getRouteUrlDefaultUrl();
+        };
+
+        static::creating(fn (Model&Contracts\HasRouteUrl $model) => $generate($model));
+        static::updating(fn (Model&Contracts\HasRouteUrl $model) => $generate($model));
 
         static::created(function (Model&Contracts\HasRouteUrl $model) {
             /** @var static|Model&Contracts\HasRouteUrl $model */
@@ -49,22 +50,10 @@ trait HasRouteUrl
         }
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Domain\Support\RouteUrl\Models\RouteUrl> */
     public function routeUrls(): MorphMany
     {
         return $this->morphMany(RouteUrl::class, 'model');
-    }
-
-    private function generateRouteUrlOnCreate(): void
-    {
-        $this->{static::getRouteUrlIsOverrideColumn()} = $this->{static::getRouteUrlUrlColumn()} !== null &&
-            $this->{static::getRouteUrlUrlColumn()} !== $this->getRouteUrlDefaultUrl();
-
-        $this->{static::getRouteUrlUrlColumn()} ??= $this->getRouteUrlDefaultUrl();
-    }
-
-    private function generateRouteUrlOnUpdate(): void
-    {
-        $this->generateRouteUrlOnCreate();
     }
 
     public function getRouteUrlUrl(): string

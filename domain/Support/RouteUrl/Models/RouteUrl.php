@@ -6,6 +6,7 @@ namespace Domain\Support\RouteUrl\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Eloquent;
 
 /**
  * Domain\Support\RouteUrl\Models\RouteUrl
@@ -17,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property bool $is_override
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read Model|\Eloquent $model
+ * @property-read Model|Eloquent $model
  * @method static \Illuminate\Database\Eloquent\Builder|RouteUrl newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|RouteUrl newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|RouteUrl query()
@@ -43,6 +44,7 @@ class RouteUrl extends Model
         'is_override' => 'bool',
     ];
 
+    /** @return MorphTo<Model, self> */
     public function model(): MorphTo
     {
         return $this->morphTo();

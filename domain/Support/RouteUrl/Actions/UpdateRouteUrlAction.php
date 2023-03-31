@@ -31,6 +31,7 @@ class UpdateRouteUrlAction
 
     private static function getRouteUrl(Model&HasRouteUrl $model): RouteUrl
     {
+        /** @phpstan-ignore-next-line  */
         return $model->routeUrls()->latest()->first();
     }
 }
