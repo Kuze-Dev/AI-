@@ -11,6 +11,7 @@ use App\FilamentTenant\Resources\TaxonomyResource;
 use Domain\Taxonomy\Actions\UpdateTaxonomyAction;
 use Domain\Taxonomy\DataTransferObjects\TaxonomyData;
 use Filament\Pages\Actions;
+use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -24,9 +25,18 @@ class EditTaxonomy extends EditRecord implements HasTreesContract
     protected function getActions(): array
     {
         return [
+            Action::make('save')
+                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->action('save')
+                ->keyBindings(['mod+s']),
             TreeFormAction::make(),
             Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
     }
 
     /** @param \Domain\Taxonomy\Models\Taxonomy $record */

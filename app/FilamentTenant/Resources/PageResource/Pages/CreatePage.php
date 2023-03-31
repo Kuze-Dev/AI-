@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Resources\PageResource\Pages;
 use App\FilamentTenant\Resources\PageResource;
 use Domain\Page\Actions\CreatePageAction;
 use Domain\Page\DataTransferObjects\PageData;
+use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,22 @@ use Throwable;
 class CreatePage extends CreateRecord
 {
     protected static string $resource = PageResource::class;
+
+    protected function getActions(): array
+    {
+        return [
+            Action::make('create')
+                ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
+                ->action('create')
+                ->keyBindings(['mod+s']),
+            $this->getCreateAnotherFormAction(),
+        ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
+    }
 
     /** @throws Throwable */
     protected function handleRecordCreation(array $data): Model
