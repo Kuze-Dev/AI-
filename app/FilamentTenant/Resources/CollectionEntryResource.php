@@ -101,7 +101,7 @@ class CollectionEntryResource extends Resource
                                 }
                             })
                             ->required(),
-                        RouteUrlForm::make('Route Url'),
+                        RouteUrlForm::make('Route Url')->applySchema(CollectionEntry::class),
                     ]),
                     Forms\Components\Section::make(trans('Taxonomies'))
                         ->schema([

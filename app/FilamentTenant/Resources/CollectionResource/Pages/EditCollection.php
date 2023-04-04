@@ -8,6 +8,7 @@ use App\FilamentTenant\Resources\CollectionResource;
 use Domain\Collection\Actions\UpdateCollectionAction;
 use Domain\Collection\DataTransferObjects\CollectionData;
 use Domain\Collection\Enums\PublishBehavior;
+use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Pages\Actions;
 use Illuminate\Database\Eloquent\Model;
@@ -55,7 +56,7 @@ class EditCollection extends EditRecord
                     is_sortable: $data['is_sortable'],
                     past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
                     future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
-                    route_url: $data['route_url'],
+                    url_data: new RouteUrlData(url: $data['route_url']['url'] ?? null),
                 ))
         );
     }

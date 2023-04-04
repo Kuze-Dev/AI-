@@ -31,7 +31,6 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property int $collection_id
  * @property string $title
  * @property string $slug
- * @property string $route_url
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property array $data
  * @property int|null $order
@@ -170,7 +169,7 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
       protected function qualifiedRouteUrl(): Attribute
       {
           return Attribute::get(fn () => Blade::render(
-              Blade::compileEchos($this->collection->route_url .'/'.$this->slug),
+              Blade::compileEchos($this->collection->getActiveRouteUrl()->url .'/'.$this->slug),
               [
                   'slug' => $this->slug,
               ]
@@ -179,6 +178,6 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
 
     public function getRouteUrlDefaultUrl(): string
     {
-        return $this->{$this->getSlugOptions()->slugField};
+        return $this->slug;
     }
 }

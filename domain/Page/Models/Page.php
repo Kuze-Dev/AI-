@@ -27,7 +27,6 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property int $id
  * @property string $name
  * @property string $slug
- * @property string $route_url
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
@@ -112,7 +111,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasR
     protected function qualifiedRouteUrl(): Attribute
     {
         return Attribute::get(fn () => Blade::render(
-            Blade::compileEchos($this->route_url),
+            Blade::compileEchos($this->getActiveRouteUrl()->url),
             [
                 'slug' => $this->slug,
             ]
@@ -121,6 +120,6 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasR
 
     public function getRouteUrlDefaultUrl(): string
     {
-        return $this->{$this->getSlugOptions()->slugField};
+        return $this->slug;
     }
 }

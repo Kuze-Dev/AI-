@@ -87,7 +87,7 @@ class CollectionResource extends Resource
                         ->searchable()
                         ->preload()
                         ->disabled(fn (?Collection $record) => $record !== null),
-                    RouteUrlForm::make('Route Url'),
+                    RouteUrlForm::make('Route Url')->applySchema(Collection::class),
                     Forms\Components\Select::make('taxonomies')
                         ->multiple()
                         ->options(

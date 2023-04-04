@@ -38,7 +38,7 @@ it('can create collection', function () {
             'future_publish_date_behavior' => 'public',
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
-            'route_url' => 'test-collection', // override but same as default
+            'route_url' => ['url' => 'test-collection'], // override but same as default
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -51,13 +51,12 @@ it('can create collection', function () {
         'future_publish_date_behavior' => 'public',
         'past_publish_date_behavior' => 'unlisted',
         'is_sortable' => true,
-        'route_url' => 'test-collection',
     ]);
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $collection->getMorphClass(),
         'model_id' => $collection->id,
         'url' => $collection->slug,
-        'is_override' => false,  // override but same as default
+        'is_override' => true,
     ]);
 });
 

@@ -7,12 +7,14 @@ namespace Domain\Page\Actions;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Domain\Support\MetaData\Actions\CreateMetaDataAction;
+use Domain\Support\RouteUrl\Actions\UpdateOrCreateRouteUrlAction;
 
 class CreatePageAction
 {
     public function __construct(
         protected CreateSliceContentAction $createSliceContent,
         protected CreateMetaDataAction $createMetaTags,
+        protected UpdateOrCreateRouteUrlAction $createRouteUrl,
     ) {
     }
 
@@ -20,7 +22,6 @@ class CreatePageAction
     {
         $page = Page::create([
             'name' => $pageData->name,
-            'route_url' => $pageData->route_url,
         ]);
 
         $this->createMetaTags->execute($page, $pageData->meta_data);
@@ -28,6 +29,8 @@ class CreatePageAction
         foreach ($pageData->slice_contents as $sliceContentData) {
             $this->createSliceContent->execute($page, $sliceContentData);
         }
+
+        $this->createRouteUrl->execute($page, $pageData->url_data);
 
         return $page;
     }

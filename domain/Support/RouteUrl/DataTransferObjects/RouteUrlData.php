@@ -7,8 +7,7 @@ namespace Domain\Support\RouteUrl\DataTransferObjects;
 class RouteUrlData
 {
     public function __construct(
-        public string $url,
-        public bool $is_override,
+        public ?string $url,
     ) {
     }
 }

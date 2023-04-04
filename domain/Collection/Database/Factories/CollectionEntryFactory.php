@@ -6,6 +6,7 @@ namespace Domain\Collection\Database\Factories;
 
 use Domain\Collection\Models\CollectionEntry;
 use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
+use Domain\Support\RouteUrl\Database\Factories\RouteUrlFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -27,6 +28,7 @@ class CollectionEntryFactory extends Factory
 
     public function configure(): self
     {
-        return $this->has(MetaDataFactory::new());
+        return $this->has(MetaDataFactory::new())
+            ->has(RouteUrlFactory::new());
     }
 }

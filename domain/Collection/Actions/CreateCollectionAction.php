@@ -6,9 +6,15 @@ namespace Domain\Collection\Actions;
 
 use Domain\Collection\DataTransferObjects\CollectionData;
 use Domain\Collection\Models\Collection;
+use Domain\Support\RouteUrl\Actions\UpdateOrCreateRouteUrlAction;
 
 class CreateCollectionAction
 {
+    public function __construct(
+        protected UpdateOrCreateRouteUrlAction $createRouteUrl,
+    ) {
+    }
+
     /** Execute create collection query. */
     public function execute(CollectionData $collectionData): Collection
     {
@@ -18,11 +24,12 @@ class CreateCollectionAction
             'past_publish_date_behavior' => $collectionData->past_publish_date_behavior,
             'future_publish_date_behavior' => $collectionData->future_publish_date_behavior,
             'is_sortable' => $collectionData->is_sortable,
-            'route_url' => $collectionData->route_url,
         ]);
 
         $collection->taxonomies()
             ->attach($collectionData->taxonomies);
+
+        $this->createRouteUrl->execute($collection, $collectionData->url_data);
 
         return $collection;
     }

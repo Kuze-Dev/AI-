@@ -173,17 +173,13 @@ it('can edit collection entry route_url', function () {
         ]);
 
     livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
-        ->fillForm(['route_url' => 'new-foo'])
+        ->fillForm(['route_url.url' => 'new-foo'])
         ->call('save')
         ->assertOk()
         ->assertHasNoFormErrors()
         ->instance()
         ->record;
 
-    assertDatabaseHas(CollectionEntry::class, [
-        'id' => $collectionEntry->id,
-        'route_url' => 'new-foo',
-    ]);
     assertDatabaseCount(RouteUrl::class, 3); // 1 (for collection) + 2 (for collection entry)
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $collectionEntry->getMorphClass(),

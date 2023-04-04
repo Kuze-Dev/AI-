@@ -23,7 +23,6 @@ return new class () extends Migration {
             $table->string('future_publish_date_behavior')->nullable();
             $table->string('past_publish_date_behavior')->nullable();
             $table->boolean('is_sortable')->default(false);
-            $table->routeUrl();
             $table->timestamps();
         });
 
@@ -35,7 +34,6 @@ return new class () extends Migration {
             $table->dateTime('published_at')->nullable();
             $table->json('data');
             $table->unsignedInteger('order')->nullable();
-            $table->routeUrl();
             $table->timestamps();
 
             $table->unique(['collection_id', 'title']);

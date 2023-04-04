@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Resources\CollectionResource\Pages;
 use App\FilamentTenant\Resources\CollectionResource;
 use Domain\Collection\Actions\CreateCollectionAction;
 use Domain\Collection\DataTransferObjects\CollectionData;
+use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -48,7 +49,7 @@ class CreateCollection extends CreateRecord
                     is_sortable: $data['is_sortable'],
                     past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
                     future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
-                    route_url: $data['route_url'],
+                    url_data: new RouteUrlData(url: $data['route_url']['url'] ?? null),
                 ))
         );
     }
