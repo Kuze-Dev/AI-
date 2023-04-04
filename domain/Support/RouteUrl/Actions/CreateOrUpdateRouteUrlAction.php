@@ -16,13 +16,7 @@ class CreateOrUpdateRouteUrlAction
     {
         $newUrl = $routeUrlData->url ?? $model->getRouteUrlDefaultUrl();
 
-        if (
-            Support::activeQueryBuilder()
-                ->whereUrl($newUrl)
-                ->where('model_type', '!=', $model->getMorphClass())
-                ->where('model_id', '!=', $model->getKey())
-                ->exists()
-        ) {
+        if (Support::activeQueryBuilderExists($newUrl, $model)) {
             abort(422, "Then [$newUrl] is already been used.");
         }
 

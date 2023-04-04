@@ -14,8 +14,7 @@ final class Support
     {
     }
 
-    /** @return \Illuminate\Database\Eloquent\Builder<RouteUrl>|RouteUrl */
-    public static function activeQueryBuilder(): Builder
+    public static function activeQueryBuilderExists(string $url, ?Contracts\HasRouteUrl $model = null): bool
     {
         return RouteUrl::select([
             'model_type',
@@ -23,6 +22,13 @@ final class Support
             DB::raw('MAX(created_at) as latest_created_at'),
         ])
             ->groupBy('model_type', 'model_id')
-            ->latest('latest_created_at');
+            ->latest('latest_created_at')
+            ->whereUrl($url)
+            ->when($model !== null, function (Builder $query) use ($model) {
+                /** @var \Illuminate\Database\Eloquent\Model $model */
+                $query->where('model_type', '!=', $model->getMorphClass())
+                    ->where('model_id', '!=', $model->getKey());
+            })
+            ->exists();
     }
 }

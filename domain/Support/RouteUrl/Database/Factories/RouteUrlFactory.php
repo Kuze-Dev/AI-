@@ -7,6 +7,9 @@ namespace Domain\Support\RouteUrl\Database\Factories;
 use Domain\Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Support\RouteUrl\Models\RouteUrl>
+ */
 class RouteUrlFactory extends Factory
 {
     protected $model = RouteUrl::class;
