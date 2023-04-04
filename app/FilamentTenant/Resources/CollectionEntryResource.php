@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\RouteUrlForm;
+use App\FilamentTenant\Support\RouteUrlTextColumn;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -154,9 +155,7 @@ class CollectionEntryResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->sortable()
-                    ->searchable(),
+                RouteUrlTextColumn::make('route_url'),
                 Tables\Columns\TagsColumn::make('taxonomyTerms.name')
                     ->limit()
                     ->searchable(),
@@ -257,5 +256,11 @@ class CollectionEntryResource extends Resource
             'create' => Resources\CollectionEntryResource\Pages\CreateCollectionEntry::route('entries/create'),
             'edit' => Resources\CollectionEntryResource\Pages\EditCollectionEntry::route('entries/{record}/edit'),
         ];
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Builder<CollectionEntry> */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with('routeUrls');
     }
 }

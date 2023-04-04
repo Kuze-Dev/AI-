@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Support\RouteUrlForm;
+use App\FilamentTenant\Support\RouteUrlTextColumn;
 use Domain\Collection\Enums\PublishBehavior;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
@@ -150,9 +151,7 @@ class CollectionResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->sortable()
-                    ->searchable(),
+                RouteUrlTextColumn::make('route_url'),
                 Tables\Columns\TextColumn::make('blueprint.name')
                     ->sortable()
                     ->searchable()
@@ -203,5 +202,11 @@ class CollectionResource extends Resource
             'create' => Resources\CollectionResource\Pages\CreateCollection::route('/create'),
             'edit' => Resources\CollectionResource\Pages\EditCollection::route('/{record}/edit'),
         ];
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Builder<Collection> */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with('routeUrls');
     }
 }

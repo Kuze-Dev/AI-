@@ -8,6 +8,7 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\RouteUrlForm;
+use App\FilamentTenant\Support\RouteUrlTextColumn;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
@@ -21,6 +22,7 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Filters\Layout;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -132,6 +134,7 @@ class PageResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable(),
+                RouteUrlTextColumn::make('route_url'),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -177,5 +180,11 @@ class PageResource extends Resource
         }
 
         return self::$cachedSlices;
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Builder<Page> */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with('routeUrls');
     }
 }
