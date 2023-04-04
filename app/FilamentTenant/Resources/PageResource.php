@@ -119,8 +119,7 @@ class PageResource extends Resource
                             ]),
                     ])->columnSpan(2),
                 MetaDataForm::make('Meta Data')
-                    ->columnSpan(1)
-                    ->extraAttributes(['class' => 'md:sticky top-[5.5rem]']),
+                    ->columnSpan(1),
             ]);
     }
 
