@@ -9,7 +9,7 @@ use Domain\Page\Models\Page;
 use Domain\Page\Models\SliceContent;
 use Domain\Support\MetaData\Actions\CreateMetaDataAction;
 use Domain\Support\MetaData\Actions\UpdateMetaDataAction;
-use Domain\Support\RouteUrl\Actions\UpdateOrCreateRouteUrlAction;
+use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 use Illuminate\Support\Arr;
 
 class UpdatePageAction
@@ -20,7 +20,7 @@ class UpdatePageAction
         protected DeleteSliceContentAction $deleteSliceContent,
         protected CreateMetaDataAction $createMetaData,
         protected UpdateMetaDataAction $updateMetaData,
-        protected UpdateOrCreateRouteUrlAction $updateOrCreateRouteUrl,
+        protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
     ) {
     }
 
@@ -47,7 +47,7 @@ class UpdatePageAction
 
         SliceContent::setNewOrder($sliceContentIds);
 
-        $this->updateOrCreateRouteUrl->execute($page, $pageData->url_data);
+        $this->createOrUpdateRouteUrl->execute($page, $pageData->url_data);
 
         return $page;
     }

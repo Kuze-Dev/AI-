@@ -7,14 +7,14 @@ namespace Domain\Page\Actions;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Domain\Support\MetaData\Actions\CreateMetaDataAction;
-use Domain\Support\RouteUrl\Actions\UpdateOrCreateRouteUrlAction;
+use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
 class CreatePageAction
 {
     public function __construct(
         protected CreateSliceContentAction $createSliceContent,
         protected CreateMetaDataAction $createMetaTags,
-        protected UpdateOrCreateRouteUrlAction $createRouteUrl,
+        protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
     ) {
     }
 
@@ -30,7 +30,7 @@ class CreatePageAction
             $this->createSliceContent->execute($page, $sliceContentData);
         }
 
-        $this->createRouteUrl->execute($page, $pageData->url_data);
+        $this->createOrUpdateRouteUrl->execute($page, $pageData->url_data);
 
         return $page;
     }

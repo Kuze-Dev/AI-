@@ -8,14 +8,14 @@ use Domain\Collection\DataTransferObjects\CollectionEntryData;
 use Domain\Collection\Models\CollectionEntry;
 use Domain\Support\MetaData\Actions\CreateMetaDataAction;
 use Domain\Support\MetaData\Actions\UpdateMetaDataAction;
-use Domain\Support\RouteUrl\Actions\UpdateOrCreateRouteUrlAction;
+use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
 class UpdateCollectionEntryAction
 {
     public function __construct(
         protected CreateMetaDataAction $createMetaData,
         protected UpdateMetaDataAction $updateMetaData,
-        protected UpdateOrCreateRouteUrlAction $updateOrCreateRouteUrl,
+        protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
     ) {
     }
 
@@ -38,7 +38,7 @@ class UpdateCollectionEntryAction
         $collectionEntry->taxonomyTerms()
             ->sync($collectionEntryData->taxonomy_terms);
 
-        $this->updateOrCreateRouteUrl->execute($collectionEntry, $collectionEntryData->url_data);
+        $this->createOrUpdateRouteUrl->execute($collectionEntry, $collectionEntryData->url_data);
 
         return $collectionEntry;
     }

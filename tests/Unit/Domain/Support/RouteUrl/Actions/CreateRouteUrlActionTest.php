@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Domain\Support\RouteUrl\Actions\UpdateOrCreateRouteUrlAction;
+use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
 use Domain\Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -35,7 +35,7 @@ it('create w/o specify route_url', function () {
         'name' => 'my-awesome-name',
     ]);
 
-    app(UpdateOrCreateRouteUrlAction::class)
+    app(CreateOrUpdateRouteUrlAction::class)
         ->execute($model, new RouteUrlData(null));
 
     assertDatabaseCount(RouteUrl::class, 1);
@@ -51,7 +51,7 @@ it('create w/ specify route_url but same as default', function () {
         'name' => 'my-awesome-name',
     ]);
 
-    app(UpdateOrCreateRouteUrlAction::class)
+    app(CreateOrUpdateRouteUrlAction::class)
         ->execute($model, new RouteUrlData('my-awesome-name'));
 
     assertDatabaseCount(RouteUrl::class, 1);
@@ -68,7 +68,7 @@ it('create w/ specify route_url', function () {
         'name' => 'my awesome name',
     ]);
 
-    app(UpdateOrCreateRouteUrlAction::class)
+    app(CreateOrUpdateRouteUrlAction::class)
         ->execute($model, new RouteUrlData('im-custom-value'));
 
     assertDatabaseCount(RouteUrl::class, 1);
@@ -85,17 +85,17 @@ it('reduplicate previous route_url', function () {
         'name' => 'my-awesome-name',
     ]);
 
-    app(UpdateOrCreateRouteUrlAction::class)
+    app(CreateOrUpdateRouteUrlAction::class)
         ->execute($model, new RouteUrlData('my-awesome-name'));
 
     $model->refresh();
 
-    app(UpdateOrCreateRouteUrlAction::class)
+    app(CreateOrUpdateRouteUrlAction::class)
         ->execute($model, new RouteUrlData('im-custom-value'));
 
     $model->refresh();
 
-    app(UpdateOrCreateRouteUrlAction::class)
+    app(CreateOrUpdateRouteUrlAction::class)
         ->execute($model, new RouteUrlData('my-awesome-name'));
 
     assertDatabaseCount(RouteUrl::class, 2);
@@ -121,7 +121,7 @@ test('override', function (?string $data) {
         'name' => 'my-awesome-name',
     ]);
 
-    app(UpdateOrCreateRouteUrlAction::class)
+    app(CreateOrUpdateRouteUrlAction::class)
         ->execute($model, new RouteUrlData($data));
 
     assertDatabaseCount(RouteUrl::class, 1);

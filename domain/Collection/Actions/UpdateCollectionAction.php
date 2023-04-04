@@ -6,12 +6,12 @@ namespace Domain\Collection\Actions;
 
 use Domain\Collection\DataTransferObjects\CollectionData;
 use Domain\Collection\Models\Collection;
-use Domain\Support\RouteUrl\Actions\UpdateOrCreateRouteUrlAction;
+use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
 class UpdateCollectionAction
 {
     public function __construct(
-        protected UpdateOrCreateRouteUrlAction $updateOrCreateRouteUrl,
+        protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
     ) {
     }
 
@@ -31,7 +31,7 @@ class UpdateCollectionAction
         $collection->taxonomies()
             ->sync($collectionData->taxonomies);
 
-        $this->updateOrCreateRouteUrl->execute($collection, $collectionData->url_data);
+        $this->createOrUpdateRouteUrl->execute($collection, $collectionData->url_data);
 
         return $collection;
     }

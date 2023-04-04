@@ -10,7 +10,7 @@ use Domain\Support\RouteUrl\Models\RouteUrl;
 use Domain\Support\RouteUrl\Support;
 use Illuminate\Database\Eloquent\Model;
 
-class UpdateOrCreateRouteUrlAction
+class CreateOrUpdateRouteUrlAction
 {
     public function execute(Model&HasRouteUrl $model, RouteUrlData $routeUrlData): void
     {
@@ -21,7 +21,6 @@ class UpdateOrCreateRouteUrlAction
                 ->whereUrl($newUrl)
                 ->where('model_type', '!=', $model->getMorphClass())
                 ->where('model_id', '!=', $model->getKey())
-//                ->whereNotMorphedTo('model', $model)
                 ->exists()
         ) {
             abort(422, "Then [$newUrl] is already been used.");

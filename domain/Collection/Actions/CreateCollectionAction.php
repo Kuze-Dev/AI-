@@ -6,12 +6,12 @@ namespace Domain\Collection\Actions;
 
 use Domain\Collection\DataTransferObjects\CollectionData;
 use Domain\Collection\Models\Collection;
-use Domain\Support\RouteUrl\Actions\UpdateOrCreateRouteUrlAction;
+use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
 class CreateCollectionAction
 {
     public function __construct(
-        protected UpdateOrCreateRouteUrlAction $createRouteUrl,
+        protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
     ) {
     }
 
@@ -29,7 +29,7 @@ class CreateCollectionAction
         $collection->taxonomies()
             ->attach($collectionData->taxonomies);
 
-        $this->createRouteUrl->execute($collection, $collectionData->url_data);
+        $this->createOrUpdateRouteUrl->execute($collection, $collectionData->url_data);
 
         return $collection;
     }
