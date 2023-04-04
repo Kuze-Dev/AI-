@@ -38,7 +38,7 @@ it('can create collection', function () {
             'future_publish_date_behavior' => 'public',
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
-            'route_url' => ['url' => 'test-collection'], // override but same as default
+            'route_url.url' => ['url' => 'test-collection'], // override but same as default
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -73,7 +73,7 @@ it('can create collection with taxonomies', function () {
     livewire(CreateCollection::class)
         ->fillForm([
             'name' => 'Test Collection',
-            'route_url' => 'test-collection',
+            'route_url.url' => 'test-collection',
             'blueprint_id' => $blueprint->getKey(),
             'taxonomies' => $taxonomies->pluck('id')->toArray(),
         ])

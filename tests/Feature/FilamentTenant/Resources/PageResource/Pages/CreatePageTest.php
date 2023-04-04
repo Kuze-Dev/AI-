@@ -38,7 +38,7 @@ it('can create page', function () {
     $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
-            'route_url' => 'test-url',
+            'route_url.url' => 'test-url',
             'slice_contents' => [
                 [
                     'slice_id' => $sliceId,
@@ -119,7 +119,7 @@ it('can create page with meta data', function () {
     $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
-            'route_url' => 'test-url',
+            'route_url.url' => 'test-url',
             'slice_contents' => [
                 [
                     'slice_id' => $sliceId,

@@ -63,7 +63,7 @@ it('can update collection', function () {
             'past_publish_date_behavior' => 'unlisted',
             'future_publish_date_behavior' => 'private',
             'is_sortable' => true,
-            'route_url' => 'test-collection',
+            'route_url.url' => 'test-collection',
             'taxonomies' => [$taxonomy->getKey()],
         ])
         ->call('save')
@@ -88,7 +88,7 @@ it('can update collection route_url', function () {
         ->createOne();
 
     livewire(EditCollection::class, ['record' => $collection->getRouteKey()])
-        ->fillForm(['route_url' => 'test-collection-updated'])
+        ->fillForm(['route_url.url' => 'test-collection-updated'])
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk();
