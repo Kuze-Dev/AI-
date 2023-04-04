@@ -38,7 +38,7 @@ it('can create collection', function () {
             'future_publish_date_behavior' => 'public',
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
-            'route_url.url' => ['url' => 'test-collection'], // override but same as default
+            'route_url.url' => 'test-collection',
         ])
         ->call('create')
         ->assertHasNoFormErrors()

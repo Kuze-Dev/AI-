@@ -7,7 +7,6 @@ use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\SliceFactory;
-use Domain\Page\Models\Page;
 use Domain\Page\Models\SliceContent;
 use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
 use Domain\Support\MetaData\Models\MetaData;
@@ -143,10 +142,6 @@ it('can edit page route_url', function () {
         ->assertHasNoFormErrors()
         ->assertOk();
 
-    assertDatabaseHas(Page::class, [
-        'id' => $page->id,
-        'route_url.url' => 'new-foo',
-    ]);
     assertDatabaseCount(RouteUrl::class, 2);
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $page->getMorphClass(),
