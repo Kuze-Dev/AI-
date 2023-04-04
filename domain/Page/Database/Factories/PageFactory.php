@@ -7,6 +7,7 @@ namespace Domain\Page\Database\Factories;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Slice;
 use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
+use Domain\Support\RouteUrl\Database\Factories\RouteUrlFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -30,6 +31,7 @@ class PageFactory extends Factory
 
     public function configure(): self
     {
-        return $this->has(MetaDataFactory::new(), 'metaData');
+        return $this->has(MetaDataFactory::new(), 'metaData')
+            ->has(RouteUrlFactory::new());
     }
 }

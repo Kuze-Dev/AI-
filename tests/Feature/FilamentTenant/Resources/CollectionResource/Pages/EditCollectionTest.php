@@ -93,10 +93,6 @@ it('can update collection route_url', function () {
         ->assertHasNoFormErrors()
         ->assertOk();
 
-    assertDatabaseHas(Collection::class, [
-        'id' => $collection->id,
-        'route_url' => 'test-collection-updated',
-    ]);
     assertDatabaseCount(RouteUrl::class, 2);
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $collection->getMorphClass(),

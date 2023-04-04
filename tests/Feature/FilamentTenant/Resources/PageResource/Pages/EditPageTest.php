@@ -15,6 +15,8 @@ use Domain\Support\RouteUrl\Models\RouteUrl;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
@@ -86,11 +88,6 @@ it('can edit page', function () {
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk();
-
-    assertDatabaseHas(Page::class, [
-        'name' => 'Test',
-        'route_url' => 'test-url',
-    ]);
 
     assertDatabaseHas(
         MetaData::class,

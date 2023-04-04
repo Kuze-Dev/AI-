@@ -16,7 +16,7 @@ class PageController
     public function index(): JsonApiResourceCollection
     {
         return PageResource::collection(
-            QueryBuilder::for(Page::query())
+            QueryBuilder::for(Page::with('routeUrls'))
                 ->allowedFilters(['name', 'slug'])
                 ->allowedIncludes([
                     'sliceContents.slice',
