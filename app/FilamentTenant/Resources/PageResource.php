@@ -58,7 +58,8 @@ class PageResource extends Resource
                                 })
                                 ->required(),
                         ]),
-                        RouteUrlForm::make('Route Url')->applySchema(Page::class),
+                        RouteUrlForm::make('Route Url')
+                            ->applySchema(Page::class),
                         Forms\Components\Section::make(trans('Slices'))
                             ->schema([
                                 Forms\Components\Repeater::make('slice_contents')

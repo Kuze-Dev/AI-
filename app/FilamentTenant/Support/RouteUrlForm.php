@@ -24,7 +24,7 @@ class RouteUrlForm extends Section
         $this->schema([
             Forms\Components\TextInput::make('url')
                 ->formatStateUsing(
-                    fn (?HasRouteUrl $record) => $record?->getActiveRouteUrl()?->url
+                    fn (?HasRouteUrl $record) => $record?->getActiveRouteUrl()->url
                 )
                 ->nullable()
                 ->string()
