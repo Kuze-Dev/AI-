@@ -6,6 +6,7 @@ namespace App\HttpTenantApi\Controllers\RouteUrl;
 
 use App\HttpTenantApi\Resources\RouteUrlResource;
 use Domain\Support\RouteUrl\Models\RouteUrl;
+use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Get;
 
 class RouteUrlController
@@ -14,7 +15,10 @@ class RouteUrlController
     public function __invoke(string $routeUrl): RouteUrlResource
     {
         return RouteUrlResource::make(
-            RouteUrl::where('url', $routeUrl)
+            QueryBuilder::for(RouteUrl::where('url', $routeUrl))
+                ->allowedIncludes([
+                    'model',
+                ])
                 ->firstOrFail()
         );
     }

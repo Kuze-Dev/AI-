@@ -9,9 +9,11 @@ use Domain\Blueprint\Models\Blueprint;
 use Domain\Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
 use Domain\Support\RouteUrl\HasRouteUrl;
 use Domain\Taxonomy\Models\Taxonomy;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Blade;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -33,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property PublishBehavior|null $future_publish_date_behavior
  * @property PublishBehavior|null $past_publish_date_behavior
  * @property bool $is_sortable
+ * @property-read string|null $qualified_route_url
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
@@ -162,6 +165,17 @@ class Collection extends Model implements IsActivitySubject, HasRouteUrlContract
     public function hasPublishDates(): bool
     {
         return $this->past_publish_date_behavior || $this->future_publish_date_behavior;
+    }
+
+    /** @return Attribute<string, static> */
+    protected function qualifiedRouteUrl(): Attribute
+    {
+        return Attribute::get(fn () => Blade::render(
+            Blade::compileEchos($this->getActiveRouteUrl()->url),
+            [
+                'slug' => $this->slug,
+            ]
+        ));
     }
 
     public function getRouteUrlDefaultUrl(): string
