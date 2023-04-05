@@ -14,7 +14,7 @@ final class Support
     {
     }
 
-    public static function isActiveRouteUrl(string $url, ?Contracts\HasRouteUrl $model = null): bool
+    public static function isActiveRouteUrl(string $url, ?Contracts\HasRouteUrl $model): bool
     {
         return RouteUrl::whereIn(
             'id',

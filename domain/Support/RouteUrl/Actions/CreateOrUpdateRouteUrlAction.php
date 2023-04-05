@@ -6,6 +6,7 @@ namespace Domain\Support\RouteUrl\Actions;
 
 use Domain\Support\RouteUrl\Contracts\HasRouteUrl;
 use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
+use Domain\Support\RouteUrl\Exceptions\AlreadyUsedRouteUrlException;
 use Domain\Support\RouteUrl\Models\RouteUrl;
 use Domain\Support\RouteUrl\Support;
 use Illuminate\Database\Eloquent\Model;
@@ -16,8 +17,15 @@ class CreateOrUpdateRouteUrlAction
     {
         $newUrl = $routeUrlData->url ?? $model->getRouteUrlDefaultUrl();
 
-        if (Support::isActiveRouteUrl($newUrl, $model)) {
-            abort(422, "The [$newUrl] is already been used.");
+        if (
+            Support::isActiveRouteUrl(
+                $newUrl,
+                $routeUrlData->url === null
+                    ? null
+                    : $model
+            )
+        ) {
+            throw new AlreadyUsedRouteUrlException();
         }
 
         $activeRouteUrl = RouteUrl::whereUrl($newUrl)

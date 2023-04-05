@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
+use Domain\Support\RouteUrl\Exceptions\AlreadyUsedRouteUrlException;
 use Domain\Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
@@ -215,3 +216,31 @@ it('transfer a non active url', function () {
         'url' => 'url-two',
     ]);
 });
+
+it('prevent override route url using default set on model', function () {
+    DB::connection()
+        ->getSchemaBuilder()
+        ->create((new TestSecondModelForRouteUrl())->getTable(), function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+    Relation::morphMap([TestSecondModelForRouteUrl::class]);
+
+    $model1 = TestModelForRouteUrl::create([
+        'name' => 'one',
+    ]);
+
+    //  will use default for 2nd model
+    app(CreateOrUpdateRouteUrlAction::class)
+        ->execute($model1, new RouteUrlData('two'));
+
+    $model2 = TestSecondModelForRouteUrl::create([
+        'name' => 'two',
+    ]);
+
+    // it will prevent creation since already used by 1st model
+    app(CreateOrUpdateRouteUrlAction::class)
+        ->execute($model2, new RouteUrlData(null));
+})
+    ->throws(AlreadyUsedRouteUrlException::class);
