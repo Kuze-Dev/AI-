@@ -16,7 +16,7 @@ class CollectionController
     public function index(): JsonApiResourceCollection
     {
         return CollectionResource::collection(
-            QueryBuilder::for(Collection::query())
+            QueryBuilder::for(Collection::with('routeUrls'))
                 ->allowedIncludes([
                     'taxonomies',
                     'routeUrls',
