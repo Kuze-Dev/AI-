@@ -33,6 +33,6 @@ class RouteUrlRule implements ValidationRule
             return;
         }
 
-        $fail("Then [$value] is already been used.");
+        $fail("The [$value] is already been used.");
     }
 }
