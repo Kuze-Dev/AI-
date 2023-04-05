@@ -14,7 +14,7 @@ final class Support
     {
     }
 
-    public static function activeQueryBuilderExists(string $url, ?Contracts\HasRouteUrl $model = null): bool
+    public static function activeRouteUrlExists(string $url, ?Contracts\HasRouteUrl $model = null): bool
     {
         return RouteUrl::select([
             'model_type',

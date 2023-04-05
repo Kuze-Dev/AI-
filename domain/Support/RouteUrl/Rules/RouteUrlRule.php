@@ -29,7 +29,7 @@ class RouteUrlRule implements ValidationRule
             return;
         }
 
-        if ( ! Support::activeQueryBuilderExists($value)) {
+        if ( ! Support::activeRouteUrlExists($value)) {
             return;
         }
 
