@@ -38,7 +38,7 @@ class UpdateCollectionEntryAction
         $collectionEntry->taxonomyTerms()
             ->sync($collectionEntryData->taxonomy_terms);
 
-        $this->createOrUpdateRouteUrl->execute($collectionEntry, $collectionEntryData->url_data);
+        $this->createOrUpdateRouteUrl->execute($collectionEntry, $collectionEntryData->route_url_data);
 
         return $collectionEntry;
     }

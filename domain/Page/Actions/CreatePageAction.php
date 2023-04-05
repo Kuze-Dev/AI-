@@ -30,7 +30,7 @@ class CreatePageAction
             $this->createSliceContent->execute($page, $sliceContentData);
         }
 
-        $this->createOrUpdateRouteUrl->execute($page, $pageData->url_data);
+        $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url_data);
 
         return $page;
     }

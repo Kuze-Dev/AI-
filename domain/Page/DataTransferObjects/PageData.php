@@ -11,7 +11,7 @@ class PageData
 {
     public function __construct(
         public readonly string $name,
-        public readonly RouteUrlData $url_data,
+        public readonly RouteUrlData $route_url_data,
         public readonly MetaDataData $meta_data,
         public readonly array $slice_contents = [],
     ) {
@@ -29,7 +29,7 @@ class PageData
                 ),
                 $data['slice_contents'] ?? []
             ),
-            url_data: new RouteUrlData(url: $data['route_url']['url'] ?? null),
+            route_url_data: new RouteUrlData(url: $data['route_url']['url'] ?? null),
             meta_data: MetaDataData::fromArray($data['meta_data'])
         );
     }

@@ -31,7 +31,7 @@ class UpdateCollectionAction
         $collection->taxonomies()
             ->sync($collectionData->taxonomies);
 
-        $this->createOrUpdateRouteUrl->execute($collection, $collectionData->url_data);
+        $this->createOrUpdateRouteUrl->execute($collection, $collectionData->route_url_data);
 
         return $collection;
     }

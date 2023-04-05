@@ -49,7 +49,7 @@ class CreateCollection extends CreateRecord
                     is_sortable: $data['is_sortable'],
                     past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
                     future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
-                    url_data: new RouteUrlData(url: $data['route_url']['url'] ?? null),
+                    route_url_data: new RouteUrlData(url: $data['route_url']['url'] ?? null),
                 ))
         );
     }
