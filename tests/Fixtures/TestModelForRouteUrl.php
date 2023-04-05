@@ -10,8 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property string $name
- * @property string $slug
- * @property string $route_url
  * @mixin \Eloquent
  */
 class TestModelForRouteUrl extends Model implements HasRouteUrlContract
