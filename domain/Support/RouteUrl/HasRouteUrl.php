@@ -20,7 +20,7 @@ trait HasRouteUrl
     public function getActiveRouteUrl(): RouteUrl
     {
         /** @phpstan-ignore-next-line  */
-        return $this->routeUrls->sortByDesc('created_at')->first();
+        return $this->routeUrls->sortByDesc('id')->first();
     }
 
     /**

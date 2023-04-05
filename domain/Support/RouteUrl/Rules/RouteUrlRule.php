@@ -29,7 +29,7 @@ class RouteUrlRule implements ValidationRule
             return;
         }
 
-        if ( ! Support::activeRouteUrlExists($value)) {
+        if ( ! Support::isActiveRouteUrl($value)) {
             return;
         }
 

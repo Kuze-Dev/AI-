@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Tests\Fixtures\TestModelForRouteUrl;
 
+use Tests\Fixtures\TestSecondModelForRouteUrl;
+
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseHas;
@@ -134,3 +136,60 @@ test('override', function (?string $data) {
     ->with([
         '', null, 'data',
     ]);
+
+it('transfer a non active url', function () {
+    DB::connection()
+        ->getSchemaBuilder()
+        ->create((new TestSecondModelForRouteUrl())->getTable(), function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+    Relation::morphMap([TestSecondModelForRouteUrl::class]);
+
+    $model1 = TestModelForRouteUrl::create([
+        'name' => 'one',
+    ]);
+    $model2 = TestSecondModelForRouteUrl::create([
+        'name' => 'two',
+    ]);
+
+    app(CreateOrUpdateRouteUrlAction::class)
+        ->execute($model1, new RouteUrlData('url-one'));
+
+    app(CreateOrUpdateRouteUrlAction::class)
+        ->execute($model2, new RouteUrlData('url-two'));
+
+    app(CreateOrUpdateRouteUrlAction::class)
+        ->execute($model1, new RouteUrlData('url-one-new'));
+
+    app(CreateOrUpdateRouteUrlAction::class)
+        ->execute($model2, new RouteUrlData('url-one'));
+
+    expect($model1)
+        ->getActiveRouteUrl()
+        ->url
+        ->toBe('url-one-new');
+
+    expect($model2)
+        ->getActiveRouteUrl()
+        ->url
+        ->toBe('url-one');
+
+    assertDatabaseCount(RouteUrl::class, 3);
+    assertDatabaseHas(RouteUrl::class, [
+        'model_type' => $model1->getMorphClass(),
+        'model_id' => $model1->getKey(),
+        'url' => 'url-one-new',
+    ]);
+    assertDatabaseHas(RouteUrl::class, [
+        'model_type' => $model2->getMorphClass(),
+        'model_id' => $model2->getKey(),
+        'url' => 'url-one',
+    ]);
+    assertDatabaseHas(RouteUrl::class, [
+        'model_type' => $model2->getMorphClass(),
+        'model_id' => $model2->getKey(),
+        'url' => 'url-two',
+    ]);
+});

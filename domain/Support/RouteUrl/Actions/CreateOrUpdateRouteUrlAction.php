@@ -16,7 +16,7 @@ class CreateOrUpdateRouteUrlAction
     {
         $newUrl = $routeUrlData->url ?? $model->getRouteUrlDefaultUrl();
 
-        if (Support::activeRouteUrlExists($newUrl, $model)) {
+        if (Support::isActiveRouteUrl($newUrl)) {
             abort(422, "The [$newUrl] is already been used.");
         }
 
