@@ -48,6 +48,28 @@ it('create w/o specify route_url', function () {
         'is_override' => false,
     ]);
 });
+it('can update w/o modify', function () {
+    $model = TestModelForRouteUrl::create([
+        'name' => 'my-awesome-name',
+    ]);
+
+    // initialise route url
+    app(CreateOrUpdateRouteUrlAction::class)
+        ->execute($model, new RouteUrlData(null));
+
+    // update with same url
+    app(CreateOrUpdateRouteUrlAction::class)
+        ->execute($model, new RouteUrlData($model->getActiveRouteUrl()->url));
+
+    assertDatabaseCount(RouteUrl::class, 1);
+    assertDatabaseHas(RouteUrl::class, [
+        'model_type' => $model->getMorphClass(),
+        'model_id' => $model->getKey(),
+        'url' => 'my-awesome-name',
+        'is_override' => true,
+    ]);
+});
+
 it('create w/ specify route_url but same as default', function () {
     $model = TestModelForRouteUrl::create([
         'name' => 'my-awesome-name',

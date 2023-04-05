@@ -14,7 +14,7 @@ final class Support
     {
     }
 
-    public static function isActiveRouteUrl(string $url): bool
+    public static function isActiveRouteUrl(string $url, ?Contracts\HasRouteUrl $model = null): bool
     {
         return RouteUrl::whereIn(
             'id',
@@ -25,6 +25,11 @@ final class Support
             }
         )
             ->whereUrl($url)
+            ->when($model !== null, function (\Illuminate\Database\Eloquent\Builder $query) use ($model) {
+                /** @var \Illuminate\Database\Eloquent\Model $model */
+                $query->where('model_type', '!=', $model->getMorphClass())
+                    ->where('model_id', '!=', $model->getKey());
+            })
             ->exists();
     }
 }
