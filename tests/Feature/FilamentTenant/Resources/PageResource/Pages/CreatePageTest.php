@@ -158,3 +158,30 @@ it('can create page with meta data', function () {
         'model_id' => $page->id,
     ]);
 });
+
+it('newly created page must have author_id', function () {
+    $sliceId = SliceFactory::new()
+        ->withDummyBlueprint()
+        ->createOne()
+        ->getKey();
+
+    $page = livewire(CreatePage::class)
+        ->fillForm([
+            'name' => 'Test',
+            'route_url' => 'test-url',
+            'slice_contents' => [
+                [
+                    'slice_id' => $sliceId,
+                    'data' => ['name' => 'foo'],
+                ],
+            ],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(Page::class, ['name' => 'Test', 'author_id' => auth()->user()->id,]);
+    
+});

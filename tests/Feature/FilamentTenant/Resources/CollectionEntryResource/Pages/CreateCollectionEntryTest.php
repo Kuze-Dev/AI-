@@ -51,6 +51,7 @@ it('can create collection entry', function () {
             'id' => $collection->id,
             'title' => 'Test',
             'slug' => 'test',
+            'author_id' => auth()->user()->id,
             'data' => json_encode(['main' => ['header' => 'Foo']]),
         ]
     );
