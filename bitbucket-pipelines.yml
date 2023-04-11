@@ -44,24 +44,6 @@ definitions:
         script:
           - *setup-script
           - composer test -- --ci --passthru-php="-d memory_limit=-1"
-    - step: &deploy-staging
-        <<: *common-step
-        name: Deploy to Staging
-        deployment: staging
-        trigger: automatic
-        script:
-          - *setup-script
-          - composer require laravel/vapor-cli
-          - ./vendor/bin/vapor deploy staging --commit="$BITBUCKET_COMMIT"
-    - step: &deploy-production
-        <<: *common-step
-        name: Deploy to Production
-        deployment: production
-        trigger: manual
-        script:
-          - *setup-script
-          - composer require laravel/vapor-cli
-          - ./vendor/bin/vapor deploy production --commit="$BITBUCKET_COMMIT"
 
 pipelines:
   branches:
@@ -75,13 +57,28 @@ pipelines:
           - step: *check-format
           - step: *analyse
           - step: *test
-      - step: *deploy-staging
-    production:
+      - step:
+        <<: *common-step
+        name: Deploy to Staging
+        deployment: staging
+        script:
+          - *setup-script
+          - composer require laravel/vapor-cli
+          - ./vendor/bin/vapor deploy staging --commit="$BITBUCKET_COMMIT"
+    master:
       - parallel:
           - step: *check-format
           - step: *analyse
           - step: *test
-      - step: *deploy-production
+      - step:
+        <<: *common-step
+        name: Deploy to Production
+        deployment: production
+        trigger: manual
+        script:
+          - *setup-script
+          - composer require laravel/vapor-cli
+          - ./vendor/bin/vapor deploy production --commit="$BITBUCKET_COMMIT"
 
   pull-requests:
     "**":
