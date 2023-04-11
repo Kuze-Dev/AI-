@@ -4,13 +4,25 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\CollectionResource\Pages;
 
+use App\FilamentTenant\Resources\CollectionEntryResource;
 use App\FilamentTenant\Resources\CollectionResource;
+use Closure;
+use Domain\Collection\Models\Collection;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListCollection extends ListRecords
 {
     protected static string $resource = CollectionResource::class;
+
+    protected function getTableRecordUrlUsing(): ?Closure
+    {
+        if (self::$resource::canViewAny()) {
+            return fn (Collection $record) => CollectionEntryResource::getUrl('index', [$record]);
+        }
+
+        return parent::getTableRecordUrlUsing();
+    }
 
     /**
      * Declare action buttons that
