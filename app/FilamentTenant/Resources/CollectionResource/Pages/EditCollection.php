@@ -32,9 +32,11 @@ class EditCollection extends EditRecord
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
-            Actions\ViewAction::make()
-                ->label(__('View Entries'))
-                ->url(fn (Collection $record) => CollectionEntryResource::getUrl('index', [$record])),
+            Actions\Action::make('view-entries')
+                ->color('secondary')
+                ->record($this->getRecord())
+                ->authorize(CollectionEntryResource::canViewAny())
+                ->url(CollectionEntryResource::getUrl('index', [$this->getRecord()])),
         ];
     }
 

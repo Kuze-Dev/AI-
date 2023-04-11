@@ -17,7 +17,11 @@ class ListCollection extends ListRecords
 
     protected function getTableRecordUrlUsing(): ?Closure
     {
-        return fn (Collection $record) => CollectionEntryResource::getUrl('index', [$record]);
+        if (self::$resource::canViewAny()) {
+            return fn (Collection $record) => CollectionEntryResource::getUrl('index', [$record]);
+        }
+
+        return parent::getTableRecordUrlUsing();
     }
 
     /**
