@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\CollectionResource\Pages;
 
+use App\FilamentTenant\Resources\CollectionEntryResource;
 use App\FilamentTenant\Resources\CollectionResource;
 use Domain\Collection\Actions\UpdateCollectionAction;
 use Domain\Collection\DataTransferObjects\CollectionData;
@@ -32,6 +33,11 @@ class EditCollection extends EditRecord
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
+            Actions\Action::make('view-entries')
+                ->color('secondary')
+                ->record($this->getRecord())
+                ->authorize(CollectionEntryResource::canViewAny())
+                ->url(CollectionEntryResource::getUrl('index', [$this->getRecord()])),
         ];
     }
 
