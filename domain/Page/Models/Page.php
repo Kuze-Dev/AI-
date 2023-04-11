@@ -61,6 +61,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
     protected $fillable = [
         'name',
         'slug',
+        'author_id',
         'route_url',
     ];
 

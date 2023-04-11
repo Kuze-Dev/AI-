@@ -8,6 +8,7 @@ use Domain\Collection\DataTransferObjects\CollectionEntryData;
 use Domain\Collection\Models\Collection;
 use Domain\Collection\Models\CollectionEntry;
 use Domain\Support\MetaData\Actions\CreateMetaDataAction;
+use Illuminate\Support\Facades\Auth;
 
 class CreateCollectionEntryAction
 {
@@ -26,6 +27,7 @@ class CreateCollectionEntryAction
                 'slug' => $collectionEntryData->slug,
                 'data' => $collectionEntryData->data,
                 'published_at' => $collectionEntryData->published_at,
+                'author_id' => auth()->user()->id,
             ]);
 
         $this->createMetaData->execute($collectionEntry, $collectionEntryData->meta_data);

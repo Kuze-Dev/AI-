@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Collection\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Admin\Models\Admin;
 use Domain\Support\SlugHistory\HasSlugHistory;
 use Domain\Collection\Models\Builders\CollectionEntryBuilder;
 use Domain\Support\MetaData\HasMetaData;
@@ -79,6 +80,7 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
         'collection_id',
         'taxonomy_term_id',
         'order',
+        'author_id',
         'published_at',
     ];
 
@@ -175,5 +177,11 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
                   'slug' => $this->slug,
               ]
           ));
+      }
+
+      /** @return BelongsTo<Admin, CollectionEntry> */
+      public function author(): BelongsTo
+      {
+          return $this->belongsTo(Admin::class);
       }
 }
