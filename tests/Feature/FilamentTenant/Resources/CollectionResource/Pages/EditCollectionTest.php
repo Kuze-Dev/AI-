@@ -30,6 +30,7 @@ it('can render collection', function () {
             'future_publish_date_behavior' => 'private',
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
+            'prefix' => 'my-prefix',
         ]);
 
     livewire(EditCollection::class, ['record' => $collection->getRouteKey()])
@@ -37,6 +38,7 @@ it('can render collection', function () {
         ->assertSuccessful()
         ->assertFormSet([
             'name' => 'Test Collection',
+            'prefix' => 'my-prefix',
             'future_publish_date_behavior' => 'private',
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
@@ -61,7 +63,7 @@ it('can update collection', function () {
             'past_publish_date_behavior' => 'unlisted',
             'future_publish_date_behavior' => 'private',
             'is_sortable' => true,
-            'route_url.url' => 'test-collection',
+            'prefix' => 'new-prefix',
             'taxonomies' => [$taxonomy->getKey()],
         ])
         ->call('save')
@@ -70,6 +72,7 @@ it('can update collection', function () {
 
     assertDatabaseHas(Collection::class, [
         'name' => 'Test Collection Updated',
+        'prefix' => 'new-prefix',
         'future_publish_date_behavior' => 'private',
         'past_publish_date_behavior' => 'unlisted',
         'is_sortable' => true,

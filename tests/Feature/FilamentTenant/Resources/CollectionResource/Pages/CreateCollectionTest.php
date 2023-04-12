@@ -46,11 +46,11 @@ it('can create collection', function () {
 
     assertDatabaseHas(Collection::class, [
         'name' => 'Test Collection',
+        'prefix' => 'test-collection',
         'blueprint_id' => $blueprint->getKey(),
         'future_publish_date_behavior' => 'public',
         'past_publish_date_behavior' => 'unlisted',
         'is_sortable' => true,
-        'prefix' => 'test-collection',
     ]);
 });
 
