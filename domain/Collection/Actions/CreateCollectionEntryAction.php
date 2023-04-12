@@ -26,7 +26,7 @@ class CreateCollectionEntryAction
                 'slug' => $collectionEntryData->slug,
                 'data' => $collectionEntryData->data,
                 'published_at' => $collectionEntryData->published_at,
-                'author_id' => auth()->user()->id,
+                'author_id' => $collectionEntryData->author_id,
             ]);
 
         $this->createMetaData->execute($collectionEntry, $collectionEntryData->meta_data);

@@ -15,6 +15,8 @@ use function Pest\Laravel\assertDatabaseHas;
 beforeEach(fn () => testInTenantContext());
 
 it('can create page', function () {
+    loginAsSuperAdmin();
+
     $sliceId = SliceFactory::new()
         ->withDummyBlueprint()
         ->createOne()
@@ -30,6 +32,7 @@ it('can create page', function () {
                     'data' => ['name' => 'foo'],
                 ],
             ],
+            'author_id' => auth()->user()->id,
             'meta_data' => [
                 'title' => 'foo',
                 'author' => '',

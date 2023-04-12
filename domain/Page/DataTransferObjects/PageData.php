@@ -13,7 +13,8 @@ class PageData
         public readonly string $route_url,
         public readonly MetaDataData $meta_data,
         public readonly array $slice_contents = [],
-        public readonly ?string $slug = null
+        public readonly ?string $slug = null,
+        public readonly ?int $author_id = null,
     ) {
     }
 
@@ -31,6 +32,7 @@ class PageData
             ),
             slug: $data['slug'] ?? null,
             route_url: $data['route_url'],
+            author_id: auth()->user()->id ?? null,
             meta_data: MetaDataData::fromArray($data['meta_data'])
         );
     }

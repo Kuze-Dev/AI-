@@ -16,6 +16,7 @@ class CollectionEntryData
         public readonly array $taxonomy_terms = [],
         public readonly ?Carbon $published_at = null,
         public readonly array $data = [],
+        public readonly ?int $author_id = null,
     ) {
     }
 
@@ -27,6 +28,7 @@ class CollectionEntryData
             published_at: isset($data['published_at']) ? Carbon::parse($data['published_at']) : null,
             taxonomy_terms: $data['taxonomy_terms'] ?? [],
             data: $data['data'],
+            author_id: auth()->user()->id ?? null,
             meta_data: MetaDataData::fromArray($data['meta_data'])
         );
     }
