@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\CollectionResource\Pages\CreateCollection;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Collection\Models\Collection;
-use Domain\Support\RouteUrl\Models\RouteUrl;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Filament\Facades\Filament;
 
@@ -38,7 +37,7 @@ it('can create collection', function () {
             'future_publish_date_behavior' => 'public',
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
-            'route_url.url' => 'test-collection',
+            'prefix' => 'test-collection',
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -51,12 +50,7 @@ it('can create collection', function () {
         'future_publish_date_behavior' => 'public',
         'past_publish_date_behavior' => 'unlisted',
         'is_sortable' => true,
-    ]);
-    assertDatabaseHas(RouteUrl::class, [
-        'model_type' => $collection->getMorphClass(),
-        'model_id' => $collection->id,
-        'url' => $collection->slug,
-        'is_override' => true,
+        'prefix' => 'test-collection',
     ]);
 });
 

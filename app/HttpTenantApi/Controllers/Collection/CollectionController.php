@@ -16,12 +16,11 @@ class CollectionController
     public function index(): JsonApiResourceCollection
     {
         return CollectionResource::collection(
-            QueryBuilder::for(Collection::with('routeUrls'))
+            QueryBuilder::for(Collection::query())
                 ->allowedIncludes([
                     'taxonomies',
-                    'routeUrls',
                 ])
-                ->allowedFilters(['name', 'slug'])
+                ->allowedFilters(['name', 'slug', 'prefix'])
                 ->jsonPaginate()
         );
     }

@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Domain\Collection\DataTransferObjects;
 
 use Domain\Collection\Enums\PublishBehavior;
-use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
 
 class CollectionData
 {
     public function __construct(
         public readonly string $name,
         public readonly string $blueprint_id,
-        public readonly RouteUrlData $route_url_data,
+        public readonly string $prefix,
         public readonly array $taxonomies = [],
         public readonly ?PublishBehavior $past_publish_date_behavior = null,
         public readonly ?PublishBehavior $future_publish_date_behavior = null,

@@ -5,11 +5,9 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\CollectionResource\Pages\EditCollection;
 use Domain\Collection\Database\Factories\CollectionFactory;
 use Domain\Collection\Models\Collection;
-use Domain\Support\RouteUrl\Models\RouteUrl;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Filament\Facades\Filament;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Livewire\livewire;
@@ -79,26 +77,6 @@ it('can update collection', function () {
     assertDatabaseHas('collection_taxonomy', [
         'taxonomy_id' => $taxonomy->getKey(),
         'collection_id' => $collection->getKey(),
-    ]);
-});
-
-it('can update collection route_url', function () {
-    $collection = CollectionFactory::new(['name' => 'Test Collection'])
-        ->withDummyBlueprint()
-        ->createOne();
-
-    livewire(EditCollection::class, ['record' => $collection->getRouteKey()])
-        ->fillForm(['route_url.url' => 'test-collection-updated'])
-        ->call('save')
-        ->assertHasNoFormErrors()
-        ->assertOk();
-
-    assertDatabaseCount(RouteUrl::class, 2);
-    assertDatabaseHas(RouteUrl::class, [
-        'model_type' => $collection->getMorphClass(),
-        'model_id' => $collection->id,
-        'url' => 'test-collection-updated',
-        'is_override' => true,
     ]);
 });
 

@@ -118,6 +118,7 @@
         "format-dirty": "vendor/bin/pint --dirty",
         "format-dry-run": "vendor/bin/pint --test",
         "test": "vendor/bin/pest --parallel",
+        "test-no-timeout": ["Composer\\Config::disableProcessTimeout", "vendor/bin/pest --parallel"],
         "test-coverage": "vendor/bin/pest --parallel --coverage-html build/coverage",
         "x-ray": "vendor/bin/x-ray app database domain resources routes tests"
     },

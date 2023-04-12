@@ -7,8 +7,8 @@ namespace Domain\Collection\Database\Factories;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Collection\Enums\PublishBehavior;
 use Domain\Collection\Models\Collection;
-use Domain\Support\RouteUrl\Database\Factories\RouteUrlFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Collection\Models\Collection>
@@ -26,6 +26,7 @@ class CollectionFactory extends Factory
         return [
             'blueprint_id' => null,
             'name' => $name,
+            'prefix' => Str::of($name)->slug(),
             'past_publish_date_behavior' => null,
             'future_publish_date_behavior' => null,
             'is_sortable' => false,
@@ -54,10 +55,5 @@ class CollectionFactory extends Factory
     public function withDummyBlueprint(): self
     {
         return $this->for(BlueprintFactory::new()->withDummySchema());
-    }
-
-    public function configure(): self
-    {
-        return $this->has(RouteUrlFactory::new());
     }
 }

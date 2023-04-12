@@ -169,7 +169,7 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
       protected function qualifiedRouteUrl(): Attribute
       {
           return Attribute::get(fn () => Blade::render(
-              Blade::compileEchos($this->collection->getActiveRouteUrl()->url .'/'.$this->slug),
+              Blade::compileEchos($this->collection->prefix .'/'.$this->slug),
               [
                   'slug' => $this->slug,
               ]

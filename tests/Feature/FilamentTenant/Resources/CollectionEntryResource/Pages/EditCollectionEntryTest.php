@@ -180,7 +180,7 @@ it('can edit collection entry route_url', function () {
         ->instance()
         ->record;
 
-    assertDatabaseCount(RouteUrl::class, 3); // 1 (for collection) + 2 (for collection entry)
+    assertDatabaseCount(RouteUrl::class, 2); // 2 (for collection entry)
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $collectionEntry->getMorphClass(),
         'model_id' => $collectionEntry->id,

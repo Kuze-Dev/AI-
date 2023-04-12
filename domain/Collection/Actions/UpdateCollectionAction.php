@@ -6,15 +6,9 @@ namespace Domain\Collection\Actions;
 
 use Domain\Collection\DataTransferObjects\CollectionData;
 use Domain\Collection\Models\Collection;
-use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
 class UpdateCollectionAction
 {
-    public function __construct(
-        protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
-    ) {
-    }
-
     /**
      * Execute operations for updating
      * collection and save collection query.
@@ -30,8 +24,6 @@ class UpdateCollectionAction
 
         $collection->taxonomies()
             ->sync($collectionData->taxonomies);
-
-        $this->createOrUpdateRouteUrl->execute($collection, $collectionData->route_url_data);
 
         return $collection;
     }

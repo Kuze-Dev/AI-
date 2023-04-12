@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\FilamentTenant\Support\RouteUrlForm;
-use App\FilamentTenant\Support\RouteUrlTextColumn;
 use Domain\Collection\Enums\PublishBehavior;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
@@ -72,8 +70,8 @@ class CollectionResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->lazy()
                         ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
-                            if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
-                                $set('slug', Str::slug($state));
+                            if ($get('prefix') === Str::slug($state) || blank($get('prefix'))) {
+                                $set('prefix', Str::slug($state));
                             }
                         })
                         ->required(),
@@ -88,6 +86,12 @@ class CollectionResource extends Resource
                         ->searchable()
                         ->preload()
                         ->disabled(fn (?Collection $record) => $record !== null),
+                    Forms\Components\TextInput::make('prefix')
+                        ->required()
+                        ->string()
+                        ->alphaDash()
+                        ->unique(ignoreRecord: true)
+                        ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                     Forms\Components\Select::make('taxonomies')
                         ->multiple()
                         ->options(
@@ -139,8 +143,6 @@ class CollectionResource extends Resource
                             ->reactive(),
                     ]),
                 ]),
-                RouteUrlForm::make('Route Url')
-                    ->applySchema(Collection::class),
             ]);
     }
 
@@ -151,7 +153,9 @@ class CollectionResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable(),
-                RouteUrlTextColumn::make('route_url'),
+                Tables\Columns\TextColumn::make('prefix')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('blueprint.name')
                     ->sortable()
                     ->searchable()
@@ -202,11 +206,5 @@ class CollectionResource extends Resource
             'create' => Resources\CollectionResource\Pages\CreateCollection::route('/create'),
             'edit' => Resources\CollectionResource\Pages\EditCollection::route('/{record}/edit'),
         ];
-    }
-
-    /** @return \Illuminate\Database\Eloquent\Builder<Collection> */
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()->with('routeUrls');
     }
 }

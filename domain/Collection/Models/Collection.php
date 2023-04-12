@@ -6,8 +6,6 @@ namespace Domain\Collection\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Blueprint;
-use Domain\Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
-use Domain\Support\RouteUrl\HasRouteUrl;
 use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -32,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string $blueprint_id
  * @property string $name
  * @property string $slug
+ * @property string $prefix
  * @property PublishBehavior|null $future_publish_date_behavior
  * @property PublishBehavior|null $past_publish_date_behavior
  * @property bool $is_sortable
@@ -60,15 +59,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @mixin \Eloquent
  */
 #[
-    OnDeleteCascade(['taxonomies', 'routeUrls']),
+    OnDeleteCascade(['taxonomies']),
     OnDeleteRestrict(['collectionEntries'])
 ]
-class Collection extends Model implements IsActivitySubject, HasRouteUrlContract
+class Collection extends Model implements IsActivitySubject
 {
     use LogsActivity;
     use HasSlug;
     use ConstraintsRelationships;
-    use HasRouteUrl;
 
     /**
      * Declare columns
@@ -79,6 +77,7 @@ class Collection extends Model implements IsActivitySubject, HasRouteUrlContract
         'blueprint_id',
         'taxonomy_id',
         'slug',
+        'prefix',
         'past_publish_date_behavior',
         'future_publish_date_behavior',
         'is_sortable',
@@ -171,15 +170,10 @@ class Collection extends Model implements IsActivitySubject, HasRouteUrlContract
     protected function qualifiedRouteUrl(): Attribute
     {
         return Attribute::get(fn () => Blade::render(
-            Blade::compileEchos($this->getActiveRouteUrl()->url),
+            Blade::compileEchos($this->prefix),
             [
                 'slug' => $this->slug,
             ]
         ));
-    }
-
-    public function getRouteUrlDefaultUrl(): string
-    {
-        return $this->slug;
     }
 }
