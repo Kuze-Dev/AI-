@@ -54,6 +54,10 @@ class MetaData extends Model implements HasMedia
         'keywords',
     ];
 
+    protected $with = [
+        'media',
+    ];
+
     /** @return MorphTo<Model, self> */
     public function model(): MorphTo
     {
