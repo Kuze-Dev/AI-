@@ -31,7 +31,6 @@ class CollectionController
             QueryBuilder::for(Collection::whereSlug($collection))
                 ->allowedIncludes([
                     'taxonomies',
-                    'routeUrls',
                 ])
                 ->firstOrFail()
         );
