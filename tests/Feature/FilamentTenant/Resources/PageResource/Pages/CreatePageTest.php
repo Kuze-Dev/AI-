@@ -182,6 +182,5 @@ it('newly created page must have author_id', function () {
         ->instance()
         ->record;
 
-    assertDatabaseHas(Page::class, ['name' => 'Test', 'author_id' => auth()->user()->id,]);
-    
+    assertDatabaseHas(Page::class, ['name' => 'Test', 'author_id' => auth()->user()->id, ]);
 });

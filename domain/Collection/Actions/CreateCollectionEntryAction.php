@@ -8,7 +8,6 @@ use Domain\Collection\DataTransferObjects\CollectionEntryData;
 use Domain\Collection\Models\Collection;
 use Domain\Collection\Models\CollectionEntry;
 use Domain\Support\MetaData\Actions\CreateMetaDataAction;
-use Illuminate\Support\Facades\Auth;
 
 class CreateCollectionEntryAction
 {
