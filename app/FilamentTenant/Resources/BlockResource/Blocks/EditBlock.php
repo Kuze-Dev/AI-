@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\FilamentTenant\Resources\SliceResource\Slices;
+namespace App\FilamentTenant\Resources\BlockResource\Blocks;
 
-use App\FilamentTenant\Resources\SliceResource;
-use Domain\Page\Actions\UpdateSliceAction;
-use Domain\Page\DataTransferObjects\SliceData;
+use App\FilamentTenant\Resources\BlockResource;
+use Domain\Page\Actions\UpdateBlockAction;
+use Domain\Page\DataTransferObjects\BlockData;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -15,9 +15,9 @@ use Throwable;
 use Exception;
 use Filament\Pages\Actions\Action;
 
-class EditSlice extends EditRecord
+class EditBlock extends EditRecord
 {
-    protected static string $resource = SliceResource::class;
+    protected static string $resource = BlockResource::class;
 
     /** @throws Exception */
     protected function getActions(): array
@@ -37,16 +37,16 @@ class EditSlice extends EditRecord
     }
 
     /**
-     * @param \Domain\Page\Models\Slice $record
+     * @param \Domain\Page\Models\Block $record
      * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(
-            fn () => app(UpdateSliceAction::class)
+            fn () => app(UpdateBlockAction::class)
                 ->execute(
                     $record,
-                    new SliceData(
+                    new BlockData(
                         name: $data['name'],
                         component: $data['component'],
                         image: $data['image'],

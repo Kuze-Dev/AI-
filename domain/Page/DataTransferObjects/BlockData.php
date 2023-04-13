@@ -6,7 +6,7 @@ namespace Domain\Page\DataTransferObjects;
 
 use Illuminate\Http\UploadedFile;
 
-class SliceData
+class BlockData
 {
     public function __construct(
         public readonly string $name,

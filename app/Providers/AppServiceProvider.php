@@ -16,7 +16,7 @@ use Domain\Form\Models\FormSubmission;
 use Domain\Globals\Models\Globals;
 use Domain\Page\Models\Page;
 use Domain\Support\SlugHistory\SlugHistory;
-use Domain\Page\Models\Slice;
+use Domain\Page\Models\Block;
 use Domain\Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
@@ -51,7 +51,7 @@ class AppServiceProvider extends ServiceProvider
             config('tenancy.tenant_model'),
             Blueprint::class,
             Page::class,
-            Slice::class,
+            Block::class,
             Menu::class,
             Node::class,
             Form::class,

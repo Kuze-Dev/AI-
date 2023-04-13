@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\FilamentTenant\Resources\SliceResource\Slices\ListSlices;
+use App\FilamentTenant\Resources\BlockResource\Blocks\ListBlocks;
 use Domain\Page\Database\Factories\PageFactory;
-use Domain\Page\Database\Factories\SliceFactory;
+use Domain\Page\Database\Factories\BlockFactory;
 use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
@@ -19,43 +19,43 @@ beforeEach(function () {
 });
 
 it('can render page', function () {
-    livewire(ListSlices::class)
+    livewire(ListBlocks::class)
         ->assertOk();
 });
 
-it('can list slices', function () {
-    $slices = SliceFactory::new()
+it('can list blocks', function () {
+    $blocks = BlockFactory::new()
         ->withDummyBlueprint()
         ->count(5)
         ->create();
 
-    livewire(ListSlices::class)
-        ->assertCanSeeTableRecords($slices)
+    livewire(ListBlocks::class)
+        ->assertCanSeeTableRecords($blocks)
         ->assertOk();
 });
 
-it('can delete slice', function () {
-    $slice = SliceFactory::new()
+it('can delete block', function () {
+    $block = BlockFactory::new()
         ->withDummyBlueprint()
         ->createOne();
 
-    livewire(ListSlices::class)
-        ->callTableAction(DeleteAction::class, $slice)
+    livewire(ListBlocks::class)
+        ->callTableAction(DeleteAction::class, $block)
         ->assertOk();
 
-    assertModelMissing($slice);
+    assertModelMissing($block);
 });
 
-it('can\'t delete slice with existing content', function () {
-    $slice = SliceFactory::new()
+it('can\'t delete block with existing content', function () {
+    $block = BlockFactory::new()
         ->withDummyBlueprint()
         ->createOne();
 
     PageFactory::new()
-        ->addSliceContent($slice)
+        ->addBlockContent($block)
         ->createOne();
 
-    livewire(ListSlices::class)
-        ->callTableAction(DeleteAction::class, $slice)
+    livewire(ListBlocks::class)
+        ->callTableAction(DeleteAction::class, $block)
         ->assertOk();
 })->throws(DeleteRestrictedException::class);

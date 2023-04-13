@@ -16,20 +16,20 @@
         x-data="{ state: $wire.entangle('{{ $getStatePath() }}') }"
         x-bind:class="{ 'justify-center': state }"
     >
-        @foreach ($slices as $id => $slice)
-            <div wire:key="slice_picker.{{ $id }}" x-show="!state || {{ $id }} === state">
+        @foreach ($blocks as $id => $block)
+            <div wire:key="block_picker.{{ $id }}" x-show="!state || {{ $id }} === state">
                 <button
                     class="flex flex-col items-center justify-center flex-shrink-0 h-32 rounded-lg cursor-pointer bg-neutral-800 w-60"
                     type="button"
                     x-on:click="state = {{ $id }}"
                 >
-                    @if($slice['image'])
-                        <img class="inline-block object-contain w-full h-full" src="{{ $slice['image'] }}" alt="{{ $slice['name'] }} preview"/>
+                    @if($block['image'])
+                        <img class="inline-block object-contain w-full h-full" src="{{ $block['image'] }}" alt="{{ $block['name'] }} preview"/>
                     @else
                         <p class="text-sm text-white">@lang('No preview available')</p>
                     @endif
                 </button>
-                <p class="w-full text-sm text-center">{{ $slice['name'] }}</p>
+                <p class="w-full text-sm text-center">{{ $block['name'] }}</p>
             </div>
         @endforeach
     </div>

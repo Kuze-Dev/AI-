@@ -11,7 +11,7 @@ use Domain\Support\MetaData\Actions\CreateMetaDataAction;
 class CreatePageAction
 {
     public function __construct(
-        protected CreateSliceContentAction $createSliceContent,
+        protected CreateBlockContentAction $createBlockContent,
         protected CreateMetaDataAction $createMetaTags
     ) {
     }
@@ -26,8 +26,8 @@ class CreatePageAction
 
         $this->createMetaTags->execute($page, $pageData->meta_data);
 
-        foreach ($pageData->slice_contents as $sliceContentData) {
-            $this->createSliceContent->execute($page, $sliceContentData);
+        foreach ($pageData->block_contents as $blockContentData) {
+            $this->createBlockContent->execute($page, $blockContentData);
         }
 
         return $page;

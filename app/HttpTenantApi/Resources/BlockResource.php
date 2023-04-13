@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @mixin \Domain\Page\Models\Slice
+ * @mixin \Domain\Page\Models\Block
  */
-class SliceResource extends JsonApiResource
+class BlockResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {

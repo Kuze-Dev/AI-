@@ -7,22 +7,22 @@ namespace Database\Seeders\Tenant;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\RichtextButton;
-use Domain\Page\Database\Factories\SliceFactory;
+use Domain\Page\Database\Factories\BlockFactory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
-class SliceSeeder extends Seeder
+class BlockSeeder extends Seeder
 {
     public function run(): void
     {
-        foreach ($this->slices() as $slice) {
-            SliceFactory::new([
-                'name' => $slice['name'],
-                'component' => Str::studly($slice['name']),
+        foreach ($this->blocks() as $block) {
+            BlockFactory::new([
+                'name' => $block['name'],
+                'component' => Str::studly($block['name']),
             ])
                 ->for(
-                    $this->createBlueprintFactory($slice['blueprint'])
-                        ->state(['name' => $slice['name'] . ' Slice Blueprint'])
+                    $this->createBlueprintFactory($block['blueprint'])
+                        ->state(['name' => $block['name'] . ' Block Blueprint'])
                 )
                 ->create();
         }
@@ -43,7 +43,7 @@ class SliceSeeder extends Seeder
         return $blueprintFactory;
     }
 
-    protected function slices(): array
+    protected function blocks(): array
     {
         return [
             [

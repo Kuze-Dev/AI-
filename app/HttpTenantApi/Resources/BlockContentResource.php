@@ -12,9 +12,9 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @mixin \Domain\Page\Models\SliceContent
+ * @mixin \Domain\Page\Models\BlockContent
  */
-class SliceContentResource extends JsonApiResource
+class BlockContentResource extends JsonApiResource
 {
     use TransformsSchemaPayload;
 
@@ -29,23 +29,23 @@ class SliceContentResource extends JsonApiResource
     public function toRelationships(Request $request): array
     {
         return [
-            'slice' => fn () => SliceResource::make($this->slice),
+            'block' => fn () => BlockResource::make($this->block),
         ];
     }
 
     protected function getSchemaData(): SchemaData
     {
-        return $this->slice->blueprint->schema;
+        return $this->block->blueprint->schema;
     }
 
     public static function newCollection(mixed $resource)
     {
         if ($resource instanceof Collection) {
-            $resource->loadMissing('slice.blueprint');
+            $resource->loadMissing('block.blueprint');
         }
 
         if ($resource instanceof LengthAwarePaginator && $resource->getCollection() instanceof Collection) {
-            $resource->getCollection()->loadMissing('slice.blueprint');
+            $resource->getCollection()->loadMissing('block.blueprint');
         }
 
         return parent::newCollection($resource);
