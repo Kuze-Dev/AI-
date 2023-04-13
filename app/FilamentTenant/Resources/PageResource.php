@@ -7,7 +7,7 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\MetaDataForm;
-use App\FilamentTenant\Support\RouteUrlForm;
+use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\RouteUrlTextColumn;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
@@ -17,6 +17,7 @@ use Domain\Page\Models\Slice;
 use Domain\Page\Models\SliceContent;
 use Exception;
 use Filament\Forms;
+use Filament\Forms\Components\Component;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -25,7 +26,6 @@ use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 class PageResource extends Resource
 {
@@ -53,15 +53,14 @@ class PageResource extends Resource
                             Forms\Components\TextInput::make('name')
                                 ->unique(ignoreRecord: true)
                                 ->lazy()
-                                ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
-                                    if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
-                                        $set('slug', Str::slug($state));
-                                    }
+                                ->afterStateUpdated(function (Forms\Components\TextInput $component) {
+                                    $component->getContainer()
+                                        ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
+                                        ?->dispatchEvent('route_url::update');
                                 })
                                 ->required(),
+                            RouteUrlFieldset::make(),
                         ]),
-                        RouteUrlForm::make('Route Url')
-                            ->applySchema(Page::class),
                         Forms\Components\Section::make(trans('Slices'))
                             ->schema([
                                 Forms\Components\Repeater::make('slice_contents')

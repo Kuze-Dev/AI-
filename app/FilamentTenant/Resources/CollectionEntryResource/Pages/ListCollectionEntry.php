@@ -71,6 +71,6 @@ class ListCollectionEntry extends ListRecords
     /** @return Builder<\Domain\Collection\Models\CollectionEntry> */
     protected function getTableQuery(): Builder
     {
-        return $this->ownerRecord->collectionEntries()->getQuery()->with('routeUrls');
+        return $this->ownerRecord->collectionEntries()->getQuery();
     }
 }

@@ -7,6 +7,7 @@ namespace Domain\Support\RouteUrl;
 use Domain\Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait HasRouteUrl
@@ -17,10 +18,10 @@ trait HasRouteUrl
         return $this->morphMany(RouteUrl::class, 'model');
     }
 
-    public function getActiveRouteUrl(): RouteUrl
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Domain\Support\RouteUrl\Models\RouteUrl> */
+    public function activeRouteUrl(): MorphOne
     {
-        /** @phpstan-ignore-next-line  */
-        return $this->routeUrls->sortByDesc('id')->first();
+        return $this->routeUrls()->one()->latestOfMany('updated_at');
     }
 
     /**

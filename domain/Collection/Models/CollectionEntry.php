@@ -19,10 +19,9 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
-use Illuminate\Support\Facades\Blade;
 use Spatie\Sluggable\SlugOptions;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
+use Illuminate\Support\Str;
 
 /**
  * Domain\Collection\Models\CollectionEntry
@@ -137,7 +136,7 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
     /** Specify activity log description. */
     public function getActivitySubjectDescription(Activity $activity): string
     {
-        return 'Collection Entry: '.$this->id;
+        return 'Collection Entry: ' . $this->id;
     }
 
     /** @return SlugOptions */
@@ -165,19 +164,9 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
         return new CollectionEntryBuilder($query);
     }
 
-      /** @return Attribute<string, static> */
-      protected function qualifiedRouteUrl(): Attribute
-      {
-          return Attribute::get(fn () => Blade::render(
-              Blade::compileEchos($this->collection->prefix .'/'.$this->slug),
-              [
-                  'slug' => $this->slug,
-              ]
-          ));
-      }
-
-    public function getRouteUrlDefaultUrl(): string
+    /** @param self $model */
+    public static function generateRouteUrl(Model $model, array $attributes): string
     {
-        return $this->slug;
+        return Str::start($model->collection->prefix, '/') . Str::of($attributes['title'])->slug()->start('/');
     }
 }

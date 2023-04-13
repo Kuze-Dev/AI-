@@ -6,7 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
-use App\FilamentTenant\Support\RouteUrlForm;
+use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\RouteUrlTextColumn;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Filament\Forms;
@@ -24,11 +24,11 @@ use Domain\Collection\Models\Builders\CollectionEntryBuilder;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Component;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rules\Unique;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -96,15 +96,19 @@ class CollectionEntryResource extends Resource
                                 ignoreRecord: true
                             )
                             ->lazy()
-                            ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
-                                if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
-                                    $set('slug', Str::slug($state));
-                                }
+                            ->afterStateUpdated(function (Forms\Components\TextInput $component) {
+                                $component->getContainer()
+                                    ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
+                                    ?->dispatchEvent('route_url::update');
                             })
                             ->required(),
+                        RouteUrlFieldset::make()
+                            ->generateModelForRouteUrlUsing(function ($livewire, CollectionEntry|string $model) {
+                                return $model instanceof CollectionEntry
+                                    ? $model
+                                    : tap(new CollectionEntry())->setRelation('collection', $livewire->ownerRecord);
+                            }),
                     ]),
-                    RouteUrlForm::make('Route Url')
-                        ->applySchema(CollectionEntry::class),
                     Forms\Components\Section::make(trans('Taxonomies'))
                         ->schema([
                             Forms\Components\Group::make()

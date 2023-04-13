@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace Domain\Support\RouteUrl\Contracts;
 
-use Domain\Support\RouteUrl\Models\RouteUrl;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\RouteUrl\Models\RouteUrl[] $routeUrls
+ * @property-read \Domain\Support\RouteUrl\Models\RouteUrl $activeRouteUrl
  */
 interface HasRouteUrl
 {
     /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Domain\Support\RouteUrl\Models\RouteUrl> */
     public function routeUrls(): MorphMany;
 
-    public function getRouteUrlDefaultUrl(): string;
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Domain\Support\RouteUrl\Models\RouteUrl> */
+    public function activeRouteUrl(): MorphOne;
 
-    public function getActiveRouteUrl(): RouteUrl;
+    public static function generateRouteUrl(Model $model, array $attributes): string;
 }

@@ -7,6 +7,7 @@ namespace Domain\Support\RouteUrl\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Eloquent;
+use Stringable;
 
 /**
  * Domain\Support\RouteUrl\Models\RouteUrl
@@ -31,7 +32,7 @@ use Eloquent;
  * @method static \Illuminate\Database\Eloquent\Builder|RouteUrl whereUrl($value)
  * @mixin \Eloquent
  */
-class RouteUrl extends Model
+class RouteUrl extends Model implements Stringable
 {
     protected $fillable = [
         'model_type',
@@ -48,5 +49,10 @@ class RouteUrl extends Model
     public function model(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function __toString(): string
+    {
+        return $this->url;
     }
 }

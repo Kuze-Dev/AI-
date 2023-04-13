@@ -14,7 +14,7 @@ class RouteUrlTextColumn extends Tables\Columns\TextColumn
         parent::setUp();
 
         $this->formatStateUsing(
-            fn (HasRouteUrl $record) => $record->getActiveRouteUrl()->url
+            fn (HasRouteUrl $record) => $record->activeRouteUrl->url
         );
     }
 }

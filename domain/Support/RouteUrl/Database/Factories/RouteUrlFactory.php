@@ -20,7 +20,7 @@ class RouteUrlFactory extends Factory
             'model_id' => null,
             'model_type' => null,
             'url' => $this->faker->unique()->word(),
-            'is_override' => $this->faker->boolean(),
+            'is_override' => false,
         ];
     }
 }

@@ -10,16 +10,15 @@ use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Domain\Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
 use Domain\Support\RouteUrl\HasRouteUrl;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Blade;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
+use Illuminate\Support\Str;
 
 /**
  * Domain\Page\Models\Page
@@ -90,7 +89,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasR
 
     public function getActivitySubjectDescription(Activity $activity): string
     {
-        return 'Page: '.$this->name;
+        return 'Page: ' . $this->name;
     }
 
     public function getRouteKeyName(): string
@@ -107,19 +106,8 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasR
             ->saveSlugsTo($this->getRouteKeyName());
     }
 
-    /** @return Attribute<string, static> */
-    protected function qualifiedRouteUrl(): Attribute
+    public static function generateRouteUrl(Model $model, array $attributes): string
     {
-        return Attribute::get(fn () => Blade::render(
-            Blade::compileEchos($this->getActiveRouteUrl()->url),
-            [
-                'slug' => $this->slug,
-            ]
-        ));
-    }
-
-    public function getRouteUrlDefaultUrl(): string
-    {
-        return $this->slug;
+        return Str::of($attributes['name'])->slug()->start('/')->toString();
     }
 }

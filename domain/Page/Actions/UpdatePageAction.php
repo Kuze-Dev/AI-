@@ -47,7 +47,7 @@ class UpdatePageAction
 
         SliceContent::setNewOrder($sliceContentIds);
 
-        $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url_data);
+        $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url);
 
         return $page;
     }

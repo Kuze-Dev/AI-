@@ -5,38 +5,30 @@ declare(strict_types=1);
 namespace Domain\Support\RouteUrl\Actions;
 
 use Domain\Support\RouteUrl\Contracts\HasRouteUrl;
-use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
-use Domain\Support\RouteUrl\Exceptions\AlreadyUsedRouteUrlException;
 use Domain\Support\RouteUrl\Models\RouteUrl;
-use Domain\Support\RouteUrl\Support;
 use Illuminate\Database\Eloquent\Model;
 
 class CreateOrUpdateRouteUrlAction
 {
-    public function execute(Model&HasRouteUrl $model, RouteUrlData $routeUrlData): void
+    public function execute(Model&HasRouteUrl $model, string $url = null): void
     {
-        $newUrl = $routeUrlData->url ?? $model->getRouteUrlDefaultUrl();
+        $is_overriden = $url !== null;
+        $url ??= $model::generateRouteUrl($model, $model->getAttributes());
 
-        if (
-            Support::isActiveRouteUrl(
-                $newUrl,
-                $routeUrlData->url === null
-                    ? null
-                    : $model
-            )
-        ) {
-            throw new AlreadyUsedRouteUrlException();
-        }
-
-        $activeRouteUrl = RouteUrl::whereUrl($newUrl)
+        /** @var ?RouteUrl $routeUrl */
+        $routeUrl = RouteUrl::whereUrl($url)
             ->first();
 
-        $activeRouteUrl?->delete();
-
-        $model->routeUrls()
-            ->create([
-                'url' => $newUrl,
-                'is_override' => filled($routeUrlData->url),
-            ]);
+        if ($routeUrl !== null) {
+            $routeUrl->model()
+                ->associate($model)
+                ->save();
+        } else {
+            $model->routeUrls()
+                ->create([
+                    'url' => $url,
+                    'is_override' => $is_overriden,
+                ]);
+        }
     }
 }
