@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 use Exception;
+use Filament\Pages\Actions\Action;
 
 class EditBlock extends EditRecord
 {
@@ -22,8 +23,17 @@ class EditBlock extends EditRecord
     protected function getActions(): array
     {
         return [
+            Action::make('save')
+                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->action('save')
+                ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
     }
 
     /**
