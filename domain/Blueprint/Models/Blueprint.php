@@ -64,23 +64,23 @@ class Blueprint extends Model implements IsActivitySubject
     {
         return 'Blueprint: '.$this->name;
     }
-    
+
     /** @return HasMany<Block> */
     public function blocks(): HasMany
     {
         return $this->hasMany(Block::class);
     }
 
-    /** @return HasMany<Form> */
-    public function forms(): HasMany 
-    {
-        return $this->hasMany(Form::class);
-    }
-
     /** @return HasMany<Collection> */
     public function collections(): HasMany
     {
         return $this->hasMany(Collection::class);
+    }
+
+    /** @return HasMany<Form> */
+    public function forms(): HasMany
+    {
+        return $this->hasMany(Form::class);
     }
 
     /** @return HasMany<Globals> */

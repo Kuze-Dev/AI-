@@ -99,6 +99,7 @@ class BlueprintResource extends Resource
                                 $modelName = class_basename($record->{$relationship}()->getRelated());
                                 $action->failureNotificationTitle(trans("{$modelName} is using this blueprint."))
                                     ->failure();
+
                                 return false;
                             }
                         }
