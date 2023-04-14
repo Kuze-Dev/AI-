@@ -8,8 +8,8 @@ use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
-use Domain\Collection\Models\Collection;
-use Domain\Collection\Models\CollectionEntry;
+use Domain\Content\Models\Content;
+use Domain\Content\Models\ContentEntry;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
@@ -59,8 +59,8 @@ class AppServiceProvider extends ServiceProvider
             FormEmailNotification::class,
             Taxonomy::class,
             TaxonomyTerm::class,
-            Collection::class,
-            CollectionEntry::class,
+            Content::class,
+            ContentEntry::class,
             SlugHistory::class,
             Globals::class,
             MetaData::class,

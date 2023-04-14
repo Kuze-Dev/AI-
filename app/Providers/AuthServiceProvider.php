@@ -33,8 +33,8 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Form\Models\FormSubmission::class => \App\Policies\FormSubmissionPolicy::class,
         \Domain\Taxonomy\Models\Taxonomy::class => \App\Policies\TaxonomyPolicy::class,
         \Domain\Taxonomy\Models\TaxonomyTerm::class => \App\Policies\TaxonomyTermPolicy::class,
-        \Domain\Collection\Models\Collection::class => \App\Policies\CollectionPolicy::class,
-        \Domain\Collection\Models\CollectionEntry::class => \App\Policies\CollectionEntryPolicy::class,
+        \Domain\Content\Models\Content::class => \App\Policies\ContentPolicy::class,
+        \Domain\Content\Models\ContentEntry::class => \App\Policies\ContentEntryPolicy::class,
         \Domain\Globals\Models\Globals::class => \App\Policies\GlobalsPolicy::class,
     ];
 
