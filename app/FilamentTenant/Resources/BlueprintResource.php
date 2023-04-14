@@ -90,7 +90,21 @@ class BlueprintResource extends Resource
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->action(function (Blueprint $record, Tables\Actions\Action $action): ?bool {
+                        $relationships = ['blocks', 'collections', 'forms', 'globals', 'taxonomies'];
+
+                        foreach ($relationships as $relationship) {
+                            if ($record->{$relationship}()->exists()) {
+                                $modelName = class_basename($record->{$relationship}()->getRelated());
+                                $action->failureNotificationTitle(trans("{$modelName} is using this blueprint."))
+                                    ->failure();
+                                return false;
+                            }
+                        }
+
+                        return $record->delete();
+                    }),
             ])
             ->defaultSort('created_at', 'desc');
     }
