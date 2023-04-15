@@ -24,7 +24,7 @@ class PageResource extends JsonApiResource
     public function toRelationships(Request $request): array
     {
         return [
-            'sliceContents' => fn () => SliceContentResource::collection($this->sliceContents),
+            'blockContents' => fn () => BlockContentResource::collection($this->blockContents),
             'slugHistories' => fn () => SlugHistoryResource::collection($this->slugHistories),
             'metaData' => fn () => MetaDataResource::make($this->metaData),
         ];

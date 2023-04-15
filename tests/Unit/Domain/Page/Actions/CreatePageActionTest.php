@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Domain\Page\Actions\CreatePageAction;
-use Domain\Page\Database\Factories\SliceFactory;
+use Domain\Page\Database\Factories\BlockFactory;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
-use Domain\Page\Models\SliceContent;
+use Domain\Page\Models\BlockContent;
 use Domain\Support\MetaData\Models\MetaData;
 
 use function Pest\Laravel\assertDatabaseCount;
@@ -15,7 +15,7 @@ use function Pest\Laravel\assertDatabaseHas;
 beforeEach(fn () => testInTenantContext());
 
 it('can create page', function () {
-    $sliceId = SliceFactory::new()
+    $blockId = BlockFactory::new()
         ->withDummyBlueprint()
         ->createOne()
         ->getKey();
@@ -24,9 +24,9 @@ it('can create page', function () {
         ->execute(PageData::fromArray([
             'name' => 'Foo',
             'route_url' => 'foo',
-            'slice_contents' => [
+            'block_contents' => [
                 [
-                    'slice_id' => $sliceId,
+                    'block_id' => $blockId,
                     'data' => ['name' => 'foo'],
                 ],
             ],
@@ -39,7 +39,7 @@ it('can create page', function () {
         ]));
 
     assertDatabaseCount(Page::class, 1);
-    assertDatabaseCount(SliceContent::class, 1);
+    assertDatabaseCount(BlockContent::class, 1);
     assertDatabaseHas(
         MetaData::class,
         [
@@ -52,9 +52,9 @@ it('can create page', function () {
         ]
     );
     assertDatabaseHas(Page::class, ['name' => 'Foo']);
-    assertDatabaseHas(SliceContent::class, [
+    assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
-        'slice_id' => $sliceId,
+        'block_id' => $blockId,
         'data' => json_encode(['name' => 'foo']),
     ]);
 });
