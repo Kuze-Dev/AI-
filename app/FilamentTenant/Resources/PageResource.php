@@ -138,6 +138,8 @@ class PageResource extends Resource
                 Tables\Columns\TextColumn::make('slug')
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('author.full_name')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),

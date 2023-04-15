@@ -182,6 +182,6 @@ class CollectionEntry extends Model implements IsActivitySubject, HasMetaDataCon
       /** @return BelongsTo<Admin, CollectionEntry> */
       public function author(): BelongsTo
       {
-          return $this->belongsTo(Admin::class);
+          return $this->belongsTo(Admin::class, 'author_id');
       }
 }

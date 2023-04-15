@@ -157,6 +157,9 @@ class CollectionEntryResource extends Resource
                 Tables\Columns\TextColumn::make('slug')
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('author.full_name')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TagsColumn::make('taxonomyTerms.name')
                     ->limit()
                     ->searchable(),
