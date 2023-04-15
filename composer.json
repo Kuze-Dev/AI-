@@ -115,6 +115,7 @@
         ],
         "analyse": "vendor/bin/phpstan analyse",
         "format": "vendor/bin/pint",
+        "format-dirty": "vendor/bin/pint --dirty",
         "format-dry-run": "vendor/bin/pint --test",
         "test": "vendor/bin/pest --parallel",
         "test-coverage": "vendor/bin/pest --parallel --coverage-html build/coverage",

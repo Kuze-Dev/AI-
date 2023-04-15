@@ -14,7 +14,7 @@ class SettingController
     #[Get('/settings/{group}')]
     public function __invoke(string $group, SettingsContainer $settingsContainer): JsonApiResource
     {
-        /** @var class-string<\Spatie\LaravelSettings\Settings>|null */
+        /** @var class-string<\Spatie\LaravelSettings\Settings>|null $settingClass */
         $settingClass = $settingsContainer->getSettingClasses()
             ->first(fn (string $settingsClass) => $settingsClass::group() === $group);
 
