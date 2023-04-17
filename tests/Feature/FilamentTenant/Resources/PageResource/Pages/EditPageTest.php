@@ -79,7 +79,7 @@ it('can edit page', function () {
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
-            'route_url.url' => 'test-url',
+            'route_url' => '/test-url',
             'slice_contents.record-1.data.main.header' => 'Bar',
             'meta_data' => $metaData,
             'meta_data.image.0' => $metaDataImage,
@@ -135,7 +135,7 @@ it('can edit page route_url', function () {
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
-            'route_url.url' => 'new-foo',
+            'route_url' => '/new-foo',
             'slice_contents.record-1.data.main.header' => 'Bar',
         ])
         ->call('save')
@@ -146,8 +146,8 @@ it('can edit page route_url', function () {
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $page->getMorphClass(),
         'model_id' => $page->id,
-        'url' => 'new-foo',
-        'is_override' => true,
+        'url' => '/'.\Illuminate\Support\Str::slug($page->name),
+        'is_override' => false,
     ]);
 });
 

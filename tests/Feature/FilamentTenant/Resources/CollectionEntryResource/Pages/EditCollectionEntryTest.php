@@ -159,6 +159,7 @@ it('can edit collection entry', function () {
 });
 
 it('can edit collection entry route_url', function () {
+    /** @var \Domain\Collection\Models\Collection $collection */
     $collection = CollectionFactory::new(['name' => 'Test Collection'])
         ->for(
             BlueprintFactory::new()
@@ -175,7 +176,7 @@ it('can edit collection entry route_url', function () {
         ]);
 
     livewire(EditCollectionEntry::class, ['ownerRecord' => $collection->getRouteKey(), 'record' => $collectionEntry->getRouteKey()])
-        ->fillForm(['route_url.url' => 'new-foo'])
+        ->fillForm(['route_url' => '/new-foo'])
         ->call('save')
         ->assertOk()
         ->assertHasNoFormErrors()
@@ -186,8 +187,8 @@ it('can edit collection entry route_url', function () {
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $collectionEntry->getMorphClass(),
         'model_id' => $collectionEntry->id,
-        'url' => 'new-foo',
-        'is_override' => true,
+        'url' => '/'.$collection->prefix.'/foo',
+        'is_override' => false,
     ]);
 });
 
