@@ -6,8 +6,8 @@ namespace Domain\Blueprint\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Casts\SchemaDataCast;
-use Domain\Collection\Models\Collection;
 use Domain\Form\Models\Form;
+use Domain\Content\Models\Content;
 use Domain\Globals\Models\Globals;
 use Domain\Page\Models\Block;
 use Domain\Taxonomy\Models\Taxonomy;
@@ -71,10 +71,10 @@ class Blueprint extends Model implements IsActivitySubject
         return $this->hasMany(Block::class);
     }
 
-    /** @return HasMany<Collection> */
-    public function collections(): HasMany
+    /** @return HasMany<Content> */
+    public function contents(): HasMany
     {
-        return $this->hasMany(Collection::class);
+        return $this->hasMany(Content::class);
     }
 
     /** @return HasMany<Form> */

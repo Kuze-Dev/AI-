@@ -92,7 +92,7 @@ class BlueprintResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
                     ->action(function (Blueprint $record, Tables\Actions\Action $action): ?bool {
-                        $relationships = ['blocks', 'collections', 'forms', 'globals', 'taxonomies'];
+                        $relationships = ['blocks', 'contents', 'forms', 'globals', 'taxonomies'];
 
                         foreach ($relationships as $relationship) {
                             if ($record->{$relationship}()->exists()) {
