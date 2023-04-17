@@ -9,8 +9,8 @@ use App\FilamentTenant\Resources\MenuResource\Pages;
 use App\FilamentTenant\Support\Tree;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
-use Domain\Collection\Models\Collection;
-use Domain\Collection\Models\CollectionEntry;
+use Domain\Content\Models\Content;
+use Domain\Content\Models\ContentEntry;
 use Domain\Menu\Enums\NodeType;
 use Domain\Menu\Enums\Target;
 use Domain\Menu\Models\Menu;
@@ -131,8 +131,8 @@ class MenuResource extends Resource
                                                         ->options(
                                                             collect([
                                                                 Page::class,
-                                                                Collection::class,
-                                                                CollectionEntry::class,
+                                                                Content::class,
+                                                                ContentEntry::class,
                                                             ])
                                                                 ->mapWithKeys(
                                                                     function (string $model) {
@@ -153,7 +153,7 @@ class MenuResource extends Resource
                                                         ->options(
                                                             fn (Closure $get) => ($modeClass = Relation::getMorphedModel($get('model_type')))
                                                                 ? match ($modeClass) {
-                                                                    CollectionEntry::class => $modeClass::pluck('title', 'id')->toArray(),
+                                                                    ContentEntry::class => $modeClass::pluck('title', 'id')->toArray(),
                                                                     default => $modeClass::pluck('name', 'id')->toArray()
                                                                 }
                                                                 : null

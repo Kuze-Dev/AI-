@@ -12,13 +12,13 @@ return [
      * }>
      */
     'related_resources' => [
-        Domain\Collection\Models\Collection::class => [
+        Domain\Content\Models\Content::class => [
             'title_column' => 'name'
         ],
-        Domain\Collection\Models\CollectionEntry::class => [
+        Domain\Content\Models\ContentEntry::class => [
             'title_column' => 'title',
             'relation_scopes' => [
-                'collection' => [
+                'content' => [
                     'title_column' => 'name'
                 ],
             ]

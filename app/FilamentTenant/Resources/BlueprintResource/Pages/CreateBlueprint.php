@@ -8,6 +8,7 @@ use App\FilamentTenant\Resources\BlueprintResource;
 use Domain\Blueprint\Actions\CreateBlueprintAction;
 use Domain\Blueprint\DataTransferObjects\BlueprintData;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
+use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,22 @@ use Illuminate\Support\Facades\DB;
 class CreateBlueprint extends CreateRecord
 {
     protected static string $resource = BlueprintResource::class;
+
+    protected function getActions(): array
+    {
+        return [
+            Action::make('create')
+                ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
+                ->action('create')
+                ->keyBindings(['mod+s']),
+            $this->getCreateAnotherFormAction(),
+        ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
+    }
 
     protected function handleRecordCreation(array $data): Model
     {

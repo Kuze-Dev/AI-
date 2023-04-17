@@ -11,8 +11,8 @@ use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Page\Models\Page;
-use Domain\Page\Models\Slice;
-use Domain\Page\Models\SliceContent;
+use Domain\Page\Models\Block;
+use Domain\Page\Models\BlockContent;
 use Exception;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -36,8 +36,8 @@ class PageResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /** @var Collection<int, Slice> */
-    public static ?Collection $cachedSlices = null;
+    /** @var Collection<int, Block> */
+    public static ?Collection $cachedBlocks = null;
 
     public static function form(Form $form): Form
     {
@@ -63,19 +63,19 @@ class PageResource extends Resource
                                 ->required()
                                 ->helperText('Use "{{ $slug }}" to insert the current slug.'),
                         ]),
-                        Forms\Components\Section::make(trans('Slices'))
+                        Forms\Components\Section::make(trans('Blocks'))
                             ->schema([
-                                Forms\Components\Repeater::make('slice_contents')
+                                Forms\Components\Repeater::make('block_contents')
                                     ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Page $record, ?array $state) {
-                                        if ($record === null || $record->sliceContents->isEmpty()) {
+                                        if ($record === null || $record->blockContents->isEmpty()) {
                                             $component->state($state ?? []);
 
                                             return;
                                         }
 
                                         $component->state(
-                                            $record->sliceContents->sortBy('order')
-                                                ->mapWithKeys(fn (SliceContent $item) => ["record-{$item->getKey()}" => $item])
+                                            $record->blockContents->sortBy('order')
+                                                ->mapWithKeys(fn (BlockContent $item) => ["record-{$item->getKey()}" => $item])
                                                 ->toArray()
                                         );
 
@@ -84,23 +84,23 @@ class PageResource extends Resource
                                             $componentContainer->callAfterStateHydrated();
                                         }
                                     })
-                                    ->itemLabel(fn (array $state) => self::getCachedSlices()->firstWhere('id', $state['slice_id'])?->name)
+                                    ->itemLabel(fn (array $state) => self::getCachedBlocks()->firstWhere('id', $state['block_id'])?->name)
                                     ->disableLabel()
                                     ->minItems(1)
                                     ->collapsed(fn (string $context) => $context === 'edit')
                                     ->orderable('order')
                                     ->schema([
-                                        Forms\Components\ViewField::make('slice_id')
-                                            ->label('Slice')
-                                            ->view('filament.forms.components.slice-picker')
+                                        Forms\Components\ViewField::make('block_id')
+                                            ->label('Block')
+                                            ->view('filament.forms.components.block-picker')
                                             ->viewData([
-                                                'slices' => self::getCachedSlices()
+                                                'blocks' => self::getCachedBlocks()
                                                     ->sortBy('name')
-                                                    ->mapWithKeys(function (Slice $slice) {
+                                                    ->mapWithKeys(function (Block $block) {
                                                         return [
-                                                            $slice->id => [
-                                                                'name' => $slice['name'],
-                                                                'image' => $slice->getFirstMediaUrl('image'),
+                                                            $block->id => [
+                                                                'name' => $block['name'],
+                                                                'image' => $block->getFirstMediaUrl('image'),
                                                             ],
                                                         ];
                                                     })
@@ -108,23 +108,22 @@ class PageResource extends Resource
                                             ])
                                             ->reactive()
                                             ->afterStateUpdated(function ($component, $state) {
-                                                $slice = self::getCachedSlices()->firstWhere('id', $state);
+                                                $block = self::getCachedBlocks()->firstWhere('id', $state);
                                                 $component->getContainer()
                                                     ->getComponent(fn ($component) => $component->getId() === 'schema-form')
                                                     ?->getChildComponentContainer()
-                                                    ->fill($slice?->is_fixed_content ? $slice->data : []);
+                                                    ->fill($block?->is_fixed_content ? $block->data : []);
                                             }),
                                         SchemaFormBuilder::make('data')
                                             ->id('schema-form')
-                                            ->dehydrated(fn (Closure $get) => ! (self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->is_fixed_content))
-                                            ->disabled(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->is_fixed_content ?? false)
-                                            ->schemaData(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->blueprint->schema),
+                                            ->dehydrated(fn (Closure $get) => ! (self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content))
+                                            ->disabled(fn (Closure $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content ?? false)
+                                            ->schemaData(fn (Closure $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->blueprint->schema),
                                     ]),
                             ]),
                     ])->columnSpan(2),
                 MetaDataForm::make('Meta Data')
-                    ->columnSpan(1)
-                    ->extraAttributes(['class' => 'md:sticky top-[5.5rem]']),
+                    ->columnSpan(1),
             ]);
     }
 
@@ -176,13 +175,13 @@ class PageResource extends Resource
         ];
     }
 
-    /** @return Collection<int, Slice> $cachedSlices */
-    protected static function getCachedSlices(): Collection
+    /** @return Collection<int, Block> $cachedBlocks */
+    protected static function getCachedBlocks(): Collection
     {
-        if ( ! isset(self::$cachedSlices)) {
-            self::$cachedSlices = Slice::with(['blueprint', 'media'])->get();
+        if ( ! isset(self::$cachedBlocks)) {
+            self::$cachedBlocks = Block::with(['blueprint', 'media'])->get();
         }
 
-        return self::$cachedSlices;
+        return self::$cachedBlocks;
     }
 }

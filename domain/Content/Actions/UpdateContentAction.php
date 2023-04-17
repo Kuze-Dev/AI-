@@ -1,0 +1,32 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Domain\Content\Actions;
+
+use Domain\Content\DataTransferObjects\ContentData;
+use Domain\Content\Models\Content;
+
+class UpdateContentAction
+{
+    /**
+     * Execute operations for updating
+     * content and save content query.
+     */
+    public function execute(Content $content, ContentData $contentData): Content
+    {
+        $content->update([
+            'name' => $contentData->name,
+            'slug' => $contentData->slug,
+            'past_publish_date_behavior' => $contentData->past_publish_date_behavior,
+            'future_publish_date_behavior' => $contentData->future_publish_date_behavior,
+            'is_sortable' => $contentData->is_sortable,
+            'route_url' => $contentData->route_url,
+        ]);
+
+        $content->taxonomies()
+            ->sync($contentData->taxonomies);
+
+        return $content;
+    }
+}
