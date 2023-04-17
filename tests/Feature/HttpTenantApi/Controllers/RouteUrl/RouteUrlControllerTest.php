@@ -34,15 +34,15 @@ it('get 404', function () {
         ->assertNotFound();
 });
 
-it('can get route', function () {
+it('can get route url', function () {
     $model = TestModelForRouteUrl::create([
         'name' => 'my-awesome-name',
     ]);
 
     app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model, new RouteUrlData('my-awesome-name'));
+        ->execute($model, new RouteUrlData('my-awesome-name', false));
 
-    getJson('api/route/'.$model->getActiveRouteUrl()->url)
+    getJson('api/route/'.$model->activeRouteUrl->url)
         ->assertOk();
 });
 
@@ -52,9 +52,9 @@ it('can show a route with includes', function (string $include) {
     ]);
 
     app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model, new RouteUrlData('my-awesome-name'));
+        ->execute($model, new RouteUrlData('my-awesome-name', false));
 
-    getJson('api/route/'.$model->getActiveRouteUrl()->url.'?'.http_build_query(['include' => $include]))
+    getJson('api/route/'.$model->activeRouteUrl->url.'?'.http_build_query(['include' => $include]))
         ->assertOk();
 })
     ->with(['model'])->todo();

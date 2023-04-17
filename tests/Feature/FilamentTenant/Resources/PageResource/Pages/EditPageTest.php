@@ -200,7 +200,7 @@ it('page slice with default value column data must be dehydrated', function () {
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
-            'slug' => 'new-foo',
+            'route_url' => '/'.Str::slug($page->name),
         ])
         ->call('save')
         ->assertHasNoFormErrors()

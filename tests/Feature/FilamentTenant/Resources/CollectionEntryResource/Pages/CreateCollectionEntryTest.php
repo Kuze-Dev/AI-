@@ -67,7 +67,7 @@ it('can create collection entry', function () {
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $collectionEntry->getMorphClass(),
         'model_id' => $collectionEntry->id,
-        'url' => $collectionEntry->slug,
+        'url' => '/'.$collectionEntry->collection->prefix.'/'.\Illuminate\Support\Str::slug($collectionEntry->title),
         'is_override' => false,
     ]);
 });

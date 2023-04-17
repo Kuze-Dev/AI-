@@ -8,8 +8,9 @@ use Domain\Support\RouteUrl\Contracts\HasRouteUrl;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Closure;
 use Domain\Support\RouteUrl\Models\RouteUrl;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -28,7 +29,7 @@ class UniqueActiveRouteUrlRule implements ValidationRule
         $query = RouteUrl::whereUrl($value)
             ->whereIn(
                 'id',
-                function (Builder $query) {
+                function (QueryBuilder $query) {
                     $query->select(DB::raw('MAX(updated_at)'))
                         ->from((new RouteUrl())->getTable())
                         ->groupBy('model_type', 'model_id');
@@ -36,7 +37,10 @@ class UniqueActiveRouteUrlRule implements ValidationRule
             );
 
         if ($this->model) {
-            $query->whereNotMorphedTo('model', $this->model);
+//            $query->whereNotMorphedTo('model', $this->model);
+            $query->where(fn (EloquentBuilder $query) => $query
+                ->whereNot('model_type',  $this->model->getMorphClass())
+                ->whereNot('model_id',  $this->model->getKey()));
         }
 
         if ($query->exists()) {

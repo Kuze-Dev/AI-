@@ -8,6 +8,7 @@ use Domain\Support\RouteUrl\Contracts\HasRouteUrl;
 use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
 use Domain\Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class CreateOrUpdateRouteUrlAction
 {
@@ -17,9 +18,15 @@ class CreateOrUpdateRouteUrlAction
             ? $routeUrlData->url
             : $model::generateRouteUrl($model, $model->getAttributes());
 
+        $url = Str::of($url)->trim('/')->prepend('/');
+
         /** @var ?RouteUrl $routeUrl */
         $routeUrl = RouteUrl::whereUrl($url)
             ->first();
+
+        if ($model->activeRouteUrl?->is($routeUrl)) {
+            return;
+        }
 
         if ($routeUrl !== null) {
             $routeUrl->model()

@@ -7,6 +7,7 @@ namespace Tests\Fixtures;
 use Domain\Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
 use Domain\Support\RouteUrl\HasRouteUrl;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 /**
  * @property string $name
@@ -25,6 +26,6 @@ class TestModelForRouteUrl extends Model implements HasRouteUrlContract
 
     public static function generateRouteUrl(Model $model, array $attributes): string
     {
-        return $model->name;
+        return Str::slug($model->name);
     }
 }

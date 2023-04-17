@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
-use Domain\Support\RouteUrl\Exceptions\AlreadyUsedRouteUrlException;
 use Domain\Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
@@ -15,6 +14,8 @@ use Tests\Fixtures\TestSecondModelForRouteUrl;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\travelTo;
+use function PHPUnit\Framework\assertEquals;
 
 uses()->group('route_url');
 
@@ -33,42 +34,59 @@ beforeEach(function () {
     assertDatabaseEmpty(RouteUrl::class);
 });
 
-it('create w/o specify route_url', function () {
+it('create w/o default route_url', function () {
     $model = TestModelForRouteUrl::create([
-        'name' => 'my-awesome-name',
+        'name' => 'my awesome name',
     ]);
 
     app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model, new RouteUrlData(null));
+        ->execute($model, new RouteUrlData($model::generateRouteUrl($model, $model->getAttributes()), false));
 
     assertDatabaseCount(RouteUrl::class, 1);
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $model->getMorphClass(),
         'model_id' => $model->getKey(),
-        'url' => 'my-awesome-name',
+        'url' => '/my-awesome-name',
         'is_override' => false,
     ]);
 });
-it('can update w/o modify', function () {
+
+it('can update w/o modify route_url', function () {
     $model = TestModelForRouteUrl::create([
         'name' => 'my-awesome-name',
     ]);
 
     // initialise route url
     app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model, new RouteUrlData(null));
+        ->execute($model, new RouteUrlData($model::generateRouteUrl($model, $model->getAttributes()), false));
+    $model->refresh();
+
+    $routeUrlDBData = [
+        'id' => 1,
+        'model_type' => $model->getMorphClass(),
+        'model_id' => $model->getKey(),
+        'url' => '/my-awesome-name',
+        'is_override' => false,
+    ];
+
+    assertDatabaseCount(RouteUrl::class, 1);
+    assertDatabaseHas(RouteUrl::class, $routeUrlDBData);
+
+    $oldRouteUrl = RouteUrl::first();
+
+    travelTo(now()->addSecond());
 
     // update with same url
     app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model, new RouteUrlData($model->getActiveRouteUrl()->url));
+        ->execute($model, new RouteUrlData($model->activeRouteUrl->url, $model->activeRouteUrl->is_override));
 
     assertDatabaseCount(RouteUrl::class, 1);
-    assertDatabaseHas(RouteUrl::class, [
-        'model_type' => $model->getMorphClass(),
-        'model_id' => $model->getKey(),
-        'url' => 'my-awesome-name',
-        'is_override' => true,
-    ]);
+    assertDatabaseHas(RouteUrl::class, $routeUrlDBData);
+
+    $newRouteUrl = RouteUrl::first();
+
+    assertEquals($oldRouteUrl->created_at->toString(), $newRouteUrl->created_at->toString());
+    assertEquals($oldRouteUrl->updated_at->toString(), $newRouteUrl->updated_at->toString());
 });
 
 it('create w/ specify route_url but same as default', function () {
@@ -77,14 +95,14 @@ it('create w/ specify route_url but same as default', function () {
     ]);
 
     app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model, new RouteUrlData('my-awesome-name'));
+        ->execute($model, new RouteUrlData($model->name, false));
 
     assertDatabaseCount(RouteUrl::class, 1);
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $model->getMorphClass(),
         'model_id' => $model->getKey(),
-        'url' => 'my-awesome-name',
-        'is_override' => true,
+        'url' => '/my-awesome-name',
+        'is_override' => false,
     ]);
 });
 
@@ -94,49 +112,51 @@ it('create w/ specify route_url', function () {
     ]);
 
     app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model, new RouteUrlData('im-custom-value'));
+        ->execute($model, new RouteUrlData('im-custom-value', true));
 
     assertDatabaseCount(RouteUrl::class, 1);
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $model->getMorphClass(),
         'model_id' => $model->getKey(),
-        'url' => 'im-custom-value',
+        'url' => '/im-custom-value',
         'is_override' => true,
     ]);
 });
 
-it('reduplicate previous route_url', function () {
+it('reuse previous route_url', function () {
     $model = TestModelForRouteUrl::create([
         'name' => 'my-awesome-name',
     ]);
 
     app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model, new RouteUrlData('my-awesome-name'));
+        ->execute($model, new RouteUrlData('original-url', true));
 
     $model->refresh();
+    travelTo(now()->addSecond());
 
     app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model, new RouteUrlData('im-custom-value'));
+        ->execute($model, new RouteUrlData('new-url', true));
 
     $model->refresh();
+    travelTo(now()->addSecond());
 
     app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model, new RouteUrlData('my-awesome-name'));
+        ->execute($model, new RouteUrlData('original-url', true));
 
     assertDatabaseCount(RouteUrl::class, 2);
 
     assertDatabaseHas(RouteUrl::class, [
-        'id' => 2,
+        'id' => 1,
         'model_type' => $model->getMorphClass(),
         'model_id' => $model->getKey(),
-        'url' => 'im-custom-value',
+        'url' => '/original-url',
         'is_override' => true,
     ]);
     assertDatabaseHas(RouteUrl::class, [
-        'id' => 3,
+        'id' => 2,
         'model_type' => $model->getMorphClass(),
         'model_id' => $model->getKey(),
-        'url' => 'my-awesome-name',
+        'url' => '/new-url',
         'is_override' => true,
     ]);
 });
@@ -147,13 +167,17 @@ test('override', function (?string $data) {
     ]);
 
     app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model, new RouteUrlData($data));
+        ->execute(
+            $model,
+            new RouteUrlData($data ?? '', filled($data))
+        );
 
     assertDatabaseCount(RouteUrl::class, 1);
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $model->getMorphClass(),
         'model_id' => $model->getKey(),
         'is_override' => filled($data),
+        'url' => '/'.(filled($data) ? $data : $model::generateRouteUrl($model, $model->getAttributes())),
     ]);
 })
     ->with([
@@ -178,69 +202,52 @@ it('transfer a non active url', function () {
     ]);
 
     app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model1, new RouteUrlData('url-one'));
+        ->execute($model1, new RouteUrlData('url-one', true));
+
+    $model1->refresh();
+    travelTo(now()->addSecond());
 
     app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model2, new RouteUrlData('url-two'));
+        ->execute($model2, new RouteUrlData('url-two', true));
+
+    $model2->refresh();
+    travelTo(now()->addSecond());
 
     app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model1, new RouteUrlData('url-one-new'));
+        ->execute($model1, new RouteUrlData('url-one-new', true));
+
+    $model1->refresh();
+    travelTo(now()->addSecond());
 
     app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model2, new RouteUrlData('url-one'));
+        ->execute($model2, new RouteUrlData('url-one', true));
+
+    $model2->refresh();
 
     expect($model1)
-        ->getActiveRouteUrl()
+        ->activeRouteUrl
         ->url
-        ->toBe('url-one-new');
+        ->toBe('/url-one-new');
 
     expect($model2)
-        ->getActiveRouteUrl()
+        ->activeRouteUrl
         ->url
-        ->toBe('url-one');
+        ->toBe('/url-one');
 
     assertDatabaseCount(RouteUrl::class, 3);
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $model1->getMorphClass(),
         'model_id' => $model1->getKey(),
-        'url' => 'url-one-new',
+        'url' => '/url-one-new',
     ]);
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $model2->getMorphClass(),
         'model_id' => $model2->getKey(),
-        'url' => 'url-one',
+        'url' => '/url-one',
     ]);
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $model2->getMorphClass(),
         'model_id' => $model2->getKey(),
-        'url' => 'url-two',
+        'url' => '/url-two',
     ]);
 });
-
-it('prevent override route url using default set on model', function () {
-    DB::connection()
-        ->getSchemaBuilder()
-        ->create((new TestSecondModelForRouteUrl())->getTable(), function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->timestamps();
-        });
-    Relation::morphMap([TestSecondModelForRouteUrl::class]);
-
-    $model1 = TestModelForRouteUrl::create([
-        'name' => 'one',
-    ]);
-
-    //  will use default for 2nd model
-    app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model1, new RouteUrlData('two'));
-
-    $model2 = TestSecondModelForRouteUrl::create([
-        'name' => 'two',
-    ]);
-
-    // it will prevent creation since already used by 1st model
-    app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model2, new RouteUrlData(null));
-})
-    ->throws(AlreadyUsedRouteUrlException::class);

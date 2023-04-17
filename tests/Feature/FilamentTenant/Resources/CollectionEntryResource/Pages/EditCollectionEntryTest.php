@@ -17,6 +17,8 @@ use Domain\Support\MetaData\Models\MetaData;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
@@ -223,6 +225,7 @@ it('can edit collection entry to have no taxonomy terms attached', function () {
             'taxonomies' => [
                 $collection->taxonomies->first()->id => [],
             ],
+            'route_url' => '/test',
         ])
         ->call('save')
         ->assertOk()
