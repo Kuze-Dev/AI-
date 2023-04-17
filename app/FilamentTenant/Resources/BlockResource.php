@@ -16,9 +16,10 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Filters\Layout;
-use Illuminate\Support\Facades\Auth;
 use Exception;
 use Closure;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Illuminate\Support\Facades\Auth;
 
 class BlockResource extends Resource
 {
@@ -73,32 +74,31 @@ class BlockResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->contentGrid([
+                'sm' => 2,
+                'md' => 3,
+                'xl' => 4,
+            ])
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('component')
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('blueprint.name')
-                    ->sortable()
-                    ->searchable()
-                    ->url(fn (Block $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable()
-                    ->toggleable()
-                    ->toggledHiddenByDefault(),
+                Tables\Columns\Layout\Stack::make([
+                    SpatieMediaLibraryImageColumn::make('image')
+                        ->collection('image')
+                        ->default('https://via.placeholder.com/500x300/333333/fff?text=No+preview+available')
+                        ->height(null)
+                        ->extraImgAttributes(['class' => 'w-full rounded-lg']),
+                    Tables\Columns\TextColumn::make('name')
+                        ->sortable()
+                        ->size('lg')
+                        ->weight('bold')
+                        ->searchable(),
+                    Tables\Columns\TextColumn::make('updated_at')
+                        ->size('sm')
+                        ->color('secondary')
+                        ->dateTime(timezone: Auth::user()?->timezone)
+                        ->sortable(),
+                ])->space(2),
             ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('blueprint')
-                    ->relationship('blueprint', 'name')
-                    ->searchable()
-                    ->optionsLimit(20),
-            ])
+            ->filters([])
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
