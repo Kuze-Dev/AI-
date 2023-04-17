@@ -18,6 +18,8 @@ use Filament\Tables;
 use Filament\Tables\Filters\Layout;
 use Exception;
 use Closure;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Illuminate\Support\Facades\Auth;
 
 class BlockResource extends Resource
 {
@@ -73,19 +75,30 @@ class BlockResource extends Resource
     {
         return $table
             ->contentGrid([
-                'md' => 2,
-                'xl' => 2,
+                'sm' => 2,
+                'md' => 3,
+                'xl' => 4,
             ])
             ->columns([
-                Tables\Columns\ViewColumn::make('image')
-                    ->view('filament.tables.components.slice-block'),
+                Tables\Columns\Layout\Stack::make([
+                    SpatieMediaLibraryImageColumn::make('image')
+                        ->collection('image')
+                        ->default('https://via.placeholder.com/500x300/333333/fff?text=No+preview+available')
+                        ->height(null)
+                        ->extraImgAttributes(['class' => 'w-full rounded-lg']),
+                    Tables\Columns\TextColumn::make('name')
+                        ->sortable()
+                        ->size('lg')
+                        ->weight('bold')
+                        ->searchable(),
+                    Tables\Columns\TextColumn::make('updated_at')
+                        ->size('sm')
+                        ->color('secondary')
+                        ->dateTime(timezone: Auth::user()?->timezone)
+                        ->sortable(),
+                ])->space(2)
             ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('blueprint')
-                    ->relationship('blueprint', 'name')
-                    ->searchable()
-                    ->optionsLimit(20),
-            ])
+            ->filters([])
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
