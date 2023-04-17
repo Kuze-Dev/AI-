@@ -96,7 +96,7 @@ class BlockResource extends Resource
                         ->color('secondary')
                         ->dateTime(timezone: Auth::user()?->timezone)
                         ->sortable(),
-                ])->space(2)
+                ])->space(2),
             ])
             ->filters([])
             ->filtersLayout(Layout::AboveContent)
