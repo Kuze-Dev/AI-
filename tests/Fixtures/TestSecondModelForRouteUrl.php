@@ -23,13 +23,8 @@ class TestSecondModelForRouteUrl extends Model implements HasRouteUrlContract
         return 'test_model_second_for_route_url';
     }
 
-    public function getRouteKeyName(): string
+    public static function generateRouteUrl(Model $model, array $attributes): string
     {
-        return 'slug';
-    }
-
-    public function getRouteUrlDefaultUrl(): string
-    {
-        return $this->name;
+        return $model->name;
     }
 }
