@@ -159,7 +159,7 @@ class CollectionEntryResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
                     ->searchable(),
-                RouteUrlTextColumn::make('route_url'),
+                //                RouteUrlTextColumn::make('route_url'),
                 Tables\Columns\TagsColumn::make('taxonomyTerms.name')
                     ->limit()
                     ->searchable(),
@@ -265,6 +265,6 @@ class CollectionEntryResource extends Resource
     /** @return \Illuminate\Database\Eloquent\Builder<CollectionEntry> */
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with('routeUrls');
+        return parent::getEloquentQuery();//->with('activeRouteUrl');
     }
 }

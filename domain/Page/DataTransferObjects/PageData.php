@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Domain\Page\DataTransferObjects;
 
 use Domain\Support\MetaData\DataTransferObjects\MetaDataData;
+use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
 
 class PageData
 {
     public function __construct(
         public readonly string $name,
         public readonly MetaDataData $meta_data,
-        public readonly ?string $route_url = null,
+        public readonly RouteUrlData $route_url_data,
         public readonly array $slice_contents = [],
     ) {
     }
@@ -29,7 +30,7 @@ class PageData
                 $data['slice_contents'] ?? []
             ),
             meta_data: MetaDataData::fromArray($data['meta_data']),
-            route_url: $data['route_url'] ?? null,
+            route_url_data: RouteUrlData::fromArray($data),
         );
     }
 }

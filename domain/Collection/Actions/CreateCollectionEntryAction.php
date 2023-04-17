@@ -34,7 +34,7 @@ class CreateCollectionEntryAction
         $collectionEntry->taxonomyTerms()
             ->attach($collectionEntryData->taxonomy_terms);
 
-        $this->createOrUpdateRouteUrl->execute($collectionEntry, $collectionEntryData->route_url);
+        $this->createOrUpdateRouteUrl->execute($collectionEntry, $collectionEntryData->route_url_data);
 
         return $collectionEntry;
     }

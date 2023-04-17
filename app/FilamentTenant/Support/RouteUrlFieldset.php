@@ -36,14 +36,13 @@ class RouteUrlFieldset extends Group
         ]);
 
         $this->schema([
-            Forms\Components\Toggle::make('is_custom_url')
+            Forms\Components\Toggle::make('is_override')
                 ->formatStateUsing(fn (?HasRouteUrl $record) => $record?->activeRouteUrl->is_override)
                 ->label(trans('Custom URL'))
                 ->reactive()
-                ->afterStateUpdated(fn () => $this->dispatchEvent('route_url::update'))
-                ->dehydrated(false),
+                ->afterStateUpdated(fn () => $this->dispatchEvent('route_url::update')),
             Forms\Components\TextInput::make('route_url')
-                ->disabled(fn (Closure $get) => ! (bool) $get('is_custom_url'))
+                ->disabled(fn (Closure $get) => ! (bool) $get('is_override'))
                 ->formatStateUsing(fn (?HasRouteUrl $record) => $record?->activeRouteUrl->url)
                 ->lazy()
                 ->required()

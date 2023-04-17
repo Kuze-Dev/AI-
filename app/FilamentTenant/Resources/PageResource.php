@@ -184,6 +184,6 @@ class PageResource extends Resource
     /** @return \Illuminate\Database\Eloquent\Builder<Page> */
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with('routeUrls');
+        return parent::getEloquentQuery()->with('activeRouteUrl');
     }
 }
