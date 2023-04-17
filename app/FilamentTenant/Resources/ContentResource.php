@@ -178,12 +178,14 @@ class ContentResource extends Resource
             ])
             ->filtersLayout(Layout::AboveContent)
             ->actions([
-                Tables\Actions\Action::make('view-entries')
-                    ->icon('heroicon-s-eye')
-                    ->color('secondary')
-                    ->url(fn (Content $record) => ContentEntryResource::getUrl('index', [$record])),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('view-entries')
+                        ->icon('heroicon-s-eye')
+                        ->color('secondary')
+                        ->url(fn (Content $record) => ContentEntryResource::getUrl('index', [$record])),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

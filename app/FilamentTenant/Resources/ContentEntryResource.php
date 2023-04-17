@@ -231,9 +231,12 @@ class ContentEntryResource extends Resource
             ->reorderable('order')
             ->filtersLayout(Layout::AboveContent)
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->url(fn ($livewire, ContentEntry $record) => self::getUrl('edit', [$livewire->ownerRecord, $record])),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make()
+                        ->url(fn ($livewire, ContentEntry $record) => self::getUrl('edit', [$livewire->ownerRecord, $record])),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
+
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
