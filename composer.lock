@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3ab8f3bf4041dc4d15f233853a91b851",
+    "content-hash": "ee778396241a4195a5d22dc5ece230d6",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -1497,6 +1497,43 @@
                 "source": "https://github.com/filamentphp/filament"
             },
             "time": "2023-03-30T17:39:12+00:00"
+        },
+        {
+            "name": "filament/spatie-laravel-media-library-plugin",
+            "version": "v2.17.25",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/filamentphp/spatie-laravel-media-library-plugin.git",
+                "reference": "77c69e5d971fd21c6815831e6dc013bfef8d48de"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/filamentphp/spatie-laravel-media-library-plugin/zipball/77c69e5d971fd21c6815831e6dc013bfef8d48de",
+                "reference": "77c69e5d971fd21c6815831e6dc013bfef8d48de",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^8.6|^9.0|^10.0",
+                "php": "^8.0",
+                "spatie/laravel-medialibrary": "^9.0|^10.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Filament\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Filament support for `spatie/laravel-medialibrary`.",
+            "homepage": "https://github.com/filamentphp/filament",
+            "support": {
+                "issues": "https://github.com/filamentphp/filament/issues",
+                "source": "https://github.com/filamentphp/filament"
+            },
+            "time": "2023-04-15T21:22:29+00:00"
         },
         {
             "name": "filament/spatie-laravel-settings-plugin",
