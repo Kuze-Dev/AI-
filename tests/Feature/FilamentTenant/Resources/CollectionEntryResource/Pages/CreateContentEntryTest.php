@@ -6,8 +6,6 @@ use App\FilamentTenant\Resources\ContentEntryResource\Pages\CreateContentEntry;
 use Carbon\Carbon;
 use Domain\Content\Models\ContentEntry;
 use Domain\Content\Database\Factories\ContentFactory;
-use Domain\Collection\Models\CollectionEntry;
-use Domain\Collection\Database\Factories\CollectionFactory;
 use Domain\Support\RouteUrl\Models\RouteUrl;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;

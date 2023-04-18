@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\ContentResource\Pages\EditContent;
 use Domain\Content\Database\Factories\ContentFactory;
 use Domain\Content\Models\Content;
-use Domain\Support\SlugHistory\SlugHistory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Filament\Facades\Filament;
 
