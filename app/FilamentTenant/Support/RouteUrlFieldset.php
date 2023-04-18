@@ -25,7 +25,7 @@ class RouteUrlFieldset extends Group
             'route_url::update' => [
                 function (self $component): void {
                     $component->evaluate(function (HasRouteUrl|string $model, Closure $get, Closure $set, array $state) {
-                        if ((bool) $get('is_custom_url')) {
+                        if ((bool) $get('is_override')) {
                             return;
                         }
 
