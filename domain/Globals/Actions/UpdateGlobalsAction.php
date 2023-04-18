@@ -17,7 +17,6 @@ class UpdateGlobalsAction
     {
         $globals->update([
             'name' => $globalData->name,
-            'slug' => $globalData->slug,
             'data' => $globalData->data,
         ]);
 

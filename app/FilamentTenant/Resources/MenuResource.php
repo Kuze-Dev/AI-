@@ -71,16 +71,7 @@ class MenuResource extends Resource
             ->schema([
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
-                        ->required()
-                        ->reactive()
-                        ->afterStateUpdated(function (Closure $set, $state) {
-                            $set('slug', Str::slug($state));
-                        }),
-                    Forms\Components\TextInput::make('slug')->required()
-                        ->disabled(fn (?Menu $record) => $record !== null)
-                        ->unique(ignoreRecord: true)
-                        ->rules('alpha_dash')
-                        ->disabled(),
+                        ->required(),
                 ]),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([

@@ -34,15 +34,6 @@ class CreateGlobals extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(
-            fn () => app(CreateGlobalsAction::class)->execute(
-                new GlobalsData(
-                    name: $data['name'],
-                    slug: $data['slug'],
-                    blueprint_id: $data['blueprint_id'],
-                    data: $data['data'],
-                )
-            )
-        );
+        return DB::transaction(fn () => app(CreateGlobalsAction::class)->execute(GlobalsData::fromArray($data)));
     }
 }
