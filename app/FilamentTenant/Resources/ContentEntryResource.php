@@ -265,7 +265,7 @@ class ContentEntryResource extends Resource
         ];
     }
 
-    /** @return \Illuminate\Database\Eloquent\Builder<CollectionEntry> */
+    /** @return \Illuminate\Database\Eloquent\Builder<ContentEntry> */
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery();//->with('activeRouteUrl');

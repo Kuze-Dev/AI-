@@ -39,10 +39,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property-read Blueprint $blueprint
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Content\Models\ContentEntry[] $contentEntries
  * @property-read int|null $content_entries_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $slugHistories
- * @property-read int|null $slug_histories_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Collection\Models\CollectionEntry[] $collectionEntries
- * @property-read int|null $collection_entries_count
  * @property-read \Illuminate\Database\Eloquent\Collection|Taxonomy[] $taxonomies
  * @property-read int|null $taxonomies_count
  * @method static \Illuminate\Database\Eloquent\Builder|Content newModelQuery()

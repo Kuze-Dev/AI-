@@ -29,8 +29,8 @@ class PageData
                 ),
                 $data['block_contents'] ?? []
             ),
-            meta_data: MetaDataData::fromArray($data['meta_data']),
             route_url_data: RouteUrlData::fromArray($data),
+            meta_data: MetaDataData::fromArray($data['meta_data']),
         );
     }
 }
