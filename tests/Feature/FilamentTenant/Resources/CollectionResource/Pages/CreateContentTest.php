@@ -50,7 +50,6 @@ it('can create content', function () {
         'future_publish_date_behavior' => 'public',
         'past_publish_date_behavior' => 'unlisted',
         'is_sortable' => true,
-        'route_url' => 'test-content',
     ]);
 });
 

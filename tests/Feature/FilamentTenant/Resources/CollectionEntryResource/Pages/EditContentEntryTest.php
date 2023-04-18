@@ -175,18 +175,18 @@ it('can edit content entry route_url', function () {
         ]);
 
     livewire(EditContentEntry::class, ['ownerRecord' => $content->getRouteKey(), 'record' => $contentEntry->getRouteKey()])
-        ->fillForm(['route_url' => '/new-foo'])
+        ->fillForm(['route_url' => '/new-foo']) // will be ignored
         ->call('save')
         ->assertOk()
         ->assertHasNoFormErrors()
         ->instance()
         ->record;
 
-    assertDatabaseCount(RouteUrl::class, 2); // 2 (for collection entry)
+    assertDatabaseCount(RouteUrl::class, 2); // 2 (for content entry)
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $contentEntry->getMorphClass(),
         'model_id' => $contentEntry->id,
-        'url' => '/'.$contentEntry->prefix.'/foo',
+        'url' => '/'.$content->prefix.'/'.\Illuminate\Support\Str::slug($contentEntry->title),
         'is_override' => false,
     ]);
 });

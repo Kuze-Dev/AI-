@@ -65,7 +65,7 @@ it('can create content entry', function () {
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $contentEntry->getMorphClass(),
         'model_id' => $contentEntry->id,
-        'url' => '/'.$contentEntry->collection->prefix.'/'.\Illuminate\Support\Str::slug($collectionEntry->title),
+        'url' => '/'.$contentEntry->content->prefix.'/'.\Illuminate\Support\Str::slug($contentEntry->title),
         'is_override' => false,
     ]);
 });

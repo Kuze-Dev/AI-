@@ -72,7 +72,6 @@ class ContentEntry extends Model implements IsActivitySubject, HasMetaDataContra
      */
     protected $fillable = [
         'title',
-        'slug',
         'data',
         'content_id',
         'taxonomy_term_id',

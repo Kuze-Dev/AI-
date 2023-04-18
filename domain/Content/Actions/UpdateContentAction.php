@@ -17,11 +17,10 @@ class UpdateContentAction
     {
         $content->update([
             'name' => $contentData->name,
-            'slug' => $contentData->slug,
+            'prefix' => $contentData->prefix,
             'past_publish_date_behavior' => $contentData->past_publish_date_behavior,
             'future_publish_date_behavior' => $contentData->future_publish_date_behavior,
             'is_sortable' => $contentData->is_sortable,
-            'route_url' => $contentData->route_url,
         ]);
 
         $content->taxonomies()

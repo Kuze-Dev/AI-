@@ -30,7 +30,7 @@ it('can render content', function () {
             'future_publish_date_behavior' => 'private',
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
-            'prefix' => 'my-prefix',
+            'prefix' => 'my-content',
         ]);
 
     livewire(EditContent::class, ['record' => $content->getRouteKey()])
