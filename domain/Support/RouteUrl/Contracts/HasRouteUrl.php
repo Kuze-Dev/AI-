@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 /**
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\RouteUrl\Models\RouteUrl[] $routeUrls
  * @property-read \Domain\Support\RouteUrl\Models\RouteUrl $activeRouteUrl
+ * @mixin \Illuminate\Database\Eloquent\Model
  */
 interface HasRouteUrl
 {

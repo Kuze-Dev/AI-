@@ -16,6 +16,7 @@ use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\travelTo;
 use function PHPUnit\Framework\assertEquals;
+use function PHPUnit\Framework\assertTrue;
 
 uses()->group('route_url');
 
@@ -60,6 +61,7 @@ it('can update w/o modify route_url', function () {
     app(CreateOrUpdateRouteUrlAction::class)
         ->execute($model, new RouteUrlData($model::generateRouteUrl($model, $model->getAttributes()), false));
     $model->refresh();
+    $model->wasRecentlyCreated = false;
 
     $routeUrlDBData = [
         'id' => 1,
@@ -84,6 +86,8 @@ it('can update w/o modify route_url', function () {
     assertDatabaseHas(RouteUrl::class, $routeUrlDBData);
 
     $newRouteUrl = RouteUrl::first();
+
+    assertTrue($oldRouteUrl->is($newRouteUrl));
 
     assertEquals($oldRouteUrl->created_at->toString(), $newRouteUrl->created_at->toString());
     assertEquals($oldRouteUrl->updated_at->toString(), $newRouteUrl->updated_at->toString());

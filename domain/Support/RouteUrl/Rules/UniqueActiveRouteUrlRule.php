@@ -13,9 +13,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 
-/**
- * @property-read (Model&HasRouteUrl)|null $model
- */
 class UniqueActiveRouteUrlRule implements ValidationRule
 {
     public function __construct(

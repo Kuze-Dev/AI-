@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
-use Domain\Collection\Models\Collection;
-use Domain\Collection\Models\CollectionEntry;
+use Domain\Content\Models\Content;
+use Domain\Content\Models\ContentEntry;
 use Domain\Page\Models\Page;
 use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
@@ -30,8 +30,8 @@ class RouteUrlResource extends JsonApiResource
             /** @phpstan-ignore-next-line  */
             'model' => fn () => match ($this->model::class) {
                 Page::class => PageResource::make($this->model),
-                Collection::class => CollectionResource::make($this->model),
-                CollectionEntry::class => CollectionEntryResource::make($this->model),
+                Content::class => ContentResource::make($this->model),
+                ContentEntry::class => ContentEntryResource::make($this->model),
             },
         ];
     }

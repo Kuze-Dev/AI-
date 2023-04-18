@@ -24,7 +24,7 @@ class CreateOrUpdateRouteUrlAction
         $routeUrl = RouteUrl::whereUrl($url)
             ->first();
 
-        if ($model->activeRouteUrl?->is($routeUrl)) {
+        if ( ! $model->wasRecentlyCreated && $model->activeRouteUrl->is($routeUrl)) {
             return;
         }
 
