@@ -9,6 +9,7 @@ use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Domain\Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
 use Domain\Support\RouteUrl\HasRouteUrl;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
@@ -57,7 +58,7 @@ use Illuminate\Support\Str;
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['taxonomyTerms', 'metaData',  'routeUrls'])]
-class ContentEntry extends Model implements IsActivitySubject, HasMetaDataContract
+class ContentEntry extends Model implements IsActivitySubject, HasMetaDataContract, HasRouteUrlContact
 {
     use LogsActivity;
     use HasSlug;

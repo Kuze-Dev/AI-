@@ -8,11 +8,13 @@ use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Domain\Support\MetaData\Actions\CreateMetaDataAction;
+use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
 class CreateContentEntryAction
 {
     public function __construct(
-        protected CreateMetaDataAction $createMetaData
+        protected CreateMetaDataAction $createMetaData,
+        protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
     ) {
     }
 
@@ -23,7 +25,6 @@ class CreateContentEntryAction
         $contentEntry = $content->contentEntries()
             ->create([
                 'title' => $contentEntryData->title,
-                'slug' => $contentEntryData->slug,
                 'data' => $contentEntryData->data,
                 'published_at' => $contentEntryData->published_at,
             ]);
@@ -32,6 +33,8 @@ class CreateContentEntryAction
 
         $contentEntry->taxonomyTerms()
             ->attach($contentEntryData->taxonomy_terms);
+
+        $this->createOrUpdateRouteUrl->execute($contentEntry, $contentEntryData->route_url_data);
 
         return $contentEntry;
     }

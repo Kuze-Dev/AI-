@@ -103,10 +103,10 @@ class ContentEntryResource extends Resource
                             })
                             ->required(),
                         RouteUrlFieldset::make()
-                            ->generateModelForRouteUrlUsing(function ($livewire, CollectionEntry|string $model) {
-                                return $model instanceof CollectionEntry
+                            ->generateModelForRouteUrlUsing(function ($livewire, ContentEntry|string $model) {
+                                return $model instanceof ContentEntry
                                     ? $model
-                                    : tap(new CollectionEntry())->setRelation('collection', $livewire->ownerRecord);
+                                    : tap(new ContentEntry())->setRelation('content', $livewire->ownerRecord);
                             }),
                     ]),
                     Forms\Components\Section::make(trans('Taxonomies'))

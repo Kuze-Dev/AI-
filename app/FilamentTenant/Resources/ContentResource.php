@@ -85,7 +85,7 @@ class ContentResource extends Resource
                         ->exists(Blueprint::class, 'id')
                         ->searchable()
                         ->preload()
-                        ->disabled(fn (?Collection $record) => $record !== null),
+                        ->disabled(fn (?Content $record) => $record !== null),
                     Forms\Components\TextInput::make('prefix')
                         ->required()
                         ->string()
