@@ -52,7 +52,10 @@ it('can create page', function () {
         ->instance()
         ->record;
 
-    assertDatabaseHas(Page::class, ['name' => 'Test']);
+    assertDatabaseHas(Page::class, [
+        'author_id' => auth()->user()->id,
+        'name' => 'Test',
+    ]);
     assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
         'block_id' => $blockId,
@@ -157,30 +160,4 @@ it('can create page with meta data', function () {
         'model_type' => $page->getMorphClass(),
         'model_id' => $page->id,
     ]);
-});
-
-it('newly created page must have author_id', function () {
-    $sliceId = BlockFactory::new()
-        ->withDummyBlueprint()
-        ->createOne()
-        ->getKey();
-
-    $page = livewire(CreatePage::class)
-        ->fillForm([
-            'name' => 'Test',
-            'route_url' => 'test-url',
-            'block_contents' => [
-                [
-                    'block_id' => $sliceId,
-                    'data' => ['name' => 'foo'],
-                ],
-            ],
-        ])
-        ->call('create')
-        ->assertHasNoFormErrors()
-        ->assertOk()
-        ->instance()
-        ->record;
-
-    assertDatabaseHas(Page::class, ['name' => 'Test', 'author_id' => auth()->user()->id, ]);
 });
