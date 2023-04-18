@@ -7,7 +7,6 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\RouteUrlFieldset;
-use App\FilamentTenant\Support\RouteUrlTextColumn;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -159,7 +158,10 @@ class ContentEntryResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
                     ->searchable(),
-                RouteUrlTextColumn::make('route_url'),
+                Tables\Columns\TextColumn::make('activeRouteUrl.url')
+                    ->label('URL')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TagsColumn::make('taxonomyTerms.name')
                     ->limit()
                     ->searchable(),

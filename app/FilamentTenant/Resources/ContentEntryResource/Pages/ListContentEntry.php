@@ -71,6 +71,6 @@ class ListContentEntry extends ListRecords
     /** @return Builder<\Domain\Content\Models\ContentEntry> */
     protected function getTableQuery(): Builder
     {
-        return $this->ownerRecord->contentEntries()->getQuery()->with('activeRouteUrl');
+        return $this->ownerRecord->contentEntries()->getQuery();
     }
 }
