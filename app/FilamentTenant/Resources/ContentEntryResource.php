@@ -159,7 +159,7 @@ class ContentEntryResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
                     ->searchable(),
-                //                RouteUrlTextColumn::make('route_url'),
+                RouteUrlTextColumn::make('route_url'),
                 Tables\Columns\TagsColumn::make('taxonomyTerms.name')
                     ->limit()
                     ->searchable(),
@@ -263,11 +263,5 @@ class ContentEntryResource extends Resource
             'create' => Resources\ContentEntryResource\Pages\CreateContentEntry::route('entries/create'),
             'edit' => Resources\ContentEntryResource\Pages\EditContentEntry::route('entries/{record}/edit'),
         ];
-    }
-
-    /** @return \Illuminate\Database\Eloquent\Builder<ContentEntry> */
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery();//->with('activeRouteUrl');
     }
 }
