@@ -31,6 +31,7 @@ class CreateOrUpdateRouteUrlAction
         if ($routeUrl !== null) {
             $routeUrl->model()
                 ->associate($model)
+                ->fill(['is_override' => $routeUrlData->is_override])
                 ->touch();
         } else {
             $model->routeUrls()

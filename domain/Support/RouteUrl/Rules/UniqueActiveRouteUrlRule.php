@@ -25,17 +25,20 @@ class UniqueActiveRouteUrlRule implements ValidationRule
         $query = RouteUrl::whereUrl($value)
             ->whereIn(
                 'id',
-                function (QueryBuilder $query) {
-                    $query->select(DB::raw('MAX(updated_at)'))
-                        ->from((new RouteUrl())->getTable())
-                        ->groupBy('model_type', 'model_id');
-                }
+                RouteUrl::select('id')
+                    ->where(
+                        'updated_at',
+                        fn (QueryBuilder $query) => $query->select(DB::raw('MAX(`updated_at`)'))
+                            ->from((new RouteUrl())->getTable(), 'sub_query_table')
+                            ->whereColumn('sub_query_table.model_type', 'route_urls.model_type')
+                            ->whereColumn('sub_query_table.model_id', 'route_urls.model_id')
+                    )
             );
 
         if ($this->model) {
-            $query->where(fn (EloquentBuilder $query) => $query
-                ->whereNot('model_type',  $this->model->getMorphClass())
-                ->whereNot('model_id',  $this->model->getKey()));
+            $query->whereNot(fn (EloquentBuilder $query) => $query
+                ->where('model_type',  $this->model->getMorphClass())
+                ->where('model_id',  $this->model->getKey()));
         }
 
         if ($query->exists()) {
