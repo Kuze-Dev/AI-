@@ -92,6 +92,7 @@ class PageResource extends Resource
                                     ->schema([
                                         Forms\Components\ViewField::make('block_id')
                                             ->label('Block')
+                                            ->required()
                                             ->view('filament.forms.components.block-picker')
                                             ->viewData([
                                                 'blocks' => self::getCachedBlocks()
