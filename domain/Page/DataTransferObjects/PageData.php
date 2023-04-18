@@ -11,9 +11,9 @@ class PageData
 {
     public function __construct(
         public readonly string $name,
-        public readonly MetaDataData $meta_data,
         public readonly RouteUrlData $route_url_data,
-        public readonly array $slice_contents = [],
+        public readonly MetaDataData $meta_data,
+        public readonly array $block_contents = [],
     ) {
     }
 
@@ -21,13 +21,13 @@ class PageData
     {
         return new self(
             name: $data['name'],
-            slice_contents: array_map(
-                fn (array $sliceContentData) => new SliceContentData(
-                    slice_id: $sliceContentData['slice_id'],
-                    data: $sliceContentData['data'] ?? null,
-                    id: $sliceContentData['id'] ?? null,
+            block_contents: array_map(
+                fn (array $blockContentData) => new BlockContentData(
+                    block_id: $blockContentData['block_id'],
+                    data: $blockContentData['data'] ?? null,
+                    id: $blockContentData['id'] ?? null,
                 ),
-                $data['slice_contents'] ?? []
+                $data['block_contents'] ?? []
             ),
             meta_data: MetaDataData::fromArray($data['meta_data']),
             route_url_data: RouteUrlData::fromArray($data),

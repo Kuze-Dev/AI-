@@ -12,7 +12,7 @@ use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 class CreatePageAction
 {
     public function __construct(
-        protected CreateSliceContentAction $createSliceContent,
+        protected CreateBlockContentAction $createBlockContent,
         protected CreateMetaDataAction $createMetaTags,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
     ) {
@@ -26,8 +26,8 @@ class CreatePageAction
 
         $this->createMetaTags->execute($page, $pageData->meta_data);
 
-        foreach ($pageData->slice_contents as $sliceContentData) {
-            $this->createSliceContent->execute($page, $sliceContentData);
+        foreach ($pageData->block_contents as $blockContentData) {
+            $this->createBlockContent->execute($page, $blockContentData);
         }
 
         $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url_data);

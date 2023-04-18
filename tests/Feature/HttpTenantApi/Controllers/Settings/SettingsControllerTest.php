@@ -11,8 +11,10 @@ beforeEach(function () {
     testInTenantContext();
 });
 
+uses()->group('settings');
+
 it('can get settings', function ($settingsClass) {
-    /** @var \Spatie\LaravelSettings\Settings */
+    /** @var \Spatie\LaravelSettings\Settings $settings */
     $settings = app($settingsClass);
 
     getJson('api/settings/' . $settings::group())

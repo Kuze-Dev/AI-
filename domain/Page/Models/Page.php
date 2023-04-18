@@ -31,9 +31,10 @@ use Illuminate\Support\Str;
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
  * @property-read int|null $activities_count
  * @property-read \Domain\Support\MetaData\Models\MetaData $metaData
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Page\Models\SliceContent[] $sliceContents
- * @property-read int|null $slice_contents_count
- * @property-read string|null $qualified_route_url
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Page\Models\BlockContent[] $blockContents
+ * @property-read int|null $block_contents_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $slugHistories
+ * @property-read int|null $slug_histories_count
  * @method static \Illuminate\Database\Eloquent\Builder|Page newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page query()
@@ -46,8 +47,8 @@ use Illuminate\Support\Str;
  * @mixin \Eloquent
  */
 
-#[OnDeleteCascade(['sliceContents', 'metaData', 'routeUrls'])]
-class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasRouteUrlContract
+#[OnDeleteCascade(['blockContents', 'metaData', 'routeUrls'])]
+class Page extends Model implements IsActivitySubject, HasMetaDataContract
 {
     use LogsActivity;
     use HasSlug;
@@ -81,15 +82,15 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasR
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return HasMany<SliceContent> */
-    public function sliceContents(): HasMany
+    /** @return HasMany<BlockContent> */
+    public function blockContents(): HasMany
     {
-        return $this->hasMany(SliceContent::class);
+        return $this->hasMany(BlockContent::class);
     }
 
     public function getActivitySubjectDescription(Activity $activity): string
     {
-        return 'Page: ' . $this->name;
+        return 'Page: '.$this->name;
     }
 
     public function getRouteKeyName(): string

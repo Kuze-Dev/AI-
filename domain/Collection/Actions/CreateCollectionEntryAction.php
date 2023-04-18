@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Domain\Collection\Actions;
+namespace Domain\Content\Actions;
 
-use Domain\Collection\DataTransferObjects\CollectionEntryData;
-use Domain\Collection\Models\Collection;
-use Domain\Collection\Models\CollectionEntry;
+use Domain\Content\DataTransferObjects\ContentEntryData;
+use Domain\Content\Models\Content;
+use Domain\Content\Models\ContentEntry;
 use Domain\Support\MetaData\Actions\CreateMetaDataAction;
-use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
-class CreateCollectionEntryAction
+class CreateContentEntryAction
 {
     public function __construct(
         protected CreateMetaDataAction $createMetaData,
@@ -18,24 +17,25 @@ class CreateCollectionEntryAction
     ) {
     }
 
-    /** Execute create collection entry query. */
-    public function execute(Collection $collection, CollectionEntryData $collectionEntryData): CollectionEntry
+    /** Execute create content entry query. */
+    public function execute(Content $content, ContentEntryData $contentEntryData): ContentEntry
     {
-        /** @var CollectionEntry $collectionEntry */
-        $collectionEntry = $collection->collectionEntries()
+        /** @var ContentEntry $contentEntry */
+        $contentEntry = $content->contentEntries()
             ->create([
-                'title' => $collectionEntryData->title,
-                'data' => $collectionEntryData->data,
-                'published_at' => $collectionEntryData->published_at,
+                'title' => $contentEntryData->title,
+                'slug' => $contentEntryData->slug,
+                'data' => $contentEntryData->data,
+                'published_at' => $contentEntryData->published_at,
             ]);
 
-        $this->createMetaData->execute($collectionEntry, $collectionEntryData->meta_data);
+        $this->createMetaData->execute($contentEntry, $contentEntryData->meta_data);
 
-        $collectionEntry->taxonomyTerms()
-            ->attach($collectionEntryData->taxonomy_terms);
+        $contentEntry->taxonomyTerms()
+            ->attach($contentEntryData->taxonomy_terms);
 
         $this->createOrUpdateRouteUrl->execute($collectionEntry, $collectionEntryData->route_url_data);
 
-        return $collectionEntry;
+        return $contentEntry;
     }
 }

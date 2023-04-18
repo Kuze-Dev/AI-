@@ -10,6 +10,8 @@ use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 
+uses()->group('settings');
+
 it('log settings', function () {
     $migrator = app(SettingsMigrator::class);
     $migrator->add('test_group.property1', 'old1 value');

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 use App\FilamentTenant\Resources\PageResource\Pages\CreatePage;
 use Domain\Page\Database\Factories\PageFactory;
-use Domain\Page\Database\Factories\SliceFactory;
+use Domain\Page\Database\Factories\BlockFactory;
 use Domain\Page\Models\Page;
-use Domain\Page\Models\SliceContent;
+use Domain\Page\Models\BlockContent;
 use Domain\Support\MetaData\Models\MetaData;
 use Domain\Support\RouteUrl\Models\RouteUrl;
 use Filament\Facades\Filament;
@@ -30,19 +30,18 @@ it('can render page', function () {
 });
 
 it('can create page', function () {
-    $sliceId = SliceFactory::new()
+    $blockId = BlockFactory::new()
         ->withDummyBlueprint()
         ->createOne()
         ->getKey();
 
-    /** @var Page $page */
     $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
             'route_url' => '/test-url', // will be ignored
-            'slice_contents' => [
+            'block_contents' => [
                 [
-                    'slice_id' => $sliceId,
+                    'block_id' => $blockId,
                     'data' => ['name' => 'foo'],
                 ],
             ],
@@ -54,9 +53,9 @@ it('can create page', function () {
         ->record;
 
     assertDatabaseHas(Page::class, ['name' => 'Test']);
-    assertDatabaseHas(SliceContent::class, [
+    assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
-        'slice_id' => $sliceId,
+        'block_id' => $blockId,
         'data' => json_encode(['name' => 'foo']),
     ]);
     assertDatabaseHas(
@@ -76,7 +75,7 @@ it('can create page', function () {
 });
 
 it('can not create page with same name', function () {
-    $sliceId = SliceFactory::new()
+    $blockId = BlockFactory::new()
         ->withDummyBlueprint()
         ->createOne()
         ->getKey();
@@ -89,9 +88,9 @@ it('can not create page with same name', function () {
     livewire(CreatePage::class)
         ->fillForm([
             'name' => 'page 1',
-            'slice_contents' => [
+            'block_contents' => [
                 [
-                    'slice_id' => $sliceId,
+                    'block_id' => $blockId,
                     'data' => ['name' => 'foo'],
                 ],
             ],
@@ -104,7 +103,7 @@ it('can not create page with same name', function () {
 });
 
 it('can create page with meta data', function () {
-    $sliceId = SliceFactory::new()
+    $blockId = BlockFactory::new()
         ->withDummyBlueprint()
         ->createOne()
         ->getKey();
@@ -117,14 +116,13 @@ it('can create page with meta data', function () {
     ];
     $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
 
-    /** @var Page $page */
     $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
             'route_url' => '/test-url', // will be ignored
-            'slice_contents' => [
+            'block_contents' => [
                 [
-                    'slice_id' => $sliceId,
+                    'block_id' => $blockId,
                     'data' => ['name' => 'foo'],
                 ],
             ],
@@ -138,10 +136,10 @@ it('can create page with meta data', function () {
         ->record;
 
     assertDatabaseHas(Page::class, ['name' => 'Test']);
-    assertDatabaseHas(SliceContent::class, [
+    assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
-        'slice_id' => $sliceId,
-        //        'data' => json_encode(['name' => 'foo']),
+        'block_id' => $blockId,
+        'data' => json_encode(['name' => 'foo']),
     ]);
     assertDatabaseHas(
         MetaData::class,

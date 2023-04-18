@@ -6,8 +6,9 @@ use App\FilamentTenant\Resources\PageResource\Pages\EditPage;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Page\Database\Factories\PageFactory;
-use Domain\Page\Database\Factories\SliceFactory;
-use Domain\Page\Models\SliceContent;
+use Domain\Page\Database\Factories\BlockFactory;
+use Domain\Page\Models\Page;
+use Domain\Page\Models\BlockContent;
 use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
 use Domain\Support\MetaData\Models\MetaData;
 use Domain\Support\RouteUrl\Models\RouteUrl;
@@ -28,8 +29,8 @@ beforeEach(function () {
 
 it('can render page', function () {
     $page = PageFactory::new()
-        ->addSliceContent(
-            SliceFactory::new()
+        ->addBlockContent(
+            BlockFactory::new()
                 ->for(
                     BlueprintFactory::new()
                         ->addSchemaSection(['title' => 'Main'])
@@ -44,15 +45,15 @@ it('can render page', function () {
         ->assertSuccessful()
         ->assertFormSet([
             'name' => $page->name,
-            'slice_contents.record-1' => $page->sliceContents->first()->toArray(),
+            'block_contents.record-1' => $page->blockContents->first()->toArray(),
         ])
         ->assertOk();
 });
 
 it('can edit page', function () {
     $page = PageFactory::new()
-        ->addSliceContent(
-            SliceFactory::new()
+        ->addBlockContent(
+            BlockFactory::new()
                 ->for(
                     BlueprintFactory::new()
                         ->addSchemaSection(['title' => 'Main'])
@@ -80,7 +81,7 @@ it('can edit page', function () {
         ->fillForm([
             'name' => 'Test',
             'route_url' => '/test-url',
-            'slice_contents.record-1.data.main.header' => 'Bar',
+            'block_contents.record-1.data.main.header' => 'Bar',
             'meta_data' => $metaData,
             'meta_data.image.0' => $metaDataImage,
         ])
@@ -104,17 +105,17 @@ it('can edit page', function () {
         'mime_type' => $metaDataImage->getMimeType(),
     ]);
 
-    assertDatabaseHas(SliceContent::class, [
+    assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
-        'slice_id' => $page->sliceContents->first()->slice_id,
+        'block_id' => $page->blockContents->first()->block_id,
         'data' => json_encode(['main' => ['header' => 'Bar']]),
     ]);
 });
 
 it('can edit page route_url', function () {
     $page = PageFactory::new(['slug' => 'foo'])
-        ->addSliceContent(
-            SliceFactory::new()
+        ->addBlockContent(
+            BlockFactory::new()
                 ->for(
                     BlueprintFactory::new()
                         ->addSchemaSection(['title' => 'Main'])
@@ -136,7 +137,7 @@ it('can edit page route_url', function () {
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'route_url' => '/new-foo',
-            'slice_contents.record-1.data.main.header' => 'Bar',
+            'block_contents.record-1.data.main.header' => 'Bar',
         ])
         ->call('save')
         ->assertHasNoFormErrors()
@@ -151,10 +152,10 @@ it('can edit page route_url', function () {
     ]);
 });
 
-it('page slice with default value will fill the slices fields', function () {
+it('page block with default value will fill the blocks fields', function () {
     $page = PageFactory::new()
-        ->addSliceContent(
-            SliceFactory::new(
+        ->addBlockContent(
+            BlockFactory::new(
                 [
                     'is_fixed_content' => true,
                     'data' => ['main' => ['header' => 'Foo']],
@@ -176,14 +177,14 @@ it('page slice with default value will fill the slices fields', function () {
         ->assertHasNoFormErrors()
         ->assertOk()
         ->assertFormSet([
-            'slice_contents.record-1.data.main.header' => 'Foo',
+            'block_contents.record-1.data.main.header' => 'Foo',
         ]);
 });
 
-it('page slice with default value column data must be dehydrated', function () {
+it('page block with default value column data must be dehydrated', function () {
     $page = PageFactory::new(['slug' => 'foo'])
-        ->addSliceContent(
-            SliceFactory::new(
+        ->addBlockContent(
+            BlockFactory::new(
                 [
                     'is_fixed_content' => true,
                     'data' => ['main' => ['header' => 'Foo']],
@@ -206,7 +207,7 @@ it('page slice with default value column data must be dehydrated', function () {
         ->assertHasNoFormErrors()
         ->assertOk();
 
-    assertDatabaseHas(SliceContent::class, [
+    assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
         'data' => null,
     ]);

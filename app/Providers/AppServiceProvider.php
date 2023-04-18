@@ -8,14 +8,15 @@ use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
-use Domain\Collection\Models\Collection;
-use Domain\Collection\Models\CollectionEntry;
+use Domain\Content\Models\Content;
+use Domain\Content\Models\ContentEntry;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
 use Domain\Globals\Models\Globals;
 use Domain\Page\Models\Page;
-use Domain\Page\Models\Slice;
+use Domain\Support\SlugHistory\SlugHistory;
+use Domain\Page\Models\Block;
 use Domain\Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
@@ -50,7 +51,7 @@ class AppServiceProvider extends ServiceProvider
             config('tenancy.tenant_model'),
             Blueprint::class,
             Page::class,
-            Slice::class,
+            Block::class,
             Menu::class,
             Node::class,
             Form::class,
@@ -58,8 +59,9 @@ class AppServiceProvider extends ServiceProvider
             FormEmailNotification::class,
             Taxonomy::class,
             TaxonomyTerm::class,
-            Collection::class,
-            CollectionEntry::class,
+            Content::class,
+            ContentEntry::class,
+            SlugHistory::class,
             Globals::class,
             MetaData::class,
         ]);

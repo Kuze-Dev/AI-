@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Domain\Page\Database\Factories\PageFactory;
-use Domain\Page\Database\Factories\SliceFactory;
+use Domain\Page\Database\Factories\BlockFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
 
 use function Pest\Laravel\getJson;
@@ -14,7 +14,7 @@ beforeEach(function () {
 
 it('can list pages', function () {
     PageFactory::new()
-        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
+        ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
         ->count(10)
         ->create();
 
@@ -31,7 +31,7 @@ it('can list pages', function () {
 
 it('can filter pages', function ($attribute) {
     $pages = PageFactory::new()
-        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
+        ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
         ->count(2)
         ->sequence(
             ['name' => 'Foo'],
@@ -55,7 +55,7 @@ it('can filter pages', function ($attribute) {
 
 it('can show a page with includes', function (string $include) {
     $page = PageFactory::new()
-        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
+        ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
         ->createOne();
 
     $page->metaData()->create([
@@ -80,7 +80,7 @@ it('can show a page with includes', function (string $include) {
                 ->etc();
         });
 })->with([
-    'sliceContents',
+    'blockContents',
     'routeUrls',
     'metaData',
 ]);

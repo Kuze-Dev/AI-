@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Domain\Page\Database\Factories;
 
 use Domain\Page\Models\Page;
-use Domain\Page\Models\Slice;
+use Domain\Page\Models\Block;
 use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
 use Domain\Support\RouteUrl\Database\Factories\RouteUrlFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -24,9 +24,9 @@ class PageFactory extends Factory
         ];
     }
 
-    public function addSliceContent(Slice|SliceFactory $slice, array $attributes = []): self
+    public function addBlockContent(Block|BlockFactory $block, array $attributes = []): self
     {
-        return $this->has(SliceContentFactory::new($attributes)->for($slice));
+        return $this->has(BlockContentFactory::new($attributes)->for($block));
     }
 
     public function configure(): self

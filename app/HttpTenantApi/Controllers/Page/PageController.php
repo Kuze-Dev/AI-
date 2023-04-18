@@ -19,7 +19,7 @@ class PageController
             QueryBuilder::for(Page::with('routeUrls'))
                 ->allowedFilters(['name', 'slug'])
                 ->allowedIncludes([
-                    'sliceContents.slice',
+                    'blockContents.block',
                     'routeUrls',
                     'metaData',
                 ])
@@ -32,7 +32,7 @@ class PageController
         return PageResource::make(
             QueryBuilder::for(Page::whereSlug($page))
                 ->allowedIncludes([
-                    'sliceContents.slice',
+                    'blockContents.block',
                     'routeUrls',
                     'metaData',
                 ])

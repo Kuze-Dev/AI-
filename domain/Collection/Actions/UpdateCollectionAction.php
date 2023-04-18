@@ -2,30 +2,30 @@
 
 declare(strict_types=1);
 
-namespace Domain\Collection\Actions;
+namespace Domain\Content\Actions;
 
-use Domain\Collection\DataTransferObjects\CollectionData;
-use Domain\Collection\Models\Collection;
+use Domain\Content\DataTransferObjects\ContentData;
+use Domain\Content\Models\Content;
 
-class UpdateCollectionAction
+class UpdateContentAction
 {
     /**
      * Execute operations for updating
-     * collection and save collection query.
+     * content and save content query.
      */
-    public function execute(Collection $collection, CollectionData $collectionData): Collection
+    public function execute(Content $content, ContentData $contentData): Content
     {
-        $collection->update([
-            'name' => $collectionData->name,
-            'past_publish_date_behavior' => $collectionData->past_publish_date_behavior,
-            'future_publish_date_behavior' => $collectionData->future_publish_date_behavior,
-            'is_sortable' => $collectionData->is_sortable,
+        $content->update([
+            'name' => $contentData->name,
+            'past_publish_date_behavior' => $contentData->past_publish_date_behavior,
+            'future_publish_date_behavior' => $contentData->future_publish_date_behavior,
+            'is_sortable' => $contentData->is_sortable,
             'prefix' => $collectionData->prefix,
         ]);
 
-        $collection->taxonomies()
-            ->sync($collectionData->taxonomies);
+        $content->taxonomies()
+            ->sync($contentData->taxonomies);
 
-        return $collection;
+        return $content;
     }
 }

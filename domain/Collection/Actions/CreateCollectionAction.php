@@ -2,28 +2,28 @@
 
 declare(strict_types=1);
 
-namespace Domain\Collection\Actions;
+namespace Domain\Content\Actions;
 
-use Domain\Collection\DataTransferObjects\CollectionData;
-use Domain\Collection\Models\Collection;
+use Domain\Content\DataTransferObjects\ContentData;
+use Domain\Content\Models\Content;
 
-class CreateCollectionAction
+class CreateContentAction
 {
-    /** Execute create collection query. */
-    public function execute(CollectionData $collectionData): Collection
+    /** Execute create content query. */
+    public function execute(ContentData $contentData): Content
     {
-        $collection = Collection::create([
-            'name' => $collectionData->name,
-            'blueprint_id' => $collectionData->blueprint_id,
-            'past_publish_date_behavior' => $collectionData->past_publish_date_behavior,
-            'future_publish_date_behavior' => $collectionData->future_publish_date_behavior,
-            'is_sortable' => $collectionData->is_sortable,
+        $content = Content::create([
+            'name' => $contentData->name,
+            'blueprint_id' => $contentData->blueprint_id,
+            'past_publish_date_behavior' => $contentData->past_publish_date_behavior,
+            'future_publish_date_behavior' => $contentData->future_publish_date_behavior,
+            'is_sortable' => $contentData->is_sortable,
             'prefix' => $collectionData->prefix,
         ]);
 
-        $collection->taxonomies()
-            ->attach($collectionData->taxonomies);
+        $content->taxonomies()
+            ->attach($contentData->taxonomies);
 
-        return $collection;
+        return $content;
     }
 }

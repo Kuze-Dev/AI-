@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Domain\Collection\Actions;
+namespace Domain\Content\Actions;
 
-use Domain\Collection\DataTransferObjects\CollectionEntryData;
-use Domain\Collection\Models\CollectionEntry;
+use Domain\Content\DataTransferObjects\ContentEntryData;
+use Domain\Content\Models\ContentEntry;
 use Domain\Support\MetaData\Actions\CreateMetaDataAction;
 use Domain\Support\MetaData\Actions\UpdateMetaDataAction;
-use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
-class UpdateCollectionEntryAction
+class UpdateContentEntryAction
 {
     public function __construct(
         protected CreateMetaDataAction $createMetaData,
@@ -21,25 +20,25 @@ class UpdateCollectionEntryAction
 
     /**
      * Execute operations for updating
-     * and save collection entry query.
+     * and save content entry query.
      */
-    public function execute(CollectionEntry $collectionEntry, CollectionEntryData $collectionEntryData): CollectionEntry
+    public function execute(ContentEntry $contentEntry, ContentEntryData $contentEntryData): ContentEntry
     {
-        $collectionEntry->update([
-            'title' => $collectionEntryData->title,
-            'published_at' => $collectionEntryData->published_at,
-            'data' => $collectionEntryData->data,
+        $contentEntry->update([
+            'title' => $contentEntryData->title,
+            'published_at' => $contentEntryData->published_at,
+            'data' => $contentEntryData->data,
         ]);
 
-        $collectionEntry->metaData()->exists()
-            ? $this->updateMetaData->execute($collectionEntry, $collectionEntryData->meta_data)
-            : $this->createMetaData->execute($collectionEntry, $collectionEntryData->meta_data);
+        $contentEntry->metaData()->exists()
+            ? $this->updateMetaData->execute($contentEntry, $contentEntryData->meta_data)
+            : $this->createMetaData->execute($contentEntry, $contentEntryData->meta_data);
 
-        $collectionEntry->taxonomyTerms()
-            ->sync($collectionEntryData->taxonomy_terms);
+        $contentEntry->taxonomyTerms()
+            ->sync($contentEntryData->taxonomy_terms);
 
-        $this->createOrUpdateRouteUrl->execute($collectionEntry, $collectionEntryData->route_url_data);
+        $this->createOrUpdateRouteUrl->execute($contentEntry, $contentEntryData->route_url_data);
 
-        return $collectionEntry;
+        return $contentEntry;
     }
 }
