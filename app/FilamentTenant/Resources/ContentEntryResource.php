@@ -159,7 +159,13 @@ class ContentEntryResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        /** @var Builder|ContentEntry $query */
+                        return $query->whereHas('author', function ($query) use ($search) {
+                            $query->where('first_name', 'like', "%{$search}%")
+                                ->orWhere('last_name', 'like', "%{$search}%");
+                        });
+                    }),
                 Tables\Columns\TagsColumn::make('taxonomyTerms.name')
                     ->limit()
                     ->searchable(),
