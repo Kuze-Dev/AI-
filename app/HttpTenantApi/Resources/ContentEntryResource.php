@@ -25,7 +25,7 @@ class ContentEntryResource extends JsonApiResource
             'data' => $this->transformSchemaPayload($this->data),
             'order' => $this->order,
             'published_at' => $this->published_at,
-            'route_url' => $this->qualified_route_url,
+            'route_url' => $this->activeRouteUrl->url,
         ];
     }
 
@@ -42,18 +42,5 @@ class ContentEntryResource extends JsonApiResource
     protected function getSchemaData(): SchemaData
     {
         return $this->content->blueprint->schema;
-    }
-
-    public static function newCollection(mixed $resource)
-    {
-        if ($resource instanceof Collection) {
-            $resource->loadMissing('content.blueprint');
-        }
-
-        if ($resource instanceof LengthAwarePaginator && $resource->getCollection() instanceof Collection) {
-            $resource->getCollection()->loadMissing('content.blueprint');
-        }
-
-        return parent::newCollection($resource);
     }
 }
