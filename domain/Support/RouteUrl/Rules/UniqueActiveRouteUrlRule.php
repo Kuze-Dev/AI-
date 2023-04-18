@@ -9,7 +9,6 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Closure;
 use Domain\Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 
@@ -34,7 +33,6 @@ class UniqueActiveRouteUrlRule implements ValidationRule
             );
 
         if ($this->model) {
-//            $query->whereNotMorphedTo('model', $this->model);
             $query->where(fn (EloquentBuilder $query) => $query
                 ->whereNot('model_type',  $this->model->getMorphClass())
                 ->whereNot('model_id',  $this->model->getKey()));
