@@ -20,7 +20,6 @@ use Filament\Tables;
 use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Facades\Auth;
 use Closure;
-use Illuminate\Support\Str;
 
 class GlobalsResource extends Resource
 {

@@ -8,7 +8,6 @@ use Domain\Blueprint\Enums\FieldType;
 use Domain\Globals\Database\Factories\GlobalsFactory;
 use Filament\Facades\Filament;
 
-use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
