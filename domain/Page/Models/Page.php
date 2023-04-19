@@ -13,6 +13,7 @@ use Domain\Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
 use Domain\Support\RouteUrl\HasRouteUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -34,9 +35,6 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property-read \Domain\Support\MetaData\Models\MetaData $metaData
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Page\Models\BlockContent[] $blockContents
  * @property-read int|null $block_contents_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $slugHistories
- * @property-read int|null $slug_histories_count
- * @property-read string|null $qualified_route_url
  * @method static \Illuminate\Database\Eloquent\Builder|Page newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page query()
@@ -112,12 +110,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasR
 
     public static function generateRouteUrl(Model $model, array $attributes): string
     {
-        return Attribute::get(fn () => Blade::render(
-            Blade::compileEchos($this->route_url),
-            [
-                'slug' => $this->slug,
-            ]
-        ));
+        return Str::of($attributes['name'])->slug()->start('/')->toString();
     }
 
     /** @return BelongsTo<Admin, Page> */
