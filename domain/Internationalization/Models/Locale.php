@@ -11,22 +11,22 @@ use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 
-
 /**
  * Domain\Globals\Models\Globals
  *
  * @property int $id
- * @property string $locale
+ * @property string $code
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
  * @property-read int|null $activities_count
- * @method static \Illuminate\Database\Eloquent\Builder|Globals newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Globals newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Globals query()
- * @method static \Illuminate\Database\Eloquent\Builder|Globals whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Globals whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Globals whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Locale newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Locale newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Locale query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Locale whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Locale whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Locale whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Locale whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class Locale extends Model implements IsActivitySubject
@@ -41,9 +41,19 @@ class Locale extends Model implements IsActivitySubject
      * that are mass assignable.
      */
     protected $fillable = [
-        'locale',
+        'code',
         'name',
+        'is_default'
     ];
+
+    protected static function booted()
+{
+    static::saving(function ($locale) {
+        if ($locale->is_default) {
+            static::where('is_default', true)->where('id', '!=', $locale->id)->update(['is_default' => false]);
+        }
+    });
+}
 
     /** @return LogOptions */
     public function getActivitylogOptions(): LogOptions
@@ -57,7 +67,7 @@ class Locale extends Model implements IsActivitySubject
     /** Specify activity log description. */
     public function getActivitySubjectDescription(Activity $activity): string
     {
-        return 'Locale: '.$this->locale;
+        return 'Code: '.$this->code;
     }
 
     /**
@@ -66,6 +76,6 @@ class Locale extends Model implements IsActivitySubject
      */
     public function getRouteKeyName(): string
     {
-        return 'locale';
+        return 'code';
     }
 }

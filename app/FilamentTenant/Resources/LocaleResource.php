@@ -4,23 +4,19 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Support\SchemaFormBuilder;
-use Domain\Blueprint\Models\Blueprint;
-use App\FilamentTenant\Resources\LocaleResource\Pages\CreateLocale;
-use App\FilamentTenant\Resources\LocaleResource\Pages\EditLocale;
-use App\FilamentTenant\Resources\LocaleResource\Pages\ListLocale;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Domain\Internationalization\Models\Locale;
+use Closure;
 use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Resources\Form;
+use Filament\Resources\Table;
+use Filament\Resources\Resource;
 use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Facades\Auth;
-use Closure;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
+use Domain\Internationalization\Models\Locale;
+use App\FilamentTenant\Resources\LocaleResource\Pages\ListLocale;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class LocaleResource extends Resource
 {
@@ -38,37 +34,33 @@ class LocaleResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form->schema([
-            Forms\Components\Card::make([
-                Forms\Components\TextInput::make('name')
-                    ->unique(ignoreRecord: true)
-                    ->lazy()
-                    ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
-                        if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
-                            $set('slug', Str::slug($state));
-                        }
-                    })
-                    ->required(),
-                Forms\Components\TextInput::make('slug')
-                    ->unique(ignoreRecord: true)
-                    ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
-                Forms\Components\Select::make('blueprint_id')
-                    ->options(
-                        fn () => Blueprint::orderBy('name')
-                            ->pluck('name', 'id')
-                            ->toArray()
-                    )
-                    ->required()
-                    ->exists(Blueprint::class, 'id')
-                    ->searchable()
-                    ->reactive()
-                    ->preload()
-                    ->disabled(fn (?Locale $record) => $record !== null),
+        $locales = collect(json_decode(File::get(public_path('locales.json')), true));
 
-                SchemaFormBuilder::make('data')
-                    ->id('schema-form')
-                    ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
-            ]),
+        $options = $locales->map(function ($locale) {
+            $display = "{$locale['locale']} ({$locale['code']})";
+            return [$display => $display];
+        })->collapse();
+
+        return $form->schema([
+            Forms\Components\Select::make('name')
+                ->options($options)
+                ->searchable()
+                ->lazy()
+                ->unique(ignoreRecord: true)
+                ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
+                    if ($get('name') === $state || blank($get('name'))) {
+                        // get last value inside parenthese e.g: English (en) => en, Switzerland (Something) (de-CH) => de-CH
+                        $code = preg_replace('/.*\((.*)\)/', '$1', $state);
+                        $set('code', $code);
+                    }
+                }),
+                Forms\Components\TextInput::make('code')
+                    ->unique(ignoreRecord: true)
+                    ->dehydrateStateUsing(fn (Closure $get, $state) => $state ?: $get('code'))
+                    ->disabled(),
+                    Forms\Components\Checkbox::make('is_default')
+                        ->label('Set Default') // Set the label of the checkbox
+                        ->hint('One default locale is required, change it by selecting another one') // Set the description of the checkbox
         ]);
     }
 
@@ -76,30 +68,25 @@ class LocaleResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('locale')
-                    ->sortable()
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('name')
-                    ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('code'),
+                Tables\Columns\CheckboxColumn::make('is_default')->label('Default')->disabled(),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable(),
+                    ->dateTime(timezone: Auth::user()?->timezone),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable()
                     ->toggleable()
                     ->toggledHiddenByDefault(),
             ])
             ->filtersLayout(Layout::AboveContent)
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->hidden(fn ($record) => $record->is_default),
+                Tables\Actions\DeleteAction::make()
+                    ->hidden(fn ($record) => $record->is_default),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ])
-            ->defaultSort('updated_at', 'desc');
+            ->defaultSort('is_default', 'desc');
     }
 
     public static function getRelations(): array

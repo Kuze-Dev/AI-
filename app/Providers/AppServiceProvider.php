@@ -20,6 +20,7 @@ use Domain\Page\Models\Block;
 use Domain\Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Domain\Internationalization\Models\Locale;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -64,6 +65,7 @@ class AppServiceProvider extends ServiceProvider
             SlugHistory::class,
             Globals::class,
             MetaData::class,
+            Locale::class,
         ]);
 
         Password::defaults(
