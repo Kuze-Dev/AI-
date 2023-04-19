@@ -27,6 +27,7 @@ class CreateContentEntryAction
                 'title' => $contentEntryData->title,
                 'data' => $contentEntryData->data,
                 'published_at' => $contentEntryData->published_at,
+                'author_id' => $contentEntryData->author_id,
             ]);
 
         $this->createMetaData->execute($contentEntry, $contentEntryData->meta_data);

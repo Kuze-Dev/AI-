@@ -25,6 +25,7 @@ use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class PageResource extends Resource
 {
@@ -59,6 +60,8 @@ class PageResource extends Resource
                                 })
                                 ->required(),
                             RouteUrlFieldset::make(),
+                            Forms\Components\Hidden::make('author_id')
+                                ->default(Auth::id()),
                         ]),
                         Forms\Components\Section::make(trans('Blocks'))
                             ->schema([
@@ -141,6 +144,15 @@ class PageResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('author.full_name')
+                    ->sortable()
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        /** @var Builder|Page $query */
+                        return $query->whereHas('author', function ($query) use ($search) {
+                            $query->where('first_name', 'like', "%{$search}%")
+                                ->orWhere('last_name', 'like', "%{$search}%");
+                        });
+                    }),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -188,11 +200,5 @@ class PageResource extends Resource
         }
 
         return self::$cachedBlocks;
-    }
-
-    /** @return \Illuminate\Database\Eloquent\Builder<Page> */
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery();
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Admin\Models\Admin;
 use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -17,6 +18,7 @@ use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 use Illuminate\Support\Str;
 
@@ -35,6 +37,7 @@ use Illuminate\Support\Str;
  * @property-read int|null $block_contents_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $slugHistories
  * @property-read int|null $slug_histories_count
+ * @property-read string|null $qualified_route_url
  * @method static \Illuminate\Database\Eloquent\Builder|Page newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page query()
@@ -57,6 +60,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasR
     use ConstraintsRelationships;
 
     protected $fillable = [
+        'author_id',
         'name',
         'slug',
     ];
@@ -109,6 +113,19 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasR
 
     public static function generateRouteUrl(Model $model, array $attributes): string
     {
-        return Str::of($attributes['name'])->slug()->start('/')->toString();
+        return Attribute::get(fn () => Blade::render(
+            Blade::compileEchos($this->route_url),
+            [
+                'slug' => $this->slug,
+            ]
+        ));
+    }
+
+    /**
+     * @return BelongsTo<Admin, Page>
+     */
+    public function author(): BelongsTo
+    {
+        return $this->belongsTo(Admin::class, 'author_id');
     }
 }

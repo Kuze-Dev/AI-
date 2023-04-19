@@ -27,7 +27,10 @@ class UpdatePageAction
     public function execute(Page $page, PageData $pageData): Page
     {
         $page->update([
+            'author_id' => $pageData->author_id,
             'name' => $pageData->name,
+            'slug' => $pageData->slug,
+            'route_url' => $pageData->route_url,
         ]);
 
         $page->metaData()->exists()

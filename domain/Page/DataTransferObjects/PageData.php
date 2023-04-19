@@ -14,6 +14,7 @@ class PageData
         public readonly RouteUrlData $route_url_data,
         public readonly MetaDataData $meta_data,
         public readonly array $block_contents = [],
+        public readonly ?int $author_id = null,
     ) {
     }
 
@@ -30,6 +31,7 @@ class PageData
                 $data['block_contents'] ?? []
             ),
             route_url_data: RouteUrlData::fromArray($data),
+            author_id: $data['author_id'] ?? null,
             meta_data: MetaDataData::fromArray($data['meta_data']),
         );
     }

@@ -107,6 +107,8 @@ class ContentEntryResource extends Resource
                                     ? $model
                                     : tap(new ContentEntry())->setRelation('content', $livewire->ownerRecord);
                             }),
+                        Forms\Components\Hidden::make('author_id')
+                            ->default(Auth::id()),
                     ]),
                     Forms\Components\Section::make(trans('Taxonomies'))
                         ->schema([
@@ -165,7 +167,17 @@ class ContentEntryResource extends Resource
                 Tables\Columns\TextColumn::make('slug')
                     ->sortable()
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('author.full_name')
+                    ->sortable()
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        /** @var Builder|ContentEntry $query */
+                        return $query->whereHas('author', function ($query) use ($search) {
+                            $query->where('first_name', 'like', "%{$search}%")
+                                ->orWhere('last_name', 'like', "%{$search}%");
+                        });
+                    }),
                 Tables\Columns\TagsColumn::make('taxonomyTerms.name')
                     ->limit()
                     ->searchable(),
