@@ -32,7 +32,7 @@ class PageData
             ),
             slug: $data['slug'] ?? null,
             route_url: $data['route_url'],
-            author_id: auth()->user()->id ?? null,
+            author_id: $data['author_id'] ?? null,
             meta_data: MetaDataData::fromArray($data['meta_data'])
         );
     }

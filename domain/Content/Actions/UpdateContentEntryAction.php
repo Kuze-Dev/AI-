@@ -24,6 +24,7 @@ class UpdateContentEntryAction
     public function execute(ContentEntry $contentEntry, ContentEntryData $contentEntryData): ContentEntry
     {
         $contentEntry->update([
+            'author_id' => $contentEntryData->author_id,
             'title' => $contentEntryData->title,
             'slug' => $contentEntryData->slug,
             'published_at' => $contentEntryData->published_at,

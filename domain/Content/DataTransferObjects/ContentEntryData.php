@@ -28,7 +28,7 @@ class ContentEntryData
             published_at: isset($data['published_at']) ? Carbon::parse($data['published_at']) : null,
             taxonomy_terms: $data['taxonomy_terms'] ?? [],
             data: $data['data'],
-            author_id: auth()->user()->id ?? null,
+            author_id: $data['author_id'] ?? null,
             meta_data: MetaDataData::fromArray($data['meta_data'])
         );
     }

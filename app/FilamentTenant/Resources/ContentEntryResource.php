@@ -103,6 +103,8 @@ class ContentEntryResource extends Resource
                         Forms\Components\TextInput::make('slug')
                             ->unique(ignoreRecord: true)
                             ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('title'))),
+                        Forms\Components\Hidden::make('author_id')
+                            ->default(Auth::id()),
                     ]),
                     Forms\Components\Section::make(trans('Taxonomies'))
                         ->schema([

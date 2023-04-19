@@ -11,7 +11,7 @@ return new class () extends Migration {
     public function up(): void
     {
         Schema::table('content_entries', function (Blueprint $table) {
-            $table->unsignedBigInteger('author_id')->nullable()->after('id');
+            $table->foreignId('author_id')->nullable()->index()->after('id');
         });
     }
 

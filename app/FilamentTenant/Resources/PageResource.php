@@ -63,6 +63,8 @@ class PageResource extends Resource
                             Forms\Components\TextInput::make('route_url')
                                 ->required()
                                 ->helperText('Use "{{ $slug }}" to insert the current slug.'),
+                            Forms\Components\Hidden::make('author_id')
+                                ->default(Auth::id()),
                         ]),
                         Forms\Components\Section::make(trans('Blocks'))
                             ->schema([
