@@ -28,6 +28,7 @@ class UpdatePageAction
             'name' => $pageData->name,
             'slug' => $pageData->slug,
             'route_url' => $pageData->route_url,
+            'published_at' => $pageData->published_at,
         ]);
 
         $page->metaData()->exists()
