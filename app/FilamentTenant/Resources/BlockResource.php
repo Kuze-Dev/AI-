@@ -83,9 +83,13 @@ class BlockResource extends Resource
                 Tables\Columns\Layout\Stack::make([
                     SpatieMediaLibraryImageColumn::make('image')
                         ->collection('image')
-                        ->default('https://via.placeholder.com/500x300/333333/fff?text=No+preview+available')
+                        ->default(
+                            fn (Block $record) => $record->getFirstMedia('image') === null
+                                ? 'https://via.placeholder.com/500x300/333333/fff?text=No+preview+available'
+                                : null
+                        )
                         ->height(null)
-                        ->extraImgAttributes(['class' => 'w-full rounded-lg']),
+                        ->extraImgAttributes(['class' => 'rounded-lg aspect-[5/3] object-cover object-center']),
                     Tables\Columns\TextColumn::make('name')
                         ->sortable()
                         ->size('lg')
