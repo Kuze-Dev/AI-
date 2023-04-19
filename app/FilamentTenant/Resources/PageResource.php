@@ -146,6 +146,7 @@ class PageResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
+                    ->formatStateUsing(fn (?Carbon $state) => $state ?? '-')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
@@ -177,8 +178,7 @@ class PageResource extends Resource
                             (int) $data['published_at_year'],
                             filled($data['published_at_month']) ? (int) $data['published_at_month'] : null
                         )
-                    ))
-                    ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
+                    )),
                 Tables\Filters\Filter::make('published_at_range')
                     ->form([
                         Forms\Components\DatePicker::make('published_at_from'),
@@ -187,8 +187,7 @@ class PageResource extends Resource
                     ->query(fn (PageBuilder $query, array $data): Builder => $query->wherePublishedAtRange(
                         filled($data['published_at_from']) ? Carbon::parse($data['published_at_from']) : null,
                         filled($data['published_at_to']) ? Carbon::parse($data['published_at_to']) : null,
-                    ))
-                    ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
+                    )),
             ])
             ->filtersLayout(Layout::AboveContent)
             ->actions([
