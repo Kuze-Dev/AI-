@@ -92,6 +92,7 @@ class PageResource extends Resource
                                     ->schema([
                                         Forms\Components\ViewField::make('block_id')
                                             ->label('Block')
+                                            ->required()
                                             ->view('filament.forms.components.block-picker')
                                             ->viewData([
                                                 'blocks' => self::getCachedBlocks()
@@ -151,7 +152,9 @@ class PageResource extends Resource
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

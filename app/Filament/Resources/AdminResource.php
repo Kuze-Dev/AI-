@@ -195,13 +195,13 @@ class AdminResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->authorize('update'),
-                Tables\Actions\DeleteAction::make()
-                    ->authorize('delete'),
-                Tables\Actions\RestoreAction::make()
-                    ->authorize('restore'),
-                Tables\Actions\ForceDeleteAction::make()
-                    ->authorize('forceDelete'),
                 Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make()
+                        ->authorize('delete'),
+                    Tables\Actions\RestoreAction::make()
+                        ->authorize('restore'),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->authorize('forceDelete'),
                     Tables\Actions\Action::make('resend-verification')
                         ->requiresConfirmation()
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
@@ -218,6 +218,7 @@ class AdminResource extends Resource
                         ->authorize('resendVerification'),
                     Tables\Actions\Action::make('send-password-reset')
                         ->requiresConfirmation()
+                        ->icon('heroicon-o-lock-open')
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
                             $result = app(ForgotPasswordAction::class)
                                 ->execute($record->email, 'admin');

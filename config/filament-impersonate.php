@@ -8,7 +8,7 @@ return [
     'redirect_to' => env('FILAMENT_IMPERSONATE_REDIRECT', '/'),
 
     // We wire up a route for the "leave" button. You can change the middleware stack here if needed.
-    'leave_middleware' => env('FILAMENT_IMPERSONATE_LEAVE_MIDDLEWARE', 'web'),
+    'leave_middleware' => env('FILAMENT_IMPERSONATE_LEAVE_MIDDLEWARE', 'admin'),
 
     'banner' => [
         // Currently supports 'dark', 'light' and 'auto'.
