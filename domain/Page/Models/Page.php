@@ -20,7 +20,6 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
-use Illuminate\Support\Str;
 
 /**
  * Domain\Page\Models\Page
@@ -121,9 +120,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasR
         ));
     }
 
-    /**
-     * @return BelongsTo<Admin, Page>
-     */
+    /** @return BelongsTo<Admin, Page> */
     public function author(): BelongsTo
     {
         return $this->belongsTo(Admin::class, 'author_id');
