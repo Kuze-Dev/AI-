@@ -23,6 +23,7 @@ use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
 
 class PageResource extends Resource
 {
@@ -62,6 +63,8 @@ class PageResource extends Resource
                             Forms\Components\TextInput::make('route_url')
                                 ->required()
                                 ->helperText('Use "{{ $slug }}" to insert the current slug.'),
+                            Forms\Components\Hidden::make('author_id')
+                                ->default(Auth::id()),
                         ]),
                         Forms\Components\Section::make(trans('Blocks'))
                             ->schema([
@@ -139,6 +142,15 @@ class PageResource extends Resource
                 Tables\Columns\TextColumn::make('slug')
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('author.full_name')
+                    ->sortable()
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        /** @var Builder|Page $query */
+                        return $query->whereHas('author', function ($query) use ($search) {
+                            $query->where('first_name', 'like', "%{$search}%")
+                                ->orWhere('last_name', 'like', "%{$search}%");
+                        });
+                    }),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
