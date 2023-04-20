@@ -49,5 +49,5 @@ it('can get route url but return InvalidArgumentException with error message', f
 })
     ->throws(
         InvalidArgumentException::class,
-        'No resource for for model '.TestModelForRouteUrl::class
+        'No resource found for model '.TestModelForRouteUrl::class
     );

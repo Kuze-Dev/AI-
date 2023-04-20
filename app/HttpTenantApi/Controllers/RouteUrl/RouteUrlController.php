@@ -30,7 +30,7 @@ class RouteUrlController
         return match ($routeUrl->model::class) {
             Page::class => PageResource::make($routeUrl->model),
             ContentEntry::class => ContentEntryResource::make($routeUrl->model),
-            default => throw new InvalidArgumentException('No resource for for model '.$routeUrl->model::class),
+            default => throw new InvalidArgumentException('No resource found for model '.$routeUrl->model::class),
         };
     }
 }
