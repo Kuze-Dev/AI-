@@ -11,6 +11,7 @@ use Tests\Fixtures\TestModelForRouteUrl;
 
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\getJson;
+use function Pest\Laravel\withoutExceptionHandling;
 
 uses()->group('route_url');
 
@@ -34,27 +35,19 @@ it('get 404', function () {
         ->assertNotFound();
 });
 
-it('can get route url', function () {
+it('can get route url but return InvalidArgumentException with error message', function () {
     $model = TestModelForRouteUrl::create([
         'name' => 'my-awesome-name',
     ]);
 
     app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model, new RouteUrlData('my-awesome-name', false));
+        ->execute($model, new RouteUrlData('url/path/one', true));
 
+    withoutExceptionHandling();
     getJson('api/route/'.$model->refresh()->activeRouteUrl->url)
         ->assertOk();
-})->todo()->skip('conflict w/ slash');
-
-it('can show a route with includes', function (string $include) {
-    $model = TestModelForRouteUrl::create([
-        'name' => 'my-awesome-name',
-    ]);
-
-    app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($model, new RouteUrlData('my-awesome-name', false));
-
-    getJson('api/route/'.$model->activeRouteUrl->url.'?'.http_build_query(['include' => $include]))
-        ->assertOk();
 })
-    ->with(['model'])->todo();
+    ->throws(
+        InvalidArgumentException::class,
+        'No resource for for model '.TestModelForRouteUrl::class
+    );
