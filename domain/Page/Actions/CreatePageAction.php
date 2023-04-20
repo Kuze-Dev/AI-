@@ -22,6 +22,7 @@ class CreatePageAction
             'name' => $pageData->name,
             'slug' => $pageData->slug,
             'route_url' => $pageData->route_url,
+            'author_id' => $pageData->author_id,
         ]);
 
         $this->createMetaTags->execute($page, $pageData->meta_data);

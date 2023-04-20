@@ -51,6 +51,7 @@ it('can create content entry', function () {
             'id' => $content->id,
             'title' => 'Test',
             'slug' => 'test',
+            'author_id' => auth()->user()->id,
             'data' => json_encode(['main' => ['header' => 'Foo']]),
         ]
     );

@@ -52,7 +52,10 @@ it('can create page', function () {
         ->instance()
         ->record;
 
-    assertDatabaseHas(Page::class, ['name' => 'Test']);
+    assertDatabaseHas(Page::class, [
+        'author_id' => auth()->user()->id,
+        'name' => 'Test',
+    ]);
     assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
         'block_id' => $blockId,
