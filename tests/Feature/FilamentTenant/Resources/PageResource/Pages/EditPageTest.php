@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\PageResource\Pages\EditPage;
+use Carbon\Carbon;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Page\Database\Factories\PageFactory;
@@ -14,6 +15,7 @@ use Domain\Support\MetaData\Models\MetaData;
 use Domain\Support\SlugHistory\SlugHistory;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Auth;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -36,13 +38,17 @@ it('can render page', function () {
                 ),
             ['data' => ['main' => ['header' => 'Foo']]]
         )
-        ->createOne();
+        ->createOne([
+            'name' => 'Test',
+            'published_at' => Carbon::now(),
+        ]);
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->assertFormExists()
         ->assertSuccessful()
         ->assertFormSet([
             'name' => $page->name,
+            'published_at' => (string) $page->published_at->timezone(Auth::user()->timezone),
             'block_contents.record-1' => $page->blockContents->first()->toArray(),
         ])
         ->assertOk();
@@ -75,21 +81,25 @@ it('can edit page', function () {
     ];
     $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
 
-    livewire(EditPage::class, ['record' => $page->getRouteKey()])
+    $updatedPage = livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
             'route_url' => 'test-url',
+            'published_at' => true,
             'block_contents.record-1.data.main.header' => 'Bar',
             'meta_data' => $metaData,
             'meta_data.image.0' => $metaDataImage,
         ])
         ->call('save')
         ->assertHasNoFormErrors()
-        ->assertOk();
+        ->assertOk()
+        ->instance()
+        ->record;
 
     assertDatabaseHas(Page::class, [
         'name' => 'Test',
         'route_url' => 'test-url',
+        'published_at' => $updatedPage->published_at,
     ]);
 
     assertDatabaseHas(

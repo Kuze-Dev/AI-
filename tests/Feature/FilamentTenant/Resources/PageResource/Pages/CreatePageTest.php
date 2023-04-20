@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\PageResource\Pages\CreatePage;
-use Carbon\Carbon;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
 use Domain\Page\Models\Page;
@@ -163,19 +162,17 @@ it('can create page with meta data', function () {
     ]);
 });
 
-it('can create page with publish date', function () {
+it('can create page with published at date', function () {
     $blockId = BlockFactory::new()
         ->withDummyBlueprint()
         ->createOne()
         ->getKey();
 
-    $dateTime = Carbon::now();
-
     $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
             'route_url' => 'test-url',
-            'published_at' => $dateTime,
+            'published_at' => true,
             'block_contents' => [
                 [
                     'block_id' => $blockId,
@@ -192,10 +189,8 @@ it('can create page with publish date', function () {
     assertDatabaseHas(
         Page::class,
         [
-            'id' => $page->id,
             'name' => 'Test',
-            'route-url' => 'test-url',
-            'published_at' => $dateTime,
+            'published_at' => $page->published_at,
         ]
     );
 
