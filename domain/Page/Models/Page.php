@@ -66,7 +66,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
         'slug',
         'author_id',
         'route_url',
-        'page_visibility'
+        'page_visibility',
     ];
 
     /**

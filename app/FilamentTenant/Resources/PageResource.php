@@ -174,14 +174,14 @@ class PageResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('page_visibility')
-                ->options(
-                    collect(PageVisibility::cases())
-                        ->mapWithKeys(fn (PageVisibility $visibilityType) => [
-                            $visibilityType->value => Str::headline($visibilityType->value),
-                        ])
-                        ->toArray()
-                )
-                ->attribute('page_visibility')
+                    ->options(
+                        collect(PageVisibility::cases())
+                            ->mapWithKeys(fn (PageVisibility $visibilityType) => [
+                                $visibilityType->value => Str::headline($visibilityType->value),
+                            ])
+                            ->toArray()
+                    )
+                    ->attribute('page_visibility'),
             ])
             ->filtersLayout(Layout::AboveContent)
             ->actions([

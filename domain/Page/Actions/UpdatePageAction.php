@@ -29,7 +29,7 @@ class UpdatePageAction
             'slug' => $pageData->slug,
             'route_url' => $pageData->route_url,
             'author_id' => $pageData->author_id,
-            'page_visibility' => $pageData->page_visibility
+            'page_visibility' => $pageData->page_visibility,
         ]);
 
         $page->metaData()->exists()

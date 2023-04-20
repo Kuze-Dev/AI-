@@ -30,10 +30,9 @@ it('can render page', function () {
 });
 
 it('can create page', function () {
-    $blockId = BlockFactory::new()
+    $block = BlockFactory::new()
         ->withDummyBlueprint()
-        ->createOne()
-        ->getKey();
+        ->createOne();
 
     $page = livewire(CreatePage::class)
         ->fillForm([
@@ -41,10 +40,11 @@ it('can create page', function () {
             'route_url' => 'test-url',
             'block_contents' => [
                 [
-                    'block_id' => $blockId,
+                    'block_id' => $block->getKey(),
                     'data' => ['name' => 'foo'],
                 ],
             ],
+            'page_visibility' => 'public',
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -56,11 +56,13 @@ it('can create page', function () {
         'author_id' => auth()->user()->id,
         'name' => 'Test',
     ]);
+
     assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
-        'block_id' => $blockId,
-        'data' => json_encode(['name' => 'foo']),
+        'block_id' => $block->getKey(),
+        'data' => json_encode($block->blockContents->first()->data),
     ]);
+
     assertDatabaseHas(
         MetaData::class,
         [
@@ -95,6 +97,7 @@ it('can not create page with same name', function () {
                     'data' => ['name' => 'foo'],
                 ],
             ],
+            'page_visibility' => 'public',
         ])
         ->call('create')
         ->assertHasFormErrors(['name' => 'unique'])
@@ -121,6 +124,7 @@ it('can create page with meta data', function () {
         ->fillForm([
             'name' => 'Test',
             'route_url' => 'test-url',
+            'page_visibility' => 'public',
             'block_contents' => [
                 [
                     'block_id' => $blockId,
@@ -136,7 +140,10 @@ it('can create page with meta data', function () {
         ->instance()
         ->record;
 
-    assertDatabaseHas(Page::class, ['name' => 'Test']);
+    assertDatabaseHas(Page::class, [
+        'name' => 'Test',
+        'page_visibility' => 'public',
+    ]);
     assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
         'block_id' => $blockId,

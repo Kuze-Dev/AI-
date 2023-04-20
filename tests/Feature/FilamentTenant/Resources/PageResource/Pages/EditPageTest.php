@@ -36,7 +36,9 @@ it('can render page', function () {
                 ),
             ['data' => ['main' => ['header' => 'Foo']]]
         )
-        ->createOne();
+        ->createOne([
+            'page_visibility' => 'public',
+        ]);
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->assertFormExists()
@@ -65,7 +67,9 @@ it('can edit page', function () {
             'author' => 'Foo author',
             'keywords' => 'Foo keywords',
         ]))
-        ->createOne();
+        ->createOne([
+            'page_visibility' => 'public',
+        ]);
 
     $metaData = [
         'title' => 'Foo title updated',
@@ -81,6 +85,7 @@ it('can edit page', function () {
             'route_url' => 'test-url',
             'block_contents.record-1.data.main.header' => 'Bar',
             'meta_data' => $metaData,
+            'page_visibility' => 'authenticated',
             'meta_data.image.0' => $metaDataImage,
         ])
         ->call('save')
@@ -89,6 +94,7 @@ it('can edit page', function () {
 
     assertDatabaseHas(Page::class, [
         'name' => 'Test',
+        'page_visibility' => 'authenticated',
         'route_url' => 'test-url',
     ]);
 
@@ -126,7 +132,9 @@ it('can edit page slug', function () {
                 ),
             ['data' => ['main' => ['header' => 'Foo']]]
         )
-        ->createOne();
+        ->createOne([
+            'page_visibility' => 'public',
+        ]);
 
     $metaDataData = [
         'title' => $page->slug,
@@ -174,7 +182,9 @@ it('page block with default value will fill the blocks fields', function () {
                 ),
             ['data' => null]
         )
-        ->createOne();
+        ->createOne([
+            'page_visibility' => 'public',
+        ]);
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
@@ -203,7 +213,9 @@ it('page block with default value column data must be dehydrated', function () {
                 ),
             ['data' => null]
         )
-        ->createOne();
+        ->createOne([
+            'page_visibility' => 'public',
+        ]);
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
