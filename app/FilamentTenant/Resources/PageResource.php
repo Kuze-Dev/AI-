@@ -10,6 +10,7 @@ use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
+use Domain\Page\Enums\PageVisibility;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
 use Domain\Page\Models\BlockContent;
@@ -65,6 +66,17 @@ class PageResource extends Resource
                                 ->helperText('Use "{{ $slug }}" to insert the current slug.'),
                             Forms\Components\Hidden::make('author_id')
                                 ->default(Auth::id()),
+                            Forms\Components\Select::make('page_visibility')
+                                ->options(
+                                    collect(PageVisibility::cases())
+                                        ->mapWithKeys(fn (PageVisibility $visibilityType) => [
+                                            $visibilityType->value => Str::headline($visibilityType->value),
+                                        ])
+                                        ->toArray()
+                                )
+                                ->searchable()
+                                ->columnSpan(['sm' => 1])
+                                ->required(),
                         ]),
                         Forms\Components\Section::make(trans('Blocks'))
                             ->schema([
@@ -160,7 +172,17 @@ class PageResource extends Resource
                     ->toggleable()
                     ->toggledHiddenByDefault(),
             ])
-            ->filters([])
+            ->filters([
+                Tables\Filters\SelectFilter::make('page_visibility')
+                ->options(
+                    collect(PageVisibility::cases())
+                        ->mapWithKeys(fn (PageVisibility $visibilityType) => [
+                            $visibilityType->value => Str::headline($visibilityType->value),
+                        ])
+                        ->toArray()
+                )
+                ->attribute('page_visibility')
+            ])
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),

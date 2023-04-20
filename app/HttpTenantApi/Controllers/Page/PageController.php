@@ -17,7 +17,7 @@ class PageController
     {
         return PageResource::collection(
             QueryBuilder::for(Page::query())
-                ->allowedFilters(['name', 'slug'])
+                ->allowedFilters(['name', 'slug', 'page_visibility'])
                 ->allowedIncludes([
                     'blockContents.block',
                     'slugHistories',

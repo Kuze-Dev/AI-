@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Page\DataTransferObjects;
 
+use Domain\Page\Enums\PageVisibility;
 use Domain\Support\MetaData\DataTransferObjects\MetaDataData;
 
 class PageData
@@ -13,6 +14,7 @@ class PageData
         public readonly string $route_url,
         public readonly MetaDataData $meta_data,
         public readonly array $block_contents = [],
+        public readonly ?PageVisibility $page_visibility = null,
         public readonly ?string $slug = null,
         public readonly ?int $author_id = null,
     ) {
@@ -33,7 +35,8 @@ class PageData
             slug: $data['slug'] ?? null,
             route_url: $data['route_url'],
             author_id: $data['author_id'] ?? null,
-            meta_data: MetaDataData::fromArray($data['meta_data'])
+            meta_data: MetaDataData::fromArray($data['meta_data']),
+            page_visibility: PageVisibility::tryFrom($data['page_visibility'] ?? '')
         );
     }
 }

@@ -6,6 +6,7 @@ namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Admin\Models\Admin;
+use Domain\Page\Enums\PageVisibility;
 use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -65,6 +66,15 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
         'slug',
         'author_id',
         'route_url',
+        'page_visibility'
+    ];
+
+    /**
+     * Columns that are converted
+     * to a specific data type.
+     */
+    protected $casts = [
+        'page_visibility' => PageVisibility::class,
     ];
 
     /**
