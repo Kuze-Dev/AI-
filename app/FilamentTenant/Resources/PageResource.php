@@ -67,6 +67,8 @@ class PageResource extends Resource
                             Forms\Components\TextInput::make('route_url')
                                 ->required()
                                 ->helperText('Use "{{ $slug }}" to insert the current slug.'),
+                            Forms\Components\Hidden::make('author_id')
+                                ->default(Auth::id()),
                         ]),
                         Forms\Components\Section::make(trans('Blocks'))
                             ->schema([
@@ -122,7 +124,7 @@ class PageResource extends Resource
                                             }),
                                         SchemaFormBuilder::make('data')
                                             ->id('schema-form')
-                                            ->dehydrated(fn (Closure $get) => ! (self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content))
+                                            ->dehydrated(fn (Closure $get) => !(self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content))
                                             ->disabled(fn (Closure $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content ?? false)
                                             ->schemaData(fn (Closure $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->blueprint->schema),
                                     ]),
@@ -148,6 +150,15 @@ class PageResource extends Resource
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->formatStateUsing(fn (?Carbon $state) => $state ?? '-')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('author.full_name')
+                    ->sortable()
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        /** @var Builder|Page $query */
+                        return $query->whereHas('author', function ($query) use ($search) {
+                            $query->where('first_name', 'like', "%{$search}%")
+                                ->orWhere('last_name', 'like', "%{$search}%");
+                        });
+                    }),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -221,7 +232,7 @@ class PageResource extends Resource
     /** @return Collection<int, Block> $cachedBlocks */
     protected static function getCachedBlocks(): Collection
     {
-        if ( ! isset(self::$cachedBlocks)) {
+        if (!isset(self::$cachedBlocks)) {
             self::$cachedBlocks = Block::with(['blueprint', 'media'])->get();
         }
 

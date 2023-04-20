@@ -16,6 +16,7 @@ class PageData
         public readonly array $block_contents = [],
         public readonly ?string $slug = null,
         public readonly ?Carbon $published_at = null,
+        public readonly ?int $author_id = null,
     ) {
     }
 
@@ -34,6 +35,7 @@ class PageData
             slug: $data['slug'] ?? null,
             route_url: $data['route_url'],
             published_at: isset($data['published_at']) ? Carbon::parse($data['published_at']) : null,
+            author_id: $data['author_id'] ?? null,
             meta_data: MetaDataData::fromArray($data['meta_data'])
         );
     }

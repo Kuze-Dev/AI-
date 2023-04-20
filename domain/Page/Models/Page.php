@@ -6,6 +6,7 @@ namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Page\Models\Builders\PageBuilder;
+use Domain\Admin\Models\Admin;
 use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -19,6 +20,7 @@ use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 
 /**
@@ -62,6 +64,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
     protected $fillable = [
         'name',
         'slug',
+        'author_id',
         'route_url',
         'published_at',
     ];
@@ -135,5 +138,15 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
                 'slug' => $this->slug,
             ]
         ));
+    }
+
+    /**
+     * Get the Admin that owns the Page
+     *
+     * @return BelongsTo<Admin, Page>
+     */
+    public function author()
+    {
+        return $this->belongsTo(Admin::class, 'author_id');
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Content\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Admin\Models\Admin;
 use Domain\Support\SlugHistory\HasSlugHistory;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Domain\Support\MetaData\HasMetaData;
@@ -79,6 +80,7 @@ class ContentEntry extends Model implements IsActivitySubject, HasMetaDataContra
         'content_id',
         'taxonomy_term_id',
         'order',
+        'author_id',
         'published_at',
     ];
 
@@ -175,5 +177,11 @@ class ContentEntry extends Model implements IsActivitySubject, HasMetaDataContra
                   'slug' => $this->slug,
               ]
           ));
+      }
+
+      /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Admin, ContentEntry> */
+      public function author(): BelongsTo
+      {
+          return $this->belongsTo(Admin::class, 'author_id');
       }
 }

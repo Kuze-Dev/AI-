@@ -103,6 +103,8 @@ class ContentEntryResource extends Resource
                         Forms\Components\TextInput::make('slug')
                             ->unique(ignoreRecord: true)
                             ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('title'))),
+                        Forms\Components\Hidden::make('author_id')
+                            ->default(Auth::id()),
                     ]),
                     Forms\Components\Section::make(trans('Taxonomies'))
                         ->schema([
@@ -157,6 +159,15 @@ class ContentEntryResource extends Resource
                 Tables\Columns\TextColumn::make('slug')
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('author.full_name')
+                    ->sortable()
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        /** @var Builder|ContentEntry $query */
+                        return $query->whereHas('author', function ($query) use ($search) {
+                            $query->where('first_name', 'like', "%{$search}%")
+                                ->orWhere('last_name', 'like', "%{$search}%");
+                        });
+                    }),
                 Tables\Columns\TagsColumn::make('taxonomyTerms.name')
                     ->limit()
                     ->searchable(),
