@@ -168,3 +168,36 @@ it('can create page with meta data', function () {
         'model_id' => $page->id,
     ]);
 });
+
+it('can create page with published at date', function () {
+    $blockId = BlockFactory::new()
+        ->withDummyBlueprint()
+        ->createOne()
+        ->getKey();
+
+    $page = livewire(CreatePage::class)
+        ->fillForm([
+            'name' => 'Test',
+            'route_url' => 'test-url',
+            'published_at' => true,
+            'block_contents' => [
+                [
+                    'block_id' => $blockId,
+                    'data' => ['name' => 'foo'],
+                ],
+            ],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(
+        Page::class,
+        [
+            'name' => 'Test',
+            'published_at' => $page->published_at,
+        ]
+    );
+});

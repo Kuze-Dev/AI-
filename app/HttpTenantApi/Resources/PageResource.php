@@ -18,6 +18,7 @@ class PageResource extends JsonApiResource
             'name' => $this->name,
             'route_url' => $this->qualified_route_url,
             'page_visibility' => $this->page_visibility,
+            'published_at' => $this->published_at,
         ];
     }
 

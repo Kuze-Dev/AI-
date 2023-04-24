@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Admin\Models\Admin;
 use Domain\Page\Enums\PageVisibility;
 use Domain\Support\MetaData\HasMetaData;
@@ -67,6 +68,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
         'author_id',
         'route_url',
         'page_visibility',
+        'published_at',
     ];
 
     /**
@@ -75,6 +77,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
      */
     protected $casts = [
         'page_visibility' => PageVisibility::class,
+        'published_at' => 'datetime',
     ];
 
     /**
@@ -88,6 +91,12 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
         return [
             'title' => $this->name,
         ];
+    }
+
+    /** @return PageBuilder<self> */
+    public function newEloquentBuilder($query): PageBuilder
+    {
+        return new PageBuilder($query);
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -106,7 +115,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
 
     public function getActivitySubjectDescription(Activity $activity): string
     {
-        return 'Page: '.$this->name;
+        return 'Page: ' . $this->name;
     }
 
     public function getRouteKeyName(): string
