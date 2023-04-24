@@ -22,6 +22,12 @@ return new class () extends Migration {
     /** Reverse the migrations. */
     public function down(): void
     {
+        Schema::table('pages', function (Blueprint $table) {
+            $table->string('route_url')->unique();
+        });
 
+        Schema::table('contents', function (Blueprint $table) {
+            $table->string('route_url')->unique();
+        });
     }
 };
