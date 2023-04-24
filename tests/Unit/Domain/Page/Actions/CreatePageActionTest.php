@@ -24,6 +24,7 @@ it('can create page', function () {
         ->execute(PageData::fromArray([
             'name' => 'Foo',
             'route_url' => 'foo',
+            'author_id' => 1,
             'block_contents' => [
                 [
                     'block_id' => $blockId,

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Page\Models\Builders\PageBuilder;
+use Domain\Admin\Models\Admin;
 use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -18,6 +20,7 @@ use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 
 /**
@@ -61,7 +64,17 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
     protected $fillable = [
         'name',
         'slug',
+        'author_id',
         'route_url',
+        'published_at',
+    ];
+
+    /**
+     * Columns that are converted
+     * to a specific data type.
+     */
+    protected $casts = [
+        'published_at' => 'datetime',
     ];
 
     /**
@@ -75,6 +88,12 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
         return [
             'title' => $this->name,
         ];
+    }
+
+    /** @return PageBuilder<self> */
+    public function newEloquentBuilder($query): PageBuilder
+    {
+        return new PageBuilder($query);
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -93,7 +112,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
 
     public function getActivitySubjectDescription(Activity $activity): string
     {
-        return 'Page: '.$this->name;
+        return 'Page: ' . $this->name;
     }
 
     public function getRouteKeyName(): string
@@ -119,5 +138,15 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
                 'slug' => $this->slug,
             ]
         ));
+    }
+
+    /**
+     * Get the Admin that owns the Page
+     *
+     * @return BelongsTo<Admin, Page>
+     */
+    public function author()
+    {
+        return $this->belongsTo(Admin::class, 'author_id');
     }
 }

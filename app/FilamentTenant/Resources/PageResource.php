@@ -9,10 +9,12 @@ use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Carbon\Carbon;
 use Closure;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
 use Domain\Page\Models\BlockContent;
+use Domain\Page\Models\Builders\PageBuilder;
 use Exception;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -23,6 +25,7 @@ use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
 
 class PageResource extends Resource
 {
@@ -59,9 +62,15 @@ class PageResource extends Resource
                             Forms\Components\TextInput::make('slug')
                                 ->unique(ignoreRecord: true)
                                 ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
+                            Forms\Components\Toggle::make('published_at')
+                                ->label(trans('Published'))
+                                ->formatStateUsing(fn (Carbon|bool|null $state) => $state instanceof Carbon ? true : (bool) $state)
+                                ->dehydrateStateUsing(fn (?bool $state) => $state ? now() : null),
                             Forms\Components\TextInput::make('route_url')
                                 ->required()
                                 ->helperText('Use "{{ $slug }}" to insert the current slug.'),
+                            Forms\Components\Hidden::make('author_id')
+                                ->default(Auth::id()),
                         ]),
                         Forms\Components\Section::make(trans('Blocks'))
                             ->schema([
@@ -92,6 +101,7 @@ class PageResource extends Resource
                                     ->schema([
                                         Forms\Components\ViewField::make('block_id')
                                             ->label('Block')
+                                            ->required()
                                             ->view('filament.forms.components.block-picker')
                                             ->viewData([
                                                 'blocks' => self::getCachedBlocks()
@@ -138,6 +148,19 @@ class PageResource extends Resource
                 Tables\Columns\TextColumn::make('slug')
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('published_at')
+                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->formatStateUsing(fn (?Carbon $state) => $state ?? '-')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('author.full_name')
+                    ->sortable()
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        /** @var Builder|Page $query */
+                        return $query->whereHas('author', function ($query) use ($search) {
+                            $query->where('first_name', 'like', "%{$search}%")
+                                ->orWhere('last_name', 'like', "%{$search}%");
+                        });
+                    }),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -147,11 +170,44 @@ class PageResource extends Resource
                     ->toggleable()
                     ->toggledHiddenByDefault(),
             ])
-            ->filters([])
+            ->filters([
+                Tables\Filters\Filter::make('published_at_year_month')
+                    ->form([
+                        Forms\Components\TextInput::make('published_at_year')
+                            ->numeric()
+                            ->debounce(),
+                        Forms\Components\Select::make('published_at_month')
+                            ->options(
+                                collect(range(1, 12))
+                                    ->mapWithKeys(fn (int $month) => [$month => Carbon::now()->month($month)->format('F')])
+                                    ->toArray()
+                            )
+                            ->disabled(fn (Closure $get) => blank($get('published_at_year')))
+                            ->helperText(fn (Closure $get) => blank($get('published_at_year')) ? 'Enter a published at year first.' : null),
+                    ])
+                    ->query(fn (PageBuilder $query, array $data): Builder => $query->when(
+                        filled($data['published_at_year']),
+                        fn (PageBuilder $query) => $query->wherePublishedAtYearMonth(
+                            (int) $data['published_at_year'],
+                            filled($data['published_at_month']) ? (int) $data['published_at_month'] : null
+                        )
+                    )),
+                Tables\Filters\Filter::make('published_at_range')
+                    ->form([
+                        Forms\Components\DatePicker::make('published_at_from'),
+                        Forms\Components\DatePicker::make('published_at_to'),
+                    ])
+                    ->query(fn (PageBuilder $query, array $data): Builder => $query->wherePublishedAtRange(
+                        filled($data['published_at_from']) ? Carbon::parse($data['published_at_from']) : null,
+                        filled($data['published_at_to']) ? Carbon::parse($data['published_at_to']) : null,
+                    )),
+            ])
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

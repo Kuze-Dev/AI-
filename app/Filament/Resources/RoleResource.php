@@ -84,8 +84,10 @@ class RoleResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->authorize('update'),
-                Tables\Actions\DeleteAction::make()
-                    ->authorize('delete'),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make()
+                        ->authorize('delete'),
+                ]),
             ])
             ->bulkActions([])
             ->defaultSort('created_at', 'desc');
