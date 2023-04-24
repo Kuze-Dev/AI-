@@ -17,7 +17,6 @@ use Illuminate\Http\UploadedFile;
 
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -145,7 +144,7 @@ it('can edit page with custom url', function () {
         ->fillForm([
             'route_url' => [
                 'is_override' => true,
-                'url' => '/some/custom/url'
+                'url' => '/some/custom/url',
             ],
             'block_contents.record-1.data.main.header' => 'Bar',
         ])

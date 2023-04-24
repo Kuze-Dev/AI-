@@ -19,7 +19,6 @@ use Illuminate\Http\UploadedFile;
 
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Livewire\livewire;
@@ -185,7 +184,7 @@ it('can edit content entry with custom url', function () {
         ->fillForm([
             'route_url' => [
                 'is_override' => true,
-                'url' => '/some/custom/url'
+                'url' => '/some/custom/url',
             ],
         ])
         ->call('save')

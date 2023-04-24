@@ -240,7 +240,7 @@ it('can create content entry with custom url', function () {
             'title' => 'Test',
             'route_url' => [
                 'is_override' => true,
-                'url' => '/some/custom/url'
+                'url' => '/some/custom/url',
             ],
             'data' => ['main' => ['header' => 'Foo']],
         ])

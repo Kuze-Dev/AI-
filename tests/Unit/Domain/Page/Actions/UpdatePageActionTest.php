@@ -36,7 +36,7 @@ it('can update page', function () {
                 'name' => 'Foo',
                 'slug' => 'foo',
                 'route_url' => [
-                    'url' => 'foo'
+                    'url' => 'foo',
                 ],
                 'author_id' => 1,
                 'block_contents' => [

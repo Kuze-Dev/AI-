@@ -201,7 +201,7 @@ it('can create page with custom url', function () {
             'name' => 'Test',
             'route_url' => [
                 'is_override' => true,
-                'url' => '/some/custom/url'
+                'url' => '/some/custom/url',
             ],
             'block_contents' => [
                 [
