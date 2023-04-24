@@ -44,7 +44,7 @@ it('can create page', function () {
                     'data' => ['name' => 'foo'],
                 ],
             ],
-            'page_visibility' => 'public',
+            'visibility' => 'public',
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -97,7 +97,7 @@ it('can not create page with same name', function () {
                     'data' => ['name' => 'foo'],
                 ],
             ],
-            'page_visibility' => 'public',
+            'visibility' => 'public',
         ])
         ->call('create')
         ->assertHasFormErrors(['name' => 'unique'])
@@ -124,7 +124,7 @@ it('can create page with meta data', function () {
         ->fillForm([
             'name' => 'Test',
             'route_url' => 'test-url',
-            'page_visibility' => 'public',
+            'visibility' => 'public',
             'block_contents' => [
                 [
                     'block_id' => $blockId,
@@ -142,7 +142,7 @@ it('can create page with meta data', function () {
 
     assertDatabaseHas(Page::class, [
         'name' => 'Test',
-        'page_visibility' => 'public',
+        'visibility' => 'public',
     ]);
     assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
@@ -180,6 +180,7 @@ it('can create page with published at date', function () {
             'name' => 'Test',
             'route_url' => 'test-url',
             'published_at' => true,
+            'visibility' => 'public',
             'block_contents' => [
                 [
                     'block_id' => $blockId,

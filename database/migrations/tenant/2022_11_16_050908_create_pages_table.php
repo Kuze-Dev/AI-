@@ -17,7 +17,7 @@ return new class () extends Migration {
 
             $table->string('name')->unique();
             $table->string('slug')->unique();
-            $table->string('page_visibility')->nullable();
+            $table->string('visibility')->nullable();
             $table->string('route_url');
 
             $table->timestamps();

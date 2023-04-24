@@ -38,7 +38,7 @@ it('can render page', function () {
             ['data' => ['main' => ['header' => 'Foo']]]
         )
         ->createOne([
-            'page_visibility' => 'public',
+            'visibility' => 'public',
         ]);
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
@@ -70,7 +70,7 @@ it('can edit page', function () {
             'keywords' => 'Foo keywords',
         ]))
         ->createOne([
-            'page_visibility' => 'public',
+            'visibility' => 'public',
         ]);
 
     $metaData = [
@@ -88,7 +88,7 @@ it('can edit page', function () {
             'published_at' => true,
             'block_contents.record-1.data.main.header' => 'Bar',
             'meta_data' => $metaData,
-            'page_visibility' => 'authenticated',
+            'visibility' => 'authenticated',
             'meta_data.image.0' => $metaDataImage,
         ])
         ->call('save')
@@ -99,7 +99,7 @@ it('can edit page', function () {
 
     assertDatabaseHas(Page::class, [
         'name' => 'Test',
-        'page_visibility' => 'authenticated',
+        'visibility' => 'authenticated',
         'route_url' => 'test-url',
         'published_at' => $updatedPage->published_at,
     ]);
@@ -139,7 +139,7 @@ it('can edit page slug', function () {
             ['data' => ['main' => ['header' => 'Foo']]]
         )
         ->createOne([
-            'page_visibility' => 'public',
+            'visibility' => 'public',
         ]);
 
     $metaDataData = [
@@ -189,7 +189,7 @@ it('page block with default value will fill the blocks fields', function () {
             ['data' => null]
         )
         ->createOne([
-            'page_visibility' => 'public',
+            'visibility' => 'public',
         ]);
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
@@ -220,7 +220,7 @@ it('page block with default value column data must be dehydrated', function () {
             ['data' => null]
         )
         ->createOne([
-            'page_visibility' => 'public',
+            'visibility' => 'public',
         ]);
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])

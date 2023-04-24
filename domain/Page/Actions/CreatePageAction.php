@@ -24,7 +24,7 @@ class CreatePageAction
             'route_url' => $pageData->route_url,
             'published_at' => $pageData->published_at,
             'author_id' => $pageData->author_id,
-            'page_visibility' => $pageData->page_visibility,
+            'visibility' => $pageData->visibility,
         ]);
 
         $this->createMetaTags->execute($page, $pageData->meta_data);

@@ -67,7 +67,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
         'slug',
         'author_id',
         'route_url',
-        'page_visibility',
+        'visibility',
         'published_at',
     ];
 
@@ -76,7 +76,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
      * to a specific data type.
      */
     protected $casts = [
-        'page_visibility' => PageVisibility::class,
+        'visibility' => PageVisibility::class,
         'published_at' => 'datetime',
     ];
 

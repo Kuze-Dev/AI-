@@ -24,7 +24,7 @@ class PageController
                 ->allowedFilters([
                     'name',
                     'slug',
-                    'page_visibility',
+                    'visibility',
                     AllowedFilter::callback(
                         'published_at_start',
                         fn (PageBuilder $query, $value) => $query->wherePublishedAtRange(publishedAtStart: Carbon::parse($value))

@@ -72,7 +72,7 @@ class PageResource extends Resource
                                 ->helperText('Use "{{ $slug }}" to insert the current slug.'),
                             Forms\Components\Hidden::make('author_id')
                                 ->default(Auth::id()),
-                            Forms\Components\Select::make('page_visibility')
+                            Forms\Components\Select::make('visibility')
                                 ->options(
                                     collect(PageVisibility::cases())
                                         ->mapWithKeys(fn (PageVisibility $visibilityType) => [
@@ -183,7 +183,7 @@ class PageResource extends Resource
                     ->toggledHiddenByDefault(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('page_visibility')
+                Tables\Filters\SelectFilter::make('visibility')
                     ->options(
                         collect(PageVisibility::cases())
                             ->mapWithKeys(fn (PageVisibility $visibilityType) => [
@@ -191,7 +191,7 @@ class PageResource extends Resource
                             ])
                             ->toArray()
                     )
-                    ->attribute('page_visibility'),
+                    ->attribute('visibility'),
                 Tables\Filters\Filter::make('published_at_year_month')
                     ->form([
                         Forms\Components\TextInput::make('published_at_year')
