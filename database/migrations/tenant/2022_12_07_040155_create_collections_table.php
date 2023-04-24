@@ -20,10 +20,10 @@ return new class () extends Migration {
             $table->foreignIdFor(BlueprintModel::class)->index();
             $table->string('name')->unique();
             $table->string('slug')->unique();
-            $table->string('prefix')->unique();
             $table->string('future_publish_date_behavior')->nullable();
             $table->string('past_publish_date_behavior')->nullable();
             $table->boolean('is_sortable')->default(false);
+            $table->string('route_url')->unique();
             $table->timestamps();
         });
 

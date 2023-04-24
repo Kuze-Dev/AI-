@@ -10,7 +10,7 @@ return new class () extends Migration {
     public function up(): void
     {
         Schema::table('pages', function (Blueprint $table) {
-            $table->dateTime('published_at')->nullable()->after('route_url');
+            $table->dateTime('published_at')->nullable()->after('slug');
         });
     }
 
