@@ -9,11 +9,11 @@ use function Pest\Laravel\assertModelMissing;
 
 beforeEach(fn () => testInTenantContext());
 
-it('can delete blueprint', function () {
+it('can delete blueprint', function (Filament\Tables\Actions\Action $action) {
     $blueprint = BlueprintFactory::new()->withDummySchema()->createOne();
 
-    $result = app(DeleteBlueprintAction::class)->execute($blueprint);
+    $result = app(DeleteBlueprintAction::class)->execute($blueprint, $action);
 
     assertModelMissing($blueprint);
     expect($result)->toBeTrue();
-});
+})->with([]);
