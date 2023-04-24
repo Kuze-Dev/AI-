@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Page\DataTransferObjects;
 
 use Domain\Support\MetaData\DataTransferObjects\MetaDataData;
+use Carbon\Carbon;
 
 class PageData
 {
@@ -14,6 +15,7 @@ class PageData
         public readonly MetaDataData $meta_data,
         public readonly array $block_contents = [],
         public readonly ?string $slug = null,
+        public readonly ?Carbon $published_at = null,
         public readonly ?int $author_id = null,
     ) {
     }
@@ -32,6 +34,7 @@ class PageData
             ),
             slug: $data['slug'] ?? null,
             route_url: $data['route_url'],
+            published_at: isset($data['published_at']) ? Carbon::parse($data['published_at']) : null,
             author_id: $data['author_id'] ?? null,
             meta_data: MetaDataData::fromArray($data['meta_data'])
         );
