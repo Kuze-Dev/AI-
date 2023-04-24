@@ -158,7 +158,7 @@ it('can create page with meta data', function () {
     ]);
     assertDatabaseHas(SlugHistory::class, [
         'model_type' => $page->getMorphClass(),
-        'model_id' => $page->id
+        'model_id' => $page->id,
     ]);
 });
 

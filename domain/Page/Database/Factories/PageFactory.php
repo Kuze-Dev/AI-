@@ -22,7 +22,7 @@ class PageFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'route_url' => '/{{$slug}}',
-            'published_at' => null
+            'published_at' => null,
         ];
     }
 
