@@ -20,4 +20,9 @@ class ListBlocks extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+
+    protected function getTableRecordsPerPageSelectOptions(): array
+    {
+        return [12, 24, 48, -1];
+    }
 }
