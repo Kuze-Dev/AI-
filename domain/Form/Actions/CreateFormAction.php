@@ -19,7 +19,6 @@ class CreateFormAction
         $form = Form::create([
             'blueprint_id' => $formData->blueprint_id,
             'name' => $formData->name,
-            'slug' => $formData->slug,
             'store_submission' => $formData->store_submission,
         ]);
 

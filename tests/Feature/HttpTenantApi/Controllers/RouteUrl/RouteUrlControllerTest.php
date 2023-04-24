@@ -1,0 +1,111 @@
+<?php
+
+declare(strict_types=1);
+
+use Domain\Content\Database\Factories\ContentEntryFactory;
+use Domain\Content\Database\Factories\ContentFactory;
+use Domain\Page\Database\Factories\PageFactory;
+use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
+use Domain\Support\RouteUrl\Contracts\HasRouteUrl;
+use Domain\Support\RouteUrl\Database\Factories\RouteUrlFactory;
+use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
+use Domain\Support\RouteUrl\Models\RouteUrl;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Testing\Fluent\AssertableJson;
+use Tests\Fixtures\TestModelForRouteUrl;
+
+use function Pest\Laravel\assertDatabaseEmpty;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\withoutExceptionHandling;
+
+uses()->group('route_url');
+
+beforeEach(function () {
+    testInTenantContext();
+
+    DB::connection()
+        ->getSchemaBuilder()
+        ->create((new TestModelForRouteUrl())->getTable(), function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+    Relation::morphMap([TestModelForRouteUrl::class]);
+    assertDatabaseEmpty(RouteUrl::class);
+});
+
+it('can retrieve model at requested route url', function (HasRouteUrl $model, string $route) {
+    getJson('api/route' . $route)
+        ->assertOk()
+        ->assertJson(
+            fn (AssertableJson $json) => $json
+                ->has('data.type')
+                ->has('data.id')
+                ->has('data.attributes')
+                ->etc()
+        );
+})->with([
+    [
+        fn () => PageFactory::new()
+            ->has(RouteUrlFactory::new(['url' => '/test/page']))
+            ->createOne(),
+        '/test/page',
+    ],
+    [
+        fn () => ContentEntryFactory::new()
+            ->for(
+                ContentFactory::new()
+                    ->withDummyBlueprint()
+                    ->createOne()
+            )
+            ->has(RouteUrlFactory::new(['url' => '/test/content/entry']))
+            ->createOne(),
+        '/test/content/entry',
+    ],
+]);
+
+it('can retrieve model using inactive route url', function () {
+    $page = PageFactory::new()
+        ->has(
+            RouteUrlFactory::new()
+                ->count(2)
+                ->sequence(
+                    ['url' => '/old/route/url'],
+                    ['url' => '/new/route/url'],
+                )
+        )
+        ->createOne();
+
+    getJson('api/route/old/route/url')
+        ->assertOk()
+        ->assertJson(
+            fn (AssertableJson $json) => $json
+                ->where('data.type', 'pages')
+                ->where('data.id', $page->getRouteKey())
+                ->etc()
+        );
+});
+
+it('responds 404 when route url doesn\'t exist', function () {
+    getJson('api/route/' . fake()->word())
+        ->assertNotFound();
+});
+
+it('can get route url but return InvalidArgumentException with error message', function () {
+    $model = TestModelForRouteUrl::create([
+        'name' => 'my-awesome-name',
+    ]);
+
+    app(CreateOrUpdateRouteUrlAction::class)
+        ->execute($model, new RouteUrlData('url/path/one', true));
+
+    withoutExceptionHandling();
+    getJson('api/route/' . $model->refresh()->activeRouteUrl->url)
+        ->assertOk();
+})
+    ->throws(
+        InvalidArgumentException::class,
+        'No resource found for model ' . TestModelForRouteUrl::class
+    );

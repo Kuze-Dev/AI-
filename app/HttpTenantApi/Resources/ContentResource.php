@@ -19,6 +19,7 @@ class ContentResource extends JsonApiResource
             'past_publish_date_behavior' => $this->past_publish_date_behavior,
             'future_publish_date_behavior' => $this->future_publish_date_behavior,
             'is_sortable' => $this->is_sortable,
+            'prefix' => $this->prefix,
         ];
     }
 
@@ -27,7 +28,6 @@ class ContentResource extends JsonApiResource
     {
         return [
             'taxonomies' => fn () => TaxonomyResource::collection($this->taxonomies),
-            'slugHistories' => fn () => SlugHistoryResource::collection($this->slugHistories),
         ];
     }
 }

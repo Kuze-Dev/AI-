@@ -20,7 +20,7 @@ class PageController
     public function index(): JsonApiResourceCollection
     {
         return PageResource::collection(
-            QueryBuilder::for(Page::query())
+            QueryBuilder::for(Page::with('activeRouteUrl'))
                 ->allowedFilters([
                     'name',
                     'slug',
@@ -46,7 +46,7 @@ class PageController
                 ])
                 ->allowedIncludes([
                     'blockContents.block',
-                    'slugHistories',
+                    'routeUrls',
                     'metaData',
                 ])
                 ->jsonPaginate()
@@ -59,7 +59,7 @@ class PageController
             QueryBuilder::for(Page::whereSlug($page))
                 ->allowedIncludes([
                     'blockContents.block',
-                    'slugHistories',
+                    'routeUrls',
                     'metaData',
                 ])
                 ->firstOrFail()

@@ -27,7 +27,7 @@ it('can create page', function () {
         ->withDummySchema()
         ->createOne();
 
-    $taxonomy = livewire(CreateTaxonomy::class)
+    livewire(CreateTaxonomy::class)
         ->fillForm([
             'name' => 'Test',
             'blueprint_id' => $blueprint->getKey(),
@@ -35,5 +35,6 @@ it('can create page', function () {
         ->call('create')
         ->assertHasNoFormErrors()
         ->assertOk();
+
     assertDatabaseCount(Taxonomy::class, 1);
 });

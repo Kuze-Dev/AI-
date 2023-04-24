@@ -19,7 +19,6 @@ use Domain\Content\Enums\PublishBehavior;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
-use Domain\Support\SlugHistory\HasSlugHistory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
@@ -29,7 +28,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string $blueprint_id
  * @property string $name
  * @property string $slug
- * @property string $route_url
+ * @property string $prefix
  * @property PublishBehavior|null $future_publish_date_behavior
  * @property PublishBehavior|null $past_publish_date_behavior
  * @property bool $is_sortable
@@ -40,8 +39,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property-read Blueprint $blueprint
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Content\Models\ContentEntry[] $contentEntries
  * @property-read int|null $content_entries_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $slugHistories
- * @property-read int|null $slug_histories_count
  * @property-read \Illuminate\Database\Eloquent\Collection|Taxonomy[] $taxonomies
  * @property-read int|null $taxonomies_count
  * @method static \Illuminate\Database\Eloquent\Builder|Content newModelQuery()
@@ -66,7 +63,6 @@ class Content extends Model implements IsActivitySubject
 {
     use LogsActivity;
     use HasSlug;
-    use HasSlugHistory;
     use ConstraintsRelationships;
 
     /**
@@ -78,10 +74,10 @@ class Content extends Model implements IsActivitySubject
         'blueprint_id',
         'taxonomy_id',
         'slug',
+        'prefix',
         'past_publish_date_behavior',
         'future_publish_date_behavior',
         'is_sortable',
-        'route_url',
     ];
 
     /**

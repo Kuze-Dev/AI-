@@ -8,14 +8,15 @@ use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @mixin \Domain\Support\SlugHistory\SlugHistory
+ * @mixin \Domain\Support\RouteUrl\Models\RouteUrl
  */
-class SlugHistoryResource extends JsonApiResource
+class RouteUrlResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
         return  [
-            'slug' => $this->slug,
+            'url' => $this->url,
+            'is_override' => $this->is_override,
         ];
     }
 }

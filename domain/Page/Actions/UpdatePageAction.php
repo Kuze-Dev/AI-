@@ -9,6 +9,7 @@ use Domain\Page\Models\Page;
 use Domain\Page\Models\BlockContent;
 use Domain\Support\MetaData\Actions\CreateMetaDataAction;
 use Domain\Support\MetaData\Actions\UpdateMetaDataAction;
+use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 use Illuminate\Support\Arr;
 
 class UpdatePageAction
@@ -19,6 +20,7 @@ class UpdatePageAction
         protected DeleteBlockContentAction $deleteBlockContent,
         protected CreateMetaDataAction $createMetaData,
         protected UpdateMetaDataAction $updateMetaData,
+        protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
     ) {
     }
 
@@ -26,8 +28,6 @@ class UpdatePageAction
     {
         $page->update([
             'name' => $pageData->name,
-            'slug' => $pageData->slug,
-            'route_url' => $pageData->route_url,
             'published_at' => $pageData->published_at,
             'author_id' => $pageData->author_id,
         ]);
@@ -48,6 +48,8 @@ class UpdatePageAction
         );
 
         BlockContent::setNewOrder($blockContentIds);
+
+        $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url_data);
 
         return $page;
     }

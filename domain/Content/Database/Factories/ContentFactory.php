@@ -26,12 +26,10 @@ class ContentFactory extends Factory
         return [
             'blueprint_id' => null,
             'name' => $name,
+            'prefix' => Str::of($name)->slug(),
             'past_publish_date_behavior' => null,
             'future_publish_date_behavior' => null,
             'is_sortable' => false,
-            'route_url' => function (array $attributes) {
-                return '/' . Str::slug($attributes['name']) . '/{{$slug}}';
-            },
         ];
     }
 

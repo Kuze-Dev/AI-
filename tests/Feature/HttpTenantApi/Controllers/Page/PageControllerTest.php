@@ -72,7 +72,7 @@ it('can show a page with includes', function (string $include) {
                 ->where('data.type', 'pages')
                 ->where('data.id', Str::slug($page->name))
                 ->where('data.attributes.name', $page->name)
-                ->where('data.attributes.route_url', $page->qualified_route_url)
+                ->where('data.attributes.route_url', $page->activeRouteUrl->url)
                 ->has(
                     'included',
                     callback: fn (AssertableJson $json) => $json->where('type', $include)->etc()
@@ -81,6 +81,6 @@ it('can show a page with includes', function (string $include) {
         });
 })->with([
     'blockContents',
-    'slugHistories',
+    'routeUrls',
     'metaData',
 ]);
