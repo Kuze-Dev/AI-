@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Page\Database\Factories;
 
+use Carbon\Carbon;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
 use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
@@ -21,7 +22,17 @@ class PageFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
+            'published_at' => null,
         ];
+    }
+
+    public function published(Carbon|bool $state = true): self
+    {
+        if ($state === false) {
+            return $this;
+        }
+
+        return $this->state(['published_at' => $state instanceof Carbon ? $state : now()]);
     }
 
     public function addBlockContent(Block|BlockFactory $block, array $attributes = []): self

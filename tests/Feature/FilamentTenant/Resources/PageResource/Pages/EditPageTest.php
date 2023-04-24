@@ -28,6 +28,7 @@ beforeEach(function () {
 
 it('can render page', function () {
     $page = PageFactory::new()
+        ->published()
         ->addBlockContent(
             BlockFactory::new()
                 ->for(
@@ -44,6 +45,7 @@ it('can render page', function () {
         ->assertSuccessful()
         ->assertFormSet([
             'name' => $page->name,
+            'published_at' => true,
             'block_contents.record-1' => $page->blockContents->first()->toArray(),
         ])
         ->assertOk();
@@ -76,17 +78,26 @@ it('can edit page', function () {
     ];
     $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
 
-    livewire(EditPage::class, ['record' => $page->getRouteKey()])
+    $updatedPage = livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
             'route_url' => '/test-url',
+            'published_at' => true,
             'block_contents.record-1.data.main.header' => 'Bar',
             'meta_data' => $metaData,
             'meta_data.image.0' => $metaDataImage,
         ])
         ->call('save')
         ->assertHasNoFormErrors()
-        ->assertOk();
+        ->assertOk()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(Page::class, [
+        'name' => 'Test',
+        'route_url' => 'test-url',
+        'published_at' => $updatedPage->published_at,
+    ]);
 
     assertDatabaseHas(
         MetaData::class,

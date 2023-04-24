@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Admin\Models\Admin;
 use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
@@ -59,7 +60,15 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasR
     protected $fillable = [
         'author_id',
         'name',
-        'slug',
+        'published_at',
+    ];
+
+    /**
+     * Columns that are converted
+     * to a specific data type.
+     */
+    protected $casts = [
+        'published_at' => 'datetime',
     ];
 
     /**
@@ -73,6 +82,12 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasR
         return [
             'title' => $this->name,
         ];
+    }
+
+    /** @return PageBuilder<self> */
+    public function newEloquentBuilder($query): PageBuilder
+    {
+        return new PageBuilder($query);
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -91,7 +106,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasR
 
     public function getActivitySubjectDescription(Activity $activity): string
     {
-        return 'Page: '.$this->name;
+        return 'Page: ' . $this->name;
     }
 
     public function getRouteKeyName(): string

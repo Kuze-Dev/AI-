@@ -10,10 +10,12 @@ use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Carbon\Carbon;
 use Closure;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
 use Domain\Page\Models\BlockContent;
+use Domain\Page\Models\Builders\PageBuilder;
 use Exception;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
@@ -59,6 +61,10 @@ class PageResource extends Resource
                                 })
                                 ->required(),
                             RouteUrlFieldset::make(),
+                            Forms\Components\Toggle::make('published_at')
+                                ->label(trans('Published'))
+                                ->formatStateUsing(fn (Carbon|bool|null $state) => $state instanceof Carbon ? true : (bool) $state)
+                                ->dehydrateStateUsing(fn (?bool $state) => $state ? now() : null),
                             Forms\Components\Hidden::make('author_id')
                                 ->default(Auth::id()),
                         ]),
@@ -143,6 +149,10 @@ class PageResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('published_at')
+                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->formatStateUsing(fn (?Carbon $state) => $state ?? '-')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable()
                     ->searchable(query: function (Builder $query, string $search): Builder {
@@ -161,7 +171,38 @@ class PageResource extends Resource
                     ->toggleable()
                     ->toggledHiddenByDefault(),
             ])
-            ->filters([])
+            ->filters([
+                Tables\Filters\Filter::make('published_at_year_month')
+                    ->form([
+                        Forms\Components\TextInput::make('published_at_year')
+                            ->numeric()
+                            ->debounce(),
+                        Forms\Components\Select::make('published_at_month')
+                            ->options(
+                                collect(range(1, 12))
+                                    ->mapWithKeys(fn (int $month) => [$month => Carbon::now()->month($month)->format('F')])
+                                    ->toArray()
+                            )
+                            ->disabled(fn (Closure $get) => blank($get('published_at_year')))
+                            ->helperText(fn (Closure $get) => blank($get('published_at_year')) ? 'Enter a published at year first.' : null),
+                    ])
+                    ->query(fn (PageBuilder $query, array $data): Builder => $query->when(
+                        filled($data['published_at_year']),
+                        fn (PageBuilder $query) => $query->wherePublishedAtYearMonth(
+                            (int) $data['published_at_year'],
+                            filled($data['published_at_month']) ? (int) $data['published_at_month'] : null
+                        )
+                    )),
+                Tables\Filters\Filter::make('published_at_range')
+                    ->form([
+                        Forms\Components\DatePicker::make('published_at_from'),
+                        Forms\Components\DatePicker::make('published_at_to'),
+                    ])
+                    ->query(fn (PageBuilder $query, array $data): Builder => $query->wherePublishedAtRange(
+                        filled($data['published_at_from']) ? Carbon::parse($data['published_at_from']) : null,
+                        filled($data['published_at_to']) ? Carbon::parse($data['published_at_to']) : null,
+                    )),
+            ])
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
