@@ -153,9 +153,6 @@ class ContentResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('prefix')
-                    ->sortable()
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->sortable()
                     ->searchable()

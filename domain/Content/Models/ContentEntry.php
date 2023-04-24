@@ -58,7 +58,7 @@ use Illuminate\Support\Str;
  * @method static ContentEntryBuilder|ContentEntry whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-#[OnDeleteCascade(['taxonomyTerms', 'metaData',  'routeUrls'])]
+#[OnDeleteCascade(['taxonomyTerms', 'metaData', 'routeUrls'])]
 class ContentEntry extends Model implements IsActivitySubject, HasMetaDataContract, HasRouteUrlContact
 {
     use LogsActivity;

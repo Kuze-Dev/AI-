@@ -176,7 +176,6 @@ it('can create page with published at date', function () {
     $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
-            'route_url' => 'test-url',
             'published_at' => true,
             'block_contents' => [
                 [

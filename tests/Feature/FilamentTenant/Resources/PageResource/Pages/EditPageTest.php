@@ -8,6 +8,7 @@ use Domain\Blueprint\Enums\FieldType;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
 use Domain\Page\Models\BlockContent;
+use Domain\Page\Models\Page;
 use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
 use Domain\Support\MetaData\Models\MetaData;
 use Domain\Support\RouteUrl\Models\RouteUrl;
@@ -81,7 +82,6 @@ it('can edit page', function () {
     $updatedPage = livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
-            'route_url' => '/test-url',
             'published_at' => true,
             'block_contents.record-1.data.main.header' => 'Bar',
             'meta_data' => $metaData,
@@ -95,7 +95,6 @@ it('can edit page', function () {
 
     assertDatabaseHas(Page::class, [
         'name' => 'Test',
-        'route_url' => 'test-url',
         'published_at' => $updatedPage->published_at,
     ]);
 
