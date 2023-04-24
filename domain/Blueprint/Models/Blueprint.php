@@ -6,14 +6,8 @@ namespace Domain\Blueprint\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Casts\SchemaDataCast;
-use Domain\Form\Models\Form;
-use Domain\Content\Models\Content;
-use Domain\Globals\Models\Globals;
-use Domain\Page\Models\Block;
-use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -63,35 +57,5 @@ class Blueprint extends Model implements IsActivitySubject
     public function getActivitySubjectDescription(Activity $activity): string
     {
         return 'Blueprint: '.$this->name;
-    }
-
-    /** @return HasMany<Block> */
-    public function blocks(): HasMany
-    {
-        return $this->hasMany(Block::class);
-    }
-
-    /** @return HasMany<Content> */
-    public function contents(): HasMany
-    {
-        return $this->hasMany(Content::class);
-    }
-
-    /** @return HasMany<Form> */
-    public function forms(): HasMany
-    {
-        return $this->hasMany(Form::class);
-    }
-
-    /** @return HasMany<Globals> */
-    public function globals(): HasMany
-    {
-        return $this->hasMany(Globals::class);
-    }
-
-    /** @return HasMany<Taxonomy> */
-    public function taxonomies(): HasMany
-    {
-        return $this->hasMany(Taxonomy::class);
     }
 }

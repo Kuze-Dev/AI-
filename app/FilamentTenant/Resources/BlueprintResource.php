@@ -8,6 +8,7 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources\BlueprintResource\Pages;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
+use Domain\Blueprint\Actions\DeleteBlueprintAction;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\SectionData;
 use Domain\Blueprint\Enums\FieldType;
@@ -92,19 +93,7 @@ class BlueprintResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
                     ->action(function (Blueprint $record, Tables\Actions\Action $action): ?bool {
-                        $relationships = ['blocks', 'contents', 'forms', 'globals', 'taxonomies'];
-
-                        foreach ($relationships as $relationship) {
-                            if ($record->{$relationship}()->exists()) {
-                                $modelName = class_basename($record->{$relationship}()->getRelated());
-                                $action->failureNotificationTitle(trans("{$modelName} is using this blueprint."))
-                                    ->failure();
-
-                                return false;
-                            }
-                        }
-
-                        return $record->delete();
+                        return app(DeleteBlueprintAction::class)->execute($record, $action);
                     }),
             ])
             ->defaultSort('created_at', 'desc');
