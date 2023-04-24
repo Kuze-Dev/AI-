@@ -156,9 +156,16 @@ it('can edit content entry', function () {
             'content_entry_id' => $contentEntry->getKey(),
         ]);
     }
+
+    assertDatabaseHas(RouteUrl::class, [
+        'model_type' => $contentEntry->getMorphClass(),
+        'model_id' => $contentEntry->id,
+        'url' => ContentEntry::generateRouteUrl($contentEntry, $updatedContentEntry->toArray()),
+        'is_override' => false,
+    ]);
 });
 
-it('can edit content entry route_url', function () {
+it('can edit content entry with custom url', function () {
     $content = ContentFactory::new(['name' => 'Test Content'])
         ->for(
             BlueprintFactory::new()
@@ -175,19 +182,23 @@ it('can edit content entry route_url', function () {
         ]);
 
     livewire(EditContentEntry::class, ['ownerRecord' => $content->getRouteKey(), 'record' => $contentEntry->getRouteKey()])
-        ->fillForm(['route_url' => '/new-foo']) // will be ignored
+        ->fillForm([
+            'route_url' => [
+                'is_override' => true,
+                'url' => '/some/custom/url'
+            ],
+        ])
         ->call('save')
         ->assertOk()
         ->assertHasNoFormErrors()
         ->instance()
         ->record;
 
-    assertDatabaseCount(RouteUrl::class, 2); // 2 (for content entry)
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $contentEntry->getMorphClass(),
         'model_id' => $contentEntry->id,
-        'url' => '/'.$content->prefix.'/'.\Illuminate\Support\Str::slug($contentEntry->title),
-        'is_override' => false,
+        'url' => '/some/custom/url',
+        'is_override' => true,
     ]);
 });
 
@@ -225,7 +236,6 @@ it('can edit content entry to have no taxonomy terms attached', function () {
             'taxonomies' => [
                 $content->taxonomies->first()->id => [],
             ],
-            'route_url' => '/test',
         ])
         ->call('save')
         ->assertOk()

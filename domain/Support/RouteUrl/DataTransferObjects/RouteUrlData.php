@@ -15,7 +15,7 @@ class RouteUrlData
     public static function fromArray(array $data): self
     {
         return new self(
-            url: $data['route_url'],
+            url: $data['url'],
             is_override: $data['is_override'] ?? false
         );
     }

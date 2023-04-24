@@ -32,7 +32,7 @@ class PageData
                 ),
                 $data['block_contents'] ?? []
             ),
-            route_url_data: RouteUrlData::fromArray($data),
+            route_url_data: RouteUrlData::fromArray($data['route_url'] ?? []),
             published_at: isset($data['published_at']) ? Carbon::parse($data['published_at']) : null,
             author_id: $data['author_id'] ?? null,
             meta_data: MetaDataData::fromArray($data['meta_data']),

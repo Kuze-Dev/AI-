@@ -19,6 +19,8 @@ class RouteUrlFieldset extends Group
     {
         parent::setUp();
 
+        $this->statePath('route_url');
+
         $this->id('route_url');
 
         $this->registerListeners([
@@ -29,7 +31,7 @@ class RouteUrlFieldset extends Group
                             return;
                         }
 
-                        $set('route_url', $model::generateRouteUrl($this->getModelForRouteUrl(), $state));
+                        $set('route_url.url', $model::generateRouteUrl($this->getModelForRouteUrl(), $get('data', true)));
                     });
                 },
             ],
@@ -41,7 +43,7 @@ class RouteUrlFieldset extends Group
                 ->label(trans('Custom URL'))
                 ->reactive()
                 ->afterStateUpdated(fn () => $this->dispatchEvent('route_url::update')),
-            Forms\Components\TextInput::make('route_url')
+            Forms\Components\TextInput::make('url')
                 ->disabled(fn (Closure $get) => ! (bool) $get('is_override'))
                 ->formatStateUsing(fn (?HasRouteUrl $record) => $record?->activeRouteUrl->url)
                 ->lazy()

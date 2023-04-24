@@ -119,9 +119,16 @@ it('can edit page', function () {
         'block_id' => $page->blockContents->first()->block_id,
         'data' => json_encode(['main' => ['header' => 'Bar']]),
     ]);
+
+    assertDatabaseHas(RouteUrl::class, [
+        'model_type' => $page->getMorphClass(),
+        'model_id' => $page->id,
+        'url' => Page::generateRouteUrl($page, $updatedPage->toArray()),
+        'is_override' => false,
+    ]);
 });
 
-it('can edit page route_url', function () {
+it('can edit page with custom url', function () {
     $page = PageFactory::new(['slug' => 'foo'])
         ->addBlockContent(
             BlockFactory::new()
@@ -134,30 +141,23 @@ it('can edit page route_url', function () {
         )
         ->createOne();
 
-    $metaDataData = [
-        'title' => $page->slug,
-        'description' => 'Foo description',
-        'author' => 'Foo author',
-        'keywords' => 'Foo keywords',
-    ];
-
-    $page->metaData()->create($metaDataData);
-
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
-            'route_url' => '/new-foo',
+            'route_url' => [
+                'is_override' => true,
+                'url' => '/some/custom/url'
+            ],
             'block_contents.record-1.data.main.header' => 'Bar',
         ])
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk();
 
-    assertDatabaseCount(RouteUrl::class, 2);
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $page->getMorphClass(),
         'model_id' => $page->id,
-        'url' => '/'.\Illuminate\Support\Str::slug($page->name),
-        'is_override' => false,
+        'url' => '/some/custom/url',
+        'is_override' => true,
     ]);
 });
 
@@ -209,9 +209,6 @@ it('page block with default value column data must be dehydrated', function () {
         ->createOne();
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
-        ->fillForm([
-            'route_url' => '/'.Str::slug($page->name),
-        ])
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk();

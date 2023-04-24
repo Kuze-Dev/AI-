@@ -25,7 +25,7 @@ class ContentEntryData
     {
         return new self(
             title: $data['title'],
-            route_url_data: RouteUrlData::fromArray($data),
+            route_url_data: RouteUrlData::fromArray($data['route_url'] ?? []),
             published_at: isset($data['published_at']) ? Carbon::parse($data['published_at']) : null,
             taxonomy_terms: $data['taxonomy_terms'] ?? [],
             data: $data['data'],

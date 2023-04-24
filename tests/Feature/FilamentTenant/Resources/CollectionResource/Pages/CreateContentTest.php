@@ -66,7 +66,6 @@ it('can create content with taxonomies', function () {
     livewire(CreateContent::class)
         ->fillForm([
             'name' => 'Test Content',
-            'route_url' => 'test-content',
             'blueprint_id' => $blueprint->getKey(),
             'taxonomies' => $taxonomies->pluck('id')->toArray(),
         ])

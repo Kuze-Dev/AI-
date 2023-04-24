@@ -66,7 +66,7 @@ it('can create content entry', function () {
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $contentEntry->getMorphClass(),
         'model_id' => $contentEntry->id,
-        'url' => '/'.$contentEntry->content->prefix.'/'.\Illuminate\Support\Str::slug($contentEntry->title),
+        'url' => ContentEntry::generateRouteUrl($contentEntry, $contentEntry->toArray()),
         'is_override' => false,
     ]);
 });
@@ -222,5 +222,37 @@ it('can create content entry with meta data', function () {
     assertDatabaseHas(Media::class, [
         'file_name' => $metaDataImage->getClientOriginalName(),
         'mime_type' => $metaDataImage->getMimeType(),
+    ]);
+});
+
+it('can create content entry with custom url', function () {
+    $content = ContentFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->createOne();
+
+    $contentEntry = livewire(CreateContentEntry::class, ['ownerRecord' => $content->getRouteKey()])
+        ->assertOk()
+        ->fillForm([
+            'title' => 'Test',
+            'route_url' => [
+                'is_override' => true,
+                'url' => '/some/custom/url'
+            ],
+            'data' => ['main' => ['header' => 'Foo']],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(RouteUrl::class, [
+        'model_type' => $contentEntry->getMorphClass(),
+        'model_id' => $contentEntry->id,
+        'url' => '/some/custom/url',
+        'is_override' => true,
     ]);
 });
