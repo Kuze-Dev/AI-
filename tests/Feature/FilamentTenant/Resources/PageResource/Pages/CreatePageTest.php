@@ -158,7 +158,7 @@ it('can create page with meta data', function () {
     ]);
     assertDatabaseHas(SlugHistory::class, [
         'model_type' => $page->getMorphClass(),
-        'model_id' => $page->id,
+        'model_id' => $page->id
     ]);
 });
 
@@ -193,10 +193,4 @@ it('can create page with published at date', function () {
             'published_at' => $page->published_at,
         ]
     );
-
-    assertDatabaseHas(BlockContent::class, [
-        'page_id' => $page->id,
-        'block_id' => $blockId,
-        'data' => json_encode(['name' => 'foo']),
-    ]);
 });

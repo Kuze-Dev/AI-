@@ -63,7 +63,9 @@ class PageResource extends Resource
                                 ->unique(ignoreRecord: true)
                                 ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                             Forms\Components\Toggle::make('published_at')
-                                ->dehydrateStateUsing(fn (Closure $get, $state) => $state ? now() : null),
+                                ->label(trans('Published'))
+                                ->formatStateUsing(fn (Carbon|bool|null $state) => $state instanceof Carbon ? true : (bool) $state)
+                                ->dehydrateStateUsing(fn (?bool $state) => $state ? now() : null),
                             Forms\Components\TextInput::make('route_url')
                                 ->required()
                                 ->helperText('Use "{{ $slug }}" to insert the current slug.'),

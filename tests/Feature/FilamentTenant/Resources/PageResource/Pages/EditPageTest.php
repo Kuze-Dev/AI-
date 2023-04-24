@@ -29,6 +29,7 @@ beforeEach(function () {
 
 it('can render page', function () {
     $page = PageFactory::new()
+        ->published()
         ->addBlockContent(
             BlockFactory::new()
                 ->for(
@@ -38,17 +39,14 @@ it('can render page', function () {
                 ),
             ['data' => ['main' => ['header' => 'Foo']]]
         )
-        ->createOne([
-            'name' => 'Test',
-            'published_at' => Carbon::now(),
-        ]);
+        ->createOne();
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->assertFormExists()
         ->assertSuccessful()
         ->assertFormSet([
             'name' => $page->name,
-            'published_at' => (string) $page->published_at->timezone(Auth::user()->timezone),
+            'published_at' => true,
             'block_contents.record-1' => $page->blockContents->first()->toArray(),
         ])
         ->assertOk();
