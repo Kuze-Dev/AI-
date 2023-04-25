@@ -22,6 +22,7 @@ use Illuminate\Support\ServiceProvider;
 use Saade\FilamentLaravelLog\Pages\ViewLog;
 use Filament\Pages\Actions as PageActions;
 use Filament\Tables\Actions as TableActions;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
@@ -174,39 +175,62 @@ class FilamentServiceProvider extends ServiceProvider
 
     protected function configureComponents(): void
     {
-        PageActions\DeleteAction::configureUsing($this->createModalSubheadingConfiguration('delete'), isImportant: true);
-        PageActions\RestoreAction::configureUsing($this->createModalSubheadingConfiguration('restore'), isImportant: true);
-        PageActions\ForceDeleteAction::configureUsing($this->createModalSubheadingConfiguration('force delete'), isImportant: true);
+        PageActions\DeleteAction::configureUsing($this->createActionConfiguration(), isImportant: true);
+        PageActions\RestoreAction::configureUsing($this->createActionConfiguration(), isImportant: true);
+        PageActions\ForceDeleteAction::configureUsing($this->createActionConfiguration(), isImportant: true);
 
-        TableActions\DeleteAction::configureUsing($this->createModalSubheadingConfiguration('delete'), isImportant: true);
-        TableActions\RestoreAction::configureUsing($this->createModalSubheadingConfiguration('restore'), isImportant: true);
-        TableActions\ForceDeleteAction::configureUsing($this->createModalSubheadingConfiguration('force delete'), isImportant: true);
+        TableActions\DeleteAction::configureUsing($this->createActionConfiguration(), isImportant: true);
+        TableActions\RestoreAction::configureUsing($this->createActionConfiguration(), isImportant: true);
+        TableActions\ForceDeleteAction::configureUsing($this->createActionConfiguration(), isImportant: true);
 
-        TableActions\DeleteBulkAction::configureUsing($this->createBulkModalSubheadingConfiguration('delete'), isImportant: true);
-        TableActions\RestoreBulkAction::configureUsing($this->createBulkModalSubheadingConfiguration('restore'), isImportant: true);
-        TableActions\ForceDeleteBulkAction::configureUsing($this->createBulkModalSubheadingConfiguration('force delete'), isImportant: true);
+        TableActions\DeleteBulkAction::configureUsing($this->createBulkActionConfiguration(), isImportant: true);
+        TableActions\RestoreBulkAction::configureUsing($this->createBulkActionConfiguration(), isImportant: true);
+        TableActions\ForceDeleteBulkAction::configureUsing($this->createBulkActionConfiguration(), isImportant: true);
     }
 
-    private function createModalSubheadingConfiguration(string $verb): Closure
+    private function createActionConfiguration(): Closure
     {
-        return fn (PageActions\Action|TableActions\Action $action) => $action->modalSubheading(
-            fn (PageActions\Action|TableActions\Action $action) => trans(
-                "Are you sure you want to {$verb} this :resource?",
-                ['resource' => $action->getModelLabel() ?? 'record']
-            )
-        );
+        return fn (PageActions\Action|TableActions\Action $action) => $action
+            ->modalSubheading(
+                fn (PageActions\Action|TableActions\Action $action) => trans(
+                    'Are you sure you want to :action this :resource?',
+                    [
+                        'action' => Str::of($action->getName())->headline()->lower()->toString(),
+                        'resource' => $action->getModelLabel() ?? 'record',
+                    ]
+                )
+            )->failureNotificationTitle(
+                fn (PageActions\Action|TableActions\Action $action) => trans(
+                    'Unable to :action :resource.',
+                    [
+                        'action' => Str::of($action->getName())->headline()->lower()->toString(),
+                        'resource' => $action->getModelLabel() ?? 'record',
+                    ]
+                )
+            );
     }
 
-    private function createBulkModalSubheadingConfiguration(string $verb): Closure
+    private function createBulkActionConfiguration(): Closure
     {
-        return fn (TableActions\BulkAction $action) => $action->modalSubheading(
-            fn (TableActions\BulkAction $action) => trans(
-                "Are you sure you want to {$verb} :count :resource/s?",
-                [
-                    'resource' => $action->getModelLabel(),
-                    'count' => $action->getRecords()?->count() ?? 0,
-                ]
+        return fn (TableActions\BulkAction $action) => $action
+            ->modalSubheading(
+                fn (TableActions\BulkAction $action) => trans(
+                    'Are you sure you want to :action :count :resource/s?',
+                    [
+                        'action' => Str::of($action->getName())->headline()->lower()->toString(),
+                        'resource' => $action->getModelLabel(),
+                        'count' => $action->getRecords()?->count() ?? 0,
+                    ]
+                )
             )
-        );
+            ->failureNotificationTitle(
+                fn (PageActions\Action|TableActions\Action $action) => trans(
+                    'Unable to :action :resource/s.',
+                    [
+                        'action' => Str::of($action->getName())->headline()->lower()->toString(),
+                        'resource' => $action->getModelLabel() ?? 'record',
+                    ]
+                )
+            );
     }
 }
