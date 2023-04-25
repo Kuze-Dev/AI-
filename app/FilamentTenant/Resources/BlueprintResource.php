@@ -15,6 +15,7 @@ use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
 use Filament\Resources\Form;
@@ -92,8 +93,12 @@ class BlueprintResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
-                    ->action(function (Blueprint $record, Tables\Actions\Action $action): ?bool {
-                        return app(DeleteBlueprintAction::class)->execute($record, $action);
+                    ->using(function (Blueprint $record) {
+                        try {
+                            return app(DeleteBlueprintAction::class)->execute($record);
+                        } catch (DeleteRestrictedException $e) {
+                            return false;
+                        }
                     }),
             ])
             ->defaultSort('created_at', 'desc');
