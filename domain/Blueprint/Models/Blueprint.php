@@ -6,6 +6,7 @@ namespace Domain\Blueprint\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Casts\SchemaDataCast;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
@@ -36,6 +37,7 @@ class Blueprint extends Model implements IsActivitySubject
 {
     use HasUuids;
     use LogsActivity;
+    use ConstraintsRelationships;
 
     protected $fillable = [
         'name',
@@ -56,6 +58,11 @@ class Blueprint extends Model implements IsActivitySubject
 
     public function getActivitySubjectDescription(Activity $activity): string
     {
-        return 'Blueprint: '.$this->name;
+        return 'Blueprint: ' . $this->name;
+    }
+
+    protected function onDeleteRestrictRelations(): array
+    {
+        return array_keys(config('domain.blueprint.relations'));
     }
 }
