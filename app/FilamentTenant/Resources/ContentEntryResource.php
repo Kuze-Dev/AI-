@@ -170,7 +170,7 @@ class ContentEntryResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('author.full_name')
-                    ->sortable()
+                    ->sortable(['first_name', 'last_name'])
                     ->searchable(query: function (Builder $query, string $search): Builder {
                         /** @var Builder|ContentEntry $query */
                         return $query->whereHas('author', function ($query) use ($search) {
