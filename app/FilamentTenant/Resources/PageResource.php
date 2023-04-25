@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\MetaDataForm;
+use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
@@ -18,15 +19,15 @@ use Domain\Page\Models\BlockContent;
 use Domain\Page\Models\Builders\PageBuilder;
 use Exception;
 use Filament\Forms;
+use Filament\Forms\Components\Component;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Filters\Layout;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Builder;
 
 class PageResource extends Resource
 {
@@ -54,22 +55,17 @@ class PageResource extends Resource
                             Forms\Components\TextInput::make('name')
                                 ->unique(ignoreRecord: true)
                                 ->lazy()
-                                ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
-                                    if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
-                                        $set('slug', Str::slug($state));
-                                    }
+                                ->afterStateUpdated(function (Forms\Components\TextInput $component) {
+                                    $component->getContainer()
+                                        ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
+                                        ?->dispatchEvent('route_url::update');
                                 })
                                 ->required(),
-                            Forms\Components\TextInput::make('slug')
-                                ->unique(ignoreRecord: true)
-                                ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
+                            RouteUrlFieldset::make(),
                             Forms\Components\Toggle::make('published_at')
                                 ->label(trans('Published'))
                                 ->formatStateUsing(fn (Carbon|bool|null $state) => $state instanceof Carbon ? true : (bool) $state)
                                 ->dehydrateStateUsing(fn (?bool $state) => $state ? now() : null),
-                            Forms\Components\TextInput::make('route_url')
-                                ->required()
-                                ->helperText('Use "{{ $slug }}" to insert the current slug.'),
                             Forms\Components\Hidden::make('author_id')
                                 ->default(Auth::id()),
                             Forms\Components\Select::make('visibility')
@@ -157,9 +153,14 @@ class PageResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
+                Tables\Columns\TextColumn::make('activeRouteUrl.url')
+                    ->label('URL')
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('slug')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->formatStateUsing(fn (?Carbon $state) => $state ?? '-')

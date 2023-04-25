@@ -5,11 +5,9 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\ContentResource\Pages\EditContent;
 use Domain\Content\Database\Factories\ContentFactory;
 use Domain\Content\Models\Content;
-use Domain\Support\SlugHistory\SlugHistory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Filament\Facades\Filament;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Livewire\livewire;
@@ -32,6 +30,7 @@ it('can render content', function () {
             'future_publish_date_behavior' => 'private',
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
+            'prefix' => 'my-content',
         ]);
 
     livewire(EditContent::class, ['record' => $content->getRouteKey()])
@@ -39,6 +38,7 @@ it('can render content', function () {
         ->assertSuccessful()
         ->assertFormSet([
             'name' => 'Test Content',
+            'prefix' => 'my-content',
             'future_publish_date_behavior' => 'private',
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
@@ -63,7 +63,7 @@ it('can update content', function () {
             'past_publish_date_behavior' => 'unlisted',
             'future_publish_date_behavior' => 'private',
             'is_sortable' => true,
-            'route_url' => 'test-content',
+            'prefix' => 'test-content',
             'taxonomies' => [$taxonomy->getKey()],
         ])
         ->call('save')
@@ -75,34 +75,11 @@ it('can update content', function () {
         'future_publish_date_behavior' => 'private',
         'past_publish_date_behavior' => 'unlisted',
         'is_sortable' => true,
-        'route_url' => 'test-content',
+        'prefix' => 'test-content',
     ]);
     assertDatabaseHas('content_taxonomy', [
         'taxonomy_id' => $taxonomy->getKey(),
         'content_id' => $content->getKey(),
-    ]);
-});
-
-it('can update content slug', function () {
-    $content = ContentFactory::new(['name' => 'Test Content'])
-        ->withDummyBlueprint()
-        ->createOne();
-
-    livewire(EditContent::class, ['record' => $content->getRouteKey()])
-        ->fillForm(['slug' => 'test-content-updated'])
-        ->call('save')
-        ->assertHasNoFormErrors()
-        ->assertOk();
-
-    assertDatabaseHas(Content::class, [
-        'id' => $content->id,
-        'slug' => 'test-content-updated',
-    ]);
-    assertDatabaseCount(SlugHistory::class, 2);
-    assertDatabaseHas(SlugHistory::class, [
-        'model_type' => $content->getMorphClass(),
-        'model_id' => $content->id,
-        'slug' => 'test-content-updated',
     ]);
 });
 

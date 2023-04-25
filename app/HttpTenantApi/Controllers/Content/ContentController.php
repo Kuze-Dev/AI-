@@ -19,9 +19,8 @@ class ContentController
             QueryBuilder::for(Content::query())
                 ->allowedIncludes([
                     'taxonomies',
-                    'slugHistories',
                 ])
-                ->allowedFilters(['name', 'slug'])
+                ->allowedFilters(['name', 'slug', 'prefix'])
                 ->jsonPaginate()
         );
     }
@@ -32,7 +31,6 @@ class ContentController
             QueryBuilder::for(Content::whereSlug($content))
                 ->allowedIncludes([
                     'taxonomies',
-                    'slugHistories',
                 ])
                 ->firstOrFail()
         );

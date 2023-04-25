@@ -8,7 +8,7 @@ use Domain\Page\Database\Factories\BlockFactory;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\BlockContent;
 use Domain\Support\MetaData\Models\MetaData;
-use Domain\Support\SlugHistory\SlugHistory;
+use Domain\Support\RouteUrl\Models\RouteUrl;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -37,7 +37,6 @@ it('can create page', function () {
     $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
-            'route_url' => 'test-url',
             'block_contents' => [
                 [
                     'block_id' => $block->getKey(),
@@ -71,9 +70,11 @@ it('can create page', function () {
             'model_id' => $page->getKey(),
         ]
     );
-    assertDatabaseHas(SlugHistory::class, [
+    assertDatabaseHas(RouteUrl::class, [
         'model_type' => $page->getMorphClass(),
         'model_id' => $page->id,
+        'url' => Page::generateRouteUrl($page, $page->toArray()),
+        'is_override' => false,
     ]);
 });
 
@@ -123,7 +124,6 @@ it('can create page with meta data', function () {
     $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
-            'route_url' => 'test-url',
             'visibility' => 'public',
             'block_contents' => [
                 [
@@ -163,10 +163,6 @@ it('can create page with meta data', function () {
         'file_name' => $metaDataImage->getClientOriginalName(),
         'mime_type' => $metaDataImage->getMimeType(),
     ]);
-    assertDatabaseHas(SlugHistory::class, [
-        'model_type' => $page->getMorphClass(),
-        'model_id' => $page->id,
-    ]);
 });
 
 it('can create page with published at date', function () {
@@ -178,7 +174,6 @@ it('can create page with published at date', function () {
     $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
-            'route_url' => 'test-url',
             'published_at' => true,
             'visibility' => 'public',
             'block_contents' => [
@@ -201,4 +196,38 @@ it('can create page with published at date', function () {
             'published_at' => $page->published_at,
         ]
     );
+});
+
+it('can create page with custom url', function () {
+    $blockId = BlockFactory::new()
+        ->withDummyBlueprint()
+        ->createOne()
+        ->getKey();
+
+    $page = livewire(CreatePage::class)
+        ->fillForm([
+            'name' => 'Test',
+            'route_url' => [
+                'is_override' => true,
+                'url' => '/some/custom/url',
+            ],
+            'block_contents' => [
+                [
+                    'block_id' => $blockId,
+                    'data' => ['name' => 'foo'],
+                ],
+            ],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(RouteUrl::class, [
+        'model_type' => $page->getMorphClass(),
+        'model_id' => $page->id,
+        'url' => '/some/custom/url',
+        'is_override' => true,
+    ]);
 });

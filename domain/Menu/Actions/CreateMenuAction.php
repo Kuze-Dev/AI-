@@ -13,7 +13,6 @@ class CreateMenuAction
     {
         $menu = Menu::create([
             'name' => $menuData->name,
-            'slug' => $menuData->slug,
         ]);
 
         return $menu;

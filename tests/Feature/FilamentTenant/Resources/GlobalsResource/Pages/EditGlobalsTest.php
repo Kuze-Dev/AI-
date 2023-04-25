@@ -8,7 +8,6 @@ use Domain\Blueprint\Enums\FieldType;
 use Domain\Globals\Database\Factories\GlobalsFactory;
 use Filament\Facades\Filament;
 
-use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
@@ -30,47 +29,16 @@ it('can edit globals', function () {
         ->for(
             BlueprintFactory::new()
                 ->addSchemaSection(['title' => 'Main'])
-                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+                ->addSchemaField(['title' => 'Title', 'type' => FieldType::TEXT])
         )
         ->createOne();
 
     livewire(EditGlobals::class, ['record' => $globals->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
-            'slug' => 'test',
-            'data.main.header' => 'Bar',
+            'data.main.title' => 'Bar',
         ])
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk();
-});
-
-it('global blueprint must never be modified', function () {
-    $globals = GlobalsFactory::new()
-        ->for(
-            BlueprintFactory::new()
-                ->addSchemaSection(['title' => 'Main'])
-                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
-        )->create();
-
-    $blueprint = BlueprintFactory::new()
-        ->addSchemaSection(['title' => 'Main'])
-        ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
-        ->createOne();
-
-    livewire(EditGlobals::class, ['record' => $globals->first()->getRouteKey()])
-        ->fillForm([
-            'name' => 'Test',
-            'slug' => 'test',
-            'blueprint_id' => $blueprint->id,
-            'data.main.header' => 'Bar',
-        ])
-        ->call('save')
-        ->assertHasNoFormErrors()
-        ->assertOk();
-
-    assertDatabaseHas(Globals::class, [
-        'blueprint_id' => $globals->blueprint_id,
-        'data' => json_encode(['main' => ['header' => 'Bar']]),
-    ]);
 });

@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
 use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
+use Domain\Support\RouteUrl\Database\Factories\RouteUrlFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,7 +22,6 @@ class PageFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'route_url' => '/{{$slug}}',
             'published_at' => null,
         ];
     }
@@ -42,6 +42,7 @@ class PageFactory extends Factory
 
     public function configure(): self
     {
-        return $this->has(MetaDataFactory::new(), 'metaData');
+        return $this->has(MetaDataFactory::new(), 'metaData')
+            ->has(RouteUrlFactory::new());
     }
 }

@@ -88,8 +88,10 @@ class BlockResource extends Resource
                                 ? 'https://via.placeholder.com/500x300/333333/fff?text=No+preview+available'
                                 : null
                         )
+                        ->width('100%')
                         ->height(null)
-                        ->extraImgAttributes(['class' => 'rounded-lg aspect-[5/3] object-cover object-center']),
+                        ->extraAttributes(['class' => ' rounded-lg w-full overflow-hidden bg-neutral-800'])
+                        ->extraImgAttributes(['class' => 'aspect-[5/3] object-contain']),
                     Tables\Columns\TextColumn::make('name')
                         ->sortable()
                         ->size('lg')

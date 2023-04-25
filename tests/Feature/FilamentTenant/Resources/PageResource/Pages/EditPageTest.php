@@ -7,15 +7,16 @@ use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
-use Domain\Page\Models\Page;
 use Domain\Page\Models\BlockContent;
+use Domain\Page\Models\Page;
 use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
 use Domain\Support\MetaData\Models\MetaData;
-use Domain\Support\SlugHistory\SlugHistory;
+use Domain\Support\RouteUrl\Models\RouteUrl;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 
-use function Pest\Laravel\assertDatabaseCount;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -84,7 +85,6 @@ it('can edit page', function () {
     $updatedPage = livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
-            'route_url' => 'test-url',
             'published_at' => true,
             'block_contents.record-1.data.main.header' => 'Bar',
             'meta_data' => $metaData,
@@ -100,7 +100,6 @@ it('can edit page', function () {
     assertDatabaseHas(Page::class, [
         'name' => 'Test',
         'visibility' => 'authenticated',
-        'route_url' => 'test-url',
         'published_at' => $updatedPage->published_at,
     ]);
 
@@ -125,9 +124,16 @@ it('can edit page', function () {
         'block_id' => $page->blockContents->first()->block_id,
         'data' => json_encode(['main' => ['header' => 'Bar']]),
     ]);
+
+    assertDatabaseHas(RouteUrl::class, [
+        'model_type' => $page->getMorphClass(),
+        'model_id' => $page->id,
+        'url' => Page::generateRouteUrl($page, $updatedPage->toArray()),
+        'is_override' => false,
+    ]);
 });
 
-it('can edit page slug', function () {
+it('can edit page with custom url', function () {
     $page = PageFactory::new(['slug' => 'foo'])
         ->addBlockContent(
             BlockFactory::new()
@@ -142,33 +148,23 @@ it('can edit page slug', function () {
             'visibility' => 'public',
         ]);
 
-    $metaDataData = [
-        'title' => $page->slug,
-        'description' => 'Foo description',
-        'author' => 'Foo author',
-        'keywords' => 'Foo keywords',
-    ];
-
-    $page->metaData()->create($metaDataData);
-
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
-            'slug' => 'new-foo',
+            'route_url' => [
+                'is_override' => true,
+                'url' => '/some/custom/url',
+            ],
             'block_contents.record-1.data.main.header' => 'Bar',
         ])
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk();
 
-    assertDatabaseHas(Page::class, [
-        'id' => $page->id,
-        'slug' => 'new-foo',
-    ]);
-    assertDatabaseCount(SlugHistory::class, 2);
-    assertDatabaseHas(SlugHistory::class, [
+    assertDatabaseHas(RouteUrl::class, [
         'model_type' => $page->getMorphClass(),
         'model_id' => $page->id,
-        'slug' => 'new-foo',
+        'url' => '/some/custom/url',
+        'is_override' => true,
     ]);
 });
 
@@ -224,9 +220,6 @@ it('page block with default value column data must be dehydrated', function () {
         ]);
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
-        ->fillForm([
-            'slug' => 'new-foo',
-        ])
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk();

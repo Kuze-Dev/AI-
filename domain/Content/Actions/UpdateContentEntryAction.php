@@ -8,12 +8,14 @@ use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\ContentEntry;
 use Domain\Support\MetaData\Actions\CreateMetaDataAction;
 use Domain\Support\MetaData\Actions\UpdateMetaDataAction;
+use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
 class UpdateContentEntryAction
 {
     public function __construct(
         protected CreateMetaDataAction $createMetaData,
-        protected UpdateMetaDataAction $updateMetaData
+        protected UpdateMetaDataAction $updateMetaData,
+        protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
     ) {
     }
 
@@ -26,7 +28,6 @@ class UpdateContentEntryAction
         $contentEntry->update([
             'author_id' => $contentEntryData->author_id,
             'title' => $contentEntryData->title,
-            'slug' => $contentEntryData->slug,
             'published_at' => $contentEntryData->published_at,
             'data' => $contentEntryData->data,
         ]);
@@ -37,6 +38,8 @@ class UpdateContentEntryAction
 
         $contentEntry->taxonomyTerms()
             ->sync($contentEntryData->taxonomy_terms);
+
+        $this->createOrUpdateRouteUrl->execute($contentEntry, $contentEntryData->route_url_data);
 
         return $contentEntry;
     }
