@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Permission;
-use STS\FilamentImpersonate\Impersonate;
+use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
 class AdminResource extends Resource
 {
