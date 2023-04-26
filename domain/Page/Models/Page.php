@@ -7,7 +7,7 @@ namespace Domain\Page\Models;
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Admin\Models\Admin;
-use Domain\Page\Enums\PageVisibility;
+use Domain\Page\Enums\Visibility;
 use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -70,7 +70,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasR
      * to a specific data type.
      */
     protected $casts = [
-        'visibility' => PageVisibility::class,
+        'visibility' => Visibility::class,
         'published_at' => 'datetime',
     ];
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Page\DataTransferObjects;
 
-use Domain\Page\Enums\PageVisibility;
+use Domain\Page\Enums\Visibility;
 use Carbon\Carbon;
 use Domain\Support\MetaData\DataTransferObjects\MetaDataData;
 use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
@@ -16,7 +16,7 @@ class PageData
         public readonly RouteUrlData $route_url_data,
         public readonly MetaDataData $meta_data,
         public readonly ?int $author_id = null,
-        public readonly PageVisibility $visibility = PageVisibility::PUBLIC,
+        public readonly Visibility $visibility = Visibility::PUBLIC,
         public readonly ?Carbon $published_at = null,
         public readonly array $block_contents = [],
     ) {
@@ -26,7 +26,7 @@ class PageData
     {
         return new self(
             name: $data['name'],
-            visibility: PageVisibility::tryFrom($data['visibility'] ?? '') ?? PageVisibility::PUBLIC,
+            visibility: Visibility::tryFrom($data['visibility'] ?? '') ?? Visibility::PUBLIC,
             route_url_data: RouteUrlData::fromArray($data['route_url'] ?? []),
             meta_data: MetaDataData::fromArray($data['meta_data']),
             author_id: $data['author_id'] ?? null,

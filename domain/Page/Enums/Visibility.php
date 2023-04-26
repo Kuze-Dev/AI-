@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Page\Enums;
 
-enum PageVisibility: string
+enum Visibility: string
 {
     case PUBLIC = 'public';
     case GUEST = 'guest';

@@ -12,7 +12,7 @@ use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
 use Closure;
-use Domain\Page\Enums\PageVisibility;
+use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
 use Domain\Page\Models\BlockContent;
@@ -65,13 +65,13 @@ class PageResource extends Resource
                             RouteUrlFieldset::make(),
                             Forms\Components\Select::make('visibility')
                                 ->options(
-                                    collect(PageVisibility::cases())
-                                        ->mapWithKeys(fn (PageVisibility $visibilityType) => [
-                                            $visibilityType->value => Str::headline($visibilityType->value),
+                                    collect(Visibility::cases())
+                                        ->mapWithKeys(fn (Visibility $visibility) => [
+                                            $visibility->value => Str::headline($visibility->value),
                                         ])
                                         ->toArray()
                                 )
-                                ->default(PageVisibility::PUBLIC->value)
+                                ->default(Visibility::PUBLIC->value)
                                 ->required(),
                             Forms\Components\Toggle::make('published_at')
                                 ->label(trans('Published'))
@@ -190,9 +190,9 @@ class PageResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('visibility')
                     ->options(
-                        collect(PageVisibility::cases())
-                            ->mapWithKeys(fn (PageVisibility $visibilityType) => [
-                                $visibilityType->value => Str::headline($visibilityType->value),
+                        collect(Visibility::cases())
+                            ->mapWithKeys(fn (Visibility $visibility) => [
+                                $visibility->value => Str::headline($visibility->value),
                             ])
                             ->toArray()
                     ),
