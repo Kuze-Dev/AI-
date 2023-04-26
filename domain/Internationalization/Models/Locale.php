@@ -16,6 +16,7 @@ use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
  *
  * @property int $id
  * @property string $code
+ * @property string $name
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
@@ -43,17 +44,17 @@ class Locale extends Model implements IsActivitySubject
     protected $fillable = [
         'code',
         'name',
-        'is_default'
+        'is_default',
     ];
 
     protected static function booted()
-{
-    static::saving(function ($locale) {
-        if ($locale->is_default) {
-            static::where('is_default', true)->where('id', '!=', $locale->id)->update(['is_default' => false]);
-        }
-    });
-}
+    {
+        static::saving(function ($locale) {
+            if ($locale->is_default) {
+                static::where('is_default', true)->where('id', '!=', $locale->id)->update(['is_default' => false]);
+            }
+        });
+    }
 
     /** @return LogOptions */
     public function getActivitylogOptions(): LogOptions

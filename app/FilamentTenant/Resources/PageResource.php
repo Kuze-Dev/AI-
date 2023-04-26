@@ -4,25 +4,26 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Resources;
-use App\FilamentTenant\Support\MetaDataForm;
-use App\FilamentTenant\Support\SchemaFormBuilder;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
-use Domain\Page\Models\Page;
-use Domain\Page\Models\Block;
-use Domain\Page\Models\BlockContent;
 use Exception;
 use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Domain\Page\Models\Page;
+use Filament\Resources\Form;
+use Domain\Page\Models\Block;
+use Filament\Resources\Table;
+use Filament\Resources\Resource;
+use App\FilamentTenant\Resources;
+use Filament\Tables\Filters\Layout;
+use Domain\Page\Models\BlockContent;
+use Illuminate\Support\Facades\Auth;
+use App\FilamentTenant\Support\MetaDataForm;
+use Illuminate\Database\Eloquent\Collection;
+use Domain\Internationalization\Models\Locale;
+use App\FilamentTenant\Support\SchemaFormBuilder;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class PageResource extends Resource
 {
@@ -62,6 +63,15 @@ class PageResource extends Resource
                             Forms\Components\TextInput::make('route_url')
                                 ->required()
                                 ->helperText('Use "{{ $slug }}" to insert the current slug.'),
+                            Forms\Components\Select::make('Locale')
+                                ->options(Locale::all()->sortByDesc('is_default')->map(function ($record) {
+                                    return [$record['code'] => $record['name']];
+                                })->collapse())
+                                ->default(optional(Locale::where('is_default', true)->first())->code)
+                                ->searchable()
+                                ->hidden(function () {
+                                    return Locale::count() === 1;
+                                }),
                         ]),
                         Forms\Components\Section::make(trans('Blocks'))
                             ->schema([
@@ -122,8 +132,7 @@ class PageResource extends Resource
                                     ]),
                             ]),
                     ])->columnSpan(2),
-                MetaDataForm::make('Meta Data')
-                    ->columnSpan(1),
+                MetaDataForm::make('Meta Data')->columnSpan(1),
             ]);
     }
 

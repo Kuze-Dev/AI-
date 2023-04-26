@@ -38,6 +38,7 @@ class LocaleResource extends Resource
 
         $options = $locales->map(function ($locale) {
             $display = "{$locale['locale']} ({$locale['code']})";
+
             return [$display => $display];
         })->collapse();
 
@@ -54,13 +55,13 @@ class LocaleResource extends Resource
                         $set('code', $code);
                     }
                 }),
-                Forms\Components\TextInput::make('code')
-                    ->unique(ignoreRecord: true)
-                    ->dehydrateStateUsing(fn (Closure $get, $state) => $state ?: $get('code'))
-                    ->disabled(),
-                    Forms\Components\Checkbox::make('is_default')
-                        ->label('Set Default') // Set the label of the checkbox
-                        ->hint('One default locale is required, change it by selecting another one') // Set the description of the checkbox
+            Forms\Components\TextInput::make('code')
+                ->unique(ignoreRecord: true)
+                ->dehydrateStateUsing(fn (Closure $get, $state) => $state ?: $get('code'))
+                ->disabled(),
+            Forms\Components\Checkbox::make('is_default')
+                ->label('Set Default')
+                ->hint('One default locale is required, change it by selecting another one'),
         ]);
     }
 
