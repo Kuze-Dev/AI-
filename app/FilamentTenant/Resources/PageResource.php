@@ -154,7 +154,7 @@ class PageResource extends Resource
                     ->formatStateUsing(fn (?Carbon $state) => $state ?? '-')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('author.full_name')
-                    ->sortable()
+                    ->sortable(['first_name', 'last_name'])
                     ->searchable(query: function (Builder $query, string $search): Builder {
                         /** @var Builder|Page $query */
                         return $query->whereHas('author', function ($query) use ($search) {
