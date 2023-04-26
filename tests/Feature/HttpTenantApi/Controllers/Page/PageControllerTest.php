@@ -34,8 +34,9 @@ it('can filter pages', function ($attribute) {
         ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
         ->count(2)
         ->sequence(
-            ['name' => 'Foo'],
-            ['name' => 'Bar'],
+            ['name' => 'Foo', 'visibility' => 'authenticated'],
+            ['name' => 'Bar', 'visibility' => 'guest'],
+            ['name' => 'Example', 'visibility' => 'public']
         )
         ->create();
 
@@ -51,7 +52,7 @@ it('can filter pages', function ($attribute) {
                     ->etc();
             });
     }
-})->with(['name', 'slug']);
+})->with(['name', 'slug', 'visibility']);
 
 it('can show a page with includes', function (string $include) {
     $page = PageFactory::new()

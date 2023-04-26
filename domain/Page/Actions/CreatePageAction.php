@@ -21,9 +21,10 @@ class CreatePageAction
     public function execute(PageData $pageData): Page
     {
         $page = Page::create([
-            'name' => $pageData->name,
-            'published_at' => $pageData->published_at,
             'author_id' => $pageData->author_id,
+            'name' => $pageData->name,
+            'visibility' => $pageData->visibility,
+            'published_at' => $pageData->published_at,
         ]);
 
         $this->createMetaTags->execute($page, $pageData->meta_data);

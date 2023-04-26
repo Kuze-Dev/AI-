@@ -12,6 +12,7 @@ use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
 use Closure;
+use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
 use Domain\Page\Models\BlockContent;
@@ -27,6 +28,7 @@ use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class PageResource extends Resource
 {
@@ -61,6 +63,16 @@ class PageResource extends Resource
                                 })
                                 ->required(),
                             RouteUrlFieldset::make(),
+                            Forms\Components\Select::make('visibility')
+                                ->options(
+                                    collect(Visibility::cases())
+                                        ->mapWithKeys(fn (Visibility $visibility) => [
+                                            $visibility->value => Str::headline($visibility->value),
+                                        ])
+                                        ->toArray()
+                                )
+                                ->default(Visibility::PUBLIC->value)
+                                ->required(),
                             Forms\Components\Toggle::make('published_at')
                                 ->label(trans('Published'))
                                 ->formatStateUsing(fn (Carbon|bool|null $state) => $state instanceof Carbon ? true : (bool) $state)
@@ -149,6 +161,10 @@ class PageResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\BadgeColumn::make('visibility')
+                    ->formatStateUsing(fn ($state) => Str::headline($state))
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->formatStateUsing(fn (?Carbon $state) => $state ?? '-')
@@ -172,6 +188,14 @@ class PageResource extends Resource
                     ->toggledHiddenByDefault(),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('visibility')
+                    ->options(
+                        collect(Visibility::cases())
+                            ->mapWithKeys(fn (Visibility $visibility) => [
+                                $visibility->value => Str::headline($visibility->value),
+                            ])
+                            ->toArray()
+                    ),
                 Tables\Filters\Filter::make('published_at_year_month')
                     ->form([
                         Forms\Components\TextInput::make('published_at_year')
