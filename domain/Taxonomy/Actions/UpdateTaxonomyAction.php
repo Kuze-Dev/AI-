@@ -18,7 +18,6 @@ class UpdateTaxonomyAction
     {
         $taxonomy->update([
             'name' => $taxonomyData->name,
-            'slug' => $taxonomyData->slug,
         ]);
 
         $this->syncTermAction->execute($taxonomy, $taxonomyData->terms);

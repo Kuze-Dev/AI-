@@ -69,5 +69,4 @@ it('can show a content with includes', function (string $include) {
         });
 })->with([
     'taxonomies',
-    'slugHistories',
 ]);

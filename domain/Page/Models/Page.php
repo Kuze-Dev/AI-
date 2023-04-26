@@ -5,15 +5,17 @@ declare(strict_types=1);
 namespace Domain\Page\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Admin\Models\Admin;
+use Domain\Page\Enums\Visibility;
 use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
-use Domain\Support\SlugHistory\HasSlugHistory;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use Domain\Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
+use Domain\Support\RouteUrl\HasRouteUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -28,7 +30,6 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property int $id
  * @property string $name
  * @property string $slug
- * @property string $route_url
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
@@ -36,9 +37,6 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property-read \Domain\Support\MetaData\Models\MetaData $metaData
  * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Page\Models\BlockContent[] $blockContents
  * @property-read int|null $block_contents_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $slugHistories
- * @property-read int|null $slug_histories_count
- * @property-read string|null $qualified_route_url
  * @method static \Illuminate\Database\Eloquent\Builder|Page newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Page query()
@@ -51,20 +49,29 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @mixin \Eloquent
  */
 
-#[OnDeleteCascade(['blockContents', 'metaData'])]
-class Page extends Model implements IsActivitySubject, HasMetaDataContract
+#[OnDeleteCascade(['blockContents', 'metaData', 'routeUrls'])]
+class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasRouteUrlContact
 {
     use LogsActivity;
     use HasSlug;
-    use HasSlugHistory;
+    use HasRouteUrl;
     use HasMetaData;
     use ConstraintsRelationships;
 
     protected $fillable = [
-        'name',
-        'slug',
         'author_id',
-        'route_url',
+        'name',
+        'visibility',
+        'published_at',
+    ];
+
+    /**
+     * Columns that are converted
+     * to a specific data type.
+     */
+    protected $casts = [
+        'visibility' => Visibility::class,
+        'published_at' => 'datetime',
     ];
 
     /**
@@ -78,6 +85,12 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
         return [
             'title' => $this->name,
         ];
+    }
+
+    /** @return PageBuilder<self> */
+    public function newEloquentBuilder($query): PageBuilder
+    {
+        return new PageBuilder($query);
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -96,7 +109,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
 
     public function getActivitySubjectDescription(Activity $activity): string
     {
-        return 'Page: '.$this->name;
+        return 'Page: ' . $this->name;
     }
 
     public function getRouteKeyName(): string
@@ -113,23 +126,13 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
             ->saveSlugsTo($this->getRouteKeyName());
     }
 
-    /** @return Attribute<string, static> */
-    protected function qualifiedRouteUrl(): Attribute
+    public static function generateRouteUrl(Model $model, array $attributes): string
     {
-        return Attribute::get(fn () => Blade::render(
-            Blade::compileEchos($this->route_url),
-            [
-                'slug' => $this->slug,
-            ]
-        ));
+        return Str::of($attributes['name'])->slug()->start('/')->toString();
     }
 
-    /**
-     * Get the Admin that owns the Page
-     *
-     * @return BelongsTo<Admin, Page>
-     */
-    public function author()
+    /** @return BelongsTo<Admin, Page> */
+    public function author(): BelongsTo
     {
         return $this->belongsTo(Admin::class, 'author_id');
     }

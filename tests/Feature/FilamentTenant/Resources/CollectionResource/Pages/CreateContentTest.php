@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\ContentResource\Pages\CreateContent;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Content\Models\Content;
-use Domain\Support\SlugHistory\SlugHistory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Filament\Facades\Filament;
 
@@ -37,7 +36,7 @@ it('can create content', function () {
             'future_publish_date_behavior' => 'public',
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
-            'route_url' => 'test-content',
+            'prefix' => 'test-content',
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -46,15 +45,11 @@ it('can create content', function () {
 
     assertDatabaseHas(Content::class, [
         'name' => 'Test Content',
+        'prefix' => 'test-content',
         'blueprint_id' => $blueprint->getKey(),
         'future_publish_date_behavior' => 'public',
         'past_publish_date_behavior' => 'unlisted',
         'is_sortable' => true,
-        'route_url' => 'test-content',
-    ]);
-    assertDatabaseHas(SlugHistory::class, [
-        'model_type' => $content->getMorphClass(),
-        'model_id' => $content->id,
     ]);
 });
 
@@ -71,7 +66,6 @@ it('can create content with taxonomies', function () {
     livewire(CreateContent::class)
         ->fillForm([
             'name' => 'Test Content',
-            'route_url' => 'test-content',
             'blueprint_id' => $blueprint->getKey(),
             'taxonomies' => $taxonomies->pluck('id')->toArray(),
         ])

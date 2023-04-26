@@ -194,7 +194,7 @@ it('can show content entry', function () {
             $json->where('data.type', 'contentEntries')
                 ->where('data.id', $contentEntry->getRouteKey())
                 ->where('data.attributes.title', $contentEntry->title)
-                ->where('data.attributes.route_url', $contentEntry->qualified_route_url)
+                ->where('data.attributes.route_url', $contentEntry->activeRouteUrl->url)
                 ->etc();
         });
 });
@@ -247,6 +247,6 @@ it('can show content entry with includes', function (string $include) {
         });
 })->with([
     'taxonomyTerms',
-    'slugHistories',
+    'routeUrls',
     'metaData',
 ]);

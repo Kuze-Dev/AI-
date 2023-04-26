@@ -21,7 +21,6 @@ class UpdateFormAction
     {
         $form->update([
             'name' => $formData->name,
-            'slug' => $formData->slug,
             'store_submission' => $formData->store_submission,
         ]);
 

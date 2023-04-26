@@ -11,7 +11,6 @@ class FormData
         public readonly string $blueprint_id,
         public readonly string $name,
         public readonly bool $store_submission,
-        public readonly ?string $slug = null,
         public readonly array $form_email_notifications = [],
     ) {
     }
@@ -22,7 +21,6 @@ class FormData
             blueprint_id: $data['blueprint_id'],
             name: $data['name'],
             store_submission: $data['store_submission'],
-            slug: $data['slug'] ?? null,
             form_email_notifications: array_map(
                 fn (array $formEmailNotificationData) => new FormEmailNotificationData(
                     id: $formEmailNotificationData['id'] ?? null,

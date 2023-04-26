@@ -16,7 +16,9 @@ class PageResource extends JsonApiResource
     {
         return  [
             'name' => $this->name,
-            'route_url' => $this->qualified_route_url,
+            'route_url' => $this->activeRouteUrl->url,
+            'visibility' => $this->visibility,
+            'published_at' => $this->published_at,
         ];
     }
 
@@ -25,7 +27,7 @@ class PageResource extends JsonApiResource
     {
         return [
             'blockContents' => fn () => BlockContentResource::collection($this->blockContents),
-            'slugHistories' => fn () => SlugHistoryResource::collection($this->slugHistories),
+            'routeUrls' => fn () => RouteUrlResource::collection($this->routeUrls),
             'metaData' => fn () => MetaDataResource::make($this->metaData),
         ];
     }

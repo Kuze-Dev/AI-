@@ -7,17 +7,18 @@ use Carbon\Carbon;
 use Domain\Content\Models\ContentEntry;
 use Domain\Content\Database\Factories\ContentFactory;
 use Domain\Content\Database\Factories\ContentEntryFactory;
+use Domain\Support\RouteUrl\Models\RouteUrl;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
 use Domain\Support\MetaData\Models\MetaData;
-use Domain\Support\SlugHistory\SlugHistory;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 
-use function Pest\Laravel\assertDatabaseCount;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Livewire\livewire;
@@ -154,9 +155,16 @@ it('can edit content entry', function () {
             'content_entry_id' => $contentEntry->getKey(),
         ]);
     }
+
+    assertDatabaseHas(RouteUrl::class, [
+        'model_type' => $contentEntry->getMorphClass(),
+        'model_id' => $contentEntry->id,
+        'url' => ContentEntry::generateRouteUrl($contentEntry, $updatedContentEntry->toArray()),
+        'is_override' => false,
+    ]);
 });
 
-it('can edit content entry slug', function () {
+it('can edit content entry with custom url', function () {
     $content = ContentFactory::new(['name' => 'Test Content'])
         ->for(
             BlueprintFactory::new()
@@ -173,22 +181,23 @@ it('can edit content entry slug', function () {
         ]);
 
     livewire(EditContentEntry::class, ['ownerRecord' => $content->getRouteKey(), 'record' => $contentEntry->getRouteKey()])
-        ->fillForm(['slug' => 'new-foo'])
+        ->fillForm([
+            'route_url' => [
+                'is_override' => true,
+                'url' => '/some/custom/url',
+            ],
+        ])
         ->call('save')
         ->assertOk()
         ->assertHasNoFormErrors()
         ->instance()
         ->record;
 
-    assertDatabaseHas(ContentEntry::class, [
-        'id' => $contentEntry->id,
-        'slug' => 'new-foo',
-    ]);
-    assertDatabaseCount(SlugHistory::class, 3); // 1 (for content) + 2 (for content entry)
-    assertDatabaseHas(SlugHistory::class, [
+    assertDatabaseHas(RouteUrl::class, [
         'model_type' => $contentEntry->getMorphClass(),
         'model_id' => $contentEntry->id,
-        'slug' => 'new-foo',
+        'url' => '/some/custom/url',
+        'is_override' => true,
     ]);
 });
 

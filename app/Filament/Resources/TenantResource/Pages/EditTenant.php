@@ -32,6 +32,19 @@ class EditTenant extends EditRecord
         ];
     }
 
+    protected function getRules(): array
+    {
+        return tap(
+            parent::getRules(),
+            fn (&$rules) => $rules['data.domains.*.domain'] = ['distinct']
+        );
+    }
+
+    protected function afterValidate(): void
+    {
+        $this->validate();
+    }
+
     protected function getFormActions(): array
     {
         return $this->getCachedActions();
