@@ -23,7 +23,7 @@ class ContentEntryResource extends JsonApiResource
             'data' => $this->transformSchemaPayload($this->data),
             'order' => $this->order,
             'published_at' => $this->published_at,
-            'route_url' => $this->activeRouteUrl->url,
+            'route_url' => $this->activeRouteUrl?->url,
         ];
     }
 
