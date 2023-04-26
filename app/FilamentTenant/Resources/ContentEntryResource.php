@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
+use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -22,11 +23,11 @@ use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Component;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rules\Unique;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -94,15 +95,20 @@ class ContentEntryResource extends Resource
                                 ignoreRecord: true
                             )
                             ->lazy()
-                            ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
-                                if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
-                                    $set('slug', Str::slug($state));
-                                }
+                            ->afterStateUpdated(function (Forms\Components\TextInput $component) {
+                                $component->getContainer()
+                                    ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
+                                    ?->dispatchEvent('route_url::update');
                             })
                             ->required(),
-                        Forms\Components\TextInput::make('slug')
-                            ->unique(ignoreRecord: true)
-                            ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('title'))),
+                        RouteUrlFieldset::make()
+                            ->generateModelForRouteUrlUsing(function ($livewire, ContentEntry|string $model) {
+                                return $model instanceof ContentEntry
+                                    ? $model
+                                    : tap(new ContentEntry())->setRelation('content', $livewire->ownerRecord);
+                            }),
+                        Forms\Components\Hidden::make('author_id')
+                            ->default(Auth::id()),
                     ]),
                     Forms\Components\Section::make(trans('Taxonomies'))
                         ->schema([
@@ -154,9 +160,24 @@ class ContentEntryResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
+                Tables\Columns\TextColumn::make('activeRouteUrl.url')
+                    ->label('URL')
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('slug')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('author.full_name')
+                    ->sortable(['first_name', 'last_name'])
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        /** @var Builder|ContentEntry $query */
+                        return $query->whereHas('author', function ($query) use ($search) {
+                            $query->where('first_name', 'like', "%{$search}%")
+                                ->orWhere('last_name', 'like', "%{$search}%");
+                        });
+                    }),
                 Tables\Columns\TagsColumn::make('taxonomyTerms.name')
                     ->limit()
                     ->searchable(),
@@ -233,7 +254,10 @@ class ContentEntryResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->url(fn ($livewire, ContentEntry $record) => self::getUrl('edit', [$livewire->ownerRecord, $record])),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make(),
+                ]),
+
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

@@ -35,7 +35,10 @@ it('can update page', function () {
             PageData::fromArray([
                 'name' => 'Foo',
                 'slug' => 'foo',
-                'route_url' => 'foo',
+                'route_url' => [
+                    'url' => 'foo',
+                ],
+                'author_id' => 1,
                 'block_contents' => [
                     [
                         'block_id' => $page->blockContents->first()->block_id,

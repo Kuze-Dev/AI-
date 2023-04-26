@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Domain\Content\Models;
 
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
-use Domain\Support\SlugHistory\HasSlugHistory;
+use Domain\Admin\Models\Admin;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Domain\Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
+use Domain\Support\RouteUrl\HasRouteUrl;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,10 +20,9 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
-use Illuminate\Support\Facades\Blade;
 use Spatie\Sluggable\SlugOptions;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
+use Illuminate\Support\Str;
 
 /**
  * Domain\Content\Models\ContentEntry
@@ -39,8 +40,6 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property-read int|null $activities_count
  * @property-read \Domain\Content\Models\Content $content
  * @property-read \Domain\Support\MetaData\Models\MetaData $metaData
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $slugHistories
- * @property-read int|null $slug_histories_count
  * @property-read \Illuminate\Database\Eloquent\Collection|TaxonomyTerm[] $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
  * @property-read string|null $qualified_route_url
@@ -59,12 +58,12 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @method static ContentEntryBuilder|ContentEntry whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-#[OnDeleteCascade(['taxonomyTerms', 'metaData'])]
-class ContentEntry extends Model implements IsActivitySubject, HasMetaDataContract
+#[OnDeleteCascade(['taxonomyTerms', 'metaData', 'routeUrls'])]
+class ContentEntry extends Model implements IsActivitySubject, HasMetaDataContract, HasRouteUrlContact
 {
     use LogsActivity;
     use HasSlug;
-    use HasSlugHistory;
+    use HasRouteUrl;
     use HasMetaData;
     use ConstraintsRelationships;
 
@@ -74,11 +73,11 @@ class ContentEntry extends Model implements IsActivitySubject, HasMetaDataContra
      */
     protected $fillable = [
         'title',
-        'slug',
         'data',
         'content_id',
         'taxonomy_term_id',
         'order',
+        'author_id',
         'published_at',
     ];
 
@@ -166,14 +165,15 @@ class ContentEntry extends Model implements IsActivitySubject, HasMetaDataContra
         return new ContentEntryBuilder($query);
     }
 
-      /** @return Attribute<string, static> */
-      protected function qualifiedRouteUrl(): Attribute
-      {
-          return Attribute::get(fn () => Blade::render(
-              Blade::compileEchos($this->content->route_url .'/'.$this->slug),
-              [
-                  'slug' => $this->slug,
-              ]
-          ));
-      }
+    /** @param self $model */
+    public static function generateRouteUrl(Model $model, array $attributes): string
+    {
+        return Str::start($model->content->prefix, '/') . Str::of($attributes['title'])->slug()->start('/');
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Admin, ContentEntry> */
+    public function author(): BelongsTo
+    {
+        return $this->belongsTo(Admin::class, 'author_id');
+    }
 }

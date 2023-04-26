@@ -7,21 +7,24 @@ namespace Domain\Page\Actions;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Domain\Support\MetaData\Actions\CreateMetaDataAction;
+use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
 class CreatePageAction
 {
     public function __construct(
         protected CreateBlockContentAction $createBlockContent,
-        protected CreateMetaDataAction $createMetaTags
+        protected CreateMetaDataAction $createMetaTags,
+        protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
     ) {
     }
 
     public function execute(PageData $pageData): Page
     {
         $page = Page::create([
+            'author_id' => $pageData->author_id,
             'name' => $pageData->name,
-            'slug' => $pageData->slug,
-            'route_url' => $pageData->route_url,
+            'visibility' => $pageData->visibility,
+            'published_at' => $pageData->published_at,
         ]);
 
         $this->createMetaTags->execute($page, $pageData->meta_data);
@@ -29,6 +32,8 @@ class CreatePageAction
         foreach ($pageData->block_contents as $blockContentData) {
             $this->createBlockContent->execute($page, $blockContentData);
         }
+
+        $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url_data);
 
         return $page;
     }

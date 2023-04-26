@@ -17,6 +17,19 @@ class CreateTenant extends CreateRecord
 {
     protected static string $resource = TenantResource::class;
 
+    protected function getRules(): array
+    {
+        return tap(
+            parent::getRules(),
+            fn (&$rules) => $rules['data.domains.*.domain'] = ['distinct']
+        );
+    }
+
+    protected function afterValidate(): void
+    {
+        $this->validate();
+    }
+
     protected function getActions(): array
     {
         return [

@@ -83,9 +83,15 @@ class BlockResource extends Resource
                 Tables\Columns\Layout\Stack::make([
                     SpatieMediaLibraryImageColumn::make('image')
                         ->collection('image')
-                        ->default('https://via.placeholder.com/500x300/333333/fff?text=No+preview+available')
+                        ->default(
+                            fn (Block $record) => $record->getFirstMedia('image') === null
+                                ? 'https://via.placeholder.com/500x300/333333/fff?text=No+preview+available'
+                                : null
+                        )
+                        ->width('100%')
                         ->height(null)
-                        ->extraImgAttributes(['class' => 'w-full rounded-lg']),
+                        ->extraAttributes(['class' => ' rounded-lg w-full overflow-hidden bg-neutral-800'])
+                        ->extraImgAttributes(['class' => 'aspect-[5/3] object-contain']),
                     Tables\Columns\TextColumn::make('name')
                         ->sortable()
                         ->size('lg')
@@ -102,7 +108,9 @@ class BlockResource extends Resource
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

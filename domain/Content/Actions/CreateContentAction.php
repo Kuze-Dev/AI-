@@ -14,12 +14,11 @@ class CreateContentAction
     {
         $content = Content::create([
             'name' => $contentData->name,
-            'slug' => $contentData->slug,
+            'prefix' => $contentData->prefix,
             'blueprint_id' => $contentData->blueprint_id,
             'past_publish_date_behavior' => $contentData->past_publish_date_behavior,
             'future_publish_date_behavior' => $contentData->future_publish_date_behavior,
             'is_sortable' => $contentData->is_sortable,
-            'route_url' => $contentData->route_url,
         ]);
 
         $content->taxonomies()

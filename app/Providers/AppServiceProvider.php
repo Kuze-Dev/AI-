@@ -15,7 +15,6 @@ use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
 use Domain\Globals\Models\Globals;
 use Domain\Page\Models\Page;
-use Domain\Support\SlugHistory\SlugHistory;
 use Domain\Page\Models\Block;
 use Domain\Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Models\Taxonomy;
@@ -62,7 +61,6 @@ class AppServiceProvider extends ServiceProvider
             TaxonomyTerm::class,
             Content::class,
             ContentEntry::class,
-            SlugHistory::class,
             Globals::class,
             MetaData::class,
             Locale::class,

@@ -23,7 +23,10 @@ it('can create page', function () {
     $page = app(CreatePageAction::class)
         ->execute(PageData::fromArray([
             'name' => 'Foo',
-            'route_url' => 'foo',
+            'route_url' => [
+                'url' => 'foo',
+            ],
+            'author_id' => 1,
             'block_contents' => [
                 [
                     'block_id' => $blockId,

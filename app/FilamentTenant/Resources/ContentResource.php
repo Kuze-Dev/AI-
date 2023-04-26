@@ -70,14 +70,11 @@ class ContentResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->lazy()
                         ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
-                            if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
-                                $set('slug', Str::slug($state));
+                            if ($get('prefix') === Str::slug($state) || blank($get('prefix'))) {
+                                $set('prefix', Str::slug($state));
                             }
                         })
                         ->required(),
-                    Forms\Components\TextInput::make('slug')
-                        ->unique(ignoreRecord: true)
-                        ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                     Forms\Components\Select::make('blueprint_id')
                         ->required()
                         ->options(
@@ -89,10 +86,12 @@ class ContentResource extends Resource
                         ->searchable()
                         ->preload()
                         ->disabled(fn (?Content $record) => $record !== null),
-                    Forms\Components\TextInput::make('route_url')
+                    Forms\Components\TextInput::make('prefix')
                         ->required()
+                        ->string()
+                        ->alphaDash()
                         ->unique(ignoreRecord: true)
-                        ->helperText('Use "{{ $slug }}" to insert the content entry\'s slug.'),
+                        ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                     Forms\Components\Select::make('taxonomies')
                         ->multiple()
                         ->options(
@@ -156,7 +155,8 @@ class ContentResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('blueprint.name')
                     ->sortable()
                     ->searchable()
@@ -178,12 +178,14 @@ class ContentResource extends Resource
             ])
             ->filtersLayout(Layout::AboveContent)
             ->actions([
-                Tables\Actions\Action::make('view-entries')
-                    ->icon('heroicon-s-eye')
-                    ->color('secondary')
-                    ->url(fn (Content $record) => ContentEntryResource::getUrl('index', [$record])),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('view-entries')
+                        ->icon('heroicon-s-eye')
+                        ->color('secondary')
+                        ->url(fn (Content $record) => ContentEntryResource::getUrl('index', [$record])),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
