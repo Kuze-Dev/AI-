@@ -15,10 +15,10 @@ class PageData
         public readonly string $name,
         public readonly RouteUrlData $route_url_data,
         public readonly MetaDataData $meta_data,
-        public readonly array $block_contents = [],
-        public readonly ?PageVisibility $visibility = null,
-        public readonly ?Carbon $published_at = null,
         public readonly ?int $author_id = null,
+        public readonly PageVisibility $visibility = PageVisibility::PUBLIC,
+        public readonly ?Carbon $published_at = null,
+        public readonly array $block_contents = [],
     ) {
     }
 
@@ -26,6 +26,11 @@ class PageData
     {
         return new self(
             name: $data['name'],
+            visibility: PageVisibility::tryFrom($data['visibility'] ?? '') ?? PageVisibility::PUBLIC,
+            route_url_data: RouteUrlData::fromArray($data['route_url'] ?? []),
+            meta_data: MetaDataData::fromArray($data['meta_data']),
+            author_id: $data['author_id'] ?? null,
+            published_at: isset($data['published_at']) ? Carbon::parse($data['published_at']) : null,
             block_contents: array_map(
                 fn (array $blockContentData) => new BlockContentData(
                     block_id: $blockContentData['block_id'],
@@ -34,11 +39,6 @@ class PageData
                 ),
                 $data['block_contents'] ?? []
             ),
-            route_url_data: RouteUrlData::fromArray($data['route_url'] ?? []),
-            published_at: isset($data['published_at']) ? Carbon::parse($data['published_at']) : null,
-            author_id: $data['author_id'] ?? null,
-            meta_data: MetaDataData::fromArray($data['meta_data']),
-            visibility: PageVisibility::tryFrom($data['visibility'] ?? '')
         );
     }
 }
