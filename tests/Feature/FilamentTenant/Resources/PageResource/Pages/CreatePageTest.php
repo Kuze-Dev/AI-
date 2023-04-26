@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\PageResource\Pages\CreatePage;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
+use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\BlockContent;
 use Domain\Support\MetaData\Models\MetaData;
@@ -54,6 +55,7 @@ it('can create page', function () {
     assertDatabaseHas(Page::class, [
         'author_id' => auth()->user()->id,
         'name' => 'Test',
+        'visibility' => Visibility::PUBLIC->value,
     ]);
 
     assertDatabaseHas(BlockContent::class, [
@@ -124,7 +126,6 @@ it('can create page with meta data', function () {
     $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
-            'visibility' => 'public',
             'block_contents' => [
                 [
                     'block_id' => $blockId,
@@ -140,10 +141,7 @@ it('can create page with meta data', function () {
         ->instance()
         ->record;
 
-    assertDatabaseHas(Page::class, [
-        'name' => 'Test',
-        'visibility' => 'public',
-    ]);
+    assertDatabaseHas(Page::class, ['name' => 'Test']);
     assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
         'block_id' => $blockId,

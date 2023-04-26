@@ -7,6 +7,7 @@ use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
+use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\BlockContent;
 use Domain\Page\Models\Page;
 use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
@@ -99,7 +100,7 @@ it('can edit page', function () {
 
     assertDatabaseHas(Page::class, [
         'name' => 'Test',
-        'visibility' => 'authenticated',
+        'visibility' => Visibility::AUTHENTICATED->value,
         'published_at' => $updatedPage->published_at,
     ]);
 
