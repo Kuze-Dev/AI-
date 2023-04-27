@@ -147,7 +147,6 @@ class PageResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('published_at')
-                    ->formatStateUsing(fn (?Carbon $state) => $state ?? '-')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('author.full_name')
