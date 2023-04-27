@@ -8,6 +8,7 @@ use Spatie\LaravelSettings\Settings;
 
 class CMSSettings extends Settings
 {
+    public ?string $signed_route;
     public ?string $deploy_hook;
 
     public static function group(): string

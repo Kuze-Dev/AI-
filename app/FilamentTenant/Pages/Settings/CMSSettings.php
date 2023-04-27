@@ -28,6 +28,11 @@ class CMSSettings extends TenantBaseSettings
     {
         return [
             Card::make([
+                TextInput::make('signed_route')
+                    // ->required()
+                    ->columnSpan('full'),
+            ]),
+            Card::make([
                 TextInput::make('deploy_hook')
                     ->required()
                     ->url()
