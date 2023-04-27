@@ -124,7 +124,7 @@ class PageResource extends Resource
                                             }),
                                         SchemaFormBuilder::make('data')
                                             ->id('schema-form')
-                                            ->dehydrated(fn (Closure $get) => ! (self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content))
+                                            ->dehydrated(fn (Closure $get) => !(self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content))
                                             ->disabled(fn (Closure $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content ?? false)
                                             ->schemaData(fn (Closure $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->blueprint->schema),
                                     ]),
@@ -147,8 +147,8 @@ class PageResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('published_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
                     ->formatStateUsing(fn (?Carbon $state) => $state ?? '-')
+                    ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable()
@@ -232,7 +232,7 @@ class PageResource extends Resource
     /** @return Collection<int, Block> $cachedBlocks */
     protected static function getCachedBlocks(): Collection
     {
-        if ( ! isset(self::$cachedBlocks)) {
+        if (!isset(self::$cachedBlocks)) {
             self::$cachedBlocks = Block::with(['blueprint', 'media'])->get();
         }
 
