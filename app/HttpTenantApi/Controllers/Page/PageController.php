@@ -14,7 +14,6 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 use Illuminate\Support\Arr;
-use PhpMyAdmin\SqlParser\Components\Condition;
 
 #[ApiResource('pages', only: ['index', 'show'])]
 class PageController
@@ -65,7 +64,7 @@ class PageController
             ])
             ->firstOrFail();
 
-        abort_if(is_null($page->published_at) && $request->hasValidSignature(false), 412);
+        abort_if(is_null($page->published_at) && ! $request->hasValidSignature(), 412);
 
         return PageResource::make($page);
     }

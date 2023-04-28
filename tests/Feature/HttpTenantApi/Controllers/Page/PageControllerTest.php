@@ -5,6 +5,8 @@ declare(strict_types=1);
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\URL;
 
 use function Pest\Laravel\getJson;
 
@@ -65,7 +67,9 @@ it('can show a page with includes', function (string $include) {
         'keywords' => 'Foo keywords',
     ]);
 
-    getJson("api/pages/{$page->getRouteKey()}?" . http_build_query(['include' => $include]))
+    $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$page->getRouteKey()]), '?');
+
+    getJson("api/pages/{$page->getRouteKey()}?" . $queryString . '&' . http_build_query(['include' => $include]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($page, $include) {
             $json

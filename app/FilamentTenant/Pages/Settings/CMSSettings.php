@@ -34,8 +34,8 @@ class CMSSettings extends TenantBaseSettings
                     ->columnSpan('full'),
             ]),
             Card::make([
-                TextInput::make('signed_route')
-                    ->required()
+                TextInput::make('front_end_preview_page_url')
+                    ->label('Front end preview page url ( URL must have "{slug}" )')
                     ->columnSpan('full'),
             ]),
         ];
