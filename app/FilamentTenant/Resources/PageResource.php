@@ -4,31 +4,32 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use Closure;
+use Exception;
+use Carbon\Carbon;
+use Filament\Forms;
+use Filament\Tables;
+use Illuminate\Support\Str;
+use Domain\Page\Models\Page;
+use Filament\Resources\Form;
+use Domain\Page\Models\Block;
+use Filament\Resources\Table;
+use Filament\Resources\Resource;
 use App\FilamentTenant\Resources;
+use Domain\Page\Enums\Visibility;
+use Filament\Tables\Filters\Layout;
+use Domain\Page\Models\BlockContent;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Component;
+use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\MetaDataForm;
+use Domain\Page\Models\Builders\PageBuilder;
+use Illuminate\Database\Eloquent\Collection;
+use Domain\Internationalization\Models\Locale;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Carbon\Carbon;
-use Closure;
-use Domain\Page\Enums\Visibility;
-use Domain\Page\Models\Page;
-use Domain\Page\Models\Block;
-use Domain\Page\Models\BlockContent;
-use Domain\Page\Models\Builders\PageBuilder;
-use Exception;
-use Filament\Forms;
-use Filament\Forms\Components\Component;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
-use Filament\Tables\Filters\Layout;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class PageResource extends Resource
 {
@@ -63,6 +64,13 @@ class PageResource extends Resource
                                 })
                                 ->required(),
                             RouteUrlFieldset::make(),
+                            Forms\Components\Select::make('locale')
+                                ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'id')->toArray())
+                                ->default(optional(Locale::where('is_default', true)->first())->id)
+                                ->searchable()
+                                ->hidden(function () {
+                                    return Locale::count() === 1;
+                                }),
                             Forms\Components\Select::make('visibility')
                                 ->options(
                                     collect(Visibility::cases())

@@ -7,6 +7,7 @@ namespace Domain\Page\Models;
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Admin\Models\Admin;
+use Domain\Internationalization\Traits\Localeable;
 use Domain\Page\Enums\Visibility;
 use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
@@ -57,6 +58,7 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasR
     use HasRouteUrl;
     use HasMetaData;
     use ConstraintsRelationships;
+    use Localeable;
 
     protected $fillable = [
         'author_id',

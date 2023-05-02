@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Locale\Traits;
+namespace Domain\Internationalization\Traits;
 
 use Domain\Locale\Models\Locale;
 

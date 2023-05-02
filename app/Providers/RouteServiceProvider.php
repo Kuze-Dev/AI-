@@ -34,6 +34,10 @@ class RouteServiceProvider extends ServiceProvider
                         Route::view('/', 'web.welcome');
                     });
             }
+
+            Route::get('/test', function () {
+                dd(\Domain\Internationalization\Models\Locale::all()->sortByDesc('is_default')->map(function ($record) { return [$record['code'] => $record['name']]; })->collapse());
+            })->middleware('tenant');
         });
     }
 

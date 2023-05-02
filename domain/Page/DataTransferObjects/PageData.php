@@ -19,6 +19,7 @@ class PageData
         public readonly Visibility $visibility = Visibility::PUBLIC,
         public readonly ?Carbon $published_at = null,
         public readonly array $block_contents = [],
+        public readonly ?int $locale = null,
     ) {
     }
 
@@ -39,6 +40,7 @@ class PageData
                 ),
                 $data['block_contents'] ?? []
             ),
+            locale: $data['locale'] ?? null,
         );
     }
 }

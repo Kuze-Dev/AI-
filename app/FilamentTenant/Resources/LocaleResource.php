@@ -26,7 +26,7 @@ class LocaleResource extends Resource
 
     protected static ?string $navigationGroup = 'CMS';
 
-    protected static ?string $navigationIcon = 'heroicon-o-globe';
+    protected static ?string $navigationIcon = 'heroicon-o-translate';
 
     protected static ?string $recordTitleAttribute = 'name';
 
