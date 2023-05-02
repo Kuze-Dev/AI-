@@ -52,7 +52,7 @@ it('can submit form with captcha', function () {
         'api/forms/' . $form->getRouteKey() . '/submissions',
         [
             fake()->word() => fake()->sentence(3),
-            'captcha_token' => 'some-token'
+            'captcha_token' => 'some-token',
         ]
     )
         ->assertCreated()
