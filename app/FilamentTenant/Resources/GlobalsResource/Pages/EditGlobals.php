@@ -11,6 +11,7 @@ use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Domain\Globals\DataTransferObjects\GlobalsData;
+use Filament\Pages\Actions\Action;
 use Throwable;
 
 class EditGlobals extends EditRecord
@@ -20,27 +21,25 @@ class EditGlobals extends EditRecord
     protected function getActions(): array
     {
         return [
+            Action::make('save')
+                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->action('save')
+                ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
         ];
     }
 
-      /**
-       * @param \Domain\Globals\Models\Globals $record
-       * @throws Throwable
-       */
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
+    }
+
+    /**
+     * @param \Domain\Globals\Models\Globals $record
+     * @throws Throwable
+     */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(
-            fn () => app(UpdateGlobalsAction::class)
-                ->execute(
-                    $record,
-                    new GlobalsData(
-                        name: $data['name'],
-                        slug: $data['slug'],
-                        blueprint_id: $data['blueprint_id'],
-                        data: $data['data'],
-                    )
-                )
-        );
+        return DB::transaction(fn () => app(UpdateGlobalsAction::class)->execute($record, GlobalsData::fromArray($data)));
     }
 }

@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\MenuResource\Pages\EditMenu;
 use Domain\Menu\Database\Factories\MenuFactory;
 use Domain\Menu\Database\Factories\NodeFactory;
+use Domain\Menu\Enums\NodeType;
+use Domain\Menu\Enums\Target;
 use Domain\Menu\Models\Menu;
 use Filament\Facades\Filament;
 
@@ -41,13 +43,15 @@ it('can edit menu', function () {
                 'nodes' => [
                     [
                         'label' => 'Test Edit Node',
+                        'target' => Target::BLANK->value,
+                        'type' => NodeType::URL->value,
                         'url' => 'https://test-edit-node.com',
-                        'target' => '_blank',
                         'children' => [
                             [
                                 'label' => 'Test Edit Child',
-                                'url' => 'https://test-edit-child.com',
-                                'target' => '_blank',
+                                'target' => Target::BLANK->value,
+                                'type' => NodeType::URL->value,
+                                'url' => 'https://test-edit-node.com',
                             ],
                         ],
                     ],

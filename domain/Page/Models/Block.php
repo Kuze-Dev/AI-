@@ -1,0 +1,93 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Domain\Page\Models;
+
+use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Blueprint\Models\Blueprint;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
+use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+
+/**
+ * Domain\Page\Models\Block
+ *
+ * @property int $id
+ * @property string $blueprint_id
+ * @property string $name
+ * @property string $component
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read int|null $activities_count
+ * @property-read Blueprint $blueprint
+ * @method static \Illuminate\Database\Eloquent\Builder|Block newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Block newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Block query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Block whereBlueprintId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Block whereComponent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Block whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Block whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Block whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Block whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+#[OnDeleteRestrict(['blockContents'])]
+class Block extends Model implements IsActivitySubject, HasMedia
+{
+    use LogsActivity;
+    use ConstraintsRelationships;
+    use InteractsWithMedia;
+
+    protected $fillable = [
+        'blueprint_id',
+        'name',
+        'component',
+        'is_fixed_content',
+        'data',
+    ];
+
+    protected $casts = [
+        'data' => 'array',
+        'is_fixed_content' => 'bool',
+    ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
+    /** @return BelongsTo<Blueprint, Block> */
+    public function blueprint(): BelongsTo
+    {
+        return $this->belongsTo(Blueprint::class);
+    }
+
+    /** @return HasMany<BlockContent> */
+    public function blockContents(): HasMany
+    {
+        return $this->hasMany(BlockContent::class);
+    }
+
+    public function getActivitySubjectDescription(Activity $activity): string
+    {
+        return 'Block: '.$this->name;
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')
+            ->singleFile();
+    }
+}

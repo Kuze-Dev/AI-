@@ -1,6 +1,14 @@
 <?php
 
 return [
+    'relations' => [
+        'blocks' => Domain\Page\Models\Block::class,
+        'contents' => Domain\Content\Models\Content::class,
+        'forms' => Domain\Form\Models\Form::class,
+        'globals' => Domain\Globals\Models\Globals::class,
+        'taxonomies' => Domain\Taxonomy\Models\Taxonomy::class,
+    ],
+
     /**
      * The list of models that could be linked to a blueprint's related resource field.
      *
@@ -12,13 +20,13 @@ return [
      * }>
      */
     'related_resources' => [
-        Domain\Collection\Models\Collection::class => [
+        Domain\Content\Models\Content::class => [
             'title_column' => 'name'
         ],
-        Domain\Collection\Models\CollectionEntry::class => [
+        Domain\Content\Models\ContentEntry::class => [
             'title_column' => 'title',
             'relation_scopes' => [
-                'collection' => [
+                'content' => [
                     'title_column' => 'name'
                 ],
             ]

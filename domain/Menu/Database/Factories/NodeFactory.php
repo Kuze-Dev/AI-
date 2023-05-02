@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Menu\Database\Factories;
 
+use Domain\Menu\Enums\NodeType;
 use Domain\Menu\Enums\Target;
 use Domain\Menu\Models\Node;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -20,9 +21,20 @@ class NodeFactory extends Factory
         return [
             'menu_id' => null,
             'parent_id' => null,
+            'model_type' => null,
+            'model_id' => null,
             'label' => fake()->word(),
             'target' => Target::self,
-            'url' => fake()->url(),
+            'type' => function (array $attributes) {
+                return $attributes['model_type'] === null
+                    ? NodeType::URL
+                    : NodeType::RESOURCE;
+            },
+            'url' => function (array $attributes) {
+                return $attributes['model_type'] === null
+                    ? fake()->url()
+                    : null;
+            },
             'order' => null,
         ];
     }

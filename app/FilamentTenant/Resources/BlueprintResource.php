@@ -8,18 +8,21 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources\BlueprintResource\Pages;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
+use Domain\Blueprint\Actions\DeleteBlueprintAction;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\SectionData;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -86,9 +89,17 @@ class BlueprintResource extends Resource
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
+            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->using(function (Blueprint $record) {
+                        try {
+                            return app(DeleteBlueprintAction::class)->execute($record);
+                        } catch (DeleteRestrictedException $e) {
+                            return false;
+                        }
+                    }),
             ])
             ->defaultSort('created_at', 'desc');
     }
@@ -278,7 +289,19 @@ class BlueprintResource extends Resource
                     ->columnSpanFull(),
             ],
             FieldType::SELECT => [
-                Forms\Components\Toggle::make('multiple'),
+                Forms\Components\Toggle::make('multiple')
+                    ->reactive()
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('min')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
+                    ->when(fn (Closure $get) => $get('multiple') === true),
+                Forms\Components\TextInput::make('max')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
+                    ->when(fn (Closure $get) => $get('multiple') === true),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
                     ->orderable()
@@ -340,6 +363,10 @@ class BlueprintResource extends Resource
             FieldType::RELATED_RESOURCE => [
                 Forms\Components\Select::make('resource')
                     ->columnSpanFull()
+                    ->lazy()
+                    ->afterStateUpdated(function (Closure $set) {
+                        $set('relation_scopes', []);
+                    })
                     ->options(
                         collect(config('domain.blueprint.related_resources', []))
                             ->keys()

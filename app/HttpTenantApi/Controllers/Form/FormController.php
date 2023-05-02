@@ -17,15 +17,19 @@ class FormController extends Controller
     public function index(): JsonApiResourceCollection
     {
         return FormResource::collection(
-            QueryBuilder::for(Form::query()->select(['blueprint_id', 'name',  'slug']))
+            QueryBuilder::for(Form::query())
                 ->allowedIncludes('blueprint')
                 ->allowedFilters(['name'])
                 ->jsonPaginate()
         );
     }
 
-    public function show(Form $form): FormResource
+    public function show(string $form): FormResource
     {
-        return FormResource::make($form);
+        return FormResource::make(
+            QueryBuilder::for(Form::whereSlug($form))
+                ->allowedIncludes('blueprint')
+                ->firstOrFail()
+        );
     }
 }

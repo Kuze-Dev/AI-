@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use Domain\Admin\Models\Admin;
+use Domain\Tenant\Models\Tenant;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Auth\Notifications\VerifyEmail as VerifyEmailNotification;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -27,24 +28,19 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Blueprint\Models\Blueprint::class => \App\Policies\BlueprintPolicy::class,
         \Domain\Menu\Models\Menu::class => \App\Policies\MenuPolicy::class,
         \Domain\Page\Models\Page::class => \App\Policies\PagePolicy::class,
-        \Domain\Page\Models\Slice::class => \App\Policies\SlicePolicy::class,
+        \Domain\Page\Models\Block::class => \App\Policies\BlockPolicy::class,
         \Domain\Form\Models\Form::class => \App\Policies\FormPolicy::class,
         \Domain\Form\Models\FormSubmission::class => \App\Policies\FormSubmissionPolicy::class,
         \Domain\Taxonomy\Models\Taxonomy::class => \App\Policies\TaxonomyPolicy::class,
         \Domain\Taxonomy\Models\TaxonomyTerm::class => \App\Policies\TaxonomyTermPolicy::class,
-        \Domain\Collection\Models\Collection::class => \App\Policies\CollectionPolicy::class,
-        \Domain\Collection\Models\CollectionEntry::class => \App\Policies\CollectionEntryPolicy::class,
+        \Domain\Content\Models\Content::class => \App\Policies\ContentPolicy::class,
+        \Domain\Content\Models\ContentEntry::class => \App\Policies\ContentEntryPolicy::class,
         \Domain\Globals\Models\Globals::class => \App\Policies\GlobalsPolicy::class,
     ];
 
-    /**
-     * Register any authentication / authorization services.
-     *
-     * @return void
-     */
-    public function boot()
+    /** Register any authentication / authorization services. */
+    public function boot(): void
     {
-        $this->registerPolicies();
         $this->configureNotificationUrls();
 
         /** @see https://freek.dev/1325-when-to-use-gateafter-in-laravel */
@@ -55,25 +51,49 @@ class AuthServiceProvider extends ServiceProvider
     {
         VerifyEmailNotification::createUrlUsing(function (mixed $notifiable) {
             if ($notifiable instanceof Admin) {
-                return URL::temporarySignedRoute(
-                    'filament.auth.verification.verify',
+                if (tenancy()->initialized) {
+                    /** @var Tenant */
+                    $tenant = tenancy()->tenant;
+
+                    $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;
+                    $routeName = 'filament-tenant.auth.verification.verify';
+                } else {
+                    $hostName = url('/', secure: app()->environment('local'));
+                    $routeName = 'filament.auth.verification.verify';
+                }
+
+                return $hostName . URL::temporarySignedRoute(
+                    $routeName,
                     now()->addMinutes(Config::get('auth.verification.expire', 60)),
                     [
                         'id' => $notifiable->getKey(),
                         'hash' => sha1($notifiable->getEmailForVerification()),
-                    ]
+                    ],
+                    false
                 );
             }
         });
 
         ResetPasswordNotification::createUrlUsing(function (mixed $notifiable, string $token) {
             if ($notifiable instanceof Admin) {
-                return URL::route(
-                    'filament.auth.password.reset',
+                if (tenancy()->initialized) {
+                    /** @var Tenant */
+                    $tenant = tenancy()->tenant;
+
+                    $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;
+                    $routeName = 'filament-tenant.auth.password.reset';
+                } else {
+                    $hostName = url('/', secure: app()->environment('local'));
+                    $routeName = 'filament.auth.password.reset';
+                }
+
+                return $hostName . URL::route(
+                    $routeName,
                     [
                         'token' => $token,
                         'email' => $notifiable->getEmailForPasswordReset(),
-                    ]
+                    ],
+                    false
                 );
             }
         });

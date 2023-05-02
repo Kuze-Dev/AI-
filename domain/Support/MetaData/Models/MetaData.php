@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Support\MetaData\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Eloquent;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
  * Domain\Support\MetaData\Models\MetaData
@@ -24,8 +22,8 @@ use Eloquent;
  * @property string|null $keywords
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
- * @property-read int|null $activities_count
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read int|null $media_count
  * @property-read Model|Eloquent $model
  * @method static \Illuminate\Database\Eloquent\Builder|MetaData newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|MetaData newQuery()
@@ -39,11 +37,11 @@ use Eloquent;
  * @method static \Illuminate\Database\Eloquent\Builder|MetaData whereModelType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MetaData whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MetaData whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
-class MetaData extends Model implements IsActivitySubject
+class MetaData extends Model implements HasMedia
 {
-    use LogsActivity;
+    use InteractsWithMedia;
 
     /**
      * Declare columns
@@ -56,23 +54,19 @@ class MetaData extends Model implements IsActivitySubject
         'keywords',
     ];
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logFillable()
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
-    }
-
-    /** Specify activity log description. */
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Meta tags: '.$this->title;
-    }
+    protected $with = [
+        'media',
+    ];
 
     /** @return MorphTo<Model, self> */
     public function model(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')
+            ->singleFile();
     }
 }

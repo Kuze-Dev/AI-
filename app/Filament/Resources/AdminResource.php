@@ -9,17 +9,19 @@ use App\Filament\Resources\AdminResource\Pages;
 use Domain\Admin\Models\Admin;
 use Domain\Auth\Actions\ForgotPasswordAction;
 use Domain\Role\Models\Role;
+use Exception;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Permission;
-use STS\FilamentImpersonate\Impersonate;
+use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
 class AdminResource extends Resource
 {
@@ -189,25 +191,34 @@ class AdminResource extends Resource
                         });
                     }),
             ])
+            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->authorize('update'),
-                Tables\Actions\DeleteAction::make()
-                    ->authorize('delete'),
-                Tables\Actions\RestoreAction::make()
-                    ->authorize('restore'),
-                Tables\Actions\ForceDeleteAction::make()
-                    ->authorize('forceDelete'),
                 Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make()
+                        ->authorize('delete'),
+                    Tables\Actions\RestoreAction::make()
+                        ->authorize('restore'),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->authorize('forceDelete'),
                     Tables\Actions\Action::make('resend-verification')
                         ->requiresConfirmation()
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
-                            $record->sendEmailVerificationNotification();
-                            $action->success();
+                            try {
+                                $record->sendEmailVerificationNotification();
+                                $action
+                                    ->successNotificationTitle(trans('A fresh verification link has been sent to your email address.'))
+                                    ->success();
+                            } catch (Exception $e) {
+                                $action->failureNotificationTitle(trans('Failed to send verification link.'))
+                                    ->failure();
+                            }
                         })
                         ->authorize('resendVerification'),
                     Tables\Actions\Action::make('send-password-reset')
                         ->requiresConfirmation()
+                        ->icon('heroicon-o-lock-open')
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
                             $result = app(ForgotPasswordAction::class)
                                 ->execute($record->email, 'admin');
@@ -219,12 +230,14 @@ class AdminResource extends Resource
                                 return;
                             }
 
-                            $action->success();
+                            $action
+                                ->successNotificationTitle(trans('A password reset link has been sent to your email address.'))
+                                ->success();
                         })
                         ->authorize('sendPasswordReset'),
                     Impersonate::make()
                         ->guard('admin')
-                        ->redirectTo(route('filament.pages.dashboard'))
+                        ->redirectTo(route(tenancy()->initialized ? 'filament-tenant.pages.dashboard' : 'filament.pages.dashboard'))
                         ->authorize('impersonate'),
                 ]),
             ])

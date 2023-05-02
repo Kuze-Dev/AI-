@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
@@ -16,7 +18,9 @@ class PageResource extends JsonApiResource
     {
         return  [
             'name' => $this->name,
-            'route_url' => $this->qualified_route_url,
+            'route_url' => $this->activeRouteUrl?->url,
+            'visibility' => $this->visibility,
+            'published_at' => $this->published_at,
         ];
     }
 
@@ -24,9 +28,22 @@ class PageResource extends JsonApiResource
     public function toRelationships(Request $request): array
     {
         return [
-            'sliceContents' => fn () => SliceContentResource::collection($this->sliceContents),
-            'slugHistories' => fn () => SlugHistoryResource::collection($this->slugHistories),
+            'blockContents' => fn () => BlockContentResource::collection($this->blockContents),
+            'routeUrls' => fn () => RouteUrlResource::collection($this->routeUrls),
             'metaData' => fn () => MetaDataResource::make($this->metaData),
         ];
+    }
+
+    public static function newCollection(mixed $resource)
+    {
+        if ($resource instanceof Collection) {
+            $resource->loadMissing('activeRouteUrl');
+        }
+
+        if ($resource instanceof LengthAwarePaginator && $resource->getCollection() instanceof Collection) {
+            $resource->getCollection()->loadMissing('activeRouteUrl');
+        }
+
+        return parent::newCollection($resource);
     }
 }

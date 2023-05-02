@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 use Domain\Page\Actions\UpdatePageAction;
 use Domain\Page\Database\Factories\PageFactory;
-use Domain\Page\Database\Factories\SliceFactory;
+use Domain\Page\Database\Factories\BlockFactory;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
-use Domain\Page\Models\SliceContent;
+use Domain\Page\Models\BlockContent;
 use Domain\Support\MetaData\Models\MetaData;
 
 use function Pest\Laravel\assertDatabaseCount;
@@ -17,7 +17,7 @@ beforeEach(fn () => testInTenantContext());
 
 it('can update page', function () {
     $page = PageFactory::new()
-        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
+        ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
         ->createOne();
 
     $metaDataData = [
@@ -35,10 +35,13 @@ it('can update page', function () {
             PageData::fromArray([
                 'name' => 'Foo',
                 'slug' => 'foo',
-                'route_url' => 'foo',
-                'slice_contents' => [
+                'route_url' => [
+                    'url' => 'foo',
+                ],
+                'author_id' => 1,
+                'block_contents' => [
                     [
-                        'slice_id' => $page->sliceContents->first()->slice_id,
+                        'block_id' => $page->blockContents->first()->block_id,
                         'data' => ['name' => 'foo'],
                     ],
                 ],
@@ -52,7 +55,7 @@ it('can update page', function () {
         );
 
     assertDatabaseCount(Page::class, 1);
-    assertDatabaseCount(SliceContent::class, 1);
+    assertDatabaseCount(BlockContent::class, 1);
     assertDatabaseHas(
         MetaData::class,
         [
@@ -65,9 +68,9 @@ it('can update page', function () {
         ]
     );
     assertDatabaseHas(Page::class, ['name' => 'Foo']);
-    assertDatabaseHas(SliceContent::class, [
+    assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
-        'slice_id' => $page->sliceContents->first()->slice_id,
+        'block_id' => $page->blockContents->first()->block_id,
         'data' => json_encode(['name' => 'foo']),
     ]);
 });
