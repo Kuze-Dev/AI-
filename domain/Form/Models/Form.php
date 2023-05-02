@@ -58,6 +58,7 @@ class Form extends Model implements IsActivitySubject
         'name',
         'slug',
         'store_submission',
+        'uses_captcha',
     ];
 
     protected $casts = [
