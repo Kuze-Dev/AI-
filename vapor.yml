@@ -23,7 +23,8 @@ environments:
         - CategoryScrapingFramework
   staging:
     domain:
-      - staging.haspcms.net
+      - haspcms.net
+      - "*.haspcms.net"
     timeout: 30
     warm: 10
     cache: hasp-cache
