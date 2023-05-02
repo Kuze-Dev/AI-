@@ -67,7 +67,7 @@ class PageController
             ->firstOrFail();
 
         abort_if(
-            is_null($page->published_at) && !URL::hasValidSignature($request, false, [
+            is_null($page->published_at) && ! URL::hasValidSignature($request, false, [
                 'include',
                 'fields',
             ]),

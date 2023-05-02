@@ -44,7 +44,8 @@ class EditPage extends EditRecord
                         && str_contains($pageUrl, '{slug}')
                     ) {
                         $previewPageUrl = str_replace('{slug}', $this->record->slug, $pageUrl);
-                        $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$this->record->slug]), '?', false);
+
+                        $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$this->record->slug], false), '?');
 
                         $this->redirect($previewPageUrl . '?' . $queryString);
                     }
