@@ -67,9 +67,9 @@ it('can show a page with includes', function (string $include) {
         'keywords' => 'Foo keywords',
     ]);
 
-    $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$page->getRouteKey()]), '?');
+    $showPageWithSignedUrl = URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$page->getRouteKey()]);
 
-    getJson("api/pages/{$page->getRouteKey()}?" . $queryString . '&' . http_build_query(['include' => $include]))
+    getJson($showPageWithSignedUrl . '&' . http_build_query(['include' => $include]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($page, $include) {
             $json

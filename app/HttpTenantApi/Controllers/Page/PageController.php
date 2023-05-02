@@ -64,8 +64,16 @@ class PageController
             ])
             ->firstOrFail();
 
-        abort_if(is_null($page->published_at) && ! $request->hasValidSignature(), 412);
+        abort_if(is_null($page->published_at) && ! $this->generateNewRequestForSignedUrl($request)->hasValidSignature(), 412);
 
         return PageResource::make($page);
+    }
+
+    protected function generateNewRequestForSignedUrl(Request $request): Request
+    {
+        return Request::create($request->server('REQUEST_SCHEME')
+            . '://' . $request->server('HTTP_HOST') . '/' . $request->path()
+            . '?expires=' . $request->all()['expires'] . '&signature='
+            . $request->all()['signature'], 'GET');
     }
 }
