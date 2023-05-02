@@ -58,6 +58,7 @@ it('can filter pages', function ($attribute) {
 it('can show a page with includes', function (string $include) {
     $page = PageFactory::new()
         ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->published()
         ->createOne();
 
     $page->metaData()->create([
@@ -67,9 +68,7 @@ it('can show a page with includes', function (string $include) {
         'keywords' => 'Foo keywords',
     ]);
 
-    $showPageWithSignedUrl = URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$page->getRouteKey()]);
-
-    getJson($showPageWithSignedUrl . '&' . http_build_query(['include' => $include]))
+    getJson("api/pages/{$page->getRouteKey()}?" . http_build_query(['include' => $include]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($page, $include) {
             $json
@@ -88,3 +87,27 @@ it('can show a page with includes', function (string $include) {
     'routeUrls',
     'metaData',
 ]);
+
+it('cant show an unpublished page', function () {
+    $page = PageFactory::new()
+        ->createOne();
+
+    getJson("api/pages/{$page->getRouteKey()}")
+        ->assertStatus(412);
+});
+
+it('can show an unpublished page with valid signature', function () {
+    $page = PageFactory::new()
+        ->createOne();
+
+    $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$page->getRouteKey()], false), '?');
+
+    getJson("api/pages/{$page->getRouteKey()}?{$queryString}")
+        ->assertStatus(200)
+        ->assertJson(function (AssertableJson $json) use ($page) {
+            $json
+                ->where('data.type', 'pages')
+                ->where('data.id', Str::slug($page->name))
+                ->etc();
+        });
+});

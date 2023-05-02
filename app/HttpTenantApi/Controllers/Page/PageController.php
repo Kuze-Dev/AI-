@@ -14,6 +14,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\URL;
 
 #[ApiResource('pages', only: ['index', 'show'])]
 class PageController
@@ -56,6 +57,7 @@ class PageController
 
     public function show(Request $request, string $page): PageResource
     {
+        /** @var Page $page */
         $page = QueryBuilder::for(Page::whereSlug($page))
             ->allowedIncludes([
                 'blockContents.block',
@@ -64,16 +66,14 @@ class PageController
             ])
             ->firstOrFail();
 
-        abort_if(is_null($page->published_at) && ! $this->generateNewRequestForSignedUrl($request)->hasValidSignature(), 412);
+        abort_if(
+            is_null($page->published_at) && !URL::hasValidSignature($request, false, [
+                'include',
+                'fields',
+            ]),
+            412
+        );
 
         return PageResource::make($page);
-    }
-
-    protected function generateNewRequestForSignedUrl(Request $request): Request
-    {
-        return Request::create($request->server('REQUEST_SCHEME')
-            . '://' . $request->server('HTTP_HOST') . '/' . $request->path()
-            . '?expires=' . $request->all()['expires'] . '&signature='
-            . $request->all()['signature'], 'GET');
     }
 }
