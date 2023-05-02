@@ -40,7 +40,7 @@ class EditPage extends EditRecord
                     $pageUrl = $cmsSettings->front_end_preview_page_url ?? null;
 
                     if (
-                        ! blank($pageUrl)
+                        ! blank($pageUrl) && is_string($pageUrl)
                         && str_contains($pageUrl, '{slug}')
                     ) {
                         $previewPageUrl = str_replace('{slug}', $this->record->slug, $pageUrl);
