@@ -93,6 +93,10 @@ class AdminPolicy
 
     public function impersonate(User $user, Admin $admin): bool
     {
+        if ( ! is_null($admin->deleted_at)) {
+            return false;
+        }
+
         return $this->checkWildcardPermissions($user);
     }
 }

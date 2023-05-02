@@ -32,11 +32,10 @@ it('can create globals', function () {
         ])
         ->createOne();
 
-    $globals = livewire(CreateGlobals::class)
+    livewire(CreateGlobals::class)
         ->fillForm([
             'blueprint_id' => $blueprint->getKey(),
             'name' => 'Test',
-            'slug' => 'test',
             'data' => ['main' => ['title' => 'Foo']],
         ])->call('create')
         ->assertHasNoFormErrors()
@@ -45,7 +44,8 @@ it('can create globals', function () {
         ->record;
 
     assertDatabaseHas(Globals::class, [
-        'name' => $globals->name,
+        'name' => 'Test',
+        'slug' => 'test',
         'blueprint_id' => $blueprint->getKey(),
         'data' => json_encode(['main' => ['title' => 'Foo']]),
     ]);

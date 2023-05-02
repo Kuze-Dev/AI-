@@ -40,17 +40,6 @@ class EditGlobals extends EditRecord
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(
-            fn () => app(UpdateGlobalsAction::class)
-                ->execute(
-                    $record,
-                    new GlobalsData(
-                        name: $data['name'],
-                        slug: $data['slug'],
-                        blueprint_id: $data['blueprint_id'],
-                        data: $data['data'],
-                    )
-                )
-        );
+        return DB::transaction(fn () => app(UpdateGlobalsAction::class)->execute($record, GlobalsData::fromArray($data)));
     }
 }

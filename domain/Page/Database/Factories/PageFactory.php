@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Page\Database\Factories;
 
+use Carbon\Carbon;
 use Domain\Page\Models\Page;
-use Domain\Page\Models\Slice;
+use Domain\Page\Models\Block;
 use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
+use Domain\Support\RouteUrl\Database\Factories\RouteUrlFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,17 +22,27 @@ class PageFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'route_url' => '/{{$slug}}',
+            'published_at' => null,
         ];
     }
 
-    public function addSliceContent(Slice|SliceFactory $slice, array $attributes = []): self
+    public function published(Carbon|bool $state = true): self
     {
-        return $this->has(SliceContentFactory::new($attributes)->for($slice));
+        if ($state === false) {
+            return $this;
+        }
+
+        return $this->state(['published_at' => $state instanceof Carbon ? $state : now()]);
+    }
+
+    public function addBlockContent(Block|BlockFactory $block, array $attributes = []): self
+    {
+        return $this->has(BlockContentFactory::new($attributes)->for($block));
     }
 
     public function configure(): self
     {
-        return $this->has(MetaDataFactory::new(), 'metaData');
+        return $this->has(MetaDataFactory::new(), 'metaData')
+            ->has(RouteUrlFactory::new());
     }
 }

@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 use App\FilamentTenant\Resources\PageResource\Pages\CreatePage;
 use Domain\Page\Database\Factories\PageFactory;
-use Domain\Page\Database\Factories\SliceFactory;
+use Domain\Page\Database\Factories\BlockFactory;
+use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\Page;
-use Domain\Page\Models\SliceContent;
+use Domain\Page\Models\BlockContent;
 use Domain\Support\MetaData\Models\MetaData;
-use Domain\Support\SlugHistory\SlugHistory;
+use Domain\Support\RouteUrl\Models\RouteUrl;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -30,21 +31,20 @@ it('can render page', function () {
 });
 
 it('can create page', function () {
-    $sliceId = SliceFactory::new()
+    $block = BlockFactory::new()
         ->withDummyBlueprint()
-        ->createOne()
-        ->getKey();
+        ->createOne();
 
     $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
-            'route_url' => 'test-url',
-            'slice_contents' => [
+            'block_contents' => [
                 [
-                    'slice_id' => $sliceId,
+                    'block_id' => $block->getKey(),
                     'data' => ['name' => 'foo'],
                 ],
             ],
+            'visibility' => 'public',
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -52,12 +52,18 @@ it('can create page', function () {
         ->instance()
         ->record;
 
-    assertDatabaseHas(Page::class, ['name' => 'Test']);
-    assertDatabaseHas(SliceContent::class, [
-        'page_id' => $page->id,
-        'slice_id' => $sliceId,
-        'data' => json_encode(['name' => 'foo']),
+    assertDatabaseHas(Page::class, [
+        'author_id' => auth()->user()->id,
+        'name' => 'Test',
+        'visibility' => Visibility::PUBLIC->value,
     ]);
+
+    assertDatabaseHas(BlockContent::class, [
+        'page_id' => $page->id,
+        'block_id' => $block->getKey(),
+        'data' => json_encode($block->blockContents->first()->data),
+    ]);
+
     assertDatabaseHas(
         MetaData::class,
         [
@@ -66,14 +72,16 @@ it('can create page', function () {
             'model_id' => $page->getKey(),
         ]
     );
-    assertDatabaseHas(SlugHistory::class, [
+    assertDatabaseHas(RouteUrl::class, [
         'model_type' => $page->getMorphClass(),
         'model_id' => $page->id,
+        'url' => Page::generateRouteUrl($page, $page->toArray()),
+        'is_override' => false,
     ]);
 });
 
 it('can not create page with same name', function () {
-    $sliceId = SliceFactory::new()
+    $blockId = BlockFactory::new()
         ->withDummyBlueprint()
         ->createOne()
         ->getKey();
@@ -86,12 +94,13 @@ it('can not create page with same name', function () {
     livewire(CreatePage::class)
         ->fillForm([
             'name' => 'page 1',
-            'slice_contents' => [
+            'block_contents' => [
                 [
-                    'slice_id' => $sliceId,
+                    'block_id' => $blockId,
                     'data' => ['name' => 'foo'],
                 ],
             ],
+            'visibility' => 'public',
         ])
         ->call('create')
         ->assertHasFormErrors(['name' => 'unique'])
@@ -101,7 +110,7 @@ it('can not create page with same name', function () {
 });
 
 it('can create page with meta data', function () {
-    $sliceId = SliceFactory::new()
+    $blockId = BlockFactory::new()
         ->withDummyBlueprint()
         ->createOne()
         ->getKey();
@@ -117,10 +126,9 @@ it('can create page with meta data', function () {
     $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
-            'route_url' => 'test-url',
-            'slice_contents' => [
+            'block_contents' => [
                 [
-                    'slice_id' => $sliceId,
+                    'block_id' => $blockId,
                     'data' => ['name' => 'foo'],
                 ],
             ],
@@ -134,9 +142,9 @@ it('can create page with meta data', function () {
         ->record;
 
     assertDatabaseHas(Page::class, ['name' => 'Test']);
-    assertDatabaseHas(SliceContent::class, [
+    assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
-        'slice_id' => $sliceId,
+        'block_id' => $blockId,
         'data' => json_encode(['name' => 'foo']),
     ]);
     assertDatabaseHas(
@@ -153,8 +161,71 @@ it('can create page with meta data', function () {
         'file_name' => $metaDataImage->getClientOriginalName(),
         'mime_type' => $metaDataImage->getMimeType(),
     ]);
-    assertDatabaseHas(SlugHistory::class, [
+});
+
+it('can create page with published at date', function () {
+    $blockId = BlockFactory::new()
+        ->withDummyBlueprint()
+        ->createOne()
+        ->getKey();
+
+    $page = livewire(CreatePage::class)
+        ->fillForm([
+            'name' => 'Test',
+            'published_at' => true,
+            'visibility' => 'public',
+            'block_contents' => [
+                [
+                    'block_id' => $blockId,
+                    'data' => ['name' => 'foo'],
+                ],
+            ],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(
+        Page::class,
+        [
+            'name' => 'Test',
+            'published_at' => $page->published_at,
+        ]
+    );
+});
+
+it('can create page with custom url', function () {
+    $blockId = BlockFactory::new()
+        ->withDummyBlueprint()
+        ->createOne()
+        ->getKey();
+
+    $page = livewire(CreatePage::class)
+        ->fillForm([
+            'name' => 'Test',
+            'route_url' => [
+                'is_override' => true,
+                'url' => '/some/custom/url',
+            ],
+            'block_contents' => [
+                [
+                    'block_id' => $blockId,
+                    'data' => ['name' => 'foo'],
+                ],
+            ],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(RouteUrl::class, [
         'model_type' => $page->getMorphClass(),
         'model_id' => $page->id,
+        'url' => '/some/custom/url',
+        'is_override' => true,
     ]);
 });

@@ -43,13 +43,6 @@ class FormResource extends Resource
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
                         ->required(),
-                    Forms\Components\TextInput::make('slug')
-                        ->unique(ignoreRecord: true)
-                        ->rules('alpha_dash')
-                        ->disabled(fn (?FormModel $record) => $record !== null)
-                        ->afterStateUpdated(function ($state, $set) {
-                            $set('slug', Str::slug($state));
-                        }),
                     Forms\Components\Select::make('blueprint_id')
                         ->options(
                             fn () => Blueprint::orderBy('name')
@@ -179,7 +172,8 @@ class FormResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('blueprint.name')
                     ->sortable()
                     ->searchable()
@@ -202,7 +196,9 @@ class FormResource extends Resource
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->defaultSort('updated_at', 'desc');
     }

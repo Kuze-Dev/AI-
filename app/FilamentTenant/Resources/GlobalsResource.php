@@ -20,7 +20,6 @@ use Filament\Tables;
 use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Facades\Auth;
 use Closure;
-use Illuminate\Support\Str;
 
 class GlobalsResource extends Resource
 {
@@ -42,16 +41,7 @@ class GlobalsResource extends Resource
             Forms\Components\Card::make([
                 Forms\Components\TextInput::make('name')
                     ->unique(ignoreRecord: true)
-                    ->lazy()
-                    ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
-                        if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
-                            $set('slug', Str::slug($state));
-                        }
-                    })
                     ->required(),
-                Forms\Components\TextInput::make('slug')
-                    ->unique(ignoreRecord: true)
-                    ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                 Forms\Components\Select::make('blueprint_id')
                     ->options(
                         fn () => Blueprint::orderBy('name')
@@ -79,6 +69,10 @@ class GlobalsResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('slug')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('blueprint.name')
                     ->sortable()
                     ->searchable()
@@ -101,7 +95,9 @@ class GlobalsResource extends Resource
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

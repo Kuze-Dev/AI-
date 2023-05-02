@@ -58,7 +58,6 @@ class SyncTermTreeAction
 
         $term->fill([
             'name' => $termData->name,
-            'slug' => $termData->slug,
             'parent_id' => $parentTerm?->id,
             'data' => $termData->data,
         ])->save();
