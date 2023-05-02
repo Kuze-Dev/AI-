@@ -12,12 +12,11 @@ class CloudflareTurnstileProvider extends BaseProvider
     {
         $response = Http::asJson()
             ->post(
-                'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-                [
+                'https://challenges.cloudflare.com/turnstile/v0/siteverify?' . http_build_query([
                     'secret' => $this->credentials['secret_key'],
                     'response' => $token,
                     'remoteip' => $ip,
-                ]
+                ])
             )
             ->throw();
 

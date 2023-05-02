@@ -12,12 +12,11 @@ class GoogleRecaptchaProvider extends BaseProvider
     {
         $response = Http::asJson()
             ->post(
-                'https://www.google.com/recaptcha/api/siteverify',
-                [
+                'https://www.google.com/recaptcha/api/siteverify?' . http_build_query([
                     'secret' => $this->credentials['secret_key'],
                     'response' => $token,
                     'remoteip' => $ip,
-                ]
+                ])
             )
             ->throw();
 
