@@ -116,7 +116,7 @@ trait LogsFormActivity
         }
 
         if (method_exists($this, 'getResource')) {
-            return Str::headline(static::getResource()::getModelLabel()) . ' ' . $event;
+            return Str::headline($this->getResource()::getModelLabel()) . ' ' . $event;
         }
 
         return $this->getTitle() . ' ' . $event;
