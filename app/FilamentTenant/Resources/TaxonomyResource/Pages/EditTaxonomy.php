@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\TaxonomyResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Support\Concerns\HasTrees;
 use App\FilamentTenant\Support\Contracts\HasTrees as HasTreesContract;
 use App\FilamentTenant\Support\TreeFormAction;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 class EditTaxonomy extends EditRecord implements HasTreesContract
 {
     use HasTrees;
+    use LogsFormActivity;
 
     protected static string $resource = TaxonomyResource::class;
 

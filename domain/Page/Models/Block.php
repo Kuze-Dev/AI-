@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Page\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -41,7 +40,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @mixin \Eloquent
  */
 #[OnDeleteRestrict(['blockContents'])]
-class Block extends Model implements IsActivitySubject, HasMedia
+class Block extends Model implements HasMedia
 {
     use LogsActivity;
     use ConstraintsRelationships;
@@ -78,11 +77,6 @@ class Block extends Model implements IsActivitySubject, HasMedia
     public function blockContents(): HasMany
     {
         return $this->hasMany(BlockContent::class);
-    }
-
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Block: '.$this->name;
     }
 
     public function registerMediaCollections(): void

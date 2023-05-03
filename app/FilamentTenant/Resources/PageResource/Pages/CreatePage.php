@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\PageResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\PageResource;
 use Domain\Page\Actions\CreatePageAction;
 use Domain\Page\DataTransferObjects\PageData;
@@ -15,6 +16,8 @@ use Throwable;
 
 class CreatePage extends CreateRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = PageResource::class;
 
     protected function getActions(): array

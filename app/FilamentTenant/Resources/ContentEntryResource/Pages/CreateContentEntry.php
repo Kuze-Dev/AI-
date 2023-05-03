@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ContentEntryResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ContentEntryResource;
 use App\FilamentTenant\Resources\ContentResource;
 use Domain\Content\Actions\CreateContentEntryAction;
@@ -16,6 +17,8 @@ use Domain\Content\Models\Content;
 
 class CreateContentEntry extends CreateRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = ContentEntryResource::class;
 
     public mixed $ownerRecord;

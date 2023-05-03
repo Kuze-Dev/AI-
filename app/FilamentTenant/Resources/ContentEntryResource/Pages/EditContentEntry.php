@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ContentEntryResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,8 @@ use Filament\Pages\Actions\DeleteAction;
 /** @method class-string<\Illuminate\Database\Eloquent\Model> getModel() */
 class EditContentEntry extends EditRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = ContentEntryResource::class;
 
     public mixed $ownerRecord;
@@ -91,15 +94,12 @@ class EditContentEntry extends EditRecord
         );
     }
 
-    /**
-     * Execute database transaction
-     * for updating content entries.
-     */
+    /** @param \Domain\Content\Models\ContentEntry $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(
             fn () => app(UpdateContentEntryAction::class)
-                ->execute($this->record, ContentEntryData::fromArray($data))
+                ->execute($record, ContentEntryData::fromArray($data))
         );
     }
 }

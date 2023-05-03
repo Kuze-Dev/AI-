@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\TenantResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\Filament\Resources\TenantResource;
 use Domain\Tenant\Actions\UpdateTenantAction;
 use Domain\Tenant\DataTransferObjects\TenantData;
@@ -17,6 +18,8 @@ use Throwable;
 
 class EditTenant extends EditRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = TenantResource::class;
 
     protected function getActions(): array

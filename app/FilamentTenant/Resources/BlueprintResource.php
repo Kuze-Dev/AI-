@@ -25,6 +25,7 @@ use Filament\Tables;
 use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\HtmlString;
@@ -368,7 +369,7 @@ class BlueprintResource extends Resource
                         $set('relation_scopes', []);
                     })
                     ->options(
-                        collect(config('domain.blueprint.related_resources', []))
+                        (new Collection(config('domain.blueprint.related_resources', [])))
                             ->keys()
                             ->mapWithKeys(
                                 function (string $model) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\BlockResource\Blocks;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\BlockResource;
 use Domain\Page\Actions\CreateBlockAction;
 use Domain\Page\DataTransferObjects\BlockData;
@@ -15,6 +16,8 @@ use Throwable;
 
 class CreateBlock extends CreateRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = BlockResource::class;
 
     protected function getActions(): array

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Content\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Admin\Models\Admin;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Domain\Support\MetaData\HasMetaData;
@@ -59,7 +58,7 @@ use Illuminate\Support\Str;
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['taxonomyTerms', 'metaData', 'routeUrls'])]
-class ContentEntry extends Model implements IsActivitySubject, HasMetaDataContract, HasRouteUrlContact
+class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlContact
 {
     use LogsActivity;
     use HasSlug;
@@ -132,12 +131,6 @@ class ContentEntry extends Model implements IsActivitySubject, HasMetaDataContra
     public function taxonomyTerms(): BelongsToMany
     {
         return $this->belongsToMany(TaxonomyTerm::class);
-    }
-
-    /** Specify activity log description. */
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Content Entry: '.$this->id;
     }
 
     /** @return SlugOptions */
