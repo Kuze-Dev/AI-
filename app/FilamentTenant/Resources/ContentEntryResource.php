@@ -141,7 +141,6 @@ class ContentEntryResource extends Resource
                         ->schema([
                             Forms\Components\DateTimePicker::make('published_at')
                                 ->timezone(Auth::user()?->timezone),
-
                         ])
                         ->when(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
                     SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
