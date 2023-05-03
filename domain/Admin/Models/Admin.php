@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Admin\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Admin\Notifications\ResetPassword;
 use Domain\Admin\Notifications\VerifyEmail;
 use Domain\Auth\Contracts\HasActiveState as HasActiveStateContract;
@@ -84,7 +83,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['twoFactorAuthentication', 'roles', 'permissions', 'tokens'])]
-class Admin extends Authenticatable implements MustVerifyEmail, HasName, TwoFactorAuthenticatableContract, FilamentUser, HasActiveStateContract, IsActivitySubject
+class Admin extends Authenticatable implements MustVerifyEmail, HasName, TwoFactorAuthenticatableContract, FilamentUser, HasActiveStateContract
 {
     use HasApiTokens;
     use HasRoles;
@@ -123,11 +122,6 @@ class Admin extends Authenticatable implements MustVerifyEmail, HasName, TwoFact
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
-    }
-
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Admin: '.$this->full_name;
     }
 
     public function isZeroDayAdmin(): bool

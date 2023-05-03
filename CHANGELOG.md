@@ -1,6 +1,13 @@
 # Release Notes
 
-## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.0)
+## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.1)
+
+## [v0.2.1](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.2.1%0Dv0.2.0)
+
+### Changed
+
+- Sync `stechstudio/filament-impersonate` config.
+- Revamp activity log.
 
 ## [v0.2.0](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.2.0%0Dv0.1.7)
 

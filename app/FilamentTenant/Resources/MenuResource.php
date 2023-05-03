@@ -54,6 +54,7 @@ class MenuResource extends Resource
     /** @param Menu $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
+        /** @phpstan-ignore-next-line */
         return [trans('Total Nodes') => $record->nodes_count];
     }
 

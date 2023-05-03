@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Tenant\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Spatie\Activitylog\LogOptions;
@@ -41,7 +40,7 @@ use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['domains'])]
-class Tenant extends BaseTenant implements TenantWithDatabase, IsActivitySubject
+class Tenant extends BaseTenant implements TenantWithDatabase
 {
     use HasDatabase;
     use HasDomains;
@@ -54,11 +53,6 @@ class Tenant extends BaseTenant implements TenantWithDatabase, IsActivitySubject
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
-    }
-
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Tenant: '.$this->name;
     }
 
     protected $fillable = [

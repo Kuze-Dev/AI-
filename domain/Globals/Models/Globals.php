@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Globals\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Blueprint;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -40,7 +39,7 @@ use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
  * @method static \Illuminate\Database\Eloquent\Builder|Globals whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class Globals extends Model implements IsActivitySubject
+class Globals extends Model
 {
     use LogsActivity;
     use HasSlug;
@@ -81,12 +80,6 @@ class Globals extends Model implements IsActivitySubject
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
-    }
-
-    /** Specify activity log description. */
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Global: '.$this->name;
     }
 
     /**

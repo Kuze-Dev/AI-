@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ContentResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ContentEntryResource;
 use App\FilamentTenant\Resources\ContentResource;
 use Domain\Content\Actions\UpdateContentAction;
@@ -18,6 +19,8 @@ use Filament\Pages\Actions\Action;
 
 class EditContent extends EditRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = ContentResource::class;
 
     /**

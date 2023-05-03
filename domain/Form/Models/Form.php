@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Form\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -47,7 +46,7 @@ use Spatie\Sluggable\SlugOptions;
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['formEmailNotifications', 'formSubmissions'])]
-class Form extends Model implements IsActivitySubject
+class Form extends Model
 {
     use HasSlug;
     use LogsActivity;
@@ -58,6 +57,7 @@ class Form extends Model implements IsActivitySubject
         'name',
         'slug',
         'store_submission',
+        'uses_captcha',
     ];
 
     protected $casts = [
@@ -70,11 +70,6 @@ class Form extends Model implements IsActivitySubject
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
-    }
-
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Form: '.$this->name;
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Form\Models\Form> */

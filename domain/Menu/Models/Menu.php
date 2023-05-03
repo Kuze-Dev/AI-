@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Menu\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
@@ -40,7 +39,7 @@ use Spatie\Sluggable\SlugOptions;
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['parentNodes'])]
-class Menu extends Model implements IsActivitySubject
+class Menu extends Model
 {
     use HasSlug;
     use LogsActivity;
@@ -57,11 +56,6 @@ class Menu extends Model implements IsActivitySubject
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
-    }
-
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Menu: ' . $this->name;
     }
 
     /** @return HasMany<Node> */

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\BlueprintResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\BlueprintResource;
 use Domain\Blueprint\Actions\UpdateBlueprintAction;
 use Domain\Blueprint\DataTransferObjects\BlueprintData;
@@ -17,6 +18,8 @@ use Illuminate\Support\Facades\DB;
 
 class EditBlueprint extends EditRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = BlueprintResource::class;
 
     protected function getActions(): array

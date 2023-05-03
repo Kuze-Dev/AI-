@@ -8,6 +8,7 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources\FormResource\Pages;
 use App\FilamentTenant\Resources\FormResource\RelationManagers\FormSubmissionsRelationManager;
 use App\FilamentTenant\Support\SchemaInterpolations;
+use App\Settings\FormSettings;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Form\Models\Form as FormModel;
@@ -56,6 +57,13 @@ class FormResource extends Resource
                         ->reactive()
                         ->preload(),
                     Forms\Components\Toggle::make('store_submission'),
+                    Forms\Components\Toggle::make('uses_captcha')
+                        ->disabled(fn (FormSettings $formSettings) => ! $formSettings->provider)
+                        ->helperText(
+                            fn (FormSettings $formSettings) => ! $formSettings->provider
+                                ? trans('Currently unavailable. Please setup Captcha(in Settings > Form Settings) first.')
+                                : null
+                        ),
                 ]),
                 Forms\Components\Card::make([
                     Forms\Components\Section::make('Available Values')
