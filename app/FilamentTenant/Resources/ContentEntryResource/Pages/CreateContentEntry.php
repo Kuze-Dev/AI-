@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Domain\Content\Models\Content;
+use Filament\Pages\Actions\Action;
 
 class CreateContentEntry extends CreateRecord
 {
@@ -60,6 +61,22 @@ class CreateContentEntry extends CreateRecord
         return trans('Create :label Content Entry', [
             'label' => $this->ownerRecord->name,
         ]);
+    }
+
+    protected function getActions(): array
+    {
+        return [
+            Action::make('create')
+                ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
+                ->action('create')
+                ->keyBindings(['mod+s']),
+            $this->getCreateAnotherFormAction(),
+        ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
     }
 
     protected function handleRecordCreation(array $data): Model
