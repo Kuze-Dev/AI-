@@ -120,4 +120,11 @@ class Taxonomy extends Model implements IsActivitySubject
             ->doNotGenerateSlugsOnUpdate()
             ->saveSlugsTo($this->getRouteKeyName());
     }
+
+    protected function onDeleteRestrictRelations(): array
+    {
+        return [
+            'contents'
+        ];
+    }
 }

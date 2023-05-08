@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Filament\Resources\RoleResource\Pages\ListRoles;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Role\Database\Factories\RoleFactory;
+use Domain\Role\Exceptions\CantDeleteRoleWithAssociatedUsersException;
 use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Pages\Actions\DeleteAction;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -56,4 +57,4 @@ it('can not delete role with existing user', function () {
 
     livewire(ListRoles::class)
         ->callTableAction(DeleteAction::class, $role);
-})->throws(DeleteRestrictedException::class);
+})->throws(CantDeleteRoleWithAssociatedUsersException::class);

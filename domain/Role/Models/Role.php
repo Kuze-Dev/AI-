@@ -58,4 +58,11 @@ class Role extends \Spatie\Permission\Models\Role implements IsActivitySubject
     {
         return 'Role: '.$this->name;
     }
+
+    protected function onDeleteRestrictRelations(): array
+    {
+        return [
+            'users'
+        ];
+    }
 }

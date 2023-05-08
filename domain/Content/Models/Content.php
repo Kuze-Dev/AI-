@@ -162,4 +162,11 @@ class Content extends Model implements IsActivitySubject
     {
         return $this->past_publish_date_behavior || $this->future_publish_date_behavior;
     }
+    
+    protected function onDeleteRestrictRelations(): array
+    {
+        return [
+            'contentEntries'
+        ];
+    }
 }

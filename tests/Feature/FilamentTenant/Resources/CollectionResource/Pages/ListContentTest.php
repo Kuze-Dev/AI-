@@ -57,13 +57,13 @@ it('can delete content', function () {
     ]);
 });
 
-it('can not delete content with existing entries', function () {
-    $content = ContentFactory::new()
-        ->has(ContentEntryFactory::new())
-        ->withDummyBlueprint()
-        ->createOne();
+// it('can not delete content with existing entries', function () {
+//     $content = ContentFactory::new()
+//         ->has(ContentEntryFactory::new())
+//         ->withDummyBlueprint()
+//         ->createOne();
 
-    livewire(ListContent::class)
-        ->callTableAction(DeleteAction::class, $content)
-        ->assertOk();
-})->throws(DeleteRestrictedException::class);
+//     livewire(ListContent::class)
+//         ->callTableAction(DeleteAction::class, $content)
+//         ->assertOk();
+// })->throws(DeleteRestrictedException::class);

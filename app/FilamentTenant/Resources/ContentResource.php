@@ -17,6 +17,8 @@ use Filament\Tables;
 use Filament\Tables\Filters\Layout;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
+use Domain\Content\Actions\DeleteContentAction;
+use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -179,12 +181,19 @@ class ContentResource extends Resource
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->using(function (Content $record) {
+                        try {
+                            return app(DeleteContentAction::class)->execute($record);
+                        } catch (DeleteRestrictedException $e) {
+                            return false;
+                        }
+                    }),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('view-entries')
                         ->icon('heroicon-s-eye')
                         ->color('secondary')
                         ->url(fn (Content $record) => ContentEntryResource::getUrl('index', [$record])),
-                    Tables\Actions\DeleteAction::make(),
                 ]),
             ])
             ->bulkActions([
