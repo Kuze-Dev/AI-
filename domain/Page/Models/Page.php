@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Page\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Admin\Models\Admin;
 use Domain\Internationalization\Traits\Localeable;
@@ -51,7 +50,7 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  */
 
 #[OnDeleteCascade(['blockContents', 'metaData', 'routeUrls'])]
-class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasRouteUrlContact
+class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
 {
     use LogsActivity;
     use HasSlug;
@@ -107,11 +106,6 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract, HasR
     public function blockContents(): HasMany
     {
         return $this->hasMany(BlockContent::class);
-    }
-
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Page: ' . $this->name;
     }
 
     public function getRouteKeyName(): string

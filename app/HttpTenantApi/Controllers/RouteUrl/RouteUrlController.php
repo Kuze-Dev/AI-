@@ -18,10 +18,10 @@ use InvalidArgumentException;
 class RouteUrlController
 {
     #[
-        Get('/route/{url}'),
+        Get('/route/{url?}'),
         Where('url', '.*')
     ]
-    public function __invoke(string $url): JsonApiResource
+    public function __invoke(string $url = ''): JsonApiResource
     {
         $routeUrl = RouteUrl::whereUrl(Str::start($url, '/'))
             ->with('model')

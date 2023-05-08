@@ -207,6 +207,7 @@ return [
         Domain\Auth\AuthServiceProvider::class,
         Domain\Role\RoleServiceProvider::class,
         Domain\Blueprint\BlueprintServiceProvider::class,
+        Domain\Support\Captcha\CaptchaServiceProvider::class,
 
     ],
 

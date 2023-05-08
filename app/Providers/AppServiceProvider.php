@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Settings\FormSettings;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Menu\Models\Menu;
@@ -16,6 +17,7 @@ use Domain\Form\Models\FormSubmission;
 use Domain\Globals\Models\Globals;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
+use Domain\Support\Captcha\CaptchaManager;
 use Domain\Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
@@ -80,5 +82,17 @@ class AppServiceProvider extends ServiceProvider
         );
 
         JsonApiResource::resolveIdUsing(fn (Model $resource): string => (string) $resource->getRouteKey());
+
+        CaptchaManager::resolveProviderUsing(
+            fn () => tenancy()->initialized
+                ? app(FormSettings::class)->provider
+                : config('catpcha.provider')
+        );
+
+        CaptchaManager::resolveCredentialsUsing(
+            fn () => tenancy()->initialized
+                ? app(FormSettings::class)->getCredentials()
+                : config('catpcha.credentials')
+        );
     }
 }

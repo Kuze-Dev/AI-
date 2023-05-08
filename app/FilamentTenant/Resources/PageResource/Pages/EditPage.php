@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\PageResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\PageResource;
 use Domain\Page\Actions\UpdatePageAction;
 use Domain\Page\DataTransferObjects\PageData;
@@ -20,6 +21,8 @@ use Filament\Pages\Actions\Action;
  */
 class EditPage extends EditRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = PageResource::class;
 
     /** @throws Exception */
