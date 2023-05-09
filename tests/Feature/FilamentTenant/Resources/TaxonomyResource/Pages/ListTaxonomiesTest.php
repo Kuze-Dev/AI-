@@ -69,5 +69,13 @@ it('can\'t delete taxonomy with existing contents', function () {
         ->attach($taxonomy);
 
     livewire(ListTaxonomies::class)
-        ->callTableAction(DeleteAction::class, $taxonomy);
-})->throws(DeleteRestrictedException::class);
+        ->callTableAction(DeleteAction::class, $taxonomy)
+        ->assertNotified(trans(
+            'Unable to :action :resource.', 
+            [
+                'action' => 'delete',
+                'resource' => 'taxonomy',
+            ]
+        ))
+        ->assertOk();
+});

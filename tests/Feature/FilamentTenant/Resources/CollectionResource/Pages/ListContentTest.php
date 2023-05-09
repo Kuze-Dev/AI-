@@ -65,5 +65,12 @@ it('can not delete content with existing entries', function () {
 
     livewire(ListContent::class)
         ->callTableAction(DeleteAction::class, $content)
+        ->assertNotified(trans(
+            'Unable to :action :resource.', 
+            [
+                'action' => 'delete',
+                'resource' => 'content',
+            ]
+        ))
         ->assertOk();
-})->throws(DeleteRestrictedException::class);
+});
