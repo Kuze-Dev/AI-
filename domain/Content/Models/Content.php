@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Content\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Database\Eloquent\Model;
@@ -59,7 +58,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
     OnDeleteCascade(['taxonomies']),
     OnDeleteRestrict(['contentEntries'])
 ]
-class Content extends Model implements IsActivitySubject
+class Content extends Model
 {
     use LogsActivity;
     use HasSlug;
@@ -132,12 +131,6 @@ class Content extends Model implements IsActivitySubject
         return $this->belongsToMany(Taxonomy::class);
     }
 
-    /** Specify activity log description. */
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Content: '.$this->name;
-    }
-
     /**
      * Set the column reference
      * for route keys.
@@ -162,11 +155,11 @@ class Content extends Model implements IsActivitySubject
     {
         return $this->past_publish_date_behavior || $this->future_publish_date_behavior;
     }
-    
+
     protected function onDeleteRestrictRelations(): array
     {
         return [
-            'contentEntries'
+            'contentEntries',
         ];
     }
 }

@@ -6,7 +6,6 @@ use App\Filament\Resources\RoleResource\Pages\ListRoles;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Role\Database\Factories\RoleFactory;
 use Domain\Role\Exceptions\CantDeleteRoleWithAssociatedUsersException;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Pages\Actions\DeleteAction;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Spatie\Permission\Models\Permission;

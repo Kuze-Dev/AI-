@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Taxonomy\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Content\Models\Content;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
@@ -53,7 +52,7 @@ use Spatie\Sluggable\SlugOptions;
     OnDeleteCascade(['taxonomyTerms']),
     OnDeleteRestrict(['contents'])
 ]
-class Taxonomy extends Model implements IsActivitySubject
+class Taxonomy extends Model
 {
     use HasSlug;
     use LogsActivity;
@@ -71,11 +70,6 @@ class Taxonomy extends Model implements IsActivitySubject
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
-    }
-
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Taxonomy: '.$this->name;
     }
 
     /** @return BelongsTo<Blueprint, Taxonomy> */
@@ -124,7 +118,7 @@ class Taxonomy extends Model implements IsActivitySubject
     protected function onDeleteRestrictRelations(): array
     {
         return [
-            'contents'
+            'contents',
         ];
     }
 }

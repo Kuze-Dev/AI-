@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Role\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -41,7 +40,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
     OnDeleteCascade(['permissions']),
     OnDeleteRestrict(['users'])
 ]
-class Role extends \Spatie\Permission\Models\Role implements IsActivitySubject
+class Role extends \Spatie\Permission\Models\Role
 {
     use LogsActivity;
     use ConstraintsRelationships;
@@ -62,7 +61,7 @@ class Role extends \Spatie\Permission\Models\Role implements IsActivitySubject
     protected function onDeleteRestrictRelations(): array
     {
         return [
-            'users'
+            'users',
         ];
     }
 }

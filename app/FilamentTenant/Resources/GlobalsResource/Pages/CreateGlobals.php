@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\GlobalsResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\GlobalsResource;
 use Domain\Globals\Actions\CreateGlobalsAction;
 use Domain\Globals\DataTransferObjects\GlobalsData;
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\DB;
 
 class CreateGlobals extends CreateRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = GlobalsResource::class;
 
     protected function getActions(): array
