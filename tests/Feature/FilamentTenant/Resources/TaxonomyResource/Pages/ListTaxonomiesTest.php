@@ -57,17 +57,17 @@ it('can delete taxonomy', function () {
     assertModelMissing($taxonomy->taxonomyTerms->first());
 });
 
-// it('can\'t delete taxonomy with existing contents', function () {
-//     $taxonomy = TaxonomyFactory::new()
-//         ->withDummyBlueprint()
-//         ->createOne();
+it('can\'t delete taxonomy with existing contents', function () {
+    $taxonomy = TaxonomyFactory::new()
+        ->withDummyBlueprint()
+        ->createOne();
 
-//     ContentFactory::new()
-//         ->withDummyBlueprint()
-//         ->createOne()
-//         ->taxonomies()
-//         ->attach($taxonomy);
+    ContentFactory::new()
+        ->withDummyBlueprint()
+        ->createOne()
+        ->taxonomies()
+        ->attach($taxonomy);
 
-//     livewire(ListTaxonomies::class)
-//         ->callTableAction(DeleteAction::class, $taxonomy);
-// })->throws(DeleteRestrictedException::class);
+    livewire(ListTaxonomies::class)
+        ->callTableAction(DeleteAction::class, $taxonomy);
+})->throws(DeleteRestrictedException::class);
