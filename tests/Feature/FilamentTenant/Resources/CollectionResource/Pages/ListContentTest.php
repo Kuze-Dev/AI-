@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\ContentResource\Pages\ListContent;
 use Domain\Content\Database\Factories\ContentEntryFactory;
 use Domain\Content\Database\Factories\ContentFactory;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
@@ -66,7 +65,7 @@ it('can not delete content with existing entries', function () {
     livewire(ListContent::class)
         ->callTableAction(DeleteAction::class, $content)
         ->assertNotified(trans(
-            'Unable to :action :resource.', 
+            'Unable to :action :resource.',
             [
                 'action' => 'delete',
                 'resource' => 'content',
