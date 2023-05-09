@@ -28,7 +28,11 @@ class FormSettings extends TenantBaseSettings
                             CaptchaProvider::CLOUDFLARE_TURNSTILE->value => 'Cloudflare Turnstile',
                         ])
                         ->enum(CaptchaProvider::class)
-                        ->dehydrateStateUsing(fn (?string $state) => CaptchaProvider::tryFrom($state ?? ''))
+                        ->dehydrateStateUsing(
+                            fn (CaptchaProvider|string|null $state) => is_string($state)
+                                ? CaptchaProvider::tryFrom($state)
+                                : $state
+                        )
                         ->lazy(),
                     Forms\Components\TextInput::make('site_key')
                         ->required()
