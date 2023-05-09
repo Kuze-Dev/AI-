@@ -121,15 +121,15 @@ class TaxonomyResource extends Resource
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
-                    ->using(function (Taxonomy $record) {
-                        try {
-                            return app(DeleteTaxonomyAction::class)->execute($record);
-                        } catch (DeleteRestrictedException $e) {
-                            return false;
-                        }
-                    }),
                 Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Taxonomy $record) {
+                            try {
+                                return app(DeleteTaxonomyAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
                 ]),
             ])
             ->bulkActions([

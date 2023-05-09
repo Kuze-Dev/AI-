@@ -53,11 +53,6 @@ class Role extends \Spatie\Permission\Models\Role
             ->dontSubmitEmptyLogs();
     }
 
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Role: '.$this->name;
-    }
-
     protected function onDeleteRestrictRelations(): array
     {
         return [

@@ -86,16 +86,16 @@ class RoleResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->authorize('update'),
-                Tables\Actions\DeleteAction::make()
-                    ->using(function (Role $record) {
-                        try {
-                            return app(DeleteRoleAction::class)->execute($record);
-                        } catch (DeleteRestrictedException $e) {
-                            return false;
-                        }
-                    })
-                    ->authorize('delete'),
                 Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Role $record) {
+                            try {
+                                return app(DeleteRoleAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        })
+                        ->authorize('delete'),
                 ]),
             ])
             ->bulkActions([])

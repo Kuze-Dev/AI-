@@ -231,14 +231,16 @@ class PageResource extends Resource
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
-                    ->using(function (Page $record) {
-                        try {
-                            return app(DeletePageAction::class)->execute($record);
-                        } catch (DeleteRestrictedException $e) {
-                            return false;
-                        }
-                    }),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Page $record) {
+                            try {
+                                return app(DeletePageAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
