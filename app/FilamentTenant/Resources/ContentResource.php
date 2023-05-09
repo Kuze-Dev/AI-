@@ -183,6 +183,10 @@ class ContentResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('view-entries')
+                        ->icon('heroicon-s-eye')
+                        ->color('secondary')
+                        ->url(fn (Content $record) => ContentEntryResource::getUrl('index', [$record])),
                     Tables\Actions\DeleteAction::make()
                         ->using(function (Content $record) {
                             try {
@@ -191,10 +195,6 @@ class ContentResource extends Resource
                                 return false;
                             }
                         }),
-                    Tables\Actions\Action::make('view-entries')
-                        ->icon('heroicon-s-eye')
-                        ->color('secondary')
-                        ->url(fn (Content $record) => ContentEntryResource::getUrl('index', [$record])),
                 ]),
             ])
             ->bulkActions([
