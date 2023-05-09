@@ -20,7 +20,10 @@ class PageController
     public function index(): JsonApiResourceCollection
     {
         return PageResource::collection(
-            QueryBuilder::for(Page::with('activeRouteUrl'))
+            QueryBuilder::for(
+                Page::with('activeRouteUrl')
+                    ->whereNotNull('published_at')
+            )
                 ->allowedFilters([
                     'name',
                     'slug',
