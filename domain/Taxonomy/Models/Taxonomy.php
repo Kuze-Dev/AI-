@@ -114,11 +114,4 @@ class Taxonomy extends Model
             ->doNotGenerateSlugsOnUpdate()
             ->saveSlugsTo($this->getRouteKeyName());
     }
-
-    protected function onDeleteRestrictRelations(): array
-    {
-        return [
-            'contents',
-        ];
-    }
 }

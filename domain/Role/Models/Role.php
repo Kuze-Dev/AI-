@@ -52,11 +52,4 @@ class Role extends \Spatie\Permission\Models\Role
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
-
-    protected function onDeleteRestrictRelations(): array
-    {
-        return [
-            'users',
-        ];
-    }
 }
