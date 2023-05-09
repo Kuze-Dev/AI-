@@ -93,14 +93,18 @@ class BlueprintResource extends Resource
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
-                    ->using(function (Blueprint $record) {
-                        try {
-                            return app(DeleteBlueprintAction::class)->execute($record);
-                        } catch (DeleteRestrictedException $e) {
-                            return false;
-                        }
-                    }),
+
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Blueprint $record) {
+                            try {
+                                return app(DeleteBlueprintAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
+                ]),
+
             ])
             ->defaultSort('created_at', 'desc');
     }
