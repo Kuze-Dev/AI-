@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Content\Actions;
 
-use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\ContentEntry;
+use Domain\Internationalization\Models\Locale;
+use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Support\MetaData\Actions\CreateMetaDataAction;
 use Domain\Support\MetaData\Actions\UpdateMetaDataAction;
 use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
@@ -30,6 +31,7 @@ class UpdateContentEntryAction
             'title' => $contentEntryData->title,
             'published_at' => $contentEntryData->published_at,
             'data' => $contentEntryData->data,
+            'locale' => $contentEntryData->locale ?? Locale::where('is_default', true)->first()?->code,
         ]);
 
         $contentEntry->metaData()->exists()

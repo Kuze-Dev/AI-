@@ -13,13 +13,13 @@ class PageData
 {
     public function __construct(
         public readonly string $name,
+        public readonly ?string $locale,
         public readonly RouteUrlData $route_url_data,
         public readonly MetaDataData $meta_data,
         public readonly ?int $author_id = null,
         public readonly Visibility $visibility = Visibility::PUBLIC,
         public readonly ?Carbon $published_at = null,
         public readonly array $block_contents = [],
-        public readonly ?int $locale = null,
     ) {
     }
 
@@ -27,6 +27,7 @@ class PageData
     {
         return new self(
             name: $data['name'],
+            locale: $data['locale'] ?? null,
             visibility: Visibility::tryFrom($data['visibility'] ?? '') ?? Visibility::PUBLIC,
             route_url_data: RouteUrlData::fromArray($data['route_url'] ?? []),
             meta_data: MetaDataData::fromArray($data['meta_data']),
@@ -40,7 +41,6 @@ class PageData
                 ),
                 $data['block_contents'] ?? []
             ),
-            locale: $data['locale'] ?? null,
         );
     }
 }

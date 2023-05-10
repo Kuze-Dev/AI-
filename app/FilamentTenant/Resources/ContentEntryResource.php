@@ -4,32 +4,33 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Resources;
-use App\FilamentTenant\Support\RouteUrlFieldset;
-use App\FilamentTenant\Support\SchemaFormBuilder;
-use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
-use Filament\Tables\Filters\Layout;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Carbon\Carbon;
 use Closure;
-use Domain\Content\Models\ContentEntry;
-use App\FilamentTenant\Support\MetaDataForm;
-use Domain\Content\Models\Builders\ContentEntryBuilder;
-use Domain\Taxonomy\Models\Taxonomy;
-use Domain\Taxonomy\Models\TaxonomyTerm;
-use Filament\Facades\Filament;
-use Filament\Forms\Components\Component;
+use Carbon\Carbon;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Support\Arr;
+use Filament\Resources\Form;
+use Filament\Resources\Table;
+use Filament\Facades\Filament;
+use Filament\Resources\Resource;
+use App\FilamentTenant\Resources;
+use Filament\Tables\Filters\Layout;
+use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Validation\Rules\Unique;
+use Domain\Content\Models\ContentEntry;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\Rules\Unique;
+use Domain\Taxonomy\Models\TaxonomyTerm;
+use Filament\Forms\Components\Component;
 use Illuminate\Database\Eloquent\Builder;
+use App\FilamentTenant\Support\MetaDataForm;
+use Domain\Internationalization\Models\Locale;
+use App\FilamentTenant\Support\RouteUrlFieldset;
+use App\FilamentTenant\Support\SchemaFormBuilder;
+use Domain\Content\Models\Builders\ContentEntryBuilder;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class ContentEntryResource extends Resource
 {
@@ -108,6 +109,12 @@ class ContentEntryResource extends Resource
                                     ? $model
                                     : tap(new ContentEntry())->setRelation('content', $livewire->ownerRecord);
                             }),
+                        Forms\Components\Select::make('locale')
+                            ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                            ->default((string) optional(Locale::where('is_default', true)->first())->code)
+                            ->searchable()
+                            ->hidden(Locale::count() === 1)
+                            ->required(),
                         Forms\Components\Hidden::make('author_id')
                             ->default(Auth::id()),
                     ]),
@@ -169,6 +176,9 @@ class ContentEntryResource extends Resource
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
+                Tables\Columns\TextColumn::make('locale')
+                ->searchable()
+                ->hidden(Locale::count() === 1),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable(['first_name', 'last_name'])
                     ->searchable(query: function (Builder $query, string $search): Builder {

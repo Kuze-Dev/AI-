@@ -6,7 +6,6 @@ namespace Domain\Page\Models;
 
 use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Admin\Models\Admin;
-use Domain\Internationalization\Traits\Localeable;
 use Domain\Page\Enums\Visibility;
 use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
@@ -29,6 +28,7 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  *
  * @property int $id
  * @property string $name
+ * @property string $locale
  * @property string $slug
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -57,13 +57,13 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
     use HasRouteUrl;
     use HasMetaData;
     use ConstraintsRelationships;
-    use Localeable;
 
     protected $fillable = [
         'author_id',
         'name',
         'visibility',
         'published_at',
+        'locale',
     ];
 
     /**

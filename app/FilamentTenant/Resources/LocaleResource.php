@@ -50,15 +50,16 @@ class LocaleResource extends Resource
                 ->unique(ignoreRecord: true)
                 ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
                     if ($get('name') === $state || blank($get('name'))) {
-                        // get last value inside parenthese e.g: English (en) => en, Switzerland (Something) (de-CH) => de-CH
                         $code = preg_replace('/.*\((.*)\)/', '$1', $state);
                         $set('code', $code);
                     }
-                }),
+                })
+                ->required(),
             Forms\Components\TextInput::make('code')
                 ->unique(ignoreRecord: true)
                 ->dehydrateStateUsing(fn (Closure $get, $state) => $state ?: $get('code'))
-                ->disabled(),
+                ->disabled()
+                ->required(),
             Forms\Components\Checkbox::make('is_default')
                 ->label('Set Default')
                 ->hint('One default locale is required, change it by selecting another one'),

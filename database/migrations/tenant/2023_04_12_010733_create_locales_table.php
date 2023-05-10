@@ -17,16 +17,6 @@ return new class () extends Migration {
             $table->boolean('is_default')->default(false);
             $table->timestamps();
         });
-
-        Schema::create('model_locales', function (Blueprint $table) {
-            $table->unsignedBigInteger('model_locales_id');
-            $table->unsignedBigInteger('locale_id');
-            $table->string('model_locales_type');
-
-            $table->index('model_locales_id');
-            $table->index('locale_id');
-            $table->index(['model_locales_id', 'model_locales_type']);
-        });
     }
 
     /** Reverse the migrations. */

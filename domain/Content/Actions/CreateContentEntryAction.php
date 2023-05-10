@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Content\Actions;
 
-use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
+use Domain\Internationalization\Models\Locale;
+use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Support\MetaData\Actions\CreateMetaDataAction;
 use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
@@ -28,6 +29,7 @@ class CreateContentEntryAction
                 'data' => $contentEntryData->data,
                 'published_at' => $contentEntryData->published_at,
                 'author_id' => $contentEntryData->author_id,
+                'locale' => $contentEntryData->locale ?? Locale::where('is_default', true)->first()?->code,
             ]);
 
         $this->createMetaData->execute($contentEntry, $contentEntryData->meta_data);

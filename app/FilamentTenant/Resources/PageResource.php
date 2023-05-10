@@ -65,12 +65,11 @@ class PageResource extends Resource
                                 ->required(),
                             RouteUrlFieldset::make(),
                             Forms\Components\Select::make('locale')
-                                ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'id')->toArray())
-                                ->default(optional(Locale::where('is_default', true)->first())->id)
+                                ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                                ->default((string) optional(Locale::where('is_default', true)->first())->code)
                                 ->searchable()
-                                ->hidden(function () {
-                                    return Locale::count() === 1;
-                                }),
+                                ->hidden(Locale::count() === 1)
+                                ->required(),
                             Forms\Components\Select::make('visibility')
                                 ->options(
                                     collect(Visibility::cases())
@@ -169,6 +168,9 @@ class PageResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('locale')
+                    ->searchable()
+                    ->hidden(Locale::count() === 1),
                 Tables\Columns\BadgeColumn::make('visibility')
                     ->formatStateUsing(fn ($state) => Str::headline($state))
                     ->sortable()
@@ -203,6 +205,8 @@ class PageResource extends Resource
                             ])
                             ->toArray()
                     ),
+                Tables\Filters\SelectFilter::make('locale')
+                    ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray()),
                 Tables\Filters\Filter::make('published_at_year_month')
                     ->form([
                         Forms\Components\TextInput::make('published_at_year')
