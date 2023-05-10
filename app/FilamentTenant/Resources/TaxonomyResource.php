@@ -20,6 +20,8 @@ use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Domain\Taxonomy\Actions\DeleteTaxonomyAction;
 
 class TaxonomyResource extends Resource
 {
@@ -120,7 +122,14 @@ class TaxonomyResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Taxonomy $record) {
+                            try {
+                                return app(DeleteTaxonomyAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
                 ]),
             ])
             ->bulkActions([

@@ -24,7 +24,7 @@ use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property array|null $data
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Blueprint $blueprint
  * @method static \Illuminate\Database\Eloquent\Builder|Globals newModelQuery()

@@ -24,14 +24,15 @@ use Spatie\Sluggable\SlugOptions;
  * @property string $name
  * @property string $slug
  * @property bool $store_submission
+ * @property int $uses_captcha
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Blueprint $blueprint
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Form\Models\FormEmailNotification[] $formEmailNotifications
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Form\Models\FormEmailNotification> $formEmailNotifications
  * @property-read int|null $form_email_notifications_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Form\Models\FormSubmission[] $formSubmissions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Form\Models\FormSubmission> $formSubmissions
  * @property-read int|null $form_submissions_count
  * @method static \Illuminate\Database\Eloquent\Builder|Form newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Form newQuery()
@@ -43,6 +44,7 @@ use Spatie\Sluggable\SlugOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|Form whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Form whereStoreSubmission($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Form whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Form whereUsesCaptcha($value)
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['formEmailNotifications', 'formSubmissions'])]
