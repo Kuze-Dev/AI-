@@ -101,7 +101,7 @@ class ActivityResource extends Resource
                                 return;
                             }
 
-                            /** @var \Filament\Resources\Resource $resource */
+                            /** @var \Filament\Resources\Resource|null $resource */
                             $resource = self::findResourceForModel($record->subject::class);
 
                             if ( ! $resource) {
