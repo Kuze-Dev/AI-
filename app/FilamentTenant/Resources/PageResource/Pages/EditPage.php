@@ -21,7 +21,9 @@ use Filament\Pages\Actions\Action;
  */
 class EditPage extends EditRecord
 {
-    use LogsFormActivity;
+    use LogsFormActivity {
+        afterSave as protected afterSaveOverride;
+    }
 
     protected static string $resource = PageResource::class;
 
@@ -53,6 +55,8 @@ class EditPage extends EditRecord
 
     protected function afterSave(): void
     {
+        $this->afterSaveOverride();
+
         $this->record->refresh();
         $this->hasCachedForms = false;
 
