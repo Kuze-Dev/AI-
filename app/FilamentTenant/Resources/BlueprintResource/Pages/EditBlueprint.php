@@ -18,7 +18,9 @@ use Illuminate\Support\Facades\DB;
 
 class EditBlueprint extends EditRecord
 {
-    use LogsFormActivity;
+    use LogsFormActivity {
+        afterSave as protected afterSaveOverride;
+    }
 
     protected static string $resource = BlueprintResource::class;
 
@@ -53,6 +55,8 @@ class EditBlueprint extends EditRecord
 
     protected function afterSave(): void
     {
+        $this->afterSaveOverride();
+
         $this->record = $this->resolveRecord($this->record->getRouteKey());
 
         $this->fillForm();

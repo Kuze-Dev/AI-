@@ -15,6 +15,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\ActivitylogServiceProvider;
@@ -100,18 +101,21 @@ class ActivityResource extends Resource
                                 return;
                             }
 
+                            /** @var \Filament\Resources\Resource|null $resource */
                             $resource = self::findResourceForModel($record->subject::class);
 
                             if ( ! $resource) {
                                 return;
                             }
 
-                            if ($resource::hasPage('view')) {
-                                return $resource::getUrl('view', ['record' => $record->subject]);
-                            }
-
-                            if ($resource::hasPage('edit')) {
-                                return $resource::getUrl('edit', ['record' => $record->subject]);
+                            try {
+                                if ($resource::hasPage('view')) {
+                                    return $resource::getUrl('view', ['record' => $record->subject]);
+                                }
+                                if ($resource::hasPage('edit')) {
+                                    return $resource::getUrl('edit', ['record' => $record->subject]);
+                                }
+                            } catch (UrlGenerationException) {
                             }
                         },
                         shouldOpenInNewTab: true
