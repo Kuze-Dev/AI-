@@ -17,7 +17,7 @@ use Spatie\EloquentSortable\SortableTrait;
  * @property int $id
  * @property int $block_id
  * @property int $page_id
- * @property array|null $data
+ * @property mixed|null $data
  * @property int $order
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -26,12 +26,12 @@ use Spatie\EloquentSortable\SortableTrait;
  * @method static Builder|BlockContent newQuery()
  * @method static Builder|BlockContent ordered(string $direction = 'asc')
  * @method static Builder|BlockContent query()
+ * @method static Builder|BlockContent whereBlockId($value)
  * @method static Builder|BlockContent whereCreatedAt($value)
  * @method static Builder|BlockContent whereData($value)
  * @method static Builder|BlockContent whereId($value)
  * @method static Builder|BlockContent whereOrder($value)
  * @method static Builder|BlockContent wherePageId($value)
- * @method static Builder|BlockContent whereBlockId($value)
  * @method static Builder|BlockContent whereUpdatedAt($value)
  * @mixin \Eloquent
  */

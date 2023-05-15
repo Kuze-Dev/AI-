@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AdminResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\Filament\Resources\AdminResource;
 use Domain\Admin\Actions\UpdateAdminAction;
 use Domain\Admin\DataTransferObjects\AdminData;
@@ -17,6 +18,8 @@ use Throwable;
 
 class EditAdmin extends EditRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = AdminResource::class;
 
     protected function getActions(): array

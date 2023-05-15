@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ContentEntryResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -14,11 +15,14 @@ use App\FilamentTenant\Resources\ContentResource;
 use Domain\Content\Actions\UpdateContentEntryAction;
 use Domain\Content\Models\Content;
 use Filament\Pages\Actions;
+use Filament\Pages\Actions\Action;
 use Filament\Pages\Actions\DeleteAction;
 
 /** @method class-string<\Illuminate\Database\Eloquent\Model> getModel() */
 class EditContentEntry extends EditRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = ContentEntryResource::class;
 
     public mixed $ownerRecord;
@@ -59,8 +63,17 @@ class EditContentEntry extends EditRecord
     protected function getActions(): array
     {
         return [
+            Action::make('save')
+                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->action('save')
+                ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
     }
 
     protected function configureDeleteAction(DeleteAction $action): void
@@ -91,15 +104,12 @@ class EditContentEntry extends EditRecord
         );
     }
 
-    /**
-     * Execute database transaction
-     * for updating content entries.
-     */
+    /** @param \Domain\Content\Models\ContentEntry $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(
             fn () => app(UpdateContentEntryAction::class)
-                ->execute($this->record, ContentEntryData::fromArray($data))
+                ->execute($record, ContentEntryData::fromArray($data))
         );
     }
 }

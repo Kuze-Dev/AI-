@@ -2,12 +2,15 @@
 
 namespace {{ namespace }};
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use {{ resource }};
 use {{ baseResourcePage }};
 use Filament\Pages\Actions\Action;
 
 class {{ resourcePageClass }} extends CreateRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = {{ resourceClass }}::class;
 
     protected function getActions(): array

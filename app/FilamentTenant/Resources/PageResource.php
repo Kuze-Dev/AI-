@@ -29,6 +29,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Domain\Page\Actions\DeletePageAction;
+use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class PageResource extends Resource
 {
@@ -167,7 +169,6 @@ class PageResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
-                    ->formatStateUsing(fn (?Carbon $state) => $state ?? '-')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable(['first_name', 'last_name'])
@@ -231,7 +232,14 @@ class PageResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Page $record) {
+                            try {
+                                return app(DeletePageAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
                 ]),
             ])
             ->bulkActions([

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Content\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Database\Eloquent\Model;
@@ -34,12 +33,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property bool $is_sortable
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Blueprint $blueprint
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Content\Models\ContentEntry[] $contentEntries
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Content\Models\ContentEntry> $contentEntries
  * @property-read int|null $content_entries_count
- * @property-read \Illuminate\Database\Eloquent\Collection|Taxonomy[] $taxonomies
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Taxonomy> $taxonomies
  * @property-read int|null $taxonomies_count
  * @method static \Illuminate\Database\Eloquent\Builder|Content newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Content newQuery()
@@ -51,6 +50,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Content whereIsSortable($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Content whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Content wherePastPublishDateBehavior($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Content wherePrefix($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Content whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Content whereUpdatedAt($value)
  * @mixin \Eloquent
@@ -59,7 +59,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
     OnDeleteCascade(['taxonomies']),
     OnDeleteRestrict(['contentEntries'])
 ]
-class Content extends Model implements IsActivitySubject
+class Content extends Model
 {
     use LogsActivity;
     use HasSlug;
@@ -130,12 +130,6 @@ class Content extends Model implements IsActivitySubject
     public function taxonomies(): BelongsToMany
     {
         return $this->belongsToMany(Taxonomy::class);
-    }
-
-    /** Specify activity log description. */
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Content: '.$this->name;
     }
 
     /**

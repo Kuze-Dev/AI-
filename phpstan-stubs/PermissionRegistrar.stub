@@ -1,0 +1,15 @@
+<?php
+
+namespace Spatie\Permission;
+
+use Illuminate\Database\Eloquent\Collection;
+
+class PermissionRegistrar
+{
+    /**
+     * @param array<string, mixed> $params
+     * @return Collection<int, \Spatie\Permission\Models\Permission>
+     */
+    public function getPermissions(array $params = [], bool $onlyOne = false): Collection
+    {}
+}
