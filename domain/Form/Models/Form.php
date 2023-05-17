@@ -64,6 +64,7 @@ class Form extends Model
 
     protected $casts = [
         'store_submission' => 'bool',
+        'uses_captcha' => 'bool',
     ];
 
     public function getActivitylogOptions(): LogOptions
