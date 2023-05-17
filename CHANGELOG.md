@@ -2,6 +2,8 @@
 
 ## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.1)
 
+- Fix proper redirects for logged in Admin.
+
 ## [v0.2.1](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.2.1%0Dv0.2.0)
 
 ### Changed

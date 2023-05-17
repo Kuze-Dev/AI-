@@ -31,7 +31,7 @@ class RouteServiceProvider extends ServiceProvider
                 Route::middleware('web')
                     ->domain($domain)
                     ->group(function () {
-                        Route::view('/', 'web.welcome');
+                        Route::redirect('/', 'admin/login');
                     });
             }
         });
