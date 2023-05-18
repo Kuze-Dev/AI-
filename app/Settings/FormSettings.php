@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Settings;
 
-use App\Settings\Casts\NullableEnumCast;
 use Domain\Support\Captcha\CaptchaProvider;
 use Spatie\LaravelSettings\Settings;
 
@@ -26,13 +25,6 @@ class FormSettings extends Settings
         return [
             'site_key',
             'secret_key',
-        ];
-    }
-
-    public static function casts(): array
-    {
-        return [
-            'provider' => new NullableEnumCast(CaptchaProvider::class),
         ];
     }
 
