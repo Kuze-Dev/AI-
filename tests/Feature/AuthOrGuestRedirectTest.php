@@ -14,7 +14,7 @@ it('redirect guest from [base url] to [login page]', function (bool $tenant) {
     }
 
     get('/')
-        ->assertRedirect('admin/login');
+        ->assertRedirect('admin');
 })
     ->with(['central' => false, 'tenant' => true]);
 
