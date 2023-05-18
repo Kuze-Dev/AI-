@@ -238,7 +238,7 @@ class AdminResource extends Resource
                         ->authorize('sendPasswordReset'),
                     Impersonate::make()
                         ->guard('admin')
-                        ->redirectTo(Filament::getUrl())
+                        ->redirectTo(Filament::getUrl() ?? '/')
                         ->authorize('impersonate'),
                 ]),
             ])
