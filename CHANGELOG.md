@@ -1,6 +1,27 @@
 # Release Notes
 
-## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.1)
+## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.2)
+
+## [v0.2.2](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.2.2%0Dv0.2.1)
+
+## Added
+
+- Add general Properties `KeyValue` field for `ActivityResource` form.
+- Add Event column for `ActivityResource` table.
+- Add `Action::withActivityLog()` macro.
+- Added `assertActivityLogged()` testing helper.
+
+## Changed
+- Upgrade `spatie/laravel-settings` to `v3.1.0`.
+- Update `phpunit.xml` to match with `phpunit/phpunit` v10 specifications.
+
+### Fixed
+
+- Fix the description for activity logs on `CreateRecord` pages.
+- Should fail gracefully when trying to resolve a subject's url in `ActivityResource` table.
+- Remove bulk actions for `ActivityResource` table.
+- `AdminResource` email field must be unique.
+- Should not be able to impersonate a deleted `Admin`.
 
 - Fix proper redirects for logged in Admin.
 

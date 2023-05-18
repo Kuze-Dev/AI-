@@ -19,7 +19,6 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
@@ -30,6 +29,7 @@ use Spatie\Permission\Traits\HasRoles;
  * Domain\Admin\Models\Admin
  *
  * @property int $id
+ * @property-read string $full_name
  * @property string $first_name
  * @property string $last_name
  * @property string $email
@@ -109,6 +109,7 @@ class Admin extends Authenticatable implements MustVerifyEmail, HasName, TwoFact
     ];
 
     protected $casts = [
+        'password' => 'hashed',
         'email_verified_at' => 'datetime',
         'password_changed_at' => 'datetime',
         'active' => 'boolean',
@@ -121,6 +122,7 @@ class Admin extends Authenticatable implements MustVerifyEmail, HasName, TwoFact
         return LogOptions::defaults()
             ->logFillable()
             ->logOnlyDirty()
+            ->logExcept(['password'])
             ->dontSubmitEmptyLogs();
     }
 
@@ -134,16 +136,6 @@ class Admin extends Authenticatable implements MustVerifyEmail, HasName, TwoFact
     {
         return Attribute::get(
             fn ($value) => "{$this->first_name} {$this->last_name}"
-        );
-    }
-
-    /** @return Attribute<never, string> */
-    protected function password(): Attribute
-    {
-        return Attribute::set(
-            fn ($value) => Hash::info($value)['algoName'] === 'unknown'
-                ? Hash::make($value)
-                : $value
         );
     }
 
