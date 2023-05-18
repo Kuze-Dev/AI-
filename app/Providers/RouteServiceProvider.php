@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use Filament\Facades\Filament;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
@@ -18,13 +19,10 @@ class RouteServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         $this->routes(function () {
-            foreach (config('tenancy.central_domains', []) as $domain) {
-                Route::middleware('web')
-                    ->domain($domain)
-                    ->group(function () {
-                        Route::redirect('/', 'admin/login')->name('filament.base-redirect');
-                    });
-            }
+            Route::middleware('web')
+                ->group(function () {
+                    Route::redirect('/', '/admin');
+                });
         });
     }
 

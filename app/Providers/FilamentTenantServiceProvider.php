@@ -57,57 +57,52 @@ class FilamentTenantServiceProvider extends ContextServiceProvider
     {
         Route::middleware(array_merge([ApplyContext::class . ':' . static::$name], $this->contextConfig('middleware.base')))
             ->domain($this->contextConfig('domain'))
+            ->prefix('admin')
+            ->name(static::$name . '.auth.')
             ->group(function () {
+                Route::get('login', Auth\Login::class)
+                    ->middleware('guest:admin')
+                    ->name('login');
+                Route::get('two-factor', Auth\TwoFactorAuthentication::class)
+                    ->middleware('guest:admin')
+                    ->name('two-factor');
 
-                Route::redirect('/', 'admin/login')->name('filament-tenant.base-redirect');
-
-                Route::prefix('admin')
-                    ->name(static::$name . '.auth.')
+                Route::prefix('password')
+                    ->name('password.')
                     ->group(function () {
-                        Route::get('login', Auth\Login::class)
+                        Route::get('reset', Auth\RequestPasswordReset::class)
                             ->middleware('guest:admin')
-                            ->name('login');
-                        Route::get('two-factor', Auth\TwoFactorAuthentication::class)
+                            ->name('request');
+                        Route::get('reset/{token}', Auth\ResetPassword::class)
                             ->middleware('guest:admin')
-                            ->name('two-factor');
+                            ->name('reset');
+                        Route::get('confirm', Auth\ConfirmPassword::class)
+                            ->middleware(Authenticate::class)
+                            ->name('confirm');
+                    });
 
-                        Route::prefix('password')
-                            ->name('password.')
+                Route::middleware(Authenticate::class)
+                    ->group(function () {
+                        Route::get('account-deactivated', Auth\AccountDeactivatedNotice::class)
+                            ->name('account-deactivated.notice');
+
+                        Route::prefix('verify')
+                            ->name('verification.')
                             ->group(function () {
-                                Route::get('reset', Auth\RequestPasswordReset::class)
-                                    ->middleware('guest:admin')
-                                    ->name('request');
-                                Route::get('reset/{token}', Auth\ResetPassword::class)
-                                    ->middleware('guest:admin')
-                                    ->name('reset');
-                                Route::get('confirm', Auth\ConfirmPassword::class)
-                                    ->middleware(Authenticate::class)
-                                    ->name('confirm');
+                                Route::get('/', Auth\EmailVerificationNotice::class)
+                                    ->name('notice');
+                                Route::get('/{id}/{hash}', Auth\VerifyEmail::class)
+                                    ->name('verify');
                             });
 
-                        Route::middleware(Authenticate::class)
-                            ->group(function () {
-                                Route::get('account-deactivated', Auth\AccountDeactivatedNotice::class)
-                                    ->name('account-deactivated.notice');
+                        Route::post('logout', function (Request $request) {
+                            Filament::auth()->logout();
 
-                                Route::prefix('verify')
-                                    ->name('verification.')
-                                    ->group(function () {
-                                        Route::get('/', Auth\EmailVerificationNotice::class)
-                                            ->name('notice');
-                                        Route::get('/{id}/{hash}', Auth\VerifyEmail::class)
-                                            ->name('verify');
-                                    });
+                            $request->session()->invalidate();
+                            $request->session()->regenerateToken();
 
-                                Route::post('logout', function (Request $request) {
-                                    Filament::auth()->logout();
-
-                                    $request->session()->invalidate();
-                                    $request->session()->regenerateToken();
-
-                                    return redirect()->route(static::$name . '.auth.login');
-                                })->name('logout');
-                            });
+                            return redirect()->route(static::$name . '.auth.login');
+                        })->name('logout');
                     });
             });
     }

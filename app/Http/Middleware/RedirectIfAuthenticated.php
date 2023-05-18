@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use Closure;
+use Filament\Facades\Filament;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,13 +23,7 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return to_route(
-                    // Strict comparison using === between Stancl\Tenancy\Tenancy and null will always evaluate to false.
-                    /** @phpstan-ignore-next-line  */
-                    tenancy() === null
-                        ? 'filament.pages.dashboard'
-                        : 'filament-tenant.pages.dashboard'
-                );
+                return redirect()->intended(Filament::getUrl());
             }
         }
 

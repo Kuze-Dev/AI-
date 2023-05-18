@@ -10,6 +10,7 @@ use Domain\Admin\Models\Admin;
 use Domain\Auth\Actions\ForgotPasswordAction;
 use Domain\Role\Models\Role;
 use Exception;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -237,7 +238,7 @@ class AdminResource extends Resource
                         ->authorize('sendPasswordReset'),
                     Impersonate::make()
                         ->guard('admin')
-                        ->redirectTo(route(tenancy()->initialized ? 'filament-tenant.pages.dashboard' : 'filament.pages.dashboard'))
+                        ->redirectTo(Filament::getUrl())
                         ->authorize('impersonate'),
                 ]),
             ])
