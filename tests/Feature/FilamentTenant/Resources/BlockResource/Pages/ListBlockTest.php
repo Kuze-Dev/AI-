@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\BlockResource\Blocks\ListBlocks;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 
@@ -57,5 +56,11 @@ it('can\'t delete block with existing content', function () {
 
     livewire(ListBlocks::class)
         ->callTableAction(DeleteAction::class, $block)
-        ->assertOk();
-})->throws(DeleteRestrictedException::class);
+        ->assertNotified(trans(
+            'Unable to :action :resource.',
+            [
+                'action' => 'delete',
+                'resource' => 'block',
+            ]
+        ));
+});
