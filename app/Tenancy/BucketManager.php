@@ -84,7 +84,7 @@ class BucketManager
                             'ObjectOwnership' => 'BucketOwnerPreferred',
                         ],
                     ],
-                ]
+                ],
             ]);
 
             $this->makeS3Client()->putBucketCors([
