@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 use App\Filament\Resources\AdminResource\Pages\ListAdmins;
 use Domain\Admin\Database\Factories\AdminFactory;
+use Domain\Admin\Notifications\ResetPassword;
+use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 use Filament\Pages\Actions\ForceDeleteAction;
 use Filament\Pages\Actions\RestoreAction;
 use Filament\Tables\Filters\TrashedFilter;
+use Illuminate\Support\Facades\Auth;
 use STS\FilamentImpersonate\Impersonate;
 
 use function Pest\Laravel\assertModelMissing;
@@ -52,6 +55,13 @@ it('can delete', function () {
         ->callTableAction(DeleteAction::class, $admin);
 
     assertSoftDeleted($admin);
+
+    assertActivityLogged(
+        logName: 'admin',
+        event: 'deleted',
+        causedBy: Filament::auth()->user(),
+        subject: $admin
+    );
 });
 
 it('can restore', function () {
@@ -64,6 +74,13 @@ it('can restore', function () {
         ->callTableAction(RestoreAction::class, $admin);
 
     assertNotSoftDeleted($admin);
+
+    assertActivityLogged(
+        logName: 'admin',
+        event: 'restored',
+        causedBy: Filament::auth()->user(),
+        subject: $admin
+    );
 });
 
 it('can force delete', function () {
@@ -76,6 +93,32 @@ it('can force delete', function () {
         ->callTableAction(ForceDeleteAction::class, $admin);
 
     assertModelMissing($admin);
+
+    assertActivityLogged(
+        logName: 'admin',
+        event: 'force-deleted',
+        causedBy: Filament::auth()->user(),
+        subject: $admin
+    );
+});
+
+it('can send password reset link', function () {
+    $admin = AdminFactory::new()
+        ->createOne();
+
+    Notification::fake();
+
+    livewire(ListAdmins::class)
+        ->callTableAction('send-password-reset', $admin);
+
+    Notification::assertSentTo($admin, ResetPassword::class);
+
+    assertActivityLogged(
+        logName: 'admin',
+        event: 'password-reset-link-sent',
+        causedBy: Filament::auth()->user(),
+        subject: $admin
+    );
 });
 
 it('can impersonate', function () {
@@ -83,11 +126,20 @@ it('can impersonate', function () {
 
     $admin = AdminFactory::new()->createOne();
 
-    assertNotEquals($admin->getKey(), auth()->id());
+    $initialAuthenticatedAdmin = Auth::user();
+
+    assertNotEquals($admin->getKey(), $initialAuthenticatedAdmin->getKey());
 
     livewire(ListAdmins::class)
         ->assertOK()
         ->callTableAction(Impersonate::class, $admin);
 
     assertEquals($admin->getKey(), auth()->id());
+
+    assertActivityLogged(
+        logName: 'admin',
+        event: 'impersonated',
+        causedBy: $initialAuthenticatedAdmin,
+        subject: $admin
+    );
 });

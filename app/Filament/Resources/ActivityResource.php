@@ -16,6 +16,7 @@ use Filament\Tables;
 use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\ActivitylogServiceProvider;
@@ -61,10 +62,19 @@ class ActivityResource extends Resource
                 Forms\Components\TextInput::make('subject_id')
                     ->translateLabel(),
                 Forms\Components\KeyValue::make('properties.old')
+                    ->visible(fn ($state) => filled($state))
                     ->translateLabel(),
                 Forms\Components\KeyValue::make('properties.attributes')
+                    ->visible(fn ($state) => filled($state))
                     ->label('New')
                     ->translateLabel(),
+                Forms\Components\KeyValue::make('data')
+                    ->formatStateUsing(
+                        fn (Activity $record) => Arr::except($record->properties?->toArray() ?? [], ['old', 'attributes'])
+                    )
+                    ->visible(fn ($state) => filled($state))
+                    ->label(trans('Properties'))
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -77,6 +87,9 @@ class ActivityResource extends Resource
                     ->label('Log')
                     ->translateLabel()
                     ->formatStateUsing(fn (string $state) => Str::headline($state)),
+                Tables\Columns\BadgeColumn::make('event')
+                    ->toggleable()
+                    ->toggledHiddenByDefault(),
                 Tables\Columns\TextColumn::make('description')
                     ->translateLabel()
                     ->searchable(),
@@ -88,6 +101,7 @@ class ActivityResource extends Resource
                                 return;
                             }
 
+                            /** @var \Filament\Resources\Resource|null $resource */
                             $resource = self::findResourceForModel($record->subject::class);
 
                             return $resource
@@ -138,6 +152,7 @@ class ActivityResource extends Resource
                 Tables\Actions\ViewAction::make()
                     ->translateLabel(),
             ])
+            ->bulkActions([])
             ->defaultSort('created_at', 'desc');
     }
 
