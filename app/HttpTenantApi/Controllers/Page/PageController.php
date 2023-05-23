@@ -72,7 +72,7 @@ class PageController
 
         $ignoreQuery = array_diff(array_keys($request->query->all()), ['signature', 'expires']);
 
-        abort_if($page->isPublished() && !URL::hasValidSignature($request, false, $ignoreQuery), 412);
+        abort_if($page->isPublished() && ! URL::hasValidSignature($request, false, $ignoreQuery), 412);
 
         return PageResource::make($page);
     }
