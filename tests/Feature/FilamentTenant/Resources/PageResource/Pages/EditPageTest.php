@@ -7,6 +7,7 @@ use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
+use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\BlockContent;
 use Domain\Page\Models\Page;
 use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
@@ -38,7 +39,9 @@ it('can render page', function () {
                 ),
             ['data' => ['main' => ['header' => 'Foo']]]
         )
-        ->createOne();
+        ->createOne([
+            'visibility' => 'public',
+        ]);
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->assertFormExists()
@@ -68,7 +71,9 @@ it('can edit page', function () {
             'author' => 'Foo author',
             'keywords' => 'Foo keywords',
         ]))
-        ->createOne();
+        ->createOne([
+            'visibility' => 'public',
+        ]);
 
     $metaData = [
         'title' => 'Foo title updated',
@@ -84,6 +89,7 @@ it('can edit page', function () {
             'published_at' => true,
             'block_contents.record-1.data.main.header' => 'Bar',
             'meta_data' => $metaData,
+            'visibility' => 'authenticated',
             'meta_data.image.0' => $metaDataImage,
         ])
         ->call('save')
@@ -94,6 +100,7 @@ it('can edit page', function () {
 
     assertDatabaseHas(Page::class, [
         'name' => 'Test',
+        'visibility' => Visibility::AUTHENTICATED->value,
         'published_at' => $updatedPage->published_at,
     ]);
 
@@ -138,7 +145,9 @@ it('can edit page with custom url', function () {
                 ),
             ['data' => ['main' => ['header' => 'Foo']]]
         )
-        ->createOne();
+        ->createOne([
+            'visibility' => 'public',
+        ]);
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
@@ -176,7 +185,9 @@ it('page block with default value will fill the blocks fields', function () {
                 ),
             ['data' => null]
         )
-        ->createOne();
+        ->createOne([
+            'visibility' => 'public',
+        ]);
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
@@ -205,7 +216,9 @@ it('page block with default value column data must be dehydrated', function () {
                 ),
             ['data' => null]
         )
-        ->createOne();
+        ->createOne([
+            'visibility' => 'public',
+        ]);
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->call('save')

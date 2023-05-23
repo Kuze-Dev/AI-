@@ -6,7 +6,9 @@ use App\FilamentTenant\Resources\FormResource\Pages\CreateForm;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
+use Domain\Support\Captcha\CaptchaProvider;
 use Filament\Facades\Filament;
+use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Livewire\livewire;
@@ -53,4 +55,16 @@ it('can create form', function () {
 
     assertDatabaseCount(Form::class, 1);
     assertDatabaseCount(FormEmailNotification::class, 1);
+});
+
+it('can\'t toggle uses captcha if not set up', function () {
+    livewire(CreateForm::class)
+        ->assertFormFieldIsDisabled('uses_captcha');
+});
+
+it('can toggle uses captcha if set up', function () {
+    resolve(SettingsMigrator::class)->update('form.provider', fn () => CaptchaProvider::GOOGLE_RECAPTCHA);
+
+    livewire(CreateForm::class)
+        ->assertFormFieldIsEnabled('uses_captcha');
 });

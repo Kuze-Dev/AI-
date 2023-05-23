@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\PageResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\PageResource;
 use App\Settings\CMSSettings;
 use Domain\Page\Actions\UpdatePageAction;
@@ -23,6 +24,10 @@ use Illuminate\Support\Facades\URL;
  */
 class EditPage extends EditRecord
 {
+    use LogsFormActivity {
+        afterSave as protected afterSaveOverride;
+    }
+
     protected static string $resource = PageResource::class;
 
     /** @throws Exception */
@@ -69,6 +74,8 @@ class EditPage extends EditRecord
 
     protected function afterSave(): void
     {
+        $this->afterSaveOverride();
+
         $this->record->refresh();
         $this->hasCachedForms = false;
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Taxonomy\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Content\Models\Content;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
@@ -29,14 +28,14 @@ use Spatie\Sluggable\SlugOptions;
  * @property string $slug
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Blueprint $blueprint
- * @property-read \Illuminate\Database\Eloquent\Collection|Content[] $contents
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Content> $contents
  * @property-read int|null $contents_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Taxonomy\Models\TaxonomyTerm[] $parentTerms
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Taxonomy\Models\TaxonomyTerm> $parentTerms
  * @property-read int|null $parent_terms_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Taxonomy\Models\TaxonomyTerm[] $taxonomyTerms
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Taxonomy\Models\TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy newQuery()
@@ -53,7 +52,7 @@ use Spatie\Sluggable\SlugOptions;
     OnDeleteCascade(['taxonomyTerms']),
     OnDeleteRestrict(['contents'])
 ]
-class Taxonomy extends Model implements IsActivitySubject
+class Taxonomy extends Model
 {
     use HasSlug;
     use LogsActivity;
@@ -71,11 +70,6 @@ class Taxonomy extends Model implements IsActivitySubject
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
-    }
-
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Taxonomy: '.$this->name;
     }
 
     /** @return BelongsTo<Blueprint, Taxonomy> */

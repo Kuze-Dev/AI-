@@ -10,6 +10,7 @@ use Domain\Admin\Models\Admin;
 use Domain\Auth\Actions\ForgotPasswordAction;
 use Domain\Role\Models\Role;
 use Exception;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -56,6 +57,7 @@ class AdminResource extends Resource
                     Forms\Components\TextInput::make('email')
                         ->email()
                         ->rules('email:rfc,dns')
+                        ->unique(ignoreRecord: true)
                         ->required()
                         ->helperText(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email') ? 'Email update is currently disabled.' : '')
                         ->disabled(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email')),
@@ -193,15 +195,11 @@ class AdminResource extends Resource
             ])
             ->filtersLayout(Layout::AboveContent)
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->authorize('update'),
+                Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make()
-                        ->authorize('delete'),
-                    Tables\Actions\RestoreAction::make()
-                        ->authorize('restore'),
-                    Tables\Actions\ForceDeleteAction::make()
-                        ->authorize('forceDelete'),
+                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\RestoreAction::make(),
+                    Tables\Actions\ForceDeleteAction::make(),
                     Tables\Actions\Action::make('resend-verification')
                         ->requiresConfirmation()
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
@@ -234,11 +232,20 @@ class AdminResource extends Resource
                                 ->successNotificationTitle(trans('A password reset link has been sent to your email address.'))
                                 ->success();
                         })
-                        ->authorize('sendPasswordReset'),
+                        ->authorize('sendPasswordReset')
+                        ->withActivityLog(
+                            event: 'password-reset-link-sent',
+                            description: fn (Tables\Actions\Action $action) => $action->getRecordTitle() . ' password reset sent'
+                        ),
                     Impersonate::make()
                         ->guard('admin')
-                        ->redirectTo(route(tenancy()->initialized ? 'filament-tenant.pages.dashboard' : 'filament.pages.dashboard'))
-                        ->authorize('impersonate'),
+                        ->redirectTo(Filament::getUrl() ?? '/')
+                        ->authorize('impersonate')
+                        ->withActivityLog(
+                            event: 'impersonated',
+                            description: fn (Tables\Actions\Action $action) => $action->getRecordTitle() . ' impersonated',
+                            causedBy: Auth::user()
+                        ),
                 ]),
             ])
             ->bulkActions([])

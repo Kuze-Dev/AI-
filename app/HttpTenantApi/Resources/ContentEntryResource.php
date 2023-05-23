@@ -6,7 +6,9 @@ namespace App\HttpTenantApi\Resources;
 
 use App\HttpTenantApi\Resources\Concerns\TransformsSchemaPayload;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
@@ -23,7 +25,7 @@ class ContentEntryResource extends JsonApiResource
             'data' => $this->transformSchemaPayload($this->data),
             'order' => $this->order,
             'published_at' => $this->published_at,
-            'route_url' => $this->activeRouteUrl->url,
+            'route_url' => $this->activeRouteUrl?->url,
         ];
     }
 
@@ -34,11 +36,25 @@ class ContentEntryResource extends JsonApiResource
             'taxonomyTerms' => fn () => TaxonomyTermResource::collection($this->taxonomyTerms),
             'routeUrls' => fn () => RouteUrlResource::collection($this->routeUrls),
             'metaData' => fn () => MetaDataResource::make($this->metaData),
+            'content' => fn () => ContentResource::make($this->content),
         ];
     }
 
     protected function getSchemaData(): SchemaData
     {
         return $this->content->blueprint->schema;
+    }
+
+    public static function newCollection(mixed $resource)
+    {
+        if ($resource instanceof Collection) {
+            $resource->loadMissing('content.blueprint', 'activeRouteUrl');
+        }
+
+        if ($resource instanceof LengthAwarePaginator && $resource->getCollection() instanceof Collection) {
+            $resource->getCollection()->loadMissing('content.blueprint', 'activeRouteUrl');
+        }
+
+        return parent::newCollection($resource);
     }
 }

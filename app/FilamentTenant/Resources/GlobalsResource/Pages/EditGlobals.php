@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\GlobalsResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\GlobalsResource;
 use Domain\Globals\Actions\UpdateGlobalsAction;
 use Filament\Pages\Actions;
@@ -16,6 +17,8 @@ use Throwable;
 
 class EditGlobals extends EditRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = GlobalsResource::class;
 
     protected function getActions(): array

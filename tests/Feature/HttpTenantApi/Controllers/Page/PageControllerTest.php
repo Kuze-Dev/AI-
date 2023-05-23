@@ -17,6 +17,7 @@ beforeEach(function () {
 it('can list pages', function () {
     PageFactory::new()
         ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->published()
         ->count(10)
         ->create();
 
@@ -34,10 +35,12 @@ it('can list pages', function () {
 it('can filter pages', function ($attribute) {
     $pages = PageFactory::new()
         ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->published()
         ->count(2)
         ->sequence(
-            ['name' => 'Foo'],
-            ['name' => 'Bar'],
+            ['name' => 'Foo', 'visibility' => 'authenticated'],
+            ['name' => 'Bar', 'visibility' => 'guest'],
+            ['name' => 'Example', 'visibility' => 'public']
         )
         ->create();
 
@@ -53,7 +56,7 @@ it('can filter pages', function ($attribute) {
                     ->etc();
             });
     }
-})->with(['name', 'slug']);
+})->with(['name', 'slug', 'visibility']);
 
 it('can show a page with includes', function (string $include) {
     $page = PageFactory::new()

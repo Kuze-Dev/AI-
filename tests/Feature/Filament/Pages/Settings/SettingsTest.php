@@ -9,8 +9,6 @@ use function Pest\Laravel\get;
 
 beforeEach(fn () => loginAsSuperAdmin());
 
-uses()->group('settings');
-
 it('can render page', function () {
     get(Settings::getUrl())
         ->assertOk();

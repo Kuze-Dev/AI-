@@ -13,6 +13,11 @@ class SettingsCacheFactory extends \Spatie\LaravelSettings\Support\SettingsCache
         // to totally ignore initializeCaches()
     }
 
+    public function all(): array
+    {
+        return [$this->build()];
+    }
+
     public function build(?string $repository = null): SettingsCache
     {
         return new SettingsCache(
