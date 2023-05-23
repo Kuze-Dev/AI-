@@ -33,6 +33,11 @@ class CMSSettings extends TenantBaseSettings
                     ->url()
                     ->columnSpan('full'),
             ]),
+            Card::make([
+                TextInput::make('front_end_preview_page_url')
+                    ->label('Front end preview page url ( URL must have "{slug}" )')
+                    ->columnSpan('full'),
+            ]),
         ];
     }
 }

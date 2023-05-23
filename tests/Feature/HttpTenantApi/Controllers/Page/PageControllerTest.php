@@ -5,6 +5,8 @@ declare(strict_types=1);
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\URL;
 
 use function Pest\Laravel\getJson;
 
@@ -59,6 +61,7 @@ it('can filter pages', function ($attribute) {
 it('can show a page with includes', function (string $include) {
     $page = PageFactory::new()
         ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->published()
         ->createOne();
 
     $page->metaData()->create([
@@ -87,3 +90,27 @@ it('can show a page with includes', function (string $include) {
     'routeUrls',
     'metaData',
 ]);
+
+it('cant show an unpublished page', function () {
+    $page = PageFactory::new()
+        ->createOne();
+
+    getJson("api/pages/{$page->getRouteKey()}")
+        ->assertStatus(412);
+});
+
+it('can show an unpublished page with valid signature', function () {
+    $page = PageFactory::new()
+        ->createOne();
+
+    $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$page->getRouteKey()], false), '?');
+
+    getJson("api/pages/{$page->getRouteKey()}?{$queryString}")
+        ->assertStatus(200)
+        ->assertJson(function (AssertableJson $json) use ($page) {
+            $json
+                ->where('data.type', 'pages')
+                ->where('data.id', Str::slug($page->name))
+                ->etc();
+        });
+});
