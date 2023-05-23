@@ -141,4 +141,9 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
     {
         return $this->belongsTo(Admin::class, 'author_id');
     }
+
+    public function isPublished(): bool
+    {
+        return is_null($this->published_at);
+    }
 }

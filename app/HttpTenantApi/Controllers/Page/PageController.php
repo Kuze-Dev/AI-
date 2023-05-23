@@ -70,13 +70,9 @@ class PageController
             ])
             ->firstOrFail();
 
-        abort_if(
-            is_null($page->published_at) && ! URL::hasValidSignature($request, false, [
-                'include',
-                'fields',
-            ]),
-            412
-        );
+        $ignoreQuery = array_diff(array_keys($request->query->all()), ['signature', 'expires']);
+
+        abort_if($page->isPublished() && !URL::hasValidSignature($request, false, $ignoreQuery), 412);
 
         return PageResource::make($page);
     }

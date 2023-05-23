@@ -13,7 +13,6 @@ use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Throwable;
 use Exception;
 use Filament\Pages\Actions\Action;
@@ -40,20 +39,18 @@ class EditPage extends EditRecord
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
             Action::make('preview')
-                ->label(__('Preview Page'))
+                ->label(__('Preview'))
+                ->visible(fn (CMSSettings $cmsSettings) => filled($cmsSettings->front_end_preview_page_url))
                 ->action(function (CMSSettings $cmsSettings) {
-                    $pageUrl = $cmsSettings->front_end_preview_page_url ?? null;
-
-                    if (
-                        ! blank($pageUrl) && is_string($pageUrl)
-                        && str_contains($pageUrl, '{slug}')
-                    ) {
-                        $previewPageUrl = str_replace('{slug}', $this->record->slug, $pageUrl);
-
-                        $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$this->record->slug], false), '?');
-
-                        $this->redirect($previewPageUrl . '?' . $queryString);
+                    if ($cmsSettings->front_end_preview_page_url === null) {
+                        return;
                     }
+
+                    $previewPageUrl = str_replace('{slug}', $this->record->slug, $cmsSettings->front_end_preview_page_url);
+                    $showPageApiUrl = URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$this->record->slug], false);
+                    $queryString = parse_url($showPageApiUrl, PHP_URL_QUERY);
+
+                    $this->redirect($previewPageUrl . '?' . $queryString);
                 }),
         ];
     }
