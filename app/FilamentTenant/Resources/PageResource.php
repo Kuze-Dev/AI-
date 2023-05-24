@@ -261,6 +261,7 @@ class PageResource extends Resource
             'index' => Resources\PageResource\Pages\ListPages::route('/'),
             'create' => Resources\PageResource\Pages\CreatePage::route('/create'),
             'edit' => Resources\PageResource\Pages\EditPage::route('/{record}/edit'),
+            'clone' => Resources\PageResource\Pages\ClonePage::route('/{record}/clone'),
         ];
     }
 

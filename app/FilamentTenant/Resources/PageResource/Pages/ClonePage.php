@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\PageResource\Pages;
 
-use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\PageResource;
 use App\Settings\CMSSettings;
-use Domain\Page\Actions\UpdatePageAction;
+use Domain\Page\Actions\ClonePageAction;
 use Domain\Page\DataTransferObjects\PageData;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -22,9 +21,49 @@ use Illuminate\Support\Facades\URL;
 /**
  * @property \Domain\Page\Models\Page $record
  */
-class EditPage extends EditRecord
+class ClonePage extends EditRecord
 {
-    use LogsFormActivity;
+    protected function getTitle(): string
+    {
+        return 'Clone ' . $this->record->name;
+    }
+
+    public function mount($record): void
+    {
+        $this->record = $this->resolveRecord($record);
+
+        $this->authorizeAccess();
+
+        $this->fillForm();
+
+        $this->data['name'] = '';
+        $this->data['route_url']['url'] = '';
+        $this->data['meta_data']['title'] = '';
+
+        $this->previousUrl = url()->previous();
+    }
+
+    public function getBreadcrumb(): string
+    {
+        return 'Clone';
+    }
+
+    protected function fillForm(): void
+    {
+        $this->callHook('beforeFill');
+
+        $this->getForms();
+
+        $data = $this->getRecord()->attributesToArray();
+
+        $data = $this->mutateFormDataBeforeFill($data);
+
+        $this->form->fill($data);
+
+        $this->callHook('afterFill');
+    }
+
+    // use LogsFormActivity;
 
     protected static string $resource = PageResource::class;
 
@@ -54,11 +93,6 @@ class EditPage extends EditRecord
                         $this->redirect($previewPageUrl . '?' . $queryString);
                     }
                 }),
-            Action::make('clone-page')
-                ->label(__('Clone Page'))
-                ->color('secondary')
-                ->record($this->getRecord())
-                ->url(PageResource::getUrl('clone', [$this->getRecord()])),
         ];
     }
 
@@ -73,14 +107,11 @@ class EditPage extends EditRecord
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdatePageAction::class)->execute($record, PageData::fromArray($data)));
+        return DB::transaction(fn () => app(ClonePageAction::class)->execute(PageData::fromArray($data)));
     }
 
     protected function afterSave(): void
     {
-        $this->record->refresh();
-        $this->hasCachedForms = false;
-
-        $this->fillForm();
+        $this->redirect(route('filament-tenant.resources.pages.index'));
     }
 }
