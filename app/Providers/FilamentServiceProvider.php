@@ -30,6 +30,7 @@ use Spatie\Activitylog\ActivitylogServiceProvider;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Exception;
+use Illuminate\Support\HtmlString;
 use Throwable;
 
 /** @property \Illuminate\Foundation\Application $app */
@@ -42,6 +43,17 @@ class FilamentServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Filament::serving(function () {
+            /** @phpstan-ignore-next-line `pushMeta()` is defined in the facade's accessor but not doc blocked. */
+            Filament::pushMeta([
+                new HtmlString('<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">'),
+                new HtmlString('<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">'),
+                new HtmlString('<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">'),
+                new HtmlString('<link rel="manifest" href="/site.webmanifest">'),
+                new HtmlString('<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">'),
+                new HtmlString('<meta name="msapplication-TileColor" content="#da532c">'),
+                new HtmlString('<meta name="theme-color" content="#ffffff">'),
+            ]);
+
             Filament::registerViteTheme('resources/css/filament/app.css');
 
             if (Filament::currentContext() !== 'filament') {
