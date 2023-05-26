@@ -41,9 +41,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::shouldBeStrict( ! $this->app->isProduction());
 
-        if ($this->app->isProduction()) {
-            Model::handleLazyLoadingViolationUsing(Integration::lazyLoadingViolationReporter());
-        }
+        Model::handleLazyLoadingViolationUsing(Integration::lazyLoadingViolationReporter());
 
         Model::handleMissingAttributeViolationUsing(function (Model $model, string $key) {
             if ($model instanceof Tenant && Str::startsWith($key, Tenant::internalPrefix())) {
