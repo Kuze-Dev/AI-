@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\PageResource\Pages\ListPages;
-use Carbon\Carbon;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
 use Filament\Facades\Filament;
