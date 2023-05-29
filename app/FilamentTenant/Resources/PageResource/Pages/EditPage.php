@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources\PageResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\PageResource;
+use App\Settings\CMSSettings;
 use Domain\Page\Actions\UpdatePageAction;
 use Domain\Page\DataTransferObjects\PageData;
 use Filament\Pages\Actions;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Throwable;
 use Exception;
 use Filament\Pages\Actions\Action;
+use Illuminate\Support\Facades\URL;
 
 /**
  * @property \Domain\Page\Models\Page $record
@@ -36,6 +38,20 @@ class EditPage extends EditRecord
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
+            Action::make('preview')
+                ->label(__('Preview'))
+                ->visible(fn (CMSSettings $cmsSettings) => filled($cmsSettings->front_end_preview_page_url))
+                ->action(function (CMSSettings $cmsSettings) {
+                    if ($cmsSettings->front_end_preview_page_url === null) {
+                        return;
+                    }
+
+                    $previewPageUrl = str_replace('{slug}', $this->record->slug, $cmsSettings->front_end_preview_page_url);
+                    $showPageApiUrl = URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$this->record->slug], false);
+                    $queryString = parse_url($showPageApiUrl, PHP_URL_QUERY);
+
+                    $this->redirect($previewPageUrl . '?' . $queryString);
+                }),
         ];
     }
 

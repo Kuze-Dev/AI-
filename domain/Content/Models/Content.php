@@ -72,7 +72,6 @@ class Content extends Model
     protected $fillable = [
         'name',
         'blueprint_id',
-        'taxonomy_id',
         'slug',
         'prefix',
         'past_publish_date_behavior',

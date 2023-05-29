@@ -21,6 +21,7 @@ use Domain\Support\Captcha\CaptchaManager;
 use Domain\Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -44,6 +45,8 @@ class AppServiceProvider extends ServiceProvider
             if ($model instanceof Tenant && Str::startsWith($key, Tenant::internalPrefix())) {
                 return null;
             }
+
+            throw new MissingAttributeException($model, $key);
         });
 
         Relation::enforceMorphMap([
