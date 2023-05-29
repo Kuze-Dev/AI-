@@ -37,10 +37,13 @@ class RouteUrlFieldset extends Group
             ],
         ]);
 
+        $this->columns('grid-cols-[auto,1fr]');
+
         $this->schema([
             Forms\Components\Toggle::make('is_override')
                 ->formatStateUsing(fn (?HasRouteUrl $record) => $record?->activeRouteUrl?->is_override)
                 ->label(trans('Custom URL'))
+                ->inline(false)
                 ->reactive()
                 ->afterStateUpdated(fn () => $this->dispatchEvent('route_url::update')),
             Forms\Components\TextInput::make('url')
