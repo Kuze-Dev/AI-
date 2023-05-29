@@ -45,11 +45,11 @@ class FilamentServiceProvider extends ServiceProvider
         Filament::serving(function () {
             /** @phpstan-ignore-next-line `pushMeta()` is defined in the facade's accessor but not doc blocked. */
             Filament::pushMeta([
-                new HtmlString('<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">'),
-                new HtmlString('<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">'),
-                new HtmlString('<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">'),
-                new HtmlString('<link rel="manifest" href="/site.webmanifest">'),
-                new HtmlString('<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">'),
+                new HtmlString('<link rel="apple-touch-icon" sizes="180x180" href="' . asset('/apple-touch-icon.png') . '">'),
+                new HtmlString('<link rel="icon" type="image/png" sizes="32x32" href="' . asset('/favicon-32x32.png') . '">'),
+                new HtmlString('<link rel="icon" type="image/png" sizes="16x16" href="' . asset('/favicon-16x16.png') . '">'),
+                new HtmlString('<link rel="manifest" href="' . asset('/site.webmanifest') . '">'),
+                new HtmlString('<link rel="mask-icon" href="' . asset('/safari-pinned-tab.svg') . '" color="#5bbad5">'),
                 new HtmlString('<meta name="msapplication-TileColor" content="#da532c">'),
                 new HtmlString('<meta name="theme-color" content="#ffffff">'),
             ]);
@@ -205,7 +205,7 @@ class FilamentServiceProvider extends ServiceProvider
         Forms\Components\FileUpload::macro('mediaLibraryCollection', function (string $collection) {
             /** @var Forms\Components\FileUpload $this */
             $this->multiple(
-                fn ($record) => $record && ! $record->getRegisteredMediaCollections()
+                fn ($record) => $record && !$record->getRegisteredMediaCollections()
                     ->firstWhere('name', $collection)
                     ->singleFile
             );
