@@ -16,7 +16,6 @@ use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
 use Domain\Page\Models\BlockContent;
-use Domain\Page\Models\Builders\PageBuilder;
 use Exception;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
@@ -82,64 +81,61 @@ class PageResource extends Resource
                             Forms\Components\Hidden::make('author_id')
                                 ->default(Auth::id()),
                         ]),
-                        Forms\Components\Section::make(trans('Blocks'))
+                        Forms\Components\Repeater::make('block_contents')
+                            ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Page $record, ?array $state) {
+                                if ($record === null || $record->blockContents->isEmpty()) {
+                                    $component->state($state ?? []);
+
+                                    return;
+                                }
+
+                                $component->state(
+                                    $record->blockContents->sortBy('order')
+                                        ->mapWithKeys(fn (BlockContent $item) => ["record-{$item->getKey()}" => $item])
+                                        ->toArray()
+                                );
+
+                                // WORKAROUND: Force after state hydrate after setting the new state
+                                foreach ($component->getChildComponentContainers() as $componentContainer) {
+                                    $componentContainer->callAfterStateHydrated();
+                                }
+                            })
+                            ->itemLabel(fn (array $state) => self::getCachedBlocks()->firstWhere('id', $state['block_id'])?->name)
+                            ->label('Blocks')
+                            ->default([])
+                            ->collapsed(fn (string $context) => $context === 'edit')
+                            ->orderable('order')
                             ->schema([
-                                Forms\Components\Repeater::make('block_contents')
-                                    ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Page $record, ?array $state) {
-                                        if ($record === null || $record->blockContents->isEmpty()) {
-                                            $component->state($state ?? []);
-
-                                            return;
-                                        }
-
-                                        $component->state(
-                                            $record->blockContents->sortBy('order')
-                                                ->mapWithKeys(fn (BlockContent $item) => ["record-{$item->getKey()}" => $item])
-                                                ->toArray()
-                                        );
-
-                                        // WORKAROUND: Force after state hydrate after setting the new state
-                                        foreach ($component->getChildComponentContainers() as $componentContainer) {
-                                            $componentContainer->callAfterStateHydrated();
-                                        }
-                                    })
-                                    ->itemLabel(fn (array $state) => self::getCachedBlocks()->firstWhere('id', $state['block_id'])?->name)
-                                    ->disableLabel()
-                                    ->minItems(1)
-                                    ->collapsed(fn (string $context) => $context === 'edit')
-                                    ->orderable('order')
-                                    ->schema([
-                                        Forms\Components\ViewField::make('block_id')
-                                            ->label('Block')
-                                            ->required()
-                                            ->view('filament.forms.components.block-picker')
-                                            ->viewData([
-                                                'blocks' => self::getCachedBlocks()
-                                                    ->sortBy('name')
-                                                    ->mapWithKeys(function (Block $block) {
-                                                        return [
-                                                            $block->id => [
-                                                                'name' => $block['name'],
-                                                                'image' => $block->getFirstMediaUrl('image'),
-                                                            ],
-                                                        ];
-                                                    })
-                                                    ->toArray(),
-                                            ])
-                                            ->reactive()
-                                            ->afterStateUpdated(function ($component, $state) {
-                                                $block = self::getCachedBlocks()->firstWhere('id', $state);
-                                                $component->getContainer()
-                                                    ->getComponent(fn ($component) => $component->getId() === 'schema-form')
-                                                    ?->getChildComponentContainer()
-                                                    ->fill($block?->is_fixed_content ? $block->data : []);
-                                            }),
-                                        SchemaFormBuilder::make('data')
-                                            ->id('schema-form')
-                                            ->dehydrated(fn (Closure $get) => ! (self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content))
-                                            ->disabled(fn (Closure $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content ?? false)
-                                            ->schemaData(fn (Closure $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->blueprint->schema),
-                                    ]),
+                                Forms\Components\ViewField::make('block_id')
+                                    ->label('Block')
+                                    ->required()
+                                    ->view('filament.forms.components.block-picker')
+                                    ->viewData([
+                                        'blocks' => self::getCachedBlocks()
+                                            ->sortBy('name')
+                                            ->mapWithKeys(function (Block $block) {
+                                                return [
+                                                    $block->id => [
+                                                        'name' => $block['name'],
+                                                        'image' => $block->getFirstMediaUrl('image'),
+                                                    ],
+                                                ];
+                                            })
+                                            ->toArray(),
+                                    ])
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($component, $state) {
+                                        $block = self::getCachedBlocks()->firstWhere('id', $state);
+                                        $component->getContainer()
+                                            ->getComponent(fn ($component) => $component->getId() === 'schema-form')
+                                            ?->getChildComponentContainer()
+                                            ->fill($block?->is_fixed_content ? $block->data : []);
+                                    }),
+                                SchemaFormBuilder::make('data')
+                                    ->id('schema-form')
+                                    ->dehydrated(fn (Closure $get) => ! (self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content))
+                                    ->disabled(fn (Closure $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content ?? false)
+                                    ->schemaData(fn (Closure $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->blueprint->schema),
                             ]),
                     ])->columnSpan(2),
                 MetaDataForm::make('Meta Data')
@@ -163,9 +159,13 @@ class PageResource extends Resource
                     ->formatStateUsing(fn ($state) => Str::headline($state))
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('published_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable(),
+                Tables\Columns\IconColumn::make('published_at')
+                    ->label(trans('Published'))
+                    ->options([
+                        'heroicon-o-check-circle' => fn ($state) => $state !== null,
+                        'heroicon-o-x-circle' => fn ($state) => $state === null,
+                    ])
+                    ->color(fn ($state) => $state !== null ? 'success' : 'danger'),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable(['first_name', 'last_name'])
                     ->searchable(query: function (Builder $query, string $search): Builder {
@@ -188,36 +188,9 @@ class PageResource extends Resource
                             ])
                             ->toArray()
                     ),
-                Tables\Filters\Filter::make('published_at_year_month')
-                    ->form([
-                        Forms\Components\TextInput::make('published_at_year')
-                            ->numeric()
-                            ->debounce(),
-                        Forms\Components\Select::make('published_at_month')
-                            ->options(
-                                collect(range(1, 12))
-                                    ->mapWithKeys(fn (int $month) => [$month => Carbon::now()->month($month)->format('F')])
-                                    ->toArray()
-                            )
-                            ->disabled(fn (Closure $get) => blank($get('published_at_year')))
-                            ->helperText(fn (Closure $get) => blank($get('published_at_year')) ? 'Enter a published at year first.' : null),
-                    ])
-                    ->query(fn (PageBuilder $query, array $data): Builder => $query->when(
-                        filled($data['published_at_year']),
-                        fn (PageBuilder $query) => $query->wherePublishedAtYearMonth(
-                            (int) $data['published_at_year'],
-                            filled($data['published_at_month']) ? (int) $data['published_at_month'] : null
-                        )
-                    )),
-                Tables\Filters\Filter::make('published_at_range')
-                    ->form([
-                        Forms\Components\DatePicker::make('published_at_from'),
-                        Forms\Components\DatePicker::make('published_at_to'),
-                    ])
-                    ->query(fn (PageBuilder $query, array $data): Builder => $query->wherePublishedAtRange(
-                        filled($data['published_at_from']) ? Carbon::parse($data['published_at_from']) : null,
-                        filled($data['published_at_to']) ? Carbon::parse($data['published_at_to']) : null,
-                    )),
+                Tables\Filters\TernaryFilter::make('published_at')
+                    ->label(trans('Published'))
+                    ->nullable(),
             ])
             ->filtersLayout(Layout::AboveContent)
             ->actions([
