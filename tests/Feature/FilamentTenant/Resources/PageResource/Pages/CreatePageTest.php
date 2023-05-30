@@ -89,7 +89,7 @@ it('can not create page with same name', function () {
     PageFactory::new()
         ->createOne(['name' => 'page 1']);
 
-    assertDatabaseCount(Page::class, 1);
+    assertDatabaseCount(Page::class, 2);
 
     livewire(CreatePage::class)
         ->fillForm([
@@ -106,7 +106,7 @@ it('can not create page with same name', function () {
         ->assertHasFormErrors(['name' => 'unique'])
         ->assertOk();
 
-    assertDatabaseCount(Page::class, 1);
+    assertDatabaseCount(Page::class, 2);
 });
 
 it('can create page with meta data', function () {

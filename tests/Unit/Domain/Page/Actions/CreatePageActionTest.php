@@ -41,8 +41,8 @@ it('can create page', function () {
             ],
         ]));
 
-    assertDatabaseCount(Page::class, 1);
-    assertDatabaseCount(BlockContent::class, 1);
+    assertDatabaseCount(Page::class, 2);
+    assertDatabaseCount(BlockContent::class, 2);
     assertDatabaseHas(
         MetaData::class,
         [

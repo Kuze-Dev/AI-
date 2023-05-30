@@ -64,7 +64,8 @@ class PageResource extends Resource
                                         ?->dispatchEvent('route_url::update');
                                 })
                                 ->required(),
-                            RouteUrlFieldset::make(),
+                            RouteUrlFieldset::make()
+                                ->disabled(fn (?Page $record) => ! empty($record) && $record->isHomePage()),
                             Forms\Components\Select::make('visibility')
                                 ->options(
                                     collect(Visibility::cases())
@@ -73,12 +74,14 @@ class PageResource extends Resource
                                         ])
                                         ->toArray()
                                 )
+                                ->disabled(fn (?Page $record) => ! empty($record) && $record->isHomePage())
                                 ->default(Visibility::PUBLIC->value)
                                 ->required(),
                             Forms\Components\Toggle::make('published_at')
                                 ->label(trans('Published'))
                                 ->formatStateUsing(fn (Carbon|bool|null $state) => $state instanceof Carbon ? true : (bool) $state)
-                                ->dehydrateStateUsing(fn (?bool $state) => $state ? now() : null),
+                                ->dehydrateStateUsing(fn (?bool $state) => $state ? now() : null)
+                                ->disabled(fn (?Page $record) => ! empty($record) && $record->isHomePage()),
                             Forms\Components\Hidden::make('author_id')
                                 ->default(Auth::id()),
                         ]),

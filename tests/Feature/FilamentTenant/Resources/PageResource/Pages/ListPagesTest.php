@@ -49,22 +49,22 @@ it('can filter pages by published at range', function () {
 
     livewire(ListPages::class)
         ->assertCanSeeTableRecords($pages)
-        ->assertCountTableRecords(5)
+        ->assertCountTableRecords(6)
         ->filterTable('published_at_range', [
             'published_at_from' => Carbon::now()->subDay(),
             'published_at_to' => null,
         ])
-        ->assertCountTableRecords(3)
+        ->assertCountTableRecords(4)
         ->filterTable('published_at_range', [
             'published_at_from' => null,
             'published_at_to' => Carbon::now()->addDay(),
         ])
-        ->assertCountTableRecords(3)
+        ->assertCountTableRecords(4)
         ->filterTable('published_at_range', [
             'published_at_from' => Carbon::now()->subDay(),
             'published_at_to' => Carbon::now()->addDay(),
         ])
-        ->assertCountTableRecords(1)
+        ->assertCountTableRecords(2)
         ->assertOk();
 });
 
