@@ -23,9 +23,11 @@ use Illuminate\Support\Facades\URL;
  */
 class ClonePage extends EditRecord
 {
+    protected static string $resource = PageResource::class;
+
     protected function getTitle(): string
     {
-        return 'Clone ' . $this->record->name;
+        return "Clone {$this->record->name}";
     }
 
     public function mount($record): void
@@ -47,25 +49,6 @@ class ClonePage extends EditRecord
     {
         return 'Clone';
     }
-
-    protected function fillForm(): void
-    {
-        $this->callHook('beforeFill');
-
-        $this->getForms();
-
-        $data = $this->getRecord()->attributesToArray();
-
-        $data = $this->mutateFormDataBeforeFill($data);
-
-        $this->form->fill($data);
-
-        $this->callHook('afterFill');
-    }
-
-    // use LogsFormActivity;
-
-    protected static string $resource = PageResource::class;
 
     /** @throws Exception */
     protected function getActions(): array

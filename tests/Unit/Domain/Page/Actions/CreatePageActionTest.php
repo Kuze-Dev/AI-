@@ -14,7 +14,7 @@ use function Pest\Laravel\assertDatabaseHas;
 
 beforeEach(fn () => testInTenantContext());
 
-it('can create page', function () {
+it('can clone page', function () {
     $blockId = BlockFactory::new()
         ->withDummyBlueprint()
         ->createOne()
