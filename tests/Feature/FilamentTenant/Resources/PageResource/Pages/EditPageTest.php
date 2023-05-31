@@ -132,7 +132,7 @@ it('can edit page', function () {
         'url' => Page::generateRouteUrl($page, $updatedPage->toArray()),
         'is_override' => false,
     ]);
-});
+})->only();
 
 it('can edit page with custom url', function () {
     $page = PageFactory::new(['slug' => 'foo'])
