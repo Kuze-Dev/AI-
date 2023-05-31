@@ -27,7 +27,6 @@ class CreatePage extends CreateRecord
                 ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
-            $this->getCreateAnotherFormAction(),
         ];
     }
 
