@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\BlueprintResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\BlueprintResource;
 use Domain\Blueprint\Actions\UpdateBlueprintAction;
 use Domain\Blueprint\DataTransferObjects\BlueprintData;
@@ -17,6 +18,10 @@ use Illuminate\Support\Facades\DB;
 
 class EditBlueprint extends EditRecord
 {
+    use LogsFormActivity {
+        afterSave as protected afterSaveOverride;
+    }
+
     protected static string $resource = BlueprintResource::class;
 
     protected function getActions(): array
@@ -50,6 +55,8 @@ class EditBlueprint extends EditRecord
 
     protected function afterSave(): void
     {
+        $this->afterSaveOverride();
+
         $this->record = $this->resolveRecord($this->record->getRouteKey());
 
         $this->fillForm();

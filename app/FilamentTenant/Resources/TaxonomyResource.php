@@ -17,11 +17,12 @@ use Filament\Tables;
 use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms;
-use Illuminate\Support\Str;
-use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Domain\Taxonomy\Actions\DeleteTaxonomyAction;
+use Illuminate\Support\Facades\Auth;
 
 class TaxonomyResource extends Resource
 {
@@ -43,6 +44,7 @@ class TaxonomyResource extends Resource
     /** @param Taxonomy $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
+        /** @phpstan-ignore-next-line */
         return [trans('Total terms') => $record->taxonomy_terms_count];
     }
 
@@ -66,16 +68,8 @@ class TaxonomyResource extends Resource
             ->schema([
                 Forms\Components\Card::make()->schema([
                     Forms\Components\TextInput::make('name')
-                        ->reactive()
-                        ->afterStateUpdated(function (Closure $set, $state) {
-                            $set('slug', Str::slug($state));
-                        })->required()
+                        ->required()
                         ->unique(ignoreRecord: true),
-                    Forms\Components\TextInput::make('slug')->required()
-                        ->disabled(fn (?Taxonomy $record) => $record !== null)
-                        ->unique(ignoreRecord: true)
-                        ->rules('alpha_dash')
-                        ->disabled(),
                     Forms\Components\Select::make('blueprint_id')
                         ->required()
                         ->options(
@@ -100,16 +94,8 @@ class TaxonomyResource extends Resource
                             Forms\Components\Grid::make(['md' => 1])
                                 ->schema([
                                     Forms\Components\TextInput::make('name')
-                                        ->reactive()
-                                        ->afterStateUpdated(function (Closure $set, $state) {
-                                            $set('slug', Str::slug($state));
-                                        })->required()
+                                        ->required()
                                         ->unique(ignoreRecord: true),
-                                    Forms\Components\TextInput::make('slug')->required()
-                                        ->disabled(fn (?TaxonomyTerm $record) => $record !== null)
-                                        ->unique(ignoreRecord: true)
-                                        ->rules('alpha_dash')
-                                        ->disabled(),
                                     SchemaFormBuilder::make('data', fn (Taxonomy $record) => $record->blueprint->schema),
                                 ]),
                         ]),
@@ -124,16 +110,27 @@ class TaxonomyResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('slug'),
                 Tables\Columns\BadgeColumn::make('taxonomy_terms_count')
                     ->counts('taxonomyTerms')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
             ->filters([])
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Taxonomy $record) {
+                            try {
+                                return app(DeleteTaxonomyAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

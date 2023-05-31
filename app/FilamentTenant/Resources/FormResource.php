@@ -8,6 +8,7 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources\FormResource\Pages;
 use App\FilamentTenant\Resources\FormResource\RelationManagers\FormSubmissionsRelationManager;
 use App\FilamentTenant\Support\SchemaInterpolations;
+use App\Settings\FormSettings;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Form\Models\Form as FormModel;
@@ -43,13 +44,6 @@ class FormResource extends Resource
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
                         ->required(),
-                    Forms\Components\TextInput::make('slug')
-                        ->unique(ignoreRecord: true)
-                        ->rules('alpha_dash')
-                        ->disabled(fn (?FormModel $record) => $record !== null)
-                        ->afterStateUpdated(function ($state, $set) {
-                            $set('slug', Str::slug($state));
-                        }),
                     Forms\Components\Select::make('blueprint_id')
                         ->options(
                             fn () => Blueprint::orderBy('name')
@@ -63,6 +57,13 @@ class FormResource extends Resource
                         ->reactive()
                         ->preload(),
                     Forms\Components\Toggle::make('store_submission'),
+                    Forms\Components\Toggle::make('uses_captcha')
+                        ->disabled(fn (FormSettings $formSettings) => ! $formSettings->provider)
+                        ->helperText(
+                            fn (FormSettings $formSettings) => ! $formSettings->provider
+                                ? trans('Currently unavailable. Please setup Captcha(in Settings > Form Settings) first.')
+                                : null
+                        ),
                 ]),
                 Forms\Components\Card::make([
                     Forms\Components\Section::make('Available Values')
@@ -177,13 +178,6 @@ class FormResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('blueprint.name')
-                    ->sortable()
-                    ->searchable()
-                    ->url(fn (FormModel $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
                 Tables\Columns\BadgeColumn::make('form_submissions_count')
                     ->counts('formSubmissions')
                     ->formatStateUsing(fn (FormModel $record, ?int $state) => $record->store_submission ? $state : 'N/A')
@@ -192,17 +186,14 @@ class FormResource extends Resource
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable()
-                    ->toggleable()
-                    ->toggledHiddenByDefault(),
             ])
             ->filters([])
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->defaultSort('updated_at', 'desc');
     }

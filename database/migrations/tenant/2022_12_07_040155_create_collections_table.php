@@ -6,8 +6,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Domain\Blueprint\Models\Blueprint as BlueprintModel;
-use Domain\Collection\Models\Collection;
-use Domain\Collection\Models\CollectionEntry;
+use Domain\Content\Models\Content;
+use Domain\Content\Models\ContentEntry;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 
@@ -15,7 +15,7 @@ return new class () extends Migration {
     /** Run the migrations. */
     public function up(): void
     {
-        Schema::create('collections', function (Blueprint $table) {
+        Schema::create('contents', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(BlueprintModel::class)->index();
             $table->string('name')->unique();
@@ -27,9 +27,9 @@ return new class () extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('collection_entries', function (Blueprint $table) {
+        Schema::create('content_entries', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Collection::class)->index();
+            $table->foreignIdFor(Content::class)->index();
             $table->string('title');
             $table->string('slug')->index();
             $table->dateTime('published_at')->nullable();
@@ -37,18 +37,18 @@ return new class () extends Migration {
             $table->unsignedInteger('order')->nullable();
             $table->timestamps();
 
-            $table->unique(['collection_id', 'title']);
+            $table->unique(['content_id', 'title']);
         });
 
-        Schema::create('collection_taxonomy', function (Blueprint $table) {
+        Schema::create('content_taxonomy', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Collection::class)->index();
+            $table->foreignIdFor(Content::class)->index();
             $table->foreignIdFor(Taxonomy::class)->index();
         });
 
-        Schema::create('collection_entry_taxonomy_term', function (Blueprint $table) {
+        Schema::create('content_entry_taxonomy_term', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(CollectionEntry::class)->index();
+            $table->foreignIdFor(ContentEntry::class)->index();
             $table->foreignIdFor(TaxonomyTerm::class)->index();
         });
     }
@@ -56,9 +56,9 @@ return new class () extends Migration {
     /** Reverse the migrations. */
     public function down(): void
     {
-        Schema::dropIfExists('collection_entry_taxonomy_term');
-        Schema::dropIfExists('collection_taxonomy');
-        Schema::dropIfExists('collection_entries');
-        Schema::dropIfExists('collections');
+        Schema::dropIfExists('content_entry_taxonomy_term');
+        Schema::dropIfExists('content_taxonomy');
+        Schema::dropIfExists('content_entries');
+        Schema::dropIfExists('contents');
     }
 };

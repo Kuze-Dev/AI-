@@ -4,64 +4,84 @@ declare(strict_types=1);
 
 namespace Domain\Page\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Domain\Page\Models\Builders\PageBuilder;
+use Domain\Admin\Models\Admin;
+use Domain\Page\Enums\Visibility;
 use Domain\Support\MetaData\HasMetaData;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
-use Domain\Support\SlugHistory\HasSlugHistory;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use Domain\Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
+use Domain\Support\RouteUrl\HasRouteUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 
 /**
  * Domain\Page\Models\Page
  *
  * @property int $id
+ * @property int|null $author_id
  * @property string $name
  * @property string $slug
- * @property string $route_url
+ * @property Visibility $visibility
+ * @property \Illuminate\Support\Carbon|null $published_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read \Domain\Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Domain\Support\MetaData\Models\MetaData $metaData
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Page\Models\SliceContent[] $sliceContents
- * @property-read int|null $slice_contents_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Support\SlugHistory\SlugHistory[] $slugHistories
- * @property-read int|null $slug_histories_count
- * @property-read string|null $qualified_route_url
- * @method static \Illuminate\Database\Eloquent\Builder|Page newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Page newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Page query()
- * @method static \Illuminate\Database\Eloquent\Builder|Page whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Page whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Page whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Page whereRouteUrl($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Page whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Page whereUpdatedAt($value)
+ * @property-read Admin|null $author
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Page\Models\BlockContent> $blockContents
+ * @property-read int|null $block_contents_count
+ * @property-read \Domain\Support\MetaData\Models\MetaData|null $metaData
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Support\RouteUrl\Models\RouteUrl> $routeUrls
+ * @property-read int|null $route_urls_count
+ * @method static PageBuilder|Page newModelQuery()
+ * @method static PageBuilder|Page newQuery()
+ * @method static PageBuilder|Page query()
+ * @method static PageBuilder|Page whereAuthorId($value)
+ * @method static PageBuilder|Page whereCreatedAt($value)
+ * @method static PageBuilder|Page whereId($value)
+ * @method static PageBuilder|Page whereName($value)
+ * @method static PageBuilder|Page wherePublishedAt($value)
+ * @method static PageBuilder|Page wherePublishedAtRange(?\Carbon\Carbon $publishedAtStart = null, ?\Carbon\Carbon $publishedAtEnd = null)
+ * @method static PageBuilder|Page wherePublishedAtYearMonth(int $year, ?int $month = null)
+ * @method static PageBuilder|Page whereSlug($value)
+ * @method static PageBuilder|Page whereUpdatedAt($value)
+ * @method static PageBuilder|Page whereVisibility($value)
  * @mixin \Eloquent
  */
 
-#[OnDeleteCascade(['sliceContents', 'metaData'])]
-class Page extends Model implements IsActivitySubject, HasMetaDataContract
+#[OnDeleteCascade(['blockContents', 'metaData', 'routeUrls'])]
+class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
 {
     use LogsActivity;
     use HasSlug;
-    use HasSlugHistory;
+    use HasRouteUrl;
     use HasMetaData;
     use ConstraintsRelationships;
 
     protected $fillable = [
+        'author_id',
         'name',
-        'slug',
-        'route_url',
+        'visibility',
+        'published_at',
+    ];
+
+    /**
+     * Columns that are converted
+     * to a specific data type.
+     */
+    protected $casts = [
+        'visibility' => Visibility::class,
+        'published_at' => 'datetime',
     ];
 
     /**
@@ -77,6 +97,12 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
         ];
     }
 
+    /** @return PageBuilder<self> */
+    public function newEloquentBuilder($query): PageBuilder
+    {
+        return new PageBuilder($query);
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -85,15 +111,10 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return HasMany<SliceContent> */
-    public function sliceContents(): HasMany
+    /** @return HasMany<BlockContent> */
+    public function blockContents(): HasMany
     {
-        return $this->hasMany(SliceContent::class);
-    }
-
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Page: '.$this->name;
+        return $this->hasMany(BlockContent::class);
     }
 
     public function getRouteKeyName(): string
@@ -110,14 +131,19 @@ class Page extends Model implements IsActivitySubject, HasMetaDataContract
             ->saveSlugsTo($this->getRouteKeyName());
     }
 
-    /** @return Attribute<string, static> */
-    protected function qualifiedRouteUrl(): Attribute
+    public static function generateRouteUrl(Model $model, array $attributes): string
     {
-        return Attribute::get(fn () => Blade::render(
-            Blade::compileEchos($this->route_url),
-            [
-                'slug' => $this->slug,
-            ]
-        ));
+        return Str::of($attributes['name'])->slug()->start('/')->toString();
+    }
+
+    /** @return BelongsTo<Admin, Page> */
+    public function author(): BelongsTo
+    {
+        return $this->belongsTo(Admin::class, 'author_id');
+    }
+
+    public function isPublished(): bool
+    {
+        return is_null($this->published_at);
     }
 }

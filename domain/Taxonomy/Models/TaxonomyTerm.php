@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Taxonomy\Models;
 
-use Domain\Collection\Models\CollectionEntry;
+use Domain\Content\Models\ContentEntry;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
@@ -29,10 +29,10 @@ use Illuminate\Database\Eloquent\Builder;
  * @property int $order
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|TaxonomyTerm[] $children
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $children
  * @property-read int|null $children_count
- * @property-read \Illuminate\Database\Eloquent\Collection|CollectionEntry[] $collectionEntries
- * @property-read int|null $collection_entries_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ContentEntry> $contentEntries
+ * @property-read int|null $content_entries_count
  * @property-read \Domain\Taxonomy\Models\Taxonomy $taxonomy
  * @method static Builder|TaxonomyTerm newModelQuery()
  * @method static Builder|TaxonomyTerm newQuery()
@@ -49,7 +49,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder|TaxonomyTerm whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-#[OnDeleteCascade(['collectionEntries', 'children'])]
+#[OnDeleteCascade(['contentEntries', 'children'])]
 class TaxonomyTerm extends Model implements Sortable
 {
     use HasSlug;
@@ -81,13 +81,13 @@ class TaxonomyTerm extends Model implements Sortable
 
     /**
      * Declare relationship of
-     * current model to collection entries.
+     * current model to content entries.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Collection\Models\CollectionEntry>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Content\Models\ContentEntry>
      */
-    public function collectionEntries(): BelongsToMany
+    public function contentEntries(): BelongsToMany
     {
-        return $this->belongsToMany(CollectionEntry::class);
+        return $this->belongsToMany(ContentEntry::class);
     }
 
     public function getRouteKeyName(): string

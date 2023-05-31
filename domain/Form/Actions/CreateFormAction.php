@@ -19,8 +19,8 @@ class CreateFormAction
         $form = Form::create([
             'blueprint_id' => $formData->blueprint_id,
             'name' => $formData->name,
-            'slug' => $formData->slug,
             'store_submission' => $formData->store_submission,
+            'uses_captcha' => $formData->uses_captcha,
         ]);
 
         foreach ($formData->form_email_notifications ?? [] as $formEmailNotification) {

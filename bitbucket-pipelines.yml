@@ -1,5 +1,5 @@
 image:
-  name: bitnami/laravel:latest
+  name: bitnami/laravel:10.1.1
   run-as-user: 1000
 
 definitions:
@@ -58,27 +58,27 @@ pipelines:
           - step: *analyse
           - step: *test
       - step:
-        <<: *common-step
-        name: Deploy to Staging
-        deployment: staging
-        script:
-          - *setup-script
-          - composer require laravel/vapor-cli
-          - ./vendor/bin/vapor deploy staging --commit="$BITBUCKET_COMMIT"
+          <<: *common-step
+          name: Deploy to Staging
+          deployment: staging
+          script:
+            - *setup-script
+            - composer require laravel/vapor-cli
+            - ./vendor/bin/vapor deploy staging --commit="$BITBUCKET_COMMIT"
     master:
       - parallel:
           - step: *check-format
           - step: *analyse
           - step: *test
       - step:
-        <<: *common-step
-        name: Deploy to Production
-        deployment: production
-        trigger: manual
-        script:
-          - *setup-script
-          - composer require laravel/vapor-cli
-          - ./vendor/bin/vapor deploy production --commit="$BITBUCKET_COMMIT"
+          <<: *common-step
+          name: Deploy to Production
+          deployment: production
+          trigger: manual
+          script:
+            - *setup-script
+            - composer require laravel/vapor-cli
+            - ./vendor/bin/vapor deploy production --commit="$BITBUCKET_COMMIT"
 
   pull-requests:
     "**":

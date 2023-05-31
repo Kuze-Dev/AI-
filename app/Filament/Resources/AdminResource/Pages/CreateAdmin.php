@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AdminResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\Filament\Resources\AdminResource;
 use Domain\Admin\Actions\CreateAdminAction;
 use Domain\Admin\DataTransferObjects\AdminData;
@@ -15,6 +16,8 @@ use Throwable;
 
 class CreateAdmin extends CreateRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = AdminResource::class;
 
     protected function getActions(): array
@@ -24,7 +27,6 @@ class CreateAdmin extends CreateRecord
                 ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
-            $this->getCreateAnotherFormAction(),
         ];
     }
 

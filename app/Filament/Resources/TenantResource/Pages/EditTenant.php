@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\TenantResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\Filament\Resources\TenantResource;
 use Domain\Tenant\Actions\UpdateTenantAction;
 use Domain\Tenant\DataTransferObjects\TenantData;
@@ -17,6 +18,8 @@ use Throwable;
 
 class EditTenant extends EditRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = TenantResource::class;
 
     protected function getActions(): array
@@ -30,6 +33,19 @@ class EditTenant extends EditRecord
             Actions\ForceDeleteAction::make(),
             Actions\RestoreAction::make(),
         ];
+    }
+
+    protected function getRules(): array
+    {
+        return tap(
+            parent::getRules(),
+            fn (&$rules) => $rules['data.domains.*.domain'] = ['distinct']
+        );
+    }
+
+    protected function afterValidate(): void
+    {
+        $this->validate();
     }
 
     protected function getFormActions(): array

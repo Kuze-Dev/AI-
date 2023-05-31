@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\GlobalsResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\GlobalsResource;
 use Domain\Globals\Actions\UpdateGlobalsAction;
 use Filament\Pages\Actions;
@@ -16,6 +17,8 @@ use Throwable;
 
 class EditGlobals extends EditRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = GlobalsResource::class;
 
     protected function getActions(): array
@@ -40,17 +43,6 @@ class EditGlobals extends EditRecord
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(
-            fn () => app(UpdateGlobalsAction::class)
-                ->execute(
-                    $record,
-                    new GlobalsData(
-                        name: $data['name'],
-                        slug: $data['slug'],
-                        blueprint_id: $data['blueprint_id'],
-                        data: $data['data'],
-                    )
-                )
-        );
+        return DB::transaction(fn () => app(UpdateGlobalsAction::class)->execute($record, GlobalsData::fromArray($data)));
     }
 }

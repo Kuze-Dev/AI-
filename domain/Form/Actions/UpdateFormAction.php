@@ -21,8 +21,8 @@ class UpdateFormAction
     {
         $form->update([
             'name' => $formData->name,
-            'slug' => $formData->slug,
             'store_submission' => $formData->store_submission,
+            'uses_captcha' => $formData->uses_captcha,
         ]);
 
         foreach ($form->formEmailNotifications->whereNotIn('id', Arr::pluck($formData->form_email_notifications, 'id')) as $formEmailNotification) {

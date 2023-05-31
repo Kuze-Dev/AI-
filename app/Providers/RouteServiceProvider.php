@@ -12,28 +12,16 @@ use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
-    /**
-     * The path to the "home" route for your application.
-     *
-     * Typically, users are redirected here after authentication.
-     *
-     * @var string
-     */
-    public const HOME = '/';
-
     /** Define your route model bindings, pattern filters, and other route configuration. */
     public function boot(): void
     {
         $this->configureRateLimiting();
 
         $this->routes(function () {
-            foreach (config('tenancy.central_domains', []) as $domain) {
-                Route::middleware('web')
-                    ->domain($domain)
-                    ->group(function () {
-                        Route::view('/', 'web.welcome');
-                    });
-            }
+            Route::middleware('web')
+                ->group(function () {
+                    Route::redirect('/', '/admin');
+                });
         });
     }
 

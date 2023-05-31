@@ -8,12 +8,14 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources\BlueprintResource\Pages;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
+use Domain\Blueprint\Actions\DeleteBlueprintAction;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\SectionData;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
 use Filament\Resources\Form;
@@ -23,6 +25,7 @@ use Filament\Tables;
 use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\HtmlString;
@@ -83,14 +86,25 @@ class BlueprintResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Blueprint $record) {
+                            try {
+                                return app(DeleteBlueprintAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
+                ]),
+
             ])
             ->defaultSort('created_at', 'desc');
     }
@@ -359,7 +373,7 @@ class BlueprintResource extends Resource
                         $set('relation_scopes', []);
                     })
                     ->options(
-                        collect(config('domain.blueprint.related_resources', []))
+                        (new Collection(config('domain.blueprint.related_resources', [])))
                             ->keys()
                             ->mapWithKeys(
                                 function (string $model) {

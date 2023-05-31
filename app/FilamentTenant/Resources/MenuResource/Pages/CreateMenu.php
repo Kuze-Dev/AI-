@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\MenuResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\MenuResource;
 use Domain\Menu\Actions\CreateMenuAction;
 use Domain\Menu\DataTransferObjects\MenuData;
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\DB;
 
 class CreateMenu extends CreateRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = MenuResource::class;
 
     protected function getActions(): array
@@ -23,7 +26,6 @@ class CreateMenu extends CreateRecord
                 ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
-            $this->getCreateAnotherFormAction(),
         ];
     }
 

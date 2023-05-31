@@ -23,17 +23,24 @@ trait ConstraintsRelationships
                 return;
             }
 
-            $onDeleteRestrict = $model->getClassAttribute(OnDeleteRestrict::class);
-            $onDeleteCascade = $model->getClassAttribute(OnDeleteCascade::class);
-
-            foreach ($onDeleteRestrict?->relations ?? [] as $relation) {
+            foreach ($model->onDeleteRestrictRelations() as $relation) {
                 $model->restrictDelete($relation);
             }
 
-            foreach ($onDeleteCascade?->relations ?? [] as $relation) {
+            foreach ($model->onDeleteCascadeRelations() as $relation) {
                 $model->cascadeDelete($relation);
             }
         });
+    }
+
+    protected function onDeleteRestrictRelations(): array
+    {
+        return $this->getClassAttribute(OnDeleteRestrict::class)?->relations ?? [];
+    }
+
+    protected function onDeleteCascadeRelations(): array
+    {
+        return $this->getClassAttribute(OnDeleteCascade::class)?->relations ?? [];
     }
 
     /**
@@ -52,7 +59,7 @@ trait ConstraintsRelationships
 
     protected function restrictDelete(string $relationName): void
     {
-        if ($this->{$relationName}()->get()->isNotEmpty()) {
+        if ($this->{$relationName}()->exists()) {
             throw DeleteRestrictedException::make($this, $relationName);
         }
     }

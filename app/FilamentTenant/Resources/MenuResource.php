@@ -9,8 +9,8 @@ use App\FilamentTenant\Resources\MenuResource\Pages;
 use App\FilamentTenant\Support\Tree;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
-use Domain\Collection\Models\Collection;
-use Domain\Collection\Models\CollectionEntry;
+use Domain\Content\Models\Content;
+use Domain\Content\Models\ContentEntry;
 use Domain\Menu\Enums\NodeType;
 use Domain\Menu\Enums\Target;
 use Domain\Menu\Models\Menu;
@@ -54,6 +54,7 @@ class MenuResource extends Resource
     /** @param Menu $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
+        /** @phpstan-ignore-next-line */
         return [trans('Total Nodes') => $record->nodes_count];
     }
 
@@ -71,16 +72,7 @@ class MenuResource extends Resource
             ->schema([
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
-                        ->required()
-                        ->reactive()
-                        ->afterStateUpdated(function (Closure $set, $state) {
-                            $set('slug', Str::slug($state));
-                        }),
-                    Forms\Components\TextInput::make('slug')->required()
-                        ->disabled(fn (?Menu $record) => $record !== null)
-                        ->unique(ignoreRecord: true)
-                        ->rules('alpha_dash')
-                        ->disabled(),
+                        ->required(),
                 ]),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([
@@ -131,8 +123,8 @@ class MenuResource extends Resource
                                                         ->options(
                                                             collect([
                                                                 Page::class,
-                                                                Collection::class,
-                                                                CollectionEntry::class,
+                                                                Content::class,
+                                                                ContentEntry::class,
                                                             ])
                                                                 ->mapWithKeys(
                                                                     function (string $model) {
@@ -153,7 +145,7 @@ class MenuResource extends Resource
                                                         ->options(
                                                             fn (Closure $get) => ($modeClass = Relation::getMorphedModel($get('model_type')))
                                                                 ? match ($modeClass) {
-                                                                    CollectionEntry::class => $modeClass::pluck('title', 'id')->toArray(),
+                                                                    ContentEntry::class => $modeClass::pluck('title', 'id')->toArray(),
                                                                     default => $modeClass::pluck('name', 'id')->toArray()
                                                                 }
                                                                 : null
@@ -178,10 +170,6 @@ class MenuResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -190,7 +178,9 @@ class MenuResource extends Resource
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

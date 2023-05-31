@@ -20,13 +20,21 @@ class FormFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'store_submission' => false,
+            'uses_captcha' => false,
         ];
     }
 
-    public function storeSubmission(bool $storeSubmission = true): self
+    public function storeSubmission(bool $state = true): self
     {
         return $this->state(
-            ['store_submission' => $storeSubmission]
+            ['store_submission' => $state]
+        );
+    }
+
+    public function usesCaptcha(bool $state = true): self
+    {
+        return $this->state(
+            ['uses_captcha' => $state]
         );
     }
 
