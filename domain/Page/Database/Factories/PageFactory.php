@@ -10,6 +10,7 @@ use Domain\Page\Models\Block;
 use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
 use Domain\Support\RouteUrl\Database\Factories\RouteUrlFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\Relationship;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Page\Models\Page>
@@ -44,12 +45,15 @@ class PageFactory extends Factory
 
     public function configure(): self
     {
-        if ($this->bypassFactoryCallback === false) {
-            return $this->has(MetaDataFactory::new(), 'metaData')
-                ->has(RouteUrlFactory::new());
-        }
+        return $this->afterCreating(function (Page $model) {
+            if (! $model->metaData) {
+                (new Relationship(MetaDataFactory::new(), 'metaData'))->recycle($this->recycle)->createFor($model);
+            }
 
-        return $this;
+            if (! $model->activeRouteUrl) {
+                (new Relationship(RouteUrlFactory::new(), 'routeUrls'))->recycle($this->recycle)->createFor($model);
+            }
+        });
     }
 
     public function addRouteUrl(array $attributes = []): self
