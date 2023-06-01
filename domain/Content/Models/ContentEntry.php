@@ -82,7 +82,6 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
         'title',
         'data',
         'content_id',
-        'taxonomy_term_id',
         'order',
         'author_id',
         'published_at',
