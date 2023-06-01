@@ -12,7 +12,7 @@ class PageSeeder extends Seeder
     public function run(): void
     {
         PageFactory::new([
-            'name' => 'Home Page',
+            'name' => 'Home',
             'visibility' => 'public',
         ])
             ->addRouteUrl([
