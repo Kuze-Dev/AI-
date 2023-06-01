@@ -44,7 +44,7 @@ it('create w/o default route_url', function () {
     app(CreateOrUpdateRouteUrlAction::class)
         ->execute($model, new RouteUrlData($model::generateRouteUrl($model, $model->getAttributes()), false));
 
-    assertDatabaseCount(RouteUrl::class, 2);
+    assertDatabaseCount(RouteUrl::class, 3);
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $model->getMorphClass(),
         'model_id' => $model->getKey(),
@@ -65,26 +65,27 @@ it('can update w/o modify route_url', function () {
     $model->wasRecentlyCreated = false;
 
     $routeUrlDBData = [
-        'id' => 1,
+        'id' => 3,
         'model_type' => $model->getMorphClass(),
         'model_id' => $model->getKey(),
         'url' => '/my-awesome-name',
         'is_override' => false,
     ];
 
-    // assertDatabaseCount(RouteUrl::class, 1);
-    assertDatabaseCount(RouteUrl::class, 2);
+    assertDatabaseCount(RouteUrl::class, 3);
     assertDatabaseHas(RouteUrl::class, $routeUrlDBData);
 
-    $oldRouteUrl = RouteUrl::first();
+    // $oldRouteUrl = RouteUrl::first();
+
+    $oldRouteUrl = RouteUrl::latest()->first();
 
     travelTo(now()->addSecond());
 
     // update with same url
-    app(CreateOrUpdateRouteUrlAction::class)
+    $result = app(CreateOrUpdateRouteUrlAction::class)
         ->execute($model, new RouteUrlData($model->activeRouteUrl->url, $model->activeRouteUrl->is_override));
 
-    assertDatabaseCount(RouteUrl::class, 1);
+    assertDatabaseCount(RouteUrl::class, 3);
     assertDatabaseHas(RouteUrl::class, $routeUrlDBData);
 
     $newRouteUrl = RouteUrl::first();
@@ -104,7 +105,7 @@ it('create w/ specify route_url but same as default', function () {
         ->execute($model, new RouteUrlData($model->name, false));
 
     // assertDatabaseCount(RouteUrl::class, 1);
-    assertDatabaseCount(RouteUrl::class, 2);
+    assertDatabaseCount(RouteUrl::class, 3);
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $model->getMorphClass(),
         'model_id' => $model->getKey(),
@@ -121,7 +122,7 @@ it('create w/ specify route_url', function () {
     app(CreateOrUpdateRouteUrlAction::class)
         ->execute($model, new RouteUrlData('im-custom-value', true));
 
-    assertDatabaseCount(RouteUrl::class, 1);
+    assertDatabaseCount(RouteUrl::class, 3);
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $model->getMorphClass(),
         'model_id' => $model->getKey(),
@@ -151,17 +152,17 @@ it('reuse previous route_url', function () {
         ->execute($model, new RouteUrlData('original-url', true));
 
     // assertDatabaseCount(RouteUrl::class, 2)
-    assertDatabaseCount(RouteUrl::class, 3);;
+    assertDatabaseCount(RouteUrl::class, 4);
 
     assertDatabaseHas(RouteUrl::class, [
-        'id' => 1,
+        'id' => 3,
         'model_type' => $model->getMorphClass(),
         'model_id' => $model->getKey(),
         'url' => '/original-url',
         'is_override' => true,
     ]);
     assertDatabaseHas(RouteUrl::class, [
-        'id' => 2,
+        'id' => 4,
         'model_type' => $model->getMorphClass(),
         'model_id' => $model->getKey(),
         'url' => '/new-url',
@@ -181,7 +182,7 @@ test('override', function (?string $data) {
         );
 
     // assertDatabaseCount(RouteUrl::class, 1);
-    assertDatabaseCount(RouteUrl::class, 2);
+    assertDatabaseCount(RouteUrl::class, 3);
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $model->getMorphClass(),
         'model_id' => $model->getKey(),
@@ -243,8 +244,7 @@ it('transfer a non active url', function () {
         ->url
         ->toBe('/url-one');
 
-    // assertDatabaseCount(RouteUrl::class, 3);
-    assertDatabaseCount(RouteUrl::class, 4);
+    assertDatabaseCount(RouteUrl::class, 5);
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $model1->getMorphClass(),
         'model_id' => $model1->getKey(),

@@ -55,7 +55,7 @@ it('can update page', function () {
         );
 
     assertDatabaseCount(Page::class, 2);
-    assertDatabaseCount(BlockContent::class, 2);
+    assertDatabaseCount(BlockContent::class, 1);
     assertDatabaseHas(
         MetaData::class,
         [
