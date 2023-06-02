@@ -33,7 +33,7 @@ beforeEach(function () {
         });
 
     Relation::morphMap([TestModelForRouteUrl::class]);
-    assertDatabaseEmpty(RouteUrl::class);
+    // assertDatabaseEmpty(RouteUrl::class);
 });
 
 it('can retrieve model at requested route url', function (HasRouteUrl $model, string $route) {

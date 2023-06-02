@@ -34,6 +34,10 @@ class PagePolicy
 
     public function delete(User $user, Page $page): bool
     {
+        if ($page->isHomePage()) {
+            return false;
+        }
+
         return $this->checkWildcardPermissions($user);
     }
 

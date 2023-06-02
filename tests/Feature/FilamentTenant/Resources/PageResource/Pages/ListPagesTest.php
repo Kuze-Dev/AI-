@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\PageResource\Pages\ListPages;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
+use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
+use Domain\Support\RouteUrl\Database\Factories\RouteUrlFactory;
 use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 
@@ -36,7 +38,10 @@ it('can list pages', function () {
 it('can delete page', function () {
     $page = PageFactory::new()
         ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->has(RouteUrlFactory::new())
+        ->has(MetaDataFactory::new())
         ->createOne();
+
     $blockContent = $page->blockContents->first();
     $metaData = $page->metaData;
 

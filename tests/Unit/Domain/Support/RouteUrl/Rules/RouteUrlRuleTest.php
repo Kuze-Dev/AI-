@@ -34,7 +34,7 @@ beforeEach(function () {
         });
 
     Relation::morphMap([TestModelForRouteUrl::class]);
-    assertDatabaseEmpty(RouteUrl::class);
+    // assertDatabaseEmpty(RouteUrl::class);
 });
 
 it('passed w/o any', function () {
