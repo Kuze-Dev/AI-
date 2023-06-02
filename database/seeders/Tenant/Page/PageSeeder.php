@@ -16,15 +16,15 @@ class PageSeeder extends Seeder
         PageFactory::new([
             'name' => 'Home',
             'visibility' => 'public',
+            'published_at' => now(),
         ])
             ->has(RouteUrlFactory::new([
                 'url' => '/',
             ]))
             ->has(MetaDataFactory::new([
-                'title' => 'Home Page',
-                'author' => 'System',
-                'description' => 'This the home page of the application',
-                'keywords' => 'Home page, home, index, front page',
+                'keywords' => null,
+                'author' => null,
+                'description' => null,
             ]))
             ->published()
             ->create();

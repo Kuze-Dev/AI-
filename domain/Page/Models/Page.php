@@ -149,6 +149,6 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
 
     public function isHomePage(): bool
     {
-        return $this->slug === 'home-page';
+        return $this->slug === 'home';
     }
 }

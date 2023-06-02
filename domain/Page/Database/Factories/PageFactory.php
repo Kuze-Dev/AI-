@@ -19,8 +19,6 @@ class PageFactory extends Factory
 {
     protected $model = Page::class;
 
-    protected bool $bypassFactoryCallback = false;
-
     public function definition(): array
     {
         return [
@@ -54,22 +52,5 @@ class PageFactory extends Factory
                 (new Relationship(RouteUrlFactory::new(), 'routeUrls'))->recycle($this->recycle)->createFor($model);
             }
         });
-    }
-
-    public function addRouteUrl(array $attributes = []): self
-    {
-        return $this->has(RouteUrlFactory::new($attributes));
-    }
-
-    public function addMetaData(array $attributes = []): self
-    {
-        return $this->has(MetaDataFactory::new($attributes));
-    }
-
-    public function bypassFactoryCallback(bool $state): self
-    {
-        $this->bypassFactoryCallback = $state;
-
-        return $this;
     }
 }
