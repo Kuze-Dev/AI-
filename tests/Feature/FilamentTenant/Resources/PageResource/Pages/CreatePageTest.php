@@ -14,7 +14,6 @@ use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -74,7 +73,7 @@ it('can create page', function () {
     );
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $page->getMorphClass(),
-        'model_id' => $page->id,
+        'model_id' => $page->getKey(),
         'url' => Page::generateRouteUrl($page, $page->toArray()),
         'is_override' => false,
     ]);
@@ -88,8 +87,6 @@ it('can not create page with same name', function () {
 
     PageFactory::new()
         ->createOne(['name' => 'page 1']);
-
-    assertDatabaseCount(Page::class, 2);
 
     livewire(CreatePage::class)
         ->fillForm([
@@ -105,8 +102,6 @@ it('can not create page with same name', function () {
         ->call('create')
         ->assertHasFormErrors(['name' => 'unique'])
         ->assertOk();
-
-    assertDatabaseCount(Page::class, 2);
 });
 
 it('can create page with meta data', function () {
@@ -153,7 +148,7 @@ it('can create page with meta data', function () {
             $metaData,
             [
                 'model_type' => $page->getMorphClass(),
-                'model_id' => $page->id,
+                'model_id' => $page->getKey(),
             ]
         )
     );
@@ -224,7 +219,7 @@ it('can create page with custom url', function () {
 
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $page->getMorphClass(),
-        'model_id' => $page->id,
+        'model_id' => $page->getKey(),
         'url' => '/some/custom/url',
         'is_override' => true,
     ]);

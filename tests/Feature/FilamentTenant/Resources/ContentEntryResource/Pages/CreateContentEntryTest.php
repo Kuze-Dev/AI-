@@ -65,7 +65,7 @@ it('can create content entry', function () {
     );
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $contentEntry->getMorphClass(),
-        'model_id' => $contentEntry->id,
+        'model_id' => $contentEntry->getKey(),
         'url' => ContentEntry::generateRouteUrl($contentEntry, $contentEntry->toArray()),
         'is_override' => false,
     ]);
@@ -209,7 +209,7 @@ it('can create content entry with meta data', function () {
             $metaData,
             [
                 'model_type' => $contentEntry->getMorphClass(),
-                'model_id' => $contentEntry->id,
+                'model_id' => $contentEntry->getKey(),
             ]
         )
     );
@@ -245,7 +245,7 @@ it('can create content entry with custom url', function () {
 
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $contentEntry->getMorphClass(),
-        'model_id' => $contentEntry->id,
+        'model_id' => $contentEntry->getKey(),
         'url' => '/some/custom/url',
         'is_override' => true,
     ]);
