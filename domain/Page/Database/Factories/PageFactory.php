@@ -46,11 +46,11 @@ class PageFactory extends Factory
     public function configure(): self
     {
         return $this->afterCreating(function (Page $model) {
-            if (! $model->metaData) {
+            if ( ! $model->metaData) {
                 (new Relationship(MetaDataFactory::new(), 'metaData'))->recycle($this->recycle)->createFor($model);
             }
 
-            if (! $model->activeRouteUrl) {
+            if ( ! $model->activeRouteUrl) {
                 (new Relationship(RouteUrlFactory::new(), 'routeUrls'))->recycle($this->recycle)->createFor($model);
             }
         });
