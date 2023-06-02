@@ -18,7 +18,9 @@ use Throwable;
 
 class CreatePage extends CreateRecord
 {
-    use LogsFormActivity;
+    use LogsFormActivity {
+        afterFill as protected logsFormActivityAfterFill;
+    }
 
     protected static string $resource = PageResource::class;
 
@@ -32,37 +34,31 @@ class CreatePage extends CreateRecord
         ];
     }
 
-    protected function afterFill()
+    protected function afterFill(): void
     {
         $pageSlug = Request::input('pageSlug');
         $clone = Request::input('clone');
 
         if ($clone) {
-            $page = Page::whereSlug($pageSlug)->with(['metaData', 'blockContents'])
+            $page = Page::whereSlug($pageSlug)->with(['metaData.media', 'blockContents'])
                 ->firstOrFail();
 
             $this->data['visibility'] = $page->visibility;
             $this->data['published_at'] = $page->published_at ? true : false;
-
-            $this->data['block_contents'] = $page->blockContents->toArray() ?? [];
-
-            $metaData = $page->metaData->toArray();
+            $this->data['block_contents'] = $page->blockContents->toArray();
             $this->data['meta_data'] = [
-                'author' => $metaData['author'],
-                'description' => $metaData['description'],
-                'keywords' => $metaData['keywords'],
+                'author' => $page->metaData?->author,
+                'description' => $page->metaData?->description,
+                'keywords' => $page->metaData?->keywords,
             ];
 
-            if ( ! empty($metaData['media'])) {
-                $imageUuid = $metaData['media'][0]['uuid'];
-                $imageAltText = $metaData['media'][0]['custom_properties']['alt_text'];
-
-                $this->data['meta_data']['image'] = [
-                    $imageUuid => $imageUuid,
-                ];
-                $this->data['meta_data']['image_alt_text'] = $imageAltText;
+            if ($image = $page->metaData?->getFirstMedia('image')) {
+                $this->data['meta_data']['image'] = [$image->uuid => $image->uuid];
+                $this->data['meta_data']['image_alt_text'] = $image->getCustomProperty('alt_text');
             }
         }
+
+        $this->logsFormActivityAfterFill();
     }
 
     protected function getFormActions(): array

@@ -9,6 +9,7 @@ use App\FilamentTenant\Resources\PageResource;
 use App\Settings\CMSSettings;
 use Domain\Page\Actions\UpdatePageAction;
 use Domain\Page\DataTransferObjects\PageData;
+use Domain\Page\Models\Page;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -58,7 +59,7 @@ class EditPage extends EditRecord
                 ->label(__('Clone Page'))
                 ->color('secondary')
                 ->record($this->getRecord())
-                ->url(PageResource::getUrl('create', ['clone' => true, 'pageSlug' => $this->getRecord()->slug])),
+                ->url(fn (Page $record) => PageResource::getUrl('create', ['clone' => true, 'pageSlug' => $record->slug])),
         ];
     }
 
