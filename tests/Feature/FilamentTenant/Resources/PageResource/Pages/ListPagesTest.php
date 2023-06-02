@@ -7,7 +7,6 @@ use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
 use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
 use Domain\Support\RouteUrl\Database\Factories\RouteUrlFactory;
-use Domain\Support\RouteUrl\Models\RouteUrl;
 use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 
