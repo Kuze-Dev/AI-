@@ -113,7 +113,7 @@ it('can edit content entry', function () {
     $updatedContentEntry = livewire(EditContentEntry::class, ['ownerRecord' => $content->getRouteKey(), 'record' => $contentEntry->getRouteKey()])
         ->fillForm([
             'title' => 'New Foo',
-            'published_at' => $publishedAt = Carbon::now(),
+            'published_at' => $publishedAt = now(Auth::user()?->timezone)->toImmutable(),
             'data' => ['main' => ['header' => 'Foo updated']],
             'taxonomies' => [
                 $content->taxonomies->first()->id => $contentEntry->taxonomyTerms->pluck('id'),
@@ -133,7 +133,7 @@ it('can edit content entry', function () {
 
     assertDatabaseHas(ContentEntry::class, [
         'title' => 'New Foo',
-        'published_at' => $publishedAt->timezone(Auth::user()?->timezone)->toDateTimeString(),
+        'published_at' => $publishedAt,
         'data' => json_encode(['main' => ['header' => 'Foo updated']]),
     ]);
 

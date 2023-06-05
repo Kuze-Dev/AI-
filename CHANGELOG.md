@@ -1,6 +1,19 @@
 # Release Notes
 
-## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.2)
+## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.3)
+
+## [v0.2.3](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.2.3%0Dv0.2.2)
+
+## Added
+
+- Add ability to update account of current logged-in admin.
+- Improved `LogsFormActivity` extensibility.
+- Add `Select::optionsFromModel()` macro.
+
+## Changed
+
+- `LogsFormActivity` will only log if the form was modified.
+- `PermissionSeeder` will now update or create permissions then delete everything else that wasn't defined in the `permissionsByGuard()` method.
 
 ## [v0.2.2](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.2.2%0Dv0.2.1)
 
@@ -22,8 +35,6 @@
 - Remove bulk actions for `ActivityResource` table.
 - `AdminResource` email field must be unique.
 - Should not be able to impersonate a deleted `Admin`.
-
-- Fix proper redirects for logged in Admin.
 
 ## [v0.2.1](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.2.1%0Dv0.2.0)
 

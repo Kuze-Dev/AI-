@@ -135,9 +135,7 @@ class RoleResource extends Resource
         return [
             Forms\Components\Hidden::make('permissions')
                 ->reactive()
-                ->afterStateHydrated(function (Forms\Components\Hidden $component, ?Role $record): void {
-                    $component->state($record ? $record->permissions->pluck('id') : []);
-                })
+                ->formatStateUsing(fn (?Role $record) => $record ? $record->permissions->pluck('id') : [])
                 ->dehydrateStateUsing(function (Closure $get): array {
                     return self::$permissionGroups->reduce(
                         function (array $permissions, PermissionGroup $permissionGroup, string $groupName) use ($get): array {
@@ -157,9 +155,7 @@ class RoleResource extends Resource
                 ->offIcon('heroicon-s-shield-exclamation')
                 ->helperText(trans('Enable all Permissions for this role'))
                 ->reactive()
-                ->afterStateHydrated(function (Forms\Components\Toggle $component, ?Role $record): void {
-                    $component->state(self::$permissionGroups->every(fn (PermissionGroup $permissionGroup): bool => $record?->hasPermissionTo($permissionGroup->main) ?? false));
-                })
+                ->formatStateUsing(fn (?Role $record) => self::$permissionGroups->every(fn (PermissionGroup $permissionGroup): bool => $record?->hasPermissionTo($permissionGroup->main) ?? false))
                 ->afterStateUpdated(function (Closure $get, Closure $set, bool $state): void {
                     self::$permissionGroups->each(function (PermissionGroup $permissionGroup, string $groupName) use ($get, $set, $state): void {
                         $set($groupName, $state);
@@ -179,9 +175,7 @@ class RoleResource extends Resource
                                     ->onIcon('heroicon-s-lock-open')
                                     ->offIcon('heroicon-s-lock-closed')
                                     ->reactive()
-                                    ->afterStateHydrated(function (Forms\Components\Toggle $component, ?Role $record) use ($permissionGroup): void {
-                                        $component->state($record?->hasPermissionTo($permissionGroup->main));
-                                    })
+                                    ->formatStateUsing(fn (?Role $record) => $record?->hasPermissionTo($permissionGroup->main))
                                     ->afterStateUpdated(function (Closure $get, Closure $set) use ($groupName, $permissionGroup): void {
                                         self::refreshPermissionGroupAbilitiesState($groupName, $permissionGroup, $get, $set);
                                         self::refreshSelectAllState($get, $set);
@@ -198,25 +192,19 @@ class RoleResource extends Resource
                                             ))
                                             ->columns(2)
                                             ->reactive()
-                                            ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Role $record) use ($permissionGroup): void {
+                                            ->formatStateUsing(function (Forms\Components\CheckboxList $component, ?Role $record) use ($permissionGroup): array {
                                                 if ( ! $record) {
-                                                    $component->state([]);
-
-                                                    return;
+                                                    return [];
                                                 }
 
                                                 if ($record->hasPermissionTo($permissionGroup->main)) {
-                                                    $component->state(array_keys($component->getOptions()));
-
-                                                    return;
+                                                    return array_keys($component->getOptions());
                                                 }
 
-                                                $component->state(
-                                                    $record->permissions->pluck('id')
-                                                        ->intersect(array_keys($component->getOptions()))
-                                                        ->values()
-                                                        ->toArray()
-                                                );
+                                                return $record->permissions->pluck('id')
+                                                    ->intersect(array_keys($component->getOptions()))
+                                                    ->values()
+                                                    ->toArray();
                                             })
                                             ->afterStateUpdated(function (Closure $get, Closure $set) use ($groupName, $permissionGroup): void {
                                                 self::refreshPermissionGroupState($groupName, $permissionGroup, $get, $set);

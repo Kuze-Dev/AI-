@@ -73,7 +73,7 @@ class ResetPassword extends Component implements HasForms
                 ->required()
                 ->rule(Password::default())
                 ->helperText(
-                    fn () => config('app.env') === 'local' || config('app.env') === 'testing'
+                    app()->environment('local', 'testing')
                         ? trans('Password must be at least 4 characters.')
                         : trans('Password must be at least 8 characters, have 1 special character, 1 number, 1 upper case and 1 lower case.')
                 )

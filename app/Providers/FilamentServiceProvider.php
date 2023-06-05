@@ -11,25 +11,28 @@ use App\Filament\Livewire\Auth\RequestPasswordReset;
 use App\Filament\Livewire\Auth\ResetPassword;
 use App\Filament\Livewire\Auth\TwoFactorAuthentication;
 use App\Filament\Livewire\Auth\VerifyEmail;
+use App\Filament\Pages\Auth\Account;
 use Closure;
 use Domain\Admin\Models\Admin;
+use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\UserMenuItem;
+use Filament\Pages\Actions as PageActions;
+use Filament\Support\Actions as SupportActions;
+use Filament\Tables\Actions as TableActions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
-use Saade\FilamentLaravelLog\Pages\ViewLog;
-use Filament\Pages\Actions as PageActions;
-use Filament\Support\Actions as SupportActions;
-use Filament\Tables\Actions as TableActions;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Saade\FilamentLaravelLog\Pages\ViewLog;
 use Spatie\Activitylog\ActivityLogger;
 use Spatie\Activitylog\ActivitylogServiceProvider;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Exception;
 use Illuminate\Support\HtmlString;
 use Throwable;
 
@@ -55,6 +58,15 @@ class FilamentServiceProvider extends ServiceProvider
             ]);
 
             Filament::registerViteTheme('resources/css/filament/app.css');
+
+            Filament::registerUserMenuItems([
+                'account' => UserMenuItem::make()
+                    ->url(
+                        Filament::auth()->user()?->isZeroDayAdmin()
+                            ? null
+                            : Account::getUrl()
+                    ),
+            ]);
 
             if (Filament::currentContext() !== 'filament') {
                 return;
@@ -199,6 +211,136 @@ class FilamentServiceProvider extends ServiceProvider
 
                     $log($action instanceof SupportActions\Contracts\HasRecord ? $action->getRecord() : null);
                 });
+            }
+        );
+
+        Forms\Components\Select::macro(
+            'optionsFromModel',
+            function (string $model, string $titleColumnName, ?Closure $callback = null): Forms\Components\Select {
+                /** @var Forms\Components\Select $this */
+
+                if (blank($this->getSearchColumns())) {
+                    $this->searchable([$titleColumnName]);
+                }
+
+                $this->getSearchResultsUsing(function (Forms\Components\Select $component, ?string $search) use ($model, $titleColumnName, $callback): array {
+
+                    $query = $model::query();
+
+                    $keyName = $query->getModel()->getKeyName();
+
+                    if ($callback) {
+                        $query = $component->evaluate($callback, ['query' => $query]) ?? $query;
+                    }
+
+                    if (empty($query->getQuery()->orders)) {
+                        $query->orderBy($titleColumnName);
+                    }
+
+                    /** @phpstan-ignore-next-line PHPStan is not aware of Laravel's Macro magics */
+                    $component->applySearchConstraint($query, strtolower($search ?? ''));
+
+                    $baseQuery = $query->getQuery();
+
+                    if (isset($baseQuery->limit)) {
+                        $component->optionsLimit($baseQuery->limit);
+                    } else {
+                        $query->limit($component->getOptionsLimit());
+                    }
+
+                    if ($component->hasOptionLabelFromRecordUsingCallback()) {
+                        return $query->get()
+                            ->mapWithKeys(fn (Model $record) => [$record->{$keyName} => $component->getOptionLabelFromRecord($record)])
+                            ->toArray();
+                    }
+
+                    if (str_contains($titleColumnName, '->') && ! str_contains($titleColumnName, ' as ')) {
+                        $titleColumnName .= " as {$titleColumnName}";
+                    }
+
+                    return $query->pluck($titleColumnName, $keyName)
+                        ->toArray();
+                });
+
+                $this->options(function (Forms\Components\Select $component) use ($model, $titleColumnName, $callback): ?array {
+                    if (($component->isSearchable()) && ! $component->isPreloaded()) {
+                        return null;
+                    }
+
+                    $query = $model::query();
+
+                    $keyName = $query->getModel()->getKeyName();
+
+                    if ($callback) {
+                        $query = $component->evaluate($callback, ['query' => $query]) ?? $query;
+                    }
+
+                    if (empty($query->getQuery()->orders)) {
+                        $query->orderBy($titleColumnName);
+                    }
+
+                    if ($component->hasOptionLabelFromRecordUsingCallback()) {
+                        return $query->get()
+                            ->mapWithKeys(fn (Model $record) => [$record->{$keyName} => $component->getOptionLabelFromRecord($record)])
+                            ->toArray();
+                    }
+
+                    if (str_contains($titleColumnName, '->') && ! str_contains($titleColumnName, ' as ')) {
+                        $titleColumnName .= " as {$titleColumnName}";
+                    }
+
+                    return $query->pluck($titleColumnName, $keyName)
+                        ->toArray();
+                });
+
+                $this->getOptionLabelUsing(function (Forms\Components\Select $component, $value) use ($model, $titleColumnName, $callback): ?string {
+
+                    $query = $model::query();
+
+                    if ($callback) {
+                        $query = $component->evaluate($callback, ['query' => $query]) ?? $query;
+                    }
+
+                    $record = $query->where($query->getModel()->getKeyName(), $value)->first();
+
+                    if ( ! $record) {
+                        return null;
+                    }
+
+                    return $component->hasOptionLabelFromRecordUsingCallback()
+                        ? $component->getOptionLabelFromRecord($record)
+                        : $record->getAttributeValue($titleColumnName);
+                });
+
+                $this->getOptionLabelsUsing(function (Forms\Components\Select $component, array $values) use ($model, $titleColumnName, $callback): array {
+
+                    $query = $model::query();
+
+                    $keyName = $query->getModel()->getKeyName();
+
+                    if ($callback) {
+                        $query = $component->evaluate($callback, ['query' => $query]) ?? $query;
+                    }
+
+                    $query->whereIn($keyName, $values);
+
+                    if ($component->hasOptionLabelFromRecordUsingCallback()) {
+                        return $query->get()
+                            ->mapWithKeys(fn (Model $record) => [$record->{$keyName} => $component->getOptionLabelFromRecord($record)])
+                            ->toArray();
+                    }
+
+                    if (str_contains($titleColumnName, '->') && ! str_contains($titleColumnName, ' as ')) {
+                        $titleColumnName .= " as {$titleColumnName}";
+                    }
+
+                    return $query->pluck($titleColumnName, $keyName)
+                        ->toArray();
+                });
+
+                $this->rule(Rule::exists($model, $model::query()->getModel()->getKeyName()));
+
+                return $this;
             }
         );
 
