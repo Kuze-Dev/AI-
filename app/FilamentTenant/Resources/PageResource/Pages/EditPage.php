@@ -59,7 +59,7 @@ class EditPage extends EditRecord
                 ->label(__('Clone Page'))
                 ->color('secondary')
                 ->record($this->getRecord())
-                ->url(fn (Page $record) => PageResource::getUrl('create', ['clone' => true, 'pageSlug' => $record->slug])),
+                ->url(fn (Page $record) => PageResource::getUrl('create', ['clone' => $record->slug])),
         ];
     }
 

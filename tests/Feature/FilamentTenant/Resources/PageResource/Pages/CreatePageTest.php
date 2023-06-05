@@ -7,7 +7,6 @@ use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
-use Domain\Page\DataTransferObjects\BlockContentData;
 use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\BlockContent;
@@ -124,33 +123,23 @@ it('can clone page', function () {
                 ),
             ['data' => ['main' => ['header' => 'Foo']]]
         )
-        ->has(MetaDataFactory::new([
-            'title' => 'Foo title',
-            'description' => 'Foo description',
-            'author' => 'Foo author',
-            'keywords' => 'Foo keywords',
-        ]))
-        ->createOne([
-            'name' => 'Test',
-            'visibility' => 'public',
-        ]);
+        ->has(MetaDataFactory::new())
+        ->createOne();
 
-    $pageBlockContent = $page->blockContents->toArray()[0];
-    $clonePage = livewire(CreatePage::class, ['clone' => 1, 'pageSlug' => $page->slug])
-        ->assertFormSet(array_map(
-            fn (array $pageBlockContent) => new BlockContentData(
-                block_id: $pageBlockContent['block_id'],
-                data: $pageBlockContent['data'] ?? null,
-                id: $pageBlockContent['id'] ?? null,
-            ),
-            $data['block_contents'] ?? []
-        ), )
-        ->fillForm([
-            'name' => 'Test Clone',
-            'published_at' => $page->published_at ? true : false,
-            // 'meta_data' => $page->metaData(),
-            'visibility' => $page->visibility->value,
+    Livewire::withQueryParams(['clone' => $page->slug]);
+
+    $clonePage = livewire(CreatePage::class)
+        ->assertFormSet([
+            'visibility' => $page->visibility,
+            'published_at' => $page->published_at,
+            'block_contents' => $page->blockContents->toArray(),
+            'meta_data' => [
+                'author' => $page->metaData?->author,
+                'description' => $page->metaData?->description,
+                'keywords' => $page->metaData?->keywords,
+            ],
         ])
+        ->fillForm(['name' => 'Test Clone'])
         ->call('create')
         ->assertHasNoFormErrors()
         ->assertOk()
@@ -159,8 +148,20 @@ it('can clone page', function () {
 
     assertDatabaseHas(Page::class, [
         'name' => 'Test Clone',
-        'visibility' => $clonePage->visibility->value,
-        'published_at' => $clonePage->published_at,
+        'visibility' => $page->visibility->value,
+        'published_at' => $page->published_at,
+    ]);
+    assertDatabaseHas(BlockContent::class, [
+        'page_id' => $clonePage->id,
+        'block_id' => $page->blockContents->first()->block_id,
+        'data' => json_encode($page->blockContents->first()->data),
+    ]);
+    assertDatabaseHas(MetaData::class, [
+        'model_id' => $clonePage->id,
+        'model_type' => $clonePage->getMorphClass(),
+        'description' => $page->metaData->description,
+        'author' => $page->metaData->author,
+        'keywords' => $page->metaData->keywords,
     ]);
 });
 

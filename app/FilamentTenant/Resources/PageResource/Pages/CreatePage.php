@@ -36,11 +36,9 @@ class CreatePage extends CreateRecord
 
     protected function afterFill(): void
     {
-        $pageSlug = Request::input('pageSlug');
-        $clone = Request::input('clone');
-
-        if ($clone) {
-            $page = Page::whereSlug($pageSlug)->with(['metaData.media', 'blockContents'])
+        if ($cloneSlug = Request::input('clone')) {
+            $page = Page::whereSlug($cloneSlug)
+                ->with(['metaData.media', 'blockContents'])
                 ->firstOrFail();
 
             $this->data['visibility'] = $page->visibility;
