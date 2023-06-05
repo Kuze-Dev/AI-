@@ -21,7 +21,7 @@ class CreateMetaDataAction
     {
         $defaults = $model->defaultMetaData();
 
-        /** @var \Domain\Support\MetaData\Models\MetaData */
+        /** @var \Domain\Support\MetaData\Models\MetaData $metaData */
         $metaData = $model->metaData()
             ->create([
                 'title' => $metaDataData->title ?? $defaults['title'] ?? null,
