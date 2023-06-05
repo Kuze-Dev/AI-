@@ -45,17 +45,12 @@ class BlockResource extends Resource
                 Forms\Components\TextInput::make('component')
                     ->required(),
                 Forms\Components\Select::make('blueprint_id')
-                    ->options(
-                        fn () => Blueprint::orderBy('name')
-                            ->pluck('name', 'id')
-                            ->toArray()
-                    )
+                    ->label(trans('Blueprint'))
                     ->required()
-                    ->exists(Blueprint::class, 'id')
-                    ->searchable()
-                    ->reactive()
                     ->preload()
-                    ->disabled(fn (?Block $record) => $record !== null),
+                    ->optionsFromModel(Blueprint::class, 'name')
+                    ->disabled(fn (?Block $record) => $record !== null)
+                    ->reactive(),
                 Forms\Components\FileUpload::make('image')
                     ->mediaLibraryCollection('image')
                     ->image(),

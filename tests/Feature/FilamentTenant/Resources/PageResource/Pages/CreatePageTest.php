@@ -3,11 +3,14 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\PageResource\Pages\CreatePage;
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Blueprint\Enums\FieldType;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
 use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\BlockContent;
+use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
 use Domain\Support\MetaData\Models\MetaData;
 use Domain\Support\RouteUrl\Models\RouteUrl;
 use Filament\Facades\Filament;
@@ -102,6 +105,59 @@ it('can not create page with same name', function () {
         ->call('create')
         ->assertHasFormErrors(['name' => 'unique'])
         ->assertOk();
+});
+
+it('can clone page', function () {
+    $page = PageFactory::new()
+        ->addBlockContent(
+            BlockFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+                ),
+            ['data' => ['main' => ['header' => 'Foo']]]
+        )
+        ->has(MetaDataFactory::new())
+        ->createOne();
+
+    Livewire::withQueryParams(['clone' => $page->slug]);
+
+    $clonePage = livewire(CreatePage::class)
+        ->assertFormSet([
+            'visibility' => $page->visibility,
+            'published_at' => $page->published_at,
+            'block_contents' => $page->blockContents->toArray(),
+            'meta_data' => [
+                'author' => $page->metaData?->author,
+                'description' => $page->metaData?->description,
+                'keywords' => $page->metaData?->keywords,
+            ],
+        ])
+        ->fillForm(['name' => 'Test Clone'])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(Page::class, [
+        'name' => 'Test Clone',
+        'visibility' => $page->visibility->value,
+        'published_at' => $page->published_at,
+    ]);
+    assertDatabaseHas(BlockContent::class, [
+        'page_id' => $clonePage->id,
+        'block_id' => $page->blockContents->first()->block_id,
+        'data' => json_encode($page->blockContents->first()->data),
+    ]);
+    assertDatabaseHas(MetaData::class, [
+        'model_id' => $clonePage->id,
+        'model_type' => $clonePage->getMorphClass(),
+        'description' => $page->metaData->description,
+        'author' => $page->metaData->author,
+        'keywords' => $page->metaData->keywords,
+    ]);
 });
 
 it('can create page with meta data', function () {

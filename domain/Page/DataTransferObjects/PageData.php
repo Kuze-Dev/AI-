@@ -26,7 +26,9 @@ class PageData
     {
         return new self(
             name: $data['name'],
-            visibility: Visibility::tryFrom($data['visibility'] ?? '') ?? Visibility::PUBLIC,
+            visibility: ($data['visibility'] ?? null) instanceof Visibility
+                ? $data['visibility']
+                : (Visibility::tryFrom($data['visibility'] ?? '') ?? Visibility::PUBLIC),
             route_url_data: RouteUrlData::fromArray($data['route_url'] ?? []),
             meta_data: MetaDataData::fromArray($data['meta_data']),
             author_id: $data['author_id'] ?? null,

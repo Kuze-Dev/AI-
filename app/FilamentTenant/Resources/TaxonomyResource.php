@@ -71,15 +71,10 @@ class TaxonomyResource extends Resource
                         ->required()
                         ->unique(ignoreRecord: true),
                     Forms\Components\Select::make('blueprint_id')
+                        ->label(trans('Blueprint'))
                         ->required()
-                        ->options(
-                            fn () => Blueprint::orderBy('name')
-                                ->pluck('name', 'id')
-                                ->toArray()
-                        )
-                        ->exists(Blueprint::class, 'id')
-                        ->searchable()
                         ->preload()
+                        ->optionsFromModel(Blueprint::class, 'name')
                         ->disabled(fn (?Taxonomy $record) => $record !== null),
                 ]),
                 Forms\Components\Section::make(trans('Terms'))->schema([

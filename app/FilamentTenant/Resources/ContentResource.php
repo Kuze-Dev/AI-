@@ -79,15 +79,10 @@ class ContentResource extends Resource
                         })
                         ->required(),
                     Forms\Components\Select::make('blueprint_id')
+                        ->label(trans('Blueprint'))
                         ->required()
-                        ->options(
-                            fn () => Blueprint::orderBy('name')
-                                ->pluck('name', 'id')
-                                ->toArray()
-                        )
-                        ->exists(Blueprint::class, 'id')
-                        ->searchable()
                         ->preload()
+                        ->optionsFromModel(Blueprint::class, 'name')
                         ->disabled(fn (?Content $record) => $record !== null),
                     Forms\Components\TextInput::make('prefix')
                         ->required()
@@ -97,12 +92,8 @@ class ContentResource extends Resource
                         ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                     Forms\Components\Select::make('taxonomies')
                         ->multiple()
-                        ->options(
-                            fn () => Taxonomy::orderBy('name')
-                                ->pluck('name', 'id')
-                                ->toArray()
-                        )
-                        ->searchable()
+                        ->preload()
+                        ->optionsFromModel(Taxonomy::class, 'name')
                         ->afterStateHydrated(function (Forms\Components\Select $component, ?Content $record) {
                             $component->state($record ? $record->taxonomies->pluck('id')->toArray() : []);
                         }),

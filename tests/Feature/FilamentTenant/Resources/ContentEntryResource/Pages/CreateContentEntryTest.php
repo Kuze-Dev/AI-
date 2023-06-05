@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\ContentEntryResource\Pages\CreateContentEntry;
-use Carbon\Carbon;
 use Domain\Content\Models\ContentEntry;
 use Domain\Content\Database\Factories\ContentFactory;
 use Domain\Support\RouteUrl\Models\RouteUrl;
@@ -14,6 +13,7 @@ use Domain\Blueprint\Enums\FieldType;
 use Domain\Support\MetaData\Models\MetaData;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Auth;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -141,7 +141,7 @@ it('can create content entry with publish date', function () {
         ->fillForm([
             'title' => 'Test',
             'slug' => 'test',
-            'published_at' => $publishedAt = Carbon::now(),
+            'published_at' => ($publishedAt = now(Auth::user()->timezone)->toImmutable()),
             'data' => ['main' => ['header' => 'Foo']],
         ])
         ->call('create')
@@ -153,7 +153,7 @@ it('can create content entry with publish date', function () {
             'id' => $content->id,
             'title' => 'Test',
             'slug' => 'test',
-            'published_at' => $publishedAt->timezone(Auth::user()?->timezone)->toDateTimeString(),
+            'published_at' => $publishedAt,
             'data' => json_encode(['main' => ['header' => 'Foo']]),
         ]
     );
