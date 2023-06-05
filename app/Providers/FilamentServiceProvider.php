@@ -59,6 +59,10 @@ class FilamentServiceProvider extends ServiceProvider
 
             Filament::registerViteTheme('resources/css/filament/app.css');
 
+            if (Filament::currentContext() !== 'filament') {
+                return;
+            }
+
             Filament::registerUserMenuItems([
                 'account' => UserMenuItem::make()
                     ->url(
@@ -67,10 +71,6 @@ class FilamentServiceProvider extends ServiceProvider
                             : Account::getUrl()
                     ),
             ]);
-
-            if (Filament::currentContext() !== 'filament') {
-                return;
-            }
 
             Filament::registerNavigationGroups([
                 NavigationGroup::make('Access')
