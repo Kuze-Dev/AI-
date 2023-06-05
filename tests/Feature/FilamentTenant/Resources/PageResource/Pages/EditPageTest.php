@@ -110,7 +110,7 @@ it('can edit page', function () {
             $metaData,
             [
                 'model_type' => $page->getMorphClass(),
-                'model_id' => $page->id,
+                'model_id' => $page->getKey(),
             ]
         )
     );
@@ -128,7 +128,7 @@ it('can edit page', function () {
 
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $page->getMorphClass(),
-        'model_id' => $page->id,
+        'model_id' => $page->getKey(),
         'url' => Page::generateRouteUrl($page, $updatedPage->toArray()),
         'is_override' => false,
     ]);
@@ -163,7 +163,7 @@ it('can edit page with custom url', function () {
 
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $page->getMorphClass(),
-        'model_id' => $page->id,
+        'model_id' => $page->getKey(),
         'url' => '/some/custom/url',
         'is_override' => true,
     ]);

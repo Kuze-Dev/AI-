@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Domain\Auth\Actions\DisableTwoFactorAuthenticationAction;
 use Domain\Auth\Events\TwoFactorAuthenticationDisabled;
+use Domain\Auth\Model\TwoFactorAuthentication;
 use Illuminate\Support\Facades\Event;
 use Tests\Fixtures\User;
 
@@ -25,7 +26,7 @@ it('can disable two factor authentication', function () {
     $result = app(DisableTwoFactorAuthenticationAction::class)->execute($this->user);
 
     expect($result)->toBeTrue();
-    assertDatabaseHas('two_factor_authentications', [
+    assertDatabaseHas(TwoFactorAuthentication::class, [
         'authenticatable_id' => $this->user->id,
         'enabled_at' => null,
     ]);
@@ -40,7 +41,7 @@ it('will reload two factor authentication if loaded in relations', function () {
     $result = app(DisableTwoFactorAuthenticationAction::class)->execute($user);
 
     expect($result)->toBeTrue();
-    assertDatabaseHas('two_factor_authentications', [
+    assertDatabaseHas(TwoFactorAuthentication::class, [
         'authenticatable_id' => $this->user->id,
         'enabled_at' => null,
     ]);
