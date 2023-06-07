@@ -21,6 +21,7 @@ class TaxonomyTermResource extends JsonApiResource
         return  [
             'name' => $this->name,
             'data' => $this->transformSchemaPayload($this->data),
+            'order' => $this->order,
         ];
     }
 

@@ -8,6 +8,7 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources\FormResource\Pages;
 use App\FilamentTenant\Resources\FormResource\RelationManagers\FormSubmissionsRelationManager;
 use App\FilamentTenant\Support\SchemaInterpolations;
+use App\Settings\FormSettings;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Form\Models\Form as FormModel;
@@ -56,6 +57,13 @@ class FormResource extends Resource
                         ->reactive()
                         ->preload(),
                     Forms\Components\Toggle::make('store_submission'),
+                    Forms\Components\Toggle::make('uses_captcha')
+                        ->disabled(fn (FormSettings $formSettings) => ! $formSettings->provider)
+                        ->helperText(
+                            fn (FormSettings $formSettings) => ! $formSettings->provider
+                                ? trans('Currently unavailable. Please setup Captcha(in Settings > Form Settings) first.')
+                                : null
+                        ),
                 ]),
                 Forms\Components\Card::make([
                     Forms\Components\Section::make('Available Values')
@@ -170,14 +178,6 @@ class FormResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->sortable()
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('blueprint.name')
-                    ->sortable()
-                    ->searchable()
-                    ->url(fn (FormModel $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
                 Tables\Columns\BadgeColumn::make('form_submissions_count')
                     ->counts('formSubmissions')
                     ->formatStateUsing(fn (FormModel $record, ?int $state) => $record->store_submission ? $state : 'N/A')
@@ -186,11 +186,6 @@ class FormResource extends Resource
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable()
-                    ->toggleable()
-                    ->toggledHiddenByDefault(),
             ])
             ->filters([])
             ->filtersLayout(Layout::AboveContent)

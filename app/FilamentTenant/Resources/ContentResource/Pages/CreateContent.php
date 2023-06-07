@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ContentResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ContentResource;
 use Domain\Content\Actions\CreateContentAction;
 use Domain\Content\DataTransferObjects\ContentData;
@@ -15,6 +16,8 @@ use Filament\Pages\Actions\Action;
 
 class CreateContent extends CreateRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = ContentResource::class;
 
     protected function getActions(): array
@@ -24,7 +27,6 @@ class CreateContent extends CreateRecord
                 ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
-            $this->getCreateAnotherFormAction(),
         ];
     }
 

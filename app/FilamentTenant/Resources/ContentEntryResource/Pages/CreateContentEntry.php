@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ContentEntryResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ContentEntryResource;
 use App\FilamentTenant\Resources\ContentResource;
 use Domain\Content\Actions\CreateContentEntryAction;
@@ -13,9 +14,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Domain\Content\Models\Content;
+use Filament\Pages\Actions\Action;
 
 class CreateContentEntry extends CreateRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = ContentEntryResource::class;
 
     public mixed $ownerRecord;
@@ -57,6 +61,21 @@ class CreateContentEntry extends CreateRecord
         return trans('Create :label Content Entry', [
             'label' => $this->ownerRecord->name,
         ]);
+    }
+
+    protected function getActions(): array
+    {
+        return [
+            Action::make('create')
+                ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
+                ->action('create')
+                ->keyBindings(['mod+s']),
+        ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
     }
 
     protected function handleRecordCreation(array $data): Model

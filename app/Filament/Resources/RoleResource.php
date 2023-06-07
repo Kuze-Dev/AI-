@@ -9,7 +9,9 @@ use App\Filament\Resources\RoleResource\Pages;
 use App\Filament\Resources\RoleResource\Support\PermissionGroup;
 use App\Filament\Resources\RoleResource\Support\PermissionGroupCollection;
 use Closure;
+use Domain\Role\Actions\DeleteRoleAction;
 use Domain\Role\Models\Role;
+use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -86,6 +88,13 @@ class RoleResource extends Resource
                     ->authorize('update'),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
+                        ->using(function (Role $record) {
+                            try {
+                                return app(DeleteRoleAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        })
                         ->authorize('delete'),
                 ]),
             ])

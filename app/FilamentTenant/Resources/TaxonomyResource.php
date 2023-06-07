@@ -20,6 +20,9 @@ use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Domain\Taxonomy\Actions\DeleteTaxonomyAction;
+use Illuminate\Support\Facades\Auth;
 
 class TaxonomyResource extends Resource
 {
@@ -41,6 +44,7 @@ class TaxonomyResource extends Resource
     /** @param Taxonomy $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
+        /** @phpstan-ignore-next-line */
         return [trans('Total terms') => $record->taxonomy_terms_count];
     }
 
@@ -106,12 +110,11 @@ class TaxonomyResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->sortable()
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\BadgeColumn::make('taxonomy_terms_count')
                     ->counts('taxonomyTerms')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
             ->filters([])
@@ -119,7 +122,14 @@ class TaxonomyResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Taxonomy $record) {
+                            try {
+                                return app(DeleteTaxonomyAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
                 ]),
             ])
             ->bulkActions([

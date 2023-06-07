@@ -17,6 +17,8 @@ use Filament\Tables;
 use Filament\Tables\Filters\Layout;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
+use Domain\Content\Actions\DeleteContentAction;
+use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -53,6 +55,7 @@ class ContentResource extends Resource
     /** @param Content $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
+        /** @phpstan-ignore-next-line */
         return [trans('Total Entries') => $record->content_entries_count];
     }
 
@@ -153,22 +156,9 @@ class ContentResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->sortable()
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('blueprint.name')
-                    ->sortable()
-                    ->searchable()
-                    ->url(fn (Content $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable()
-                    ->toggleable()
-                    ->toggledHiddenByDefault(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('blueprint')
@@ -184,7 +174,14 @@ class ContentResource extends Resource
                         ->icon('heroicon-s-eye')
                         ->color('secondary')
                         ->url(fn (Content $record) => ContentEntryResource::getUrl('index', [$record])),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Content $record) {
+                            try {
+                                return app(DeleteContentAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
                 ]),
             ])
             ->bulkActions([

@@ -66,6 +66,27 @@ class BucketManager
         ]);
 
         try {
+            $this->makeS3Client()->putPublicAccessBlock([
+                'Bucket' => $bucket,
+                'PublicAccessBlockConfiguration' => [
+                    'BlockPublicAcls' => false,
+                    'BlockPublicPolicy' => false,
+                    'IgnorePublicAcls' => false,
+                    'RestrictPublicBuckets' => false,
+                ],
+            ]);
+
+            $this->makeS3Client()->putBucketOwnershipControls([
+                'Bucket' => $bucket,
+                'OwnershipControls' => [
+                    'Rules' => [
+                        [
+                            'ObjectOwnership' => 'BucketOwnerPreferred',
+                        ],
+                    ],
+                ],
+            ]);
+
             $this->makeS3Client()->putBucketCors([
                 'Bucket' => $bucket,
                 'CORSConfiguration' => [

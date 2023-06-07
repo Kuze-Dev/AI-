@@ -8,6 +8,7 @@ use App\Settings\CMSSettings;
 use Filament\Notifications\Notification;
 use Filament\Widgets\Widget;
 use Illuminate\Support\Facades\Http;
+use Spatie\Activitylog\ActivityLogger;
 
 class DeployStaticSite extends Widget
 {
@@ -30,7 +31,7 @@ class DeployStaticSite extends Widget
             return;
         }
 
-        /** @var \Illuminate\Http\Client\Response */
+        /** @var \Illuminate\Http\Client\Response $response */
         $response = Http::post($this->getDeployHook());
 
         tap(Notification::make(), function (Notification $notification) use ($response) {
@@ -42,6 +43,16 @@ class DeployStaticSite extends Widget
 
                 return;
             }
+
+            app(ActivityLogger::class)
+                ->useLog('admin')
+                ->event('deployed-hook')
+                ->withProperties([
+                    'custom' => [
+                        'deploy_hook' => $this->getDeployHook(),
+                    ],
+                ])
+                ->log('Deployed hook');
 
             $notification->success()
                 ->title(trans('Deployment Request Sent'));

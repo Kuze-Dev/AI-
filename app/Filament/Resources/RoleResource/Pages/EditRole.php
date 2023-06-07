@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\RoleResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\Filament\Resources\RoleResource;
 use Domain\Role\Actions\UpdateRoleAction;
 use Domain\Role\DataTransferObjects\RoleData;
@@ -16,6 +17,8 @@ use Throwable;
 
 class EditRole extends EditRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = RoleResource::class;
 
     protected function getActions(): array

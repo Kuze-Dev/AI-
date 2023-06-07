@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Content\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Admin\Models\Admin;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Domain\Support\MetaData\HasMetaData;
@@ -28,6 +27,7 @@ use Illuminate\Support\Str;
  * Domain\Content\Models\ContentEntry
  *
  * @property int $id
+ * @property int|null $author_id
  * @property int $content_id
  * @property string $title
  * @property string $slug
@@ -36,16 +36,20 @@ use Illuminate\Support\Str;
  * @property int|null $order
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read \Domain\Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
+ * @property-read Admin|null $author
  * @property-read \Domain\Content\Models\Content $content
- * @property-read \Domain\Support\MetaData\Models\MetaData $metaData
- * @property-read \Illuminate\Database\Eloquent\Collection|TaxonomyTerm[] $taxonomyTerms
+ * @property-read \Domain\Support\MetaData\Models\MetaData|null $metaData
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Support\RouteUrl\Models\RouteUrl> $routeUrls
+ * @property-read int|null $route_urls_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
- * @property-read string|null $qualified_route_url
  * @method static ContentEntryBuilder|ContentEntry newModelQuery()
  * @method static ContentEntryBuilder|ContentEntry newQuery()
  * @method static ContentEntryBuilder|ContentEntry query()
+ * @method static ContentEntryBuilder|ContentEntry whereAuthorId($value)
  * @method static ContentEntryBuilder|ContentEntry whereContentId($value)
  * @method static ContentEntryBuilder|ContentEntry whereCreatedAt($value)
  * @method static ContentEntryBuilder|ContentEntry whereData($value)
@@ -53,13 +57,16 @@ use Illuminate\Support\Str;
  * @method static ContentEntryBuilder|ContentEntry whereOrder($value)
  * @method static ContentEntryBuilder|ContentEntry wherePublishStatus(?\Domain\Content\Enums\PublishBehavior $publishBehavior = null, ?string $timezone = null)
  * @method static ContentEntryBuilder|ContentEntry wherePublishedAt($value)
+ * @method static ContentEntryBuilder|ContentEntry wherePublishedAtRange(?\Carbon\Carbon $publishedAtStart = null, ?\Carbon\Carbon $publishedAtEnd = null)
+ * @method static ContentEntryBuilder|ContentEntry wherePublishedAtYearMonth(int $year, ?int $month = null)
  * @method static ContentEntryBuilder|ContentEntry whereSlug($value)
+ * @method static ContentEntryBuilder|ContentEntry whereTaxonomyTerms(string $taxonomy, array $terms)
  * @method static ContentEntryBuilder|ContentEntry whereTitle($value)
  * @method static ContentEntryBuilder|ContentEntry whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['taxonomyTerms', 'metaData', 'routeUrls'])]
-class ContentEntry extends Model implements IsActivitySubject, HasMetaDataContract, HasRouteUrlContact
+class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlContact
 {
     use LogsActivity;
     use HasSlug;
@@ -75,7 +82,6 @@ class ContentEntry extends Model implements IsActivitySubject, HasMetaDataContra
         'title',
         'data',
         'content_id',
-        'taxonomy_term_id',
         'order',
         'author_id',
         'published_at',
@@ -132,12 +138,6 @@ class ContentEntry extends Model implements IsActivitySubject, HasMetaDataContra
     public function taxonomyTerms(): BelongsToMany
     {
         return $this->belongsToMany(TaxonomyTerm::class);
-    }
-
-    /** Specify activity log description. */
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Content Entry: '.$this->id;
     }
 
     /** @return SlugOptions */

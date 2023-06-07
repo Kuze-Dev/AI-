@@ -18,6 +18,8 @@ use Filament\Tables;
 use Filament\Tables\Filters\Layout;
 use Exception;
 use Closure;
+use Domain\Page\Actions\DeleteBlockAction;
+use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Support\Facades\Auth;
 
@@ -109,7 +111,14 @@ class BlockResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Block $record) {
+                            try {
+                                return app(DeleteBlockAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
                 ]),
             ])
             ->bulkActions([

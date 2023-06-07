@@ -67,6 +67,7 @@ class ContentEntryResource extends Resource
     /** @param ContentEntry $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
+        /** @phpstan-ignore-next-line */
         return [trans('Content') => $record->content->name];
     }
 
@@ -140,7 +141,6 @@ class ContentEntryResource extends Resource
                         ->schema([
                             Forms\Components\DateTimePicker::make('published_at')
                                 ->timezone(Auth::user()?->timezone),
-
                         ])
                         ->when(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
                     SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
@@ -164,11 +164,6 @@ class ContentEntryResource extends Resource
                     ->label('URL')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->sortable()
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable(['first_name', 'last_name'])
                     ->searchable(query: function (Builder $query, string $search): Builder {
@@ -188,11 +183,6 @@ class ContentEntryResource extends Resource
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable()
-                    ->toggleable()
-                    ->toggledHiddenByDefault(),
             ])
             ->filters([
                 Tables\Filters\Filter::make('taxonomies')
