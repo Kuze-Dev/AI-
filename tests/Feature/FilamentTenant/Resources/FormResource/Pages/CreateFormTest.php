@@ -10,7 +10,7 @@ use Domain\Support\Captcha\CaptchaProvider;
 use Filament\Facades\Filament;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 
-use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
@@ -30,22 +30,19 @@ it('can create form', function () {
         ->withDummySchema()
         ->createOne();
 
-    $this->assertDatabaseEmpty(Form::class);
-    $this->assertDatabaseEmpty(FormEmailNotification::class);
-
     livewire(CreateForm::class)
         ->fillForm([
-            'name' => fake()->sentence(2),
+            'name' => 'Test',
             'blueprint_id' => $blueprint->getKey(),
             'form_email_notifications' => [
                 [
-                    'to' => [fake()->safeEmail()],
-                    'cc' => [fake()->safeEmail()],
-                    'bcc' => [fake()->safeEmail()],
-                    'sender' => fake()->safeEmail(),
-                    'reply_to' => [fake()->safeEmail()],
-                    'subject' => fake()->sentence(),
-                    'template' => fake()->paragraphs(asText: true),
+                    'to' => ['test@user'],
+                    'cc' => ['test@user'],
+                    'bcc' => ['test@user'],
+                    'sender' => 'test@user',
+                    'reply_to' => ['test@user'],
+                    'subject' => 'Test Subject',
+                    'template' => 'Some test template',
                 ],
             ],
         ])
@@ -53,8 +50,19 @@ it('can create form', function () {
         ->assertHasNoFormErrors()
         ->assertOk();
 
-    assertDatabaseCount(Form::class, 1);
-    assertDatabaseCount(FormEmailNotification::class, 1);
+    assertDatabaseHas(Form::class, [
+        'name' => 'Test',
+        'blueprint_id' => $blueprint->getKey(),
+    ]);
+    assertDatabaseHas(FormEmailNotification::class, [
+        'to' => ['test@user'],
+        'cc' => ['test@user'],
+        'bcc' => ['test@user'],
+        'sender' => 'test@user',
+        'reply_to' => ['test@user'],
+        'subject' => 'Test Subject',
+        'template' => 'Some test template',
+    ]);
 });
 
 it('can\'t toggle uses captcha if not set up', function () {

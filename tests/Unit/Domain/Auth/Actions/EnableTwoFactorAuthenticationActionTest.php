@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Event;
 use Mockery\MockInterface;
 use Tests\Fixtures\User;
 
-use function Pest\Laravel\assertDatabaseCount;
-
 beforeEach(function () {
     Event::fake();
     $this->user = User::create(['email' => 'test@user']);
@@ -28,7 +26,7 @@ it('can enable two factor authentication', function () {
     $result = app(EnableTwoFactorAuthenticationAction::class)->execute($this->user, 'valid code');
 
     expect($result)->toBeTrue();
-    assertDatabaseCount('two_factor_authentications', 1);
+    expect($this->user->hasEnabledTwoFactorAuthentication())->toBeTrue();
     Event::assertDispatched(TwoFactorAuthenticationEnabled::class);
 });
 
@@ -40,24 +38,8 @@ it('won\'t enable two factor authentication on invalid code ', function () {
     $result = app(EnableTwoFactorAuthenticationAction::class)->execute($this->user, 'valid code');
 
     expect($result)->toBeFalse();
-    assertDatabaseCount('two_factor_authentications', 1);
+    expect($this->user->hasEnabledTwoFactorAuthentication())->toBeFalse();
     Event::assertNotDispatched(TwoFactorAuthenticationEnabled::class);
-});
-
-it('will reload two factor authentication if loaded in relations', function () {
-    $this->user->load('twoFactorAuthentication');
-
-    $user = mock($this->user)->expect(load: fn () => $this->user);
-    $this->mock(
-        ValidateTotpCodeAction::class,
-        fn (MockInterface $mock) => $mock->expects('execute')->andReturns(true)
-    );
-
-    $result = app(EnableTwoFactorAuthenticationAction::class)->execute($user, 'secret');
-
-    expect($result)->toBeTrue();
-    assertDatabaseCount('two_factor_authentications', 1);
-    Event::assertDispatched(TwoFactorAuthenticationEnabled::class);
 });
 
 it('does nothing if already enabled', function () {

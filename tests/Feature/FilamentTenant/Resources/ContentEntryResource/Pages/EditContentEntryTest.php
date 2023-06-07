@@ -113,7 +113,7 @@ it('can edit content entry', function () {
     $updatedContentEntry = livewire(EditContentEntry::class, ['ownerRecord' => $content->getRouteKey(), 'record' => $contentEntry->getRouteKey()])
         ->fillForm([
             'title' => 'New Foo',
-            'published_at' => $publishedAt = Carbon::now(),
+            'published_at' => $publishedAt = now(Auth::user()?->timezone)->toImmutable(),
             'data' => ['main' => ['header' => 'Foo updated']],
             'taxonomies' => [
                 $content->taxonomies->first()->id => $contentEntry->taxonomyTerms->pluck('id'),
@@ -133,7 +133,7 @@ it('can edit content entry', function () {
 
     assertDatabaseHas(ContentEntry::class, [
         'title' => 'New Foo',
-        'published_at' => $publishedAt->timezone(Auth::user()?->timezone)->toDateTimeString(),
+        'published_at' => $publishedAt,
         'data' => json_encode(['main' => ['header' => 'Foo updated']]),
     ]);
 
@@ -145,7 +145,7 @@ it('can edit content entry', function () {
             'author' => null,
             'keywords' => null,
             'model_type' => $updatedContentEntry->getMorphClass(),
-            'model_id' => $updatedContentEntry->id,
+            'model_id' => $updatedContentEntry->getKey(),
         ]
     );
 
@@ -158,7 +158,7 @@ it('can edit content entry', function () {
 
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $contentEntry->getMorphClass(),
-        'model_id' => $contentEntry->id,
+        'model_id' => $contentEntry->getKey(),
         'url' => ContentEntry::generateRouteUrl($contentEntry, $updatedContentEntry->toArray()),
         'is_override' => false,
     ]);
@@ -195,7 +195,7 @@ it('can edit content entry with custom url', function () {
 
     assertDatabaseHas(RouteUrl::class, [
         'model_type' => $contentEntry->getMorphClass(),
-        'model_id' => $contentEntry->id,
+        'model_id' => $contentEntry->getKey(),
         'url' => '/some/custom/url',
         'is_override' => true,
     ]);
@@ -306,7 +306,7 @@ it('can edit content entry meta data', function () {
             $metaData,
             [
                 'model_type' => $updatedContentEntry->getMorphClass(),
-                'model_id' => $updatedContentEntry->id,
+                'model_id' => $updatedContentEntry->getKey(),
             ]
         )
     );

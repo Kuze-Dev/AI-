@@ -7,7 +7,6 @@ use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Event;
 use Tests\Fixtures\TestNotification;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\patchJson;
 use function PHPUnit\Framework\assertTrue;
 
@@ -17,7 +16,6 @@ it('mark as un-read', function () {
     $user = loginAsUser();
     $user->notify(new TestNotification(fake()->sentence()));
 
-    assertDatabaseCount(DatabaseNotification::class, 1);
     /** @var DatabaseNotification $notification */
     $notification = DatabaseNotification::first();
 

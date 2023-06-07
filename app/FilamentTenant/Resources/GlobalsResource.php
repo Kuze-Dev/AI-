@@ -43,18 +43,12 @@ class GlobalsResource extends Resource
                     ->unique(ignoreRecord: true)
                     ->required(),
                 Forms\Components\Select::make('blueprint_id')
-                    ->options(
-                        fn () => Blueprint::orderBy('name')
-                            ->pluck('name', 'id')
-                            ->toArray()
-                    )
+                    ->label(trans('Blueprint'))
                     ->required()
-                    ->exists(Blueprint::class, 'id')
-                    ->searchable()
-                    ->reactive()
                     ->preload()
-                    ->disabled(fn (?Globals $record) => $record !== null),
-
+                    ->optionsFromModel(Blueprint::class, 'name')
+                    ->disabled(fn (?Globals $record) => $record !== null)
+                    ->reactive(),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
                     ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),

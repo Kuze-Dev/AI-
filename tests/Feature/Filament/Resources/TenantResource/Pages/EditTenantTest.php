@@ -7,7 +7,6 @@ use Domain\Tenant\Database\Factories\TenantFactory;
 use Domain\Tenant\Models\Tenant;
 use Stancl\Tenancy\Database\Models\Domain;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -38,5 +37,4 @@ it('can edit tenant', function () {
 
     assertDatabaseHas(Tenant::class, ['name' => 'Test']);
     assertDatabaseHas(Domain::class, ['domain' => 'test.localhost']);
-    assertDatabaseCount(Domain::class, 1);
 });

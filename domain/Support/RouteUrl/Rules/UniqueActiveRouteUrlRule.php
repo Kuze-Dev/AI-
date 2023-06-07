@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 class UniqueActiveRouteUrlRule implements ValidationRule
 {
     public function __construct(
-        protected readonly ?HasRouteUrl $model
+        protected readonly ?HasRouteUrl $ignoreModel = null
     ) {
     }
 
@@ -35,10 +35,10 @@ class UniqueActiveRouteUrlRule implements ValidationRule
                     )
             );
 
-        if ($this->model) {
+        if ($this->ignoreModel) {
             $query->whereNot(fn (EloquentBuilder $query) => $query
-                ->where('model_type',  $this->model->getMorphClass())
-                ->where('model_id',  $this->model->getKey()));
+                ->where('model_type',  $this->ignoreModel->getMorphClass())
+                ->where('model_id',  $this->ignoreModel->getKey()));
         }
 
         if ($query->exists()) {

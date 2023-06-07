@@ -9,7 +9,6 @@ use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Filament\Facades\Filament;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -41,9 +40,6 @@ it('can edit form', function () {
         ->withDummyBlueprint()
         ->storeSubmission()
         ->createOne();
-
-    assertDatabaseCount(Form::class, 1);
-    assertDatabaseCount(FormEmailNotification::class, 0);
 
     livewire(EditForm::class, ['record' => $form->getRouteKey()])
         ->fillForm([

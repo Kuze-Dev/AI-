@@ -6,24 +6,27 @@ use App\Filament\Resources\RoleResource\Pages\CreateRole;
 use App\Filament\Resources\RoleResource\Support\PermissionGroupCollection;
 use Spatie\Permission\Models\Role;
 
-use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(fn () => loginAsSuperAdmin());
 
 it('can create', function () {
-    assertDatabaseCount(Role::class, 1); // from seed
-
-    livewire(CreateRole::class)
+    /** @var Role */
+    $role = livewire(CreateRole::class)
         ->fillForm([
             'name' => 'Foo',
             'guard_name' => 'admin',
-            'permissions' => [1],
         ])
         ->call('create')
-        ->assertHasNoFormErrors();
+        ->assertHasNoFormErrors()
+        ->instance()
+        ->record;
 
-    assertDatabaseCount(Role::class, 2);
+    assertDatabaseHas(Role::class, [
+        'name' => 'Foo',
+        'guard_name' => 'admin',
+    ]);
 });
 
 it('doesn\'t show any permission when no guard is selected', function () {
@@ -40,7 +43,6 @@ it('can select all permissions', function () {
         ->fillForm([
             'name' => 'Foo',
             'guard_name' => 'admin',
-
         ])
         ->instance();
 
@@ -60,7 +62,6 @@ it('can toggle permission group to select all abilities', function () {
         ->fillForm([
             'name' => 'Foo',
             'guard_name' => 'admin',
-
         ])
         ->instance();
 

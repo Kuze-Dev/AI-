@@ -200,6 +200,8 @@ class BlueprintResource extends Resource
                     ->helperText(new HtmlString(<<<HTML
                             Rules should be separated with "|". Available rules can be found on <a href="https://laravel.com/docs/validation#available-validation-rules" class="text-primary-500" target="_blank" rel="noopener noreferrer">Laravel's Documentation</a>.
                         HTML)),
+                Forms\Components\TextInput::make('helper_text')
+                    ->columnSpanFull(),
                 Forms\Components\Section::make('Field Options')
                     ->id('field-options')
                     ->collapsible()

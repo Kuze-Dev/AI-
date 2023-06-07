@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 
 class CreateOrUpdateRouteUrlAction
 {
-    public function execute(Model&HasRouteUrl $model, RouteUrlData $routeUrlData): void
+    public function execute(Model&HasRouteUrl $model, RouteUrlData $routeUrlData): RouteUrl
     {
         $url = $routeUrlData->is_override
             ? $routeUrlData->url
@@ -24,21 +24,23 @@ class CreateOrUpdateRouteUrlAction
         $routeUrl = RouteUrl::whereUrl($url)
             ->first();
 
-        if ( ! $model->wasRecentlyCreated && $model->activeRouteUrl?->is($routeUrl)) {
-            return;
-        }
-
-        if ($routeUrl !== null) {
-            $routeUrl->model()
-                ->associate($model)
-                ->fill(['is_override' => $routeUrlData->is_override])
-                ->touch();
-        } else {
-            $model->routeUrls()
+        if ( ! $routeUrl) {
+            return $model->routeUrls()
                 ->create([
                     'url' => $url,
                     'is_override' => $routeUrlData->is_override,
                 ]);
         }
+
+        if ($model->activeRouteUrl()->is($routeUrl)) {
+            return $routeUrl;
+        }
+
+        $routeUrl->model()
+            ->associate($model)
+            ->fill(['is_override' => $routeUrlData->is_override])
+            ->touch();
+
+        return $routeUrl;
     }
 }

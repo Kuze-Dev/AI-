@@ -9,13 +9,11 @@ use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 use Domain\Support\RouteUrl\Contracts\HasRouteUrl;
 use Domain\Support\RouteUrl\Database\Factories\RouteUrlFactory;
 use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
-use Domain\Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\Fixtures\TestModelForRouteUrl;
 
-use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\withoutExceptionHandling;
 
@@ -23,17 +21,6 @@ uses()->group('route_url');
 
 beforeEach(function () {
     testInTenantContext();
-
-    DB::connection()
-        ->getSchemaBuilder()
-        ->create((new TestModelForRouteUrl())->getTable(), function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->timestamps();
-        });
-
-    Relation::morphMap([TestModelForRouteUrl::class]);
-    assertDatabaseEmpty(RouteUrl::class);
 });
 
 it('can retrieve model at requested route url', function (HasRouteUrl $model, string $route) {
@@ -94,9 +81,17 @@ it('responds 404 when route url doesn\'t exist', function () {
 });
 
 it('can get route url but return InvalidArgumentException with error message', function () {
-    $model = TestModelForRouteUrl::create([
-        'name' => 'my-awesome-name',
-    ]);
+    DB::connection()
+        ->getSchemaBuilder()
+        ->create((new TestModelForRouteUrl())->getTable(), function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+    Relation::morphMap([TestModelForRouteUrl::class]);
+
+    $model = TestModelForRouteUrl::create(['name' => 'my-awesome-name']);
 
     app(CreateOrUpdateRouteUrlAction::class)
         ->execute($model, new RouteUrlData('url/path/one', true));
@@ -105,7 +100,4 @@ it('can get route url but return InvalidArgumentException with error message', f
     getJson('api/route/' . $model->refresh()->activeRouteUrl->url)
         ->assertOk();
 })
-    ->throws(
-        InvalidArgumentException::class,
-        'No resource found for model ' . TestModelForRouteUrl::class
-    );
+    ->throws(InvalidArgumentException::class, 'No resource found for model ' . TestModelForRouteUrl::class);
