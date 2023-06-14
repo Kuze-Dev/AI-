@@ -54,7 +54,9 @@ class BlueprintResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->required()
-                        ->unique(ignoreRecord: true),
+                        ->unique(ignoreRecord: true)
+                        ->string()
+                        ->maxLength(255),
                 ]),
                 Forms\Components\Card::make()
                     ->statePath('schema')
@@ -67,7 +69,9 @@ class BlueprintResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('title')
                                     ->lazy()
-                                    ->required(),
+                                    ->required()
+                                    ->string()
+                                    ->maxLength(255),
                                 Forms\Components\TextInput::make('state_name')
                                     ->disabled(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
                                         $record->schema->sections,
@@ -153,6 +157,8 @@ class BlueprintResource extends Resource
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->lazy()
+                    ->string()
+                    ->maxLength(255)
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('state_name')
                     ->columnSpan(['sm' => 2])

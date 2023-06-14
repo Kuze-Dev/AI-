@@ -69,6 +69,8 @@ class TaxonomyResource extends Resource
                 Forms\Components\Card::make()->schema([
                     Forms\Components\TextInput::make('name')
                         ->required()
+                        ->string()
+                        ->maxLength(255)
                         ->unique(ignoreRecord: true),
                     Forms\Components\Select::make('blueprint_id')
                         ->label(trans('Blueprint'))

@@ -72,7 +72,9 @@ class MenuResource extends Resource
             ->schema([
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
-                        ->required(),
+                        ->required()
+                        ->string()
+                        ->maxLength(255),
                 ]),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([

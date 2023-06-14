@@ -101,7 +101,9 @@ class ContentEntryResource extends Resource
                                     ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
                                     ?->dispatchEvent('route_url::update');
                             })
-                            ->required(),
+                            ->required()
+                            ->string()
+                            ->maxLength(255),
                         RouteUrlFieldset::make()
                             ->generateModelForRouteUrlUsing(function ($livewire, ContentEntry|string $model) {
                                 return $model instanceof ContentEntry

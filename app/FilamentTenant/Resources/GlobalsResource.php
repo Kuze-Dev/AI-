@@ -41,7 +41,9 @@ class GlobalsResource extends Resource
             Forms\Components\Card::make([
                 Forms\Components\TextInput::make('name')
                     ->unique(ignoreRecord: true)
-                    ->required(),
+                    ->required()
+                    ->string()
+                    ->maxLength(255),
                 Forms\Components\Select::make('blueprint_id')
                     ->label(trans('Blueprint'))
                     ->required()
