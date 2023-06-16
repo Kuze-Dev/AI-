@@ -49,6 +49,7 @@ class RoleResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->required()
+                        ->string()
                         ->maxLength(255),
                     Forms\Components\Select::make('guard_name')
                         ->default(config('auth.defaults.guard'))
@@ -184,12 +185,10 @@ class RoleResource extends Resource
                                 Forms\Components\Fieldset::make('Abilities')
                                     ->schema([
                                         Forms\Components\CheckboxList::make("{$groupName}_abilities")
-                                            ->label('')
-                                            ->options($permissionGroup->abilities->mapWithKeys(
-                                                fn (Permission $permission) => [
-                                                    $permission->id => Str::headline(explode('.', $permission->name, 2)[1]),
-                                                ]
-                                            ))
+                                            ->disableLabel()
+                                            ->options($permissionGroup->abilities->mapWithKeys(fn (Permission $permission) => [
+                                                $permission->id => Str::headline(explode('.', $permission->name, 2)[1]),
+                                            ]))
                                             ->columns(2)
                                             ->reactive()
                                             ->formatStateUsing(function (Forms\Components\CheckboxList $component, ?Role $record) use ($permissionGroup): array {
