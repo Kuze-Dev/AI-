@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Taxonomy;
 
+use App\Features\CMS\CMSBase;
 use App\HttpTenantApi\Resources\TaxonomyResource;
 use Domain\Taxonomy\Models\Taxonomy;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
-#[ApiResource('taxonomies', only: ['index', 'show'])]
+#[
+    ApiResource('taxonomies', only: ['index', 'show']),
+    Middleware('feature.tenant:' . CMSBase::class)
+]
 class TaxonomyController
 {
     public function index(): JsonApiResourceCollection
