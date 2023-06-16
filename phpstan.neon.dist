@@ -8,6 +8,7 @@ parameters:
     stubFiles:
         - phpstan-stubs/Permission.stub
         - phpstan-stubs/PermissionRegistrar.stub
+        - phpstan-stubs/Tenancy.stub
 
     paths:
         - app

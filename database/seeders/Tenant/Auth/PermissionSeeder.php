@@ -36,7 +36,6 @@ class PermissionSeeder extends BasePermissionSeeder
                 ...$this->generateFilamentResourcePermissions('form', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('formSubmission', only: ['viewAny', 'view']),
                 ...$this->generateFilamentResourcePermissions('taxonomy', except: ['deleteAny']),
-                ...$this->generateFilamentResourcePermissions('taxonomyTerm', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('content', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('contentEntry', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('globals', except: ['deleteAny']),
