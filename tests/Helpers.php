@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Features\CMS\CMSBase;
+use App\Features\CMS\ECommerceBase;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
 use Domain\Tenant\Database\Factories\TenantFactory;
@@ -69,6 +70,7 @@ function testInTenantContext(): Tenant
     $tenant->createDomain(['domain' => $domain]);
 
     $tenant->features()->activate(CMSBase::class);
+    $tenant->features()->activate(ECommerceBase::class);
 
     URL::forceRootUrl(Request::getScheme() . '://' . $domain);
 
