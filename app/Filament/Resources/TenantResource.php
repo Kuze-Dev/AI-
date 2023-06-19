@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Features;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Resources\TenantResource\Pages;
 use App\Filament\Rules\CheckDatabaseConnection;
 use App\Filament\Rules\FullyQualifiedDomainNameRule;
+use App\Filament\Support\Forms\FeatureSelector;
 use Domain\Tenant\Models\Tenant;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -43,6 +45,7 @@ class TenantResource extends Resource
                 ]),
                 Forms\Components\Section::make(trans('Database'))
                     ->statePath('database')
+                    ->collapsed(fn (string $context) => $context === 'edit')
                     ->schema([
                         Forms\Components\TextInput::make('host')
                             ->required(fn (?Tenant $record) => $record === null)
@@ -73,6 +76,7 @@ class TenantResource extends Resource
                     ->disabledOn('edit')
                     ->dehydrated(fn (string $context) => $context !== 'edit'),
                 Forms\Components\Section::make(trans('Domains'))
+                    ->collapsed(fn (string $context) => $context === 'edit')
                     ->schema([
                         Forms\Components\Repeater::make('domains')
                             ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Tenant $record, ?array $state) {
@@ -92,6 +96,17 @@ class TenantResource extends Resource
                                             ),
                                     )
                                     ->rules([new FullyQualifiedDomainNameRule()]),
+                            ]),
+                    ]),
+                Forms\Components\Section::make(trans('Features'))
+                    ->collapsed(fn (string $context) => $context === 'edit')
+                    ->schema([
+                        FeatureSelector::make('features')
+                            ->options([
+                                Features\CMS\CMSBase::class => [
+                                    'label' => trans('CMS'),
+                                    'extras' => [],
+                                ],
                             ]),
                     ]),
             ]);
