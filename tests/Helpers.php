@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\CMS\CMSBase;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
 use Domain\Tenant\Database\Factories\TenantFactory;
@@ -66,6 +67,8 @@ function testInTenantContext(): Tenant
     $domain = 'test.' . parse_url(config('app.url'), PHP_URL_HOST);
 
     $tenant->createDomain(['domain' => $domain]);
+
+    $tenant->features()->activate(CMSBase::class);
 
     URL::forceRootUrl(Request::getScheme() . '://' . $domain);
 

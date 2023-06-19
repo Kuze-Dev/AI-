@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Content;
 
+use App\Features\CMS\CMSBase;
 use App\HttpTenantApi\Resources\ContentResource;
 use Domain\Content\Models\Content;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
-#[ApiResource('contents', only: ['index', 'show'])]
+#[
+    ApiResource('contents', only: ['index', 'show']),
+    Middleware('feature.tenant:' . CMSBase::class)
+]
 class ContentController
 {
     public function index(): JsonApiResourceCollection

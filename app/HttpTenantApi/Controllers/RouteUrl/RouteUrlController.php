@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\RouteUrl;
 
+use App\Features\CMS\CMSBase;
 use App\HttpTenantApi\Resources\ContentEntryResource;
 use App\HttpTenantApi\Resources\PageResource;
 use Domain\Content\Models\ContentEntry;
@@ -14,7 +15,9 @@ use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Where;
 use TiMacDonald\JsonApi\JsonApiResource;
 use InvalidArgumentException;
+use Spatie\RouteAttributes\Attributes\Middleware;
 
+#[Middleware('feature.tenant:'. CMSBase::class)]
 class RouteUrlController
 {
     #[
