@@ -17,7 +17,7 @@
         x-bind:class="{ 'justify-center': state }"
     >
         @foreach ($blocks as $id => $block)
-            <div wire:key="block_picker.{{ $id }}" x-show="!state || {{ $id }} === state">
+            <div wire:key="{{ $getId() }}.{{ $id }}" x-show="!state || {{ $id }} === state">
                 <button
                     class="flex flex-col items-center justify-center flex-shrink-0 rounded-lg cursor-pointer h-36 bg-neutral-800 w-60"
                     type="button"
