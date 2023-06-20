@@ -64,22 +64,26 @@ class PageResource extends Resource
                                 ->required(),
                             RouteUrlFieldset::make()
                                 ->disabled(fn (?Page $record) => $record?->isHomePage()),
-                            Forms\Components\Select::make('visibility')
-                                ->options(
-                                    collect(Visibility::cases())
-                                        ->mapWithKeys(fn (Visibility $visibility) => [
-                                            $visibility->value => Str::headline($visibility->value),
-                                        ])
-                                        ->toArray()
-                                )
-                                ->disabled(fn (?Page $record) => $record?->isHomePage())
-                                ->default(Visibility::PUBLIC->value)
-                                ->required(),
-                            Forms\Components\Toggle::make('published_at')
-                                ->label(trans('Published'))
-                                ->formatStateUsing(fn (Carbon|bool|null $state) => $state instanceof Carbon ? true : (bool) $state)
-                                ->dehydrateStateUsing(fn (?bool $state) => $state ? now() : null)
-                                ->disabled(fn (?Page $record) => $record?->isHomePage()),
+                            Forms\Components\Group::make([
+                                Forms\Components\Toggle::make('published_at')
+                                    ->label(trans('Published'))
+                                    ->formatStateUsing(fn (Carbon|bool|null $state) => $state instanceof Carbon ? true : (bool) $state)
+                                    ->dehydrateStateUsing(fn (?bool $state) => $state ? now() : null)
+                                    ->disabled(fn (?Page $record) => $record?->isHomePage()),
+                                Forms\Components\Select::make('visibility')
+                                    ->options(
+                                        collect(Visibility::cases())
+                                            ->mapWithKeys(fn (Visibility $visibility) => [
+                                                $visibility->value => Str::headline($visibility->value),
+                                            ])
+                                            ->toArray()
+                                    )
+                                    ->disabled(fn (?Page $record) => $record?->isHomePage())
+                                    ->default(Visibility::PUBLIC->value)
+                                    ->required(),
+                            ])
+                                ->columns('grid-cols-[10rem,1fr] items-center'),
+
                             Forms\Components\Hidden::make('author_id')
                                 ->default(Auth::id()),
                         ]),
