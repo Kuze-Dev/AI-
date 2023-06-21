@@ -48,12 +48,7 @@ class CurrencyResource extends Resource
                 Forms\Components\Toggle::make('enabled'),
                 Forms\Components\TextInput::make('exchange_rate'),
                 Forms\Components\Toggle::make('default'),
-                Forms\Components\DateTimePicker::make('created_at')
-                    ->disabled()
-                    ->default(now()),
-                Forms\Components\DateTimePicker::make('updated_at')
-                    ->disabled()
-                    ->default(now()),
+        
             ]),
         ]);
     }
@@ -94,8 +89,14 @@ class CurrencyResource extends Resource
 
             ])
             
-            ->filters([])
-            ->filtersLayout(Layout::AboveContent)
+            ->filters([
+                Tables\Filters\SelectFilter::make('enabled')
+                    ->label('Status')
+                    ->options([
+                        '1' => 'Selected',
+                        '0' => 'Not Selected',
+                    ]),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
