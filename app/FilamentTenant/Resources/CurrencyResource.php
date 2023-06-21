@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Resources;
-use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Domain\Blueprint\Models\Blueprint;
-use Domain\Page\Models\Currency;
+use Domain\Currency\Models\Currency;
+use Domain\Currency\Actions\DeleteCurrencyAction;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -17,11 +14,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Filters\Layout;
 use Exception;
-use Closure;
-use Domain\Page\Actions\DeleteBlockAction;
 use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Illuminate\Support\Facades\Auth;
 use App\FilamentTenant\Resources\CurrencyResource\Pages;
 
 class CurrencyResource extends Resource
@@ -36,7 +29,10 @@ class CurrencyResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['code'];
+    }
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -48,7 +44,8 @@ class CurrencyResource extends Resource
                 Forms\Components\Toggle::make('enabled'),
                 Forms\Components\TextInput::make('exchange_rate'),
                 Forms\Components\Toggle::make('default'),
-        
+          
+         
             ]),
         ]);
     }
@@ -69,9 +66,8 @@ class CurrencyResource extends Resource
                     ->label('Exchange Rate')
                     ->sortable()
                     ->searchable(),
+                  
                     Tables\Columns\BadgeColumn::make('enabled')
-                    ->sortable()
-                    ->searchable()
                     ->enum([
                         '1' => 'Selected',
                         '0' => 'Not Selected',
@@ -85,25 +81,18 @@ class CurrencyResource extends Resource
                         return 'secondary';
                     }),
           
-                  
 
             ])
             
-            ->filters([
-                Tables\Filters\SelectFilter::make('enabled')
-                    ->label('Status')
-                    ->options([
-                        '1' => 'Selected',
-                        '0' => 'Not Selected',
-                    ]),
-            ])
+            ->filters([])
+            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
                         ->using(function (Currency $record) {
                             try {
-                                return app(DeleteBlockAction::class)->execute($record);
+                                return app(DeleteCurrencyAction::class)->execute($record);
                             } catch (DeleteRestrictedException $e) {
                                 return false;
                             }
@@ -123,8 +112,8 @@ class CurrencyResource extends Resource
     {
         return [
             'index' => Pages\ListCurrency::route('/'),
-            // 'create' => Pages\CreateBlueprint::route('/create'),
-            // 'edit' => Pages\EditBlueprint::route('/{record}/edit'),
+            'create' => Pages\CreateCurrency::route('/create'),
+            'edit' => Pages\EditCurrency::route('/{record}/edit'),
         ];
     }
 }

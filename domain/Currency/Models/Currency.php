@@ -1,7 +1,8 @@
 <?php
 
-namespace Domain\Page\Models;
+namespace Domain\Currency\Models;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class Currency extends Model
 {
@@ -13,14 +14,16 @@ class Currency extends Model
         'enabled',
         'exchange_rate',
         'default',
-        'created_at',
-        'updated_at',
     ];
 
 
     protected static function boot()
     {
         parent::boot();
+
+        Relation::morphMap([
+            'currency' => 'Domain\Currency\Models\Currency',
+        ]);
 
         self::creating(function ($currency) {
             // Disable all other currencies when creating a new enabled currency
