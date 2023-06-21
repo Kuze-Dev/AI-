@@ -32,7 +32,7 @@ class CurrencyResource extends Resource
 
     protected static ?string $navigationGroup = 'eCommerce';
 
-    protected static ?string $navigationIcon = 'heroicon-o-template';
+    protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -75,6 +75,8 @@ class CurrencyResource extends Resource
                     ->sortable()
                     ->searchable(),
                     Tables\Columns\BadgeColumn::make('enabled')
+                    ->sortable()
+                    ->searchable()
                     ->enum([
                         '1' => 'Selected',
                         '0' => 'Not Selected',
