@@ -17,6 +17,7 @@ use Domain\Form\Models\FormSubmission;
 use Domain\Globals\Models\Globals;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
+use Domain\Product\Models\Product;
 use Domain\Support\Captcha\CaptchaManager;
 use Domain\Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Models\Taxonomy;
@@ -62,6 +63,7 @@ class AppServiceProvider extends ServiceProvider
             Form::class,
             FormSubmission::class,
             FormEmailNotification::class,
+            Product::class,
             Taxonomy::class,
             TaxonomyTerm::class,
             Content::class,
