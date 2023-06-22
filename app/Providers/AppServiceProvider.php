@@ -8,6 +8,7 @@ use App\Settings\FormSettings;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Customer\Models\Customer;
+use Domain\Customer\Models\Tier;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
 use Domain\Content\Models\Content;
@@ -69,6 +70,7 @@ class AppServiceProvider extends ServiceProvider
             ContentEntry::class,
             Globals::class,
             MetaData::class,
+            Tier::class,
             Customer::class,
         ]);
 
