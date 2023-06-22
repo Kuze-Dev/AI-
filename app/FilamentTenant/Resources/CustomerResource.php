@@ -8,6 +8,7 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Models\Customer;
+use Domain\Customer\Models\Tier;
 use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -77,8 +78,10 @@ class CustomerResource extends Resource
                         ->translateLabel()
                         ->required()
                         ->before(fn () => now()),
-                    Forms\Components\Select::make('tier')
-                        ->translateLabel(),
+                    Forms\Components\Select::make('tier_id')
+                        ->label(trans('Tier'))
+                        ->preload()
+                        ->optionsFromModel(Tier::class, 'name'),
                     Forms\Components\TextInput::make('password')
                         ->translateLabel()
                         ->password()

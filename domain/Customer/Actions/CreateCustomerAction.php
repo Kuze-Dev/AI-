@@ -19,6 +19,7 @@ class CreateCustomerAction
     public function execute(CustomerData $customerData): Customer
     {
         $customer = Customer::create([
+            'tier_id' => $customerData->tier_id,
             'email' => $customerData->email,
             'first_name' => $customerData->first_name,
             'last_name' => $customerData->last_name,

@@ -19,6 +19,7 @@ class EditCustomerAction
     public function execute(Customer $customer, CustomerData $customerData): Customer
     {
         $customer->update([
+            'tier_id' => $customerData->tier_id,
             'email' => $customerData->email,
             'first_name' => $customerData->first_name,
             'last_name' => $customerData->last_name,

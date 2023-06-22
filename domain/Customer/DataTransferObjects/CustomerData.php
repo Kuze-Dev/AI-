@@ -19,7 +19,7 @@ class CustomerData
         public readonly Status $status,
         public readonly Carbon $birth_date,
         public readonly ?string $password = null,
-        public readonly ?int $tier = null,
+        public readonly ?int $tier_id = null,
     ) {
     }
 
@@ -34,6 +34,10 @@ class CustomerData
             : Status::INACTIVE;
 
         $data['birth_date'] = now()->parse($data['birth_date']);
+
+        if (isset($data['tier_id'])) {
+            $data['tier_id'] = (int) $data['tier_id'];
+        }
 
         return new self(...$data);
     }

@@ -6,6 +6,7 @@ namespace Domain\Customer\Models;
 
 use Domain\Customer\Enums\Status;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Activitylog\LogOptions;
@@ -17,6 +18,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * Domain\Customer\Models\Customer
  *
  * @property int $id
+ * @property int $tier_id
  * @property string $email
  * @property mixed|null $password
  * @property-read  string $full_name
@@ -30,6 +32,9 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read int|null $media_count
+ * @property-read \Domain\Customer\Models\Tier|null $tier
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer onlyTrashed()
@@ -44,6 +49,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereMobile($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Customer whereTierId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer withoutTrashed()
@@ -56,6 +62,7 @@ class Customer extends Authenticatable implements HasMedia
     use InteractsWithMedia;
 
     protected $fillable = [
+        'tier_id',
         'email',
         'password',
         'first_name',
@@ -96,5 +103,11 @@ class Customer extends Authenticatable implements HasMedia
     {
         $this->addMediaCollection('image')
             ->singleFile();
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Tier, \Domain\Customer\Models\Customer> */
+    public function tier(): BelongsTo
+    {
+        return $this->belongsTo(Tier::class);
     }
 }
