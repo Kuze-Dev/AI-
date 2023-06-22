@@ -11,7 +11,7 @@ use Illuminate\Http\UploadedFile;
 class CustomerData
 {
     public function __construct(
-        public readonly UploadedFile|string|null $image,
+        public readonly UploadedFile|string $image,
         public readonly string $email,
         public readonly string $first_name,
         public readonly string $last_name,
