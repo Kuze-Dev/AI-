@@ -107,7 +107,6 @@ class CurrencyResource extends Resource
                 Tables\Filters\SelectFilter::make('enabled')
                     ->label('Status')
                     ->options([
-                        '' => 'All',
                         '1' => 'Selected',
                         '0' => 'Not Selected',
                     ]),

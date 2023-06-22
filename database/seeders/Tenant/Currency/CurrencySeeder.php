@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\Tenant\Page;
+namespace Database\Seeders\Tenant\Currency;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
