@@ -48,17 +48,18 @@ class EditCurrency extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         // dd($data);
-        return DB::transaction(fn() => app(UpdateCurrencyAction::class)
-            ->execute(
-                $record,
-                new CurrencyData(
-                    code: $data['code'],
-                    name: $data['name'],
-                    enabled: $data['enabled'],
-                    exchange_rate: (float) $data['exchange_rate'],
-                    default: $data['default'],
+        return DB::transaction(
+            fn () => app(UpdateCurrencyAction::class)
+                ->execute(
+                    $record,
+                    new CurrencyData(
+                        code: $data['code'],
+                        name: $data['name'],
+                        enabled: $data['enabled'],
+                        exchange_rate: (float) $data['exchange_rate'],
+                        default: $data['default'],
+                    )
                 )
-            )
         );
     }
 

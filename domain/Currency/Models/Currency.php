@@ -1,6 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Currency\Models;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -17,7 +20,6 @@ class Currency extends Model
         'default',
     ];
 
-
     protected static function boot()
     {
         parent::boot();
@@ -28,7 +30,7 @@ class Currency extends Model
 
         self::creating(function ($currency) {
             // Disable all other currencies when creating a new enabled currency
-            
+
             if ($currency->enabled) {
                 self::where('enabled', true)->update(['enabled' => false]);
             }
@@ -46,9 +48,9 @@ class Currency extends Model
                 self::where('id', '!=', $currency->id)->update(['default' => false]);
             }
         });
-        
+
         self::saved(function () {
-            if (!self::where('enabled', true)->exists()) {
+            if ( ! self::where('enabled', true)->exists()) {
                 self::where('default', true)->update(['enabled' => true]);
             }
         });

@@ -11,7 +11,6 @@ class UpdateCurrencyAction
 {
     public function execute(Currency $currency, CurrencyData $currencyData): Currency
     {
-   
 
         $currency->update([
             'code' => $currencyData->code,
@@ -23,6 +22,4 @@ class UpdateCurrencyAction
 
         return $currency;
     }
-
-
 }

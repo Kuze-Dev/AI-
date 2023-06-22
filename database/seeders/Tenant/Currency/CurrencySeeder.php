@@ -1,6 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders\Tenant\Currency;
+
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -17,7 +20,7 @@ class CurrencySeeder extends Seeder
             [
                 'code' => 'PHP',
                 'name' => 'Philippine Peso',
-                'enabled' => true,
+                'enabled' => false,
                 'exchange_rate' => 56.00,
                 'default' => false,
                 'created_at' => now(),
@@ -26,7 +29,7 @@ class CurrencySeeder extends Seeder
             [
                 'code' => 'USD',
                 'name' => 'US Dollar',
-                'enabled' => true,
+                'enabled' => false,
                 'exchange_rate' => 1.00,
                 'default' => true,
                 'created_at' => now(),
