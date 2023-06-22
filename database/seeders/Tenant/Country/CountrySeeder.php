@@ -1,6 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders\Tenant\Country;
+
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 

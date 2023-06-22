@@ -48,18 +48,19 @@ class EditCountry extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         // dd($data);
-        return DB::transaction(fn() => app(UpdateCountryAction::class)
-            ->execute(
-                $record,
-                new CountryData(
-                    code: $data['code'],
-                    name: $data['name'],
-                    capital: $data['capital'],
-                    timezone: $data['timezone'],
-                    language: $data['language'],
-                    active: $data['active'],
+        return DB::transaction(
+            fn () => app(UpdateCountryAction::class)
+                ->execute(
+                    $record,
+                    new CountryData(
+                        code: $data['code'],
+                        name: $data['name'],
+                        capital: $data['capital'],
+                        timezone: $data['timezone'],
+                        language: $data['language'],
+                        active: $data['active'],
+                    )
                 )
-            )
         );
     }
 

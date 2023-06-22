@@ -19,16 +19,12 @@ class CreateCountry extends CreateRecord
 
     protected static string $resource = CountryResource::class;
 
-    
-
-   
     protected function getRedirectUrl(): string
     {
         $resource = static::getResource();
 
         return $resource::getUrl('index');
     }
-
 
     protected function getActions(): array
     {

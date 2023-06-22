@@ -8,7 +8,6 @@ use App\FilamentTenant\Resources\CountryResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-
 class ListCountry extends ListRecords
 {
     protected static string $resource = CountryResource::class;
@@ -19,8 +18,9 @@ class ListCountry extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
-    protected function getTableRecordsPerPageSelectOptions(): array 
+
+    protected function getTableRecordsPerPageSelectOptions(): array
     {
         return [10, 25, 50, 100];
-    } 
+    }
 }

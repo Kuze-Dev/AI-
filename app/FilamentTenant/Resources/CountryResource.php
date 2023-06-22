@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Domain\Country\Actions\DeleteCountryAction;
 use Domain\Country\Models\Country;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -31,6 +32,7 @@ class CountryResource extends Resource
     {
         return ['name'];
     }
+
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -46,7 +48,6 @@ class CountryResource extends Resource
             ]),
         ]);
     }
-    
 
     /** @throws Exception */
     /** @throws Exception */
@@ -58,7 +59,7 @@ class CountryResource extends Resource
                     ->sortable()
                     ->toggleable()
                     ->searchable(),
-                    
+
                 Tables\Columns\TextColumn::make('name')->label('Countries')
                     ->sortable()
                     ->searchable(),
@@ -75,7 +76,7 @@ class CountryResource extends Resource
                     ->toggleable()
                     ->searchable(),
                 Tables\Columns\BadgeColumn::make('active')
-                ->toggleable()
+                    ->toggleable()
                     ->enum([
                         '1' => 'Active',
                         '0' => 'Inactive',
@@ -85,6 +86,7 @@ class CountryResource extends Resource
                         if ($state == '1') {
                             return 'success';
                         }
+
                         return 'secondary';
                     })
                     ->toggleable(),
@@ -119,12 +121,6 @@ class CountryResource extends Resource
             ->bulkActions([])
             ->defaultSort('id', 'asc');
     }
-    
-
-
-
-
-
 
     public static function getPages(): array
     {

@@ -11,7 +11,6 @@ class UpdateCountryAction
 {
     public function execute(Country $country, CountryData $countryData): Country
     {
-   
 
         $country->update([
             'code' => $countryData->code,
@@ -24,6 +23,4 @@ class UpdateCountryAction
 
         return $country;
     }
-
-
 }
