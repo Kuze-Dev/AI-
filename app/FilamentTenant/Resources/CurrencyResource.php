@@ -12,7 +12,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Exception;
 use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use App\FilamentTenant\Resources\CurrencyResource\Pages;
@@ -33,6 +32,7 @@ class CurrencyResource extends Resource
     {
         return ['code'];
     }
+
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -42,9 +42,8 @@ class CurrencyResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required(),
                 Forms\Components\Toggle::make('enabled'),
-                Forms\Components\TextInput::make('exchange_rate'),
+                Forms\Components\TextInput::make('exchange_rate')->numeric(),
                 Forms\Components\Toggle::make('default'),
-
 
             ]),
         ]);
@@ -93,13 +92,12 @@ class CurrencyResource extends Resource
 
                         return 'secondary';
                     })->toggleable(),
-                    Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('created_at')
                     ->sortable()
                     ->toggleable(),
-                    Tables\Columns\TextColumn::make('updated_at')
+                Tables\Columns\TextColumn::make('updated_at')
                     ->sortable()
-                    ->toggleable()
-
+                    ->toggleable(),
 
             ])
 
@@ -127,11 +125,6 @@ class CurrencyResource extends Resource
             ->bulkActions([])
             ->defaultSort('id', 'asc');
     }
-
-
-
-
-
 
     public static function getPages(): array
     {

@@ -19,16 +19,12 @@ class CreateCurrency extends CreateRecord
 
     protected static string $resource = CurrencyResource::class;
 
-    
-
-   
     protected function getRedirectUrl(): string
     {
         $resource = static::getResource();
 
         return $resource::getUrl('index');
     }
-
 
     protected function getActions(): array
     {

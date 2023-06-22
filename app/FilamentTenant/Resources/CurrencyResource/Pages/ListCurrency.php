@@ -8,7 +8,6 @@ use App\FilamentTenant\Resources\CurrencyResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-
 class ListCurrency extends ListRecords
 {
     protected static string $resource = CurrencyResource::class;
@@ -19,8 +18,9 @@ class ListCurrency extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
-    protected function getTableRecordsPerPageSelectOptions(): array 
+
+    protected function getTableRecordsPerPageSelectOptions(): array
     {
         return [10, 25, 50, 100];
-    } 
+    }
 }
