@@ -14,7 +14,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
@@ -113,7 +112,7 @@ class TaxonomyResource extends Resource
                     ->sortable(),
             ])
             ->filters([])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
