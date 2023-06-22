@@ -36,6 +36,10 @@ class CreateTenantAction
             $this->createDomain->execute($tenant, $domain);
         }
 
+        foreach ($tenantData->features as $feature) {
+            $tenant->features()->activate($feature);
+        }
+
         return $tenant;
     }
 }
