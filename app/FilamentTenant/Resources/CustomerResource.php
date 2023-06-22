@@ -125,10 +125,18 @@ class CustomerResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->wrap(),
+                Tables\Columns\BadgeColumn::make('tier.name')
+                    ->translateLabel()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->wrap(),
                 Tables\Columns\BadgeColumn::make('status'),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('tier')
+                    ->translateLabel()
+                    ->relationship('tier', 'name')
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
