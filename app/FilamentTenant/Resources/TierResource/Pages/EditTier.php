@@ -6,10 +6,15 @@ namespace App\FilamentTenant\Resources\TierResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\TierResource;
+use Domain\Customer\Actions\EditTierAction;
+use Domain\Customer\DataTransferObjects\TierData;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class EditTier extends EditRecord
 {
@@ -34,5 +39,17 @@ class EditTier extends EditRecord
     protected function getFormActions(): array
     {
         return $this->getCachedActions();
+    }
+
+    /**
+     * @param \Domain\Customer\Models\Tier$record
+     * @throws Throwable
+     */
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        return DB::transaction(
+            fn () => app(EditTierAction::class)
+                ->execute($record, new TierData(...$data))
+        );
     }
 }
