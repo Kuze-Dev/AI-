@@ -6,8 +6,12 @@ namespace App\FilamentTenant\Resources\PaymentMethodResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\PaymentMethodResource;
+use Domain\PaymentMethod\Actions\CreatePaymentMethodAction;
+use Domain\PaymentMethod\DataTransferObjects\PaymentMethodData;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Pages\Actions\Action;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class CreatePaymentMethod extends CreateRecord
 {
@@ -28,5 +32,10 @@ class CreatePaymentMethod extends CreateRecord
     protected function getFormActions(): array
     {
         return $this->getCachedActions();
+    }
+
+    protected function handleRecordCreation(array $data): Model
+    {
+        return DB::transaction(fn () => app(CreatePaymentMethodAction::class)->execute(PaymentMethodData::fromArray($data)));
     }
 }

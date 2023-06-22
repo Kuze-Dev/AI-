@@ -17,6 +17,7 @@ use Domain\Form\Models\FormSubmission;
 use Domain\Globals\Models\Globals;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
+use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Support\Captcha\CaptchaManager;
 use Domain\Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Models\Taxonomy;
@@ -68,6 +69,7 @@ class AppServiceProvider extends ServiceProvider
             ContentEntry::class,
             Globals::class,
             MetaData::class,
+            PaymentMethod::class,
         ]);
 
         Password::defaults(
