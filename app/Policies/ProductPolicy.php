@@ -16,7 +16,6 @@ class ProductPolicy
 
     public function before(): ?Response
     {
-        // dd(tenancy()->tenant?->features()->active(ECommerceBase::class));
         if ( tenancy()->tenant?->features()->active(ECommerceBase::class)) {
             return Response::denyAsNotFound();
         }

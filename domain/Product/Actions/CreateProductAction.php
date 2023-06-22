@@ -39,6 +39,9 @@ class CreateProductAction
             $product->clearMediaCollection('image');
         }
 
+        $product->taxonomyTerms()
+            ->attach($productData->taxonomy_terms);
+
         return $product;
     }
 

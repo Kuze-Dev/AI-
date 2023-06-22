@@ -3,7 +3,6 @@
 namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Support\MetaDataForm;
-use App\FilamentTenant\Support\RouteUrlFieldset;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Product\Models\Product;
 use Filament\Resources\Form;
@@ -12,7 +11,12 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms;
-use Filament\Forms\Components\Component;
+use Closure;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Filters\Layout;
+use Illuminate\Support\Arr;
 
 class ProductResource extends Resource
 {
@@ -28,6 +32,8 @@ class ProductResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $taxonomies = Taxonomy::with('taxonomyTerms')->whereIn('slug', ['brand', 'category'])->get();
+
         return $form
             ->columns(3)
             ->schema([
@@ -37,11 +43,41 @@ class ProductResource extends Resource
                             ->label('Product Name')
                             ->unique(ignoreRecord: true)
                             ->required(),
-                        Forms\Components\Textarea::make('description'),
+                        Forms\Components\Group::make()
+                            ->schema([
+                                Forms\Components\Group::make()
+                                    ->statePath('taxonomies')
+                                    ->schema(
+                                        fn () => $taxonomies->map(
+                                            fn (Taxonomy $taxonomy) => Forms\Components\Select::make($taxonomy->name)
+                                                ->statePath((string) $taxonomy->id)
+                                                ->multiple(
+                                                    fn () => $taxonomy->slug === 'brand' ? false : true
+                                                )
+                                                ->options(
+                                                    $taxonomy->taxonomyTerms->sortBy('name')
+                                                        ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->id => $term->name])
+                                                        ->toArray()
+                                                )
+                                                ->formatStateUsing(
+                                                    fn (?Product $record) => $record?->taxonomyTerms->where('taxonomy_id', $taxonomy->id)
+                                                        ->pluck('id')
+                                                        ->toArray() ?? []
+                                                )
+                                                ->required()
+                                        )->toArray()
+                                    )
+                                    ->dehydrated(false),
+                                Forms\Components\Hidden::make('taxonomy_terms')
+                                    ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
+                            ])
+                            ->when(fn () => !empty($taxonomies->toArray())),
+                        Forms\Components\RichEditor::make('description')->required(),
                         Forms\Components\FileUpload::make('image')
                             ->label('Media')
                             ->mediaLibraryCollection('image')
-                            ->image(),
+                            ->image()
+                            ->required(),
                         Forms\Components\Section::make('Customer Remarks')
                             ->schema([
                                 Forms\Components\Toggle::make('allow_customer_remarks')
@@ -52,10 +88,8 @@ class ProductResource extends Resource
                     ]),
                     Forms\Components\Section::make('Section Display')
                         ->schema([
-                            Forms\Components\Toggle::make('is_special_offer')
-                                ->required(),
-                            Forms\Components\Toggle::make('is_featured')
-                                ->required(),
+                            Forms\Components\Toggle::make('is_special_offer'),
+                            Forms\Components\Toggle::make('is_featured'),
                         ])->columns(2),
                     Forms\Components\Section::make('Shipping')
                         ->schema([
@@ -88,8 +122,11 @@ class ProductResource extends Resource
                     Forms\Components\Section::make('Status')
                         ->schema([
                             Forms\Components\Toggle::make('status')
-                                ->helperText('This product will be hidden from all sales channels.')
-                                ->required(),
+                                ->label(
+                                    fn ($state) =>
+                                    $state ? 'Active' : 'Inactive'
+                                )
+                                ->helperText('This product will be hidden from all sales channels.'),
                         ]),
                     MetaDataForm::make('Meta Data')
                 ])->columnSpan(1)
@@ -104,14 +141,27 @@ class ProductResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('selling_price')
+                    ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive'),
+                Tables\Columns\TextColumn::make('stock')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\BadgeColumn::make('status')
+                    ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive')
+                    ->color(fn (Product $record) => $record->status ? 'success' : 'secondary')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
-            ->filters([])
+            ->filters([
+                Tables\Filters\TernaryFilter::make('status')
+                    ->label(trans('Status'))
+                    ->trueLabel('Active')
+                    ->falseLabel('Inactive')
+                    ->nullable(),
+            ])
+            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->authorize('update'),
@@ -120,7 +170,8 @@ class ProductResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array

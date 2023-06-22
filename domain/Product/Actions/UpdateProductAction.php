@@ -7,12 +7,14 @@ namespace Domain\Product\Actions;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
 use Domain\Support\MetaData\Actions\CreateMetaDataAction;
+use Domain\Support\MetaData\Actions\UpdateMetaDataAction;
 use Illuminate\Http\UploadedFile;
 
 class UpdateProductAction
 {
     public function __construct(
-        protected CreateMetaDataAction $createMetaTags,
+        protected CreateMetaDataAction $createMetaData,
+        protected UpdateMetaDataAction $updateMetaData,
     ) {
     }
 
@@ -20,7 +22,10 @@ class UpdateProductAction
     {
         $product->update($this->getProductAttributes($productData));
 
-        $this->createMetaTags->execute($product, $productData->meta_data);
+
+        $product->metaData()->exists()
+            ? $this->updateMetaData->execute($product, $productData->meta_data)
+            : $this->createMetaData->execute($product, $productData->meta_data);
 
         if ($productData->image instanceof UploadedFile && $imageString = $productData->image->get()) {
             $product->addMediaFromString($imageString)
@@ -32,6 +37,9 @@ class UpdateProductAction
         if ($productData->image === null) {
             $product->clearMediaCollection('image');
         }
+
+        $product->taxonomyTerms()
+            ->sync($productData->taxonomy_terms);
 
         return $product;
     }

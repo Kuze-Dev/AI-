@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use Domain\Product\Models\Product;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -29,11 +32,18 @@ return new class() extends Migration
             $table->boolean('allow_remark_with_image')->default(false);
             $table->timestamps();
         });
+
+        Schema::create('product_taxonomy_term', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(Product::class)->index();
+            $table->foreignIdFor(TaxonomyTerm::class)->index();
+        });
     }
 
     /** Reverse the migrations. */
     public function down(): void
     {
         Schema::dropIfExists('products');
+        Schema::dropIfExists('product_taxonomy_term');
     }
 };

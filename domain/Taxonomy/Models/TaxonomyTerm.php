@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Domain\Taxonomy\Models;
 
 use Domain\Content\Models\ContentEntry;
+use Domain\Product\Models\Product;
 use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -49,7 +51,10 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder|TaxonomyTerm whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-#[OnDeleteCascade(['contentEntries', 'children'])]
+#[
+    OnDeleteCascade(['contentEntries', 'children']),
+    OnDeleteRestrict(['products'])
+]
 class TaxonomyTerm extends Model implements Sortable
 {
     use HasSlug;
@@ -88,6 +93,11 @@ class TaxonomyTerm extends Model implements Sortable
     public function contentEntries(): BelongsToMany
     {
         return $this->belongsToMany(ContentEntry::class);
+    }
+
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class);
     }
 
     public function getRouteKeyName(): string

@@ -16,6 +16,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -37,7 +40,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-// #[OnDeleteCascade(['metaData'])]
+#[OnDeleteCascade(['metaData'])]
 class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, HasMedia
 {
     use LogsActivity;
@@ -93,6 +96,16 @@ class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, 
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function taxonomyTerms(): BelongsToMany
+    {
+        return $this->belongsToMany(TaxonomyTerm::class);
+    }
+
+    public function taxonomies(): BelongsToMany
+    {
+        return $this->belongsToMany(Taxonomy::class);
     }
 
     public function getSlugOptions(): SlugOptions
