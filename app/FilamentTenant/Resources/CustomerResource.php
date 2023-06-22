@@ -9,7 +9,6 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Models\Customer;
 use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
-use Filament\Facades\Filament;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -48,12 +47,12 @@ class CustomerResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Card::make([
-                    //                    Forms\Components\FileUpload::make('profile_imane')
-                    //                        ->translateLabel()
-                    //                        ->mediaLibraryCollection('image')
-                    //                        ->required()
-                    //                        ->image()
-                    //                        ->columnSpanFull(),
+                    Forms\Components\FileUpload::make('image')
+                        ->label(trans('Profile image'))
+                        ->mediaLibraryCollection('image')
+                        ->required()
+                        ->image()
+                        ->columnSpanFull(),
                     Forms\Components\TextInput::make('first_name')
                         ->translateLabel()
                         ->required()
@@ -73,14 +72,15 @@ class CustomerResource extends Resource
                     Forms\Components\TextInput::make('mobile')
                         ->translateLabel()
                         ->required()
-                        ->email()
                         ->maxLength(255),
                     Forms\Components\DatePicker::make('birth_date')
                         ->translateLabel()
                         ->required()
                         ->before(fn () => now()),
-                    //                    Forms\Components\Select::make('tier'),
+                    Forms\Components\Select::make('tier')
+                        ->translateLabel(),
                     Forms\Components\TextInput::make('password')
+                        ->translateLabel()
                         ->password()
                         ->required()
                         ->rule(Password::default())
@@ -91,13 +91,15 @@ class CustomerResource extends Resource
                         )
                         ->visible(fn (?Customer $record) => $record === null || ! $record->exists),
                     Forms\Components\TextInput::make('password_confirmation')
+                        ->translateLabel()
                         ->required()
                         ->password()
                         ->same('password')
                         ->dehydrated(false)
                         ->rule(Password::default())
                         ->visible(fn (?Customer $record) => $record === null || ! $record->exists),
-                    //                    Forms\Components\Toggle::make('status'),
+                    Forms\Components\Toggle::make('status')
+                        ->translateLabel(),
                 ])->columns(2),
             ]);
     }
@@ -110,14 +112,17 @@ class CustomerResource extends Resource
                 Tables\Columns\TextColumn::make('full_name')
                     ->translateLabel()
                     ->searchable(['first_name', 'last_name'])
-                    ->sortable(['first_name', 'last_name']),
+                    ->sortable(['first_name', 'last_name'])
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('email')
                     ->translateLabel()
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Filament::auth()->user()?->timezone)
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('mobile')
+                    ->translateLabel()
+                    ->searchable()
+                    ->sortable()
+                    ->wrap(),
                 Tables\Columns\BadgeColumn::make('status'),
             ])
             ->filters([

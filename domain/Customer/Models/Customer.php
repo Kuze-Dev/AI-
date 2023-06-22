@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
  * Domain\Customer\Models\Customer
@@ -47,10 +49,11 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|Customer withoutTrashed()
  * @mixin \Eloquent
  */
-class Customer extends Authenticatable
+class Customer extends Authenticatable implements HasMedia
 {
     use SoftDeletes;
     use LogsActivity;
+    use InteractsWithMedia;
 
     protected $fillable = [
         'email',
@@ -87,5 +90,11 @@ class Customer extends Authenticatable
         return Attribute::get(
             fn ($value) => "{$this->first_name} {$this->last_name}"
         );
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')
+            ->singleFile();
     }
 }
