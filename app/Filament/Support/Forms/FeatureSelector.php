@@ -65,10 +65,13 @@ class FeatureSelector extends Field
                     function (array $state, array $data, string $key) use ($component, $get) {
                         $statePath = $component->getStatePath(false) . '.' . class_basename($key);
 
-                        return $state + array_filter([
-                            $get($statePath) ? $key : null,
-                            ...$get($statePath . '_extras'),
-                        ]);
+                        return array_merge(
+                            $state,
+                            array_filter([
+                                $get($statePath) ? $key : null,
+                                ...$get($statePath . '_extras'),
+                            ])
+                        );
                     },
                     []
                 )
