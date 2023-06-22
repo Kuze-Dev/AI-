@@ -44,8 +44,8 @@ class CurrencyResource extends Resource
                 Forms\Components\Toggle::make('enabled'),
                 Forms\Components\TextInput::make('exchange_rate'),
                 Forms\Components\Toggle::make('default'),
-          
-         
+
+
             ]),
         ]);
     }
@@ -57,17 +57,17 @@ class CurrencyResource extends Resource
         return $table
             ->columns([
 
-                // Tables\Columns\CheckboxColumn::make('enabled')->label(""),
                 Tables\Columns\TextColumn::make('code')
                     ->label('Currency')
                     ->sortable()
                     ->searchable(),
-                    Tables\Columns\TextColumn::make('exchange_rate')
+                Tables\Columns\TextColumn::make('exchange_rate')
                     ->label('Exchange Rate')
                     ->sortable()
+                    ->toggleable()
                     ->searchable(),
-                  
-                    Tables\Columns\BadgeColumn::make('enabled')
+
+                Tables\Columns\BadgeColumn::make('enabled')
                     ->enum([
                         '1' => 'Selected',
                         '0' => 'Not Selected',
@@ -77,15 +77,41 @@ class CurrencyResource extends Resource
                         if ($state == '1') {
                             return 'success';
                         }
-                 
+
                         return 'secondary';
                     }),
-          
+
+                Tables\Columns\BadgeColumn::make('default')
+                    ->enum([
+                        '1' => 'Selected',
+                        '0' => 'Not Selected',
+                    ])
+                    ->color(static function ($state): string {
+                        if ($state == '1') {
+                            return 'success';
+                        }
+
+                        return 'secondary';
+                    })->toggleable(),
+                    Tables\Columns\TextColumn::make('created_at')
+                    ->sortable()
+                    ->toggleable(),
+                    Tables\Columns\TextColumn::make('updated_at')
+                    ->sortable()
+                    ->toggleable()
+
 
             ])
-            
-            ->filters([])
-            ->filtersLayout(Layout::AboveContent)
+
+            ->filters([
+                Tables\Filters\SelectFilter::make('enabled')
+                    ->label('Status')
+                    ->options([
+                        '' => 'All',
+                        '1' => 'Selected',
+                        '0' => 'Not Selected',
+                    ]),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([

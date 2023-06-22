@@ -45,5 +45,11 @@ class Currency extends Model
                 self::where('id', '!=', $currency->id)->update(['default' => false]);
             }
         });
+        
+        self::saved(function () {
+            if (!self::where('enabled', true)->exists()) {
+                self::where('default', true)->update(['enabled' => true]);
+            }
+        });
     }
 }
