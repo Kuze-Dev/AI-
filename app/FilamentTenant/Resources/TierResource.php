@@ -74,6 +74,8 @@ class TierResource extends Resource
                                 return false;
                             }
                         }),
+                    Tables\Actions\RestoreAction::make(),
+                    Tables\Actions\ForceDeleteAction::make(),
                 ]),
             ])
             ->bulkActions([

@@ -9,6 +9,7 @@ use App\FilamentTenant\Resources\TierResource;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
+use Exception;
 
 class EditTier extends EditRecord
 {
@@ -16,6 +17,7 @@ class EditTier extends EditRecord
 
     protected static string $resource = TierResource::class;
 
+    /** @throws Exception */
     protected function getActions(): array
     {
         return [
@@ -24,6 +26,8 @@ class EditTier extends EditRecord
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
+            Actions\ForceDeleteAction::make(),
+            Actions\RestoreAction::make(),
         ];
     }
 

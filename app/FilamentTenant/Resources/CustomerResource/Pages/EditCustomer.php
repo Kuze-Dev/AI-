@@ -31,6 +31,8 @@ class EditCustomer extends EditRecord
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
+            Actions\ForceDeleteAction::make(),
+            Actions\RestoreAction::make(),
         ];
     }
 

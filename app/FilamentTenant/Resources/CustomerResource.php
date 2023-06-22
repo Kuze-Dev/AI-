@@ -143,6 +143,8 @@ class CustomerResource extends Resource
                                 return false;
                             }
                         }),
+                    Tables\Actions\RestoreAction::make(),
+                    Tables\Actions\ForceDeleteAction::make(),
                 ]),
             ])
             ->bulkActions([
