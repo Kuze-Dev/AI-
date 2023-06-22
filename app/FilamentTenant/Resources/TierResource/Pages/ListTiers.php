@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\FilamentTenant\Resources\TierResource\Pages;
+
+use App\FilamentTenant\Resources\TierResource;
+use Filament\Pages\Actions;
+use Filament\Resources\Pages\ListRecords;
+
+class ListTiers extends ListRecords
+{
+    protected static string $resource = TierResource::class;
+
+    protected function getActions(): array
+    {
+        return [
+            Actions\CreateAction::make(),
+        ];
+    }
+}

@@ -11,6 +11,12 @@ class TierSeeder extends Seeder
 {
     public function run(): void
     {
-        TierFactory::new()->createOne(['name' => 'Default']);
+        TierFactory::new()
+            ->sequence(
+                ['name' => 'Default'],
+                ['name' => 'Gold'],
+            )
+            ->count(2)
+            ->create();
     }
 }

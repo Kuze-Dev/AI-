@@ -7,10 +7,10 @@ namespace App\Policies;
 use App\Features\ECommerce\ECommerceBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Illuminate\Foundation\Auth\User;
-use Domain\Customer\Models\Customer;
+use Domain\Customer\Models\Tier;
 use Illuminate\Auth\Access\Response;
 
-class CustomerPolicy
+class TierPolicy
 {
     use ChecksWildcardPermissions;
 
@@ -28,7 +28,7 @@ class CustomerPolicy
         return $this->checkWildcardPermissions($user);
     }
 
-    public function view(User $user, Customer $customer): bool
+    public function view(User $user, Tier $tier): bool
     {
         return $this->checkWildcardPermissions($user);
     }
@@ -38,22 +38,22 @@ class CustomerPolicy
         return $this->checkWildcardPermissions($user);
     }
 
-    public function update(User $user, Customer $customer): bool
+    public function update(User $user, Tier $tier): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function delete(User $user, Customer $customer): bool
+    public function delete(User $user, Tier $tier): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function restore(User $user, Customer $customer): bool
+    public function restore(User $user, Tier $tier): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function forceDelete(User $user, Customer $customer): bool
+    public function forceDelete(User $user, Tier $tier): bool
     {
         return $this->checkWildcardPermissions($user);
     }

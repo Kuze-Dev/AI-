@@ -39,6 +39,8 @@ class FilamentTenantServiceProvider extends ContextServiceProvider
             ]);
 
             Filament::registerNavigationGroups([
+                NavigationGroup::make('Customer Management')
+                    ->icon('heroicon-s-users'),
                 NavigationGroup::make('CMS')
                     ->icon('heroicon-s-document-text'),
                 NavigationGroup::make('Access')
