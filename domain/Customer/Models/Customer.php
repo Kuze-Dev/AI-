@@ -18,7 +18,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * Domain\Customer\Models\Customer
  *
  * @property int $id
- * @property int $tier_id
+ * @property int|null $tier_id
  * @property string $email
  * @property mixed|null $password
  * @property-read  string $full_name
