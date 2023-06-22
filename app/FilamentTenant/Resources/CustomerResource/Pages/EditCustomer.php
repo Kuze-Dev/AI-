@@ -6,8 +6,13 @@ namespace App\FilamentTenant\Resources\CustomerResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\CustomerResource;
+use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Actions\EditCustomerAction;
+use Domain\Customer\Actions\ForceDeleteCustomerAction;
+use Domain\Customer\Actions\RestoreCustomerAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
+use Domain\Customer\Models\Customer;
+use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
@@ -30,9 +35,27 @@ class EditCustomer extends EditRecord
                 ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
-            Actions\DeleteAction::make(),
-            Actions\ForceDeleteAction::make(),
-            Actions\RestoreAction::make(),
+            Actions\DeleteAction::make()
+                ->using(function (Customer $record) {
+                    try {
+                        return app(DeleteCustomerAction::class)->execute($record);
+                    } catch (DeleteRestrictedException $e) {
+                        return false;
+                    }
+                }),
+            Actions\ForceDeleteAction::make()
+                ->using(function (Customer $record) {
+                    try {
+                        return app(ForceDeleteCustomerAction::class)->execute($record);
+                    } catch (DeleteRestrictedException $e) {
+                        return false;
+                    }
+                }),
+            Actions\RestoreAction::make()
+                ->using(
+                    fn (Customer $record) => app(RestoreCustomerAction::class)
+                        ->execute($record)
+                ),
         ];
     }
 

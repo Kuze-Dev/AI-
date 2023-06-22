@@ -7,9 +7,12 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Customer\Actions\DeleteCustomerAction;
+use Domain\Customer\Actions\ForceDeleteCustomerAction;
+use Domain\Customer\Actions\RestoreCustomerAction;
 use Domain\Customer\Models\Customer;
 use Domain\Customer\Models\Tier;
 use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Filament\Facades\Filament;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -130,13 +133,17 @@ class CustomerResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->wrap(),
-                Tables\Columns\BadgeColumn::make('status'),
+                Tables\Columns\BadgeColumn::make('status')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime(timezone: Filament::auth()->user()?->timezone)
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('tier')
                     ->translateLabel()
-                    ->relationship('tier', 'name')
+                    ->relationship('tier', 'name'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -149,13 +156,24 @@ class CustomerResource extends Resource
                                 return false;
                             }
                         }),
-                    Tables\Actions\RestoreAction::make(),
-                    Tables\Actions\ForceDeleteAction::make(),
+                    Tables\Actions\RestoreAction::make()
+                        ->using(
+                            fn (Customer $record) => app(RestoreCustomerAction::class)
+                                ->execute($record)
+                        ),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->using(function (Customer $record) {
+                            try {
+                                return app(ForceDeleteCustomerAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
                 ]),
             ])
             ->bulkActions([
             ])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('updated_at', 'desc');
     }
 
     public static function getRelations(): array

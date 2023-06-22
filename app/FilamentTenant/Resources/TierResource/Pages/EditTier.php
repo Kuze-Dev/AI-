@@ -6,8 +6,13 @@ namespace App\FilamentTenant\Resources\TierResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\TierResource;
+use Domain\Customer\Actions\DeleteTierAction;
 use Domain\Customer\Actions\EditTierAction;
+use Domain\Customer\Actions\ForceDeleteTierAction;
+use Domain\Customer\Actions\RestoreTierAction;
 use Domain\Customer\DataTransferObjects\TierData;
+use Domain\Customer\Models\Tier;
+use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
@@ -30,9 +35,27 @@ class EditTier extends EditRecord
                 ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
-            Actions\DeleteAction::make(),
-            Actions\ForceDeleteAction::make(),
-            Actions\RestoreAction::make(),
+            Actions\DeleteAction::make()
+                ->using(function (Tier $record) {
+                    try {
+                        return app(DeleteTierAction::class)->execute($record);
+                    } catch (DeleteRestrictedException $e) {
+                        return false;
+                    }
+                }),
+            Actions\ForceDeleteAction::make()
+                ->using(function (Tier $record) {
+                    try {
+                        return app(ForceDeleteTierAction::class)->execute($record);
+                    } catch (DeleteRestrictedException $e) {
+                        return false;
+                    }
+                }),
+            Actions\RestoreAction::make()
+                ->using(
+                    fn (Tier $record) => app(RestoreTierAction::class)
+                        ->execute($record)
+                ),
         ];
     }
 
