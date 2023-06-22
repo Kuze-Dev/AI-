@@ -17,7 +17,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -83,7 +82,7 @@ class RoleResource extends Resource
                 Tables\Filters\SelectFilter::make('guard_name')
                     ->options(self::getGuards()->mapWithKeys(fn (string $guardName) => [$guardName => $guardName])),
             ])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->authorize('update'),

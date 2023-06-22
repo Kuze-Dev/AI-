@@ -393,10 +393,12 @@ class FilamentServiceProvider extends ServiceProvider
 
     protected function configureComponents(): void
     {
+        PageActions\CreateAction::configureUsing(fn (PageActions\CreateAction $action) => $action->icon('heroicon-o-plus-sm'));
         PageActions\DeleteAction::configureUsing($this->createActionConfiguration(), isImportant: true);
         PageActions\RestoreAction::configureUsing($this->createActionConfiguration(), isImportant: true);
         PageActions\ForceDeleteAction::configureUsing($this->createActionConfiguration(), isImportant: true);
 
+        TableActions\EditAction::configureUsing(fn (TableActions\EditAction $action) => $action->button());
         TableActions\DeleteAction::configureUsing($this->createActionConfiguration(), isImportant: true);
         TableActions\RestoreAction::configureUsing($this->createActionConfiguration(), isImportant: true);
         TableActions\ForceDeleteAction::configureUsing($this->createActionConfiguration(), isImportant: true);
