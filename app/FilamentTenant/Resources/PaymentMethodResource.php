@@ -19,6 +19,7 @@ use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
+use Throwable;
 
 class PaymentMethodResource extends Resource
 {
@@ -85,8 +86,10 @@ class PaymentMethodResource extends Resource
                         ->disableAddingRows()
                         ->disableEditingKeys()
                         ->disableDeletingRows()
-                        ->formatStateUsing(function () {
-
+                        ->formatStateUsing(function ($record) {
+                            if ($record) {
+                                return $record->credentials;
+                            }
                             return [
                                 'paypal_secret_id' => '',
                                 'paypal_secret_key' => '',
