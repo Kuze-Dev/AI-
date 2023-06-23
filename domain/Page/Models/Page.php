@@ -151,4 +151,13 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
     {
         return $this->slug === 'home';
     }
+
+    /** @return array */
+    public static function searchableColumns(): array
+    {
+        return [
+            'name',
+            'slug',
+        ];
+    }
 }

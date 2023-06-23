@@ -176,4 +176,13 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
     {
         return $this->belongsTo(Admin::class, 'author_id');
     }
+
+    /** @return array */
+    public static function searchableColumns(): array
+    {
+        return [
+            'title',
+            'slug',
+        ];
+    }
 }
