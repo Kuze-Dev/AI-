@@ -22,7 +22,6 @@ class UpdateProductAction
     {
         $product->update($this->getProductAttributes($productData));
 
-
         $product->metaData()->exists()
             ? $this->updateMetaData->execute($product, $productData->meta_data)
             : $this->createMetaData->execute($product, $productData->meta_data);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Support\MetaDataForm;
@@ -18,7 +20,6 @@ use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Builder;
-use App\FilamentTenant\Support\SchemaFormBuilder;
 
 class ProductResource extends Resource
 {
@@ -73,7 +74,7 @@ class ProductResource extends Resource
                                 Forms\Components\Hidden::make('taxonomy_terms')
                                     ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                             ])
-                            ->when(fn () => !empty($taxonomies->toArray())),
+                            ->when(fn () => ! empty($taxonomies->toArray())),
                         Forms\Components\RichEditor::make('description')->required(),
                         Forms\Components\FileUpload::make('image')
                             ->label('Media')
@@ -158,8 +159,7 @@ class ProductResource extends Resource
 
                                         Forms\Components\Toggle::make('status')
                                             ->label(
-                                                fn ($state) =>
-                                                $state ? 'Active' : 'Inactive'
+                                                fn ($state) => $state ? 'Active' : 'Inactive'
                                             )
                                             ->helperText('This product will be hidden from all sales channels.'),
 
@@ -174,7 +174,7 @@ class ProductResource extends Resource
                                             ])
                                             ->disableItemMovement()
                                             ->defaultItems(1)
-                                            ->columns(2)
+                                            ->columns(2),
                                     ]),
                             ])->hiddenOn('create'),
                     ]),
@@ -217,13 +217,12 @@ class ProductResource extends Resource
                         ->schema([
                             Forms\Components\Toggle::make('status')
                                 ->label(
-                                    fn ($state) =>
-                                    $state ? 'Active' : 'Inactive'
+                                    fn ($state) => $state ? 'Active' : 'Inactive'
                                 )
                                 ->helperText('This product will be hidden from all sales channels.'),
                         ]),
-                    MetaDataForm::make('Meta Data')
-                ])->columnSpan(1)
+                    MetaDataForm::make('Meta Data'),
+                ])->columnSpan(1),
             ]);
     }
 
@@ -280,7 +279,7 @@ class ProductResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+
         ];
     }
 

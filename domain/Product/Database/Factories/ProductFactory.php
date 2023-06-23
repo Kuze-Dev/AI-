@@ -12,7 +12,7 @@ class ProductFactory extends Factory
     protected $model = Product::class;
 
     public function definition(): array
-    { 
+    {
         return [
             'name' => $this->faker->unique()->word,
             'sku' => $this->faker->unique()->word,

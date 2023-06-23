@@ -3,14 +3,12 @@
 declare(strict_types=1);
 
 use Domain\Product\Models\Product;
-use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class() extends Migration
-{
+return new class () extends Migration {
     /** Run the migrations. */
     public function up(): void
     {

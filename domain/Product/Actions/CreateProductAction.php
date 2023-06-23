@@ -17,7 +17,7 @@ class CreateProductAction
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
     ) {
     }
-    
+
     public function execute(ProductData $productData): Product
     {
         /** @var Product $product */
@@ -26,7 +26,6 @@ class CreateProductAction
         $this->createMetaTags->execute($product, $productData->meta_data);
 
         // $this->createOrUpdateRouteUrl->execute($product, $productData->route_url_data);
-
 
         if ($productData->image instanceof UploadedFile && $imageString = $productData->image->get()) {
             $product->addMediaFromString($imageString)

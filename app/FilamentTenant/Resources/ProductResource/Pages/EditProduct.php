@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Resources\ProductResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
@@ -29,7 +31,7 @@ class EditProduct extends EditRecord implements HasTreesContract
                 ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
-                TreeFormAction::make(),
+            TreeFormAction::make(),
             Actions\DeleteAction::make(),
         ];
     }

@@ -63,7 +63,7 @@ class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, 
         'is_featured',
         'is_special_offer',
         'allow_customer_remarks',
-        'allow_remark_with_image'
+        'allow_remark_with_image',
     ];
 
     /**
