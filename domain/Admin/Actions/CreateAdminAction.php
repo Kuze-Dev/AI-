@@ -15,8 +15,13 @@ class CreateAdminAction
         /** @var Admin $admin */
         $admin = Admin::create($this->getAdminAttributes($adminData));
 
-        $admin->syncRoles($adminData->roles);
-        $admin->syncPermissions($adminData->permissions);
+        if ($adminData->roles !== null) {
+            $admin->syncRoles($adminData->roles);
+        }
+
+        if ($adminData->permissions !== null) {
+            $admin->syncPermissions($adminData->permissions);
+        }
 
         event(new Registered($admin));
 

@@ -17,7 +17,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Facades\Auth;
 use Closure;
 
@@ -43,18 +42,12 @@ class GlobalsResource extends Resource
                     ->unique(ignoreRecord: true)
                     ->required(),
                 Forms\Components\Select::make('blueprint_id')
-                    ->options(
-                        fn () => Blueprint::orderBy('name')
-                            ->pluck('name', 'id')
-                            ->toArray()
-                    )
+                    ->label(trans('Blueprint'))
                     ->required()
-                    ->exists(Blueprint::class, 'id')
-                    ->searchable()
-                    ->reactive()
                     ->preload()
-                    ->disabled(fn (?Globals $record) => $record !== null),
-
+                    ->optionsFromModel(Blueprint::class, 'name')
+                    ->disabled(fn (?Globals $record) => $record !== null)
+                    ->reactive(),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
                     ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
@@ -79,7 +72,7 @@ class GlobalsResource extends Resource
                     ->searchable()
                     ->optionsLimit(20),
             ])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([

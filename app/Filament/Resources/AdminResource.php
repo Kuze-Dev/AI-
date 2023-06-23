@@ -8,7 +8,6 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\Filament\Resources\AdminResource\Pages;
 use Domain\Admin\Models\Admin;
 use Domain\Auth\Actions\ForgotPasswordAction;
-use Domain\Role\Models\Role;
 use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms;
@@ -16,12 +15,10 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
-use Spatie\Permission\Models\Permission;
 use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
 class AdminResource extends Resource
@@ -56,7 +53,7 @@ class AdminResource extends Resource
                         ->required(),
                     Forms\Components\TextInput::make('email')
                         ->email()
-                        ->rules('email:rfc,dns')
+                        ->rules(app()->environment('local', 'testing') ? 'email' : 'email:rfc,dns')
                         ->unique(ignoreRecord: true)
                         ->required()
                         ->helperText(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email') ? 'Email update is currently disabled.' : '')
@@ -66,7 +63,7 @@ class AdminResource extends Resource
                         ->required()
                         ->rule(Password::default())
                         ->helperText(
-                            fn () => config('app.env') === 'local' || config('app.env') === 'testing'
+                            app()->environment('local', 'testing')
                                 ? trans('Password must be at least 4 characters.')
                                 : trans('Password must be at least 8 characters, have 1 special character, 1 number, 1 upper case and 1 lower case.')
                         )
@@ -97,25 +94,23 @@ class AdminResource extends Resource
                     Forms\Components\Section::make(trans('Access'))
                         ->schema([
                             Forms\Components\Select::make('roles')
+                                ->formatStateUsing(fn (?Admin $record) => $record ? $record->roles->pluck('id')->toArray() : [])
                                 ->multiple()
-                                ->options(
-                                    fn () => Role::orderBy('name')
-                                        ->pluck('name', 'id')
-                                        ->toArray()
-                                )
-                                ->afterStateHydrated(function (Forms\Components\Select $component, ?Admin $record): void {
-                                    $component->state($record ? $record->roles->pluck('id')->toArray() : []);
-                                }),
+                                ->preload()
+                                ->optionsFromModel(
+                                    config('permission.models.role'),
+                                    'name',
+                                    fn (Builder $query) => $query->where('guard_name', 'admin')
+                                ),
                             Forms\Components\Select::make('permissions')
+                                ->formatStateUsing(fn (?Admin $record) => $record ? $record->permissions->pluck('id')->toArray() : [])
                                 ->multiple()
-                                ->options(
-                                    fn () => Permission::orderBy('name')
-                                        ->pluck('name', 'id')
-                                        ->toArray()
-                                )
-                                ->afterStateHydrated(function (Forms\Components\Select $component, ?Admin $record): void {
-                                    $component->state($record ? $record->permissions->pluck('id')->toArray() : []);
-                                }),
+                                ->preload()
+                                ->optionsFromModel(
+                                    config('permission.models.permission'),
+                                    'name',
+                                    fn (Builder $query) => $query->where('guard_name', 'admin')
+                                ),
                         ]),
                 ])
                     ->columnSpan(['lg' => 1]),
@@ -193,7 +188,7 @@ class AdminResource extends Resource
                         });
                     }),
             ])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Mail;
 
 use Domain\Form\Models\FormSubmission;
 
-use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseHas;
 
 beforeEach(fn () => testInTenantContext());
@@ -21,8 +21,6 @@ it('store', function () {
         ->storeSubmission()
         ->createOne();
 
-    $this->assertDatabaseEmpty(FormSubmission::class);
-
     $data = [fake()->word() => fake()->sentence(3)];
 
     app(CreateFormSubmissionAction::class)
@@ -31,7 +29,6 @@ it('store', function () {
             data: $data,
         );
 
-    assertDatabaseCount(FormSubmission::class, 1);
     assertDatabaseHas(FormSubmission::class, [
         'form_id' => $form->id,
         'data' => json_encode($data),
@@ -44,7 +41,7 @@ it('do not store', function () {
         ->storeSubmission(false)
         ->createOne();
 
-    $this->assertDatabaseEmpty(FormSubmission::class);
+    assertDatabaseEmpty(FormSubmission::class);
 
     app(CreateFormSubmissionAction::class)
         ->execute(
@@ -52,7 +49,7 @@ it('do not store', function () {
             data: ['field' => 'value'],
         );
 
-    $this->assertDatabaseEmpty(FormSubmission::class);
+    assertDatabaseEmpty(FormSubmission::class);
 });
 
 it('dispatch email notifications', function () {

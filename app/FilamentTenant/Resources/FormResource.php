@@ -17,7 +17,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 use Filament\Resources\RelationManagers\RelationGroup;
@@ -45,17 +44,12 @@ class FormResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->required(),
                     Forms\Components\Select::make('blueprint_id')
-                        ->options(
-                            fn () => Blueprint::orderBy('name')
-                                ->pluck('name', 'id')
-                                ->toArray()
-                        )
-                        ->disabled(fn (?FormModel $record) => $record !== null)
+                        ->label(trans('Blueprint'))
                         ->required()
-                        ->exists(Blueprint::class, 'id')
-                        ->searchable()
-                        ->reactive()
-                        ->preload(),
+                        ->preload()
+                        ->optionsFromModel(Blueprint::class, 'name')
+                        ->disabled(fn (?FormModel $record) => $record !== null)
+                        ->reactive(),
                     Forms\Components\Toggle::make('store_submission'),
                     Forms\Components\Toggle::make('uses_captcha')
                         ->disabled(fn (FormSettings $formSettings) => ! $formSettings->provider)
@@ -188,7 +182,7 @@ class FormResource extends Resource
                     ->sortable(),
             ])
             ->filters([])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([

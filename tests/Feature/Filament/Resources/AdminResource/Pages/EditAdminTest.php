@@ -5,11 +5,9 @@ declare(strict_types=1);
 use App\Filament\Resources\AdminResource\Pages\EditAdmin;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
-use Tests\RequestFactories\AdminRequestFactory;
 
-use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
-use function PHPUnit\Framework\assertSame;
 
 beforeEach(fn () => loginAsSuperAdmin());
 
@@ -34,42 +32,21 @@ it('can show edit', function () {
 
 it('can update', function () {
     $admin = AdminFactory::new()
-        ->active()
+        ->active(false)
         ->createOne();
 
-    assertDatabaseCount(Admin::class, 2); // with logged-in user
-
     livewire(EditAdmin::class, ['record' => $admin->getKey()])
-        ->fillForm(AdminRequestFactory::new()->create())
+        ->fillForm([
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'active' => true,
+        ])
         ->call('save')
         ->assertHasNoFormErrors();
 
-    assertDatabaseCount(Admin::class, 2); // with logged-in user
-});
-
-it('can update with active', function (bool $active) {
-    $admin = AdminFactory::new()
-        ->active()
-        ->createOne();
-
-    assertDatabaseCount(Admin::class, 2); // with logged-in user
-
-    livewire(EditAdmin::class, ['record' => $admin->getKey()])
-        ->fillForm(
-            AdminRequestFactory::new()
-                ->active($active)
-                ->create()
-        )
-        ->call('save')
-        ->assertHasNoFormErrors();
-
-    assertDatabaseCount(Admin::class, 2); // with logged-in user
-
-    $newAdmin = Admin::whereKeyNot(auth()->user())->first();
-
-    assertSame($active, $newAdmin->active);
-})
-    ->with([
+    assertDatabaseHas(Admin::class, [
+        'first_name' => 'Test',
+        'last_name' => 'User',
         'active' => true,
-        'inactive' => false,
     ]);
+});

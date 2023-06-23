@@ -12,8 +12,14 @@ class UpdateAdminAction
     public function execute(Admin $admin, AdminData $adminData): Admin
     {
         $admin->update($this->getAdminAttributes($adminData));
-        $admin->syncRoles($adminData->roles);
-        $admin->syncPermissions($adminData->permissions);
+
+        if ($adminData->roles !== null) {
+            $admin->syncRoles($adminData->roles);
+        }
+
+        if ($adminData->permissions !== null) {
+            $admin->syncPermissions($adminData->permissions);
+        }
 
         if ($admin->wasChanged('email')) {
             $admin->forceFill(['email_verified_at' => null])

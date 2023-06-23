@@ -4,13 +4,24 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Features\CMS\CMSBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Taxonomy\Models\Taxonomy;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
 
 class TaxonomyPolicy
 {
     use ChecksWildcardPermissions;
+
+    public function before(): ?Response
+    {
+        if ( ! tenancy()->tenant?->features()->active(CMSBase::class)) {
+            return Response::denyAsNotFound();
+        }
+
+        return null;
+    }
 
     public function viewAny(User $user): bool
     {

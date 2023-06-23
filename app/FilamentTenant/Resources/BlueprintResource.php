@@ -22,7 +22,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -90,7 +89,7 @@ class BlueprintResource extends Resource
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make(),
 
@@ -200,6 +199,8 @@ class BlueprintResource extends Resource
                     ->helperText(new HtmlString(<<<HTML
                             Rules should be separated with "|". Available rules can be found on <a href="https://laravel.com/docs/validation#available-validation-rules" class="text-primary-500" target="_blank" rel="noopener noreferrer">Laravel's Documentation</a>.
                         HTML)),
+                Forms\Components\TextInput::make('helper_text')
+                    ->columnSpanFull(),
                 Forms\Components\Section::make('Field Options')
                     ->id('field-options')
                     ->collapsible()

@@ -9,6 +9,7 @@ use Carbon\CarbonInterval;
 use DateInterval;
 use Filament\Forms\ComponentContainer;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\ActivityLogger;
 use Spatie\Activitylog\Contracts\Activity;
@@ -19,18 +20,10 @@ use Spatie\Activitylog\Contracts\Activity;
  */
 trait LogsFormActivity
 {
-    protected static string $logName = 'admin';
-
-    protected static bool $logOnlyDirty = true;
-
     public array $initialFormState;
 
     public function afterFill(): void
     {
-        if ( ! $this->shouldLogInitialState()) {
-            return;
-        }
-
         $state = $this->form->getRawState();
 
         $this->form->dehydrateState($state);
@@ -43,25 +36,40 @@ trait LogsFormActivity
 
     protected function afterCreate(): void
     {
-        $this->logFormActivity('created');
+        if ($this->formIsDirty()) {
+            $this->logFormActivity('created');
+        }
     }
 
     protected function afterSave(): void
     {
-        $this->logFormActivity('updated');
+        if ($this->formIsDirty()) {
+            $this->logFormActivity('updated');
+        }
+    }
+
+    protected function formIsDirty(): bool
+    {
+        return count($this->formChanges()) > 0;
     }
 
     protected function logFormActivity(string $event, string $description = null): ?Activity
     {
-        return app(ActivityLogger::class)
-            ->useLog(self::$logName)
+        $activityLogger = app(ActivityLogger::class)
+            ->useLog($this->getLogName())
             ->event($event)
-            ->when(
-                $this->hasProperty('record'),
-                fn (ActivityLogger $activityLogger) => $activityLogger->performedOn($this->record)
-            )
-            ->withProperties($this->getActivityProperties())
-            ->log($description ?? $this->getDescriptionForEvent($event));
+            ->withProperties($this->getActivityProperties());
+
+        if ($record = $this->logsPerformedOn()) {
+            $activityLogger->performedOn($record);
+        }
+
+        return $activityLogger->log($description ?? $this->getDescriptionForEvent($event));
+    }
+
+    protected function getLogName(): string
+    {
+        return 'admin';
     }
 
     protected function getActivityProperties(): array
@@ -72,29 +80,8 @@ trait LogsFormActivity
             $properties['old'] = $this->initialFormState;
         }
 
-        if (self::$logOnlyDirty && isset($properties['old'])) {
-            // Snippet copied from https://github.com/spatie/laravel-activitylog/blob/1f5d1b966187b2d11995d0d1898a2d4fb44b5c67/src/Traits/LogsActivity.php#L295-L319
-            $properties['attributes'] = array_udiff_assoc(
-                $properties['attributes'],
-                $properties['old'],
-                function ($new, $old) {
-                    // Strict check for php's weird behaviors
-                    if ($old === null || $new === null) {
-                        return $new === $old ? 0 : 1;
-                    }
-
-                    // Handles Date interval comparisons since php cannot use spaceship
-                    // Operator to compare them and will throw ErrorException.
-                    if ($old instanceof DateInterval) {
-                        return CarbonInterval::make($old)?->equalTo($new) ? 0 : 1;
-                    } elseif ($new instanceof DateInterval) {
-                        return CarbonInterval::make($new)?->equalTo($old) ? 0 : 1;
-                    }
-
-                    return $new <=> $old;
-                }
-            );
-
+        if ($this->shouldLogOnlyDirty() && isset($properties['old'])) {
+            $properties['attributes'] = $this->formChanges();
             $properties['old'] = collect($properties['old'])
                 ->only(array_keys($properties['attributes']))
                 ->all();
@@ -103,10 +90,45 @@ trait LogsFormActivity
         return $properties;
     }
 
+    protected function shouldLogOnlyDirty(): bool
+    {
+        return true;
+    }
+
     protected function shouldLogInitialState(): bool
     {
         /** @phpstan-ignore-next-line See https://github.com/phpstan/phpstan/issues/3632 */
         return $this instanceof EditRecord || $this instanceof BaseSettings;
+    }
+
+    protected function formChanges(): array
+    {
+        // Snippet copied from https://github.com/spatie/laravel-activitylog/blob/1f5d1b966187b2d11995d0d1898a2d4fb44b5c67/src/Traits/LogsActivity.php#L295-L319
+        return array_udiff_assoc(
+            $this->form->getState(),
+            $this->initialFormState,
+            function ($new, $old) {
+                // Strict check for php's weird behaviors
+                if ($old === null || $new === null) {
+                    return $new === $old ? 0 : 1;
+                }
+
+                // Handles Date interval comparisons since php cannot use spaceship
+                // Operator to compare them and will throw ErrorException.
+                if ($old instanceof DateInterval) {
+                    return CarbonInterval::make($old)?->equalTo($new) ? 0 : 1;
+                } elseif ($new instanceof DateInterval) {
+                    return CarbonInterval::make($new)?->equalTo($old) ? 0 : 1;
+                }
+
+                return $new <=> $old;
+            }
+        );
+    }
+
+    protected function logsPerformedOn(): ?Model
+    {
+        return $this->hasProperty('record') ? $this->record : null;
     }
 
     protected function getDescriptionForEvent(string $event): string
