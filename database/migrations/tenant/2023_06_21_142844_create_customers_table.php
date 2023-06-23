@@ -28,10 +28,10 @@ return new class () extends Migration {
 
             $table->string('email')->unique();
             $table->string('password')->nullable();
-            $table->string('first_name');
-            $table->string('last_name');
+            $table->string('first_name')->index();
+            $table->string('last_name')->index();
             $table->string('mobile');
-            $table->string('status')->default(Status::ACTIVE->value);
+            $table->string('status')->default(Status::ACTIVE->value)->index();
 
             $table->date('birth_date');
             $table->timestamps();
