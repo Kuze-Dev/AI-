@@ -3,6 +3,7 @@
 namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Support\MetaDataForm;
+use App\FilamentTenant\Support\Tree;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Product\Models\Product;
 use Filament\Resources\Form;
@@ -14,9 +15,10 @@ use Filament\Forms;
 use Closure;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Arr;
+use Illuminate\Database\Eloquent\Builder;
+use App\FilamentTenant\Support\SchemaFormBuilder;
 
 class ProductResource extends Resource
 {
@@ -94,25 +96,117 @@ class ProductResource extends Resource
                     Forms\Components\Section::make('Shipping')
                         ->schema([
                             Forms\Components\TextInput::make('shipping_fee')
+                                ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
+                                    prefix: '$',
+                                    thousandsSeparator: ',',
+                                    decimalPlaces: 2,
+                                    isSigned: false
+                                ))
                                 ->dehydrateStateUsing(fn ($state) => (float) $state)
                                 ->helperText('Leave this field blank if there is no shipping fee.'),
                         ]),
+                    // Reference: Block & Taxonomy
+                    Forms\Components\Section::make(trans('Variants (work in progress)'))->schema([
+                        Tree::make('variants')
+                            ->formatStateUsing(
+                                fn () => []
+                            )
+                            ->itemLabel(fn (array $state) => $state['name'] ?? null)
+                            ->schema([
+                                Forms\Components\Grid::make(['md' => 1])
+                                    ->schema([
+                                        Forms\Components\TextInput::make('variant_name')
+                                            ->required()
+                                            ->unique(ignoreRecord: true),
+                                    ]),
+                                Forms\Components\FileUpload::make('image')
+                                    ->label('Product Image')
+                                    // ->mediaLibraryCollection('image')
+                                    ->image()
+                                    ->required(),
+                                Forms\Components\Section::make('Inventory & Shipping')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('sku')
+                                            ->unique(ignoreRecord: true)
+                                            ->required(),
+                                        Forms\Components\TextInput::make('stock')
+                                            ->numeric()
+                                            ->dehydrateStateUsing(fn ($state) => (int) $state)
+                                            ->required(),
+                                    ])->columns(2),
+                                Forms\Components\Section::make('Pricing')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('retail_price')
+                                            ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
+                                                prefix: '$',
+                                                thousandsSeparator: ',',
+                                                decimalPlaces: 2,
+                                                isSigned: false
+                                            ))
+                                            ->dehydrateStateUsing(fn ($state) => (float) $state)
+                                            ->required(),
+
+                                        Forms\Components\TextInput::make('selling_price')
+                                            ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
+                                                prefix: '$',
+                                                thousandsSeparator: ',',
+                                                decimalPlaces: 2,
+                                                isSigned: false
+                                            ))
+                                            ->dehydrateStateUsing(fn ($state) => (float) $state)
+                                            ->required(),
+
+                                        Forms\Components\Toggle::make('status')
+                                            ->label(
+                                                fn ($state) =>
+                                                $state ? 'Active' : 'Inactive'
+                                            )
+                                            ->helperText('This product will be hidden from all sales channels.'),
+
+                                    ])->columns(2),
+                                // Reference: TenantResource
+                                Forms\Components\Section::make('Dynamic Attributes')
+                                    ->schema([
+                                        Forms\Components\Repeater::make('dynamic_attributes')
+                                            ->schema([
+                                                Forms\Components\TextInput::make('attribute_name')->required(),
+                                                Forms\Components\TextInput::make('attribute_value')->required(),
+                                            ])
+                                            ->disableItemMovement()
+                                            ->defaultItems(1)
+                                            ->columns(2)
+                                    ]),
+                            ])->hiddenOn('create'),
+                    ]),
                     Forms\Components\Section::make('Inventory')
                         ->schema([
                             Forms\Components\TextInput::make('sku')
                                 ->unique(ignoreRecord: true)
                                 ->required(),
                             Forms\Components\TextInput::make('stock')
+                                ->numeric()
                                 ->dehydrateStateUsing(fn ($state) => (int) $state)
                                 ->required(),
-
                         ])->columns(2),
                     Forms\Components\Section::make('Pricing')
                         ->schema([
                             Forms\Components\TextInput::make('retail_price')
+                                ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
+                                    prefix: '$',
+                                    thousandsSeparator: ',',
+                                    decimalPlaces: 2,
+                                    isSigned: false
+                                ))
                                 ->dehydrateStateUsing(fn ($state) => (float) $state)
                                 ->required(),
+
                             Forms\Components\TextInput::make('selling_price')
+                                ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
+                                    prefix: '$',
+                                    thousandsSeparator: ',',
+                                    decimalPlaces: 2,
+                                    isSigned: false
+                                ))
                                 ->dehydrateStateUsing(fn ($state) => (float) $state)
                                 ->required(),
 
@@ -150,16 +244,26 @@ class ProductResource extends Resource
                     ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive')
                     ->color(fn (Product $record) => $record->status ? 'success' : 'secondary')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Last Modified')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\TernaryFilter::make('status')
-                    ->label(trans('Status'))
-                    ->trueLabel('Active')
-                    ->falseLabel('Inactive')
-                    ->nullable(),
+                Tables\Filters\SelectFilter::make('status')
+                    ->options(['1' => 'Active', '0' => 'Inactive'])
+                    ->query(function (Builder $query, array $data) {
+                        $query->when(filled($data['value']), function (Builder $query) use ($data) {
+                            $query->when(filled($data['value']), function (Builder $query) use ($data) {
+                                /** @var Prodct|Builder $query */
+                                match ($data['value']) {
+                                    '1' => $query->where('status', true),
+                                    '0' => $query->where('status', false),
+                                    default => '',
+                                };
+                            });
+                        });
+                    }),
             ])
             ->filtersLayout(Layout::AboveContent)
             ->actions([
@@ -170,8 +274,7 @@ class ProductResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ])
-            ->defaultSort('created_at', 'desc');
+            ]);
     }
 
     public static function getRelations(): array
