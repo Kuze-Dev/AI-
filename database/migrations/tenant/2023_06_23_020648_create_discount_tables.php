@@ -17,6 +17,7 @@ return new class () extends Migration {
             $table->string('name')->index();
             $table->text('description')->nullable();
             $table->string('type')->index();
+            $table->float('amount', 8, 2);
             $table->string('status')->index();
             $table->unsignedInteger('max_uses');
             $table->unsignedInteger('max_uses_per_user');

@@ -6,5 +6,6 @@ namespace Domain\Discount\Enums;
 
 enum DiscountConditionType: string
 {
-    case SAMPLE_CODE = 'sample_code';
+    case ORDER_SUB_TOTAL = 'order_sub_total';
+    case DELIVERY_FEE = 'delivery_fee';
 }

@@ -51,6 +51,7 @@ class Discount extends Model
         'name',
         'description',
         'type',
+        'amount',
         'status',
         'max_uses',
         'max_uses_per_user',

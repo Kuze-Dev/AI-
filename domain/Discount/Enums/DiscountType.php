@@ -6,5 +6,6 @@ namespace Domain\Discount\Enums;
 
 enum DiscountType: string
 {
-    case SAMPLE_CODE = 'sample_code';
+    case FIXED_VALUE = 'fixed_value';
+    case PERCENTAGE = 'percentage';
 }
