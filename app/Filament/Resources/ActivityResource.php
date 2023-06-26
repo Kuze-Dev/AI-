@@ -13,7 +13,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Support\Arr;
@@ -147,7 +146,7 @@ class ActivityResource extends Resource
                     ->options(self::getModel()::distinct()->pluck('log_name')->mapWithKeys(fn ($value) => [$value => Str::headline($value)]))
                     ->default('admin'),
             ])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->translateLabel(),

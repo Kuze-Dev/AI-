@@ -15,7 +15,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Exception;
 use Closure;
 use Domain\Page\Actions\DeleteBlockAction;
@@ -102,7 +101,7 @@ class BlockResource extends Resource
                 ])->space(2),
             ])
             ->filters([])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
