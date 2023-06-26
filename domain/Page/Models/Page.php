@@ -22,6 +22,8 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
+use Domain\Support\Payments\Interfaces\PayableInterface;
+use Domain\Support\Payments\Models\Traits\HasPayments;
 
 /**
  * Domain\Page\Models\Page
@@ -60,13 +62,14 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  */
 
 #[OnDeleteCascade(['blockContents', 'metaData', 'routeUrls'])]
-class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
+class Page extends Model implements HasMetaDataContract, HasRouteUrlContact, PayableInterface
 {
     use LogsActivity;
     use HasSlug;
     use HasRouteUrl;
     use HasMetaData;
     use ConstraintsRelationships;
+    use HasPayments;
 
     protected $fillable = [
         'author_id',

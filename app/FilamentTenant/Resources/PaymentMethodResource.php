@@ -73,6 +73,10 @@ class PaymentMethodResource extends Resource
                         ->inline(false)
                         ->helperText('If enabled, message here')
                         ->reactive(),
+                     Forms\Components\Toggle::make('live')
+                        ->inline(false)
+                        ->helperText('If enabled, message here')
+                        ->reactive(),
                     Forms\Components\Select::make('gateway')
                         ->required()
                         ->options([

@@ -20,6 +20,7 @@ use Domain\Page\Models\Block;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Support\Captcha\CaptchaManager;
 use Domain\Support\MetaData\Models\MetaData;
+use Domain\Support\Payments\Models\Payment;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\MissingAttributeException;
@@ -70,6 +71,7 @@ class AppServiceProvider extends ServiceProvider
             Globals::class,
             MetaData::class,
             PaymentMethod::class,
+            Payment::class,
         ]);
 
         Password::defaults(
