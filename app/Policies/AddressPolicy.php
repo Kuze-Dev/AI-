@@ -6,9 +6,9 @@ namespace App\Policies;
 
 use App\Features\ECommerce\ECommerceBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
-use Illuminate\Foundation\Auth\User;
-use Domain\Customer\Models\Address;
+use Domain\Address\Models\Address;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Foundation\Auth\User;
 
 class AddressPolicy
 {

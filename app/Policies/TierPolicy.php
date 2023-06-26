@@ -6,9 +6,9 @@ namespace App\Policies;
 
 use App\Features\ECommerce\ECommerceBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
-use Illuminate\Foundation\Auth\User;
-use Domain\Customer\Models\Tier;
+use Domain\Tier\Models\Tier;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Foundation\Auth\User;
 
 class TierPolicy
 {

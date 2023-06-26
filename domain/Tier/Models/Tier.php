@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Domain\Customer\Models;
+namespace Domain\Tier\Models;
 
+use Domain\Customer\Models\Customer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;

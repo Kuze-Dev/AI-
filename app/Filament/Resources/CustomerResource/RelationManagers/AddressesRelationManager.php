@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerResource\RelationManagers;
 
-use Domain\Customer\Actions\DeleteAddressAction;
-use Domain\Customer\Models\Address;
+use Domain\Address\Actions\DeleteAddressAction;
+use Domain\Address\Models\Address;
 use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Exception;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Exception;
 
 class AddressesRelationManager extends RelationManager
 {

@@ -6,17 +6,17 @@ namespace App\FilamentTenant\Resources\TierResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\TierResource;
-use Domain\Customer\Actions\DeleteTierAction;
-use Domain\Customer\Actions\EditTierAction;
-use Domain\Customer\Actions\ForceDeleteTierAction;
-use Domain\Customer\Actions\RestoreTierAction;
-use Domain\Customer\DataTransferObjects\TierData;
-use Domain\Customer\Models\Tier;
 use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Domain\Tier\Actions\DeleteTierAction;
+use Domain\Tier\Actions\EditTierAction;
+use Domain\Tier\Actions\ForceDeleteTierAction;
+use Domain\Tier\Actions\RestoreTierAction;
+use Domain\Tier\DataTransferObjects\TierData;
+use Domain\Tier\Models\Tier;
+use Exception;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
-use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -65,7 +65,7 @@ class EditTier extends EditRecord
     }
 
     /**
-     * @param \Domain\Customer\Models\Tier$record
+     * @param \Domain\Tier\Models\Tier$record
      * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model

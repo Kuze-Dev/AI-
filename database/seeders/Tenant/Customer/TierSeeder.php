@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Tenant\Customer;
 
-use Domain\Customer\Database\Factories\TierFactory;
+use Domain\Tier\Database\Factories\TierFactory;
 use Illuminate\Database\Seeder;
 
 class TierSeeder extends Seeder

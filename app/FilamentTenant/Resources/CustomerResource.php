@@ -11,18 +11,17 @@ use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Actions\ForceDeleteCustomerAction;
 use Domain\Customer\Actions\RestoreCustomerAction;
 use Domain\Customer\Models\Customer;
-use Domain\Customer\Models\Tier;
 use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Domain\Tier\Models\Tier;
+use Exception;
 use Filament\Facades\Filament;
+use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Exception;
-use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class CustomerResource extends Resource

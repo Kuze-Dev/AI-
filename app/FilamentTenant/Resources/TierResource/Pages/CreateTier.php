@@ -6,8 +6,8 @@ namespace App\FilamentTenant\Resources\TierResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\TierResource;
-use Domain\Customer\Actions\CreateTierAction;
-use Domain\Customer\DataTransferObjects\TierData;
+use Domain\Tier\Actions\CreateTierAction;
+use Domain\Tier\DataTransferObjects\TierData;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;

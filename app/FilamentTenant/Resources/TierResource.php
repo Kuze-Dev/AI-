@@ -7,20 +7,20 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\TierResource\RelationManagers\CustomersRelationManager;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Domain\Customer\Actions\DeleteTierAction;
-use Domain\Customer\Actions\ForceDeleteTierAction;
-use Domain\Customer\Actions\RestoreTierAction;
-use Domain\Customer\Models\Tier;
 use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Domain\Tier\Actions\DeleteTierAction;
+use Domain\Tier\Actions\ForceDeleteTierAction;
+use Domain\Tier\Actions\RestoreTierAction;
+use Domain\Tier\Models\Tier;
+use Exception;
 use Filament\Facades\Filament;
+use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms;
 
 class TierResource extends Resource
 {
@@ -122,7 +122,7 @@ class TierResource extends Resource
         ];
     }
 
-    /** @return Builder<\Domain\Customer\Models\Tier> */
+    /** @return Builder<\Domain\Tier\Models\Tier> */
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Domain\Customer\Actions;
+namespace Domain\Address\Actions;
 
-use Domain\Customer\Models\Address;
+use Domain\Address\Models\Address;
 
 class DeleteAddressAction
 {

@@ -6,6 +6,7 @@ namespace Domain\Customer\Database\Factories;
 
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
+use Domain\Tier\Database\Factories\TierFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
 

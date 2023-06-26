@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Customer\Models;
 
+use Domain\Address\Models\Address;
 use Domain\Customer\Enums\Status;
+use Domain\Tier\Models\Tier;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -33,11 +35,11 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Customer\Models\Address> $addresses
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Address\Models\Address> $addresses
  * @property-read int|null $addresses_count
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
- * @property-read \Domain\Customer\Models\Tier|null $tier
+ * @property-read \Domain\Tier\Models\Tier|null $tier
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer onlyTrashed()
@@ -108,7 +110,7 @@ class Customer extends Authenticatable implements HasMedia
             ->singleFile();
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Tier, \Domain\Customer\Models\Customer> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Tier\Models\Tier, \Domain\Customer\Models\Customer> */
     public function tier(): BelongsTo
     {
         return $this->belongsTo(Tier::class);

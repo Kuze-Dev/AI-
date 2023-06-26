@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Domain\Customer\Actions;
+namespace Domain\Tier\Actions;
 
-use Domain\Customer\Models\Tier;
+use Domain\Tier\Models\Tier;
 
 class RestoreTierAction
 {
