@@ -21,7 +21,9 @@ class DatabaseSeeder extends Seeder
             Currency\CurrencySeeder::class,
             Address\CountrySeeder::class,
             Address\StateSeeder::class,
+            Address\RegionSeeder::class,
             Address\CitySeeder::class,
+          
         ]);
     }
 }

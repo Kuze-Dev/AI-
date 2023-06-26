@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Database\Seeders\Tenant\Address;
 
 use Domain\Address\Models\Country;
-use Domain\Address\Models\State;
+use Domain\Address\Models\Region;
 use Illuminate\Database\Seeder;
 
-class StateSeeder extends Seeder
+class RegionSeeder extends Seeder
 {
     public function run(): void
     {
 
-        $country = Country::where('code', 'US')->first();
+        $country = Country::where('code', 'PH')->first();
 
         if ( ! $country) {
             $country = Country::create([
@@ -26,20 +26,22 @@ class StateSeeder extends Seeder
             ]);
         }
 
-        State::create([
+        Region::create([
             'country_id' => $country->id,
-            'name' => 'New York City',
+            'name' => 'National Capital Region',
+        ]);
+    
+        Region::create([
+            'country_id' => $country->id,
+            'name' => 'Central Visayas',
+        ]);
+    
+        Region::create([
+            'country_id' => $country->id,
+            'name' => 'Central Luzon',
         ]);
 
-        State::create([
-            'country_id' => $country->id,
-            'name' => 'Los Angeles',
-        ]);
 
-        State::create([
-            'country_id' => $country->id,
-            'name' => 'Chicago',
-        ]);
 
     }
 }
