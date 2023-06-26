@@ -5,8 +5,8 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\PageResource\Pages\ListPages;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
-use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
-use Domain\Support\RouteUrl\Database\Factories\RouteUrlFactory;
+use Support\MetaData\Database\Factories\MetaDataFactory;
+use Support\RouteUrl\Database\Factories\RouteUrlFactory;
 use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 

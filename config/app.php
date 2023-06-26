@@ -181,11 +181,11 @@ return [
         Domain\Auth\AuthServiceProvider::class,
         Domain\Role\RoleServiceProvider::class,
         Domain\Blueprint\BlueprintServiceProvider::class,
-        Domain\Support\Captcha\CaptchaServiceProvider::class,
 
         /*
         * Support Service Providers...
         */
+        Support\Captcha\CaptchaServiceProvider::class,
         Support\Excel\ExcelServiceProvider::class,
 
     ])->toArray(),

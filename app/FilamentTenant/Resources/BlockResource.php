@@ -18,7 +18,7 @@ use Filament\Tables;
 use Exception;
 use Closure;
 use Domain\Page\Actions\DeleteBlockAction;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Support\Facades\Auth;
 
