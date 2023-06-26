@@ -12,6 +12,7 @@ use Filament\Resources\Pages\CreateRecord;
 use Filament\Pages\Actions\Action;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Throwable;
 
 class CreateProduct extends CreateRecord
 {
