@@ -18,7 +18,7 @@ class DiscountData
         public readonly DiscountStatus $status,
         public readonly float $amount,
         public readonly int $max_uses,
-        public readonly int $max_uses_per_user,
+        // public readonly int $max_uses_per_user,
         public readonly Carbon $valid_start_at,
         public readonly Carbon $valid_end_at,
     ) {

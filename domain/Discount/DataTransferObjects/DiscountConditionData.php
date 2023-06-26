@@ -10,9 +10,9 @@ use Domain\Discount\Models\Discount;
 class DiscountConditionData
 {
     public function __construct(
-        public readonly DiscountConditionType $type,
-        public readonly ?string $data = null,
-        public readonly Discount $discount,
+        public readonly DiscountConditionType $discount_condition_type,
+        public readonly ?array $data = null,
+        public readonly int $discount_id,
     ) {
     }
 }

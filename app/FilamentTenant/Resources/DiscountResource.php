@@ -10,11 +10,14 @@ use App\FilamentTenant\Resources\DiscountResource\Pages\EditDiscount;
 use App\FilamentTenant\Resources\DiscountResource\Pages\ListDiscounts;
 use Closure;
 use Domain\Discount\Actions\AutoGenerateCode;
+use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Card;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -65,7 +68,7 @@ class DiscountResource extends Resource
                         ->numeric()
                         ->rules(['max:100'], fn (Closure $get) => $get('type') === 'percentage'),
 
-                    Select::make('type')->options([
+                    Select::make('discount_condition_type')->options([
                         'order_sub_total' => 'Order Sub Total',
                         'delivery_fee' => 'Delivery Fee',
                     ])->label(trans('Discount Condition Type')),
@@ -82,21 +85,25 @@ class DiscountResource extends Resource
                         ->numeric()
                         ->label(trans('Maximum Usage per Discount Code')),
 
-                    TextInput::make('max_uses_per_user')
-                        ->required()
-                        ->numeric()
-                        ->label(trans('Maximum Usage per Customer')),
-                ])->columns(2)
+                    // TextInput::make('max_uses_per_user')
+                    //     ->required()
+                    //     ->numeric()
+                    //     ->label(trans('Maximum Usage per Customer')),
+                ])
                     ->columnSpan(['lg' => 2]),
 
                 Group::make([
                     Section::make(trans('Status & Period'))
                         ->schema([
-                            Toggle::make('active'),
-                            DateTimePicker::make('valid_start_date')
-                                ->label('Start Date'),
-                            DateTimePicker::make('valid_end_date')
-                                ->label('Expiration Date'),
+                            Select::make('status')
+                                ->options([
+                                    'active' => 'Active',
+                                    'inactive' => 'Inactive',
+                                ])->label(trans('Status')),
+                            DateTimePicker::make('valid_start_at')
+                                ->label(trans('Start Date')),
+                            DateTimePicker::make('valid_end_at')
+                                ->label(trans('Expiration Date')),
                         ]),
                 ])
                     ->columnSpan(['lg' => 1]),

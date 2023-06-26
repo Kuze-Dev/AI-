@@ -28,7 +28,7 @@ final class CreateDiscountAction
             'amount' => $discountData->amount,
             'status' => $discountData->status,
             'max_uses' => $discountData->max_uses,
-            'max_uses_per_user' => $discountData->max_uses_per_user,
+            // 'max_uses_per_user' => $discountData->max_uses_per_user,
             'valid_start_at' => $discountData->valid_start_at,
             'valid_end_at' => $discountData->valid_end_at,
         ]);

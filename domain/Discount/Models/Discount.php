@@ -54,7 +54,7 @@ class Discount extends Model
         'amount',
         'status',
         'max_uses',
-        'max_uses_per_user',
+        // 'max_uses_per_user',
         'valid_start_at',
         'valid_end_at',
     ];
@@ -63,7 +63,7 @@ class Discount extends Model
         'type' => DiscountType::class,
         'status' => DiscountStatus::class,
         'max_uses' => 'int',
-        'max_uses_per_user' => 'int',
+        // 'max_uses_per_user' => 'int',
         'valid_start_at' => 'datetime',
         'valid_end_at' => 'datetime',
     ];

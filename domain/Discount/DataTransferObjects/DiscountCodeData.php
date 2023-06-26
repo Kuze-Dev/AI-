@@ -10,7 +10,7 @@ class DiscountCodeData
 {
     public function __construct(
         public readonly string $code,
-        public readonly Discount $discount,
+        public readonly int $discount_id,
     ) {
     }
 }

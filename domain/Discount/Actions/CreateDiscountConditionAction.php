@@ -13,8 +13,8 @@ class CreateDiscountConditionAction
     public function execute(DiscountConditionData $discountConditionData): DiscountCondition
     {
         $discountCondition = DiscountCondition::create([
-            'discount_id' => $discountConditionData->discount,
-            'type' => $discountConditionData->type,
+            'discount_id' => $discountConditionData->discount_id,
+            'type' => $discountConditionData->discount_condition_type,
             'data' => $discountConditionData->data,
         ]);
 

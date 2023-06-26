@@ -13,7 +13,7 @@ class CreateDiscountCodeAction
     public function execute(DiscountCodeData $discountCodeData): DiscountCode
     {
         $discountCode = DiscountCode::create([
-            'discount_id' => $discountCodeData->discount,
+            'discount_id' => $discountCodeData->discount_id,
             'code' => $discountCodeData->code,
 
         ]);

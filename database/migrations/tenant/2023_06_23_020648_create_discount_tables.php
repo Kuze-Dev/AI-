@@ -20,7 +20,7 @@ return new class () extends Migration {
             $table->float('amount', 8, 2);
             $table->string('status')->index();
             $table->unsignedInteger('max_uses');
-            $table->unsignedInteger('max_uses_per_user');
+            // $table->unsignedInteger('max_uses_per_user');
 
             $table->timestamp('valid_start_at');
             $table->timestamp('valid_end_at')->nullable();
