@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Domain\Address\Models\State;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,8 +13,10 @@ return new class () extends Migration {
     {
         Schema::create('cities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('state_id')->constrained('states');
+
+            $table->foreignIdFor(State::class)->index();
             $table->string('name')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
         });

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Domain\Address\Models\Country;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,14 +13,15 @@ return new class () extends Migration {
     {
         Schema::create('states', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('country_id')->constrained('countries');
+
+            $table->foreignIdFor(Country::class)->index();
             $table->string('name')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
         });
     }
 
-    /** Reverse the migrations. */
     public function down(): void
     {
         Schema::dropIfExists('states');
