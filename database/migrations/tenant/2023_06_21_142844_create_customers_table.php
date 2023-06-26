@@ -47,18 +47,14 @@ return new class () extends Migration {
             $table->text('address_line_1');
             $table->text('address_line_2')->nullable();
             $table->string('country');
-
-            $table->string('state')->nullable();
-            $table->string('region')->nullable();
-
-            $table->string('province');
+            $table->string('state_or_region')->nullable();
+            $table->string('city_or_province');
             $table->string('zip_code');
 
             $table->boolean('is_default_shipping');
             $table->boolean('is_default_billing');
 
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

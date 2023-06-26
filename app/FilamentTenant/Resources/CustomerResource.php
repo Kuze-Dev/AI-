@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use App\Filament\Resources\CustomerResource\RelationManagers\AddressesRelationManager;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Actions\ForceDeleteCustomerAction;
@@ -179,6 +180,7 @@ class CustomerResource extends Resource
     public static function getRelations(): array
     {
         return [
+            AddressesRelationManager::class,
             ActivitiesRelationManager::class,
         ];
     }

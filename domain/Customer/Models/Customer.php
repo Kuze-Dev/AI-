@@ -7,6 +7,7 @@ namespace Domain\Customer\Models;
 use Domain\Customer\Enums\Status;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Activitylog\LogOptions;
@@ -109,5 +110,10 @@ class Customer extends Authenticatable implements HasMedia
     public function tier(): BelongsTo
     {
         return $this->belongsTo(Tier::class);
+    }
+
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(Address::class);
     }
 }
