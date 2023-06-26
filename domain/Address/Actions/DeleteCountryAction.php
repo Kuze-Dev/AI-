@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Domain\Country\Actions;
+namespace Domain\Address\Actions;
 
-use Domain\Country\Models\Country;
+use Domain\Address\Models\Address;
 
 class DeleteCountryAction
 {

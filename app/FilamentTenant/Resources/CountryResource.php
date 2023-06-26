@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Domain\Country\Actions\DeleteCountryAction;
-use Domain\Country\Models\Country;
+use Domain\Address\Actions\DeleteCountryAction;
+use Domain\Address\Models\Address;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;

@@ -19,7 +19,9 @@ class DatabaseSeeder extends Seeder
             Auth\AdminSeeder::class,
             Page\PageSeeder::class,
             Currency\CurrencySeeder::class,
-            Country\CountrySeeder::class,
+            Address\CountrySeeder::class,
+            Address\StateSeeder::class,
+            Address\CitySeeder::class,
         ]);
     }
 }

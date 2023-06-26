@@ -2,17 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Domain\Country\Actions;
+namespace Domain\Address\Actions;
 
-use Domain\Country\DataTransferObjects\CountryData;
-use Domain\Country\Models\Country;
+use Domain\Address\DataTransferObjects\AddressData;
+use Domain\Address\Models\Address;
 
-class UpdateCountryAction
+class CreateCountryAction
 {
-    public function execute(Country $country, CountryData $countryData): Country
+    public function execute(CountryData $countryData): Country
     {
-
-        $country->update([
+        return Country::create([
             'code' => $countryData->code,
             'name' => $countryData->name,
             'capital' => $countryData->capital,
@@ -20,7 +19,5 @@ class UpdateCountryAction
             'language' => $countryData->language,
             'active' => $countryData->active,
         ]);
-
-        return $country;
     }
 }

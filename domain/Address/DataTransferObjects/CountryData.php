@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Country\DataTransferObjects;
+namespace Domain\Address\DataTransferObjects;
 
 class CountryData
 {

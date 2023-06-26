@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Country\Models;
+namespace Domain\Address\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -25,7 +25,7 @@ class Country extends Model
         parent::boot();
 
         Relation::morphMap([
-            'currency' => 'Domain\Country\Models\Country',
+            'currency' => 'Domain\Address\Models\Address',
         ]);
 
     }

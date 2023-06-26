@@ -6,9 +6,9 @@ namespace App\FilamentTenant\Resources\CountryResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\CountryResource;
-use Domain\Country\Actions\UpdateCountryAction;
-use Domain\Country\DataTransferObjects\CountryData;
-use Domain\Country\Models\Country;
+use Domain\Address\Actions\UpdateCountryAction;
+use Domain\Address\DataTransferObjects\AddressData;
+use Domain\Address\Models\Address;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;

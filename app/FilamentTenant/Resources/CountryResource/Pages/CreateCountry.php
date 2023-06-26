@@ -6,8 +6,8 @@ namespace App\FilamentTenant\Resources\CountryResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\CountryResource;
-use Domain\Country\Actions\CreateCountryAction;
-use Domain\Country\DataTransferObjects\CountryData;
+use Domain\Address\Actions\CreateCountryAction;
+use Domain\Address\DataTransferObjects\AddressData;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
