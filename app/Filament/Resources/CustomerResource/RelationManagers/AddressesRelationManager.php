@@ -41,13 +41,13 @@ class AddressesRelationManager extends RelationManager
                     ->maxLength(255),
 
                 Forms\Components\TextInput::make('state_or_region') // TODO: relation
-                    ->translateLabel()
+                    ->label(trans('State/Region'))
                     ->nullable()
                     ->string()
                     ->maxLength(255),
 
                 Forms\Components\TextInput::make('city_or_province') // TODO: relation
-                    ->translateLabel()
+                    ->label(trans('City/Province'))
                     ->required()
                     ->string()
                     ->maxLength(255),
@@ -71,53 +71,62 @@ class AddressesRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('address_line_1')
+                    ->translateLabel()
                     ->sortable()
                     ->searchable()
                     ->wrap(),
                 Tables\Columns\TextColumn::make('address_line_2')
+                    ->translateLabel()
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->wrap(),
                 Tables\Columns\TextColumn::make('country') // TODO: relation
+                    ->translateLabel()
                     ->sortable()
                     ->searchable()
                     ->wrap(),
-                Tables\Columns\TextColumn::make('state') // TODO: relation
+                Tables\Columns\TextColumn::make('state_or_region') // TODO: relation
+                    ->label(trans('State/Region'))
                     ->sortable()
                     ->searchable()
                     ->wrap(),
-                Tables\Columns\TextColumn::make('region') // TODO: relation
-                    ->sortable()
-                    ->searchable()
-                    ->wrap(),
-                Tables\Columns\TextColumn::make('province') // TODO: relation
+                Tables\Columns\TextColumn::make('city_or_province') // TODO: relation
+                    ->label(trans('City/Province'))
                     ->sortable()
                     ->searchable()
                     ->wrap(),
                 Tables\Columns\TextColumn::make('zip_code')
+                    ->translateLabel()
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->wrap(),
                 Tables\Columns\IconColumn::make('is_default_billing')
+                    ->translateLabel()
                     ->boolean()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_default_shipping')
+                    ->translateLabel()
                     ->boolean()
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\TernaryFilter::make('is_default_billing'),
-                Tables\Filters\TernaryFilter::make('is_default_shipping'),
+                Tables\Filters\TernaryFilter::make('is_default_billing')
+                    ->translateLabel(),
+                Tables\Filters\TernaryFilter::make('is_default_shipping')
+                    ->translateLabel(),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->translateLabel(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->translateLabel(),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
+                        ->translateLabel()
                         ->using(function (Address $record) {
                             try {
                                 return app(DeleteAddressAction::class)->execute($record);

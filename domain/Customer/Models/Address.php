@@ -14,13 +14,13 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * Domain\Customer\Models\Tier
  *
  * @property int $id
+ * @property-read  string $full_detail
  * @property int $customer_id
  * @property string $address_line_1
  * @property string|null $address_line_2
  * @property string $country
- * @property string|null $state
- * @property string|null $region
- * @property string $province
+ * @property string|null $state_or_region
+ * @property string $city_or_province
  * @property string $zip_code
  * @property bool $is_default_shipping
  * @property bool $is_default_billing
@@ -28,21 +28,21 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
+ * @property-read \Domain\Customer\Models\Customer|null $customer
  * @property-read \Domain\Customer\Models\Customer|null $tier
  * @method static \Illuminate\Database\Eloquent\Builder|Address newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Address newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Address query()
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereAddressLine1($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereAddressLine2($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereCityOrProvince($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereCountry($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereCustomerId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereIsDefaultBilling($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereIsDefaultShipping($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Address whereProvince($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Address whereRegion($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Address whereState($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereStateOrRegion($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereZipCode($value)
  * @mixin \Eloquent
@@ -76,8 +76,8 @@ class Address extends Model
                 $this->address_line_1,
                 $this->address_line_2,
                 $this->country,
-                $this->state ?? $this->region,
-                $this->province,
+                $this->state_or_region,
+                $this->city_or_province,
                 $this->zip_code
             )
         );
