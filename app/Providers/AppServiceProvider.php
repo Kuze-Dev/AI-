@@ -7,6 +7,7 @@ namespace App\Providers;
 use App\Settings\FormSettings;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Customer\Models\Address;
 use Domain\Customer\Models\Customer;
 use Domain\Customer\Models\Tier;
 use Domain\Menu\Models\Menu;
@@ -72,6 +73,7 @@ class AppServiceProvider extends ServiceProvider
             MetaData::class,
             Tier::class,
             Customer::class,
+            Address::class,
         ]);
 
         Password::defaults(

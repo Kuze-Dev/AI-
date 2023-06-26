@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Domain\Customer\Enums\Status;
+use Domain\Customer\Models\Customer;
 use Domain\Customer\Models\Tier;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -34,6 +35,28 @@ return new class () extends Migration {
             $table->string('status')->default(Status::ACTIVE->value)->index();
 
             $table->date('birth_date');
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('addresses', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignIdFor(Customer::class)->index();
+
+            $table->text('address_line_1');
+            $table->text('address_line_2')->nullable();
+            $table->string('country');
+
+            $table->string('state')->nullable();
+            $table->string('region')->nullable();
+
+            $table->string('province');
+            $table->string('zip_code');
+
+            $table->boolean('is_default_shipping');
+            $table->boolean('is_default_billing');
+
             $table->timestamps();
             $table->softDeletes();
         });
