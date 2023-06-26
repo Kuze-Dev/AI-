@@ -51,7 +51,7 @@ class ProductResource extends Resource
                             ->label('Media')
                             ->mediaLibraryCollection('image')
                             ->image()
-                            ->required()
+                            ->required(),
                     ]),
 
                     Forms\Components\Section::make('Customer Remarks')
@@ -99,8 +99,6 @@ class ProductResource extends Resource
                                             ->unique(ignoreRecord: true),
                                     ]),
                             ])->hiddenOn('create'),
-
-
 
                         // Reference: Block & Taxonomy
                         Tree::make('variants')
@@ -232,7 +230,7 @@ class ProductResource extends Resource
                                     Forms\Components\Hidden::make('taxonomy_terms')
                                         ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                                 ])
-                                ->when(fn () => !empty($taxonomies->toArray())),
+                                ->when(fn () => ! empty($taxonomies->toArray())),
                         ]),
                     MetaDataForm::make('Meta Data'),
                 ])->columnSpan(1),
@@ -267,7 +265,7 @@ class ProductResource extends Resource
                     ->query(function (Builder $query, array $data) {
                         $query->when(filled($data['value']), function (Builder $query) use ($data) {
                             $query->when(filled($data['value']), function (Builder $query) use ($data) {
-                                /** @var Prodct|Builder $query */
+                                /** @var Product|Builder $query */
                                 match ($data['value']) {
                                     '1' => $query->where('status', true),
                                     '0' => $query->where('status', false),
