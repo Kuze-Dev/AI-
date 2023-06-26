@@ -10,32 +10,46 @@ use Illuminate\Database\Seeder;
 
 class CitySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
-        // Retrieve a state
+
         $state = State::first();
 
-        // Create cities associated with the state
+        if ( ! $state) {
+
+            $country = \Domain\Address\Models\Country::first();
+
+            if ( ! $country) {
+                $country = \Domain\Address\Models\Country::create([
+                    'code' => 'PH',
+                    'name' => 'Philippines',
+                    'capital' => 'Manila',
+                    'timezone' => 'Asia/Manila',
+                    'language' => 'Filipino',
+                    'active' => true,
+                ]);
+            }
+
+            $state = State::create([
+                'country_id' => $country->id,
+                'name' => 'Metro Manila',
+            ]);
+        }
+
         City::create([
             'state_id' => $state->id,
             'name' => 'Manila',
         ]);
-        
+
         City::create([
             'state_id' => $state->id,
             'name' => 'Quezon City',
         ]);
-        
+
         City::create([
             'state_id' => $state->id,
             'name' => 'Makati City',
         ]);
-        
-        // Add more cities and states as needed
+
     }
 }

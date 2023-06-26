@@ -7,7 +7,7 @@ namespace App\FilamentTenant\Resources\CountryResource\Pages;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\CountryResource;
 use Domain\Address\Actions\CreateCountryAction;
-use Domain\Address\DataTransferObjects\AddressData;
+use Domain\Address\DataTransferObjects\CountryData;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -48,6 +48,7 @@ class CreateCountry extends CreateRecord
                 code: $data['code'],
                 name: $data['name'],
                 capital: $data['capital'],
+                state_or_province: $data['state_or_province'],
                 timezone: $data['timezone'],
                 language: $data['language'],
                 active: $data['active'],

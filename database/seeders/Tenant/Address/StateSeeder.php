@@ -10,31 +10,36 @@ use Illuminate\Database\Seeder;
 
 class StateSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
-        // Retrieve a country
+
         $country = Country::first();
 
-        // Create states associated with the country
+        if ( ! $country) {
+            $country = Country::create([
+                'code' => 'PH',
+                'name' => 'Philippines',
+                'capital' => 'Manila',
+                'timezone' => 'Asia/Manila',
+                'language' => 'Filipino',
+                'active' => true,
+            ]);
+        }
+
         State::create([
             'country_id' => $country->id,
             'name' => 'Metro Manila',
         ]);
-        
+
         State::create([
             'country_id' => $country->id,
             'name' => 'Cebu',
         ]);
-        
+
         State::create([
             'country_id' => $country->id,
             'name' => 'Bulacan',
         ]);
-        // Add more states and countries as needed
+
     }
 }

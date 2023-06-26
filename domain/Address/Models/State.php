@@ -19,13 +19,15 @@ class State extends Model
         // Add any additional fields for the state model
     ];
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\Country, State>*/
     public function country(): BelongsTo
     {
         return $this->belongsTo(Country::class);
     }
 
-    public function cities(): HasMany
-    {
-        return $this->hasMany(City::class);
-    }
+        /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Address\Models\City>*/
+        public function cities(): HasMany
+        {
+            return $this->hasMany(City::class);
+        }
 }

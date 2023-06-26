@@ -7,8 +7,8 @@ namespace App\FilamentTenant\Resources\CountryResource\Pages;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\CountryResource;
 use Domain\Address\Actions\UpdateCountryAction;
-use Domain\Address\DataTransferObjects\AddressData;
-use Domain\Address\Models\Address;
+use Domain\Address\DataTransferObjects\CountryData;
+use Domain\Address\Models\Country;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
@@ -57,6 +57,7 @@ class EditCountry extends EditRecord
                         name: $data['name'],
                         capital: $data['capital'],
                         timezone: $data['timezone'],
+                        state_or_province: $data['state_or_province'],
                         language: $data['language'],
                         active: $data['active'],
                     )

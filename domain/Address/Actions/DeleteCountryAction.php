@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Address\Actions;
 
-use Domain\Address\Models\Address;
+use Domain\Address\Models\Country;
 
 class DeleteCountryAction
 {

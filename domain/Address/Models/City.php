@@ -15,9 +15,9 @@ class City extends Model
     protected $fillable = [
         'name',
         'state_id',
-        // Add any additional fields for the city model
     ];
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\State, City> */
     public function state(): BelongsTo
     {
         return $this->belongsTo(State::class);

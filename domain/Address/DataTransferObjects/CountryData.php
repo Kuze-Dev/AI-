@@ -10,6 +10,7 @@ class CountryData
         public readonly string $code,
         public readonly string $name,
         public readonly string $capital,
+        public readonly string $state_or_province,
         public readonly string $timezone,
         public readonly string $language,
         public readonly bool $active,

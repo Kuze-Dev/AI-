@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\CountryResource\Pages\CreateCountry;
-use Domain\Address\Models\Address;
+use Domain\Address\Models\Country;
 use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;

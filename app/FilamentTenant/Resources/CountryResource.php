@@ -6,7 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Address\Actions\DeleteCountryAction;
-use Domain\Address\Models\Address;
+use Domain\Address\Models\Country;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;

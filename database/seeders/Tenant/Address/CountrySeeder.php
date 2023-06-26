@@ -4,18 +4,12 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Tenant\Address;
 
-
 use Domain\Address\Models\Country;
 use Illuminate\Database\Seeder;
 
 class CountrySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
         Country::create([
             'code' => 'PH',
@@ -35,6 +29,5 @@ class CountrySeeder extends Seeder
             'active' => false,
         ]);
 
-        // Add more countries as needed
     }
 }
