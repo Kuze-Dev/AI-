@@ -4,26 +4,38 @@ declare(strict_types=1);
 
 namespace Domain\Discount\Actions;
 
-use Domain\Content\DataTransferObjects\ContentData;
-use Domain\Content\Models\Content;
+use Domain\Discount\DataTransferObjects\DiscountCodeData;
+use Domain\Discount\DataTransferObjects\DiscountConditionData;
+use Domain\Discount\DataTransferObjects\DiscountData;
+use Domain\Discount\Models\Discount;
 
-class CreateContentAction
+final class CreateDiscountAction
 {
+    public function __construct(
+        protected CreateDiscountCodeAction $createDiscountCodeAction,
+        protected CreateDiscountConditionAction $createDiscountConditionAction,
+    ) {
+    }
+
     /** Execute create content query. */
-    public function execute(ContentData $contentData): Content
+    public function execute(DiscountData $discountData, DiscountConditionData $discountConditionData, DiscountCodeData $discountCodeData): Discount
     {
-        $content = Content::create([
-            'name' => $contentData->name,
-            'prefix' => $contentData->prefix,
-            'blueprint_id' => $contentData->blueprint_id,
-            'past_publish_date_behavior' => $contentData->past_publish_date_behavior,
-            'future_publish_date_behavior' => $contentData->future_publish_date_behavior,
-            'is_sortable' => $contentData->is_sortable,
+        $discount = Discount::create([
+            'name' => $discountData->name,
+            'slug' => $discountData->slug,
+            'description' => $discountData->description,
+            'type' => $discountData->type,
+            'amount' => $discountData->amount,
+            'status' => $discountData->status,
+            'max_uses' => $discountData->max_uses,
+            'max_uses_per_user' => $discountData->max_uses_per_user,
+            'valid_start_at' => $discountData->valid_start_at,
+            'valid_end_at' => $discountData->valid_end_at,
         ]);
 
-        $content->taxonomies()
-            ->attach($contentData->taxonomies);
+        $this->createDiscountCodeAction->execute($discountCodeData);
+        $this->createDiscountConditionAction->execute($discountConditionData);
 
-        return $content;
+        return $discount;
     }
 }

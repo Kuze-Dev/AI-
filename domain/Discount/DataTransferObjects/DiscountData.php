@@ -13,9 +13,10 @@ class DiscountData
     public function __construct(
         public readonly string $name,
         public readonly string $slug,
-        public readonly ?string $description,
+        public readonly ?string $description = null,
         public readonly DiscountType $type,
         public readonly DiscountStatus $status,
+        public readonly float $amount,
         public readonly int $max_uses,
         public readonly int $max_uses_per_user,
         public readonly Carbon $valid_start_at,

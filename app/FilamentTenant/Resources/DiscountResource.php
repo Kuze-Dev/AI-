@@ -58,7 +58,7 @@ class DiscountResource extends Resource
                         'fixed_value' => 'Fixed',
                         'percentage' => 'Percentage',
                     ])->reactive()
-                        ->label('Discount Type'),
+                        ->label(trans('Discount Type')),
 
                     TextInput::make('amount')
                         ->required()
@@ -68,19 +68,24 @@ class DiscountResource extends Resource
                     Select::make('type')->options([
                         'order_sub_total' => 'Order Sub Total',
                         'delivery_fee' => 'Delivery Fee',
-                    ])->label('Discount Condition Type'),
+                    ])->label(trans('Discount Condition Type')),
 
                     TextInput::make('code')
                         ->suffixAction(
                             fn (?string $state): Action => Action::make('code')
                                 ->icon('heroicon-o-cog')
                                 ->action(fn (TextInput $component) => $component->state((new AutoGenerateCode())()))
-                                ->tooltip('auto generate code'),
+                                ->tooltip(trans('auto generate code')),
                         ),
-                    TextInput::make('usage_limit')
+                    TextInput::make('max_uses')
                         ->required()
                         ->numeric()
-                        ->label(trans('Maximum Usage')),
+                        ->label(trans('Maximum Usage per Discount Code')),
+
+                    TextInput::make('max_uses_per_user')
+                        ->required()
+                        ->numeric()
+                        ->label(trans('Maximum Usage per Customer')),
                 ])->columns(2)
                     ->columnSpan(['lg' => 2]),
 

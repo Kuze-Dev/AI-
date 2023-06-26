@@ -73,7 +73,7 @@ class Discount extends Model
         return $this->hasMany(DiscountCode::class);
     }
 
-    public function DiscountConditions(): HasMany
+    public function discountConditions(): HasMany
     {
         return $this->hasMany(DiscountCondition::class);
     }
