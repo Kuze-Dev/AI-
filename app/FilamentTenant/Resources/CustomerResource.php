@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\Filament\Resources\CustomerResource\RelationManagers\AddressesRelationManager;
+use App\FilamentTenant\Resources\CustomerResource\RelationManagers\AddressesRelationManager;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Actions\ForceDeleteCustomerAction;
@@ -22,6 +22,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules\Password;
 
 class CustomerResource extends Resource
@@ -158,8 +159,10 @@ class CustomerResource extends Resource
                         }),
                     Tables\Actions\RestoreAction::make()
                         ->using(
-                            fn (Customer $record) => app(RestoreCustomerAction::class)
-                                ->execute($record)
+                            fn (Customer $record) => DB::transaction(
+                                fn () => app(RestoreCustomerAction::class)
+                                    ->execute($record)
+                            )
                         ),
                     Tables\Actions\ForceDeleteAction::make()
                         ->using(function (Customer $record) {

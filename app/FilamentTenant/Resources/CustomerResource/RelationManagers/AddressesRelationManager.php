@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources\CustomerResource\RelationManagers;
+namespace App\FilamentTenant\Resources\CustomerResource\RelationManagers;
 
+use Domain\Address\Actions\CreateAddressAction;
 use Domain\Address\Actions\DeleteAddressAction;
+use Domain\Address\Actions\UpdateAddressAction;
+use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Address\Models\Address;
 use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Exception;
@@ -13,6 +16,8 @@ use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Contracts\HasRelationshipTable;
+use Illuminate\Support\Facades\DB;
 
 class AddressesRelationManager extends RelationManager
 {
@@ -119,11 +124,26 @@ class AddressesRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
-                    ->translateLabel(),
+                    ->translateLabel()
+                    ->using(function (array $data, HasRelationshipTable $livewire) {
+
+                        $data['customer_id'] = $livewire->getPropertyValue('ownerRecord')->getKey();
+
+                        return DB::transaction(
+                            fn () => app(CreateAddressAction::class)
+                                ->execute(new AddressData(...$data))
+                        );
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->translateLabel(),
+                    ->translateLabel()
+                    ->using(fn (Address $record, array $data) => DB::transaction(
+                        fn () => DB::transaction(
+                            fn () => app(UpdateAddressAction::class)
+                                ->execute($record, new AddressData(...$data))
+                        )
+                    )),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
                         ->translateLabel()

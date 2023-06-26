@@ -21,6 +21,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\DB;
 
 class TierResource extends Resource
 {
@@ -86,8 +87,10 @@ class TierResource extends Resource
                         }),
                     Tables\Actions\RestoreAction::make()
                         ->using(
-                            fn (Tier $record) => app(RestoreTierAction::class)
-                                ->execute($record)
+                            fn (Tier $record) => DB::transaction(
+                                fn () => app(RestoreTierAction::class)
+                                    ->execute($record)
+                            )
                         ),
                     Tables\Actions\ForceDeleteAction::make()
                         ->using(function (Tier $record) {
