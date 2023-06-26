@@ -9,6 +9,7 @@ use Domain\Tier\Models\Tier;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Arr;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -73,14 +74,16 @@ class Address extends Model
     protected function fullDetail(): Attribute
     {
         return Attribute::get(
-            fn ($value) => sprintf(
-                '%s, %s, %s, %s, %s, %s',
-                $this->address_line_1,
-                $this->address_line_2,
-                $this->country,
-                $this->state_or_region,
-                $this->city_or_province,
-                $this->zip_code
+            fn ($value) => Arr::join(
+                array_filter([
+                    $this->address_line_1,
+                    $this->address_line_2,
+                    $this->country,
+                    $this->state_or_region,
+                    $this->city_or_province,
+                    $this->zip_code,
+                ]),
+                ', '
             )
         );
     }
