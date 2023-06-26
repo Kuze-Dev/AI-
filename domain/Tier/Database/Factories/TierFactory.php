@@ -21,4 +21,9 @@ class TierFactory extends Factory
             'description' => $this->faker->sentence(),
         ];
     }
+
+    public function deleted(): self
+    {
+        return $this->state(['deleted_at' => now()]);
+    }
 }
