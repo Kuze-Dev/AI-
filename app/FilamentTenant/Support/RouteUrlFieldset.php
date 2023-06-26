@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Support;
 
 use Closure;
-use Domain\Support\RouteUrl\Contracts\HasRouteUrl;
-use Domain\Support\RouteUrl\Rules\UniqueActiveRouteUrlRule;
+use Support\RouteUrl\Contracts\HasRouteUrl;
+use Support\RouteUrl\Rules\UniqueActiveRouteUrlRule;
 use Filament\Forms;
 use Filament\Forms\Components\Group;
 use Illuminate\Database\Eloquent\Model;

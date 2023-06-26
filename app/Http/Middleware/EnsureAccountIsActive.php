@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use Domain\Auth\Contracts\HasActiveState;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Closure;
+use Domain\Auth\Contracts\HasActiveState;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class EnsureAccountIsActive
 {
-    public function handle(Request $request, Closure $next, string $redirectTo = null): Response|RedirectResponse
+    public function handle(Request $request, Closure $next, string $redirectTo = null): Response
     {
         $user = $request->user();
 

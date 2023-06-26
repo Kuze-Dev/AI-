@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
-use Domain\Support\RouteUrl\Database\Factories\RouteUrlFactory;
+use Support\RouteUrl\Database\Factories\RouteUrlFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
