@@ -16,7 +16,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Unique;
 use Stancl\Tenancy\Database\Models\Domain;
@@ -128,7 +127,7 @@ class TenantResource extends Resource
                     ->sortable(),
             ])
             ->filters([])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([

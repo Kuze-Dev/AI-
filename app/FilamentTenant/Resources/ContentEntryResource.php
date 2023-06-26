@@ -13,7 +13,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
 use Closure;
@@ -240,7 +239,7 @@ class ContentEntryResource extends Resource
                     ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
             ])
             ->reorderable('order')
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->url(fn ($livewire, ContentEntry $record) => self::getUrl('edit', [$livewire->ownerRecord, $record])),

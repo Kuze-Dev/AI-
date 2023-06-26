@@ -22,7 +22,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -90,7 +89,7 @@ class BlueprintResource extends Resource
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make(),
 
