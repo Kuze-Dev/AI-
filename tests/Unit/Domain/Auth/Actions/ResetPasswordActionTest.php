@@ -10,12 +10,13 @@ use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Password;
+use Pest\Mock\Mock;
 
 it('can reset password', function () {
     Event::fake();
-    $passwordBroker = mock(PasswordBroker::class)
+    $passwordBroker = (new Mock(PasswordBroker::class))
         ->expect(reset: function (array $credentials, callable $callback) {
-            $user = mock(User::class)
+            $user = (new Mock(User::class))
                 ->expect(
                     fill: fn () => null,
                     setRememberToken: fn () => null,

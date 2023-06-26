@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Pennant\Feature;
 use Stancl\Tenancy\Database\Models\Tenant;
@@ -81,6 +82,13 @@ class AppServiceProvider extends ServiceProvider
                         $this->app->isProduction(),
                         fn (Password $password) => $password->uncompromised()
                     )
+        );
+
+        Rule::macro(
+            'email',
+            fn (): string => app()->environment('local', 'testing')
+                ? 'email'
+                : 'email:rfc,dns'
         );
 
         JsonApiResource::resolveIdUsing(fn (Model $resource): string => (string) $resource->getRouteKey());

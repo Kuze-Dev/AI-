@@ -8,6 +8,7 @@ use Domain\Admin\Models\Admin;
 use Domain\Tenant\Database\Factories\TenantFactory;
 use Domain\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\URL;
 use Spatie\Activitylog\ActivitylogServiceProvider;
@@ -75,4 +76,22 @@ function testInTenantContext(): Tenant
     tenancy()->initialize($tenant);
 
     return $tenant;
+}
+
+// https://github.com/konnco/filament-import/blob/1.5.2/tests/Pest.php#L16
+function csvFiles(callable $fakeRows, int $rowCount = 10): Illuminate\Http\Testing\File
+{
+    Storage::fake('uploads');
+
+    $content = collect(''); // headings, not necessary for testing
+
+    for ($i = 0; $i < $rowCount; $i++) {
+        $content = $content->push(implode(',', value($fakeRows)));
+    }
+
+    return UploadedFile::fake()
+        ->createWithContent(
+            name: 'import-file.csv',
+            content: $content->join("\n")
+        );
 }
