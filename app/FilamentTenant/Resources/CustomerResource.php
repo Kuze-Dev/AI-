@@ -88,8 +88,7 @@ class CustomerResource extends Resource
                     Forms\Components\TextInput::make('password')
                         ->translateLabel()
                         ->password()
-                        ->required()
-                        ->rule(Password::default())
+                        ->rules(Password::sometimes())
                         ->helperText(
                             app()->environment('local', 'testing')
                                 ? trans('Password must be at least 4 characters.')
@@ -98,11 +97,10 @@ class CustomerResource extends Resource
                         ->visible(fn (?Customer $record) => $record === null || ! $record->exists),
                     Forms\Components\TextInput::make('password_confirmation')
                         ->translateLabel()
-                        ->required()
                         ->password()
                         ->same('password')
                         ->dehydrated(false)
-                        ->rule(Password::default())
+                        ->rules(Password::sometimes())
                         ->visible(fn (?Customer $record) => $record === null || ! $record->exists),
                     Forms\Components\Toggle::make('status')
                         ->translateLabel(),

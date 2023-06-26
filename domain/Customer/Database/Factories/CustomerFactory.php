@@ -30,4 +30,9 @@ class CustomerFactory extends Factory
             'birth_date' => now()->subYears($this->faker->randomDigitNotNull()),
         ];
     }
+
+    public function deleted(): self
+    {
+        return $this->state(['deleted_at' => now()]);
+    }
 }
