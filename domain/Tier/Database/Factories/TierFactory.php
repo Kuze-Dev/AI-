@@ -8,7 +8,7 @@ use Domain\Tier\Models\Tier;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Customer\Models\Tier>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Tier\Models\Tier>
  */
 class TierFactory extends Factory
 {

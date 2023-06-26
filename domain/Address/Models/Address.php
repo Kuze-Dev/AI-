@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Address\Models;
 
 use Domain\Customer\Models\Customer;
+use Domain\Tier\Models\Tier;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -92,12 +93,13 @@ class Address extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Customer\Models\Address> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Tier\Models\Tier, \Domain\Address\Models\Address> */
     public function tier(): BelongsTo
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Tier::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Address\Models\Address> */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);

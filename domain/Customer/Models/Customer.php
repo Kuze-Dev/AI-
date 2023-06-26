@@ -116,6 +116,9 @@ class Customer extends Authenticatable implements HasMedia
         return $this->belongsTo(Tier::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Address\Models\Address>
+     */
     public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
