@@ -134,14 +134,15 @@ class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, 
         return 'slug';
     }
 
+    /**
+     * Declare relationship of
+     * current model to taxonomy terms.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm>
+     */
     public function taxonomyTerms(): BelongsToMany
     {
         return $this->belongsToMany(TaxonomyTerm::class);
-    }
-
-    public function taxonomies(): BelongsToMany
-    {
-        return $this->belongsToMany(Taxonomy::class);
     }
 
     public function getSlugOptions(): SlugOptions

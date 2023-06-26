@@ -37,8 +37,7 @@ class UpdateProductAction
             $product->clearMediaCollection('image');
         }
 
-        $product->taxonomyTerms()
-            ->sync($productData->taxonomy_terms);
+        $product->taxonomyTerms()->sync($productData->taxonomy_terms);
 
         return $product;
     }

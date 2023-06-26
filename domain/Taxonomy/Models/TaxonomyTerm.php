@@ -97,6 +97,12 @@ class TaxonomyTerm extends Model implements Sortable
         return $this->belongsToMany(ContentEntry::class);
     }
 
+    /**
+     * Declare relationship of
+     * current model to products.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Product\Models\Product>
+     */
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class);
