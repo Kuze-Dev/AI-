@@ -9,6 +9,43 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Domain\Address\Models\Country
+ *
+ * @property int $id
+ * @property string $code
+ * @property string $name
+ * @property string|null $capital
+ * @property CountryStateOrRegion|null $state_or_region
+ * @property string|null $timezone
+ * @property string|null $language
+ * @property bool $active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Address\Models\Region> $regions
+ * @property-read int|null $regions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Address\Models\State> $states
+ * @property-read int|null $states_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Country newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Country newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Country onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Country query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Country whereActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Country whereCapital($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Country whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Country whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Country whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Country whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Country whereLanguage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Country whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Country whereStateOrRegion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Country whereTimezone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Country whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Country withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Country withoutTrashed()
+ * @mixin \Eloquent
+ */
 class Country extends Model
 {
     use SoftDeletes;

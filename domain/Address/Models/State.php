@@ -9,6 +9,32 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Domain\Address\Models\State
+ *
+ * @property int $id
+ * @property int $country_id
+ * @property string $name
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Address\Models\City> $cities
+ * @property-read int|null $cities_count
+ * @property-read \Domain\Address\Models\Country|null $country
+ * @method static \Illuminate\Database\Eloquent\Builder|State newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|State newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|State onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|State query()
+ * @method static \Illuminate\Database\Eloquent\Builder|State whereCountryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|State whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|State whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|State whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|State whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|State whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|State withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|State withoutTrashed()
+ * @mixin \Eloquent
+ */
 class State extends Model
 {
     use SoftDeletes;
