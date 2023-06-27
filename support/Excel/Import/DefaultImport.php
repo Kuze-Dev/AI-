@@ -13,7 +13,7 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Events\ImportFailed;
-use Support\Excel\Notifications\ImportFailed as ImportFailedNotification;
+use Support\Excel\Listeners\SendImportFailedNotification;
 
 class DefaultImport implements ShouldQueue, ToModel, WithValidation, WithChunkReading, WithHeadingRow, WithEvents
 {
@@ -54,14 +54,8 @@ class DefaultImport implements ShouldQueue, ToModel, WithValidation, WithChunkRe
 
     public function registerEvents(): array
     {
-        return [ImportFailed::class => function (ImportFailed $event) {
-            if ($event->getException() instanceof ValidationException) {
-                Notification::send(
-                    $this->user,
-                    new ImportFailedNotification($event->getException()->errors()[0][0])
-                );
-            }
-        },
+        return [
+            ImportFailed::class => new SendImportFailedNotification($this->user),
         ];
     }
 }
