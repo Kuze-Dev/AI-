@@ -16,7 +16,7 @@ class UpdateCountryAction
             'code' => $countryData->code,
             'name' => $countryData->name,
             'capital' => $countryData->capital,
-            'state_or_province' => $countryData->state_or_province,
+            'state_or_region' => $countryData->state_or_region,
             'timezone' => $countryData->timezone,
             'language' => $countryData->language,
             'active' => $countryData->active,

@@ -48,7 +48,7 @@ class CreateCountry extends CreateRecord
                 code: $data['code'],
                 name: $data['name'],
                 capital: $data['capital'],
-                state_or_province: $data['state_or_province'],
+                state_or_region: $data['state_or_region'],
                 timezone: $data['timezone'],
                 language: $data['language'],
                 active: $data['active'],

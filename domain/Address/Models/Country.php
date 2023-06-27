@@ -28,8 +28,15 @@ class Country extends Model
         'active' => 'bool',
     ];
 
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Address\Models\Region>*/
     public function regions(): HasMany
     {
         return $this->hasMany(Region::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Address\Models\State>*/
+    public function states(): HasMany
+    {
+        return $this->hasMany(State::class);
     }
 }

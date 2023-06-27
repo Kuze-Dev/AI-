@@ -28,26 +28,31 @@ class CountryResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
     public static function getGloballySearchableAttributes(): array
     {
         return ['name'];
     }
 
-    public static function form(Form $form): Form
-    {
-        return $form->schema([
-            Forms\Components\Card::make([
-                Forms\Components\TextInput::make('code')
-                    ->required(),
-                Forms\Components\TextInput::make('name')
-                    ->required(),
-                Forms\Components\TextInput::make('capital'),
-                Forms\Components\TextInput::make('timezone'),
-                Forms\Components\TextInput::make('language'),
-                Forms\Components\Toggle::make('active'),
-            ]),
-        ]);
-    }
+    // public static function form(Form $form): Form
+    // {
+    //     return $form->schema([
+    //         Forms\Components\Card::make([
+    //             Forms\Components\TextInput::make('code')
+    //                 ->required(),
+    //             Forms\Components\TextInput::make('name')
+    //                 ->required(),
+    //             Forms\Components\TextInput::make('capital'),
+    //             Forms\Components\TextInput::make('timezone'),
+    //             Forms\Components\TextInput::make('language'),
+    //             Forms\Components\Toggle::make('active'),
+    //         ]),
+    //     ]);
+    // }
 
     /** @throws Exception */
     /** @throws Exception */
@@ -105,18 +110,20 @@ class CountryResource extends Resource
                         '0' => 'Inactive',
                     ]),
             ])
+
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make()
-                        ->using(function (Country $record) {
-                            try {
-                                return app(DeleteCountryAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
-                                return false;
-                            }
-                        }),
-                ]),
+
+                // Tables\Actions\EditAction::make(),
+                // Tables\Actions\ActionGroup::make([
+                //     Tables\Actions\DeleteAction::make()
+                //         ->using(function (Country $record) {
+                //             try {
+                //                 return app(DeleteCountryAction::class)->execute($record);
+                //             } catch (DeleteRestrictedException $e) {
+                //                 return false;
+                //             }
+                //         }),
+                // ]),
             ])
             ->bulkActions([])
             ->defaultSort('id', 'asc');
@@ -126,8 +133,8 @@ class CountryResource extends Resource
     {
         return [
             'index' => Pages\ListCountry::route('/'),
-            'create' => Pages\CreateCountry::route('/create'),
-            'edit' => Pages\EditCountry::route('/{record}/edit'),
+            // 'create' => Pages\CreateCountry::route('/create'),
+            // 'edit' => Pages\EditCountry::route('/{record}/edit'),
         ];
     }
 }

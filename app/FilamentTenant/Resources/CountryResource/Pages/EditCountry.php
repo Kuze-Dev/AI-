@@ -57,7 +57,7 @@ class EditCountry extends EditRecord
                         name: $data['name'],
                         capital: $data['capital'],
                         timezone: $data['timezone'],
-                        state_or_province: $data['state_or_province'],
+                        state_or_region: $data['state_or_region'],
                         language: $data['language'],
                         active: $data['active'],
                     )

@@ -22,4 +22,10 @@ class City extends Model
     {
         return $this->belongsTo(State::class);
     }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\Region, City> */
+    public function region(): BelongsTo
+    {
+        return $this->belongsTo(Region::class);
+    }
 }

@@ -16,7 +16,7 @@ return new class () extends Migration {
             $table->id();
 
             $table->string('code')->index();
-            $table->string('name')->index();
+            $table->string('name')->unique();
             $table->string('capital')->nullable();
             $table->string('state_or_region')->nullable();
             $table->string('timezone')->nullable();
@@ -61,6 +61,9 @@ return new class () extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('currencies');
+        Schema::dropIfExists('countries');
+        Schema::dropIfExists('regions');
+        Schema::dropIfExists('states');
+        Schema::dropIfExists('cities');
     }
 };
