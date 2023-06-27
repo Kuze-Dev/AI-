@@ -51,7 +51,7 @@ class AddressesRelationManager extends RelationManager
                     ->preload()
                     ->optionsFromModel(Country::class, 'name')
                     ->reactive()
-                    ->afterStateHydrated(function (callable $set) {
+                    ->afterStateUpdated(function (callable $set) {
                         $set('state_id', null);
                         $set('region_id', null);
                         $set('city_id', null);
