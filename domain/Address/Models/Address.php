@@ -19,11 +19,12 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property int $id
  * @property-read  string $full_detail
  * @property int $customer_id
+ * @property int $country_id
+ * @property int|null $state_id
+ * @property int|null $region_id
+ * @property int $city_id
  * @property string $address_line_1
  * @property string|null $address_line_2
- * @property string $country
- * @property string|null $state_or_region
- * @property string $city_or_province
  * @property string $zip_code
  * @property bool $is_default_shipping
  * @property bool $is_default_billing
@@ -31,21 +32,22 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Domain\Customer\Models\Customer|null $customer
- * @property-read \Domain\Customer\Models\Customer|null $tier
+ * @property-read Customer|null $customer
+ * @property-read Tier|null $tier
  * @method static \Illuminate\Database\Eloquent\Builder|Address newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Address newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Address query()
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereAddressLine1($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereAddressLine2($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Address whereCityOrProvince($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Address whereCountry($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereCityId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereCountryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereCustomerId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereIsDefaultBilling($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereIsDefaultShipping($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Address whereStateOrRegion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereRegionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereStateId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereZipCode($value)
  * @mixin \Eloquent
