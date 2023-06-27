@@ -9,10 +9,14 @@ use Domain\Address\Models\Country;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<Country>
+ */
 class CountryFactory extends Factory
 {
     protected $model = Country::class;
 
+    /** @return array */
     public function definition(): array
     {
         return [

@@ -7,6 +7,9 @@ namespace Domain\Address\Database\Factories;
 use Domain\Address\Models\State;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<State>
+ */
 class StateFactory extends Factory
 {
     protected $model = State::class;
