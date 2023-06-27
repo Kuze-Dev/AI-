@@ -18,7 +18,7 @@ class EditCustomerAction
 
     public function execute(Customer $customer, CustomerData $customerData): Customer
     {
-        $customer->update([
+        $newData = [
             'tier_id' => $customerData->tier_id,
             'email' => $customerData->email,
             'first_name' => $customerData->first_name,
@@ -27,7 +27,14 @@ class EditCustomerAction
             'status' => $customerData->status,
             'birth_date' => $customerData->birth_date,
             'password' => $customerData->password,
-        ]);
+        ];
+
+        if ($newData['email'] === null) {
+            unset($newData['email']);
+        }
+
+        $customer->update($newData);
+        unset($newData);
 
         if ($customerData->image !== null) {
             $this->syncMediaCollection->execute($customer, new MediaCollectionData(

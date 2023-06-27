@@ -11,12 +11,12 @@ use Illuminate\Http\UploadedFile;
 class CustomerData
 {
     public function __construct(
-        public readonly string $email,
         public readonly string $first_name,
         public readonly string $last_name,
         public readonly string $mobile,
         public readonly Status $status,
         public readonly Carbon $birth_date,
+        public readonly ?string $email = null,
         public readonly ?string $password = null,
         public readonly ?int $tier_id = null,
         public readonly UploadedFile|string|null $image = null,

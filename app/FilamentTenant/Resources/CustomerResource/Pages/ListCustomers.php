@@ -37,8 +37,8 @@ class ListCustomers extends ListRecords
                             'last_name' => $row['last_name'],
                             'mobile' => $row['mobile'],
                             'status' => Status::tryFrom($row['status']),
-                            'birth_date' => $row['birth_date'],
-                            'tier' => $row['tier'],
+                            'birth_date' => now()->parse($row['birth_date']),
+                            'tier_id' => isset($row['tier']) ? (Tier::whereName($row['tier'])->first()->getKey()) : null,
                         ];
                         unset($row);
 
@@ -62,7 +62,7 @@ class ListCustomers extends ListRecords
                         'last_name' => 'required|string|min:3|max:100',
                         'mobile' => 'required|string|min:3|max:100',
                         'status' => ['nullable', Rule::enum(Status::class)],
-                        'birth_date' => 'required|date_format:'.config('tables.date_format'),
+                        'birth_date' => 'required|date',
                         'tier' => [
                             'nullable',
                             Rule::exists(Tier::class, 'name'),

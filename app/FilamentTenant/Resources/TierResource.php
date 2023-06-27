@@ -7,7 +7,6 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\TierResource\RelationManagers\CustomersRelationManager;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Domain\Tier\Actions\DeleteTierAction;
 use Domain\Tier\Actions\ForceDeleteTierAction;
 use Domain\Tier\Actions\RestoreTierAction;
@@ -22,6 +21,7 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class TierResource extends Resource
 {
@@ -103,7 +103,6 @@ class TierResource extends Resource
                 ]),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
             ])
             ->defaultSort('updated_at', 'desc');
     }
