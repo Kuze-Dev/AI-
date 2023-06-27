@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Settings\FormSettings;
+use Domain\Address\Models\City;
+use Domain\Address\Models\Country;
+use Domain\Address\Models\Region;
+use Domain\Address\Models\State;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
+use Domain\Currency\Models\Currency;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
@@ -68,6 +73,11 @@ class AppServiceProvider extends ServiceProvider
             ContentEntry::class,
             Globals::class,
             MetaData::class,
+            Currency::class,
+            Country::class,
+            Region::class,
+            State::class,
+            City::class,
         ]);
 
         Password::defaults(
