@@ -17,7 +17,7 @@ return new class () extends Migration {
             $table->boolean('enabled')->default(false);
             $table->decimal('exchange_rate', 8, 2)->nullable();
             $table->boolean('default')->default(false);
-            
+
             $table->timestamps();
             $table->softDeletes();
         });
