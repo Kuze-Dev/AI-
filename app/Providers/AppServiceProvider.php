@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Pennant\Feature;
 use Stancl\Tenancy\Database\Models\Tenant;
 use TiMacDonald\JsonApi\JsonApiResource;
 
@@ -70,7 +71,7 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Password::defaults(
-            fn () => $this->app->environment('local', 'testing')
+            $this->app->environment('local', 'testing')
                 ? Password::min(4)
                 : Password::min(8)
                     ->mixedCase()
@@ -95,5 +96,7 @@ class AppServiceProvider extends ServiceProvider
                 ? app(FormSettings::class)->getCredentials()
                 : config('catpcha.credentials')
         );
+
+        Feature::discover('App\\Features\\CMS', app_path('Features/CMS'));
     }
 }

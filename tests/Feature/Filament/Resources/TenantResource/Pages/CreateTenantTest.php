@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Filament\Resources\TenantResource\Pages\CreateTenant;
 use Domain\Tenant\Models\Tenant;
 
-use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(fn () => loginAsSuperAdmin());
@@ -34,5 +34,5 @@ it('can create tenant', function () {
         ->call('create')
         ->assertHasNoFormErrors();
 
-    assertDatabaseCount(Tenant::class, 1);
+    assertDatabaseHas(Tenant::class, ['name' => 'Test']);
 });

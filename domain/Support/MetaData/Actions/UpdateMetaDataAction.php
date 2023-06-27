@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace Domain\Support\MetaData\Actions;
 
+use Domain\Support\Common\Actions\SyncMediaCollectionAction;
+use Domain\Support\Common\DataTransferObjects\MediaCollectionData;
 use Domain\Support\MetaData\Contracts\HasMetaData;
 use Domain\Support\MetaData\DataTransferObjects\MetaDataData;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\UploadedFile;
 
 class UpdateMetaDataAction
 {
+    public function __construct(
+        protected SyncMediaCollectionAction $syncMediaCollectionAction
+    ) {
+    }
+
     public function execute(Model&HasMetaData $model, MetaDataData $metaDataData): Model
     {
         $defaults = $model->defaultMetaData();
@@ -25,19 +31,18 @@ class UpdateMetaDataAction
             'keywords' => $metaDataData->keywords ?? $defaults['keywords'] ?? null,
         ]);
 
-        if ($metaDataData->image instanceof UploadedFile && $imageString = $metaDataData->image->get()) {
-            $metaData->addMediaFromString($imageString)
-                ->usingFileName($metaDataData->image->getClientOriginalName())
-                ->usingName(pathinfo($metaDataData->image->getClientOriginalName(), PATHINFO_FILENAME))
-                ->withCustomProperties(['alt_text' => $metaDataData->image_alt_text])
-                ->toMediaCollection('image');
-        } elseif ($metaDataData->image !== null) {
-            $metaData->getFirstMedia('image')
-                ?->setCustomProperty('alt_text', $metaDataData->image_alt_text)
-                ->save();
-        } else {
-            $metaData->clearMediaCollection('image');
-        }
+        $this->syncMediaCollectionAction->execute(
+            $metaData,
+            MediaCollectionData::fromArray([
+                'collection' => 'image',
+                'media' => $metaDataData->image
+                    ? [
+                        'media' => $metaDataData->image,
+                        'custom_properties' => ['alt_text' => $metaDataData->image_alt_text],
+                    ]
+                    : [],
+            ])
+        );
 
         return $model;
     }

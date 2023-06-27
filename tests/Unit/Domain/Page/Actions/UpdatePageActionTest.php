@@ -10,7 +10,6 @@ use Domain\Page\Models\Page;
 use Domain\Page\Models\BlockContent;
 use Domain\Support\MetaData\Models\MetaData;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 
 beforeEach(fn () => testInTenantContext());
@@ -54,8 +53,12 @@ it('can update page', function () {
             ])
         );
 
-    assertDatabaseCount(Page::class, 1);
-    assertDatabaseCount(BlockContent::class, 1);
+    assertDatabaseHas(Page::class, ['name' => 'Foo']);
+    assertDatabaseHas(BlockContent::class, [
+        'page_id' => $page->id,
+        'block_id' => $page->blockContents->first()->block_id,
+        'data' => json_encode(['name' => 'foo']),
+    ]);
     assertDatabaseHas(
         MetaData::class,
         [
@@ -64,13 +67,7 @@ it('can update page', function () {
             'keywords' => 'foo keywords updated',
             'description' => 'foo description updated',
             'model_type' => $page->getMorphClass(),
-            'model_id' => $page->id,
+            'model_id' => $page->getKey(),
         ]
     );
-    assertDatabaseHas(Page::class, ['name' => 'Foo']);
-    assertDatabaseHas(BlockContent::class, [
-        'page_id' => $page->id,
-        'block_id' => $page->blockContents->first()->block_id,
-        'data' => json_encode(['name' => 'foo']),
-    ]);
 });

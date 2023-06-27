@@ -13,12 +13,12 @@ class AdminData
     public function __construct(
         public readonly string $first_name,
         public readonly string $last_name,
-        public readonly string $email,
+        public readonly ?string $email = null,
         public readonly ?string $password = null,
-        public readonly bool $active = true,
         public readonly ?string $timezone = null,
-        public readonly array $roles = [],
-        public readonly array $permissions = [],
+        public readonly ?bool $active = null,
+        public readonly ?array $roles = null,
+        public readonly ?array $permissions = null,
     ) {
     }
 }

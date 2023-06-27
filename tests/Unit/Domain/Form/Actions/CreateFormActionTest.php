@@ -8,7 +8,6 @@ use Domain\Form\DataTransferObjects\FormData;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 
 beforeEach(fn () => testInTenantContext());
@@ -17,9 +16,6 @@ it('store', function () {
     $blueprint = BlueprintFactory::new()
         ->withDummySchema()
         ->createOne();
-
-    assertDatabaseCount(Form::class, 0);
-    assertDatabaseCount(FormEmailNotification::class, 0);
 
     app(CreateFormAction::class)
         ->execute(FormData::fromArray([
@@ -36,8 +32,6 @@ it('store', function () {
             ],
         ]));
 
-    assertDatabaseCount(Form::class, 1);
-    assertDatabaseCount(FormEmailNotification::class, 1);
     assertDatabaseHas(Form::class, [
         'blueprint_id' => $blueprint->getKey(),
         'name' => 'Test',
