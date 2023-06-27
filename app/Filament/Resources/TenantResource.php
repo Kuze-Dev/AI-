@@ -106,6 +106,10 @@ class TenantResource extends Resource
                                     'label' => trans('CMS'),
                                     'extras' => [],
                                 ],
+                                Features\ECommerce\ECommerceBase::class => [
+                                    'label' => trans('eCommerce'),
+                                    'extras' => [],
+                                ],
                             ]),
                     ]),
             ]);
