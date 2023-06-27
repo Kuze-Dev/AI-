@@ -19,6 +19,7 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -143,6 +144,18 @@ class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, 
     public function taxonomyTerms(): BelongsToMany
     {
         return $this->belongsToMany(TaxonomyTerm::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Product\Models\ProductVariant> */
+    public function productVariants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Product\Models\ProductOption> */
+    public function productOptions(): HasMany
+    {
+        return $this->hasMany(ProductOption::class);
     }
 
     public function getSlugOptions(): SlugOptions

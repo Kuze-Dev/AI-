@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Domain\Product\Models\Product;
+use Domain\Product\Models\ProductOption;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -36,6 +37,33 @@ return new class () extends Migration {
             $table->foreignIdFor(Product::class)->index();
             $table->foreignIdFor(TaxonomyTerm::class)->index();
         });
+
+        Schema::create('product_variants', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(Product::class)->index();
+            $table->string('sku')->unique();
+            $table->json('combination');
+            $table->decimal('retail_price', 10, 2);
+            $table->decimal('selling_price', 10, 2);
+            $table->unsignedInteger('stock');
+            $table->string('status')->default(true);
+            $table->timestamps();
+        });
+
+        Schema::create('product_options', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(Product::class)->index();
+            $table->string('name');
+            $table->string('slug');
+            $table->timestamps();
+        });
+
+        Schema::create('product_option_values', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('slug');
+            $table->foreignIdFor(ProductOption::class)->index();
+        });
     }
 
     /** Reverse the migrations. */
@@ -43,5 +71,8 @@ return new class () extends Migration {
     {
         Schema::dropIfExists('products');
         Schema::dropIfExists('product_taxonomy_term');
+        Schema::dropIfExists('product_variants');
+        Schema::dropIfExists('product_options');
+        Schema::dropIfExists('product_option_values');
     }
 };
