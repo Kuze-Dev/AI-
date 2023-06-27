@@ -11,7 +11,6 @@ use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Actions\ForceDeleteCustomerAction;
 use Domain\Customer\Actions\RestoreCustomerAction;
 use Domain\Customer\Models\Customer;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Domain\Tier\Models\Tier;
 use Exception;
 use Filament\Facades\Filament;
@@ -23,7 +22,10 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Support\Excel\Actions\ExportBulkAction;
 
 class CustomerResource extends Resource
 {
@@ -71,7 +73,7 @@ class CustomerResource extends Resource
                         ->translateLabel()
                         ->required()
                         ->email()
-                        ->rule('email') // TODO: use `Rule::email()` macro from tall-boilerplate
+                        ->rule(Rule::email())
                         ->maxLength(255),
                     Forms\Components\TextInput::make('mobile')
                         ->translateLabel()
@@ -173,6 +175,22 @@ class CustomerResource extends Resource
                 ]),
             ])
             ->bulkActions([
+                ExportBulkAction::make()
+                    ->queue()
+                    ->query(fn (Builder $query) => $query->with('tier')->latest())
+                    ->mapUsing(
+                        ['Email', 'First Name',  'Last Name', 'Mobile', 'Status', 'Birth Date', 'Tier', 'Created At'],
+                        fn (Customer $customer): array => [
+                            $customer->email,
+                            $customer->first_name,
+                            $customer->last_name,
+                            $customer->mobile,
+                            $customer->status->value,
+                            $customer->birth_date->format(config('tables.date_format')),
+                            $customer->tier?->name,
+                            $customer->created_at?->format(config('tables.date_time_format')),
+                        ]
+                    ),
             ])
             ->defaultSort('updated_at', 'desc');
     }

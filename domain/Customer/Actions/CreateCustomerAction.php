@@ -6,9 +6,9 @@ namespace Domain\Customer\Actions;
 
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Models\Customer;
-use Domain\Support\Common\Actions\SyncMediaCollectionAction;
-use Domain\Support\Common\DataTransferObjects\MediaCollectionData;
-use Domain\Support\Common\DataTransferObjects\MediaData;
+use Support\Common\Actions\SyncMediaCollectionAction;
+use Support\Common\DataTransferObjects\MediaCollectionData;
+use Support\Common\DataTransferObjects\MediaData;
 
 class CreateCustomerAction
 {
@@ -29,12 +29,14 @@ class CreateCustomerAction
             'password' => $customerData->password,
         ]);
 
-        $this->syncMediaCollection->execute($customer, new MediaCollectionData(
-            collection: 'image',
-            media: [
-                new MediaData(media: $customerData->image),
-            ],
-        ));
+        if ($customerData->image !== null) {
+            $this->syncMediaCollection->execute($customer, new MediaCollectionData(
+                collection: 'image',
+                media: [
+                    new MediaData(media: $customerData->image),
+                ],
+            ));
+        }
 
         return $customer;
     }
