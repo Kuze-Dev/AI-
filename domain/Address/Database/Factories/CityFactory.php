@@ -14,8 +14,20 @@ class CityFactory extends Factory
     public function definition(): array
     {
         return [
-            'state_id' => StateFactory::new(),
-            'region_id' => RegionFactory::new(),
+            'state_id' => function (array $attributes) {
+                if (isset($attributes['region_id'])) {
+                    return null;
+                }
+
+                return StateFactory::new();
+            },
+            'region_id' => function (array $attributes) {
+                if (isset($attributes['state_id'])) {
+                    return null;
+                }
+
+                return RegionFactory::new();
+            },
             'name' => $this->faker->name(),
         ];
     }

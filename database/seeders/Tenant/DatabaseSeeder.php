@@ -20,9 +20,6 @@ class DatabaseSeeder extends Seeder
             Page\PageSeeder::class,
             Currency\CurrencySeeder::class,
             Address\CountrySeeder::class,
-            Address\StateSeeder::class,
-            Address\RegionSeeder::class,
-            Address\CitySeeder::class,
 
         ]);
     }
