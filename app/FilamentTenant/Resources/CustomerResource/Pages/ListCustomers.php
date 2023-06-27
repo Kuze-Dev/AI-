@@ -36,9 +36,9 @@ class ListCustomers extends ListRecords
                             'first_name' => $row['first_name'],
                             'last_name' => $row['last_name'],
                             'mobile' => $row['mobile'],
-                            'status' => Status::tryFrom($row['status']),
+                            'status' => Status::from($row['status']),
                             'birth_date' => now()->parse($row['birth_date']),
-                            'tier_id' => isset($row['tier']) ? (Tier::whereName($row['tier'])->first()->getKey()) : null,
+                            'tier_id' => isset($row['tier']) ? (Tier::whereName($row['tier'])->first()?->getKey()) : null,
                         ];
                         unset($row);
 

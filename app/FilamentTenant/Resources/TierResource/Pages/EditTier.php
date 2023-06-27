@@ -6,7 +6,6 @@ namespace App\FilamentTenant\Resources\TierResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\TierResource;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Domain\Tier\Actions\DeleteTierAction;
 use Domain\Tier\Actions\EditTierAction;
 use Domain\Tier\Actions\ForceDeleteTierAction;
@@ -19,6 +18,7 @@ use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Throwable;
 
 class EditTier extends EditRecord
