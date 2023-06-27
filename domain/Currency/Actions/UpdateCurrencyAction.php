@@ -4,22 +4,24 @@ declare(strict_types=1);
 
 namespace Domain\Currency\Actions;
 
-use Domain\Currency\DataTransferObjects\CurrencyData;
 use Domain\Currency\Models\Currency;
 
 class UpdateCurrencyAction
 {
-    public function execute(Currency $currency, CurrencyData $currencyData): Currency
+    public function execute(Currency $currency): void
     {
 
-        $currency->update([
-            'code' => $currencyData->code,
-            'name' => $currencyData->name,
-            'enabled' => $currencyData->enabled,
-            'exchange_rate' => $currencyData->exchange_rate,
-            'default' => $currencyData->default,
-        ]);
+        if ($currency->enabled) {
+            Currency::where('id', '!=', $currency->id)->update(['enabled' => false]);
+        }
 
-        return $currency;
+        if ($currency->default) {
+            Currency::where('id', '!=', $currency->id)->update(['default' => false]);
+        }
+
+        if (!Currency::where('enabled', true)->exists()) {
+            Currency::where('default', true)->update(['enabled' => true]);
+        }
+        
     }
 }
