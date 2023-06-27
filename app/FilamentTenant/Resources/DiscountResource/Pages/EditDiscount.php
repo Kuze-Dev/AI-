@@ -24,6 +24,7 @@ class EditDiscount extends EditRecord
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
+            Actions\RestoreAction::make(),
         ];
     }
 

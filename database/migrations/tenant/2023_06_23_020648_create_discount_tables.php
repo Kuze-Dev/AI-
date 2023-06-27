@@ -13,47 +13,61 @@ return new class () extends Migration {
         Schema::create('discounts', function (Blueprint $table) {
             $table->id();
 
-            $table->string('slug')->unique();
             $table->string('name')->index();
+            $table->string('slug')->unique();
             $table->text('description')->nullable();
-            $table->string('type')->index();
-            $table->float('amount', 8, 2);
+            $table->string('code')->unique();
             $table->string('status')->index();
-            $table->unsignedInteger('max_uses');
+            $table->unsignedInteger('max_uses')->nullable();
             // $table->unsignedInteger('max_uses_per_user');
 
             $table->timestamp('valid_start_at');
             $table->timestamp('valid_end_at')->nullable();
+            $table->softDeletes('deleted_at')->nullable();
             $table->timestamps();
         });
 
-        Schema::create('discount_codes', function (Blueprint $table) {
-            $table->id();
+        // Schema::create('discount_codes', function (Blueprint $table) {
+        //     $table->id();
 
-            $table->foreignIdFor(Discount::class)->index();
-            // $table->foreignIdFor(Customer::class);
+        //     $table->foreignIdFor(Discount::class)->index();
+        //     // $table->foreignIdFor(Customer::class);
 
-            $table->string('code')->unique();
+        //     $table->string('code')->unique();
 
-            $table->timestamps();
-        });
+        //     $table->timestamps();
+        // });
 
         Schema::create('discount_conditions', function (Blueprint $table) {
             $table->id();
 
             $table->foreignIdFor(Discount::class)->index();
 
-            $table->string('type')->index();
-            $table->json('data')->nullable();
+            $table->string('discount_type')->index();
+            $table->string('amount_type')->index();
+            $table->bigInteger('amount');
 
             $table->timestamps();
         });
+
+        Schema::create('discount_requirements', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignIdFor(Discount::class)->index();
+
+            $table->string('requirement_type')->index();
+            $table->bigInteger('minimum_amount');
+
+            $table->timestamps();
+        });
+
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('discount_requirements');
         Schema::dropIfExists('discount_conditions');
-        Schema::dropIfExists('discount_codes');
+        // Schema::dropIfExists('discount_codes');
         Schema::dropIfExists('discounts');
     }
 };

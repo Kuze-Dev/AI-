@@ -283,7 +283,7 @@ namespace Domain\Discount\Models{
  * @property string $slug
  * @property string $name
  * @property string|null $description
- * @property DiscountType $type
+ * @property DiscountConditionType $type
  * @property mixed $status
  * @property int $max_uses
  * @property int $max_uses_per_user

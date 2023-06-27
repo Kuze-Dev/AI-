@@ -26,21 +26,11 @@ use Illuminate\Support\Str;
 /**
  * Domain\Content\Models\ContentEntry
  *
- * @property int $id
- * @property int|null $author_id
- * @property int $content_id
- * @property string $title
- * @property string $slug
- * @property \Illuminate\Support\Carbon|null $published_at
- * @property array $data
- * @property int|null $order
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Domain\Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Admin|null $author
- * @property-read \Domain\Content\Models\Content $content
+ * @property-read \Domain\Content\Models\Content|null $content
  * @property-read \Domain\Support\MetaData\Models\MetaData|null $metaData
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Support\RouteUrl\Models\RouteUrl> $routeUrls
  * @property-read int|null $route_urls_count
@@ -49,20 +39,10 @@ use Illuminate\Support\Str;
  * @method static ContentEntryBuilder|ContentEntry newModelQuery()
  * @method static ContentEntryBuilder|ContentEntry newQuery()
  * @method static ContentEntryBuilder|ContentEntry query()
- * @method static ContentEntryBuilder|ContentEntry whereAuthorId($value)
- * @method static ContentEntryBuilder|ContentEntry whereContentId($value)
- * @method static ContentEntryBuilder|ContentEntry whereCreatedAt($value)
- * @method static ContentEntryBuilder|ContentEntry whereData($value)
- * @method static ContentEntryBuilder|ContentEntry whereId($value)
- * @method static ContentEntryBuilder|ContentEntry whereOrder($value)
  * @method static ContentEntryBuilder|ContentEntry wherePublishStatus(?\Domain\Content\Enums\PublishBehavior $publishBehavior = null, ?string $timezone = null)
- * @method static ContentEntryBuilder|ContentEntry wherePublishedAt($value)
  * @method static ContentEntryBuilder|ContentEntry wherePublishedAtRange(?\Carbon\Carbon $publishedAtStart = null, ?\Carbon\Carbon $publishedAtEnd = null)
  * @method static ContentEntryBuilder|ContentEntry wherePublishedAtYearMonth(int $year, ?int $month = null)
- * @method static ContentEntryBuilder|ContentEntry whereSlug($value)
  * @method static ContentEntryBuilder|ContentEntry whereTaxonomyTerms(string $taxonomy, array $terms)
- * @method static ContentEntryBuilder|ContentEntry whereTitle($value)
- * @method static ContentEntryBuilder|ContentEntry whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['taxonomyTerms', 'metaData', 'routeUrls'])]

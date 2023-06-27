@@ -4,54 +4,39 @@ declare(strict_types=1);
 
 namespace Domain\Discount\Models;
 
-use Domain\Discount\Enums\DiscountType;
+use Domain\Discount\Enums\DiscountStatus;
+use Domain\Discount\Enums\DiscountConditionType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Domain\Discount\Models\Discount
  *
- * @property int $id
- * @property string $slug
- * @property string $name
- * @property string|null $description
- * @property DiscountType $type
- * @property mixed $status
- * @property int $max_uses
- * @property int $max_uses_per_user
- * @property \Illuminate\Support\Carbon $valid_start_at
- * @property \Illuminate\Support\Carbon|null $valid_end_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Discount\Models\DiscountCondition> $DiscountConditions
+ * @property mixed $type
+ * @property DiscountStatus $status
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Discount\Models\DiscountCondition> $discountConditions
  * @property-read int|null $discount_conditions_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Discount\Models\DiscountCode> $discountCodes
- * @property-read int|null $discount_codes_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Discount\Models\DiscountRequirement> $discountRequirements
+ * @property-read int|null $discount_requirements_count
  * @method static \Illuminate\Database\Eloquent\Builder|Discount newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Discount newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Discount query()
- * @method static \Illuminate\Database\Eloquent\Builder|Discount whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Discount whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Discount whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Discount whereMaxUses($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Discount whereMaxUsesPerUser($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Discount whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Discount whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Discount whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Discount whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Discount whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Discount whereValidEndAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Discount whereValidStartAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount withoutTrashed()
  * @mixin \Eloquent
  */
 class Discount extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
-        'slug',
         'name',
+        'slug',
         'description',
-        'type',
-        'amount',
+        'code',
         'status',
         'max_uses',
         // 'max_uses_per_user',
@@ -60,7 +45,7 @@ class Discount extends Model
     ];
 
     protected $casts = [
-        'type' => DiscountType::class,
+        'type' => DiscountConditionType::class,
         'status' => DiscountStatus::class,
         'max_uses' => 'int',
         // 'max_uses_per_user' => 'int',
@@ -68,13 +53,18 @@ class Discount extends Model
         'valid_end_at' => 'datetime',
     ];
 
-    public function discountCodes(): HasMany
+    // public function discountCodes(): HasMany
+    // {
+    //     return $this->hasMany(DiscountCode::class);
+    // }
+
+    public function discountCondition(): HasOne
     {
-        return $this->hasMany(DiscountCode::class);
+        return $this->hasOne(DiscountCondition::class);
     }
 
-    public function discountConditions(): HasMany
+    public function discountRequirement(): HasOne
     {
-        return $this->hasMany(DiscountCondition::class);
+        return $this->hasOne(DiscountRequirement::class);
     }
 }

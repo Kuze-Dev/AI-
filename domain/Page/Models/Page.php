@@ -26,14 +26,7 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 /**
  * Domain\Page\Models\Page
  *
- * @property int $id
- * @property int|null $author_id
- * @property string $name
- * @property string $slug
  * @property Visibility $visibility
- * @property \Illuminate\Support\Carbon|null $published_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Domain\Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
@@ -46,16 +39,8 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @method static PageBuilder|Page newModelQuery()
  * @method static PageBuilder|Page newQuery()
  * @method static PageBuilder|Page query()
- * @method static PageBuilder|Page whereAuthorId($value)
- * @method static PageBuilder|Page whereCreatedAt($value)
- * @method static PageBuilder|Page whereId($value)
- * @method static PageBuilder|Page whereName($value)
- * @method static PageBuilder|Page wherePublishedAt($value)
  * @method static PageBuilder|Page wherePublishedAtRange(?\Carbon\Carbon $publishedAtStart = null, ?\Carbon\Carbon $publishedAtEnd = null)
  * @method static PageBuilder|Page wherePublishedAtYearMonth(int $year, ?int $month = null)
- * @method static PageBuilder|Page whereSlug($value)
- * @method static PageBuilder|Page whereUpdatedAt($value)
- * @method static PageBuilder|Page whereVisibility($value)
  * @mixin \Eloquent
  */
 

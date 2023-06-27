@@ -12,8 +12,8 @@ use Domain\Menu\Models\Node;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Domain\Discount\Models\Discount;
-use Domain\Discount\Models\DiscountCode;
 use Domain\Discount\Models\DiscountCondition;
+use Domain\Discount\Models\DiscountRequirement;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
@@ -72,7 +72,7 @@ class AppServiceProvider extends ServiceProvider
             Globals::class,
             MetaData::class,
             Discount::class,
-            DiscountCode::class,
+            DiscountRequirement::class,
             DiscountCondition::class,
         ]);
 

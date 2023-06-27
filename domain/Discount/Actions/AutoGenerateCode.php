@@ -10,6 +10,6 @@ final class AutoGenerateCode
 {
     public function __invoke()
     {
-        return Str::uuid();
+        return Str::random(8);
     }
 }

@@ -20,33 +20,15 @@ use Illuminate\Database\Eloquent\Builder;
 /**
  * Domain\Taxonomy\Models\TaxonomyTerm
  *
- * @property int $id
- * @property int $taxonomy_id
- * @property int|null $parent_id
- * @property string $name
- * @property string $slug
- * @property array $data
- * @property int $order
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $children
  * @property-read int|null $children_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ContentEntry> $contentEntries
  * @property-read int|null $content_entries_count
- * @property-read \Domain\Taxonomy\Models\Taxonomy $taxonomy
+ * @property-read \Domain\Taxonomy\Models\Taxonomy|null $taxonomy
  * @method static Builder|TaxonomyTerm newModelQuery()
  * @method static Builder|TaxonomyTerm newQuery()
  * @method static Builder|TaxonomyTerm ordered(string $direction = 'asc')
  * @method static Builder|TaxonomyTerm query()
- * @method static Builder|TaxonomyTerm whereCreatedAt($value)
- * @method static Builder|TaxonomyTerm whereData($value)
- * @method static Builder|TaxonomyTerm whereId($value)
- * @method static Builder|TaxonomyTerm whereName($value)
- * @method static Builder|TaxonomyTerm whereOrder($value)
- * @method static Builder|TaxonomyTerm whereParentId($value)
- * @method static Builder|TaxonomyTerm whereSlug($value)
- * @method static Builder|TaxonomyTerm whereTaxonomyId($value)
- * @method static Builder|TaxonomyTerm whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['contentEntries', 'children'])]

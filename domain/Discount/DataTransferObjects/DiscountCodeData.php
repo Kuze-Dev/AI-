@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Domain\Discount\DataTransferObjects;
+// declare(strict_types=1);
 
-use Domain\Discount\Models\Discount;
+// namespace Domain\Discount\DataTransferObjects;
 
-class DiscountCodeData
-{
-    public function __construct(
-        public readonly string $code,
-        public readonly int $discount_id,
-    ) {
-    }
-}
+// class DiscountCodeData
+// {
+//     public function __construct(
+//         public readonly string $code,
+//         public readonly int $discount_id,
+//     ) {
+//     }
+// }

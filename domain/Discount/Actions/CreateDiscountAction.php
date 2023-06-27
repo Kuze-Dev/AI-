@@ -4,28 +4,19 @@ declare(strict_types=1);
 
 namespace Domain\Discount\Actions;
 
-use Domain\Discount\DataTransferObjects\DiscountCodeData;
-use Domain\Discount\DataTransferObjects\DiscountConditionData;
 use Domain\Discount\DataTransferObjects\DiscountData;
 use Domain\Discount\Models\Discount;
 
 final class CreateDiscountAction
 {
-    public function __construct(
-        protected CreateDiscountCodeAction $createDiscountCodeAction,
-        protected CreateDiscountConditionAction $createDiscountConditionAction,
-    ) {
-    }
-
     /** Execute create content query. */
-    public function execute(DiscountData $discountData, DiscountConditionData $discountConditionData, DiscountCodeData $discountCodeData): Discount
+    public function execute(DiscountData $discountData): Discount
     {
         $discount = Discount::create([
             'name' => $discountData->name,
             'slug' => $discountData->slug,
             'description' => $discountData->description,
-            'type' => $discountData->type,
-            'amount' => $discountData->amount,
+            'code' => $discountData->code,
             'status' => $discountData->status,
             'max_uses' => $discountData->max_uses,
             // 'max_uses_per_user' => $discountData->max_uses_per_user,
@@ -33,8 +24,16 @@ final class CreateDiscountAction
             'valid_end_at' => $discountData->valid_end_at,
         ]);
 
-        $this->createDiscountCodeAction->execute($discountCodeData);
-        $this->createDiscountConditionAction->execute($discountConditionData);
+        $discount->discountCondition()->create([
+            'discount_type' => $discountData->discountConditionTypeData->discount_type,
+            'amount_type' => $discountData->discountConditionTypeData->discount_amount_type,
+            'amount' => $discountData->discountConditionTypeData->amount,
+        ]);
+
+        $discount->discountRequirement()->create([
+            'requirement_type' => $discountData->discountRequirementData->discount_requirement_type,
+            'minimum_amount' => $discountData->discountRequirementData->minimum_amount,
+        ]);
 
         return $discount;
     }
