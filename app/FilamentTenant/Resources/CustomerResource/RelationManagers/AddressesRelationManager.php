@@ -15,7 +15,6 @@ use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Contracts\HasRelationshipTable;
 use Illuminate\Support\Facades\DB;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
@@ -125,7 +124,7 @@ class AddressesRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->translateLabel()
-                    ->using(function (array $data, HasRelationshipTable $livewire) {
+                    ->using(function (array $data, self $livewire) {
 
                         $data['customer_id'] = $livewire->getPropertyValue('ownerRecord')->getKey();
 
