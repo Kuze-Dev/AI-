@@ -60,21 +60,7 @@ class CountryResource extends Resource
                     ->sortable()
                     ->toggleable()
                     ->searchable(),
-                Tables\Columns\BadgeColumn::make('active')
-                    ->toggleable()
-                    ->enum([
-                        '1' => 'Active',
-                        '0' => 'Inactive',
-                    ])
-                    ->label('Active')
-                    ->color(static function ($state): string {
-                        if ($state == '1') {
-                            return 'success';
-                        }
-
-                        return 'secondary';
-                    })
-                    ->toggleable(),
+                Tables\Columns\ToggleColumn::make('active')->label(''),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()
                     ->toggleable(),
