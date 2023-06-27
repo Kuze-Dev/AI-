@@ -61,7 +61,9 @@ class PageResource extends Resource
                                         ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
                                         ?->dispatchEvent('route_url::update');
                                 })
-                                ->required(),
+                                ->required()
+                                ->string()
+                                ->maxLength(255),
                             RouteUrlFieldset::make()
                                 ->disabled(fn (?Page $record) => $record?->isHomePage()),
                             Forms\Components\Group::make([

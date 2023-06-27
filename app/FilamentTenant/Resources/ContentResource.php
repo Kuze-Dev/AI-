@@ -70,6 +70,8 @@ class ContentResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
+                        ->string()
+                        ->maxLength(255)
                         ->lazy()
                         ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
                             if ($get('prefix') === Str::slug($state) || blank($get('prefix'))) {
@@ -86,6 +88,7 @@ class ContentResource extends Resource
                     Forms\Components\TextInput::make('prefix')
                         ->required()
                         ->string()
+                        ->maxLength(255)
                         ->alphaDash()
                         ->unique(ignoreRecord: true)
                         ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
