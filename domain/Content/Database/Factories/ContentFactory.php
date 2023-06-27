@@ -15,10 +15,8 @@ use Illuminate\Support\Str;
  */
 class ContentFactory extends Factory
 {
-    /** Specify reference model. */
     protected $model = Content::class;
 
-    /** Define values of model instance. */
     public function definition(): array
     {
         $name = $this->faker->unique()->word();
