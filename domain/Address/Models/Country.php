@@ -6,6 +6,7 @@ namespace Domain\Address\Models;
 
 use Domain\Address\Enums\CountryStateOrRegion;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Country extends Model
@@ -26,4 +27,9 @@ class Country extends Model
         'state_or_region' => CountryStateOrRegion::class,
         'active' => 'bool',
     ];
+
+    public function regions(): HasMany
+    {
+        return $this->hasMany(Region::class);
+    }
 }

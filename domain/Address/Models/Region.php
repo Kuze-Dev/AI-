@@ -25,7 +25,7 @@ class Region extends Model
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Address\Models\City>*/
-    public function City(): HasMany
+    public function cities(): HasMany
     {
         return $this->hasMany(City::class);
     }
