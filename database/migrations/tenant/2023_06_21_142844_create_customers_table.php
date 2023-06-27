@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use Domain\Address\Models\City;
+use Domain\Address\Models\Country;
+use Domain\Address\Models\Region;
+use Domain\Address\Models\State;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
@@ -43,12 +47,13 @@ return new class () extends Migration {
             $table->id();
 
             $table->foreignIdFor(Customer::class)->index();
+            $table->foreignIdFor(Country::class)->index();
+            $table->foreignIdFor(State::class)->index()->nullable();
+            $table->foreignIdFor(Region::class)->index()->nullable();
+            $table->foreignIdFor(City::class)->index();
 
             $table->text('address_line_1');
             $table->text('address_line_2')->nullable();
-            $table->string('country');
-            $table->string('state_or_region')->nullable();
-            $table->string('city_or_province');
             $table->string('zip_code');
 
             $table->boolean('is_default_shipping');

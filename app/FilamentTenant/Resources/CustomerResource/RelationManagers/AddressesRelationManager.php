@@ -9,6 +9,7 @@ use Domain\Address\Actions\DeleteAddressAction;
 use Domain\Address\Actions\UpdateAddressAction;
 use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Address\Models\Address;
+use Domain\Address\Models\Country;
 use Exception;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -38,11 +39,11 @@ class AddressesRelationManager extends RelationManager
                     ->nullable()
                     ->string()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('country')  // TODO: relation
+                Forms\Components\Select::make('country_id')  // TODO: relation
                     ->translateLabel()
                     ->required()
-                    ->string()
-                    ->maxLength(255),
+                    ->preload()
+                    ->optionsFromModel(Country::class, 'name'),
 
                 Forms\Components\TextInput::make('state_or_region') // TODO: relation
                     ->label(trans('State/Region'))
