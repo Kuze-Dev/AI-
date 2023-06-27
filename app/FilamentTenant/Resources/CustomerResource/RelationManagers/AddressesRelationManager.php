@@ -126,7 +126,7 @@ class AddressesRelationManager extends RelationManager
                     ->translateLabel()
                     ->using(function (array $data, self $livewire) {
 
-                        $data['customer_id'] = $livewire->getPropertyValue('ownerRecord')->getKey();
+                        $data['customer_id'] = $livewire->getOwnerRecord()->getKey();
 
                         return DB::transaction(
                             fn () => app(CreateAddressAction::class)
