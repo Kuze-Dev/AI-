@@ -8,6 +8,10 @@ use Domain\Currency\Models\Currency;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<Currency>
+ */
+
 class CurrencyFactory extends Factory
 {
     protected $model = Currency::class;

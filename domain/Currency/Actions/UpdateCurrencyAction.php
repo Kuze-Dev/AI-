@@ -19,9 +19,9 @@ class UpdateCurrencyAction
             Currency::where('id', '!=', $currency->id)->update(['default' => false]);
         }
 
-        if (!Currency::where('enabled', true)->exists()) {
+        if ( ! Currency::where('enabled', true)->exists()) {
             Currency::where('default', true)->update(['enabled' => true]);
         }
-        
+
     }
 }

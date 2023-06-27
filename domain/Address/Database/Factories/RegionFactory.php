@@ -7,10 +7,14 @@ namespace Domain\Address\Database\Factories;
 use Domain\Address\Models\Region;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<Region>
+ */
 class RegionFactory extends Factory
 {
     protected $model = Region::class;
 
+    /** @return array */
     public function definition(): array
     {
         return [
