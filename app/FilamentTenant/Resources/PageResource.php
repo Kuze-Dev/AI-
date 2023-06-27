@@ -28,7 +28,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Domain\Page\Actions\DeletePageAction;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class PageResource extends Resource
 {
@@ -61,7 +61,9 @@ class PageResource extends Resource
                                         ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
                                         ?->dispatchEvent('route_url::update');
                                 })
-                                ->required(),
+                                ->required()
+                                ->string()
+                                ->maxLength(255),
                             RouteUrlFieldset::make()
                                 ->disabled(fn (?Page $record) => $record?->isHomePage()),
                             Forms\Components\Group::make([

@@ -10,6 +10,7 @@ use Filament\Pages\SettingsPage;
 use Illuminate\Support\Facades\Route;
 use Closure;
 use Filament\Pages\Actions\Action;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
@@ -79,7 +80,7 @@ abstract class BaseSettings extends SettingsPage
         return 'filament.pages.settings.'.self::getSlug();
     }
 
-    protected function getBreadcrumb(): string
+    protected function getBreadcrumb(): Htmlable|string
     {
         return static::$breadcrumb ?? static::getTitle();
     }

@@ -6,11 +6,11 @@ namespace Domain\Content\Models;
 
 use Domain\Admin\Models\Admin;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
-use Domain\Support\MetaData\HasMetaData;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
-use Domain\Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
-use Domain\Support\RouteUrl\HasRouteUrl;
+use Support\MetaData\HasMetaData;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
+use Support\RouteUrl\HasRouteUrl;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,7 +20,7 @@ use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
-use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
+use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 use Illuminate\Support\Str;
 
 /**
@@ -36,13 +36,13 @@ use Illuminate\Support\Str;
  * @property int|null $order
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Domain\Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
+ * @property-read \Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Admin|null $author
  * @property-read \Domain\Content\Models\Content $content
- * @property-read \Domain\Support\MetaData\Models\MetaData|null $metaData
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Support\RouteUrl\Models\RouteUrl> $routeUrls
+ * @property-read \Support\MetaData\Models\MetaData|null $metaData
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Support\RouteUrl\Models\RouteUrl> $routeUrls
  * @property-read int|null $route_urls_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count

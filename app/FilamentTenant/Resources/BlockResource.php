@@ -18,7 +18,7 @@ use Filament\Tables;
 use Exception;
 use Closure;
 use Domain\Page\Actions\DeleteBlockAction;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Support\Facades\Auth;
 
@@ -40,9 +40,13 @@ class BlockResource extends Resource
             Forms\Components\Card::make([
                 Forms\Components\TextInput::make('name')
                     ->unique(ignoreRecord: true)
+                    ->string()
+                    ->maxLength(255)
                     ->required(),
                 Forms\Components\TextInput::make('component')
-                    ->required(),
+                    ->required()
+                    ->string()
+                    ->maxLength(255),
                 Forms\Components\Select::make('blueprint_id')
                     ->label(trans('Blueprint'))
                     ->required()

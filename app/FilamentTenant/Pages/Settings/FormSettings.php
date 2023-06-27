@@ -6,7 +6,7 @@ namespace App\FilamentTenant\Pages\Settings;
 
 use App\Settings\FormSettings as SettingsFormSettings;
 use Closure;
-use Domain\Support\Captcha\CaptchaProvider;
+use Support\Captcha\CaptchaProvider;
 use Filament\Forms;
 
 class FormSettings extends TenantBaseSettings
