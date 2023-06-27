@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Domain\Address\Models;
 
 use Domain\Customer\Models\Customer;
-use Domain\Tier\Models\Tier;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -107,7 +106,6 @@ class Address extends Model
     {
         return $this->belongsTo(Customer::class);
     }
-
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\Country, \Domain\Address\Models\Address> */
     public function country(): BelongsTo
