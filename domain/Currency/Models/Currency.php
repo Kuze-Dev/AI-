@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Domain\Currency\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -14,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $id
  * @property string|null $code
  * @property string|null $name
- * @property string|null $exchange_rate
+ * @property float|null $exchange_rate
  * @property bool $enabled
  * @property bool $default
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -52,6 +51,7 @@ class Currency extends Model
     protected $casts = [
         'enabled' => 'bool',
         'default' => 'bool',
+        'exchange_rate' => 'float',
     ];
 
     protected static function boot()
