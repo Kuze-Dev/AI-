@@ -78,11 +78,11 @@ class Taxonomy extends Model
         return $this->belongsTo(Blueprint::class);
     }
 
-     /** @return HasMany<TaxonomyTerm> */
-     public function parentTerms(): HasMany
-     {
-         return $this->taxonomyTerms()->whereNull('parent_id')->ordered();
-     }
+    /** @return HasMany<TaxonomyTerm> */
+    public function parentTerms(): HasMany
+    {
+        return $this->taxonomyTerms()->whereNull('parent_id')->ordered();
+    }
 
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Taxonomy\Models\TaxonomyTerm> */
     public function taxonomyTerms(): HasMany

@@ -16,49 +16,41 @@ class CitySeeder extends Seeder
 
         $state = State::where('name', 'New York City')->first();
         $region = Region::first('name', 'National Capital Region')->first();
- 
 
-        if($state){
+        if($state) {
             City::create([
                 'state_id' => $state->id,
                 'name' => 'New York City',
             ]);
-            
+
             City::create([
                 'state_id' => $state->id,
                 'name' => 'Buffalo',
             ]);
-            
+
             City::create([
                 'state_id' => $state->id,
                 'name' => 'Rochester',
             ]);
         }
 
-        if($region){
+        if($region) {
             City::create([
                 'region_id' => $region->id,
                 'name' => 'Manila',
             ]);
-    
+
             City::create([
                 'region_id' => $region->id,
                 'name' => 'Quezon City',
             ]);
-    
+
             City::create([
                 'region_id' => $region->id,
                 'name' => 'Makati City',
             ]);
-    
+
         }
-        
-
- 
-
-   
-
-        
 
     }
 }

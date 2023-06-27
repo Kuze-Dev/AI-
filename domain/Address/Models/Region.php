@@ -24,9 +24,9 @@ class Region extends Model
         return $this->belongsTo(Country::class);
     }
 
-        /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Address\Models\City>*/
-        public function City(): HasMany
-        {
-            return $this->hasMany(City::class);
-        }
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Address\Models\City>*/
+    public function City(): HasMany
+    {
+        return $this->hasMany(City::class);
+    }
 }

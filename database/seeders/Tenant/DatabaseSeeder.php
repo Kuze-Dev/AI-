@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
             Address\StateSeeder::class,
             Address\RegionSeeder::class,
             Address\CitySeeder::class,
-          
+
         ]);
     }
 }

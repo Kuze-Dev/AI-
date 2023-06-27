@@ -30,18 +30,16 @@ class RegionSeeder extends Seeder
             'country_id' => $country->id,
             'name' => 'National Capital Region',
         ]);
-    
+
         Region::create([
             'country_id' => $country->id,
             'name' => 'Central Visayas',
         ]);
-    
+
         Region::create([
             'country_id' => $country->id,
             'name' => 'Central Luzon',
         ]);
-
-
 
     }
 }
