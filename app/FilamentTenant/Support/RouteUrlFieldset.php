@@ -52,6 +52,7 @@ class RouteUrlFieldset extends Group
                 ->lazy()
                 ->required()
                 ->string()
+                ->maxLength(255)
                 ->startsWith('/')
                 ->rule(fn (?HasRouteUrl $record) => new UniqueActiveRouteUrlRule($record)),
         ]);
