@@ -32,8 +32,11 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
+ * @property-read \Domain\Address\Models\City|null $city
+ * @property-read \Domain\Address\Models\Country|null $country
  * @property-read Customer|null $customer
- * @property-read Tier|null $tier
+ * @property-read \Domain\Address\Models\Region|null $region
+ * @property-read \Domain\Address\Models\State|null $state
  * @method static \Illuminate\Database\Eloquent\Builder|Address newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Address newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Address query()
@@ -99,15 +102,34 @@ class Address extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Tier\Models\Tier, \Domain\Address\Models\Address> */
-    public function tier(): BelongsTo
-    {
-        return $this->belongsTo(Tier::class);
-    }
-
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Address\Models\Address> */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\Country, \Domain\Address\Models\Address> */
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\State, \Domain\Address\Models\Address> */
+    public function state(): BelongsTo
+    {
+        return $this->belongsTo(State::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\Region, \Domain\Address\Models\Address> */
+    public function region(): BelongsTo
+    {
+        return $this->belongsTo(Region::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\City, \Domain\Address\Models\Address> */
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class);
     }
 }
