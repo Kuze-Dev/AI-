@@ -6,6 +6,10 @@ namespace App\Providers;
 
 use App\Settings\FormSettings;
 use Domain\Address\Models\Address;
+use Domain\Address\Models\City;
+use Domain\Address\Models\Country;
+use Domain\Address\Models\Region;
+use Domain\Address\Models\State;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Content\Models\Content;
@@ -75,6 +79,10 @@ class AppServiceProvider extends ServiceProvider
             Tier::class,
             Customer::class,
             Address::class,
+            Country::class,
+            Region::class,
+            State::class,
+            City::class,
         ]);
 
         Password::defaults(
