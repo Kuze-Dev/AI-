@@ -1,23 +1,60 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Support\Payments\Providers;
 
-use Domain\Support\Payments\DataTransferObjects\PayPalProviderData;
-use Domain\Support\Payments\Interfaces\HandlesManual;
-use Domain\Support\Payments\Interfaces\PayableInterface;
+use Aws\Arn\Exception\InvalidArnException;
+use Domain\Support\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
+use Domain\Support\Payments\DataTransferObjects\PaymentGateway\PaymentCapture;
+use Domain\Support\Payments\DataTransferObjects\PaymentGateway\PaymentRefund;
+use Domain\Support\Payments\Events\PaymentProcessEvent;
+use Domain\Support\Payments\Models\Payment;
 
-class CodProvider extends Provider implements HandlesManual
+class CodProvider extends Provider
 {
-    protected $name = 'cod';
+    protected string $name = 'cod';
 
-    public function handleManually(PayPalProviderData $providerData)
-    {   
-        $payable = $providerData->model;
+    public function authorize(): PaymentAuthorize
+    {
 
-        $payable->payment()->create([
-            'gateway' => $this->getName(),
-            'transaction_id' => '',
-            'amount' => $providerData->transactionData->amount->total
+        $providerData = $this->data;
+
+        $paymentData = $providerData->transactionData->amount;
+
+        $providerData->model->payments()->create([
+            'payment_method_id' => $providerData->payment_method_id,
+            'gateway' => $this->name,
+            'amount' => $paymentData->total,
+            'status' => 'pending',
         ]);
+
+        return new PaymentAuthorize(true);
+    }
+
+    public function refund(): PaymentRefund
+    {
+        return new PaymentRefund(success: false);
+    }
+
+    public function capture(Payment $paymentModel, array $data): PaymentCapture
+    {
+        return match ($data['status']) {
+            'success' => $this->processTransaction($paymentModel, $data),
+            default => throw new InvalidArnException(),
+        };
+    }
+
+    protected function processTransaction(Payment $paymentModel, array $data): PaymentCapture
+    {
+
+        $paymentModel->update([
+            'status' => 'paid',
+        ]);
+
+        event(new PaymentProcessEvent($paymentModel));
+
+        return new PaymentCapture(success: true);
+
     }
 }

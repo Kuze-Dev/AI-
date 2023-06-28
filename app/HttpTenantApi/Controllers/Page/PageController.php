@@ -9,12 +9,6 @@ use App\HttpTenantApi\Resources\PageResource;
 use Carbon\Carbon;
 use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Page\Models\Page;
-use Domain\PaymentMethod\Models\PaymentMethod;
-use Domain\Support\Payments\Actions\CreatePaymentAction;
-use Domain\Support\Payments\DataTransferObjects\PaypalAmountData;
-use Domain\Support\Payments\DataTransferObjects\PayPalProviderData;
-use Domain\Support\Payments\DataTransferObjects\PaypalDetailsData;
-use Domain\Support\Payments\DataTransferObjects\TransactionData;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -23,7 +17,6 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\URL;
 use Spatie\RouteAttributes\Attributes\Middleware;
-use Illuminate\Database\Eloquent\Model;
 
 #[
     ApiResource('pages', only: ['index', 'show']),
@@ -33,49 +26,6 @@ class PageController
 {
     public function index(): JsonApiResourceCollection
     {
-
-
-        $paymentMethod = PaymentMethod::first();
-
-        // /** @var PayableInterface */
-        $page = Page::first();
-
-        $providerData = new PayPalProviderData(
-            transactionData: TransactionData::fromArray(
-                [
-                    'reference_id' => '123',
-                    'amount' =>  PaypalAmountData::fromArray([
-                        'currency' => 'PHP',
-                        'total' => '1000.00',
-                        'details' => PaypalDetailsData::fromArray( [
-                            'subtotal' => '950.00',
-                            'shipping' => '50.00'
-                            ]
-                        )
-                ]),
-                    'item_list' => [
-                        [
-                            'sku' => 'SKU-4958',
-                            'name' => 'Product One',
-                            'description' => 'Sample Product',
-                            'quantity' => '1',
-                            'price' => '950',
-                            'currency' => 'PHP',
-                            'tax' => '0',
-                            'category' => 'Product', 
-                        ]
-                        ],
-                    'description' => 'payment request',
-                ]
-                    ),
-                model:$page
-        );
-
-
-        $payment = app(CreatePaymentAction::class)->execute($paymentMethod, $providerData);
-
-
-        
         return PageResource::collection(
             QueryBuilder::for(
                 Page::with('activeRouteUrl')

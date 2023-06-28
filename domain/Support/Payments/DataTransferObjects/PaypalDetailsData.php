@@ -1,7 +1,8 @@
 <?php
 
-namespace Domain\Support\Payments\DataTransferObjects;
+declare(strict_types=1);
 
+namespace Domain\Support\Payments\DataTransferObjects;
 
 class PaypalDetailsData
 {
@@ -14,7 +15,6 @@ class PaypalDetailsData
         public readonly ?string $insurance = null,
         public readonly ?string $gift_wrap = null,
         public readonly ?string $fee = null,
-      
     ) {
     }
 
@@ -32,5 +32,3 @@ class PaypalDetailsData
         );
     }
 }
-
-

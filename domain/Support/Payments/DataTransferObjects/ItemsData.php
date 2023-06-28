@@ -1,7 +1,8 @@
 <?php
 
-namespace Domain\Support\Payments\DataTransferObjects;
+declare(strict_types=1);
 
+namespace Domain\Support\Payments\DataTransferObjects;
 
 class ItemsData
 {
@@ -33,5 +34,3 @@ class ItemsData
         );
     }
 }
-
-

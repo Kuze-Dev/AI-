@@ -1,17 +1,17 @@
 <?php
 
-namespace Domain\Support\Payments\DataTransferObjects;
+declare(strict_types=1);
 
+namespace Domain\Support\Payments\DataTransferObjects;
 
 class TransactionData
 {
     public function __construct(
         public readonly string $reference_id,
-        public readonly PaypalAmountData $amount,
+        public readonly AmountData $amount,
         public readonly ?array $item_list = null,
-        public readonly ?string $description = null,  
+        public readonly ?string $description = null,
         public readonly ?string $order_url = null,
-     
     ) {
     }
 
@@ -36,9 +36,6 @@ class TransactionData
             ),
             description: $data['description'] ?? null,
             order_url: $data['order_url'] ?? null,
-            
         );
     }
-
-  
 }

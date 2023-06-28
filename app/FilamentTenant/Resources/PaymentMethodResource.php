@@ -73,7 +73,7 @@ class PaymentMethodResource extends Resource
                         ->inline(false)
                         ->helperText('If enabled, message here')
                         ->reactive(),
-                     Forms\Components\Toggle::make('live')
+                    Forms\Components\Toggle::make('live')
                         ->inline(false)
                         ->helperText('If enabled, message here')
                         ->reactive(),
@@ -82,6 +82,7 @@ class PaymentMethodResource extends Resource
                         ->options([
                             'paypal' => 'PayPaL',
                             'stripe' => 'Stripe',
+                            'manual' => 'Manual',
                         ])
                         ->reactive(),
                     Forms\Components\Textarea::make('description')
@@ -94,6 +95,7 @@ class PaymentMethodResource extends Resource
                             if ($record) {
                                 return $record->credentials;
                             }
+
                             return [
                                 'paypal_secret_id' => '',
                                 'paypal_secret_key' => '',

@@ -2,36 +2,28 @@
 
 declare(strict_types=1);
 
-
 namespace Domain\Support\Payments\Actions;
 
 use Domain\PaymentMethod\Models\PaymentMethod;
-use Domain\Support\Payments\DataTransferObjects\PaypalAmountData;
-use Domain\Support\Payments\DataTransferObjects\PaypalDetailsData;
-use Domain\Support\Payments\DataTransferObjects\PayPalProviderData;
-use Domain\Support\Payments\DataTransferObjects\TransactionData;
-use Domain\Support\Payments\Interfaces\HandlesManual;
-use Domain\Support\Payments\Interfaces\HandlesRedirection;
-use Domain\Support\Payments\PaymentManager;
-use Illuminate\Database\Eloquent\Model;
+use Domain\Support\Payments\Contracts\PaymentManagerInterface;
+use Domain\Support\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
+use Domain\Support\Payments\DataTransferObjects\ProviderData;
+use Throwable;
 
 class CreatePaymentAction
 {
     /** Execute create collection query. */
-    public function execute(PaymentMethod $paymentMethod, PayPalProviderData $paypalProviderData)
+    public function execute(PaymentMethod $paymentMethod, ProviderData $ProviderData): PaymentAuthorize
     {
-        
-        $paymentManager = PaymentManager::createProvider($paymentMethod);
+        try {
+            return app(PaymentManagerInterface::class)
+                ->driver($paymentMethod->slug)
+                ->withData($ProviderData)
+                ->authorize();
 
-        if ($paymentManager instanceof HandlesRedirection) {
-            
-            $paymentManager->initRedirection($paypalProviderData);
+        } catch (Throwable $th) {
+            throw $th;
         }
-        elseif ($paymentManager instanceof HandlesManual) {
-
-            $paymentManager->handleManually($paypalProviderData);
-        }
-
 
     }
 }

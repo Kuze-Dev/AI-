@@ -1,0 +1,56 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Domain\Support\Payments;
+
+use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\Support\Payments\Contracts\PaymentManagerInterface;
+use Domain\Support\Payments\Providers\CodProvider;
+use Domain\Support\Payments\Providers\PaypalProvider;
+use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Support\ServiceProvider;
+use InvalidArgumentException;
+
+class PaymentServiceProvider extends ServiceProvider implements DeferrableProvider
+{
+    public function register()
+    {
+        $this->app->singleton(
+            PaymentManagerInterface::class,
+            fn ($app) => $app->make(PaymentManager::class)
+        );
+
+        $this->mergeConfigFrom(__DIR__ . '/config/payment.php', 'payment-gateway');
+    }
+
+    public function boot(): void
+    {
+        if (tenancy()->initialized) {
+
+            $paymentMethods = PaymentMethod::all();
+
+            if ($paymentMethods->count() > 0) {
+                foreach ($paymentMethods as $paymentType) {
+
+                    app(PaymentManagerInterface::class)->extend($paymentType->slug, function () use ($paymentType) {
+                        return match ($paymentType->gateway) {
+                            'paypal' => new PaypalProvider(),
+                            'manual' => new CodProvider(),
+                            default => throw new InvalidArgumentException(),
+                        };
+                    });
+                }
+            }
+        }
+
+    }
+
+    public function provides()
+    {
+
+        return [
+            PaymentManagerInterface::class,
+        ];
+    }
+}

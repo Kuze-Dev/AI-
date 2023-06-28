@@ -1,24 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Support\Payments;
 
-use Domain\PaymentMethod\Models\PaymentMethod;
-use Domain\Support\Payments\Providers\PaypalProvider;
+use Illuminate\Support\Manager;
 
 // use App\Services\Payments\Contracts\PaymentManager as PaymentManagerContract;
 // use App\Services\Payments\Providers\Provider;
 
-class PaymentManager 
+class PaymentManager extends Manager
 {
-   
-    public static function createProvider(PaymentMethod $paymentMethod)
+    /**
+     * Get the default driver name.
+     *
+     * @return string
+     */
+    public function getDefaultDriver(): string
     {
-        
-        return match ($paymentMethod->gateway) {
-
-            'paypal' => new PaypalProvider($paymentMethod),
-        };
+        return config('payment-gateway.default');
     }
-
- 
 }
