@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Domain\Currency\Actions\UpdateCurrencyAction;
 use Domain\Currency\Models\Currency;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -51,7 +52,9 @@ class CurrencyResource extends Resource
                     ->toggleable()
                     ->searchable(),
 
-                Tables\Columns\ToggleColumn::make('enabled')->label('status'),
+                Tables\Columns\ToggleColumn::make('enabled')->label('status')->updateStateUsing(function (Currency $record) {
+                        return app(UpdateCurrencyAction::class)->execute($record,);
+                }),
 
                 Tables\Columns\BadgeColumn::make('default')
                     ->enum([

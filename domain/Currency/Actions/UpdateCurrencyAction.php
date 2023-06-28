@@ -8,20 +8,15 @@ use Domain\Currency\Models\Currency;
 
 class UpdateCurrencyAction
 {
-    public function execute(Currency $currency): void
+    public function execute(Currency $currency): Currency
     {
-
-        if ($currency->enabled) {
+       
+        if (!$currency->enabled) {
             Currency::where('id', '!=', $currency->id)->update(['enabled' => false]);
+            Currency::where('id', $currency->id)->update(['enabled' => true]);
+            // dd($currency->enabled);
         }
 
-        if ($currency->default) {
-            Currency::where('id', '!=', $currency->id)->update(['default' => false]);
-        }
-
-        if ( ! Currency::where('enabled', true)->exists()) {
-            Currency::where('default', true)->update(['enabled' => true]);
-        }
-
+        return $currency;
     }
 }
