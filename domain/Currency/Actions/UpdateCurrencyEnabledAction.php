@@ -6,7 +6,7 @@ namespace Domain\Currency\Actions;
 
 use Domain\Currency\Models\Currency;
 
-class UpdateCurrencyAction
+class UpdateCurrencyEnabledAction
 {
     public function execute(Currency $currency): Currency
     {
