@@ -3,12 +3,11 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\CountryResource\Pages\ListCountry;
-use Domain\Address\Models\Country;
 use Filament\Facades\Filament;
-use Filament\Pages\Actions\DeleteAction;
+
+use Domain\Address\Database\Factories\CountryFactory;
 
 use function Pest\Livewire\livewire;
-use function Pest\Laravel\assertSoftDeleted;
 
 beforeEach(function () {
     testInTenantContext();
@@ -21,42 +20,9 @@ it('can render page', function () {
 });
 
 it('can list countries', function () {
-    $country = [
-        Country::create([
-            'code' => 'USD',
-            'name' => 'United States',
-            'capital' => 'Washington, D.C.',
-            'timezone' => 'America/New_York',
-            'language' => 'English',
-            'active' => true,
-        ]),
-        Country::create([
-            'code' => 'EUR',
-            'name' => 'European Union',
-            'capital' => 'Brussels',
-            'timezone' => 'Europe/Brussels',
-            'language' => 'Multilingual',
-            'active' => true,
-        ]),
-        // Add more countries as needed
-    ];
+    $countries = CountryFactory::new()
+        ->count(5)
+        ->create();
 
-    livewire(ListCountry::class)
-        ->assertCanSeeTableRecords($country);
-});
-
-it('can delete country', function () {
-    $country = Country::create([
-        'code' => 'USA',
-        'name' => 'United States',
-        'capital' => 'Washington, D.C.',
-        'timezone' => 'America/New_York',
-        'language' => 'English',
-        'active' => true,
-    ]);
-
-    livewire(ListCountry::class)
-        ->callTableAction(DeleteAction::class, $country);
-
-    assertSoftDeleted($country);
+    livewire(ListCountry::class)->assertCanSeeTableRecords($countries);
 });

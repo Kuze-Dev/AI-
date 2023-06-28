@@ -53,7 +53,7 @@ class CurrencyResource extends Resource
                     ->searchable(),
 
                 Tables\Columns\ToggleColumn::make('enabled')->label('status')->updateStateUsing(function (Currency $record) {
-                        return app(UpdateCurrencyAction::class)->execute($record,);
+                    return app(UpdateCurrencyAction::class)->execute($record, );
                 }),
 
                 Tables\Columns\BadgeColumn::make('default')

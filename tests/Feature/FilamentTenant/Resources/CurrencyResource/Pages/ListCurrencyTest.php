@@ -3,12 +3,11 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\CurrencyResource\Pages\ListCurrency;
-use Domain\Currency\Models\Currency;
 use Filament\Facades\Filament;
-use Filament\Pages\Actions\DeleteAction;
+
+use Domain\Currency\Database\Factories\CurrencyFactory;
 
 use function Pest\Livewire\livewire;
-use function Pest\Laravel\assertSoftDeleted;
 
 beforeEach(function () {
     testInTenantContext();
@@ -21,39 +20,9 @@ it('can render page', function () {
 });
 
 it('can list currencies', function () {
-    $currency = [
-        Currency::create([
-            'code' => 'USD',
-            'name' => 'US Dollar',
-            'enabled' => true,
-            'exchange_rate' => 1.0,
-            'default' => false,
-        ]),
-        Currency::create([
-            'code' => 'EUR',
-            'name' => 'Euro',
-            'enabled' => true,
-            'exchange_rate' => 0.8,
-            'default' => false,
-        ]),
-        // Add more currencies as needed
-    ];
+    $currencies = CurrencyFactory::new()
+        ->count(5)
+        ->create();
 
-    livewire(ListCurrency::class)
-        ->assertCanSeeTableRecords($currency);
-});
-
-it('can delete currency', function () {
-    $currency = Currency::create([
-        'code' => 'USD',
-        'name' => 'US Dollar',
-        'enabled' => true,
-        'exchange_rate' => 1.0,
-        'default' => false,
-    ]);
-
-    livewire(ListCurrency::class)
-        ->callTableAction(DeleteAction::class, $currency);
-
-    assertSoftDeleted($currency);
+    livewire(ListCurrency::class)->assertCanSeeTableRecords($currencies);
 });

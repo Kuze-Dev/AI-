@@ -20,8 +20,8 @@ class CountryFactory extends Factory
     public function definition(): array
     {
         return [
-            'code' => $this->faker->word(),
-            'name' => $this->faker->name(),
+            'code' => $this->faker->unique()->word(),
+            'name' => $this->faker->unique()->name(),
             'capital' => $this->faker->word(),
             'state_or_region' => Arr::random(CountryStateOrRegion::cases()),
             'timezone' => $this->faker->timezone(),
