@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Domain\Customer\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Spatie\RouteAttributes\Attributes\Post;
 
 class LoginController extends Controller
@@ -16,7 +17,7 @@ class LoginController extends Controller
     public function __invoke(Request $request): mixed
     {
         $validated = $this->validate($request, [
-            'email' => 'required|email',
+            'email' => ['required', Rule::email()],
             'password' => 'required|string',
         ]);
 
