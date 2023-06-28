@@ -12,11 +12,12 @@ class UpdateAddressAction
     public function execute(Address $address, AddressData $addressData): Address
     {
         $address->update([
+            'country_id' => $addressData->country_id,
+            'state_id' => $addressData->state_id,
+            'region_id' => $addressData->region_id,
+            'city_id' => $addressData->city_id,
             'address_line_1' => $addressData->address_line_1,
             'address_line_2' => $addressData->address_line_2,
-            'country' => $addressData->country,
-            'state_or_region' => $addressData->state_or_region,
-            'city_or_province' => $addressData->city_or_province,
             'zip_code' => $addressData->zip_code,
             'is_default_shipping' => $addressData->is_default_shipping,
             'is_default_billing' => $addressData->is_default_billing,

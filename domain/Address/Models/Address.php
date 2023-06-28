@@ -31,8 +31,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Domain\Address\Models\City|null $city
- * @property-read \Domain\Address\Models\Country|null $country
+ * @property-read \Domain\Address\Models\City $city
+ * @property-read \Domain\Address\Models\Country $country
  * @property-read Customer|null $customer
  * @property-read \Domain\Address\Models\Region|null $region
  * @property-read \Domain\Address\Models\State|null $state
@@ -79,14 +79,15 @@ class Address extends Model
     /** @return Attribute<string, never> */
     protected function fullDetail(): Attribute
     {
+        /** @var self $this */
         return Attribute::get(
             fn ($value) => Arr::join(
                 array_filter([
                     $this->address_line_1,
                     $this->address_line_2,
-                    $this->country,
-                    $this->state_or_region,
-                    $this->city_or_province,
+                    $this->country->name,
+                    $this->state?->name ?? $this->region?->name,
+                    $this->city->name,
                     $this->zip_code,
                 ]),
                 ', '
