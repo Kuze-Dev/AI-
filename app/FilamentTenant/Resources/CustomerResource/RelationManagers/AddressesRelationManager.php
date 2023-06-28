@@ -57,6 +57,7 @@ class AddressesRelationManager extends RelationManager
                         $set('city_id', null);
                         $set('zip_code', null);
                     }),
+
                 Forms\Components\Select::make('state_id')
                     ->label(trans('State'))
                     ->required()
@@ -70,6 +71,7 @@ class AddressesRelationManager extends RelationManager
 
                         return Country::whereKey($get('country_id'))->value('state_or_region') === CountryStateOrRegion::STATE;
                     }),
+
                 Forms\Components\Select::make('region_id')
                     ->label(trans('Region'))
                     ->required()
@@ -83,24 +85,30 @@ class AddressesRelationManager extends RelationManager
 
                         return Country::whereKey($get('country_id'))->value('state_or_region') === CountryStateOrRegion::REGION;
                     }),
+
                 Forms\Components\Select::make('city_id')
                     ->label(trans('City'))
                     ->required()
                     ->preload()
-                    ->optionsFromModel(City::class, 'name', function (Builder $query, callable $get) {
-                        /** @var \Illuminate\Database\Eloquent\Builder|\Domain\Address\Models\City $query */
-                        if ($get('state_id') !== null) {
-                            return $query->where('state_id', $get('state_id'));
-                        } elseif ($get('region_id') !== null) {
-                            return $query->where('region_id', $get('region_id'));
-                        }
+                    ->optionsFromModel(
+                        City::class,
+                        'name',
+                        function (Builder $query, callable $get) {
+                            /** @var \Illuminate\Database\Eloquent\Builder|\Domain\Address\Models\City $query */
+                            if ($get('state_id') !== null) {
+                                return $query->where('state_id', $get('state_id'));
+                            } elseif ($get('region_id') !== null) {
+                                return $query->where('region_id', $get('region_id'));
+                            }
 
-                        return $query->whereKey(0); // no result
-                    })
+                            return $query->whereKey(0); // no result
+                        }
+                    )
                     ->reactive()
                     ->visible(function (callable $get) {
                         return $get('state_id') !== null || $get('region_id') !== null;
                     }),
+
                 Forms\Components\TextInput::make('zip_code')
                     ->translateLabel()
                     ->required()
@@ -134,20 +142,18 @@ class AddressesRelationManager extends RelationManager
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->wrap(),
-                Tables\Columns\TextColumn::make('country') // TODO: relation
+                Tables\Columns\TextColumn::make('country.name')
                     ->translateLabel()
                     ->sortable()
-                    ->searchable()
                     ->wrap(),
-                Tables\Columns\TextColumn::make('state_or_region') // TODO: relation
-                    ->label(trans('State/Region'))
+                Tables\Columns\TextColumn::make('state.name')
                     ->sortable()
-                    ->searchable()
                     ->wrap(),
-                Tables\Columns\TextColumn::make('city_or_province') // TODO: relation
-                    ->label(trans('City/Province'))
+                Tables\Columns\TextColumn::make('region.name')
                     ->sortable()
-                    ->searchable()
+                    ->wrap(),
+                Tables\Columns\TextColumn::make('city.name')
+                    ->sortable()
                     ->wrap(),
                 Tables\Columns\TextColumn::make('zip_code')
                     ->translateLabel()
@@ -179,7 +185,7 @@ class AddressesRelationManager extends RelationManager
 
                         return DB::transaction(
                             fn () => app(CreateAddressAction::class)
-                                ->execute(new AddressData(...$data))
+                                ->execute(AddressData::fromArray($data))
                         );
                     }),
             ])
@@ -189,7 +195,7 @@ class AddressesRelationManager extends RelationManager
                     ->using(fn (Address $record, array $data) => DB::transaction(
                         fn () => DB::transaction(
                             fn () => app(UpdateAddressAction::class)
-                                ->execute($record, new AddressData(...$data))
+                                ->execute($record, AddressData::fromArray($data))
                         )
                     )),
                 Tables\Actions\ActionGroup::make([
