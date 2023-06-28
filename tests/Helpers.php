@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Features\CMS\CMSBase;
-use App\Features\CMS\ECommerceBase;
+use App\Features\ECommerce\ECommerceBase;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
 use Domain\Tenant\Database\Factories\TenantFactory;

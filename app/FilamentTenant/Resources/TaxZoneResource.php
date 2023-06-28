@@ -82,7 +82,7 @@ class TaxZoneResource extends Resource
                     ])
                         ->visible(function (array $state) {
                             $type = ! $state['type'] instanceof TaxZoneType
-                                ? TaxZoneType::tryFrom($state['type'])
+                                ? TaxZoneType::tryFrom($state['type'] ?? '')
                                 : $state['type'];
 
                             return $type === TaxZoneType::COUNTRY;
@@ -101,7 +101,7 @@ class TaxZoneResource extends Resource
                     ])
                         ->visible(function (array $state) {
                             $type = ! $state['type'] instanceof TaxZoneType
-                                ? TaxZoneType::tryFrom($state['type'])
+                                ? TaxZoneType::tryFrom($state['type'] ?? '')
                                 : $state['type'];
 
                             return $type === TaxZoneType::STATE;
