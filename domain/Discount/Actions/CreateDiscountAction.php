@@ -25,9 +25,9 @@ final class CreateDiscountAction
         ]);
 
         $discount->discountCondition()->create([
-            'discount_type' => $discountData->discountConditionData->discount_type,
-            'amount_type' => $discountData->discountConditionData->discount_amount_type,
-            'amount' => $discountData->discountConditionData->amount,
+            'discount_type' => $discountData->discountConditionTypeData->discount_type,
+            'amount_type' => $discountData->discountConditionTypeData->discount_amount_type,
+            'amount' => $discountData->discountConditionTypeData->amount,
         ]);
 
         $discount->discountRequirement()->create([

@@ -7,7 +7,7 @@ namespace Domain\Discount\DataTransferObjects;
 use Domain\Discount\Enums\DiscountAmountType;
 use Domain\Discount\Enums\DiscountConditionType;
 
-class DiscountConditionData
+class DiscountConditionTypeData
 {
     public function __construct(
         public readonly DiscountConditionType $discount_type,

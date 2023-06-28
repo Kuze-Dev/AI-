@@ -11,9 +11,8 @@ use App\FilamentTenant\Resources\DiscountResource\Pages\ListDiscounts;
 use Auth;
 use Closure;
 use Domain\Discount\Actions\AutoGenerateCode;
-use Domain\Discount\Actions\ForceDeleteDiscountAction;
+use Domain\Discount\Enums\DiscountRequirementType;
 use Domain\Discount\Models\Discount;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\DateTimePicker;
@@ -27,8 +26,6 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -82,6 +79,11 @@ class DiscountResource extends Resource
                         ->helperText(new HtmlString(<<<HTML
                                 Leave this blank if no maximum usage.
                             HTML)),
+
+                    // TextInput::make('max_uses_per_user')
+                    //     ->required()
+                    //     ->numeric()
+                    //     ->label(trans('Maximum Usage per Customer')),
                 ])
                     ->columnSpan(['lg' => 2]),
                 Group::make([
@@ -135,18 +137,17 @@ class DiscountResource extends Resource
                             TextInput::make('discountCondition.amount')
                                 ->required()
                                 ->numeric()
-                                ->rules(['min:1'])
                                 ->label(trans('Discount Amount')),
+
                         ]),
 
                 ])->columnSpan(['lg' => 2]),
                 Group::make([
                     Section::make(trans('Requirements'))
                         ->schema([
-                            Select::make('discountRequirement.requirement_type')
-                                ->options([
-                                    'minimum_order_amount' => 'Minimum Order Amount',
-                                ]),
+                            TextInput::make('discountRequirement.requirement_type')
+                                ->disabled()
+                                ->default(DiscountRequirementType::MINIMUM_ORDER_AMOUNT),
 
                             TextInput::make('discountRequirement.minimum_amount')
                                 ->label(trans('Minimum purchase amount'))
@@ -154,7 +155,7 @@ class DiscountResource extends Resource
                                 ->helperText(new HtmlString(<<<HTML
                                         Leave this blank if no minimum purchase amount.
                                     HTML))
-                                ->rules(['max:100|min:1'], fn (Closure $get) => $get('type') === 'percentage'),
+                                ->rules(['max:100'], fn (Closure $get) => $get('type') === 'percentage'),
                         ]),
 
                 ])->columnSpan(['lg' => 2]),
@@ -166,7 +167,7 @@ class DiscountResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name'),
-                TextColumn::make('discountCondition.amount')->label(trans('Amount')),
+                TextColumn::make('amount'),
                 TextColumn::make('valid_start_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->date('F j, Y, g:i a')
@@ -189,16 +190,7 @@ class DiscountResource extends Resource
                 TrashedFilter::make(),
             ])
             ->actions([
-                EditAction::make(),
-                ForceDeleteAction::make()
-                    ->button()
-                    ->using(function (Discount $record) {
-                        try {
-                            return app(ForceDeleteDiscountAction::class)->execute($record);
-                        } catch (DeleteRestrictedException $e) {
-                            return false;
-                        }
-                    }),
+                Tables\Actions\EditAction::make(),
                 DeleteAction::make()->button(),
                 RestoreAction::make()->button(),
             ])
