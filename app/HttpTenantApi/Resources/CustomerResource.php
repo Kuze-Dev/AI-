@@ -20,7 +20,7 @@ class CustomerResource extends JsonApiResource
             'email' => $this->email,
             'mobile' => $this->mobile,
             'status' => $this->status,
-            'birth_date' => $this->birth_date->toDateTimeString(),
+            'birth_date' => $this->birth_date->toDateString(),
         ];
     }
 }

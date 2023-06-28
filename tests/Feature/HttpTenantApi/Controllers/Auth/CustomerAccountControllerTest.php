@@ -23,12 +23,13 @@ it('fetch current customer account', function () {
     $response->assertOk()
         ->assertJson(function (AssertableJson $json) use ($customer) {
             $json
+                ->where('data.type', 'customers')
                 ->where('data.attributes.first_name', $customer->first_name)
                 ->where('data.attributes.last_name', $customer->last_name)
                 ->where('data.attributes.email', $customer->email)
                 ->where('data.attributes.mobile', $customer->mobile)
                 ->where('data.attributes.status', $customer->status->value)
-                ->where('data.attributes.birth_date', $customer->birth_date->toDateTimeString())
+                ->where('data.attributes.birth_date', $customer->birth_date->toDateString())
                 ->etc();
         });
 });
