@@ -39,6 +39,7 @@ return new class () extends Migration {
             $table->string('status')->default(Status::ACTIVE->value)->index();
 
             $table->date('birth_date');
+            $table->timestamp('email_verified_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

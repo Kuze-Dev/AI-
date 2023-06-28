@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Domain\Customer\Models;
 
 use Domain\Address\Models\Address;
+use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Customer\Enums\Status;
 use Domain\Tier\Models\Tier;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
@@ -60,11 +63,12 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @method static \Illuminate\Database\Eloquent\Builder|Customer withoutTrashed()
  * @mixin \Eloquent
  */
-class Customer extends Authenticatable implements HasMedia
+class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
 {
     use SoftDeletes;
     use LogsActivity;
     use InteractsWithMedia;
+    use Notifiable;
 
     protected $fillable = [
         'tier_id',
@@ -85,6 +89,7 @@ class Customer extends Authenticatable implements HasMedia
         'password' => 'hashed',
         'birth_date' => 'date',
         'status' => Status::class,
+        'email_verified_at' => 'datetime',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -120,5 +125,10 @@ class Customer extends Authenticatable implements HasMedia
     public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
+    }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new VerifyEmail());
     }
 }

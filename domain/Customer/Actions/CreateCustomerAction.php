@@ -6,6 +6,7 @@ namespace Domain\Customer\Actions;
 
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Models\Customer;
+use Illuminate\Auth\Events\Registered;
 use Support\Common\Actions\SyncMediaCollectionAction;
 use Support\Common\DataTransferObjects\MediaCollectionData;
 use Support\Common\DataTransferObjects\MediaData;
@@ -37,6 +38,8 @@ class CreateCustomerAction
                 ],
             ));
         }
+
+        event(new Registered($customer));
 
         return $customer;
     }

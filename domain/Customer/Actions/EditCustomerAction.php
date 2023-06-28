@@ -45,6 +45,13 @@ class EditCustomerAction
             ));
         }
 
+        if ($customer->wasChanged('email')) {
+            $customer->forceFill(['email_verified_at' => null])
+                ->save();
+
+            $customer->sendEmailVerificationNotification();
+        }
+
         return $customer;
     }
 }
