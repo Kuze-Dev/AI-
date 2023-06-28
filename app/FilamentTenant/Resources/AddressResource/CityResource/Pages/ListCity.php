@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\FilamentTenant\Resources\CountryResource\Pages;
+namespace App\FilamentTenant\Resources\AddressResource\CityResource\Pages;
 
-use App\FilamentTenant\Resources\CountryResource;
+use App\FilamentTenant\Resources\AddressResource\CityResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListCountry extends ListRecords
+class ListCity extends ListRecords
 {
-    protected static string $resource = CountryResource::class;
+    protected static string $resource = CityResource::class;
 
     protected function getActions(): array
     {

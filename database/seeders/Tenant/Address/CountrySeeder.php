@@ -57,7 +57,7 @@ class CountrySeeder extends Seeder
         CountryFactory::new()
             ->has(
                 StateFactory::new([
-                    'name' => 'Los Angeles',
+                    'name' => 'New York City',
                 ])
                     ->has(
                         CityFactory::new()
@@ -77,7 +77,7 @@ class CountrySeeder extends Seeder
             )
             ->has(
                 StateFactory::new([
-                    'name' => 'New York City',
+                    'name' => 'Los Angeles',
                 ])
             )
             ->has(
