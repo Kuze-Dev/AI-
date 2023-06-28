@@ -28,7 +28,7 @@ it('can create customer', function () {
 
     livewire(CreateCustomer::class)
         ->fillForm([
-            'image' =>  UploadedFile::fake()->image('test_image.jpg'),
+            'image' => UploadedFile::fake()->image('test_image.jpg'),
             'email' => 'email@test.com',
             'first_name' => 'test first name',
             'last_name' => 'test last name',

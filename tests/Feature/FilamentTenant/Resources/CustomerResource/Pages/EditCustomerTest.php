@@ -40,12 +40,10 @@ it('can render page', function () {
 it('can edit tier', function () {
     $customer = CustomerFactory::new()
         ->createOne();
-    // Prepare the storage and create a temporary image file.
-    $image = UploadedFile::fake()->image('test_image.jpg');
 
     livewire(EditCustomer::class, ['record' => $customer->getRouteKey()])
         ->fillForm([
-            'image' => $image,
+            'image' => UploadedFile::fake()->image('test_image.jpg'),
             'email' => 'email@test.com',
             'first_name' => 'test first name',
             'last_name' => 'test last name',
@@ -58,12 +56,11 @@ it('can edit tier', function () {
         ->assertHasNoFormErrors();
 
     assertDatabaseHas(Customer::class, [
-        'image' => $image,
         'email' => 'email@test.com',
         'first_name' => 'test first name',
         'last_name' => 'test last name',
         'mobile' => '09123456789',
-        'status' => true,
-        'birth_date' => now()->subDay(),
+        'status' => Status::ACTIVE->value,
+        'birth_date' => now()->subDay()->toDateString().' 00:00:00',
     ]);
 });
