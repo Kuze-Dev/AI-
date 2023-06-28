@@ -26,6 +26,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  *
  * @property int $id
  * @property int|null $tier_id
+ * @property string $cuid customer unique ID
  * @property string $email
  * @property mixed|null $password
  * @property-read  string $full_name
@@ -55,6 +56,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @method static \Illuminate\Database\Eloquent\Builder|Customer query()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereBirthDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Customer whereCuid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereEmailVerifiedAt($value)
@@ -80,6 +82,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
 
     protected $fillable = [
         'tier_id',
+        'cuid',
         'email',
         'password',
         'first_name',
@@ -99,6 +102,11 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
         'status' => Status::class,
         'email_verified_at' => 'datetime',
     ];
+
+    public function getRouteKeyName(): string
+    {
+        return 'cuid';
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
