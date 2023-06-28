@@ -40,6 +40,11 @@ return [
             'driver' => 'session',
             'provider' => 'admin',
         ],
+
+        'api' => [
+            'driver' => 'session',
+            'provider' => 'customer',
+        ],
     ],
 
     /*
@@ -63,6 +68,11 @@ return [
         'admin' => [
             'driver' => 'eloquent',
             'model' => Domain\Admin\Models\Admin::class,
+        ],
+
+        'customer' => [
+            'driver' => 'eloquent',
+            'model' => Domain\Customer\Models\Customer::class,
         ],
 
         // 'users' => [

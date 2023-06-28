@@ -7,6 +7,7 @@ namespace App\Providers;
 use App\Settings\FormSettings;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Customer\Models\Customer;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
 use Domain\Content\Models\Content;
@@ -17,6 +18,7 @@ use Domain\Form\Models\FormSubmission;
 use Domain\Globals\Models\Globals;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
+use Domain\Tier\Models\Tier;
 use Support\Captcha\CaptchaManager;
 use Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Models\Taxonomy;
@@ -69,6 +71,8 @@ class AppServiceProvider extends ServiceProvider
             ContentEntry::class,
             Globals::class,
             MetaData::class,
+            Tier::class,
+            Customer::class,
         ]);
 
         Password::defaults(
