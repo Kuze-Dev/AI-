@@ -26,18 +26,15 @@ it('can render page', function () {
 
 it('can create customer', function () {
 
-    // Prepare the storage and create a temporary image file.
-    $image = UploadedFile::fake()->image('test_image.jpg');
-
     livewire(CreateCustomer::class)
         ->fillForm([
-            'image' => $image,
+            'image' =>  UploadedFile::fake()->image('test_image.jpg'),
             'email' => 'email@test.com',
             'first_name' => 'test first name',
             'last_name' => 'test last name',
             'mobile' => '09123456789',
             'status' => true,
-            'birth_date' => now()->subDay(),
+            'birth_date' => now()->subDay()->format('Y-m-d'),
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -49,6 +46,6 @@ it('can create customer', function () {
         'last_name' => 'test last name',
         'mobile' => '09123456789',
         'status' => Status::ACTIVE->value,
-        'birth_date' => now()->subDay(),
+        'birth_date' => now()->subDay()->toDateString().' 00:00:00',
     ]);
 });
