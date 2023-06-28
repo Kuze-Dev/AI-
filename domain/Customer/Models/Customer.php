@@ -80,6 +80,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
 
     protected $fillable = [
         'tier_id',
+        'cuid',
         'email',
         'password',
         'first_name',
@@ -99,6 +100,11 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
         'status' => Status::class,
         'email_verified_at' => 'datetime',
     ];
+
+    public function getRouteKeyName(): string
+    {
+        return 'cuid';
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

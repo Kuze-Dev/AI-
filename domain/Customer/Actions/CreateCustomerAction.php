@@ -7,6 +7,7 @@ namespace Domain\Customer\Actions;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Models\Customer;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Str;
 use Support\Common\Actions\SyncMediaCollectionAction;
 use Support\Common\DataTransferObjects\MediaCollectionData;
 use Support\Common\DataTransferObjects\MediaData;
@@ -21,6 +22,7 @@ class CreateCustomerAction
     {
         $customer = Customer::create([
             'tier_id' => $customerData->tier_id,
+            'cuid' => Str::uuid(),
             'email' => $customerData->email,
             'first_name' => $customerData->first_name,
             'last_name' => $customerData->last_name,

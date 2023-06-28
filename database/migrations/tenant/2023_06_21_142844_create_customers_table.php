@@ -26,6 +26,7 @@ return new class () extends Migration {
 
             $table->foreignIdFor(Tier::class)->nullable()->index();
 
+            $table->string('cuid')->unique()->comment('customer unique ID');
             $table->string('email')->unique();
             $table->string('password')->nullable();
             $table->string('first_name')->index();

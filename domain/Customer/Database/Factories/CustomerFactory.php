@@ -21,6 +21,7 @@ class CustomerFactory extends Factory
     {
         return [
             'tier_id' => TierFactory::new(),
+            'cuid' => $this->faker->unique()->uuid(),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => $this->faker->password(),
             'first_name' => $this->faker->firstName(),
