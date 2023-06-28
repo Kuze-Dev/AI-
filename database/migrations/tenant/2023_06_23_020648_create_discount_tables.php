@@ -55,8 +55,11 @@ return new class () extends Migration {
 
             $table->foreignIdFor(Discount::class)->index();
 
-            $table->string('requirement_type')->index();
-            $table->bigInteger('minimum_amount');
+            $table->string('requirement_type')
+                ->nullable()
+                ->index();
+            $table->bigInteger('minimum_amount')
+                ->nullable();
 
             $table->timestamps();
         });

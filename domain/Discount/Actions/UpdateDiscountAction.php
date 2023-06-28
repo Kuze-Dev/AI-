@@ -7,12 +7,12 @@ namespace Domain\Discount\Actions;
 use Domain\Discount\DataTransferObjects\DiscountData;
 use Domain\Discount\Models\Discount;
 
-final class CreateDiscountAction
+final class UpdateDiscountAction
 {
     /** Execute create content query. */
-    public function execute(DiscountData $discountData): Discount
+    public function execute(Discount $discount, DiscountData $discountData): Discount
     {
-        $discount = Discount::create([
+        $discount->update([
             'name' => $discountData->name,
             'slug' => $discountData->slug,
             'description' => $discountData->description,
@@ -24,13 +24,13 @@ final class CreateDiscountAction
             'valid_end_at' => $discountData->valid_end_at,
         ]);
 
-        $discount->discountCondition()->create([
+        $discount->discountCondition()->update([
             'discount_type' => $discountData->discountConditionData->discount_type,
             'amount_type' => $discountData->discountConditionData->discount_amount_type,
             'amount' => $discountData->discountConditionData->amount,
         ]);
 
-        $discount->discountRequirement()->create([
+        $discount->discountRequirement()->update([
             'requirement_type' => $discountData->discountRequirementData->discount_requirement_type,
             'minimum_amount' => $discountData->discountRequirementData->minimum_amount,
         ]);
