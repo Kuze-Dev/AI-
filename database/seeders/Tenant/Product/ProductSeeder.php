@@ -4,86 +4,17 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Tenant\Product;
 
-use Domain\Blueprint\Models\Blueprint;
-use Domain\Product\Models\Product;
-use Domain\Product\Models\ProductOption;
-use Domain\Product\Models\ProductOptionValue;
-use Domain\Product\Models\ProductVariant;
-use Domain\Taxonomy\Models\Taxonomy;
-use Domain\Taxonomy\Models\TaxonomyTerm;
+use Domain\Product\Database\Factories\ProductFactory;
 use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        // Seed brand and category taxonomy
-        $taxonomies = [
-            [
-                'name' => 'Brand',
-                'term' => [
-                    ['name' => 'Louis Vuitton'],
-                    ['name' => 'Balenciaga'],
-                ],
-            ],
-            [
-                'name' => 'Categories',
-                'term' => [
-                    ['name' => 'Clothing'],
-                    ['name' => 'Food & Beverages'],
-                    ['name' => 'Electronics'],
-                ],
-            ],
-        ];
-
-        // $blueprint = Blueprint::where('name', 'Image with Heading Block Blueprint')->first();
-
-        // foreach ($taxonomies as $taxonomyData) {
-        //     $taxonomy = Taxonomy::create([
-        //         'name' => $taxonomyData['name'],
-        //         'blueprint_id' => $blueprint->id,
-        //     ]);
-
-        //     foreach ($taxonomyData['term'] as $termData) {
-        //         TaxonomyTerm::create(['taxonomy_id' => $taxonomy->id, 'data' => [
-        //             'main' => [
-        //                 'heading' => $termData['name'],
-        //             ],
-        //         ], 'name' => $termData['name']]);
-        //     }
-        // }
-        $data = $this->data();
-
-        $taxonomyTermIds = TaxonomyTerm::whereIn('slug', ['bench', 'clothing'])->pluck('id');
-
-        foreach ($data['products'] as $productData) {
-            $product = Product::create($productData);
-
-            $product->taxonomyTerms()->attach($taxonomyTermIds);
-
-            foreach ($data['product_options'] as $productOption) {
-                $productOptionModel = ProductOption::create(['product_id' => $product->id, 'name' => $productOption['name']]);
-
-                foreach ($productOption['values'] as $productOptionValue) {
-                    ProductOptionValue::create(['product_option_id' => $productOptionModel->id, 'name' => $productOptionValue]);
-                }
-            }
-
-            foreach ($data['variant_combinations'] as $index => $combination) {
-                echo $product->sku . $index;
-                ProductVariant::create([
-                    'product_id' => $product->id,
-                    'sku' => $product->sku . $index,
-                    'combination' => json_encode($combination),
-                    'retail_price' => $product->retail_price,
-                    'selling_price' => $product->selling_price,
-                    'stock' => $product->stock,
-                ]);
-            }
-        }
+        (new ProductFactory())->seedData();
     }
 
-    private function data(): array
+    public function data(): array
     {
         return [
             'products' => [
@@ -203,6 +134,23 @@ class ProductSeeder extends Seeder
                 [
                     'size' => 'large',
                     'color' => 'black',
+                ],
+            ],
+            'taxonomies' => [
+                [
+                    'name' => 'Brand',
+                    'term' => [
+                        ['name' => 'Brand One'],
+                        ['name' => 'The Next Brand'],
+                    ],
+                ],
+                [
+                    'name' => 'Categories',
+                    'term' => [
+                        ['name' => 'Clothing'],
+                        ['name' => 'Food & Beverages'],
+                        ['name' => 'Electronics'],
+                    ],
                 ],
             ],
         ];

@@ -35,7 +35,7 @@ class ProductResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $taxonomies = Taxonomy::with('taxonomyTerms')->whereIn('slug', ['brand', 'category'])->get();
+        $taxonomies = Taxonomy::with('taxonomyTerms')->whereIn('slug', ['brand', 'categories'])->get();
 
         return $form
             ->columns(3)
