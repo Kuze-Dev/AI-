@@ -26,7 +26,7 @@ class ProductData
         public readonly bool $allow_remark_with_image = false,
         public readonly array $taxonomy_terms = [],
         public readonly ?string $description = null,
-        public readonly UploadedFile|string|null $image = null,
+        public readonly UploadedFile|string|null|array $images = null,
     ) {
     }
 
@@ -48,7 +48,7 @@ class ProductData
             is_special_offer: $data['is_special_offer'],
             allow_customer_remarks: $data['allow_customer_remarks'],
             allow_remark_with_image: $data['allow_remark_with_image'],
-            image: $data['image'],
+            images: $data['images'],
         );
     }
 }

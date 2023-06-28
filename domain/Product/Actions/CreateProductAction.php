@@ -26,15 +26,16 @@ class CreateProductAction
         $this->createMetaTags->execute($product, $productData->meta_data);
 
         // $this->createOrUpdateRouteUrl->execute($product, $productData->route_url_data);
-
-        if ($productData->image instanceof UploadedFile && $imageString = $productData->image->get()) {
-            $product->addMediaFromString($imageString)
-                ->usingFileName($productData->image->getClientOriginalName())
-                ->usingName(pathinfo($productData->image->getClientOriginalName(), PATHINFO_FILENAME))
-                ->toMediaCollection('image');
+        foreach ($productData->images as $image) {
+            if ($image instanceof UploadedFile && $imageString = $image->get()) {
+                $product->addMediaFromString($imageString)
+                    ->usingFileName($image->getClientOriginalName())
+                    ->usingName(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME))
+                    ->toMediaCollection('image');
+            }
         }
 
-        if ($productData->image === null) {
+        if ($productData->images === null) {
             $product->clearMediaCollection('image');
         }
 

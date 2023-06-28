@@ -15,6 +15,7 @@ use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms;
 use Closure;
+use Domain\Product\Models\ProductOption;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Tables\Filters\Layout;
@@ -47,13 +48,13 @@ class ProductResource extends Resource
                             ->unique(ignoreRecord: true)
                             ->required(),
                         Forms\Components\RichEditor::make('description')->required(),
-                        Forms\Components\FileUpload::make('image')
+                        Forms\Components\FileUpload::make('images')
                             ->label('Media')
                             ->mediaLibraryCollection('image')
                             ->image()
+                            ->multiple()
                             ->required(),
                     ]),
-
                     Forms\Components\Section::make('Customer Remarks')
                         ->schema([
                             Forms\Components\Toggle::make('allow_customer_remarks')
@@ -69,12 +70,6 @@ class ProductResource extends Resource
                     Forms\Components\Section::make('Shipping')
                         ->schema([
                             Forms\Components\TextInput::make('weight')
-                                ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
-                                    prefix: '$',
-                                    thousandsSeparator: ',',
-                                    decimalPlaces: 2,
-                                    isSigned: false
-                                ))
                                 ->dehydrateStateUsing(fn ($state) => (float) $state),
 
                             Forms\Components\TextInput::make('dimenstion'),
@@ -83,23 +78,45 @@ class ProductResource extends Resource
                     Forms\Components\Section::make(trans('Variants (work in progress)'))->schema([
                         // For Manage Variant
                         Tree::make('manage_variants')
-                            ->formatStateUsing(
-                                fn () => []
-                            )
+                            ->formatStateUsing(fn () => [])
                             ->itemLabel(fn (array $state) => $state['name'] ?? null)
                             ->schema([
-                                Forms\Components\Grid::make(['md' => 1])
+                                Forms\Components\Repeater::make('options')
+                                    ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state) {
+                                        if ( ! $record) {
+                                            return $state;
+                                        }
+
+                                        $record->productOptions->load('productOptionValues');
+                                        $mappedOptions = $record->productOptions->map(function (ProductOption $productOption) {
+                                            return [
+                                                'id' => $productOption->id,
+                                                'name' => $productOption->name,
+                                                'slug' => $productOption->slug,
+                                                'productOptionValues' => $productOption->productOptionValues,
+                                            ];
+                                        });
+                                        $component->state($mappedOptions->toArray());
+                                    })
                                     ->schema([
-                                        Forms\Components\TextInput::make('variant_name')
-                                            ->required()
-                                            ->unique(ignoreRecord: true),
-                                    ]),
-                                Forms\Components\Grid::make(['md' => 1])
-                                    ->schema([
-                                        Forms\Components\TextInput::make('variant_values')
-                                            ->required()
-                                            ->unique(ignoreRecord: true),
-                                    ]),
+                                        Forms\Components\TextInput::make('name')
+                                            ->required(),
+                                        Forms\Components\Repeater::make('productOptionValues')
+                                            ->afterStateHydrated(function (Forms\Components\Repeater $component, ?ProductOption $record, ?array $state) {
+                                                dd($component);
+                                                // $component->state($record ? $record->productOptionValues->toArray() : $state);
+                                            })
+                                            ->schema([
+                                                Forms\Components\TextInput::make('name')
+                                                    ->label('')
+                                                    ->lazy()
+                                                    ->required(),
+                                            ])
+                                            ->disableItemMovement(),
+                                    ])
+                                    ->disableItemMovement()
+                                    ->maxItems(2)
+                                    ->collapsible(),
                             ])->hiddenOn('create'),
 
                         // Reference: Block & Taxonomy
