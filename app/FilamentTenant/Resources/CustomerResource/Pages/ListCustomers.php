@@ -74,8 +74,9 @@ class ListCustomers extends ListRecords
                 ->queue()
                 ->query(fn (Builder $query) => $query->with('tier')->latest())
                 ->mapUsing(
-                    ['Email', 'First Name',  'Last Name', 'Mobile', 'Status', 'Birth Date', 'Tier', 'Created At'],
+                    ['CUID', 'Email', 'First Name',  'Last Name', 'Mobile', 'Status', 'Birth Date', 'Tier', 'Created At'],
                     fn (Customer $customer): array => [
+                        $customer->cuid,
                         $customer->email,
                         $customer->first_name,
                         $customer->last_name,
