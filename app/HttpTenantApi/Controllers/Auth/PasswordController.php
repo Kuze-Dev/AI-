@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Password as PasswordBroker;
 use Illuminate\Validation\ValidationException;
 use Spatie\RouteAttributes\Attributes\Post;
@@ -18,14 +17,13 @@ use Spatie\RouteAttributes\Attributes\Prefix;
 class PasswordController extends Controller
 {
     #[Post('email', name: 'password.request')]
-    public function sendResetLinkEmail(Request $request)
+    public function sendResetLinkEmail(Request $request): mixed
     {
         $validated = $this->validate($request, [
             'email' => ['required', Rule::email()],
         ]);
 
-        // todo: password broker for customer
-        $response = PasswordBroker::broker()->sendResetLink($validated);
+        $response = PasswordBroker::broker('customer')->sendResetLink($validated);
 
         return $response === PasswordBroker::RESET_LINK_SENT
              ? new JsonResponse(['message' => trans($response)], 200)
@@ -35,8 +33,8 @@ class PasswordController extends Controller
     }
 
     #[Post('reset', name: 'password.update')]
-    public function reset(Request $request)
+    public function reset(Request $request): mixed
     {
-
+        return '';
     }
 }
