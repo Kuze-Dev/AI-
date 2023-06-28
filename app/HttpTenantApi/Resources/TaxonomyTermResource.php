@@ -25,16 +25,23 @@ class TaxonomyTermResource extends JsonApiResource
         ];
     }
 
-       /** @return array<string, callable> */
-       public function toRelationships(Request $request): array
-       {
-           return [
-               'children' => fn () => TaxonomyTermResource::collection($this->children),
-           ];
-       }
+    /** @return array<string, callable> */
+    public function toRelationships(Request $request): array
+    {
+        return [
+            'children' => fn () => TaxonomyTermResource::collection($this->children),
+        ];
+    }
 
     protected function getSchemaData(): SchemaData
     {
-        return $this->taxonomy->blueprint->schema;
+        if ($this->taxonomy && $this->taxonomy->blueprint->exists()) {
+            return $this->taxonomy->blueprint->schema;
+        }
+
+        // Handle the case when taxonomy or blueprint is null
+        // Return an appropriate default or throw an exception
+        // For example:
+        throw new \RuntimeException('Invalid taxonomy or missing blueprint.');
     }
 }

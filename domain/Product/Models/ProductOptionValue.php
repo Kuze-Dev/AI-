@@ -46,10 +46,4 @@ class ProductOptionValue extends Model
     {
         return $this->belongsTo(ProductOption::class);
     }
-
-    public function registerMediaCollections(): void
-    {
-        $this->addMediaCollection('image')
-            ->singleFile();
-    }
 }

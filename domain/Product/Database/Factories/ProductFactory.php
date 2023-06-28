@@ -14,6 +14,9 @@ use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Product\Models\Product>
+ */
 class ProductFactory extends Factory
 {
     protected $model = Product::class;
@@ -32,40 +35,38 @@ class ProductFactory extends Factory
         ];
     }
 
-    public function seedData()
+    public function seedData(): void
     {
-        $blueprint = Blueprint::where('name', 'Image with Heading Block Blueprint')->first();
+        $blueprint = Blueprint::where('name', 'Image with Heading Block Blueprint')->firstOrFail();
+
         $data = (new ProductSeeder())->data();
 
         $this->seedTaxonomies($data['taxonomies'], $blueprint);
         $this->seedProducts($data['products'], $data['product_options'], $data['variant_combinations']);
     }
 
-    private function seedTaxonomies($taxonomies, $blueprint)
+    private function seedTaxonomies(array $taxonomies, Blueprint $blueprint): void
     {
-        collect($taxonomies)->each(function ($taxonomyData) use ($blueprint) {
-            if ( ! Taxonomy::whereName($taxonomyData['name'])->first()) {
+        // Seed Brand and Category in Taxonomy
+        foreach ($taxonomies as $taxonomyData) {
+            if ( ! Taxonomy::whereName($taxonomyData['name'])->exists()) {
                 $taxonomy = Taxonomy::create([
                     'name' => $taxonomyData['name'],
                     'blueprint_id' => $blueprint->id,
                 ]);
 
-                collect($taxonomyData['term'])->each(function ($termData) use ($taxonomy) {
-                    TaxonomyTerm::create([
-                        'taxonomy_id' => $taxonomy->id,
-                        'data' => [
-                            'main' => [
-                                'heading' => $termData['name'],
-                            ],
+                foreach ($taxonomyData['term'] as $termData) {
+                    TaxonomyTerm::create(['taxonomy_id' => $taxonomy->id, 'data' => [
+                        'main' => [
+                            'heading' => $termData['name'],
                         ],
-                        'name' => $termData['name'],
-                    ]);
-                });
+                    ], 'name' => $termData['name']]);
+                }
             }
-        });
+        }
     }
 
-    private function seedProducts($products, $productOptions, $variantCombinations)
+    private function seedProducts(array $products, array $productOptions, array $variantCombinations): void
     {
         $taxonomyTermIds = TaxonomyTerm::whereIn('slug', ['brand-one', 'clothing'])->pluck('id');
 
@@ -78,24 +79,19 @@ class ProductFactory extends Factory
         });
     }
 
-    private function seedProductOptions($product, $productOptions)
+    private function seedProductOptions(Product $product, array $productOptions): void
     {
-        collect($productOptions)->each(function ($productOption) use ($product) {
-            $productOptionModel = ProductOption::create([
-                'product_id' => $product->id,
-                'name' => $productOption['name'],
-            ]);
 
-            collect($productOption['values'])->each(function ($productOptionValue) use ($productOptionModel) {
-                ProductOptionValue::create([
-                    'product_option_id' => $productOptionModel->id,
-                    'name' => $productOptionValue,
-                ]);
-            });
-        });
+        foreach ($productOptions as $productOption) {
+            $productOptionModel = ProductOption::create(['product_id' => $product->id, 'name' => $productOption['name']]);
+
+            foreach ($productOption['values'] as $productOptionValue) {
+                ProductOptionValue::create(['product_option_id' => $productOptionModel->id, 'name' => $productOptionValue]);
+            }
+        }
     }
 
-    private function seedProductVariants($product, $variantCombinations)
+    private function seedProductVariants(Product $product, array $variantCombinations): void
     {
         collect($variantCombinations)->each(function ($combination, $index) use ($product) {
             ProductVariant::create([
