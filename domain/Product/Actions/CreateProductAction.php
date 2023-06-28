@@ -53,7 +53,6 @@ class CreateProductAction
                 'description' => $productData->description,
                 'retail_price' => $productData->retail_price,
                 'selling_price' => $productData->selling_price,
-                'shipping_fee' => $productData->shipping_fee,
                 'status' => $productData->status,
                 'stock' => $productData->stock,
                 'is_digital_product' => $productData->is_digital_product,

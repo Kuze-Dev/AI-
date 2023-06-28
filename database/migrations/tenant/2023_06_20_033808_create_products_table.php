@@ -20,7 +20,8 @@ return new class () extends Migration {
             $table->string('sku')->unique();
             $table->decimal('retail_price', 10, 2);
             $table->decimal('selling_price', 10, 2);
-            $table->decimal('shipping_fee', 10, 2)->nullable();
+            $table->json('dimension')->nullable();
+            $table->decimal('weight')->nullable();
             $table->unsignedInteger('stock');
             $table->mediumText('description')->nullable();
             $table->string('status')->default(true);

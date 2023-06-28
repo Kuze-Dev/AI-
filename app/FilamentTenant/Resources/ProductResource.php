@@ -68,15 +68,17 @@ class ProductResource extends Resource
                         ])->columns(2),
                     Forms\Components\Section::make('Shipping')
                         ->schema([
-                            Forms\Components\TextInput::make('shipping_fee')
+                            Forms\Components\TextInput::make('weight')
                                 ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
                                     prefix: '$',
                                     thousandsSeparator: ',',
                                     decimalPlaces: 2,
                                     isSigned: false
                                 ))
-                                ->dehydrateStateUsing(fn ($state) => (float) $state)
-                                ->helperText('Leave this field blank if there is no shipping fee.'),
+                                ->dehydrateStateUsing(fn ($state) => (float) $state),
+
+                            Forms\Components\TextInput::make('dimenstion'),
+                            // ->helperText('Leave this field blank if there is no shipping fee.'),
                         ]),
                     Forms\Components\Section::make(trans('Variants (work in progress)'))->schema([
                         // For Manage Variant

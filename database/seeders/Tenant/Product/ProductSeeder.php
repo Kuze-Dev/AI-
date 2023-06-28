@@ -24,7 +24,6 @@ class ProductSeeder extends Seeder
                     'description' => 'A comfortable cotton t-shirt.',
                     'selling_price' => 19.99,
                     'retail_price' => 24.99,
-                    'shipping_fee' => 5,
                     'stock' => 212,
                 ],
                 [
@@ -33,7 +32,6 @@ class ProductSeeder extends Seeder
                     'description' => 'Classic denim jeans for everyday wear.',
                     'selling_price' => 49.99,
                     'retail_price' => 54.99,
-                    'shipping_fee' => 5,
                     'stock' => 90,
                 ],
                 [
@@ -42,7 +40,6 @@ class ProductSeeder extends Seeder
                     'description' => 'An elegant dress for special occasions.',
                     'selling_price' => 79.99,
                     'retail_price' => 84.99,
-                    'shipping_fee' => 5,
                     'stock' => 75,
                 ],
                 [
@@ -51,7 +48,6 @@ class ProductSeeder extends Seeder
                     'description' => 'Comfortable loose overgarment that resembles a shirt or smock.',
                     'selling_price' => 23.99,
                     'retail_price' => 27.99,
-                    'shipping_fee' => 5,
                     'stock' => 155,
                 ],
                 [
@@ -60,7 +56,6 @@ class ProductSeeder extends Seeder
                     'description' => 'A cozy hoodie for a casual and warm style.',
                     'selling_price' => 44.99,
                     'retail_price' => 49.99,
-                    'shipping_fee' => 5,
                     'stock' => 88,
                 ],
                 [
@@ -69,7 +64,6 @@ class ProductSeeder extends Seeder
                     'description' => 'A stylish tank top for hot summer days.',
                     'selling_price' => 14.99,
                     'retail_price' => 19.99,
-                    'shipping_fee' => 5,
                     'stock' => 111,
                 ],
                 [
@@ -78,7 +72,6 @@ class ProductSeeder extends Seeder
                     'description' => 'A stylish polo shirt for a smart-casual look.',
                     'selling_price' => 34.99,
                     'retail_price' => 39.99,
-                    'shipping_fee' => 5,
                     'stock' => 177,
                 ],
                 [
@@ -87,7 +80,6 @@ class ProductSeeder extends Seeder
                     'description' => 'A cozy sweatshirt for chilly days.',
                     'selling_price' => 39.99,
                     'retail_price' => 44.99,
-                    'shipping_fee' => 5,
                     'stock' => 133,
                 ],
                 [
@@ -97,7 +89,6 @@ class ProductSeeder extends Seeder
                         environments and outdoor activities.',
                     'selling_price' => 59.99,
                     'retail_price' => 64.99,
-                    'shipping_fee' => 5,
                     'stock' => 124,
                 ],
                 [
@@ -106,7 +97,6 @@ class ProductSeeder extends Seeder
                     'description' => 'light-weight shorts that stop at varying distances above the knee',
                     'selling_price' => 43.99,
                     'retail_price' => 48.99,
-                    'shipping_fee' => 5,
                     'stock' => 188,
                 ],
             ],

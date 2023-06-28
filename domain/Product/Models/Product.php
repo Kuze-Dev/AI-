@@ -32,7 +32,6 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string $sku
  * @property string $retail_price
  * @property string $selling_price
- * @property string|null $shipping_fee
  * @property int $stock
  * @property string|null $description
  * @property string $status
@@ -69,7 +68,6 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereRetailPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereSellingPrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereShippingFee($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereSku($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereStatus($value)
@@ -93,7 +91,6 @@ class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, 
         'description',
         'retail_price',
         'selling_price',
-        'shipping_fee',
         'stock',
         'status',
         'is_digital_product',
@@ -107,7 +104,9 @@ class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, 
      * Columns that are converted
      * to a specific data type.
      */
-    protected $casts = [];
+    protected $casts = [
+        'dimension' => 'array',
+    ];
 
     /**
      * Define default reference

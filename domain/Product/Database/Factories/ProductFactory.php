@@ -30,7 +30,6 @@ class ProductFactory extends Factory
             'description' => $this->faker->paragraph,
             'selling_price' => $this->faker->randomFloat(2, 0, 100),
             'retail_price' => $this->faker->randomFloat(2, 0, 100),
-            'shipping_fee' => $this->faker->randomFloat(2, 0, 10),
             'stock' => $this->faker->numberBetween(0, 100),
         ];
     }

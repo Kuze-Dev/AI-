@@ -26,7 +26,6 @@ class ProductData
         public readonly bool $allow_remark_with_image = false,
         public readonly array $taxonomy_terms = [],
         public readonly ?string $description = null,
-        public readonly ?float $shipping_fee = null,
         public readonly UploadedFile|string|null $image = null,
     ) {
     }
@@ -42,7 +41,6 @@ class ProductData
             description: $data['description'],
             retail_price: $data['retail_price'],
             selling_price: $data['selling_price'],
-            shipping_fee: $data['shipping_fee'],
             status: $data['status'],
             stock: $data['stock'],
             // is_digital_product: $data['is_digital_product'],
