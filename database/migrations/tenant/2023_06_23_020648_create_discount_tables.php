@@ -21,8 +21,8 @@ return new class () extends Migration {
             $table->unsignedInteger('max_uses')->nullable();
             // $table->unsignedInteger('max_uses_per_user');
 
-            $table->timestamp('valid_start_at');
-            $table->timestamp('valid_end_at')->nullable();
+            $table->dateTime('valid_start_at');
+            $table->dateTime('valid_end_at')->nullable();
             $table->softDeletes('deleted_at')->nullable();
             $table->timestamps();
         });
@@ -59,6 +59,19 @@ return new class () extends Migration {
                 ->nullable()
                 ->index();
             $table->bigInteger('minimum_amount')
+                ->nullable();
+
+            $table->timestamps();
+        });
+
+        Schema::create('discount_limits', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignIdFor(Discount::class)->index();
+            // $table->foreignIdFor(Customer::class)->index();
+            // $table->foreignIdFor(Order::class)->index();
+
+            $table->bigInteger('times_used')
                 ->nullable();
 
             $table->timestamps();

@@ -49,24 +49,6 @@ class EditDiscount extends EditRecord
         return $this->getCachedActions();
     }
 
-    protected function mutateFormDataBeforeFill(array $data): array
-    {
-        $discount = $this->getRecord();
-
-        $data['discountRequirement'] = [
-            'requirement_type' => $discount->discountRequirement->requirement_type,
-            'minimum_amount' => $discount->discountRequirement->minimum_amount,
-        ];
-
-        $data['discountCondition'] = [
-            'discount_type' => $discount->discountCondition->discount_type,
-            'amount_type' => $discount->discountCondition->amount_type,
-            'amount' => $discount->discountCondition->amount,
-        ];
-
-        return $data;
-    }
-
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(
