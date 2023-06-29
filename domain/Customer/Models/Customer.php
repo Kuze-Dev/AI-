@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Domain\Customer\Models;
 
 use Domain\Address\Models\Address;
-use Domain\Customer\Notifications\ResetPassword;
 use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Customer\Enums\Status;
 use Domain\Tier\Models\Tier;
@@ -147,10 +146,5 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new VerifyEmail());
-    }
-
-    public function sendPasswordResetNotification($token): void
-    {
-        $this->notify(new ResetPassword($token));
     }
 }
