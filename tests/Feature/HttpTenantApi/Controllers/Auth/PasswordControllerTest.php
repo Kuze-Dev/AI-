@@ -42,10 +42,8 @@ it('can reset password', function () {
     Notification::fake();
     Queue::fake();
 
-    $token = PasswordBroker::broker('customer')->createToken($customer);
-
     postJson('api/password/reset', [
-        'token' => ray()->pass($token),
+        'token' => PasswordBroker::broker('customer')->createToken($customer),
         'email' => $customer->email,
         'password' => 'new-password',
     ])
