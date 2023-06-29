@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 
 use function Pest\Laravel\postJson;
+use function PHPUnit\Framework\assertNotSame;
 use function PHPUnit\Framework\assertTrue;
 
 beforeEach(function () {
@@ -36,7 +37,10 @@ it('can send link', function () {
 
 it('can reset password', function () {
     $customer = CustomerFactory::new()
-        ->createOne(['password' => 'old-password']);
+        ->createOne([
+            'password' => 'old-password',
+            'remember_token' => 'old-remember_token',
+        ]);
 
     Event::fake();
     Notification::fake();
@@ -54,6 +58,7 @@ it('can reset password', function () {
     $customer->refresh();
 
     assertTrue(Hash::check('new-password', $customer->password), 'password not reset');
+    assertNotSame('old-remember_token', $customer->getRememberToken());
 
     Notification::assertSentTo([$customer], PasswordHasBeenReset::class);
     Event::assertDispatched(PasswordReset::class);
