@@ -14,16 +14,37 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * Domain\Discount\Models\Discount
  *
- * @property mixed $type
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property string|null $description
+ * @property string $code
  * @property DiscountStatus $status
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Discount\Models\DiscountCondition> $discountConditions
- * @property-read int|null $discount_conditions_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Discount\Models\DiscountRequirement> $discountRequirements
- * @property-read int|null $discount_requirements_count
+ * @property int|null $max_uses
+ * @property \Illuminate\Support\Carbon $valid_start_at
+ * @property \Illuminate\Support\Carbon|null $valid_end_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property DiscountConditionType $type
+ * @property-read \Domain\Discount\Models\DiscountCondition|null $discountCondition
+ * @property-read \Domain\Discount\Models\DiscountRequirement|null $discountRequirement
  * @method static \Illuminate\Database\Eloquent\Builder|Discount newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Discount newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Discount onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Discount query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereMaxUses($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereValidEndAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereValidStartAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Discount withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Discount withoutTrashed()
  * @mixin \Eloquent

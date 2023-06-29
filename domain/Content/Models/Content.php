@@ -23,8 +23,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 /**
  * Domain\Content\Models\Content
  *
- * @property PublishBehavior $past_publish_date_behavior
- * @property PublishBehavior $future_publish_date_behavior
+ * @property int $id
+ * @property string $blueprint_id
+ * @property string $name
+ * @property string $slug
+ * @property string $prefix
+ * @property PublishBehavior|null $future_publish_date_behavior
+ * @property PublishBehavior|null $past_publish_date_behavior
+ * @property bool $is_sortable
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Blueprint|null $blueprint
@@ -35,6 +43,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Content newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Content newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Content query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Content whereBlueprintId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Content whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Content whereFuturePublishDateBehavior($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Content whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Content whereIsSortable($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Content whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Content wherePastPublishDateBehavior($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Content wherePrefix($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Content whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Content whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 #[

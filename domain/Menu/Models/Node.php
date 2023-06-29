@@ -20,16 +20,38 @@ use Eloquent;
 /**
  * Domain\Menu\Models\Node
  *
+ * @property int $id
+ * @property int $menu_id
+ * @property int|null $parent_id
+ * @property string|null $model_type
+ * @property int|null $model_id
+ * @property string $label
  * @property Target $target
  * @property NodeType $type
+ * @property string|null $url
+ * @property int $order
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Node> $children
  * @property-read int|null $children_count
  * @property-read \Domain\Menu\Models\Menu|null $menu
- * @property-read Model|Eloquent $model
+ * @property-read Model|\Eloquent $model
  * @method static Builder|Node newModelQuery()
  * @method static Builder|Node newQuery()
  * @method static Builder|Node ordered(string $direction = 'asc')
  * @method static Builder|Node query()
+ * @method static Builder|Node whereCreatedAt($value)
+ * @method static Builder|Node whereId($value)
+ * @method static Builder|Node whereLabel($value)
+ * @method static Builder|Node whereMenuId($value)
+ * @method static Builder|Node whereModelId($value)
+ * @method static Builder|Node whereModelType($value)
+ * @method static Builder|Node whereOrder($value)
+ * @method static Builder|Node whereParentId($value)
+ * @method static Builder|Node whereTarget($value)
+ * @method static Builder|Node whereType($value)
+ * @method static Builder|Node whereUpdatedAt($value)
+ * @method static Builder|Node whereUrl($value)
  * @mixin Eloquent
  */
 #[OnDeleteCascade(['children'])]
