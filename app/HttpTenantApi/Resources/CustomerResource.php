@@ -21,6 +21,7 @@ class CustomerResource extends JsonApiResource
             'mobile' => $this->mobile,
             'status' => $this->status,
             'birth_date' => $this->birth_date->toDateString(),
+            'is_verified' => $this->hasVerifiedEmail(),
         ];
     }
 }
