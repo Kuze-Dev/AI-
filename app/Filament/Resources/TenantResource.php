@@ -111,6 +111,14 @@ class TenantResource extends Resource
                                     'label' => trans('eCommerce'),
                                     'extras' => [],
                                 ],
+                                Features\ECommerce\Payments\PaymentGateway::class => [
+                                    'label' => trans('Paypal Gateway'),
+                                    'extras' => [ 
+                                        'paypal' => 'PayPaL',
+                                        'stripe' => 'Stripe',
+                                        'manual' => 'Offline Payment',
+                                    ],
+                                ],
                             ]),
                     ]),
             ]);

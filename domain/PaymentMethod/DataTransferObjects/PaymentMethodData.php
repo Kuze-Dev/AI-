@@ -12,7 +12,6 @@ class PaymentMethodData
         public readonly string $subtitle,
         public readonly string $description,
         public readonly bool $status,
-        public readonly array $credentials = [],
     ) {
     }
 
@@ -24,7 +23,6 @@ class PaymentMethodData
             subtitle: $data['subtitle'],
             description: $data['description'],
             status: $data['status'],
-            credentials: $data['credentials'] ?? [],
         );
     }
 }

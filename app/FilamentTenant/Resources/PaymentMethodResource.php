@@ -73,10 +73,6 @@ class PaymentMethodResource extends Resource
                         ->inline(false)
                         ->helperText('If enabled, message here')
                         ->reactive(),
-                    Forms\Components\Toggle::make('live')
-                        ->inline(false)
-                        ->helperText('If enabled, message here')
-                        ->reactive(),
                     Forms\Components\Select::make('gateway')
                         ->required()
                         ->options([
@@ -87,20 +83,6 @@ class PaymentMethodResource extends Resource
                         ->reactive(),
                     Forms\Components\Textarea::make('description')
                         ->maxLength(fn (int $value = 250) => $value),
-                    Forms\Components\KeyValue::make('credentials')
-                        ->disableAddingRows()
-                        ->disableEditingKeys()
-                        ->disableDeletingRows()
-                        ->formatStateUsing(function ($record) {
-                            if ($record) {
-                                return $record->credentials;
-                            }
-
-                            return [
-                                'paypal_secret_id' => '',
-                                'paypal_secret_key' => '',
-                            ];
-                        }),
 
                 ]),
             ]);

@@ -11,9 +11,9 @@ use Domain\Support\Payments\DataTransferObjects\PaymentGateway\PaymentRefund;
 use Domain\Support\Payments\Events\PaymentProcessEvent;
 use Domain\Support\Payments\Models\Payment;
 
-class CodProvider extends Provider
+class OfflinePayment extends Provider
 {
-    protected string $name = 'cod';
+    protected string $name = 'offline';
 
     public function authorize(): PaymentAuthorize
     {

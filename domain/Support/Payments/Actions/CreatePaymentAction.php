@@ -16,6 +16,7 @@ class CreatePaymentAction
     public function execute(PaymentMethod $paymentMethod, ProviderData $ProviderData): PaymentAuthorize
     {
         try {
+
             return app(PaymentManagerInterface::class)
                 ->driver($paymentMethod->slug)
                 ->withData($ProviderData)

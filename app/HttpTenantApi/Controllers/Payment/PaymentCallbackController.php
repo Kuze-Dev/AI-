@@ -36,11 +36,11 @@ class PaymentCallbackController
 
             $data = array_merge($request->all(), ['status' => $status]);
 
-            dump(
+            // dump(
                 app(PaymentManagerInterface::class)
                     ->driver($paymentMethod->gateway)
-                    ->capture($paymentModel, $data)
-            );
+                    ->capture($paymentModel, $data);
+            // );
 
             #redirect to FE order summary or order page.
             return redirect()->away('/');
@@ -53,7 +53,7 @@ class PaymentCallbackController
     // #[Get('/test-payment', name: 'payment-test')]
     // public function test()
     // {
-    //     $paymentMethod = PaymentMethod::where('slug', 'paypal')->first();
+    //     $paymentMethod = PaymentMethod::where('slug', 'cod')->first();
 
     //     $page = Page::first();
 

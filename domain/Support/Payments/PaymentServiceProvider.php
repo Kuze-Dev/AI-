@@ -6,7 +6,7 @@ namespace Domain\Support\Payments;
 
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Support\Payments\Contracts\PaymentManagerInterface;
-use Domain\Support\Payments\Providers\CodProvider;
+use Domain\Support\Payments\Providers\OfflinePayment;
 use Domain\Support\Payments\Providers\PaypalProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
@@ -32,11 +32,10 @@ class PaymentServiceProvider extends ServiceProvider implements DeferrableProvid
 
             if ($paymentMethods->count() > 0) {
                 foreach ($paymentMethods as $paymentType) {
-
                     app(PaymentManagerInterface::class)->extend($paymentType->slug, function () use ($paymentType) {
                         return match ($paymentType->gateway) {
                             'paypal' => new PaypalProvider(),
-                            'manual' => new CodProvider(),
+                            'manual' => new OfflinePayment(),
                             default => throw new InvalidArgumentException(),
                         };
                     });

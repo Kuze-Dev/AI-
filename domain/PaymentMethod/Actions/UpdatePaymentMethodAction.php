@@ -21,7 +21,6 @@ class UpdatePaymentMethodAction
             'gateway' => $paymentMethodData->gateway,
             'description' => $paymentMethodData->description,
             'status' => $paymentMethodData->status,
-            'credentials' => $paymentMethodData->credentials,
         ]);
 
         return $paymentMethod;
