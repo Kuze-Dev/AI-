@@ -6,7 +6,6 @@ namespace Domain\Address\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -18,8 +17,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Address\Models\City> $cities
- * @property-read int|null $cities_count
  * @property-read \Domain\Address\Models\Country|null $country
  * @method static \Illuminate\Database\Eloquent\Builder|State newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|State newQuery()
@@ -42,18 +39,12 @@ class State extends Model
     protected $fillable = [
         'name',
         'country_id',
-        // Add any additional fields for the state model
+
     ];
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\Country, State>*/
     public function country(): BelongsTo
     {
         return $this->belongsTo(Country::class);
-    }
-
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Address\Models\City>*/
-    public function cities(): HasMany
-    {
-        return $this->hasMany(City::class);
     }
 }

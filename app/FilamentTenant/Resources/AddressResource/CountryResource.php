@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\AddressResource;
 
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Domain\Address\Enums\CountryStateOrRegion;
 use Domain\Address\Models\Country;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -61,7 +60,7 @@ class CountryResource extends Resource
                     ->sortable()
                     ->toggleable()
                     ->searchable(),
-                Tables\Columns\ToggleColumn::make('active')->label(''),
+                Tables\Columns\ToggleColumn::make('active')->label('Active'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()
                     ->toggleable(),
@@ -80,12 +79,8 @@ class CountryResource extends Resource
 
             ->actions([
                 Tables\Actions\ViewAction::make()->url(function (Country $record) {
-                    if($record->state_or_region == CountryStateOrRegion::STATE) {
-                        return "/admin/regions?tableFilters[country_id][value]={$record->id}";
-                    }
-                    if($record->state_or_region == CountryStateOrRegion::REGION) {
-                        return "/admin/states?tableFilters[country_id][value]={$record->id}";
-                    }
+
+                    return "/admin/states?tableFilters[country_id][value]={$record->id}";
                 }),
 
             ])

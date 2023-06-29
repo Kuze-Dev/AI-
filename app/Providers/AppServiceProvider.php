@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Settings\FormSettings;
-use Domain\Address\Models\City;
 use Domain\Address\Models\Country;
-use Domain\Address\Models\Region;
 use Domain\Address\Models\State;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
@@ -74,9 +72,7 @@ class AppServiceProvider extends ServiceProvider
             Globals::class,
             MetaData::class,
             Country::class,
-            Region::class,
             State::class,
-            City::class,
         ]);
 
         Password::defaults(

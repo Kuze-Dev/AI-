@@ -40,7 +40,7 @@ class StateResource extends Resource
         return $table
             ->columns([
 
-                Tables\Columns\TextColumn::make('name')->label('States')
+                Tables\Columns\TextColumn::make('name')->label('State/Province')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -59,13 +59,7 @@ class StateResource extends Resource
                         return $countries->pluck('name', 'id')->toArray();
                     }),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()->url(function (State $record) {
-                    return "/admin/cities?tableFilters[state_id][value]={$record->id}";
-
-                }),
-
-            ])
+            ->actions([])
             ->bulkActions([])
             ->defaultSort('id', 'asc');
     }

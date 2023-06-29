@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Tenant\Address;
 
-use Domain\Address\Database\Factories\CityFactory;
 use Domain\Address\Database\Factories\CountryFactory;
-use Domain\Address\Database\Factories\RegionFactory;
 use Domain\Address\Database\Factories\StateFactory;
 use Illuminate\Database\Seeder;
 
@@ -16,33 +14,18 @@ class CountrySeeder extends Seeder
     {
         CountryFactory::new()
             ->has(
-                RegionFactory::new([
-                    'name' => 'National Capital Region',
-                ])
-                    ->has(
-                        CityFactory::new()
-                            ->count(3)
-                            ->sequence(
-                                [
-                                    'name' => 'Manila',
-                                ],
-                                [
-                                    'name' => 'Quezon City',
-                                ],
-                                [
-                                    'name' => 'Makati City',
-                                ],
-                            )
-                    )
-            )
-            ->has(
-                RegionFactory::new([
-                    'name' => 'Central Visayas',
+                StateFactory::new([
+                    'name' => 'Metro Manila',
                 ])
             )
             ->has(
-                RegionFactory::new([
-                    'name' => 'Central Luzon',
+                StateFactory::new([
+                    'name' => 'Bulacan',
+                ])
+            )
+            ->has(
+                StateFactory::new([
+                    'name' => 'Pampanga',
                 ])
             )
             ->createOne([
@@ -59,21 +42,6 @@ class CountrySeeder extends Seeder
                 StateFactory::new([
                     'name' => 'New York City',
                 ])
-                    ->has(
-                        CityFactory::new()
-                            ->count(3)
-                            ->sequence(
-                                [
-                                    'name' => 'New York City',
-                                ],
-                                [
-                                    'name' => 'Buffalo',
-                                ],
-                                [
-                                    'name' => 'Rochester',
-                                ],
-                            )
-                    )
             )
             ->has(
                 StateFactory::new([
