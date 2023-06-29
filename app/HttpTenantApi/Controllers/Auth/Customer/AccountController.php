@@ -11,7 +11,7 @@ use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
 
 #[Middleware(['auth:sanctum'])]
-class CustomerAccountController
+class AccountController
 {
     #[Get('account', name: 'account')]
     public function __invoke(Request $request): CustomerResource
