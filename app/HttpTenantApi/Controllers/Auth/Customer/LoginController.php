@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Auth;
+namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
 use App\Http\Controllers\Controller;
 use Domain\Customer\Models\Customer;

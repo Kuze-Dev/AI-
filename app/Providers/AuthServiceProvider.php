@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use Domain\Admin\Models\Admin;
+use Domain\Customer\Models\Customer;
 use Domain\Tenant\Models\Tenant;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Auth\Notifications\VerifyEmail as VerifyEmailNotification;
@@ -74,9 +75,35 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         ResetPasswordNotification::createUrlUsing(function (mixed $notifiable, string $token) {
+
+            if ($notifiable instanceof Customer) {
+
+                /** @var Tenant $tenant */
+                $tenant = tenancy()->tenant;
+
+                if ($url = config('domain.customer.password_reset_url')) {
+                    return $url.'?'.http_build_query([
+                        'token' => $token,
+                        'email' => $notifiable->getEmailForPasswordReset(),
+                    ]);
+                }
+
+                $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;
+                $routeName = 'filament-tenant.auth.password.reset';
+
+                return $hostName . URL::route(
+                    $routeName,
+                    [
+                        'token' => $token,
+                        'email' => $notifiable->getEmailForPasswordReset(),
+                    ],
+                    false
+                );
+            }
+
             if ($notifiable instanceof Admin) {
                 if (tenancy()->initialized) {
-                    /** @var Tenant */
+                    /** @var Tenant $tenant */
                     $tenant = tenancy()->tenant;
 
                     $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;

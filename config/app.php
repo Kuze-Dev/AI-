@@ -181,6 +181,7 @@ return [
         Domain\Auth\AuthServiceProvider::class,
         Domain\Role\RoleServiceProvider::class,
         Domain\Blueprint\BlueprintServiceProvider::class,
+        Domain\Customer\CustomerServiceProvider::class,
 
         /*
         * Support Service Providers...

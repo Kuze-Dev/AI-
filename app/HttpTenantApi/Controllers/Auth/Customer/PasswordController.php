@@ -2,13 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Auth;
+namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
 use App\Http\Controllers\Controller;
+use Domain\Customer\Actions\CustomerPasswordResetAction;
+use Domain\Customer\Models\Customer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password as PasswordBroker;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Spatie\RouteAttributes\Attributes\Post;
 use Spatie\RouteAttributes\Attributes\Prefix;
@@ -35,6 +39,25 @@ class PasswordController extends Controller
     #[Post('reset', name: 'password.update')]
     public function reset(Request $request): mixed
     {
-        return '';
+        $validated = $this->validate($request, [
+            'token' => 'required|string',
+            'email' => ['required', Rule::email()],
+            'password' => Password::required(),
+        ]);
+
+        $response = PasswordBroker::broker('customer')
+            ->reset(
+                $validated,
+                function (Customer $customer, string $password): void {
+                    DB::transaction(fn () => app(CustomerPasswordResetAction::class)
+                        ->execute($customer, $password));
+                }
+            );
+
+        return $response == PasswordBroker::PASSWORD_RESET
+            ? new JsonResponse(['message' => trans($response)], 200)
+            : throw ValidationException::withMessages([
+                'email' => [trans($response)],
+            ]);
     }
 }
