@@ -15,11 +15,13 @@ use Throwable;
 class RegisterController
 {
     /** @throws Throwable */
-    #[Post('register')]
+    #[Post('register', name: 'customer.register')]
     public function __invoke(CustomerRequest $request): CustomerResource
     {
-        $customer = DB::transaction(fn () => app(CreateCustomerAction::class)
-            ->execute(CustomerData::fromArray($request->validated())));
+        $customer = DB::transaction(
+            fn () => app(CreateCustomerAction::class)
+                ->execute(CustomerData::fromArray($request->validated()))
+        );
 
         return CustomerResource::make($customer);
     }
