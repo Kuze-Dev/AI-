@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Domain\Customer\Database\Factories\CustomerFactory;
+use Domain\Customer\Events\PasswordResetSent;
 use Domain\Customer\Notifications\PasswordHasBeenReset;
 use Domain\Customer\Notifications\ResetPassword;
 use Illuminate\Auth\Events\PasswordReset;
@@ -24,8 +25,9 @@ it('can send link', function () {
     $customer = CustomerFactory::new()
         ->createOne();
 
-    Queue::fake();
+    Event::fake();
     Notification::fake();
+    Queue::fake();
 
     postJson('api/password/email', ['email' => $customer->email])
         ->assertValid()
@@ -33,6 +35,7 @@ it('can send link', function () {
         ->assertJson(['message' => 'We have emailed your password reset link!']);
 
     Notification::assertSentTo([$customer], ResetPassword::class);
+    Event::assertDispatched(PasswordResetSent::class);
 });
 
 it('can reset password', function () {
