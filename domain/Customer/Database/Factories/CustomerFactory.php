@@ -9,6 +9,7 @@ use Domain\Customer\Models\Customer;
 use Domain\Tier\Database\Factories\TierFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Customer\Models\Customer>
@@ -29,6 +30,7 @@ class CustomerFactory extends Factory
             'mobile' => $this->faker->phoneNumber(),
             'status' => Arr::random(Status::cases()),
             'birth_date' => now()->subYears($this->faker->randomDigitNotNull()),
+            'remember_token' => Str::random(10),
         ];
     }
 
