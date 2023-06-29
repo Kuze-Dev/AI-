@@ -59,23 +59,21 @@ class ProductResource extends Resource
                         ->schema([
                             Forms\Components\Toggle::make('allow_customer_remarks')
                                 ->label('Allow customer to add remarks upon purchase'),
-                            Forms\Components\Checkbox::make('allow_remark_with_image')
-                                ->label('Allow to add media'),
                         ]),
                     Forms\Components\Section::make('Section Display')
                         ->schema([
                             Forms\Components\Toggle::make('is_special_offer'),
                             Forms\Components\Toggle::make('is_featured'),
                         ])->columns(2),
-                    Forms\Components\Section::make('Shipping')
-                        ->schema([
-                            Forms\Components\TextInput::make('weight')
-                                ->dehydrateStateUsing(fn ($state) => (float) $state),
+                    // Forms\Components\Section::make('Shipping')
+                    //     ->schema([
+                    //         Forms\Components\TextInput::make('weight')
+                    //             ->dehydrateStateUsing(fn ($state) => (float) $state),
 
-                            Forms\Components\TextInput::make('dimenstion'),
-                            // ->helperText('Leave this field blank if there is no shipping fee.'),
-                        ]),
-                    Forms\Components\Section::make(trans('Variants (work in progress)'))->schema([
+                    //         Forms\Components\TextInput::make('dimenstion'),
+                    //         // ->helperText('Leave this field blank if there is no shipping fee.'),
+                    //     ]),
+                    Forms\Components\Section::make(trans('Variants'))->schema([
                         // For Manage Variant
                         Tree::make('manage_variants')
                             ->formatStateUsing(fn () => [])
@@ -86,7 +84,6 @@ class ProductResource extends Resource
                                         if ( ! $record) {
                                             return $state;
                                         }
-
                                         $record->productOptions->load('productOptionValues');
                                         $mappedOptions = $record->productOptions->map(function (ProductOption $productOption) {
                                             return [
@@ -102,10 +99,6 @@ class ProductResource extends Resource
                                         Forms\Components\TextInput::make('name')
                                             ->required(),
                                         Forms\Components\Repeater::make('productOptionValues')
-                                            ->afterStateHydrated(function (Forms\Components\Repeater $component, ?ProductOption $record, ?array $state) {
-                                                dd($component);
-                                                // $component->state($record ? $record->productOptionValues->toArray() : $state);
-                                            })
                                             ->schema([
                                                 Forms\Components\TextInput::make('name')
                                                     ->label('')

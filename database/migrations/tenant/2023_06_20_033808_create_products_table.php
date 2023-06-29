@@ -29,7 +29,6 @@ return new class () extends Migration {
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_special_offer')->default(false);
             $table->boolean('allow_customer_remarks')->default(false);
-            $table->boolean('allow_remark_with_image')->default(false);
             $table->timestamps();
         });
 

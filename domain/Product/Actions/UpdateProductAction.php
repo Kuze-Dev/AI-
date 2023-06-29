@@ -59,7 +59,6 @@ class UpdateProductAction
                 'is_featured' => $productData->is_featured,
                 'is_special_offer' => $productData->is_special_offer,
                 'allow_customer_remarks' => $productData->allow_customer_remarks,
-                'allow_remark_with_image' => $productData->allow_remark_with_image,
             ],
             fn ($value) => filled($value)
         );
