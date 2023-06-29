@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Customer\Actions;
 
+use Illuminate\Auth\Events\PasswordReset;
 use Domain\Customer\Models\Customer;
 use Domain\Customer\Notifications\PasswordHasBeenReset;
 use Illuminate\Support\Str;
@@ -21,5 +22,7 @@ class CustomerPasswordResetAction
         $customer->save();
 
         $customer->notify(new PasswordHasBeenReset());
+
+        event(new PasswordReset($customer));
     }
 }
