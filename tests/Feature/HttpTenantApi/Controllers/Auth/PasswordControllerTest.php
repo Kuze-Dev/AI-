@@ -5,9 +5,11 @@ declare(strict_types=1);
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Customer\Notifications\PasswordHasBeenReset;
 use Domain\Customer\Notifications\ResetPassword;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Password as PasswordBroker;
-use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
 
 use function Pest\Laravel\postJson;
 
@@ -34,8 +36,9 @@ it('can reset password', function () {
     $customer = CustomerFactory::new()
         ->createOne();
 
-    Queue::fake();
+    Event::fake();
     Notification::fake();
+    Queue::fake();
 
     $token = PasswordBroker::broker('customer')->createToken($customer);
 
@@ -49,4 +52,5 @@ it('can reset password', function () {
         ->assertJson(['message' => 'Your password has been reset!']);
 
     Notification::assertSentTo([$customer], PasswordHasBeenReset::class);
+    Event::assertDispatched(PasswordReset::class);
 });
