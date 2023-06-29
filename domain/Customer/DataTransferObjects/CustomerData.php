@@ -29,9 +29,9 @@ class CustomerData
             ? (
                 is_bool($data['status'])
                 ? ($data['status'] ? Status::ACTIVE : Status::INACTIVE)
-                : Status::tryFrom($data['status'])
+                : Status::from($data['status'])
             )
-            : Status::INACTIVE;
+            : Status::ACTIVE;
 
         $data['birth_date'] = now()->parse($data['birth_date']);
 
