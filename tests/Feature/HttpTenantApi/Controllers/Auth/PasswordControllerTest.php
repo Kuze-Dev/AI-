@@ -8,10 +8,12 @@ use Domain\Customer\Notifications\ResetPassword;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Password as PasswordBroker;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 
 use function Pest\Laravel\postJson;
+use function PHPUnit\Framework\assertTrue;
 
 beforeEach(function () {
     testInTenantContext();
@@ -34,7 +36,7 @@ it('can send link', function () {
 
 it('can reset password', function () {
     $customer = CustomerFactory::new()
-        ->createOne();
+        ->createOne(['password' => 'old-password']);
 
     Event::fake();
     Notification::fake();
@@ -45,11 +47,15 @@ it('can reset password', function () {
     postJson('api/password/reset', [
         'token' => ray()->pass($token),
         'email' => $customer->email,
-        'password' => '1234',
+        'password' => 'new-password',
     ])
         ->assertValid()
         ->assertOk()
         ->assertJson(['message' => 'Your password has been reset!']);
+
+    $customer->refresh();
+
+    assertTrue(Hash::check('new-password', $customer->password), 'password not reset');
 
     Notification::assertSentTo([$customer], PasswordHasBeenReset::class);
     Event::assertDispatched(PasswordReset::class);
