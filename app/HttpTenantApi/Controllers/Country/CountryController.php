@@ -3,7 +3,8 @@
 declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Country;
-use App\Features\CMS\CMSBase;
+
+use App\Features\ECommerce\ECommerceBase;
 use App\HttpTenantApi\Resources\CountryResource;
 use Domain\Address\Models\Country;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -13,7 +14,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('countries', only: ['index', 'show']),
-    Middleware('feature.tenant:' . CMSBase::class)
+    Middleware('feature.tenant:' . ECommerceBase::class)
 ]
 class CountryController
 {
@@ -29,10 +30,10 @@ class CountryController
         );
     }
 
-    public function show(string $content): CountryResource
+    public function show(string $country): CountryResource
     {
         return CountryResource::make(
-            QueryBuilder::for(Country::whereSlug($content))
+            QueryBuilder::for(Country::whereSlug($country))
                 ->allowedIncludes([
                     'states',
                 ])
