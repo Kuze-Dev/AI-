@@ -26,4 +26,9 @@ class TierFactory extends Factory
     {
         return $this->state(['deleted_at' => now()]);
     }
+
+    public static function createDefault(): Tier
+    {
+        return self::new()->createOne(['name' => config('domain.tier.default')]);
+    }
 }
