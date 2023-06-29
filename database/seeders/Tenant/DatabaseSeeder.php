@@ -18,7 +18,6 @@ class DatabaseSeeder extends Seeder
             Auth\RoleSeeder::class,
             Auth\AdminSeeder::class,
             Page\PageSeeder::class,
-            Currency\CurrencySeeder::class,
             Address\CountrySeeder::class,
 
         ]);

@@ -15,7 +15,6 @@ use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
-use Domain\Currency\Models\Currency;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
@@ -74,7 +73,6 @@ class AppServiceProvider extends ServiceProvider
             ContentEntry::class,
             Globals::class,
             MetaData::class,
-            Currency::class,
             Country::class,
             Region::class,
             State::class,
