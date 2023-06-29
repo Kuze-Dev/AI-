@@ -216,22 +216,24 @@ class FilamentServiceProvider extends ServiceProvider
 
         Forms\Components\Select::macro(
             'optionsFromModel',
-            function (string $model, string $titleColumnName, ?Closure $callback = null): Forms\Components\Select {
+            function (string|Closure $model, string|Closure $titleColumnName, ?Closure $callback = null): Forms\Components\Select {
                 /** @var Forms\Components\Select $this */
 
                 if (blank($this->getSearchColumns())) {
-                    $this->searchable([$titleColumnName]);
+                    $this->searchable(fn (Forms\Components\Select $component) => $component->evaluate($titleColumnName));
                 }
 
                 $this->getSearchResultsUsing(function (Forms\Components\Select $component, ?string $search) use ($model, $titleColumnName, $callback): array {
 
-                    $query = $model::query();
+                    $query = $component->evaluate($model)::query();
 
                     $keyName = $query->getModel()->getKeyName();
 
                     if ($callback) {
                         $query = $component->evaluate($callback, ['query' => $query]) ?? $query;
                     }
+
+                    $titleColumnName = $component->evaluate($titleColumnName);
 
                     if (empty($query->getQuery()->orders)) {
                         $query->orderBy($titleColumnName);
@@ -267,7 +269,7 @@ class FilamentServiceProvider extends ServiceProvider
                         return null;
                     }
 
-                    $query = $model::query();
+                    $query = $component->evaluate($model)::query();
 
                     $keyName = $query->getModel()->getKeyName();
 
@@ -285,6 +287,8 @@ class FilamentServiceProvider extends ServiceProvider
                             ->toArray();
                     }
 
+                    $titleColumnName = $component->evaluate($titleColumnName);
+
                     if (str_contains($titleColumnName, '->') && ! str_contains($titleColumnName, ' as ')) {
                         $titleColumnName .= " as {$titleColumnName}";
                     }
@@ -295,7 +299,7 @@ class FilamentServiceProvider extends ServiceProvider
 
                 $this->getOptionLabelUsing(function (Forms\Components\Select $component, $value) use ($model, $titleColumnName, $callback): ?string {
 
-                    $query = $model::query();
+                    $query = $component->evaluate($model)::query();
 
                     if ($callback) {
                         $query = $component->evaluate($callback, ['query' => $query]) ?? $query;
@@ -309,12 +313,12 @@ class FilamentServiceProvider extends ServiceProvider
 
                     return $component->hasOptionLabelFromRecordUsingCallback()
                         ? $component->getOptionLabelFromRecord($record)
-                        : $record->getAttributeValue($titleColumnName);
+                        : $record->getAttributeValue($component->evaluate($titleColumnName));
                 });
 
                 $this->getOptionLabelsUsing(function (Forms\Components\Select $component, array $values) use ($model, $titleColumnName, $callback): array {
 
-                    $query = $model::query();
+                    $query = $component->evaluate($model)::query();
 
                     $keyName = $query->getModel()->getKeyName();
 
@@ -330,6 +334,8 @@ class FilamentServiceProvider extends ServiceProvider
                             ->toArray();
                     }
 
+                    $titleColumnName = $component->evaluate($titleColumnName);
+
                     if (str_contains($titleColumnName, '->') && ! str_contains($titleColumnName, ' as ')) {
                         $titleColumnName .= " as {$titleColumnName}";
                     }
@@ -338,7 +344,12 @@ class FilamentServiceProvider extends ServiceProvider
                         ->toArray();
                 });
 
-                $this->rule(Rule::exists($model, $model::query()->getModel()->getKeyName()));
+                $this->rule(function (Forms\Components\Select $component) use ($model) {
+                    $model = $component->evaluate($model);
+                    $keyName = $model::query()->getModel()->getKeyName();
+
+                    return Rule::exists($model, $keyName);
+                });
 
                 return $this;
             }

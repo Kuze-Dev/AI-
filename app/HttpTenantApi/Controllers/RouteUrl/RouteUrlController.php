@@ -9,7 +9,7 @@ use App\HttpTenantApi\Resources\ContentEntryResource;
 use App\HttpTenantApi\Resources\PageResource;
 use Domain\Content\Models\ContentEntry;
 use Domain\Page\Models\Page;
-use Domain\Support\RouteUrl\Models\RouteUrl;
+use Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Support\Str;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Where;

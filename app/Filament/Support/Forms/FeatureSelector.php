@@ -67,10 +67,9 @@ class FeatureSelector extends Field
 
                         return array_merge(
                             $state,
-                            array_filter([
-                                $get($statePath) ? $key : null,
-                                ...$get($statePath . '_extras'),
-                            ])
+                            $get($statePath)
+                                ? [$key, ...$get($statePath . '_extras')]
+                                : []
                         );
                     },
                     []

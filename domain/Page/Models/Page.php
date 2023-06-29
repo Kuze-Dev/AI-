@@ -7,11 +7,11 @@ namespace Domain\Page\Models;
 use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Admin\Models\Admin;
 use Domain\Page\Enums\Visibility;
-use Domain\Support\MetaData\HasMetaData;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
-use Domain\Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
-use Domain\Support\RouteUrl\HasRouteUrl;
+use Support\MetaData\HasMetaData;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
+use Support\RouteUrl\HasRouteUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
@@ -21,26 +21,41 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
+use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 
 /**
  * Domain\Page\Models\Page
  *
+ * @property int $id
+ * @property int|null $author_id
+ * @property string $name
+ * @property string $slug
  * @property Visibility $visibility
- * @property-read \Domain\Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
+ * @property \Illuminate\Support\Carbon|null $published_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Admin|null $author
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Page\Models\BlockContent> $blockContents
  * @property-read int|null $block_contents_count
- * @property-read \Domain\Support\MetaData\Models\MetaData|null $metaData
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Support\RouteUrl\Models\RouteUrl> $routeUrls
+ * @property-read \Support\MetaData\Models\MetaData|null $metaData
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Support\RouteUrl\Models\RouteUrl> $routeUrls
  * @property-read int|null $route_urls_count
  * @method static PageBuilder|Page newModelQuery()
  * @method static PageBuilder|Page newQuery()
  * @method static PageBuilder|Page query()
+ * @method static PageBuilder|Page whereAuthorId($value)
+ * @method static PageBuilder|Page whereCreatedAt($value)
+ * @method static PageBuilder|Page whereId($value)
+ * @method static PageBuilder|Page whereName($value)
+ * @method static PageBuilder|Page wherePublishedAt($value)
  * @method static PageBuilder|Page wherePublishedAtRange(?\Carbon\Carbon $publishedAtStart = null, ?\Carbon\Carbon $publishedAtEnd = null)
  * @method static PageBuilder|Page wherePublishedAtYearMonth(int $year, ?int $month = null)
+ * @method static PageBuilder|Page whereSlug($value)
+ * @method static PageBuilder|Page whereUpdatedAt($value)
+ * @method static PageBuilder|Page whereVisibility($value)
  * @mixin \Eloquent
  */
 

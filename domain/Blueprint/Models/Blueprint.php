@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Domain\Blueprint\Models;
 
 use Domain\Blueprint\Models\Casts\SchemaDataCast;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
