@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
+use App\Features\ECommerce\ECommerceBase;
 use App\Http\Controllers\Controller;
 use Domain\Customer\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 
+#[Middleware('feature.tenant:' . ECommerceBase::class)]
 class LoginController extends Controller
 {
     #[Post(uri: 'login', name: 'login')]

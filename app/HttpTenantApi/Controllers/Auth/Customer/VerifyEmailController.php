@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
+use App\Features\ECommerce\ECommerceBase;
 use App\Filament\Requests\VerifyEmailRequest;
 use Domain\Auth\Actions\VerifyEmailAction;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -11,7 +12,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
 
-#[Middleware(['auth:sanctum'])]
+#[Middleware(['auth:sanctum', 'feature.tenant:' . ECommerceBase::class])]
 class VerifyEmailController
 {
     #[Get('verify', name: 'customer.verify')]

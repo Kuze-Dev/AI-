@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
+use App\Features\ECommerce\ECommerceBase;
 use App\Http\Controllers\Controller;
 use Domain\Customer\Actions\CustomerPasswordResetAction;
 use Domain\Customer\Actions\CustomerSendPasswordResetAction;
@@ -15,10 +16,14 @@ use Illuminate\Support\Facades\Password as PasswordBroker;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 use Illuminate\Validation\ValidationException;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 use Spatie\RouteAttributes\Attributes\Prefix;
 
-#[Prefix('password'), ]
+#[
+    Prefix('password'),
+    Middleware('feature.tenant:' . ECommerceBase::class)
+]
 class PasswordController extends Controller
 {
     #[Post('email', name: 'password.request')]
