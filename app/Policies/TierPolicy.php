@@ -14,10 +14,14 @@ class TierPolicy
 {
     use ChecksWildcardPermissions;
 
-    public function before(): ?Response
+    public function before(?User $user, string $ability, mixed $tier = null): Response|false|null
     {
         if ( ! tenancy()->tenant?->features()->active(ECommerceBase::class)) {
             return Response::denyAsNotFound();
+        }
+
+        if ($tier instanceof Tier && $tier->name === config('domain.tier.default')) {
+            return false;
         }
 
         return null;

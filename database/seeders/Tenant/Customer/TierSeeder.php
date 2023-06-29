@@ -13,7 +13,7 @@ class TierSeeder extends Seeder
     {
         TierFactory::new()
             ->sequence(
-                ['name' => 'Default'],
+                ['name' => config('domain.tier.default')],
                 ['name' => 'Gold'],
             )
             ->count(2)

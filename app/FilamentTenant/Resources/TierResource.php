@@ -44,6 +44,7 @@ class TierResource extends Resource
                         ->translateLabel()
                         ->required()
                         ->string()
+                        ->unique(ignoreRecord: true)
                         ->maxLength(255),
                     Forms\Components\RichEditor::make('description')
                         ->translateLabel()

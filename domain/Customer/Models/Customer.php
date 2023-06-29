@@ -25,7 +25,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * Domain\Customer\Models\Customer
  *
  * @property int $id
- * @property int|null $tier_id
+ * @property int $tier_id
  * @property string $cuid customer unique ID
  * @property string $email
  * @property mixed|null $password
@@ -47,7 +47,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property-read int|null $media_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
- * @property-read Tier|null $tier
+ * @property-read Tier $tier
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newModelQuery()

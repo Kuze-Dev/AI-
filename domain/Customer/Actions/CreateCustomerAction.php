@@ -6,6 +6,7 @@ namespace Domain\Customer\Actions;
 
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Models\Customer;
+use Domain\Tier\Models\Tier;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Str;
 use Support\Common\Actions\SyncMediaCollectionAction;

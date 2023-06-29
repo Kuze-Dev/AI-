@@ -72,6 +72,7 @@ class CustomerResource extends Resource
                     Forms\Components\TextInput::make('email')
                         ->translateLabel()
                         ->required()
+                        ->unique(ignoreRecord: true)
                         ->email()
                         ->rule(Rule::email())
                         ->maxLength(255),
@@ -85,6 +86,7 @@ class CustomerResource extends Resource
                         ->before(fn () => now()),
                     Forms\Components\Select::make('tier_id')
                         ->label(trans('Tier'))
+                        ->required()
                         ->preload()
                         ->optionsFromModel(Tier::class, 'name'),
                     Forms\Components\TextInput::make('password')
