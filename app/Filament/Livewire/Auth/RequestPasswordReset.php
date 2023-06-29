@@ -12,6 +12,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\Redirector;
 
@@ -51,7 +52,7 @@ class RequestPasswordReset extends Component implements HasForms
             TextInput::make('email')
                 ->default('')
                 ->email()
-                ->rules('email:rfc,dns')
+                ->rules(Rule::email())
                 ->required()
                 ->autocomplete(),
         ];

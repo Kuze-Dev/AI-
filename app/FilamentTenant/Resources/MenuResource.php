@@ -21,7 +21,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -72,7 +71,9 @@ class MenuResource extends Resource
             ->schema([
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
-                        ->required(),
+                        ->required()
+                        ->string()
+                        ->maxLength(255),
                 ]),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([
@@ -175,7 +176,7 @@ class MenuResource extends Resource
                     ->sortable(),
             ])
             ->filters([])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([

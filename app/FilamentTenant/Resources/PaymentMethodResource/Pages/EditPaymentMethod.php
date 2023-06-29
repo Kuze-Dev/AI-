@@ -38,10 +38,10 @@ class EditPaymentMethod extends EditRecord
         return $this->getCachedActions();
     }
 
-     /**
-      * @param PaymentMethod $record
-      * @throws Throwable
-      */
+    /**
+     * @param PaymentMethod $record
+     * @throws Throwable
+     */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(fn () => app(UpdatePaymentMethodAction::class)->execute($record, PaymentMethodData::fromArray($data)));

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
-use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
-use Domain\Support\RouteUrl\Models\RouteUrl;
+use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
+use Support\RouteUrl\DataTransferObjects\RouteUrlData;
+use Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Tests\Fixtures\TestModelForRouteUrl;

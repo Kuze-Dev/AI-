@@ -6,9 +6,9 @@ namespace Domain\Taxonomy\Models;
 
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Content\Models\Content;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -78,11 +78,11 @@ class Taxonomy extends Model
         return $this->belongsTo(Blueprint::class);
     }
 
-     /** @return HasMany<TaxonomyTerm> */
-     public function parentTerms(): HasMany
-     {
-         return $this->taxonomyTerms()->whereNull('parent_id')->ordered();
-     }
+    /** @return HasMany<TaxonomyTerm> */
+    public function parentTerms(): HasMany
+    {
+        return $this->taxonomyTerms()->whereNull('parent_id')->ordered();
+    }
 
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Taxonomy\Models\TaxonomyTerm> */
     public function taxonomyTerms(): HasMany

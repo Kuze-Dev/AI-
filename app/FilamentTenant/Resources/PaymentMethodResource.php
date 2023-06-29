@@ -12,7 +12,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Domain\PaymentMethod\Actions\DeletePaymentMethodAction;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Tables;
 use Filament\Forms;
 use Filament\Tables\Filters\Layout;

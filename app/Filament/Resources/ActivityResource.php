@@ -13,7 +13,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Support\Arr;
@@ -91,6 +90,7 @@ class ActivityResource extends Resource
                     ->toggleable()
                     ->toggledHiddenByDefault(),
                 Tables\Columns\TextColumn::make('description')
+                    ->wrap()
                     ->translateLabel()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('subject.name')
@@ -135,7 +135,8 @@ class ActivityResource extends Resource
                         shouldOpenInNewTab: true
                     ),
                 Tables\Columns\TextColumn::make('causer.full_name')
-                    ->translateLabel(),
+                    ->translateLabel()
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->translateLabel()
                     ->dateTime(timezone: Auth::user()?->timezone)
@@ -147,7 +148,6 @@ class ActivityResource extends Resource
                     ->options(self::getModel()::distinct()->pluck('log_name')->mapWithKeys(fn ($value) => [$value => Str::headline($value)]))
                     ->default('admin'),
             ])
-            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->translateLabel(),

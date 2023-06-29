@@ -15,14 +15,13 @@ use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
 use Domain\Blueprint\Models\Blueprint;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -54,7 +53,9 @@ class BlueprintResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->required()
-                        ->unique(ignoreRecord: true),
+                        ->unique(ignoreRecord: true)
+                        ->string()
+                        ->maxLength(255),
                 ]),
                 Forms\Components\Card::make()
                     ->statePath('schema')
@@ -67,7 +68,9 @@ class BlueprintResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('title')
                                     ->lazy()
-                                    ->required(),
+                                    ->required()
+                                    ->string()
+                                    ->maxLength(255),
                                 Forms\Components\TextInput::make('state_name')
                                     ->disabled(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
                                         $record->schema->sections,
@@ -90,7 +93,7 @@ class BlueprintResource extends Resource
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make(),
 
@@ -153,6 +156,8 @@ class BlueprintResource extends Resource
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->lazy()
+                    ->string()
+                    ->maxLength(255)
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('state_name')
                     ->columnSpan(['sm' => 2])

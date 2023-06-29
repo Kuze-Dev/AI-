@@ -18,8 +18,8 @@ use Domain\Globals\Models\Globals;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
 use Domain\PaymentMethod\Models\PaymentMethod;
-use Domain\Support\Captcha\CaptchaManager;
-use Domain\Support\MetaData\Models\MetaData;
+use Support\Captcha\CaptchaManager;
+use Support\MetaData\Models\MetaData;
 use Domain\Support\Payments\Models\Payment;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Pennant\Feature;
 use Stancl\Tenancy\Database\Models\Tenant;
@@ -87,6 +88,13 @@ class AppServiceProvider extends ServiceProvider
                     )
         );
 
+        Rule::macro(
+            'email',
+            fn (): string => app()->environment('local', 'testing')
+                ? 'email'
+                : 'email:rfc,dns'
+        );
+
         JsonApiResource::resolveIdUsing(fn (Model $resource): string => (string) $resource->getRouteKey());
 
         CaptchaManager::resolveProviderUsing(
@@ -103,5 +111,6 @@ class AppServiceProvider extends ServiceProvider
 
         Feature::discover('App\\Features\\CMS', app_path('Features/CMS'));
         Feature::discover('App\\Features\\ECommerce', app_path('Features/ECommerce'));
+
     }
 }

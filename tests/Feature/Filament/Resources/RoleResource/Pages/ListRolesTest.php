@@ -23,14 +23,12 @@ it('can list', function () {
         ->assertCanSeeTableRecords($roles);
 });
 
-it('can delete role', function () {
+it('can delete', function () {
     $permission = Permission::first();
 
-    $role = RoleFactory::new()
-        ->create();
+    $role = RoleFactory::new()->create();
 
-    $role->permissions()
-        ->attach($permission);
+    $role->permissions()->attach($permission);
 
     livewire(ListRoles::class)
         ->callTableAction(DeleteAction::class, $role);

@@ -10,9 +10,9 @@ use Domain\Page\Database\Factories\BlockFactory;
 use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\BlockContent;
 use Domain\Page\Models\Page;
-use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
-use Domain\Support\MetaData\Models\MetaData;
-use Domain\Support\RouteUrl\Models\RouteUrl;
+use Support\MetaData\Database\Factories\MetaDataFactory;
+use Support\MetaData\Models\MetaData;
+use Support\RouteUrl\Models\RouteUrl;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 

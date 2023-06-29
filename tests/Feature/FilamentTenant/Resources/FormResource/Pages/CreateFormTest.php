@@ -6,7 +6,7 @@ use App\FilamentTenant\Resources\FormResource\Pages\CreateForm;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
-use Domain\Support\Captcha\CaptchaProvider;
+use Support\Captcha\CaptchaProvider;
 use Filament\Facades\Filament;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 

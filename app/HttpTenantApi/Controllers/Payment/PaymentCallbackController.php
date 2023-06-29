@@ -37,9 +37,9 @@ class PaymentCallbackController
             $data = array_merge($request->all(), ['status' => $status]);
 
             // dump(
-                app(PaymentManagerInterface::class)
-                    ->driver($paymentMethod->gateway)
-                    ->capture($paymentModel, $data);
+            app(PaymentManagerInterface::class)
+                ->driver($paymentMethod->gateway)
+                ->capture($paymentModel, $data);
             // );
 
             #redirect to FE order summary or order page.
