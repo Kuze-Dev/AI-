@@ -50,9 +50,26 @@ class AuthServiceProvider extends ServiceProvider
     protected function configureNotificationUrls(): void
     {
         VerifyEmailNotification::createUrlUsing(function (mixed $notifiable) {
+            if ($notifiable instanceof Customer) {
+                /** @var Tenant $tenant */
+                $tenant = tenancy()->tenant;
+
+                $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;
+
+                return $hostName . URL::temporarySignedRoute(
+                    'tenant.api.customer.verify',
+                    now()->addMinutes(Config::get('auth.verification.expire', 60)),
+                    [
+                        'id' => $notifiable->getKey(),
+                        'hash' => sha1($notifiable->getEmailForVerification()),
+                    ],
+                    false
+                );
+            }
+
             if ($notifiable instanceof Admin) {
                 if (tenancy()->initialized) {
-                    /** @var Tenant */
+                    /** @var Tenant $tenant */
                     $tenant = tenancy()->tenant;
 
                     $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;
