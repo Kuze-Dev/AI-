@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Address\Models;
 
-use Domain\Address\Enums\CountryStateOrRegion;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -16,14 +15,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $code
  * @property string $name
  * @property string|null $capital
- * @property CountryStateOrRegion|null $state_or_region
  * @property string|null $timezone
  * @property string|null $language
  * @property bool $active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Address\Models\Region> $regions
  * @property-read int|null $regions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Address\Models\State> $states
  * @property-read int|null $states_count
@@ -54,22 +51,14 @@ class Country extends Model
         'code',
         'name',
         'capital',
-        'state_or_region',
         'timezone',
         'language',
         'active',
     ];
 
     protected $casts = [
-        'state_or_region' => CountryStateOrRegion::class,
         'active' => 'bool',
     ];
-
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Address\Models\Region>*/
-    public function regions(): HasMany
-    {
-        return $this->hasMany(Region::class);
-    }
 
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Address\Models\State>*/
     public function states(): HasMany
