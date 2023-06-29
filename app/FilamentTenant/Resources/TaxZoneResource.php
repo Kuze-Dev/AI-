@@ -110,7 +110,8 @@ class TaxZoneResource extends Resource
                     Forms\Components\TextInput::make('percentage')
                         ->required()
                         ->numeric()
-                        ->visible(fn (Closure $get) => filled($get('type'))),
+                        ->visible(fn (Closure $get) => filled($get('type')))
+                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 ]),
             ]);
     }
@@ -142,18 +143,14 @@ class TaxZoneResource extends Resource
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
-            ->filters([
-
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make(),
                 ]),
             ])
-            ->bulkActions([
-
-            ]);
+            ->bulkActions([]);
     }
 
     public static function getRelations(): array
