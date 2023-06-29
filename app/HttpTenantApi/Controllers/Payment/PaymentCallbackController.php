@@ -13,8 +13,8 @@ use Illuminate\Http\Request;
 use Spatie\RouteAttributes\Attributes\Get;
 use Domain\Support\Payments\Actions\CreatePaymentAction;
 use Domain\Support\Payments\DataTransferObjects\AmountData;
-use Domain\Support\Payments\DataTransferObjects\ProviderData;
-use Domain\Support\Payments\DataTransferObjects\PaypalDetailsData;
+use Domain\Support\Payments\DataTransferObjects\CreatepaymentData;
+use Domain\Support\Payments\DataTransferObjects\PaymentDetailsData;
 use Domain\Support\Payments\DataTransferObjects\TransactionData;
 use Throwable;
 
@@ -57,14 +57,14 @@ class PaymentCallbackController
 
     //     $page = Page::first();
 
-    //     $providerData = new ProviderData(
+    //     $providerData = new CreatepaymentData(
     //         transactionData: TransactionData::fromArray(
     //             [
     //                 'reference_id' => '123',
     //                 'amount' => AmountData::fromArray([
     //                     'currency' => 'PHP',
     //                     'total' => '1000.00',
-    //                     'details' => PaypalDetailsData::fromArray(
+    //                     'details' => PaymentDetailsData::fromArray(
     //                         [
     //                             'subtotal' => '950.00',
     //                             'shipping' => '50.00',
@@ -85,14 +85,14 @@ class PaymentCallbackController
     //                 ],
     //                 'description' => 'payment request',
     //             ]
-    //         ),
-    //         model:$page,
-    //         payment_method_id: $paymentMethod->id,
+    //             ),
+    //             payment_driver: 'paypal'
+
     //     );
 
     //     dump(
     //         app(CreatePaymentAction::class)
-    //             ->execute($paymentMethod, $providerData)
+    //             ->execute($page, $providerData)
     //     );
 
     // }

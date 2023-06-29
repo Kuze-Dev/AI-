@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Support\Payments\DataTransferObjects;
 
-use Domain\Support\Payments\Models\Payment;
-
-class ProviderData
+class CreatepaymentData
 {
     public function __construct(
         public readonly TransactionData $transactionData,
-        public readonly Payment $paymentModel,
-        public readonly int $payment_method_id,
+        public readonly string $payment_driver,
     ) {
     }
 }

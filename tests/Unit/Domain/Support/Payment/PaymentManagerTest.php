@@ -29,4 +29,4 @@ it('Manual payment Gateway must be instance of OfflinePayment Provider  ', funct
     $paymentGateway = app(PaymentManagerInterface::class)->driver('cod');
 
     assertInstanceOf(OfflinePayment::class, $paymentGateway);
-})->only();
+});

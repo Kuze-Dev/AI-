@@ -38,4 +38,19 @@ class TransactionData
             order_url: $data['order_url'] ?? null,
         );
     }
+
+    public function getTotal(): string
+    {
+        return $this->amount->total;
+    }
+
+    public function getCurrency(): string
+    {
+        return $this->amount->currency;
+    }
+
+    public function getPaymentDetails(): array
+    {
+        return array_filter(get_object_vars($this->amount->details), fn ($value) => $value !== null);
+    }
 }

@@ -17,11 +17,16 @@ return new class () extends Migration {
             $table->morphs('payable');
 
             $table->foreignIdFor(PaymentMethod::class);
+
             $table->string('gateway');
+            $table->string('currency');
             $table->string('amount');
             $table->string('status');
             $table->string('payment_id')->nullable();
             $table->string('transaction_id')->nullable();
+
+            $table->json('payment_details');
+
             $table->timestamps();
             $table->softDeletes();
         });

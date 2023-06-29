@@ -18,17 +18,6 @@ class OfflinePayment extends Provider
     public function authorize(): PaymentAuthorize
     {
 
-        $providerData = $this->data;
-
-        $paymentData = $providerData->transactionData->amount;
-
-        $providerData->model->payments()->create([
-            'payment_method_id' => $providerData->payment_method_id,
-            'gateway' => $this->name,
-            'amount' => $paymentData->total,
-            'status' => 'pending',
-        ]);
-
         return new PaymentAuthorize(true);
     }
 

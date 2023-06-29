@@ -13,6 +13,9 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Domain\PaymentMethod\Actions\DeletePaymentMethodAction;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use App\Features\ECommerce\PaypalGateway;
+use App\Features\ECommerce\StripeGateway;
+use App\Features\ECommerce\OfflineGateway;
 use Filament\Tables;
 use Filament\Forms;
 use Filament\Tables\Filters\Layout;
@@ -75,11 +78,22 @@ class PaymentMethodResource extends Resource
                         ->reactive(),
                     Forms\Components\Select::make('gateway')
                         ->required()
-                        ->options([
-                            'paypal' => 'PayPaL',
-                            'stripe' => 'Stripe',
-                            'manual' => 'Manual',
-                        ])
+                        ->options(function () {
+
+                            if (tenancy()->initialized) {
+
+                                $tenant = tenancy()->tenant;
+
+                                return array_filter([
+                                    'paypal' => $tenant?->features()->active(app(PaypalGateway::class)->name) ? app(PaypalGateway::class)->label : false,
+                                    'stripe' => $tenant?->features()->active(app(StripeGateway::class)->name) ? app(StripeGateway::class)->label : false,
+                                    'manual' => $tenant?->features()->active(app(OfflineGateway::class)->name) ? app(OfflineGateway::class)->label : false,
+                                ], fn ($value) => $value !== false);
+                            }
+
+                            return [];
+
+                        })
                         ->reactive(),
                     Forms\Components\Textarea::make('description')
                         ->maxLength(fn (int $value = 250) => $value),

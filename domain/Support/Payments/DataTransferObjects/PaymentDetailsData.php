@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Support\Payments\DataTransferObjects;
 
-class PaypalDetailsData
+class PaymentDetailsData
 {
     public function __construct(
         public readonly ?string $subtotal = null,

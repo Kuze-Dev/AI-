@@ -7,7 +7,7 @@ namespace Domain\Support\Payments\DataTransferObjects;
 class AmountData
 {
     public function __construct(
-        public readonly PaypalDetailsData $details,
+        public readonly PaymentDetailsData $details,
         public readonly string $currency,
         public readonly string $total,
     ) {

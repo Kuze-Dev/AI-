@@ -25,14 +25,20 @@ class Payment extends Model implements HasMedia
         'payable_id',
         'payment_method_id',
         'gateway',
+        'currency',
         'amount',
         'status',
         'payment_id',
         'transaction_id',
+        'payment_details',
     ];
 
     protected $with = [
         'media',
+    ];
+
+    protected $casts = [
+        'payment_details' => 'array',
     ];
 
     /** @return MorphTo<Model, self> */

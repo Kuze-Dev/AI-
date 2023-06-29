@@ -10,6 +10,8 @@ class StripeGateway
 {
     public string $name = 'ecommerce.stripe';
 
+    public string $label = 'Stripe';
+
     public function resolve(Tenant $scope): mixed
     {
         return false;

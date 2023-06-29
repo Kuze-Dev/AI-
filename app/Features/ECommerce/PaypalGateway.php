@@ -10,6 +10,8 @@ class PaypalGateway
 {
     public string $name = 'ecommerce.paypal';
 
+    public string $label = 'PayPaL';
+
     public function resolve(Tenant $scope): mixed
     {
         return false;

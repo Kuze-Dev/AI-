@@ -4,13 +4,13 @@ return [
    
     'default' => 'cod',
 
-        'manual' => [],
+    'manual' => [],
 
-        'paypal' => [
+    'paypal' => [
 
-            'http.ConnectionTimeOut' => 30,
-            'log.LogEnabled' => true,
-            'log.FileName' => storage_path() . '/logs/paypal.log',
-            'log.LogLevel' => 'ERROR',
-        ],
+        'http.ConnectionTimeOut' => 30,
+        'log.LogEnabled' => true,
+        'log.FileName' => storage_path() . '/logs/paypal.log',
+        'log.LogLevel' => 'ERROR',
+    ],
 ];
