@@ -18,6 +18,7 @@ use Closure;
 use Domain\Product\Models\ProductOption;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Builder;
@@ -65,14 +66,35 @@ class ProductResource extends Resource
                             Forms\Components\Toggle::make('is_special_offer'),
                             Forms\Components\Toggle::make('is_featured'),
                         ])->columns(2),
-                    // Forms\Components\Section::make('Shipping')
-                    //     ->schema([
-                    //         Forms\Components\TextInput::make('weight')
-                    //             ->dehydrateStateUsing(fn ($state) => (float) $state),
+                    Forms\Components\Section::make('Shipping')
+                        ->schema([
+                            Forms\Components\TextInput::make('weight')
+                                ->numeric()
+                                ->dehydrateStateUsing(fn ($state) => (float) $state),
 
-                    //         Forms\Components\TextInput::make('dimenstion'),
-                    //         // ->helperText('Leave this field blank if there is no shipping fee.'),
-                    //     ]),
+                            Forms\Components\Fieldset::make('dimension')
+                                ->label('Dimension')
+                                ->dehydrateStateUsing(fn ($state) => dd($state))
+                                ->schema([
+                                    Forms\Components\TextInput::make('length')
+                                        ->numeric()
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['length']))
+                                        ->dehydrateStateUsing(fn ($state) => (float) $state)
+                                        ->label('Length'),
+
+                                    Forms\Components\TextInput::make('width')
+                                        ->numeric()
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['width']))
+                                        ->dehydrateStateUsing(fn ($state) => (float) $state)
+                                        ->label('Width'),
+
+                                    Forms\Components\TextInput::make('height')
+                                        ->numeric()
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['height']))
+                                        ->dehydrateStateUsing(fn ($state) => (float) $state)
+                                        ->label('Height'),
+                                ])->columns(3),
+                        ]),
                     Forms\Components\Section::make(trans('Variants'))->schema([
                         // For Manage Variant
                         Tree::make('manage_variants')
@@ -253,6 +275,13 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
+                SpatieMediaLibraryImageColumn::make('image')
+                    ->collection('image')
+                    ->default(
+                        fn (Product $record) => $record->getFirstMedia('image') === null
+                            ? 'https://via.placeholder.com/500x300/333333/fff?text=No+preview+available'
+                            : null
+                    ),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
@@ -296,7 +325,8 @@ class ProductResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])
+            ->defaultSort('updated_at', 'desc');
     }
 
     public static function getRelations(): array

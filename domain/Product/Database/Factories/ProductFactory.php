@@ -13,6 +13,7 @@ use Domain\Product\Models\ProductVariant;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Http;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Product\Models\Product>
@@ -48,19 +49,20 @@ class ProductFactory extends Factory
     {
         // Seed Brand and Category in Taxonomy
         foreach ($taxonomies as $taxonomyData) {
-            if ( ! Taxonomy::whereName($taxonomyData['name'])->exists()) {
-                $taxonomy = Taxonomy::create([
-                    'name' => $taxonomyData['name'],
-                    'blueprint_id' => $blueprint->id,
-                ]);
+            if ($foundTaxonomy = Taxonomy::whereName($taxonomyData['name'])->first()) {
+                $foundTaxonomy->delete();
+            }
+            $taxonomy = Taxonomy::create([
+                'name' => $taxonomyData['name'],
+                'blueprint_id' => $blueprint->id,
+            ]);
 
-                foreach ($taxonomyData['term'] as $termData) {
-                    TaxonomyTerm::create(['taxonomy_id' => $taxonomy->id, 'data' => [
-                        'main' => [
-                            'heading' => $termData['name'],
-                        ],
-                    ], 'name' => $termData['name']]);
-                }
+            foreach ($taxonomyData['term'] as $termData) {
+                TaxonomyTerm::create(['taxonomy_id' => $taxonomy->id, 'data' => [
+                    'main' => [
+                        'heading' => $termData['name'],
+                    ],
+                ], 'name' => $termData['name']]);
             }
         }
     }
@@ -70,7 +72,17 @@ class ProductFactory extends Factory
         $taxonomyTermIds = TaxonomyTerm::whereIn('slug', ['brand-one', 'clothing'])->pluck('id');
 
         collect($products)->each(function ($productData) use ($taxonomyTermIds, $productOptions, $variantCombinations) {
+            $productImageUrl = $productData['image_url'];
+            unset($productData['image_url']);
             $product = Product::create($productData);
+
+            $response = Http::get($productImageUrl);
+            if ($response->successful()) {
+                $product
+                    ->addMediaFromUrl($productImageUrl)
+                    ->toMediaCollection('image');
+            }
+
             $product->taxonomyTerms()->attach($taxonomyTermIds);
 
             $this->seedProductOptions($product, $productOptions);
@@ -96,7 +108,7 @@ class ProductFactory extends Factory
             ProductVariant::create([
                 'product_id' => $product->id,
                 'sku' => $product->sku . $index,
-                'combination' => json_encode($combination),
+                'combination' => $combination,
                 'retail_price' => $product->retail_price,
                 'selling_price' => $product->selling_price,
                 'stock' => $product->stock,

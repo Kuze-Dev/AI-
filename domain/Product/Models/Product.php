@@ -39,7 +39,6 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property int $is_featured
  * @property int $is_special_offer
  * @property int $allow_customer_remarks
- * @property int $allow_remark_with_image
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Domain\Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
@@ -97,7 +96,8 @@ class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, 
         'is_featured',
         'is_special_offer',
         'allow_customer_remarks',
-        'allow_remark_with_image',
+        'weight',
+        'dimension',
     ];
 
     /**

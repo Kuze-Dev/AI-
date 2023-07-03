@@ -25,6 +25,14 @@ class ProductSeeder extends Seeder
                     'selling_price' => 19.99,
                     'retail_price' => 24.99,
                     'stock' => 212,
+                    'image_url' => 'https://images.pexels.com/photos/996329/pexels-photo-996329.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                    'dimension' => [
+                        'length' => 23,
+                        'width' => 23,
+                        'height' => 23,
+                    ],
+                    'weight' => 0.50,
+
                 ],
                 [
                     'name' => 'Jeans',
@@ -33,6 +41,13 @@ class ProductSeeder extends Seeder
                     'selling_price' => 49.99,
                     'retail_price' => 54.99,
                     'stock' => 90,
+                    'image_url' => 'https://images.pexels.com/photos/603022/pexels-photo-603022.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                    'dimension' => [
+                        'length' => 23,
+                        'width' => 23,
+                        'height' => 23,
+                    ],
+                    'weight' => 2.25,
                 ],
                 [
                     'name' => 'Dress',
@@ -41,6 +56,13 @@ class ProductSeeder extends Seeder
                     'selling_price' => 79.99,
                     'retail_price' => 84.99,
                     'stock' => 75,
+                    'image_url' => 'https://images.pexels.com/photos/7089430/pexels-photo-7089430.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                    'dimension' => [
+                        'length' => 23,
+                        'width' => 23,
+                        'height' => 23,
+                    ],
+                    'weight' => 1.25,
                 ],
                 [
                     'name' => 'Blouse',
@@ -49,6 +71,13 @@ class ProductSeeder extends Seeder
                     'selling_price' => 23.99,
                     'retail_price' => 27.99,
                     'stock' => 155,
+                    'image_url' => 'https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                    'dimension' => [
+                        'length' => 23,
+                        'width' => 23,
+                        'height' => 23,
+                    ],
+                    'weight' => 0.50,
                 ],
                 [
                     'name' => 'Hoodies',
@@ -57,6 +86,13 @@ class ProductSeeder extends Seeder
                     'selling_price' => 44.99,
                     'retail_price' => 49.99,
                     'stock' => 88,
+                    'image_url' => 'https://images.pexels.com/photos/634785/pexels-photo-634785.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                    'dimension' => [
+                        'length' => 23,
+                        'width' => 23,
+                        'height' => 23,
+                    ],
+                    'weight' => 2.75,
                 ],
                 [
                     'name' => 'Tank Top',
@@ -65,6 +101,13 @@ class ProductSeeder extends Seeder
                     'selling_price' => 14.99,
                     'retail_price' => 19.99,
                     'stock' => 111,
+                    'image_url' => 'https://images.pexels.com/photos/2775417/pexels-photo-2775417.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                    'dimension' => [
+                        'length' => 23,
+                        'width' => 23,
+                        'height' => 23,
+                    ],
+                    'weight' => 0.80,
                 ],
                 [
                     'name' => 'Polo Shirt',
@@ -73,6 +116,13 @@ class ProductSeeder extends Seeder
                     'selling_price' => 34.99,
                     'retail_price' => 39.99,
                     'stock' => 177,
+                    'image_url' => 'https://images.pexels.com/photos/3228934/pexels-photo-3228934.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                    'dimension' => [
+                        'length' => 23,
+                        'width' => 23,
+                        'height' => 23,
+                    ],
+                    'weight' => 0.90,
                 ],
                 [
                     'name' => 'Sweatshirt',
@@ -81,6 +131,13 @@ class ProductSeeder extends Seeder
                     'selling_price' => 39.99,
                     'retail_price' => 44.99,
                     'stock' => 133,
+                    'image_url' => 'https://images.pexels.com/photos/845434/pexels-photo-845434.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                    'dimension' => [
+                        'length' => 23,
+                        'width' => 23,
+                        'height' => 23,
+                    ],
+                    'weight' => 2.60,
                 ],
                 [
                     'name' => 'Cargo pants',
@@ -90,6 +147,14 @@ class ProductSeeder extends Seeder
                     'selling_price' => 59.99,
                     'retail_price' => 64.99,
                     'stock' => 124,
+                    'image_url' => 'https://images.pexels.com/photos/17037280/pexels-photo-17037280/free-photo-of-model-posing-in-black-jacket-and-cargo-pants.jpeg?auto=compress&cs=tinysrgb&w=1600',
+
+                    'dimension' => [
+                        'length' => 23,
+                        'width' => 23,
+                        'height' => 23,
+                    ],
+                    'weight' => 3.80,
                 ],
                 [
                     'name' => 'Swimming trunks',
@@ -98,6 +163,13 @@ class ProductSeeder extends Seeder
                     'selling_price' => 43.99,
                     'retail_price' => 48.99,
                     'stock' => 188,
+                    'image_url' => 'https://images.pexels.com/photos/9963946/pexels-photo-9963946.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                    'dimension' => [
+                        'length' => 23,
+                        'width' => 23,
+                        'height' => 23,
+                    ],
+                    'weight' => 1.40,
                 ],
             ],
             'product_options' => [
