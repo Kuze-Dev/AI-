@@ -64,12 +64,10 @@ class Country extends Model
         'active' => 'bool',
     ];
 
-
     public function getRouteKeyName(): string
     {
         return 'slug';
     }
-
 
     public function getSlugOptions(): SlugOptions
     {
