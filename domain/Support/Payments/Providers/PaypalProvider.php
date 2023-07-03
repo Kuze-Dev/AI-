@@ -23,6 +23,7 @@ use PayPal\Api\RedirectUrls;
 use PayPal\Api\Transaction;
 use PayPal\Auth\OAuthTokenCredential;
 use PayPal\Rest\ApiContext;
+use Throwable;
 
 class PaypalProvider extends Provider
 {
@@ -59,69 +60,79 @@ class PaypalProvider extends Provider
 
     public function authorize(): PaymentAuthorize
     {
-        $providerData = $this->data;
 
-        $payer = app(Payer::class)->setPaymentMethod($this->name);
-        // (['payment_method' => $this->name]);
+        try {
 
-        // $totalItems = $providerData->transactionData->item_list ?
-        //         count($providerData->transactionData->item_list) :
-        //         0;
-        // if ($totalItems > 0) {
+            $providerData = $this->data;
 
-        //     $itemList = new ItemList();
+            $payer = app(Payer::class)->setPaymentMethod($this->name);
+            // (['payment_method' => $this->name]);
 
-        //     foreach ($providerData->transactionData->item_list as $item) {
-        //         $itemList->addItem(new Item([
-        //             'name' => $item->name,
-        //             'quantity' => $item->quantity,
-        //             'currency' => $item->currency,
-        //             'price' => $item->price,
-        //         ]));
-        //     }
-        // }
+            // $totalItems = $providerData->transactionData->item_list ?
+            //         count($providerData->transactionData->item_list) :
+            //         0;
+            // if ($totalItems > 0) {
 
-        $paymentData = $providerData->paymentModel;
+            //     $itemList = new ItemList();
 
-        /** @phpstan-ignore-next-line */
-        $amount = new Amount([
-            'currency' => $paymentData->currency,
-            'total' => $paymentData->amount,
+            //     foreach ($providerData->transactionData->item_list as $item) {
+            //         $itemList->addItem(new Item([
+            //             'name' => $item->name,
+            //             'quantity' => $item->quantity,
+            //             'currency' => $item->currency,
+            //             'price' => $item->price,
+            //         ]));
+            //     }
+            // }
+
+            $paymentData = $providerData->paymentModel;
+
             /** @phpstan-ignore-next-line */
-            'details' => new Details($paymentData->payment_details),
-        ]);
+            $amount = new Amount([
+                'currency' => $paymentData->currency,
+                'total' => $paymentData->amount,
+                /** @phpstan-ignore-next-line */
+                'details' => new Details($paymentData->payment_details),
+            ]);
 
-        $transaction = app(Transaction::class)
-            ->setAmount($amount)
+            $transaction = app(Transaction::class)
+                ->setAmount($amount);
             // ->setItemList($itemList ?? [])
-            ->setDescription((string) $providerData->transactionData->description);
+            // ->setDescription((string) $providerData->transactionData->description);
 
-        $redirectUrls = app(RedirectUrls::class)
-            ->setReturnUrl(
-                route('tenant.api.payment-callback', [
-                    'paymentmethod' => $providerData->payment_method_id,
-                    'transactionId' => $providerData->paymentModel->id,
-                    'status' => 'success',
-                ])
-            )->setCancelUrl(
-                route('tenant.api.payment-callback', [
-                    'paymentmethod' => $providerData->payment_method_id,
-                    'transactionId' => $providerData->paymentModel->id,
-                    'status' => 'cancel',
-                ])
-            );
+            $redirectUrls = app(RedirectUrls::class)
+                ->setReturnUrl(
+                    route('tenant.api.payment-callback', [
+                        'paymentmethod' => $providerData->payment_method_id,
+                        'transactionId' => $providerData->paymentModel->id,
+                        'status' => 'success',
+                    ])
+                )->setCancelUrl(
+                    route('tenant.api.payment-callback', [
+                        'paymentmethod' => $providerData->payment_method_id,
+                        'transactionId' => $providerData->paymentModel->id,
+                        'status' => 'cancel',
+                    ])
+                );
 
-        $payment = app(Payment::class)->setIntent('sale')
-            ->setPayer($payer)
-            ->addTransaction($transaction)
-            ->setRedirectUrls($redirectUrls);
+            $payment = app(Payment::class)->setIntent('sale')
+                ->setPayer($payer)
+                ->addTransaction($transaction)
+                ->setRedirectUrls($redirectUrls);
 
-        $payment->create($this->paypalApiContext);
+            $payment->create($this->paypalApiContext);
 
-        return PaymentAuthorize::fromArray([
-            'success' => true,
-            'url' => $payment->getApprovalLink(),
-        ]);
+            return PaymentAuthorize::fromArray([
+                'success' => true,
+                'url' => $payment->getApprovalLink(),
+            ]);
+
+        } catch (Throwable $th) {
+            return PaymentAuthorize::fromArray([
+                'success' => false,
+                'message' => $th->getMessage(),
+            ]);
+        }
 
     }
 
