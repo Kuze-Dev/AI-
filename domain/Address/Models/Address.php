@@ -16,39 +16,30 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * Domain\Customer\Models\Tier
  *
  * @property int $id
- * @property-read  string $full_detail
  * @property int $customer_id
- * @property int $country_id
- * @property int|null $state_id
- * @property int|null $region_id
- * @property int $city_id
+ * @property int $state_id
  * @property string $address_line_1
- * @property string|null $address_line_2
  * @property string $zip_code
+ * @property string $city
  * @property bool $is_default_shipping
  * @property bool $is_default_billing
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Domain\Address\Models\City $city
- * @property-read \Domain\Address\Models\Country $country
  * @property-read Customer|null $customer
- * @property-read \Domain\Address\Models\Region|null $region
+ * @property-read string $full_detail
  * @property-read \Domain\Address\Models\State|null $state
  * @method static \Illuminate\Database\Eloquent\Builder|Address newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Address newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Address query()
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereAddressLine1($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Address whereAddressLine2($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Address whereCityId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Address whereCountryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereCity($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereCustomerId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereIsDefaultBilling($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereIsDefaultShipping($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Address whereRegionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereStateId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereZipCode($value)
@@ -74,11 +65,10 @@ class Address extends Model
     ];
 
     /** @return Attribute<string, never> */
-    protected function fullDetail(): Attribute
+    public function fullDetail(): Attribute
     {
-        /** @var self $this */
         return Attribute::get(
-            fn ($value) => Arr::join(
+            fn ($value): string => Arr::join(
                 array_filter([
                     $this->address_line_1,
                     $this->state->country->name,
@@ -103,12 +93,6 @@ class Address extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
-    }
-
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\Country, \Domain\Address\Models\Address> */
-    public function country(): BelongsTo
-    {
-        return $this->belongsTo(Country::class);
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\State, \Domain\Address\Models\Address> */
