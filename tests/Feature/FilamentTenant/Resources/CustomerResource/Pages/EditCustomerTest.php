@@ -31,7 +31,7 @@ it('can render page', function () {
             'first_name' => $customer->first_name,
             'last_name' => $customer->last_name,
             'mobile' => $customer->mobile,
-            'status' => $customer->status === Status::ACTIVE,
+            'status' => $customer->status->value,
             'birth_date' => $customer->birth_date,
         ])
         ->assertOk();

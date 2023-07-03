@@ -10,6 +10,7 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Actions\ForceDeleteCustomerAction;
 use Domain\Customer\Actions\RestoreCustomerAction;
+use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
 use Exception;
@@ -22,6 +23,7 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
@@ -106,8 +108,14 @@ class CustomerResource extends Resource
                         ->dehydrated(false)
                         ->rules(Password::sometimes())
                         ->visible(fn (?Customer $record) => $record === null || ! $record->exists),
-                    Forms\Components\Toggle::make('status')
-                        ->translateLabel(),
+                    Forms\Components\Select::make('status')
+                        ->translateLabel()
+                        ->required()
+                        ->options(
+                            collect(Status::cases())
+                                ->mapWithKeys(fn (Status $target) => [$target->value => Str::headline($target->value)])
+                                ->toArray()
+                        ),
                 ])->columns(2),
             ]);
     }
@@ -147,6 +155,12 @@ class CustomerResource extends Resource
                 Tables\Filters\SelectFilter::make('tier')
                     ->translateLabel()
                     ->relationship('tier', 'name'),
+                Tables\Filters\SelectFilter::make('status')
+                    ->options(
+                        collect(Status::cases())
+                            ->mapWithKeys(fn (Status $target) => [$target->value => Str::headline($target->value)])
+                            ->toArray()
+                    ),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

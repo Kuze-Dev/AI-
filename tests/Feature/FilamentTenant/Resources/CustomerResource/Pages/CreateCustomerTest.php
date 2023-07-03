@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\CustomerResource\Pages\CreateCustomer;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
+use Domain\Tier\Models\Tier;
 use Filament\Facades\Filament;
 
 use Illuminate\Http\UploadedFile;
@@ -28,6 +29,7 @@ it('can create customer', function () {
 
     livewire(CreateCustomer::class)
         ->fillForm([
+            'tier_id' => Tier::first()->getKey(),
             'image' => UploadedFile::fake()->image('test_image.jpg'),
             'email' => 'email@test.com',
             'first_name' => 'test first name',

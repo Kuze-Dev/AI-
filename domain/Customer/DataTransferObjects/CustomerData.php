@@ -25,13 +25,7 @@ class CustomerData
 
     public static function fromArray(array $data): self
     {
-        $data['status'] = isset($data['status'])
-            ? (
-                is_bool($data['status'])
-                ? ($data['status'] ? Status::ACTIVE : Status::INACTIVE)
-                : Status::from($data['status'])
-            )
-            : Status::ACTIVE;
+        $data['status'] = Status::from($data['status']);
 
         $data['birth_date'] = now()->parse($data['birth_date']);
 
