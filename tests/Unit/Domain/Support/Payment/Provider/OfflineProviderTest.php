@@ -34,7 +34,7 @@ it('can generate payment authorization dto ', function () {
 
     $paymentMethod = PaymentMethod::where('slug', 'cod')->first();
 
-    $payment = PaymentFactory::new()->setPaymentMethod($paymentMethod->id)->create();
+    $payment = PaymentFactory::new()->setPaymentMethod($paymentMethod->id)->createOne();
 
     $providerData = new ProviderData(
         transactionData:  TransactionData::fromArray([
@@ -62,7 +62,7 @@ it('can capture payment ', function () {
 
     $paymentMethod = PaymentMethod::where('slug', 'cod')->first();
 
-    $payment = PaymentFactory::new()->setPaymentMethod($paymentMethod->id)->create();
+    $payment = PaymentFactory::new()->setPaymentMethod($paymentMethod->id)->createOne();
 
     $data = [
         'status' => 'success',
@@ -89,7 +89,7 @@ it('unsupported status must throws InvalidArgumentException class ', function ()
 
     $paymentMethod = PaymentMethod::where('slug', 'cod')->first();
 
-    $payment = PaymentFactory::new()->setPaymentMethod($paymentMethod->id)->create();
+    $payment = PaymentFactory::new()->setPaymentMethod($paymentMethod->id)->createOne();
 
     $data = [
         'status' => 'paid',
