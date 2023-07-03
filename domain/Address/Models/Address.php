@@ -60,13 +60,10 @@ class Address extends Model
 
     protected $fillable = [
         'customer_id',
-        'address_line_1',
-        'address_line_2',
-        'country_id',
         'state_id',
-        'region_id',
-        'city_id',
+        'address_line_1',
         'zip_code',
+        'city',
         'is_default_shipping',
         'is_default_billing',
     ];
@@ -84,11 +81,10 @@ class Address extends Model
             fn ($value) => Arr::join(
                 array_filter([
                     $this->address_line_1,
-                    $this->address_line_2,
-                    $this->country->name,
-                    $this->state?->name ?? $this->region?->name,
-                    $this->city->name,
+                    $this->state->country->name,
+                    $this->state->name,
                     $this->zip_code,
+                    $this->city,
                 ]),
                 ', '
             )
@@ -119,17 +115,5 @@ class Address extends Model
     public function state(): BelongsTo
     {
         return $this->belongsTo(State::class);
-    }
-
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\Region, \Domain\Address\Models\Address> */
-    public function region(): BelongsTo
-    {
-        return $this->belongsTo(Region::class);
-    }
-
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\City, \Domain\Address\Models\Address> */
-    public function city(): BelongsTo
-    {
-        return $this->belongsTo(City::class);
     }
 }

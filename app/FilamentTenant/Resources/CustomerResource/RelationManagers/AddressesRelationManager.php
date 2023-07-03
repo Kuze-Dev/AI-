@@ -8,11 +8,8 @@ use Domain\Address\Actions\CreateAddressAction;
 use Domain\Address\Actions\DeleteAddressAction;
 use Domain\Address\Actions\UpdateAddressAction;
 use Domain\Address\DataTransferObjects\AddressData;
-use Domain\Address\Enums\CountryStateOrRegion;
 use Domain\Address\Models\Address;
-use Domain\Address\Models\City;
 use Domain\Address\Models\Country;
-use Domain\Address\Models\Region;
 use Domain\Address\Models\State;
 use Exception;
 use Filament\Forms;
@@ -39,11 +36,6 @@ class AddressesRelationManager extends RelationManager
                     ->required()
                     ->string()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('address_line_2')
-                    ->translateLabel()
-                    ->nullable()
-                    ->string()
-                    ->maxLength(255),
 
                 Forms\Components\Select::make('country_id')
                     ->label(trans('Country'))
@@ -53,70 +45,33 @@ class AddressesRelationManager extends RelationManager
                     ->reactive()
                     ->afterStateUpdated(function (callable $set) {
                         $set('state_id', null);
-                        $set('region_id', null);
-                        $set('city_id', null);
-                        $set('zip_code', null);
-                    }),
+                    })
+                    ->dehydrated(false),
 
                 Forms\Components\Select::make('state_id')
                     ->label(trans('State'))
                     ->required()
                     ->preload()
-                    ->optionsFromModel(State::class, 'name')
-                    ->reactive()
-                    ->visible(function (callable $get) {
-                        if ($get('country_id') === null) {
-                            return false;
-                        }
-
-                        return Country::whereKey($get('country_id'))->value('state_or_region') === CountryStateOrRegion::STATE;
-                    }),
-
-                Forms\Components\Select::make('region_id')
-                    ->label(trans('Region'))
-                    ->required()
-                    ->preload()
-                    ->optionsFromModel(Region::class, 'name')
-                    ->reactive()
-                    ->visible(function (callable $get) {
-                        if ($get('country_id') === null) {
-                            return false;
-                        }
-
-                        return Country::whereKey($get('country_id'))->value('state_or_region') === CountryStateOrRegion::REGION;
-                    }),
-
-                Forms\Components\Select::make('city_id')
-                    ->label(trans('City'))
-                    ->required()
-                    ->preload()
                     ->optionsFromModel(
-                        City::class,
+                        State::class,
                         'name',
-                        function (Builder $query, callable $get) {
-                            /** @var \Illuminate\Database\Eloquent\Builder|\Domain\Address\Models\City $query */
-                            if ($get('state_id') !== null) {
-                                return $query->where('state_id', $get('state_id'));
-                            } elseif ($get('region_id') !== null) {
-                                return $query->where('region_id', $get('region_id'));
-                            }
-
-                            return $query->whereKey(0); // no result
-                        }
+                        fn (Builder $query, callable $get) => $query->where('country_id', $get('country_id'))
                     )
                     ->reactive()
-                    ->visible(function (callable $get) {
-                        return $get('state_id') !== null || $get('region_id') !== null;
-                    }),
+                    ->visible(fn (callable $get) => $get('country_id') !== null),
 
                 Forms\Components\TextInput::make('zip_code')
                     ->translateLabel()
                     ->required()
                     ->string()
                     ->maxLength(255)
-                    ->visible(function (callable $get) {
-                        return $get('city_id') !== null;
-                    }),
+                    ->reactive(),
+
+                Forms\Components\TextInput::make('city')
+                    ->translateLabel()
+                    ->required()
+                    ->string()
+                    ->maxLength(255),
 
                 Forms\Components\Checkbox::make('is_default_billing')
                     ->translateLabel(),
@@ -136,24 +91,16 @@ class AddressesRelationManager extends RelationManager
                     ->sortable()
                     ->searchable()
                     ->wrap(),
-                Tables\Columns\TextColumn::make('address_line_2')
-                    ->translateLabel()
-                    ->sortable()
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->wrap(),
-                Tables\Columns\TextColumn::make('country.name')
+                Tables\Columns\TextColumn::make('state.country.name')
                     ->translateLabel()
                     ->sortable()
                     ->wrap(),
                 Tables\Columns\TextColumn::make('state.name')
                     ->sortable()
                     ->wrap(),
-                Tables\Columns\TextColumn::make('region.name')
+                Tables\Columns\TextColumn::make('city')
                     ->sortable()
-                    ->wrap(),
-                Tables\Columns\TextColumn::make('city.name')
-                    ->sortable()
+                    ->searchable()
                     ->wrap(),
                 Tables\Columns\TextColumn::make('zip_code')
                     ->translateLabel()
@@ -192,6 +139,11 @@ class AddressesRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->translateLabel()
+                    ->mutateRecordDataUsing(function (array $data, Address $record): array {
+                        $data['country_id'] = $record->state->country_id;
+
+                        return $data;
+                    })
                     ->using(fn (Address $record, array $data) => DB::transaction(
                         fn () => DB::transaction(
                             fn () => app(UpdateAddressAction::class)

@@ -15,6 +15,7 @@ return new class () extends Migration {
 
             $table->string('code')->unique();
             $table->string('name')->unique();
+            $table->string('slug')->unique();
             $table->string('capital')->nullable();
             $table->string('timezone')->nullable();
             $table->string('language')->nullable();
