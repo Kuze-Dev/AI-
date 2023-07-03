@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Domain\Support\Payments\Providers;
 
-use Aws\Arn\Exception\InvalidArnException;
 use Domain\Support\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Support\Payments\DataTransferObjects\PaymentGateway\PaymentCapture;
 use Domain\Support\Payments\DataTransferObjects\PaymentGateway\PaymentRefund;
 use Domain\Support\Payments\Events\PaymentProcessEvent;
 use Domain\Support\Payments\Models\Payment;
+use InvalidArgumentException;
 
 class OfflinePayment extends Provider
 {
@@ -30,7 +30,7 @@ class OfflinePayment extends Provider
     {
         return match ($data['status']) {
             'success' => $this->processTransaction($paymentModel, $data),
-            default => throw new InvalidArnException(),
+            default => throw new InvalidArgumentException(),
         };
     }
 

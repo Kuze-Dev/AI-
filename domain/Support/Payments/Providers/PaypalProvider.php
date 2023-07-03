@@ -128,6 +128,7 @@ class PaypalProvider extends Provider
             ]);
 
         } catch (Throwable $th) {
+
             return PaymentAuthorize::fromArray([
                 'success' => false,
                 'message' => $th->getMessage(),
