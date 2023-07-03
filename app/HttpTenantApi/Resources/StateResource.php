@@ -16,7 +16,6 @@ class StateResource extends JsonApiResource
     {
         return [
             'name' => $this->name,
-
         ];
     }
 }
