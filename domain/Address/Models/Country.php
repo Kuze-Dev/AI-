@@ -17,14 +17,13 @@ use Illuminate\Support\Str;
  * @property int $id
  * @property string $code
  * @property string $name
+ * @property string $slug
  * @property string|null $capital
  * @property string|null $timezone
- * @property string|null $language
  * @property bool $active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read int|null $regions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Address\Models\State> $states
  * @property-read int|null $states_count
  * @method static \Illuminate\Database\Eloquent\Builder|Country newModelQuery()
@@ -37,9 +36,8 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Eloquent\Builder|Country whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Country whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Country whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Country whereLanguage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Country whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Country whereStateOrRegion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Country whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Country whereTimezone($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Country whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Country withTrashed()
