@@ -51,10 +51,6 @@ class CountryResource extends Resource
                     ->sortable()
                     ->toggleable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('language')
-                    ->sortable()
-                    ->toggleable()
-                    ->searchable(),
                 Tables\Columns\ToggleColumn::make('active')->label('Active'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()

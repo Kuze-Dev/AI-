@@ -19,7 +19,6 @@ class CountryResource extends JsonApiResource
             'name' => $this->name,
             'capital' => $this->capital,
             'timezone' => $this->timezone,
-            'language' => $this->language,
             'active' => $this->active,
         ];
     }
