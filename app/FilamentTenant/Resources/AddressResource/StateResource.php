@@ -23,11 +23,6 @@ class StateResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function canCreate(): bool
-    {
-        return false;
-    }
-
     public static function getGloballySearchableAttributes(): array
     {
         return ['name'];
@@ -69,5 +64,10 @@ class StateResource extends Resource
         return [
             'index' => Pages\ListState::route('/'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
     }
 }

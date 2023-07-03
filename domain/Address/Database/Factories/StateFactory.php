@@ -8,7 +8,7 @@ use Domain\Address\Models\State;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<State>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Address\Models\State>
  */
 class StateFactory extends Factory
 {

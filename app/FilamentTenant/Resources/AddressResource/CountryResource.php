@@ -24,11 +24,6 @@ class CountryResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function canCreate(): bool
-    {
-        return false;
-    }
-
     public static function getGloballySearchableAttributes(): array
     {
         return ['name'];
@@ -93,5 +88,10 @@ class CountryResource extends Resource
         return [
             'index' => Pages\ListCountry::route('/'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
     }
 }
