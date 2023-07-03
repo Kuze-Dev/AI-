@@ -58,7 +58,7 @@ it('can generate payment authorization dto ', function () {
 
 it('can capture payment ', function () {
 
-    Event::fake();
+    Event::fake([PaymentProcessEvent::class]);
 
     $paymentMethod = PaymentMethod::where('slug', 'cod')->first();
 
