@@ -6,15 +6,13 @@ namespace Database\Seeders\Tenant\Address;
 
 use Domain\Address\Models\Country;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Http;
 
 class CountrySeeder extends Seeder
 {
     public function run(): void
     {
 
-        $response = Http::get('https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/countries%2Bstates.json');
-        $countriesData = $response->json();
+        $countriesData = $this->getCountriesData();
 
         if($countriesData) {
             foreach ($countriesData as $countryData) {
@@ -33,5 +31,12 @@ class CountrySeeder extends Seeder
                 }
             }
         }
+    }
+
+    protected function getCountriesData(): array
+    {
+        $response = file_get_contents('https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/countries%2Bstates.json');
+
+        return json_decode($response, true);
     }
 }
