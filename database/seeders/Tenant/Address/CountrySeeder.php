@@ -14,7 +14,7 @@ class CountrySeeder extends Seeder
 
         $countriesData = $this->getCountriesData();
 
-        if($countriesData) {
+        if ($countriesData) {
             foreach ($countriesData as $countryData) {
                 $country = Country::create([
                     'code' => $countryData['iso2'],
@@ -36,6 +36,10 @@ class CountrySeeder extends Seeder
     protected function getCountriesData(): array
     {
         $response = file_get_contents('https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/countries%2Bstates.json');
+
+        if (!$response) {
+            throw new \Exception();
+        }
 
         return json_decode($response, true);
     }
