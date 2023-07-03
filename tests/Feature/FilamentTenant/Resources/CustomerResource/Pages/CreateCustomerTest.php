@@ -35,7 +35,7 @@ it('can create customer', function () {
             'first_name' => 'test first name',
             'last_name' => 'test last name',
             'mobile' => '09123456789',
-            'status' => true,
+            'status' => Status::ACTIVE->value,
             'birth_date' => now()->subDay()->format('Y-m-d'),
         ])
         ->call('create')

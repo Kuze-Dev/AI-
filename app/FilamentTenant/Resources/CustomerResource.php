@@ -115,7 +115,8 @@ class CustomerResource extends Resource
                             collect(Status::cases())
                                 ->mapWithKeys(fn (Status $target) => [$target->value => Str::headline($target->value)])
                                 ->toArray()
-                        ),
+                        )
+                        ->in(collect(Status::cases())->map(fn (Status $status) => $status->value)->toArray()),
                 ])->columns(2),
             ]);
     }
