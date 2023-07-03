@@ -12,8 +12,6 @@ class CountrySeeder extends Seeder
 {
     public function run(): void
     {
-
-
         Http::fake([
             'https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/countries%2Bstates.json' => Http::response([
                 [
@@ -92,7 +90,6 @@ class CountrySeeder extends Seeder
                 ],
             ]),
         ]);
-        
         
 
         $response = Http::get('https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/countries%2Bstates.json');
