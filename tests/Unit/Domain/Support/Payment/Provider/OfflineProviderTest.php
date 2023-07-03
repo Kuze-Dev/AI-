@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 use Domain\PaymentMethod\Database\Factories\PaymentMethodFactory;
 use Domain\PaymentMethod\Models\PaymentMethod;
-use Domain\Support\Payments\Contracts\PaymentManagerInterface;
-use Domain\Support\Payments\Database\Factories\PaymentFactory;
-use Domain\Support\Payments\DataTransferObjects\AmountData;
-use Domain\Support\Payments\DataTransferObjects\PaymentDetailsData;
-use Domain\Support\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
-use Domain\Support\Payments\DataTransferObjects\PaymentGateway\PaymentCapture;
-use Domain\Support\Payments\DataTransferObjects\ProviderData;
-use Domain\Support\Payments\DataTransferObjects\TransactionData;
-use Domain\Support\Payments\Events\PaymentProcessEvent;
-use Domain\Support\Payments\Models\Payment;
-use Domain\Support\Payments\Providers\OfflinePayment;
+use Domain\Payments\Contracts\PaymentManagerInterface;
+use Domain\Payments\Database\Factories\PaymentFactory;
+use Domain\Payments\DataTransferObjects\AmountData;
+use Domain\Payments\DataTransferObjects\PaymentDetailsData;
+use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
+use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentCapture;
+use Domain\Payments\DataTransferObjects\ProviderData;
+use Domain\Payments\DataTransferObjects\TransactionData;
+use Domain\Payments\Events\PaymentProcessEvent;
+use Domain\Payments\Models\Payment;
+use Domain\Payments\Providers\OfflinePayment;
 use Illuminate\Support\Facades\Event;
 
 use function Pest\Laravel\assertDatabaseHas;

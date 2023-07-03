@@ -188,7 +188,7 @@ return [
         */
         Support\Captcha\CaptchaServiceProvider::class,
         Support\Excel\ExcelServiceProvider::class,
-        Domain\Support\Payments\PaymentServiceProvider::class,
+        Domain\Payments\PaymentServiceProvider::class,
 
     ])->toArray(),
 

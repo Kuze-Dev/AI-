@@ -21,8 +21,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Domain\Support\Payments\Interfaces\PayableInterface;
-use Domain\Support\Payments\Models\Traits\HasPayments;
+use Domain\Payments\Interfaces\PayableInterface;
+use Domain\Payments\Models\Traits\HasPayments;
 use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 
 /**

@@ -20,7 +20,7 @@ use Domain\Page\Models\Block;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Support\Captcha\CaptchaManager;
 use Support\MetaData\Models\MetaData;
-use Domain\Support\Payments\Models\Payment;
+use Domain\Payments\Models\Payment;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\MissingAttributeException;

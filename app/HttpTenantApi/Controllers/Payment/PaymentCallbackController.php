@@ -6,16 +6,16 @@ namespace App\HttpTenantApi\Controllers\Payment;
 
 use Domain\Page\Models\Page;
 use Domain\PaymentMethod\Models\PaymentMethod;
-use Domain\Support\Payments\Contracts\PaymentManagerInterface;
-use Domain\Support\Payments\Models\Payment;
+use Domain\Payments\Contracts\PaymentManagerInterface;
+use Domain\Payments\Models\Payment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Spatie\RouteAttributes\Attributes\Get;
-use Domain\Support\Payments\Actions\CreatePaymentAction;
-use Domain\Support\Payments\DataTransferObjects\AmountData;
-use Domain\Support\Payments\DataTransferObjects\CreatepaymentData;
-use Domain\Support\Payments\DataTransferObjects\PaymentDetailsData;
-use Domain\Support\Payments\DataTransferObjects\TransactionData;
+use Domain\Payments\Actions\CreatePaymentAction;
+use Domain\Payments\DataTransferObjects\AmountData;
+use Domain\Payments\DataTransferObjects\CreatepaymentData;
+use Domain\Payments\DataTransferObjects\PaymentDetailsData;
+use Domain\Payments\DataTransferObjects\TransactionData;
 use Throwable;
 
 class PaymentCallbackController

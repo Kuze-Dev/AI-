@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Domain\PaymentMethod\Database\Factories\PaymentMethodFactory;
-use Domain\Support\Payments\Contracts\PaymentManagerInterface;
-use Domain\Support\Payments\Providers\OfflinePayment;
+use Domain\Payments\Contracts\PaymentManagerInterface;
+use Domain\Payments\Providers\OfflinePayment;
 
 use function PHPUnit\Framework\assertInstanceOf;
 

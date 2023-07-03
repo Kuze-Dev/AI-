@@ -21,7 +21,7 @@ class PaymentMethodController
     public function index(): JsonApiResourceCollection
     {
         return PaymentMethodResource::collection(
-            QueryBuilder::for(PaymentMethod::where('status',true))
+            QueryBuilder::for(PaymentMethod::where('status', true))
                 ->allowedFilters(['title', 'slug'])
                 ->jsonPaginate()
         );
