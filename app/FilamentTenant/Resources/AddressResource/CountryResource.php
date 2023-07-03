@@ -70,7 +70,6 @@ class CountryResource extends Resource
 
             ->actions([
                 Tables\Actions\ViewAction::make()->url(function (Country $record) {
-                    // TODO: optimized calling filter
                     return StateResource::getUrl().'?'.http_build_query(['tableFilters' => ['country_id' => ['value' => $record->getKey()]]]);
                 }),
 
