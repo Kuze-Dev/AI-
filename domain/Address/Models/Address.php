@@ -65,7 +65,7 @@ class Address extends Model
     ];
 
     /** @return Attribute<string, never> */
-    public function fullDetail(): Attribute
+    protected function fullDetail(): Attribute
     {
         return Attribute::get(
             fn ($value): string => Arr::join(
