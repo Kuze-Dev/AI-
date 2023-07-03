@@ -190,7 +190,7 @@ class CustomerResource extends Resource
                             $customer->mobile,
                             $customer->status->value,
                             $customer->birth_date->format(config('tables.date_format')),
-                            $customer->tier?->name,
+                            $customer->tier->name,
                             $customer->created_at?->format(config('tables.date_time_format')),
                         ]
                     ),
