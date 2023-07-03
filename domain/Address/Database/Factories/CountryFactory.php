@@ -22,7 +22,6 @@ class CountryFactory extends Factory
             'name' => $this->faker->unique()->name(),
             'capital' => $this->faker->word(),
             'timezone' => $this->faker->timezone(),
-            'language' => $this->faker->word(),
             'active' => $this->faker->boolean(),
         ];
     }

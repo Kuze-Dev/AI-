@@ -19,7 +19,6 @@ use Illuminate\Support\Str;
  * @property string $name
  * @property string|null $capital
  * @property string|null $timezone
- * @property string|null $language
  * @property bool $active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
