@@ -4,8 +4,8 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     content: [
-        "./resources/*/filament/**/*.blade.php",
-        "./resources/*/filament/**/*.js",
+        "./resources/**/filament/**/*.blade.php",
+        "./resources/**/filament/**/*.js",
         './vendor/filament/**/*.blade.php',
         "./app/Filament/**/*.php",
         "./app/FilamentTenant/**/*.php",

@@ -7,13 +7,13 @@ use Carbon\Carbon;
 use Domain\Content\Models\ContentEntry;
 use Domain\Content\Database\Factories\ContentFactory;
 use Domain\Content\Database\Factories\ContentEntryFactory;
-use Domain\Support\RouteUrl\Models\RouteUrl;
+use Support\RouteUrl\Models\RouteUrl;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
-use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
-use Domain\Support\MetaData\Models\MetaData;
+use Support\MetaData\Database\Factories\MetaDataFactory;
+use Support\MetaData\Models\MetaData;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 

@@ -1,6 +1,20 @@
 # Release Notes
 
-## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.3)
+## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.4)
+
+## [0.2.4](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/0.2.4%0Dv0.2.3)
+
+### Added
+
+- Evaluatable parameters for `Select::optionsFromModel()` macro.
+- Added `wrap()` on table `TextColumns`.
+- Added ellipsis for long titles and breadcrumbs.
+- Added `Rule::email()` macro.
+- Added export and import actions.
+
+### Changed
+
+- Updated `sortable()` and `searchable()` implementation on Filament Table columns.
 
 ## [v0.2.3](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.2.3%0Dv0.2.2)
 

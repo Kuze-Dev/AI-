@@ -7,7 +7,7 @@ use Domain\Page\Database\Factories\BlockFactory;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\BlockContent;
-use Domain\Support\MetaData\Models\MetaData;
+use Support\MetaData\Models\MetaData;
 
 use function Pest\Laravel\assertDatabaseHas;
 
