@@ -35,12 +35,16 @@ class TenancyServiceProvider extends ServiceProvider
                     /** @var Tenant $tenant */
                     $tenant = $event->tenant;
 
-                    Bus::chain([
+                    Bus::chain(array_merge([
                         new CreateDatabase($tenant),
                         new Jobs\MigrateDatabase($tenant),
-                        new Jobs\SeedDatabase($tenant),
-                        new CreateS3Bucket($tenant),
-                    ])->dispatch();
+                        ! app()->runningUnitTests()
+                            ? [
+                                new Jobs\SeedDatabase($tenant),
+                                new CreateS3Bucket($tenant),
+                            ]
+                            : [],
+                    ]))->dispatch();
                 },
             ],
             Events\SavingTenant::class => [],
