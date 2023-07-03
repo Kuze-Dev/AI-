@@ -87,8 +87,6 @@ it('can capture payment ', function () {
 
 it('unsupported status must throws InvalidArgumentException class ', function () {
 
-    Event::fake();
-
     $paymentMethod = PaymentMethod::where('slug', 'cod')->first();
 
     $payment = PaymentFactory::new()->setPaymentMethod($paymentMethod->id)->create();
