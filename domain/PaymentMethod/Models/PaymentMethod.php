@@ -66,7 +66,7 @@ class PaymentMethod extends Model implements HasMedia
         'subtitle',
         'status',
         'description',
-        // 'credentials',
+        'instruction',
     ];
 
     protected $casts = [

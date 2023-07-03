@@ -98,6 +98,8 @@ class PaymentMethodResource extends Resource
                     Forms\Components\Textarea::make('description')
                         ->maxLength(fn (int $value = 250) => $value),
 
+                    Forms\Components\RichEditor::make('instruction'),
+
                 ]),
             ]);
     }

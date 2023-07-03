@@ -10,8 +10,9 @@ class PaymentMethodData
         public readonly string $title,
         public readonly string $gateway,
         public readonly string $subtitle,
-        public readonly string $description,
         public readonly bool $status,
+        public readonly ?string $description,
+        public readonly ?string $instruction,
     ) {
     }
 
@@ -21,7 +22,8 @@ class PaymentMethodData
             title: $data['title'],
             gateway: $data['gateway'],
             subtitle: $data['subtitle'],
-            description: $data['description'],
+            description: $data['description'] ?? null,
+            instruction: $data['instruction'] ?? null,
             status: $data['status'],
         );
     }

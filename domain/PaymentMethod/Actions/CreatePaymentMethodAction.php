@@ -17,6 +17,7 @@ class CreatePaymentMethodAction
             'subtitle' => $paymentMethodData->subtitle,
             'gateway' => $paymentMethodData->gateway,
             'description' => $paymentMethodData->description,
+            'instruction' => $paymentMethodData->instruction,
             'status' => $paymentMethodData->status,
         ]);
 

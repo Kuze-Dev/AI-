@@ -18,7 +18,7 @@ return new class () extends Migration {
             $table->string('subtitle')->nullable();
             $table->boolean('status')->default(false);
             $table->text('description')->nullable();
-            // $table->longText('credentials')->nullable();
+            $table->longText('instruction')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

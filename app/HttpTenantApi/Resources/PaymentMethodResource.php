@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Resources;
 
 use Illuminate\Http\Request;
-use Domain\Blueprint\DataTransferObjects\SchemaData;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
@@ -13,8 +12,6 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class PaymentMethodResource extends JsonApiResource
 {
-
-
     public function toAttributes(Request $request): array
     {
         $image = $this->getFirstMedia('logo');
@@ -27,7 +24,7 @@ class PaymentMethodResource extends JsonApiResource
             'logo' => $image?->getUrl(),
             'status' => $this->status,
             'description' => $this->description,
+            'instruction' => $this->instruction,
         ];
     }
-
 }

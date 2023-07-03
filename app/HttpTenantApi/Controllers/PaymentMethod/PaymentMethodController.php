@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\PaymentMethod;
 
 use App\Features\CMS\CMSBase;
-use App\HttpTenantApi\Resources\GlobalsResource;
 use App\HttpTenantApi\Resources\PaymentMethodResource;
-use Domain\Globals\Models\Globals;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
@@ -23,11 +21,9 @@ class PaymentMethodController
     public function index(): JsonApiResourceCollection
     {
         return PaymentMethodResource::collection(
-            QueryBuilder::for(PaymentMethod::class)
+            QueryBuilder::for(PaymentMethod::where('status',true))
                 ->allowedFilters(['title', 'slug'])
                 ->jsonPaginate()
         );
     }
-
-   
 }
