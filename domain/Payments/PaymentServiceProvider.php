@@ -36,6 +36,7 @@ class PaymentServiceProvider extends ServiceProvider implements DeferrableProvid
                         return match ($paymentType->gateway) {
                             'paypal' => new PaypalProvider(),
                             'manual' => new OfflinePayment(),
+                            'bank-transfer' => new OfflinePayment(),
                             default => throw new InvalidArgumentException(),
                         };
                     });
