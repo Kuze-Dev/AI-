@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * Domain\Currency\Models\Currency
  *
  * @property int $id
- * @property string|null $code
- * @property string|null $name
+ * @property string $code
+ * @property string $name
  * @property float|null $exchange_rate
  * @property bool $enabled
  * @property bool $default
