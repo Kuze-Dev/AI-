@@ -7,9 +7,6 @@ namespace Domain\Discount\Database\Factories;
 use Domain\Discount\Models\DiscountRequirement;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Discount\Models\DiscountRequirement>
- */
 class DiscountRequirementFactory extends Factory
 {
     protected $model = DiscountRequirement::class;
@@ -18,7 +15,7 @@ class DiscountRequirementFactory extends Factory
     {
         return [
             'requirement_type' => 'minimum_order_amount',
-            'minimum_amount' => fake()->numberBetween(100, 1000),
+            'minimum_amount' => fake()->randomNumber(),
         ];
     }
 }

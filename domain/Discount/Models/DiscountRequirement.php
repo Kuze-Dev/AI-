@@ -52,7 +52,6 @@ class DiscountRequirement extends Model
         'damount_type' => DiscountAmountType::class,
     ];
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Discount\Models\Discount, \Domain\Discount\Models\DiscountRequirement> */
     public function discount(): BelongsTo
     {
         return $this->belongsTo(Discount::class);

@@ -55,7 +55,6 @@ class DiscountCondition extends Model
         'amount' => 'int',
     ];
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Discount\Models\Discount, \Domain\Discount\Models\DiscountCondition> */
     public function discount(): BelongsTo
     {
         return $this->belongsTo(Discount::class);
