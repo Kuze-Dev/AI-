@@ -8,7 +8,7 @@ use Domain\Address\Models\Country;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<Country>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Address\Models\Country>
  */
 class CountryFactory extends Factory
 {
@@ -22,7 +22,6 @@ class CountryFactory extends Factory
             'name' => $this->faker->unique()->name(),
             'capital' => $this->faker->word(),
             'timezone' => $this->faker->timezone(),
-            'language' => $this->faker->word(),
             'active' => $this->faker->boolean(),
         ];
     }

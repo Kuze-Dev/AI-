@@ -15,14 +15,11 @@ return new class () extends Migration {
 
             $table->string('code')->unique();
             $table->string('name')->unique();
-            $table->string('slug')->unique();
             $table->string('capital')->nullable();
             $table->string('timezone')->nullable();
-            $table->string('language')->nullable();
             $table->boolean('active')->default(false);
 
             $table->timestamps();
-            $table->softDeletes();
         });
 
         Schema::create('states', function (Blueprint $table) {
@@ -32,7 +29,6 @@ return new class () extends Migration {
             $table->string('name')->index();
 
             $table->timestamps();
-            $table->softDeletes();
         });
 
     }
