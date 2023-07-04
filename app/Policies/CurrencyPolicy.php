@@ -28,11 +28,6 @@ class CurrencyPolicy
         return $this->checkWildcardPermissions($user);
     }
 
-    public function view(User $user, Currency $currency): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
-
     public function update(User $user, Currency $currency): bool
     {
         return $this->checkWildcardPermissions($user);

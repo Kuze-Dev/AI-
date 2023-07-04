@@ -35,7 +35,6 @@ class CurrencyResource extends Resource
     {
         return $table
             ->columns([
-
                 Tables\Columns\TextColumn::make('code')
                     ->label('Currency')
                     ->sortable()
@@ -50,10 +49,10 @@ class CurrencyResource extends Resource
                     ->sortable()
                     ->toggleable()
                     ->searchable(),
-                Tables\Columns\ToggleColumn::make('enabled')->label('status')->updateStateUsing(function (Currency $record) {
-                    return app(UpdateCurrencyEnabledAction::class)->execute($record, );
-                }),
-
+                Tables\Columns\ToggleColumn::make('enabled')->label('status')
+                    ->updateStateUsing(function (Currency $record) {
+                        return app(UpdateCurrencyEnabledAction::class)->execute($record, );
+                    }),
                 Tables\Columns\BadgeColumn::make('default')
                     ->enum([
                         '1' => 'Selected',
@@ -74,7 +73,6 @@ class CurrencyResource extends Resource
                     ->toggleable(),
 
             ])
-
             ->filters([
                 Tables\Filters\SelectFilter::make('enabled')
                     ->label('Status')
