@@ -12,27 +12,22 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $code
  * @property string $name
- * @property float|null $exchange_rate
+ * @property float $exchange_rate
  * @property bool $enabled
  * @property bool $default
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
  * @method static \Illuminate\Database\Eloquent\Builder|Currency newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Currency newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Currency onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Currency query()
  * @method static \Illuminate\Database\Eloquent\Builder|Currency whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Currency whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Currency whereDefault($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Currency whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Currency whereEnabled($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Currency whereExchangeRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Currency whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Currency whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Currency whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Currency withTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|Currency withoutTrashed()
  * @mixin \Eloquent
  */
 class Currency extends Model
