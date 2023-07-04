@@ -88,6 +88,7 @@ pipelines:
           <<: *common-step
           name: Deploy to Ecommerce Branch
           deployment: ecommerce
+          trigger: manual
           script:
             - *setup-script
             - composer require laravel/vapor-cli
