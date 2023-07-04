@@ -2,6 +2,7 @@
 
 namespace {{ namespace }};
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use {{ resource }};
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
@@ -9,6 +10,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class {{ resourcePageClass }} extends EditRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = {{ resourceClass }}::class;
 
     protected function getActions(): array

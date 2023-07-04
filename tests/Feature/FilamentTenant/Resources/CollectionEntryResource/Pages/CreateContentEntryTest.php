@@ -136,14 +136,12 @@ it('can create content entry with publish date', function () {
             'past_publish_date_behavior' => 'unlisted',
         ]);
 
-    $dateTime = Carbon::now();
-
     livewire(CreateContentEntry::class, ['ownerRecord' => $content->getRouteKey()])
         ->assertOk()
         ->fillForm([
             'title' => 'Test',
             'slug' => 'test',
-            'published_at' => $dateTime,
+            'published_at' => $publishedAt = Carbon::now(),
             'data' => ['main' => ['header' => 'Foo']],
         ])
         ->call('create')
@@ -155,7 +153,7 @@ it('can create content entry with publish date', function () {
             'id' => $content->id,
             'title' => 'Test',
             'slug' => 'test',
-            'published_at' => $dateTime,
+            'published_at' => $publishedAt->timezone(Auth::user()?->timezone)->toDateTimeString(),
             'data' => json_encode(['main' => ['header' => 'Foo']]),
         ]
     );
@@ -174,8 +172,6 @@ it('can create content entry with meta data', function () {
             'past_publish_date_behavior' => 'unlisted',
         ]);
 
-    $dateTime = Carbon::now();
-
     $metaData = [
         'title' => 'Test Meta Data Title',
         'keywords' => 'Test Meta Data Keywords',
@@ -189,7 +185,6 @@ it('can create content entry with meta data', function () {
         ->fillForm([
             'title' => 'Test',
             'slug' => 'test',
-            'published_at' => $dateTime,
             'data' => ['main' => ['header' => 'Foo']],
             'meta_data' => $metaData,
             'meta_data.image.0' => $metaDataImage,
@@ -205,7 +200,6 @@ it('can create content entry with meta data', function () {
             'id' => $content->id,
             'title' => 'Test',
             'slug' => 'test',
-            'published_at' => $dateTime,
             'data' => json_encode(['main' => ['header' => 'Foo']]),
         ]
     );

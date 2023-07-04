@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\FormResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\FormResource;
 use Domain\Form\Actions\UpdateFormAction;
 use Domain\Form\DataTransferObjects\FormData;
@@ -17,6 +18,8 @@ use Filament\Pages\Actions\Action;
 
 class EditForm extends EditRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = FormResource::class;
 
     /** @throws Exception */

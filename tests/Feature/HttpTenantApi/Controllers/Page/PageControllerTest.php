@@ -15,6 +15,7 @@ beforeEach(function () {
 it('can list pages', function () {
     PageFactory::new()
         ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->published()
         ->count(10)
         ->create();
 
@@ -32,6 +33,7 @@ it('can list pages', function () {
 it('can filter pages', function ($attribute) {
     $pages = PageFactory::new()
         ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->published()
         ->count(2)
         ->sequence(
             ['name' => 'Foo', 'visibility' => 'authenticated'],

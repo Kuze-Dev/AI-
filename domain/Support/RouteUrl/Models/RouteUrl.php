@@ -30,7 +30,7 @@ use Stringable;
  * @method static \Illuminate\Database\Eloquent\Builder|RouteUrl whereModelType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|RouteUrl whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|RouteUrl whereUrl($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class RouteUrl extends Model implements Stringable
 {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Blueprint\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Domain\Blueprint\Models\Casts\SchemaDataCast;
 use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -21,7 +20,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property \Domain\Blueprint\DataTransferObjects\SchemaData $schema
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @method static \Illuminate\Database\Eloquent\Builder|Blueprint newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Blueprint newQuery()
@@ -33,7 +32,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|Blueprint whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class Blueprint extends Model implements IsActivitySubject
+class Blueprint extends Model
 {
     use HasUuids;
     use LogsActivity;
@@ -54,11 +53,6 @@ class Blueprint extends Model implements IsActivitySubject
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
-    }
-
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Blueprint: ' . $this->name;
     }
 
     protected function onDeleteRestrictRelations(): array

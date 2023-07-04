@@ -16,15 +16,20 @@ use Domain\Admin\Models\Admin;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Navigation\NavigationGroup;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Saade\FilamentLaravelLog\Pages\ViewLog;
 use Filament\Pages\Actions as PageActions;
+use Filament\Support\Actions as SupportActions;
 use Filament\Tables\Actions as TableActions;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\ActivityLogger;
+use Spatie\Activitylog\ActivitylogServiceProvider;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Exception;
 use Throwable;
 
 /** @property \Illuminate\Foundation\Application $app */
@@ -77,7 +82,7 @@ class FilamentServiceProvider extends ServiceProvider
 
         $this->registerRoutes();
 
-        $this->registerFormComponentMacros();
+        $this->registerMacros();
 
         $this->configureComponents();
     }
@@ -124,8 +129,67 @@ class FilamentServiceProvider extends ServiceProvider
             });
     }
 
-    protected function registerFormComponentMacros(): void
+    protected function registerMacros(): void
     {
+        SupportActions\Action::macro(
+            'withActivityLog',
+            function (
+                string $logName = 'admin',
+                Closure|string|null $event = null,
+                Closure|string|null $description = null,
+                Closure|array|null $properties = null,
+                Model|int|string|null $causedBy = null,
+            ): SupportActions\Action {
+                /** @var SupportActions\Action $this */
+                return $this->after(function (SupportActions\Action $action) use ($logName, $event, $description, $properties, $causedBy) {
+                    $event = $action->evaluate($event) ?? $action->getName();
+                    $properties = $action->evaluate($properties);
+                    $description = Str::headline($action->evaluate($description ?? $event) ?? $action->getName());
+                    $causedBy ??= Filament::auth()->user();
+
+                    $log = function (?Model $model) use ($properties, $event, $logName, $description, $causedBy): void {
+                        if ($model && $model::class === ActivitylogServiceProvider::determineActivityModel()) {
+                            return;
+                        }
+
+                        $activityLogger = app(ActivityLogger::class)
+                            ->useLog($logName)
+                            ->event($event)
+                            ->causedBy($causedBy);
+
+                        if ($model) {
+                            $activityLogger->performedOn($model);
+                        }
+
+                        if ($model && in_array($event, ['deleted', 'restored', 'force-deleted'])) {
+                            $attributes = method_exists($model, 'attributesToBeLogged')
+                                ? $model->only($model->attributesToBeLogged())
+                                : $model->attributesToArray();
+
+                            $activityLogger->withProperties([
+                                ($event === 'restored') ? 'attributes' : 'old' => $attributes,
+                                ($event !== 'restored') ? 'attributes' : 'old' => [],
+                            ]);
+                        } elseif ($properties) {
+                            $activityLogger->withProperties($properties);
+                        }
+
+                        $activityLogger->log($description);
+                    };
+
+                    if ($action instanceof TableActions\BulkAction) {
+                        foreach ($action->getRecords() ?? [] as $record) {
+                            $log($record);
+                        }
+
+                        return;
+                    }
+
+                    $log($action instanceof SupportActions\Contracts\HasRecord ? $action->getRecord() : null);
+                });
+            }
+        );
+
         Forms\Components\FileUpload::macro('mediaLibraryCollection', function (string $collection) {
             /** @var Forms\Components\FileUpload $this */
             $this->multiple(
@@ -191,6 +255,20 @@ class FilamentServiceProvider extends ServiceProvider
     private function createActionConfiguration(): Closure
     {
         return fn (PageActions\Action|TableActions\Action $action) => $action
+            ->withActivityLog(
+                event: fn (PageActions\Action|TableActions\Action $action) => match ($action->getName()) {
+                    'delete' => 'deleted',
+                    'restore' => 'restored',
+                    'forceDelete' => 'force-deleted',
+                    default => throw new Exception(),
+                },
+                description: fn (PageActions\Action|TableActions\Action $action) => match ($action->getName()) {
+                    'delete' => $action->getRecordTitle() . ' deleted',
+                    'restore' => $action->getRecordTitle() . ' restored',
+                    'forceDelete' => $action->getRecordTitle() . ' force deleted',
+                    default => throw new Exception(),
+                }
+            )
             ->modalSubheading(
                 fn (PageActions\Action|TableActions\Action $action) => trans(
                     'Are you sure you want to :action this :resource?',
@@ -199,7 +277,8 @@ class FilamentServiceProvider extends ServiceProvider
                         'resource' => $action->getModelLabel() ?? 'record',
                     ]
                 )
-            )->failureNotificationTitle(
+            )
+            ->failureNotificationTitle(
                 fn (PageActions\Action|TableActions\Action $action) => trans(
                     'Unable to :action :resource.',
                     [
@@ -213,6 +292,12 @@ class FilamentServiceProvider extends ServiceProvider
     private function createBulkActionConfiguration(): Closure
     {
         return fn (TableActions\BulkAction $action) => $action
+            ->withActivityLog(event: fn (TableActions\BulkAction $action) => match ($action->getName()) {
+                'delete' => 'deleted',
+                'restore' => 'restored',
+                'forceDelete' => 'force-deleted',
+                default => throw new Exception(),
+            })
             ->modalSubheading(
                 fn (TableActions\BulkAction $action) => trans(
                     'Are you sure you want to :action :count :resource/s?',

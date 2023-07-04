@@ -18,6 +18,11 @@ class AdminSeeder extends Seeder
             'first_name' => 'System',
             'last_name' => 'Administrator',
         ])
+            ->state(
+                fn () => ($password = tenancy()->central(fn () => Admin::whereId(1)->first()?->password))
+                    ? ['password' => $password]
+                    : []
+            )
             ->create();
 
         /** @phpstan-ignore-next-line */

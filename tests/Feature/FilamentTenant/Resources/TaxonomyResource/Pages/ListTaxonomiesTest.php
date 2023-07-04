@@ -6,7 +6,6 @@ use App\FilamentTenant\Resources\TaxonomyResource\Pages\ListTaxonomies;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Content\Database\Factories\ContentFactory;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Filament\Facades\Filament;
@@ -69,5 +68,13 @@ it('can\'t delete taxonomy with existing contents', function () {
         ->attach($taxonomy);
 
     livewire(ListTaxonomies::class)
-        ->callTableAction(DeleteAction::class, $taxonomy);
-})->throws(DeleteRestrictedException::class);
+        ->callTableAction(DeleteAction::class, $taxonomy)
+        ->assertNotified(trans(
+            'Unable to :action :resource.',
+            [
+                'action' => 'delete',
+                'resource' => 'taxonomy',
+            ]
+        ))
+        ->assertOk();
+});

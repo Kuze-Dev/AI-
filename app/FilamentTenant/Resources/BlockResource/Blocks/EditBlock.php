@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\BlockResource\Blocks;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\BlockResource;
 use Domain\Page\Actions\UpdateBlockAction;
 use Domain\Page\DataTransferObjects\BlockData;
@@ -17,6 +18,8 @@ use Filament\Pages\Actions\Action;
 
 class EditBlock extends EditRecord
 {
+    use LogsFormActivity;
+
     protected static string $resource = BlockResource::class;
 
     /** @throws Exception */
