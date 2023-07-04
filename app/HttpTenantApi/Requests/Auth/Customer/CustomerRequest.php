@@ -41,6 +41,7 @@ class CustomerRequest extends FormRequest
             'shipping_zip_code' => 'required|string|max:255',
             'shipping_city' => 'required|string|max:255',
             'shipping_default' => 'required|bool',
+            'shipping_label_as' => 'required|in:home,office',
 
             // billing address
             'billing_same_as_shipping' => 'required|bool',
@@ -52,6 +53,7 @@ class CustomerRequest extends FormRequest
             'billing_zip_code' => 'required_if:billing_same_as_shipping,0|string|max:255',
             'billing_city' => 'required_if:billing_same_as_shipping,0|string|max:255',
             'billing_default' => 'required_if:billing_same_as_shipping,0|bool',
+            'billing_label_as' => 'required_if:billing_same_as_shipping,0|in:home,office',
         ];
     }
 
