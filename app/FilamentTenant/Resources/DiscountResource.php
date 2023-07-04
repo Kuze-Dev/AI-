@@ -8,14 +8,15 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use App\FilamentTenant\Resources\DiscountResource\Pages\CreateDiscount;
 use App\FilamentTenant\Resources\DiscountResource\Pages\EditDiscount;
 use App\FilamentTenant\Resources\DiscountResource\Pages\ListDiscounts;
-use Auth;
 use Carbon\Carbon;
 use Closure;
 use Domain\Discount\Actions\AutoGenerateCode;
+use Filament\Facades\Filament;
 use Domain\Discount\Actions\ForceDeleteDiscountAction;
+use Domain\Discount\Actions\RestoreDiscountAction;
+use Domain\Discount\Actions\SoftDeleteDiscountAction;
 use Domain\Discount\Enums\DiscountAmountType;
 use Domain\Discount\Models\Discount;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\DateTimePicker;
@@ -40,6 +41,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\HtmlString;
 use Str;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class DiscountResource extends Resource
 {
@@ -69,8 +71,8 @@ class DiscountResource extends Resource
                         ->disabled(),
 
                     RichEditor::make('description')
-                        ->translateLabel()
-                        ->required(),
+                        ->translateLabel(),
+
                     TextInput::make('code')
                         ->suffixAction(
                             fn (?string $state): Action => Action::make('code')
@@ -101,11 +103,11 @@ class DiscountResource extends Resource
 
                             DateTimePicker::make('valid_start_at')
                                 ->required()
-                                ->timezone(Auth::user()?->timezone)
+                                ->timezone(timezone: Filament::auth()->user()?->timezone)
                                 ->label(trans('Start Date')),
 
                             DateTimePicker::make('valid_end_at')
-                                ->timezone(Auth::user()?->timezone)
+                                ->timezone(timezone: Filament::auth()->user()?->timezone)
                                 ->after('valid_start_at')
                                 ->label(trans('Expiration Date'))
                                 ->helperText(new HtmlString(<<<HTML
@@ -125,6 +127,7 @@ class DiscountResource extends Resource
                                 ->default('order_sub_total')
                                 ->formatStateUsing(fn ($record) => $record?->discountCondition->discount_type)
                                 ->label(trans('Discount Type')),
+
                             Radio::make('discountCondition.amount_type')->options([
                                 'fixed_value' => 'Fixed Value',
                                 'percentage' => 'Percentage',
@@ -184,12 +187,12 @@ class DiscountResource extends Resource
                     })
                     ->label(trans('Amount')),
                 TextColumn::make('valid_start_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime(timezone: Filament::auth()->user()?->timezone)
                     ->date('F j, Y, g:i a')
                     ->label(trans('Start Date')),
 
                 TextColumn::make('valid_end_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime(timezone: Filament::auth()->user()?->timezone)
                     ->date('F j, Y, g:i a')
                     ->label(trans('Expiration Date')),
 
@@ -215,6 +218,7 @@ class DiscountResource extends Resource
                             return false;
                         }
                     }),
+
                 DeleteAction::make()
                     ->before(function (DeleteAction $action, $record) {
                         $endDate = Carbon::parse($record->valid_end_at);
@@ -222,8 +226,23 @@ class DiscountResource extends Resource
                             return $action->halt();
                         }
                     })
+                    ->using(function (Discount $record) {
+                        try {
+                            return app(SoftDeleteDiscountAction::class)->execute($record);
+                        } catch (DeleteRestrictedException $e) {
+                            return false;
+                        }
+                    })
                     ->button(),
-                RestoreAction::make()->button(),
+
+                RestoreAction::make()
+                    ->using(function (Discount $record) {
+                        try {
+                            return app(RestoreDiscountAction::class)->execute($record);
+                        } catch (DeleteRestrictedException $e) {
+                            return false;
+                        }
+                    })->button(),
             ])
             ->bulkActions([
                 // Tables\Actions\DeleteBulkAction::make(),
@@ -237,13 +256,13 @@ class DiscountResource extends Resource
         ];
     }
 
-     public static function getEloquentQuery(): EloquentBuilder
-     {
-         return parent::getEloquentQuery()
-             ->withoutGlobalScopes([
-                 SoftDeletingScope::class,
-             ]);
-     }
+    public static function getEloquentQuery(): EloquentBuilder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
 
     public static function getPages(): array
     {

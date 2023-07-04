@@ -8,6 +8,7 @@ use Domain\Discount\Enums\DiscountAmountType;
 use Domain\Discount\Enums\DiscountRequirementType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Domain\Discount\Models\DiscountRequirement
@@ -33,6 +34,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class DiscountRequirement extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'discount_id',
         'requirement_type',

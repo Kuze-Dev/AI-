@@ -8,6 +8,7 @@ use Domain\Discount\Enums\DiscountAmountType;
 use Domain\Discount\Enums\DiscountConditionType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Domain\Discount\Models\DiscountCondition
@@ -34,6 +35,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class DiscountCondition extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'discount_id',
         'discount_type',

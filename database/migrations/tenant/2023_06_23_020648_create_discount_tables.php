@@ -47,6 +47,7 @@ return new class () extends Migration {
             $table->string('amount_type')->index();
             $table->bigInteger('amount');
 
+            $table->softDeletes('deleted_at')->nullable();
             $table->timestamps();
         });
 
@@ -61,16 +62,20 @@ return new class () extends Migration {
             $table->bigInteger('minimum_amount')
                 ->nullable();
 
+            $table->softDeletes('deleted_at')->nullable();
             $table->timestamps();
         });
 
         Schema::create('discount_limits', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(Discount::class)->index();
-            // $table->foreignIdFor(Customer::class)->index();
-            // $table->foreignIdFor(Order::class)->index();
+            $table->foreignIdFor(Discount::class)
+                ->index()
+                ->nullable();
+            $table->morphs(Customer::class);
+            $table->morphs(Order::class);
 
+            $table->string('code')->index();
             $table->bigInteger('times_used')
                 ->nullable();
 
@@ -81,6 +86,7 @@ return new class () extends Migration {
 
     public function down(): void
     {
+        Schema::dropIfExists('discount_limits');
         Schema::dropIfExists('discount_requirements');
         Schema::dropIfExists('discount_conditions');
         // Schema::dropIfExists('discount_codes');
