@@ -25,17 +25,11 @@ class CurrencyResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function canCreate(): bool
-    {
-        return false;
-    }
-
     public static function getGloballySearchableAttributes(): array
     {
         return ['code'];
     }
 
-    /** @throws Exception */
     /** @throws Exception */
     public static function table(Table $table): Table
     {
@@ -100,5 +94,10 @@ class CurrencyResource extends Resource
         return [
             'index' => Pages\ListCurrency::route('/'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
     }
 }

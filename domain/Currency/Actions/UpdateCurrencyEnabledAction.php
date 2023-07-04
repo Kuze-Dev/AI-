@@ -14,9 +14,10 @@ class UpdateCurrencyEnabledAction
             return $currency;
         }
 
-        Currency::where('id', '!=', $currency->id)->update(['enabled' => false]);
+        Currency::whereKeyNot($currency)
+            ->update(['enabled' => false]);
+
         $currency->update(['enabled' => true]);
-        // dd($currency->enabled);
 
         return $currency;
     }
