@@ -20,7 +20,7 @@ class CustomerRequestFactory extends RequestFactory
 
                 return "{$firstName}.{$lastName}@fake.com";
             },
-            'password' => 'new-password',
+            'password' => 'secret',
             'mobile' => $this->faker->phoneNumber(),
             'birth_date' => now()->subYears($this->faker->randomDigitNotNull())->format('Y-m-d'),
         ];
