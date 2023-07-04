@@ -123,10 +123,10 @@ class ActivityResource extends Resource
                             }
 
                             try {
-                                if ($resource::hasPage('view')) {
+                                if ($resource::hasPage('view') && $resource::canView($record)) {
                                     return $resource::getUrl('view', ['record' => $record->subject]);
                                 }
-                                if ($resource::hasPage('edit')) {
+                                if ($resource::hasPage('edit') && $resource::canEdit($record)) {
                                     return $resource::getUrl('edit', ['record' => $record->subject]);
                                 }
                             } catch (UrlGenerationException) {
