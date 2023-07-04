@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Features\CMS\CMSBase;
-use App\Features\CMS\ECommerceBase;
+use App\Features\ECommerce\ECommerceBase;
 use Database\Seeders\Tenant\Auth\PermissionSeeder;
 use Database\Seeders\Tenant\Auth\RoleSeeder;
 use Domain\Admin\Database\Factories\AdminFactory;
