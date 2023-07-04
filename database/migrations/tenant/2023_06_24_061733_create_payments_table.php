@@ -12,7 +12,7 @@ return new class () extends Migration {
     public function up(): void
     {
         Schema::create('payments', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
 
             $table->morphs('payable');
 
@@ -22,6 +22,8 @@ return new class () extends Migration {
             $table->string('currency');
             $table->string('amount');
             $table->string('status');
+            $table->string('remarks')->nullable();
+            $table->longText('message')->nullable();
             $table->string('payment_id')->nullable();
             $table->string('transaction_id')->nullable();
 

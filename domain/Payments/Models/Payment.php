@@ -6,14 +6,14 @@ namespace Domain\Payments\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+// use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Payment extends Model implements HasMedia
 {
     use InteractsWithMedia;
-    use HasUuids;
+    // use HasUuids;
 
     /**
      * Declare columns
@@ -28,6 +28,8 @@ class Payment extends Model implements HasMedia
         'currency',
         'amount',
         'status',
+        'remarks',
+        'message',
         'payment_id',
         'transaction_id',
         'payment_details',
