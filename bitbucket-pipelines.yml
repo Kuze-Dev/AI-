@@ -65,6 +65,19 @@ pipelines:
             - *setup-script
             - composer require laravel/vapor-cli
             - ./vendor/bin/vapor deploy staging --commit="$BITBUCKET_COMMIT"
+    ecommerce-branch:
+      - parallel:
+          - step: *check-format
+          - step: *analyse
+          - step: *test
+      - step:
+          <<: *common-step
+          name: Deploy to Ecommerce Branch
+          deployment: ecommerce-branch
+          script:
+            - *setup-script
+            - composer require laravel/vapor-cli
+            - ./vendor/bin/vapor deploy ecommerce-branch --commit="$BITBUCKET_COMMIT"
     master:
       - parallel:
           - step: *check-format
