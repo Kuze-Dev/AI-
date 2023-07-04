@@ -28,11 +28,6 @@ class CountryPolicy
         return $this->checkWildcardPermissions($user);
     }
 
-    public function view(User $user, Country $country): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
-
     public function update(User $user, Country $country): bool
     {
         return $this->checkWildcardPermissions($user);

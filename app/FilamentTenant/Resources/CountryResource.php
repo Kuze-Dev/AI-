@@ -20,7 +20,7 @@ class CountryResource extends Resource
 
     protected static ?string $navigationGroup = 'eCommerce';
 
-    protected static ?string $navigationIcon = 'heroicon-s-globe';
+    protected static ?string $navigationIcon = 'heroicon-o-globe';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -29,7 +29,6 @@ class CountryResource extends Resource
         return ['name'];
     }
 
-    /** @throws Exception */
     /** @throws Exception */
     public static function table(Table $table): Table
     {
