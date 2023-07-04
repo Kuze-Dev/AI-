@@ -48,7 +48,7 @@ class CountryResource extends Resource
                     ]),
             ])
             ->bulkActions([])
-            ->defaultSort('id', 'asc');
+            ->defaultSort('updated_at', 'asc');
     }
 
     public static function getPages(): array
