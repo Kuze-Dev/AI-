@@ -18,6 +18,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property int $id
  * @property int $customer_id
  * @property int $state_id
+ * @property string $label_as
  * @property string $address_line_1
  * @property string $zip_code
  * @property string $city
@@ -52,6 +53,7 @@ class Address extends Model
     protected $fillable = [
         'customer_id',
         'state_id',
+        'label_as',
         'address_line_1',
         'zip_code',
         'city',

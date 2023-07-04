@@ -17,6 +17,7 @@ return new class () extends Migration {
             $table->foreignIdFor(Customer::class)->index();
             $table->foreignIdFor(State::class)->index();
 
+            $table->string('label_as');
             $table->text('address_line_1');
             $table->string('zip_code');
             $table->string('city');

@@ -40,7 +40,6 @@ class CustomerRegisterRequest extends FormRequest
             'shipping_address_line_1' => 'required|string|max:255',
             'shipping_zip_code' => 'required|string|max:255',
             'shipping_city' => 'required|string|max:255',
-            'shipping_default' => 'required|bool',
             'shipping_label_as' => 'required|in:home,office',
 
             // billing address
@@ -52,7 +51,6 @@ class CustomerRegisterRequest extends FormRequest
             'billing_address_line_1' => 'required_if:billing_same_as_shipping,0|string|max:255',
             'billing_zip_code' => 'required_if:billing_same_as_shipping,0|string|max:255',
             'billing_city' => 'required_if:billing_same_as_shipping,0|string|max:255',
-            'billing_default' => 'required_if:billing_same_as_shipping,0|bool',
             'billing_label_as' => 'required_if:billing_same_as_shipping,0|in:home,office',
         ];
     }
@@ -73,6 +71,7 @@ class CustomerRegisterRequest extends FormRequest
         );
 
         $shippingAddress = new AddressData(
+            label_as: $validated['shipping_label_as'],
             address_line_1: $validated['shipping_address_line_1'],
             state_id: (int) $validated['shipping_state_id'],
             zip_code: $validated['shipping_zip_code'],
@@ -84,6 +83,9 @@ class CustomerRegisterRequest extends FormRequest
         $same = $this->boolean('billing_same_as_shipping');
 
         $billingAddress = new AddressData(
+            label_as: $same
+                ? $validated['shipping_label_as']
+                : $validated['billing_label_as'],
             address_line_1: $same
                 ? $validated['shipping_address_line_1']
                 : $validated['billing_address_line_1'],
