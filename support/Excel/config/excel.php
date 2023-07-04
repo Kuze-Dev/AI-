@@ -1,5 +1,7 @@
 <?php
 
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+
 return [
 
     'temporary_files' => [
@@ -16,6 +18,9 @@ return [
 
     'path' => 'admin/download-export',
 
-    'middleware' => []
+    'middleware' => [
+        'universal',
+        InitializeTenancyByDomain::class,
+    ]
 
 ];
