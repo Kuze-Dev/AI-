@@ -37,5 +37,4 @@ class PagePolicy
     {
         return $this->checkWildcardPermissions($user);
     }
-
 }
