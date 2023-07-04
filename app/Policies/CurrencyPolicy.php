@@ -6,11 +6,11 @@ namespace App\Policies;
 
 use App\Features\ECommerce\ECommerceBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
-use Domain\Page\Models\Page;
+use Domain\Currency\Models\Currency;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
 
-class PagePolicy
+class CurrencyPolicy
 {
     use ChecksWildcardPermissions;
 
@@ -28,12 +28,12 @@ class PagePolicy
         return $this->checkWildcardPermissions($user);
     }
 
-    public function view(User $user, Page $page): bool
+    public function view(User $user, Currency $currency): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function update(User $user, Page $page): bool
+    public function update(User $user, Currency $currency): bool
     {
         return $this->checkWildcardPermissions($user);
     }
