@@ -35,29 +35,10 @@ class CountryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('code')
-                    ->sortable()
-                    ->toggleable()
-                    ->searchable(),
-
                 Tables\Columns\TextColumn::make('name')->label('Countries')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('capital')
-                    ->sortable()
-                    ->toggleable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('timezone')
-                    ->sortable()
-                    ->toggleable()
-                    ->searchable(),
-                Tables\Columns\ToggleColumn::make('active')->label('Active'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->sortable()
-                    ->toggleable(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->sortable()
-                    ->toggleable(),
+                Tables\Columns\ToggleColumn::make('active')->label(''),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('active')

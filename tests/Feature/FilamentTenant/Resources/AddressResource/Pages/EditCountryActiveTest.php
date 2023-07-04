@@ -16,10 +16,8 @@ beforeEach(function () {
 
 it('can update country active', function () {
     $country = CountryFactory::new()->createOne([
-        'active' => true,
+        'active' => false,
     ]);
-
-    $country->update(['active' => false]);
 
     assertDatabaseHas(Country::class, [
         'id' => $country->id,

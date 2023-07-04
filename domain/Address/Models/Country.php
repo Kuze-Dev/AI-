@@ -6,9 +6,6 @@ namespace Domain\Address\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
 use Illuminate\Support\Str;
 
 /**
@@ -46,9 +43,6 @@ use Illuminate\Support\Str;
  */
 class Country extends Model
 {
-    use SoftDeletes;
-    use HasSlug;
-
     protected $fillable = [
         'code',
         'name',
@@ -64,16 +58,7 @@ class Country extends Model
 
     public function getRouteKeyName(): string
     {
-        return 'slug';
-    }
-
-    public function getSlugOptions(): SlugOptions
-    {
-        return SlugOptions::create()
-            ->generateSlugsFrom('name')
-            ->preventOverwrite()
-            ->doNotGenerateSlugsOnUpdate()
-            ->saveSlugsTo($this->getRouteKeyName());
+        return 'code';
     }
 
     public static function generateRouteUrl(Model $model, array $attributes): string
