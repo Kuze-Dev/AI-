@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\HttpTenantApi\Controllers\Discount;
 
 use App\Features\ECommerce\ECommerceBase;
@@ -7,7 +9,6 @@ use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\DiscountResource;
 use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
-use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Discount\Database\Factories;
 
 use Domain\Discount\Models\DiscountRequirement;

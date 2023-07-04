@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Discount\Database\Seeders;
 
 use Domain\Discount\Database\Factories\DiscountConditionFactory;

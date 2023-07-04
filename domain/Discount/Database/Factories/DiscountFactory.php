@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Discount\Database\Factories;
 
 use Domain\Discount\Models\Discount;
 use Illuminate\Database\Eloquent\Factories\Factory;
-
 
 class DiscountFactory extends Factory
 {

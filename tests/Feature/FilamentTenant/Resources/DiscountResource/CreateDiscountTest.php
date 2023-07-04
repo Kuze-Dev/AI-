@@ -2,14 +2,10 @@
 
 declare(strict_types=1);
 
-use App\FilamentTenant\Resources\ContentResource\Pages\CreateContent;
 use App\FilamentTenant\Resources\DiscountResource\Pages\CreateDiscount;
-use Domain\Blueprint\Database\Factories\BlueprintFactory;
-use Domain\Content\Models\Content;
 use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
 use Domain\Discount\Models\DiscountCondition;
-use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -74,6 +70,5 @@ it('can create discount', function () {
         'minimum_amount' => 1000,
     ]);
 
-
 })
-->only();
+    ->only();

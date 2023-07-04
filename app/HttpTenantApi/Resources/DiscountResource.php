@@ -29,7 +29,7 @@ class DiscountResource extends JsonApiResource
     {
         return [
             'discountCondition' => fn () => DiscountConditionResource::make($this->discountCondition),
-            'discountRequirement' => fn() => DiscountRequirementResource::make($this->discountRequirement)
+            'discountRequirement' => fn () => DiscountRequirementResource::make($this->discountRequirement),
         ];
     }
 }

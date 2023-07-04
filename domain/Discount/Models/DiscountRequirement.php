@@ -17,19 +17,24 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $discount_id
  * @property DiscountRequirementType|null $requirement_type
  * @property int|null $minimum_amount
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property DiscountAmountType $damount_type
  * @property-read \Domain\Discount\Models\Discount|null $discount
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountRequirement newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountRequirement newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|DiscountRequirement onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountRequirement query()
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountRequirement whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DiscountRequirement whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountRequirement whereDiscountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountRequirement whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountRequirement whereMinimumAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountRequirement whereRequirementType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountRequirement whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DiscountRequirement withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|DiscountRequirement withoutTrashed()
  * @mixin \Eloquent
  */
 class DiscountRequirement extends Model
