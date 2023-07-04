@@ -52,6 +52,11 @@ pipelines:
           - step: *check-format
           - step: *analyse
           - step: *test
+    develop-ecommerce:
+      - parallel:
+          - step: *check-format
+          - step: *analyse
+          - step: *test
     staging:
       - parallel:
           - step: *check-format

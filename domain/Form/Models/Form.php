@@ -24,12 +24,12 @@ use Spatie\Sluggable\SlugOptions;
  * @property string $name
  * @property string $slug
  * @property bool $store_submission
- * @property int $uses_captcha
+ * @property bool $uses_captcha
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read Blueprint $blueprint
+ * @property-read Blueprint|null $blueprint
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Form\Models\FormEmailNotification> $formEmailNotifications
  * @property-read int|null $form_email_notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Form\Models\FormSubmission> $formSubmissions

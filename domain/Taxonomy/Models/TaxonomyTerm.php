@@ -33,7 +33,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property-read int|null $children_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ContentEntry> $contentEntries
  * @property-read int|null $content_entries_count
- * @property-read \Domain\Taxonomy\Models\Taxonomy $taxonomy
+ * @property-read \Domain\Taxonomy\Models\Taxonomy|null $taxonomy
  * @method static Builder|TaxonomyTerm newModelQuery()
  * @method static Builder|TaxonomyTerm newQuery()
  * @method static Builder|TaxonomyTerm ordered(string $direction = 'asc')
