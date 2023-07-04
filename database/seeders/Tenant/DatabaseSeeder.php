@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
             Auth\RoleSeeder::class,
             Auth\AdminSeeder::class,
             Page\PageSeeder::class,
-            Customer\TierSeeder::class,
+            Tier\TierSeeder::class,
         ]);
     }
 }

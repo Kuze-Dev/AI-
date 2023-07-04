@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Database\Seeders\Tenant\Customer;
+namespace Database\Seeders\Tenant\Tier;
 
 use Domain\Tier\Database\Factories\TierFactory;
 use Illuminate\Database\Seeder;
