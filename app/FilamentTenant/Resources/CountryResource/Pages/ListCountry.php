@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\FilamentTenant\Resources\AddressResource\CountryResource\Pages;
+namespace App\FilamentTenant\Resources\CountryResource\Pages;
 
-use App\FilamentTenant\Resources\AddressResource\CountryResource;
+use App\FilamentTenant\Resources\CountryResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 

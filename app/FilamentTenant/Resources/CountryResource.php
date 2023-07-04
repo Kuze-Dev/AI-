@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\FilamentTenant\Resources\AddressResource;
+namespace App\FilamentTenant\Resources;
 
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Address\Models\Country;
@@ -10,7 +10,7 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Exception;
-use App\FilamentTenant\Resources\AddressResource\CountryResource\Pages;
+use App\FilamentTenant\Resources\CountryResource\Pages;
 
 class CountryResource extends Resource
 {
@@ -66,13 +66,6 @@ class CountryResource extends Resource
                         '1' => 'Active',
                         '0' => 'Inactive',
                     ]),
-            ])
-
-            ->actions([
-                Tables\Actions\ViewAction::make()->url(function (Country $record) {
-                    return StateResource::getUrl().'?'.http_build_query(['tableFilters' => ['country_id' => ['value' => $record->getKey()]]]);
-                }),
-
             ])
             ->bulkActions([])
             ->defaultSort('id', 'asc');
