@@ -20,6 +20,7 @@ use Domain\Form\Models\FormSubmission;
 use Domain\Globals\Models\Globals;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
+use Domain\Taxation\Models\TaxZone;
 use Support\Captcha\CaptchaManager;
 use Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Models\Taxonomy;
@@ -75,6 +76,7 @@ class AppServiceProvider extends ServiceProvider
             Discount::class,
             DiscountRequirement::class,
             DiscountCondition::class,
+            TaxZone::class,
         ]);
 
         Password::defaults(
