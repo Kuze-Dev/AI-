@@ -21,9 +21,7 @@ class CurrencyFactory extends Factory
         return [
             'code' => $this->faker->unique()->word(),
             'name' => $this->faker->unique()->name(),
-            'exchange_rate' => $this->faker->boolean()
-                ? Arr::random(range(10, 100, 0.1))
-                : null,
+            'exchange_rate' => Arr::random(range(10, 100, 0.1222)),
             'enabled' => $this->faker->boolean(),
             'default' => $this->faker->boolean(),
         ];

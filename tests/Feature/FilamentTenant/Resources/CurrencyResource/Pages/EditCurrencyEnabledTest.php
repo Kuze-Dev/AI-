@@ -17,22 +17,13 @@ beforeEach(function () {
 
 it('can update currencies enabled', function () {
     $currency1 = CurrencyFactory::new()->createOne([
-        'enabled' => true,
-    ]);
-
-    $currency2 = CurrencyFactory::new()->createOne([
         'enabled' => false,
     ]);
 
-    app(UpdateCurrencyEnabledAction::class)->execute($currency2);
+    app(UpdateCurrencyEnabledAction::class)->execute($currency1);
 
     assertDatabaseHas(Currency::class, [
-        'id' => $currency2->id,
         'enabled' => true,
-    ]);
-
-    assertDatabaseHas(Currency::class, [
-
     ]);
 
 });

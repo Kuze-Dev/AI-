@@ -39,6 +39,7 @@ class PermissionSeeder extends BasePermissionSeeder
                 ...$this->generateFilamentResourcePermissions('content', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('contentEntry', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('globals', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('currency', except: ['deleteAny']),
             ],
         ];
     }

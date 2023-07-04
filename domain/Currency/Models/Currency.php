@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Domain\Currency\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Domain\Currency\Models\Currency
@@ -38,8 +37,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Currency extends Model
 {
-    use SoftDeletes;
-
     protected $fillable = [
         'code',
         'name',

@@ -19,7 +19,6 @@ class DatabaseSeeder extends Seeder
             Auth\AdminSeeder::class,
             Page\PageSeeder::class,
             Currency\CurrencySeeder::class,
-
         ]);
     }
 }
