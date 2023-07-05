@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Settings\FormSettings;
+use Domain\Address\Models\Country;
+use Domain\Address\Models\State;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Menu\Models\Menu;
@@ -79,6 +81,8 @@ class AppServiceProvider extends ServiceProvider
             DiscountRequirement::class,
             DiscountCondition::class,
             TaxZone::class,
+            Country::class,
+            State::class,
         ]);
 
         Password::defaults(

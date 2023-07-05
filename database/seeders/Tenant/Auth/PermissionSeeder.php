@@ -40,6 +40,7 @@ class PermissionSeeder extends BasePermissionSeeder
                 ...$this->generateFilamentResourcePermissions('contentEntry', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('globals', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('taxZone', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('country', only: ['viewAny', 'update']),
             ],
         ];
     }

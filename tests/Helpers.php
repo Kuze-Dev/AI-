@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 use App\Features\CMS\CMSBase;
 use App\Features\ECommerce\ECommerceBase;
+<<<<<<< HEAD
+=======
+use Database\Seeders\Tenant\Auth\PermissionSeeder;
+use Database\Seeders\Tenant\Auth\RoleSeeder;
+>>>>>>> e2f835f3661e13775379cdbd6500682476449378
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
 use Domain\Tenant\Database\Factories\TenantFactory;
@@ -16,6 +21,7 @@ use Spatie\Activitylog\ActivitylogServiceProvider;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\seed;
 
 function loginAsSuperAdmin(Admin $admin = null): Admin
 {
@@ -76,6 +82,11 @@ function testInTenantContext(): Tenant
     URL::forceRootUrl(Request::getScheme() . '://' . $domain);
 
     tenancy()->initialize($tenant);
+
+    seed([
+        PermissionSeeder::class,
+        RoleSeeder::class,
+    ]);
 
     return $tenant;
 }
