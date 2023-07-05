@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Fixtures;
 
-use Domain\Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
-use Domain\Support\RouteUrl\HasRouteUrl;
+use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
+use Support\RouteUrl\HasRouteUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 

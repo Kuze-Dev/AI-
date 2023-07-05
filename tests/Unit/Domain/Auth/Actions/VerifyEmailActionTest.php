@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Domain\Auth\Actions\VerifyEmailAction;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Event;
+use Pest\Mock\Mock;
 use Tests\Fixtures\User;
 
 beforeEach(function () {
@@ -12,10 +13,8 @@ beforeEach(function () {
 });
 
 it('can verify email', function () {
-    $user = mock(new User([
-        'id' => 1,
-        'email' => 'test@user',
-    ]))->expect(markEmailAsVerified: fn () => true);
+    $user = (new Mock(new User(['id' => 1, 'email' => 'test@user'])))
+        ->expect(markEmailAsVerified: fn () => true);
 
     $result = app(VerifyEmailAction::class)->execute($user);
 

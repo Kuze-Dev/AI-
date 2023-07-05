@@ -6,9 +6,9 @@ namespace Domain\Content\Actions;
 
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\ContentEntry;
-use Domain\Support\MetaData\Actions\CreateMetaDataAction;
-use Domain\Support\MetaData\Actions\UpdateMetaDataAction;
-use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
+use Support\MetaData\Actions\CreateMetaDataAction;
+use Support\MetaData\Actions\UpdateMetaDataAction;
+use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
 class UpdateContentEntryAction
 {
