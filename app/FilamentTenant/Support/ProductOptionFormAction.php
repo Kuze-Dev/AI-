@@ -21,7 +21,10 @@ class ProductOptionFormAction extends Action
     private function generateCombinations($options, $current = [], $index = 0, $result = [])
     {
         if ($index === count($options)) {
-            $result[] = $current;
+            $result[] = [
+                'id' => uniqid(), // Add a unique ID
+                'data' => $current,
+            ];
 
             return $result;
         }
@@ -54,7 +57,7 @@ class ProductOptionFormAction extends Action
                 return trans('Edit :label', ['label' => $productOptionComponent->getItemLabel($state) ?? $name]);
             }
 
-            return trans('Add :name', ['name' => $name]);
+            return trans('Manage :name', ['name' => $name]);
         });
 
         $this->slideOver(true);
@@ -83,6 +86,7 @@ class ProductOptionFormAction extends Action
             $oldData = data_get($livewire, $activeProductOptionStatePath) ?? [];
             data_set($livewire, $activeProductOptionStatePath, array_merge($oldData, $data));
             data_set($livewire, 'data.product_variants', $productVariants);
+            // dd($livewire);
             $livewire->unmountProductOptionItem();
         });
     }

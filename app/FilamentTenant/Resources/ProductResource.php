@@ -95,7 +95,7 @@ class ProductResource extends Resource
                                         ->label('Height'),
                                 ])->columns(3),
                         ]),
-                    Forms\Components\Section::make(trans('Variants (work in progress)'))->schema([
+                    Forms\Components\Section::make(trans('Variant (work in progress)'))->schema([
                         // For Manage Variant
                         ProductOptionSupport::make('product_options')
                             ->formatStateUsing(fn () => [])
@@ -133,7 +133,7 @@ class ProductResource extends Resource
                                     ->maxItems(2)
                                     ->collapsible(),
                             ])->hiddenOn('create'),
-                        // ProductVariant::make('product_variants'),
+                        ProductVariant::make('product_variants'),
                         // Forms\Components\TextInput::make('product_variants')
                     ]),
                     Forms\Components\Section::make('Inventory')
