@@ -23,6 +23,7 @@ use Domain\Page\Models\Block;
 use Domain\Taxation\Models\TaxZone;
 use Support\Captcha\CaptchaManager;
 use Support\MetaData\Models\MetaData;
+use Domain\Product\Models\Product;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\MissingAttributeException;
@@ -67,6 +68,7 @@ class AppServiceProvider extends ServiceProvider
             Form::class,
             FormSubmission::class,
             FormEmailNotification::class,
+            Product::class,
             Taxonomy::class,
             TaxonomyTerm::class,
             Content::class,
@@ -101,7 +103,7 @@ class AppServiceProvider extends ServiceProvider
 
         JsonApiResource::resolveIdUsing(fn (Model $resource): string => (string) $resource->getRouteKey());
 
-        CaptchaManager::resolveProviderUsing(
+        CaptchaManager ::resolveProviderUsing(
             fn () => tenancy()->initialized
                 ? app(FormSettings::class)->provider
                 : config('catpcha.provider')
