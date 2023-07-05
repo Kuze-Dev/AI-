@@ -27,7 +27,7 @@ class SearchController
                 ? explode(',', $request->filter['models'])
                 : self::SEARCHABLE_MODELS,
             function (array $results, string $model) use ($request) {
-                if (!method_exists($this, $method = 'get' . Str::of($model)->studly() . 'Results')) {
+                if ( ! method_exists($this, $method = 'get' . Str::of($model)->studly() . 'Results')) {
                     throw new BadMethodCallException("Searching for `{$model}` may be invalid or not yet implemented.");
                 }
 
