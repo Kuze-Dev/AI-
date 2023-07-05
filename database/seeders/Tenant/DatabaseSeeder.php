@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             Product\ProductSeeder::class,
             Address\CountrySeeder::class,
             Currency\CurrencySeeder::class,
+            Tier\TierSeeder::class,
         ]);
     }
 }
