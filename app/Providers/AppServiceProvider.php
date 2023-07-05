@@ -103,7 +103,7 @@ class AppServiceProvider extends ServiceProvider
 
         JsonApiResource::resolveIdUsing(fn (Model $resource): string => (string) $resource->getRouteKey());
 
-        CaptchaManager ::resolveProviderUsing(
+        CaptchaManager::resolveProviderUsing(
             fn () => tenancy()->initialized
                 ? app(FormSettings::class)->provider
                 : config('catpcha.provider')
