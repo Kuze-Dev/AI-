@@ -75,6 +75,8 @@ class ProductFactory extends Factory
             $productImageUrl = $productData['image_url'];
             unset($productData['image_url']);
             $product = Product::create($productData);
+            // Just to clear residual images of previous product
+            $product->clearMediaCollection('image');
 
             $response = Http::get($productImageUrl);
             if ($response->successful()) {

@@ -5,12 +5,23 @@ declare(strict_types=1);
 namespace Database\Seeders\Tenant\Product;
 
 use Domain\Product\Database\Factories\ProductFactory;
+use Domain\Product\Models\Product;
+use Domain\Product\Models\ProductOption;
+use Domain\Product\Models\ProductOptionValue;
+use Domain\Product\Models\ProductVariant;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class ProductSeeder extends Seeder
 {
     public function run(): void
     {
+        ProductOptionValue::truncate();
+        ProductOption::truncate();
+        ProductVariant::truncate();
+        DB::table('product_taxonomy_term')->truncate();
+        Product::truncate();
+
         (new ProductFactory())->seedData();
     }
 

@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Support\MetaDataForm;
-use App\FilamentTenant\Support\Tree;
+use App\FilamentTenant\Support\ProductOption as ProductOptionSupport;
+use App\FilamentTenant\Support\ProductVariant;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Product\Models\Product;
 use Filament\Resources\Form;
@@ -74,7 +75,6 @@ class ProductResource extends Resource
 
                             Forms\Components\Fieldset::make('dimension')
                                 ->label('Dimension')
-                                ->dehydrateStateUsing(fn ($state) => dd($state))
                                 ->schema([
                                     Forms\Components\TextInput::make('length')
                                         ->numeric()
@@ -95,9 +95,9 @@ class ProductResource extends Resource
                                         ->label('Height'),
                                 ])->columns(3),
                         ]),
-                    Forms\Components\Section::make(trans('Variants'))->schema([
+                    Forms\Components\Section::make(trans('Variants (work in progress)'))->schema([
                         // For Manage Variant
-                        Tree::make('manage_variants')
+                        ProductOptionSupport::make('product_options')
                             ->formatStateUsing(fn () => [])
                             ->itemLabel(fn (array $state) => $state['name'] ?? null)
                             ->schema([
@@ -133,63 +133,8 @@ class ProductResource extends Resource
                                     ->maxItems(2)
                                     ->collapsible(),
                             ])->hiddenOn('create'),
-
-                        // Reference: Block & Taxonomy
-                        Tree::make('variants')
-                            ->formatStateUsing(
-                                fn () => []
-                            )
-                            ->itemLabel(fn (array $state) => $state['name'] ?? null)
-                            ->schema([
-                                Forms\Components\Group::make()
-                                    ->schema([
-                                        Forms\Components\TextInput::make('size')
-                                            ->required()
-                                            ->unique(ignoreRecord: true),
-                                        Forms\Components\TextInput::make('color')
-                                            ->required()
-                                            ->unique(ignoreRecord: true),
-                                    ])->columns(2),
-                                Forms\Components\Section::make('Inventory & Shipping')
-                                    ->schema([
-                                        Forms\Components\TextInput::make('sku')
-                                            ->unique(ignoreRecord: true)
-                                            ->required(),
-                                        Forms\Components\TextInput::make('stock')
-                                            ->numeric()
-                                            ->dehydrateStateUsing(fn ($state) => (int) $state)
-                                            ->required(),
-                                    ])->columns(2),
-                                Forms\Components\Section::make('Pricing')
-                                    ->schema([
-                                        Forms\Components\TextInput::make('retail_price')
-                                            ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
-                                                prefix: '$',
-                                                thousandsSeparator: ',',
-                                                decimalPlaces: 2,
-                                                isSigned: false
-                                            ))
-                                            ->dehydrateStateUsing(fn ($state) => (float) $state)
-                                            ->required(),
-
-                                        Forms\Components\TextInput::make('selling_price')
-                                            ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
-                                                prefix: '$',
-                                                thousandsSeparator: ',',
-                                                decimalPlaces: 2,
-                                                isSigned: false
-                                            ))
-                                            ->dehydrateStateUsing(fn ($state) => (float) $state)
-                                            ->required(),
-
-                                        Forms\Components\Toggle::make('status')
-                                            ->label(
-                                                fn ($state) => $state ? 'Active' : 'Inactive'
-                                            )
-                                            ->helperText('This product will be hidden from all sales channels.'),
-
-                                    ])->columns(2),
-                            ])->hiddenOn('create'),
+                        // ProductVariant::make('product_variants'),
+                        // Forms\Components\TextInput::make('product_variants')
                     ]),
                     Forms\Components\Section::make('Inventory')
                         ->schema([
@@ -281,7 +226,8 @@ class ProductResource extends Resource
                         fn (Product $record) => $record->getFirstMedia('image') === null
                             ? 'https://via.placeholder.com/500x300/333333/fff?text=No+preview+available'
                             : null
-                    ),
+                    )
+                    ->extraImgAttributes(['class' => 'aspect-[5/3] object-fill']),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),

@@ -26,6 +26,7 @@ class ProductController
                     'productOptions',
                     'productVariants',
                     'taxonomyTerms',
+                    'media',
                 ])
                 ->allowedFilters(['name', 'slug', 'is_digital_product', 'is_special_offer', 'is_featured', 'status'])
                 ->jsonPaginate()
@@ -40,6 +41,7 @@ class ProductController
                     'productOptions',
                     'productVariants',
                     'taxonomyTerms',
+                    'media',
                 ])
                 ->firstOrFail()
         );

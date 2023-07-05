@@ -6,9 +6,11 @@ namespace App\FilamentTenant\Resources\ProductResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ProductResource;
-use App\FilamentTenant\Support\Concerns\HasTrees;
-use App\FilamentTenant\Support\Contracts\HasTrees as HasTreesContract;
-use App\FilamentTenant\Support\TreeFormAction;
+use App\FilamentTenant\Support\Concerns\HasProductOptions;
+use App\FilamentTenant\Support\Concerns\HasProductVariants;
+use App\FilamentTenant\Support\Contracts\HasProductOptions as HasProductOptionsContracts;
+use App\FilamentTenant\Support\Contracts\HasProductVariants as HasProductVariantsContracts;
+use App\FilamentTenant\Support\ProductOptionFormAction;
 use Domain\Product\Actions\UpdateProductAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Filament\Pages\Actions;
@@ -18,9 +20,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class EditProduct extends EditRecord implements HasTreesContract
+class EditProduct extends EditRecord implements HasProductVariantsContracts, HasProductOptionsContracts
 {
-    use HasTrees;
+    use HasProductVariants;
+    use HasProductOptions;
     use LogsFormActivity;
 
     protected static string $resource = ProductResource::class;
@@ -32,7 +35,7 @@ class EditProduct extends EditRecord implements HasTreesContract
                 ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
-            TreeFormAction::make(),
+            ProductOptionFormAction::make(),
             Actions\DeleteAction::make(),
         ];
     }
