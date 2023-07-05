@@ -39,8 +39,8 @@ class ProductFactory extends Factory
     {
         $blueprint = Blueprint::where('name', 'Image with Heading Block Blueprint')->first();
         $data = (new ProductSeeder())->data();
-        
-        if (!$blueprint) {
+
+        if ( ! $blueprint) {
             $blueprint = Blueprint::create($data['blueprint_for_taxonomy']);
         }
 
