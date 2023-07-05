@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Taxation\Models;
 
+use Domain\Address\Models\Country;
+use Domain\Address\Models\State;
 use Domain\Taxation\Enums\PriceDisplay;
 use Domain\Taxation\Enums\TaxZoneType;
 use Illuminate\Database\Eloquent\Model;
@@ -41,13 +43,15 @@ class TaxZone extends Model
             ->dontSubmitEmptyLogs();
     }
 
+    /** @return BelongsToMany<Country> */
     public function countries(): BelongsToMany
     {
-        return $this->belongsToMany(''); // TODO: Set relations
+        return $this->belongsToMany(Country::class, 'tax_zone_country');
     }
 
+    /** @return BelongsToMany<State> */
     public function states(): BelongsToMany
     {
-        return $this->belongsToMany(''); // TODO: Set relations
+        return $this->belongsToMany(State::class, 'tax_zone_state');
     }
 }

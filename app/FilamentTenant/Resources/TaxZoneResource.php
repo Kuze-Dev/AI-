@@ -8,6 +8,8 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources\TaxZoneResource\Pages;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
+use Domain\Address\Models\Country;
+use Domain\Address\Models\State;
 use Domain\Taxation\Enums\PriceDisplay;
 use Domain\Taxation\Enums\TaxZoneType;
 use Domain\Taxation\Models\TaxZone;
@@ -73,6 +75,8 @@ class TaxZoneResource extends Resource
                         Forms\Components\Fieldset::make(trans('Countries'))
                             ->schema([
                                 Forms\Components\CheckboxList::make('countries')
+                                    ->options(Country::pluck('name', 'id'))
+                                    ->formatStateUsing(fn (?TaxZone $record) => $record?->countries->modelKeys() ?? [])
                                     ->bulkToggleable()
                                     ->searchable()
                                     ->disableLabel()
@@ -88,10 +92,20 @@ class TaxZoneResource extends Resource
                             return $type === TaxZoneType::COUNTRY;
                         }),
                     Forms\Components\Group::make([
-                        Forms\Components\Select::make('country'),
+                        Forms\Components\Select::make('country')
+                            ->optionsFromModel(Country::class, 'name')
+                            ->preload()
+                            ->required()
+                            ->reactive(),
                         Forms\Components\Fieldset::make(trans('States/Provinces'))
                             ->schema([
                                 Forms\Components\CheckboxList::make('states')
+                                    ->options(
+                                        fn (Closure $get) => ($country = $get('country'))
+                                            ? State::whereCountryId($country)->pluck('name', 'id')
+                                            : []
+                                    )
+                                    ->formatStateUsing(fn (?TaxZone $record) => $record?->states->modelKeys() ?? [])
                                     ->bulkToggleable()
                                     ->searchable()
                                     ->disableLabel()

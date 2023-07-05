@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use Domain\Address\Models\Country;
+use Domain\Address\Models\State;
+use Domain\Taxation\Models\TaxZone;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -21,6 +24,16 @@ return new class () extends Migration {
             $table->decimal('percentage', 7, 3);
 
             $table->timestamps();
+        });
+
+        Schema::create('tax_zone_country', function (Blueprint $table) {
+            $table->foreignIdFor(TaxZone::class)->index();
+            $table->foreignIdFor(Country::class)->index();
+        });
+
+        Schema::create('tax_zone_state', function (Blueprint $table) {
+            $table->foreignIdFor(TaxZone::class)->index();
+            $table->foreignIdFor(State::class)->index();
         });
     }
 

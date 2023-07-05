@@ -27,7 +27,7 @@ class CreateTaxZoneAction
             'percentage' => $taxZoneData->percentage,
         ]);
 
-        // $this->syncTaxZoneByType($taxZone, $taxZoneData); // TODO: uncomment when relations have been established
+        $this->syncTaxZoneByType($taxZone, $taxZoneData);
 
         return $taxZone;
     }
