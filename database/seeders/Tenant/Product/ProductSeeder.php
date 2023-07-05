@@ -226,6 +226,50 @@ class ProductSeeder extends Seeder
                     ],
                 ],
             ],
+            'blueprint_for_taxonomy' => [
+                "name" => "Image with Heading Block Blueprint",
+                "schema" => [
+                    'sections' => [
+                        [
+
+                            "title" => "Main",
+                            "fields" => [
+                                [
+                                    "max" => null,
+                                    "min" => null,
+                                    "step" => null,
+                                    "type" => "text",
+                                    "rules" => [
+                                        "required",
+                                        "string"
+                                    ],
+                                    "title" => "Heading",
+                                    "max_length" => null,
+                                    "min_length" => null,
+                                    "state_name" => "heading"
+                                ],
+                                [
+                                    "type" => "file",
+                                    "rules" => [
+                                        "required",
+                                        "image"
+                                    ],
+                                    "title" => "Image",
+                                    "accept" => [],
+                                    "reorder" => false,
+                                    "max_size" => null,
+                                    "min_size" => null,
+                                    "multiple" => false,
+                                    "max_files" => null,
+                                    "min_files" => null,
+                                    "state_name" => "image"
+                                ]
+                            ],
+                            "state_name" => "main"
+                        ],
+                    ],
+                ],
+            ]
         ];
     }
 }

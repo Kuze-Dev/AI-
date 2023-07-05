@@ -37,9 +37,12 @@ class ProductFactory extends Factory
 
     public function seedData(): void
     {
-        $blueprint = Blueprint::where('name', 'Image with Heading Block Blueprint')->firstOrFail();
-
+        $blueprint = Blueprint::where('name', 'Image with Heading Block Blueprint')->first();
         $data = (new ProductSeeder())->data();
+        
+        if (!$blueprint) {
+            $blueprint = Blueprint::create($data['blueprint_for_taxonomy']);
+        }
 
         $this->seedTaxonomies($data['taxonomies'], $blueprint);
         $this->seedProducts($data['products'], $data['product_options'], $data['variant_combinations']);
