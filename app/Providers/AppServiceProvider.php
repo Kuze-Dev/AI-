@@ -83,6 +83,7 @@ class AppServiceProvider extends ServiceProvider
             TaxZone::class,
             Country::class,
             State::class,
+            Currency::class,
         ]);
 
         Password::defaults(

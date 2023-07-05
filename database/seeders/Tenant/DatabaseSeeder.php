@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             DiscountSeeder::class,
             Product\ProductSeeder::class,
             Address\CountrySeeder::class,
+            Currency\CurrencySeeder::class,
         ]);
     }
 }
