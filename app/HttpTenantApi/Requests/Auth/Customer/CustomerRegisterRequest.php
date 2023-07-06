@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Requests\Auth\Customer;
 
 use Domain\Address\DataTransferObjects\AddressData;
+use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\State;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\DataTransferObjects\CustomerRegisterData;
@@ -40,7 +41,7 @@ class CustomerRegisterRequest extends FormRequest
             'shipping_address_line_1' => 'required|string|max:255',
             'shipping_zip_code' => 'required|string|max:255',
             'shipping_city' => 'required|string|max:255',
-            'shipping_label_as' => 'required|in:home,office',
+            'shipping_label_as' => ['required', Rule::enum(AddressLabelAs::class)],
 
             // billing address
             'billing_same_as_shipping' => 'required|bool',
@@ -51,7 +52,7 @@ class CustomerRegisterRequest extends FormRequest
             'billing_address_line_1' => 'required_if:billing_same_as_shipping,0|string|max:255',
             'billing_zip_code' => 'required_if:billing_same_as_shipping,0|string|max:255',
             'billing_city' => 'required_if:billing_same_as_shipping,0|string|max:255',
-            'billing_label_as' => 'required_if:billing_same_as_shipping,0|in:home,office',
+            'billing_label_as' => ['required_if:billing_same_as_shipping,0', Rule::enum(AddressLabelAs::class)],
         ];
     }
 

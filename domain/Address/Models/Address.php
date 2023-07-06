@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Address\Models;
 
+use Domain\Address\Enums\AddressLabelAs;
 use Domain\Customer\Models\Customer;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -18,7 +19,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property int $id
  * @property int $customer_id
  * @property int $state_id
- * @property string $label_as
+ * @property AddressLabelAs $label_as
  * @property string $address_line_1
  * @property string $zip_code
  * @property string $city
@@ -62,6 +63,7 @@ class Address extends Model
     ];
 
     protected $casts = [
+        'label_as' => AddressLabelAs::class,
         'is_default_billing' => 'bool',
         'is_default_shipping' => 'bool',
     ];
