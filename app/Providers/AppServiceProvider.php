@@ -31,8 +31,6 @@ use Support\Captcha\CaptchaManager;
 use Support\MetaData\Models\MetaData;
 use Domain\Product\Models\Product;
 use Domain\PaymentMethod\Models\PaymentMethod;
-use Support\Captcha\CaptchaManager;
-use Support\MetaData\Models\MetaData;
 use Domain\Payments\Models\Payment;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
@@ -86,7 +84,6 @@ class AppServiceProvider extends ServiceProvider
             ContentEntry::class,
             Globals::class,
             MetaData::class,
-<<<<<<< HEAD
             Discount::class,
             DiscountRequirement::class,
             DiscountCondition::class,
@@ -97,10 +94,8 @@ class AppServiceProvider extends ServiceProvider
             Tier::class,
             Customer::class,
             Address::class,
-=======
             PaymentMethod::class,
             Payment::class,
->>>>>>> feature/payment-gateway
         ]);
 
         Password::defaults(
