@@ -85,6 +85,80 @@ class CartController extends Controller
             ]);
     }
 
+    #[Delete('/items/{cartLineId}', name: 'cart.items.{cartLineId}')]
+    public function delete(int $cartLineId)
+    {
+        try {
+            $cartLine = CartLine::findOrFail($cartLineId);
+
+            $cartLine->delete();
+
+            return response()
+                ->json([
+                    'message' => 'Cart item Deleted Successfully',
+                ]);
+        } catch (ModelNotFoundException $e) {
+            return response()
+                ->json([
+                    'error' => 'Cart item not found',
+                ], 404);
+        }
+    }
+
+    #[Delete('/clear/{cartId}', name: 'cart.clear.{cartId}')]
+    public function clear(int $cartId)
+    {
+        try {
+            $cart = Cart::findOrFail($cartId);
+
+            $cart->delete();
+
+            return response()
+                ->json([
+                    'message' => 'Cart Cleared Successfully',
+                ]);
+        } catch (ModelNotFoundException $e) {
+            return response()
+                ->json([
+                    'error' => 'Cart not found',
+                ], 404);
+        }
+    }
+
+    #[Post('/bulk-remove', name: 'cart.bulk-remove')]
+    public function bulkRemove(Request $request)
+    {
+        $cartLineIds = $request->input('cart_line_ids');
+
+        try {
+            $cartLines = CartLine::whereIn('id', $cartLineIds)
+                // ->whereHas('cart', function ($query) use ($customer) {
+                //     $query->where('customer_id', $customer->id);
+                // })
+                ->get();
+
+            if (count($cartLineIds) !== $cartLines->count()) {
+                throw new ModelNotFoundException;
+            }
+
+            $cartLines = CartLine::whereIn('id', $cartLineIds)->get();
+
+            $cartLines->each(function ($cartLine) {
+                $cartLine->delete();
+            });
+
+            return response()
+                ->json([
+                    'message' => 'Cart lines Deleted Successfully',
+                ]);
+        } catch (ModelNotFoundException $e) {
+            return response()
+                ->json([
+                    'error' => 'Cart lines not found',
+                ], 404);
+        }
+    }
+
     #[Patch('/items/quantity/{cartLineId}', name: 'cart.items.quantity.{cartLineId}')]
     public function update(CartQuantityUpdateRequest $request)
     {
