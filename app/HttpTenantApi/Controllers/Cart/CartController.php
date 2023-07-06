@@ -26,17 +26,23 @@ use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Delete;
 use Spatie\RouteAttributes\Attributes\Patch;
+use Spatie\RouteAttributes\Attributes\Middleware;
+use Illuminate\Database\Eloquent\Builder;
 
 #[
     Prefix('carts'),
+    Middleware(['auth:sanctum'])
 ]
 class CartController extends Controller
 {
+
     #[Get('/{cartId}', name: 'cart.show.{cartId}')]
     public function show(int $cartId)
     {
         try {
-            Cart::findOrFail($cartId);
+            $customerId = auth()->user()->id;
+
+            Cart::where('id', $cartId)->whereCustomerId($customerId)->firstOrFail();
 
             return CartLineResource::collection(
                 QueryBuilder::for(
@@ -59,6 +65,8 @@ class CartController extends Controller
     {
         $validatedData = $request->validated();
 
+        $validatedData['customer_id'] = auth()->user()->id;
+
         $result = app(CartStoreAction::class)
             ->execute(CartStoreData::fromArray($validatedData));
 
@@ -79,7 +87,14 @@ class CartController extends Controller
     public function delete(int $cartLineId)
     {
         try {
-            $cartLine = CartLine::findOrFail($cartLineId);
+            $customerId = auth()->user()->id;
+
+            $cartLine = CartLine::whereHas(
+                'cart',
+                function (Builder $query) use ($customerId) {
+                    $query->whereCustomerId($customerId);
+                }
+            )->where('id', $cartLineId)->firstOrFail();
 
             $cartLine->delete();
 
@@ -90,7 +105,7 @@ class CartController extends Controller
         } catch (ModelNotFoundException $e) {
             return response()
                 ->json([
-                    'error' => 'Cart item not found',
+                    'error' => 'Cart line not found',
                 ], 404);
         }
     }
@@ -99,7 +114,9 @@ class CartController extends Controller
     public function clear(int $cartId)
     {
         try {
-            $cart = Cart::findOrFail($cartId);
+            $customerId = auth()->user()->id;
+
+            $cart =  Cart::where('id', $cartId)->whereCustomerId($customerId)->firstOrFail();
 
             $cart->delete();
 
@@ -118,13 +135,15 @@ class CartController extends Controller
     #[Post('/bulk-remove', name: 'cart.bulk-remove')]
     public function bulkRemove(Request $request)
     {
-        $cartLineIds = $request->input('cart_line_ids');
-
         try {
+            $cartLineIds = $request->input('cart_line_ids');
+
+            $customerId = auth()->user()->id;
+
             $cartLines = CartLine::whereIn('id', $cartLineIds)
-                // ->whereHas('cart', function ($query) use ($customer) {
-                //     $query->where('customer_id', $customer->id);
-                // })
+                ->whereHas('cart', function ($query) use ($customerId) {
+                    $query->whereCustomerId($customerId);
+                })
                 ->get();
 
             if (count($cartLineIds) !== $cartLines->count()) {
@@ -152,56 +171,66 @@ class CartController extends Controller
     #[Patch('/items/quantity/{cartLineId}', name: 'cart.items.quantity.{cartLineId}')]
     public function update(CartQuantityUpdateRequest $request)
     {
-        $validatedData = $request->validated();
+        try {
+            $validatedData = $request->validated();
 
-        $payload = CartQuantityUpdateData::fromArray($validatedData);
+            $payload = CartQuantityUpdateData::fromArray($validatedData);
 
-        $result = app(CartQuantityUpdateAction::class)
-            ->execute($payload);
+            $result = app(CartQuantityUpdateAction::class)
+                ->execute($payload);
 
-        if ($result instanceof CartLine) {
+            if ($result instanceof CartLine) {
+                return response()
+                    ->json([
+                        'message' => 'Cart quantity updated successfully'
+                        // 'data' => $result,
+                    ]);
+            }
+        } catch (ModelNotFoundException $e) {
             return response()
                 ->json([
-                    'message' => 'Cart quantity updated successfully'
-                    // 'data' => $result,
-                ]);
+                    'error' => 'Cart line not found',
+                ], 404);
         }
-
-        return response()->json([
-            'error' => 'Bad Request',
-            'message' => $result
-        ], 400);
     }
 
     #[Post('/items/notes', name: 'cart.items.notes')]
     public function updateNotes(CartNotesUpdateRequest $request)
     {
-        $validatedData = $request->validated();
+        try {
+            $validatedData = $request->validated();
 
-        $payload = CartNotesUpdateData::fromArray($validatedData);
+            $payload = CartNotesUpdateData::fromArray($validatedData);
 
-        $result = app(CartNotesUpdateAction::class)
-            ->execute($payload);
+            $result = app(CartNotesUpdateAction::class)
+                ->execute($payload);
 
-        if ($result instanceof CartLine) {
+            if ($result instanceof CartLine) {
+                return response()
+                    ->json([
+                        'message' => 'Notes updated successfully',
+                        // 'data' => $result,
+                    ]);
+            }
+        } catch (ModelNotFoundException $e) {
             return response()
                 ->json([
-                    'message' => 'Notes updated successfully',
-                    // 'data' => $result,
-                ]);
+                    'error' => 'Cart line not found',
+                ], 404);
         }
-
-        return response()->json([
-            'error' => 'Bad Request',
-            'message' => $result
-        ], 400);
     }
 
     #[Delete('/items/notes/{cartLineId}', name: 'cart.items.notes.{cartLineId}')]
     public function deleteNotesImage(int $cartLineId)
     {
         try {
-            $cartLine = CartLine::findOrFail($cartLineId);
+            $customerId = auth()->user()->id;
+
+            $cartLine = CartLine::where('id', $cartLineId)
+                ->whereHas('cart', function ($query) use ($customerId) {
+                    $query->whereCustomerId($customerId);
+                })
+                ->whereNull('checked_out_at')->firstOrFail();
 
             $cartLine->clearMediaCollection('cart_line_notes');
 
@@ -212,7 +241,7 @@ class CartController extends Controller
         } catch (ModelNotFoundException $e) {
             return response()
                 ->json([
-                    'error' => 'Cart item not found',
+                    'error' => 'Cart line not found',
                 ], 404);
         }
     }

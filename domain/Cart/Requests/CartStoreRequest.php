@@ -33,10 +33,10 @@ class CartStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'customer_id' => [
-                'required',
-                Rule::exists('customers', 'id'),
-            ],
+            // 'customer_id' => [
+            //     'required',
+            //     Rule::exists('customers', 'id'),
+            // ],
             'purchasable_id' => [
                 'required',
                 Rule::exists('products', 'id'),

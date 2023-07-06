@@ -8,12 +8,23 @@ use Domain\Cart\DataTransferObjects\CartQuantityUpdateData;
 use Domain\Cart\Models\CartLine;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CartQuantityUpdateAction
 {
     public function execute(CartQuantityUpdateData $cartLineData)
     {
-        $cartLine = CartLine::where('id', $cartLineData->cart_line_id)->whereNull('checked_out_at')->first();
+        $customerId = auth()->user()->id;
+
+        $cartLine = CartLine::where('id', $cartLineData->cart_line_id)
+            ->whereHas('cart', function ($query) use ($customerId) {
+                $query->whereCustomerId($customerId);
+            })
+            ->whereNull('checked_out_at')->first();
+
+        if (!$cartLine) {
+            throw new ModelNotFoundException;
+        }
 
         $product = null;
 
