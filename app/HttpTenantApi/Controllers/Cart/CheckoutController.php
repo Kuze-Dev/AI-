@@ -13,6 +13,8 @@ use Spatie\RouteAttributes\Attributes\Post;
 use Spatie\RouteAttributes\Attributes\Prefix;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Spatie\RouteAttributes\Attributes\Get;
+use Illuminate\Http\Request;
 
 #[
     Prefix('checkouts'),
@@ -44,8 +46,7 @@ class CheckoutController extends Controller
 
         CartLine::whereIn('id', $cartLineIds)
             ->update([
-                'checkout_reference' => $checkoutReference,
-                'checkout_expiration' => now()->addMinutes(20)
+                'checkout_reference' => $checkoutReference
             ]);
 
         return response()
@@ -54,5 +55,68 @@ class CheckoutController extends Controller
                 'purchasables_for_checkout' => $purchasablesForCheckout,
                 'reference' => $checkoutReference
             ]);
+    }
+
+    #[Get('/', 'checkouts')]
+    public function checkoutItems(Request $request)
+    {
+        $customerId = auth()->user()->id;
+
+        $reference = $request->input('reference');
+
+        if (!$reference) {
+            return response()->json([
+                'error' => 'Bad Request',
+                'message' => 'Invalid reference.'
+            ], 400);
+        }
+
+        $purchasableIds = json_decode($request->input('purchasable_ids', '[]'), true);
+
+        if (!is_array($purchasableIds)) {
+            $purchasableIds = [];
+        }
+
+        $cartLines = CartLine::with(["purchasable", "variant"])->whereHas('cart', function ($query) use ($customerId) {
+            $query->whereCustomerId($customerId);
+        })->whereIn('purchasable_id', $purchasableIds)
+            ->whereCheckoutReference($reference)
+            ->get();
+
+        if (count($cartLines) <= 0) {
+            return response()->json([
+                'error' => 'Bad Request',
+                'message' => 'Invalid cart line IDs.'
+            ], 400);
+        }
+
+        return $cartLines;
+
+
+
+
+        // $cartLines->each(function ($cartLine) {
+        //     $mediaCollection = $cartLine->getMedia('cart_line_notes');
+        //     $previewUrl = $mediaCollection->isEmpty() ? null : $mediaCollection->first()->getUrl('preview');
+        //     $cartLine->unsetRelation('media');
+        //     if ($previewUrl) {
+        //         $cartLine->notes_image = [
+        //             'preview_url' => $previewUrl,
+        //         ];
+        //     }
+
+        //     $productImageCollection = $cartLine->purchasable->getFirstMediaUrl('image');
+        //     $productImageUrl = $productImageCollection;
+        //     $cartLine->purchasable->unsetRelation('media');
+        //     if (!empty($productImageUrl)) {
+        //         $cartLine->purchasable->image = $productImageUrl;
+        //     }
+        // });
+
+        // return response()
+        //     ->json([
+        //         'message' => 'Cart Lines for checkout',
+        //         'data' => $cartLines
+        //     ]);
     }
 }
