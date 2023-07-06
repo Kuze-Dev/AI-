@@ -31,6 +31,8 @@ use Domain\Page\Models\Page;
 use Support\Captcha\CaptchaManager;
 use Support\MetaData\Models\MetaData;
 use Domain\Product\Models\Product;
+use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\Payments\Models\Payment;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tier\Models\Tier;
@@ -94,6 +96,8 @@ class AppServiceProvider extends ServiceProvider
             Customer::class,
             Address::class,
             CartLine::class,
+            PaymentMethod::class,
+            Payment::class,
         ]);
 
         Password::defaults(
