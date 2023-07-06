@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\Http\Controllers\Controller;
+use Domain\Cart\Actions\CartNotesUpdateAction;
 use Domain\Cart\Actions\CartQuantityUpdateAction;
 use Domain\Cart\Actions\CartStoreAction;
+use Domain\Cart\DataTransferObjects\CartNotesUpdateData;
 use Domain\Cart\DataTransferObjects\CartQuantityUpdateData;
 use Domain\Cart\DataTransferObjects\CartStoreData;
 use Domain\Cart\Enums\CartActionResult;
 use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
+use Domain\Cart\Requests\CartNotesUpdateRequest;
 use Domain\Cart\Requests\CartQuantityUpdateRequest;
 use Domain\Cart\Requests\CartStoreRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -79,6 +82,30 @@ class CartController extends Controller
             ->json([
                 'message' => 'Successfully Added to Cart',
             ]);
+    }
+
+    #[Post('/items/notes', name: 'cart.items.notes')]
+    public function updateNotes(CartNotesUpdateRequest $request)
+    {
+        $validatedData = $request->validated();
+
+        $payload = CartNotesUpdateData::fromArray($validatedData);
+
+        $result = app(CartNotesUpdateAction::class)
+            ->execute($payload);
+
+        if ($result instanceof CartLine) {
+            return response()
+                ->json([
+                    'message' => 'Notes updated successfully',
+                    // 'data' => $result,
+                ]);
+        }
+
+        return response()->json([
+            'error' => 'Bad Request',
+            'message' => $result
+        ], 400);
     }
 
     #[Patch('/items/quantity/{cartLineId}', name: 'cart.items.quantity.{cartLineId}')]

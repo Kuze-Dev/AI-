@@ -13,7 +13,7 @@ class CartQuantityUpdateAction
 {
     public function execute(CartQuantityUpdateData $cartLineData)
     {
-        $cartLine = CartLine::where('id', $cartLineData->cartLineId)->whereNull('checked_out_at')->first();
+        $cartLine = CartLine::where('id', $cartLineData->cart_line_id)->whereNull('checked_out_at')->first();
 
         $product = null;
 

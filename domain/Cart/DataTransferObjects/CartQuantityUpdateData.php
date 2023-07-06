@@ -7,7 +7,7 @@ namespace Domain\Cart\DataTransferObjects;
 class CartQuantityUpdateData
 {
     public function __construct(
-        public readonly int $cartLineId,
+        public readonly int $cart_line_id,
         public readonly string $action,
         public readonly ?int $quantity,
     ) {
@@ -16,7 +16,7 @@ class CartQuantityUpdateData
     public static function fromArray(array $data): self
     {
         return new self(
-            cartLineId: $data['cartLineId'],
+            cart_line_id: $data['cartLineId'],
             action: $data['action'],
             quantity: $data['quantity'] ?? null,
         );

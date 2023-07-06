@@ -13,34 +13,34 @@ use Illuminate\Support\Facades\DB;
 
 class CreateCartLineAction
 {
-    public function execute(Cart $cart, CartStoreData $cartStoreData): CartLine
+    public function execute(Cart $cart, CartStoreData $cartLineData): CartLine
     {
         DB::beginTransaction();
 
         try {
             $purchasableType = '';
 
-            match ($cartStoreData->purchasable_type) {
+            match ($cartLineData->purchasable_type) {
                 'Product' => $purchasableType = Product::class,
                 // 'Service' => $purchasableType = Service::class,
                 // 'Booking' => $purchasableType = Booking::class,
             };
 
-            $variant = ProductVariant::where('product_id', $cartStoreData->purchasable_id)
-                ->whereJsonContains('combination', $cartStoreData->variant)
+            $variant = ProductVariant::where('product_id', $cartLineData->purchasable_id)
+                ->whereJsonContains('combination', $cartLineData->variant)
                 ->first();
 
             $cartLine = CartLine::updateOrCreate(
                 [
                     'cart_id' => $cart->id,
-                    'purchasable_id' => $cartStoreData->purchasable_id,
+                    'purchasable_id' => $cartLineData->purchasable_id,
                     'variant_id' => $variant ? $variant->id : null,
                     'purchasable_type' => $purchasableType,
                     'checked_out_at' => null,
                 ],
                 [
-                    'quantity' => DB::raw('quantity + ' . $cartStoreData->quantity),
-                    'notes' => $cartStoreData->notes,
+                    'quantity' => DB::raw('quantity + ' . $cartLineData->quantity),
+                    'notes' => $cartLineData->notes,
                 ]
             );
 

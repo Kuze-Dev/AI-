@@ -12,24 +12,24 @@ use Exception;
 
 class CartStoreAction
 {
-    public function execute(CartStoreData $cartStoreData): CartActionResult|Exception
+    public function execute(CartStoreData $cartData): CartActionResult|Exception
     {
-        $customerCart = Cart::where('customer_id', $cartStoreData->customer_id)->first();
+        $customerCart = Cart::where('customer_id', $cartData->customer_id)->first();
 
         if ($customerCart) {
-            return $this->createCartLine($customerCart, $cartStoreData);
+            return $this->createCartLine($customerCart, $cartData);
         }
 
         $cart = Cart::create([
-            'customer_id' => $cartStoreData->customer_id,
+            'customer_id' => $cartData->customer_id,
         ]);
 
-        return $this->createCartLine($cart, $cartStoreData);
+        return $this->createCartLine($cart, $cartData);
     }
 
-    private function createCartLine(Cart $cart, CartStoreData $cartStoreData): CartActionResult|Exception
+    private function createCartLine(Cart $cart, CartStoreData $cartData): CartActionResult|Exception
     {
-        $result = app(CreateCartLineAction::class)->execute($cart, $cartStoreData);
+        $result = app(CreateCartLineAction::class)->execute($cart, $cartData);
 
         if ($result instanceof CartLine) {
             return CartActionResult::SUCCESS;
