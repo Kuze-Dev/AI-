@@ -15,6 +15,7 @@ class ProductResource extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         return [
+            'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
             'sku' => $this->sku,
@@ -27,6 +28,7 @@ class ProductResource extends JsonApiResource
             'is_featured' => $this->is_featured,
             'is_special_offer' => $this->is_special_offer,
             'allow_customer_remarks' => $this->allow_customer_remarks,
+            'image_url' => $this->getFirstMediaUrl('image')
         ];
     }
 

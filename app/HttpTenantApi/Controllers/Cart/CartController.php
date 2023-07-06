@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\Http\Controllers\Controller;
+use App\HttpTenantApi\Resources\CartLineResource;
 use Domain\Cart\Actions\CartNotesUpdateAction;
 use Domain\Cart\Actions\CartQuantityUpdateAction;
 use Domain\Cart\Actions\CartStoreAction;
@@ -32,30 +33,19 @@ use Spatie\RouteAttributes\Attributes\Patch;
 class CartController extends Controller
 {
     #[Get('/{cartId}', name: 'cart.show.{cartId}')]
-    public function show(int $cartId, Request $request)
+    public function show(int $cartId)
     {
-        $perPage = $request->query('per_page', 10);
-
         try {
             Cart::findOrFail($cartId);
 
-            $model = QueryBuilder::for(
-                CartLine::with(["purchasable.media", 'variant'])
-                    ->where("cart_id", $cartId)
-                    ->whereNull("checked_out_at")
-            )->jsonPaginate($perPage);
-
-            $model->getCollection()->transform(function ($item) {
-                $item->purchasable->image_url = $item->purchasable->getFirstMediaUrl('image');
-                $item->purchasable->unsetRelation('media');
-
-                $notesCollection = $item->getMedia('cart_line_notes');
-                $item->purchasable->notes_image_url = $notesCollection->isEmpty() ? null : $notesCollection->first()->getUrl('preview');
-
-                return $item;
-            });
-
-            return $model;
+            return CartLineResource::collection(
+                QueryBuilder::for(
+                    CartLine::with(["purchasable", 'variant'])
+                        ->where("cart_id", $cartId)
+                        ->whereNull("checked_out_at")
+                )->allowedIncludes(['purchasable', 'variant'])
+                    ->jsonPaginate()
+            );
         } catch (ModelNotFoundException $e) {
             return response()
                 ->json([
