@@ -121,7 +121,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
     protected function fullName(): Attribute
     {
         return Attribute::get(
-            fn ($value) => "{$this->first_name} {$this->last_name}"
+            fn ($value): string => "{$this->first_name} {$this->last_name}"
         );
     }
 
