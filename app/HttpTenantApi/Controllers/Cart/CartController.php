@@ -23,6 +23,7 @@ use Spatie\RouteAttributes\Attributes\Post;
 use Spatie\RouteAttributes\Attributes\Prefix;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\RouteAttributes\Attributes\Delete;
 use Spatie\RouteAttributes\Attributes\Patch;
 
 #[
@@ -84,6 +85,30 @@ class CartController extends Controller
             ]);
     }
 
+    #[Patch('/items/quantity/{cartLineId}', name: 'cart.items.quantity.{cartLineId}')]
+    public function update(CartQuantityUpdateRequest $request)
+    {
+        $validatedData = $request->validated();
+
+        $payload = CartQuantityUpdateData::fromArray($validatedData);
+
+        $result = app(CartQuantityUpdateAction::class)
+            ->execute($payload);
+
+        if ($result instanceof CartLine) {
+            return response()
+                ->json([
+                    'message' => 'Cart quantity updated successfully'
+                    // 'data' => $result,
+                ]);
+        }
+
+        return response()->json([
+            'error' => 'Bad Request',
+            'message' => $result
+        ], 400);
+    }
+
     #[Post('/items/notes', name: 'cart.items.notes')]
     public function updateNotes(CartNotesUpdateRequest $request)
     {
@@ -108,27 +133,23 @@ class CartController extends Controller
         ], 400);
     }
 
-    #[Patch('/items/quantity/{cartLineId}', name: 'cart.items.quantity.{cartLineId}')]
-    public function update(CartQuantityUpdateRequest $request)
+    #[Delete('/items/notes/{cartLineId}', name: 'cart.items.notes.{cartLineId}')]
+    public function deleteNotesImage(int $cartLineId)
     {
-        $validatedData = $request->validated();
+        try {
+            $cartLine = CartLine::findOrFail($cartLineId);
 
-        $payload = CartQuantityUpdateData::fromArray($validatedData);
+            $cartLine->clearMediaCollection('cart_line_notes');
 
-        $result = app(CartQuantityUpdateAction::class)
-            ->execute($payload);
-
-        if ($result instanceof CartLine) {
             return response()
                 ->json([
-                    'message' => 'Cart quantity updated successfully'
-                    // 'data' => $result,
+                    'message' => 'Image deleted successfully',
                 ]);
+        } catch (ModelNotFoundException $e) {
+            return response()
+                ->json([
+                    'error' => 'Cart item not found',
+                ], 404);
         }
-
-        return response()->json([
-            'error' => 'Bad Request',
-            'message' => $result
-        ], 400);
     }
 }
