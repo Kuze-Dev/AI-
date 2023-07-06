@@ -21,7 +21,7 @@ class CountryController
     public function index(): JsonApiResourceCollection
     {
         return CountryResource::collection(
-            QueryBuilder::for(Country::query())
+            QueryBuilder::for(Country::whereActive(true))
                 ->allowedIncludes([
                     'states',
                 ])
