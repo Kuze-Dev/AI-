@@ -21,7 +21,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int|null $variant_id
  * @property int $quantity
  * @property string|null $notes
- * @property bool $for_check_out
  * @property \Illuminate\Support\Carbon|null $checked_out_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -58,12 +57,12 @@ class CartLine extends Model implements HasMedia
         'purchasable_type',
         'quantity',
         'notes',
-        'for_check_out',
+        'checkout_reference',
         'checked_out_at',
     ];
 
     protected $casts = [
-        'for_check_out' => 'boolean',
+        'checkout_expiration' => 'datetime',
         'checked_out_at' => 'datetime',
     ];
 

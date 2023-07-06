@@ -12,6 +12,7 @@ use Domain\Currency\Models\Currency;
 use Domain\Address\Models\Address;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
@@ -95,6 +96,7 @@ class AppServiceProvider extends ServiceProvider
             Tier::class,
             Customer::class,
             Address::class,
+            Cart::class,
             CartLine::class,
             PaymentMethod::class,
             Payment::class,

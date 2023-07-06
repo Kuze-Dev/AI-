@@ -29,7 +29,8 @@ return new class() extends Migration
             $table->unsignedInteger('variant_id')->nullable();
             $table->integer('quantity');
             $table->longText('notes')->nullable();
-            $table->boolean("for_check_out")->default(false);
+            $table->string('checkout_reference')->nullable()->default(null);
+            $table->dateTime("checkout_expiration")->nullable()->default(null);
 
             $table->dateTime("checked_out_at")->nullable()->default(null);
             $table->timestamps();
