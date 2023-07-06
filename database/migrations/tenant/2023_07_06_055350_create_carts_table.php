@@ -14,19 +14,23 @@ return new class() extends Migration
     {
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
+
             $table->foreignIdFor(Customer::class)->index()->onDelete('cascade');
+
             $table->timestamps();
         });
 
         Schema::create('cart_lines', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Cart::class)->index()->onDelete('cascade');
+
             $table->unsignedInteger('purchasable_id')->index()->onDelete('cascade');
             $table->string('purchasable_type')->index();;
             $table->unsignedInteger('variant_id')->nullable();
             $table->integer('quantity');
             $table->longText('notes')->nullable();
             $table->boolean("for_check_out")->default(false);
+
             $table->dateTime("checked_out_at")->nullable()->default(null);
             $table->timestamps();
         });

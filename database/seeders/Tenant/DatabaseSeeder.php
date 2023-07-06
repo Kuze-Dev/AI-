@@ -19,11 +19,12 @@ class DatabaseSeeder extends Seeder
             // Auth\RoleSeeder::class,
             // Auth\AdminSeeder::class,
             // Page\PageSeeder::class,
-            DiscountSeeder::class,
+            // DiscountSeeder::class,
             // Product\ProductSeeder::class,
-            Address\CountrySeeder::class,
-            Currency\CurrencySeeder::class,
-            Tier\TierSeeder::class,
+            // Address\CountrySeeder::class,
+            // Currency\CurrencySeeder::class,
+            // Tier\TierSeeder::class,
+            Cart\CartSeeder::class
         ]);
     }
 }
