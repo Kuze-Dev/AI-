@@ -7,6 +7,7 @@ namespace Domain\Cart\Actions;
 use Domain\Cart\DataTransferObjects\CartStoreData;
 use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
+use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 

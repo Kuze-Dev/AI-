@@ -12,6 +12,7 @@ use Domain\Currency\Models\Currency;
 use Domain\Address\Models\Address;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Cart\Models\CartLine;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Domain\Discount\Models\Discount;
@@ -53,7 +54,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Model::shouldBeStrict( ! $this->app->isProduction());
+        Model::shouldBeStrict(!$this->app->isProduction());
 
         Model::handleMissingAttributeViolationUsing(function (Model $model, string $key) {
             if ($model instanceof Tenant && Str::startsWith($key, Tenant::internalPrefix())) {
@@ -92,19 +93,20 @@ class AppServiceProvider extends ServiceProvider
             Tier::class,
             Customer::class,
             Address::class,
+            CartLine::class,
         ]);
 
         Password::defaults(
             $this->app->environment('local', 'testing')
                 ? Password::min(4)
                 : Password::min(8)
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols()
-                    ->when(
-                        $this->app->isProduction(),
-                        fn (Password $password) => $password->uncompromised()
-                    )
+                ->mixedCase()
+                ->numbers()
+                ->symbols()
+                ->when(
+                    $this->app->isProduction(),
+                    fn (Password $password) => $password->uncompromised()
+                )
         );
 
         Rule::macro(
