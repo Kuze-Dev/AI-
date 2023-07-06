@@ -78,19 +78,19 @@ class ProductResource extends Resource
                                 ->schema([
                                     Forms\Components\TextInput::make('length')
                                         ->numeric()
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['length']))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['length']))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Length'),
 
                                     Forms\Components\TextInput::make('width')
                                         ->numeric()
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['width']))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['width']))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Width'),
 
                                     Forms\Components\TextInput::make('height')
                                         ->numeric()
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['height']))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['height']))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Height'),
                                 ])->columns(3),
@@ -102,8 +102,8 @@ class ProductResource extends Resource
                             ->itemLabel(fn (array $state) => $state['name'] ?? null)
                             ->schema([
                                 Forms\Components\Repeater::make('options')
-                                    ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state) {
-                                        if ( ! $record) {
+                                    ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, Closure $set) {
+                                        if (!$record) {
                                             return $state;
                                         }
                                         $record->productOptions->load('productOptionValues');
@@ -116,6 +116,10 @@ class ProductResource extends Resource
                                             ];
                                         });
                                         $component->state($mappedOptions->toArray());
+                                        //     dd($mappedOptions->toArray());
+                                        // $productVariants = $this->generateCombinations($mappedOptions->toArray());
+                                        // dd($productVariants);
+                                        // $set('product_variants', $productVariants);
                                     })
                                     ->schema([
                                         Forms\Components\TextInput::make('name')
@@ -133,7 +137,15 @@ class ProductResource extends Resource
                                     ->maxItems(2)
                                     ->collapsible(),
                             ])->hiddenOn('create'),
-                        ProductVariant::make('product_variants'),
+                        ProductVariant::make('product_variants')
+                            ->formatStateUsing(
+                                fn (Product $record) =>
+                                $record->productVariants->toArray()
+                            )
+                        // ->afterStateHydrated(function (ProductVariant $component, $state) {
+                        // $component->state(ucwords($state));
+                        // dd($component, $state);
+                        // }),
                         // Forms\Components\TextInput::make('product_variants')
                     ]),
                     Forms\Components\Section::make('Inventory')
@@ -209,11 +221,31 @@ class ProductResource extends Resource
                                     Forms\Components\Hidden::make('taxonomy_terms')
                                         ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                                 ])
-                                ->when(fn () => ! empty($taxonomies->toArray())),
+                                ->when(fn () => !empty($taxonomies->toArray())),
                         ]),
                     MetaDataForm::make('Meta Data'),
                 ])->columnSpan(1),
             ]);
+    }
+
+    private function generateCombinations($options, $current = [], $index = 0, $result = [])
+    {
+        if ($index === count($options)) {
+            $result[] = [
+                'id' => uniqid(), // Add a unique ID
+                'data' => $current,
+            ];
+
+            return $result;
+        }
+
+        foreach ($options[$index]['productOptionValues'] as $value) {
+            $newCurrent = $current;
+            $newCurrent[$options[$index]['name']] = $value['name'];
+            $result = $this->generateCombinations($options, $newCurrent, $index + 1, $result);
+        }
+
+        return $result;
     }
 
     public static function table(Table $table): Table

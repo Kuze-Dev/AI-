@@ -23,7 +23,7 @@ class ProductOptionFormAction extends Action
         if ($index === count($options)) {
             $result[] = [
                 'id' => uniqid(), // Add a unique ID
-                'data' => $current,
+                'combination' => $current,
             ];
 
             return $result;
@@ -86,7 +86,6 @@ class ProductOptionFormAction extends Action
             $oldData = data_get($livewire, $activeProductOptionStatePath) ?? [];
             data_set($livewire, $activeProductOptionStatePath, array_merge($oldData, $data));
             data_set($livewire, 'data.product_variants', $productVariants);
-            // dd($livewire);
             $livewire->unmountProductOptionItem();
         });
     }
