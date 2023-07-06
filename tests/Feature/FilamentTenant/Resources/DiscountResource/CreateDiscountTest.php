@@ -70,4 +70,4 @@ it('can create discount', function () {
     //     'minimum_amount' => 1000,
     // ]);
 
-})->only();
+});
