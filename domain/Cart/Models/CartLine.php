@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Models;
 
-use App\Models\Product\ProductVariant;
+use Domain\Product\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
