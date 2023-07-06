@@ -13,6 +13,7 @@ class UpdateAddressAction
     {
         $address->update([
             'state_id' => $addressData->state_id,
+            'label_as' => $addressData->label_as,
             'address_line_1' => $addressData->address_line_1,
             'zip_code' => $addressData->zip_code,
             'city' => $addressData->city,
