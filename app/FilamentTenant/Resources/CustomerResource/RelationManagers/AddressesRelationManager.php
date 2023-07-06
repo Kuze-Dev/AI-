@@ -8,6 +8,7 @@ use Domain\Address\Actions\CreateAddressAction;
 use Domain\Address\Actions\DeleteAddressAction;
 use Domain\Address\Actions\UpdateAddressAction;
 use Domain\Address\DataTransferObjects\AddressData;
+use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
@@ -19,6 +20,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class AddressesRelationManager extends RelationManager
@@ -78,6 +80,17 @@ class AddressesRelationManager extends RelationManager
                 Forms\Components\Checkbox::make('is_default_shipping')
                     ->translateLabel(),
 
+                Forms\Components\Select::make('label_as')
+                    ->translateLabel()
+                    ->options(
+                        collect(AddressLabelAs::cases())
+                            ->mapWithKeys(fn (AddressLabelAs $target) => [
+                                $target->value => Str::headline($target->value),
+                            ])
+                            ->toArray()
+                    )
+                    ->enum(AddressLabelAs::class),
+
             ])->columns(1);
     }
 
@@ -86,6 +99,12 @@ class AddressesRelationManager extends RelationManager
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('label_as')
+                    ->translateLabel()
+                    ->sortable()
+                    ->searchable()
+                    ->wrap()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('address_line_1')
                     ->translateLabel()
                     ->sortable()

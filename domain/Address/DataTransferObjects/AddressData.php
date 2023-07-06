@@ -7,6 +7,7 @@ namespace Domain\Address\DataTransferObjects;
 class AddressData
 {
     public function __construct(
+        public readonly string $label_as,
         public readonly string $address_line_1,
         public readonly int $state_id,
         public readonly string $zip_code,
