@@ -61,6 +61,7 @@ class PermissionSeeder extends BasePermissionSeeder
                     hasSoftDeletes: true
                 ),
                 ...$this->generateFilamentResourcePermissions('addresses', ),
+                ...$this->generateFilamentResourcePermissions('paymentMethod', except: ['deleteAny']),
             ],
         ];
     }
