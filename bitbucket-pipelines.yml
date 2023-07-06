@@ -52,11 +52,6 @@ pipelines:
           - step: *check-format
           - step: *analyse
           - step: *test
-    develop-ecommerce:
-      - parallel:
-          - step: *check-format
-          - step: *analyse
-          - step: *test
     staging:
       - parallel:
           - step: *check-format
@@ -89,15 +84,14 @@ pipelines:
           - step: *check-format
           - step: *analyse
           - step: *test
-      - step:
-          <<: *common-step
-          name: Deploy to Ecommerce Branch
-          deployment: ecommerce
-          trigger: manual
-          script:
-            - *setup-script
-            - composer require laravel/vapor-cli
-            - ./vendor/bin/vapor deploy ecommerce-branch --commit="$BITBUCKET_COMMIT"
+          - step:
+              <<: *common-step
+              name: Deploy to Ecommerce Branch
+              deployment: ecommerce
+              script:
+                - *setup-script
+                - composer require laravel/vapor-cli
+                - ./vendor/bin/vapor deploy ecommerce-branch --commit="$BITBUCKET_COMMIT"
   pull-requests:
     "**":
       - parallel:
