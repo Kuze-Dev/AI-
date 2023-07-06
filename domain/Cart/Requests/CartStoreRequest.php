@@ -47,7 +47,7 @@ class CartStoreRequest extends FormRequest
                     $purchasableId = $this->input('purchasable_id');
 
                     foreach ($value as $variantKey => $variantValue) {
-                        $keyExists = ProductOption::where('product_id', $purchasableId)->where('name', $variantKey)->exists();
+                        $keyExists = ProductOption::whereProductId($purchasableId)->whereName($variantKey)->exists();
 
                         if (!$keyExists) {
                             $fail("Invalid $variantKey option.");
@@ -55,10 +55,10 @@ class CartStoreRequest extends FormRequest
                         }
 
                         $valueExists = ProductOptionValue::whereHas('productOption', function ($query) use ($purchasableId, $variantKey) {
-                            $query->where('product_id', $purchasableId)
-                                ->where('name', $variantKey);
+                            $query->whereProductId($purchasableId)
+                                ->whereName($variantKey);
                         })
-                            ->where('name', $variantValue)
+                            ->whereName($variantValue)
                             ->exists();
 
                         if (!$valueExists) {
@@ -81,7 +81,7 @@ class CartStoreRequest extends FormRequest
                     $hasVariant = $this->input('variant');
 
                     if ($hasVariant) {
-                        $product = ProductVariant::where('product_id', $purchasableId)
+                        $product = ProductVariant::whereProductId($purchasableId)
                             ->whereJsonContains('combination', $hasVariant)
                             ->first();
 

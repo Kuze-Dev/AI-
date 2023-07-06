@@ -26,7 +26,7 @@ class CreateCartLineAction
                 // 'Booking' => $purchasableType = Booking::class,
             };
 
-            $variant = ProductVariant::where('product_id', $cartLineData->purchasable_id)
+            $variant = ProductVariant::whereProductId($cartLineData->purchasable_id)
                 ->whereJsonContains('combination', $cartLineData->variant)
                 ->first();
 

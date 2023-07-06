@@ -14,7 +14,7 @@ class CartStoreAction
 {
     public function execute(CartStoreData $cartData): CartActionResult|Exception
     {
-        $customerCart = Cart::where('customer_id', $cartData->customer_id)->first();
+        $customerCart = Cart::whereCustomerId($cartData->customer_id)->first();
 
         if ($customerCart) {
             return $this->createCartLine($customerCart, $cartData);

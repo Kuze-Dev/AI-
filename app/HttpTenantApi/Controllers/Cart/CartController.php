@@ -41,7 +41,7 @@ class CartController extends Controller
             return CartLineResource::collection(
                 QueryBuilder::for(
                     CartLine::with(["purchasable", 'variant'])
-                        ->where("cart_id", $cartId)
+                        ->whereCartId($cartId)
                         ->whereNull("checked_out_at")
                 )->allowedIncludes(['purchasable', 'variant'])
                     ->jsonPaginate()
