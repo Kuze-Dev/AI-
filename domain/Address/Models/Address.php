@@ -29,7 +29,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property-read int|null $activities_count
  * @property-read Customer|null $customer
  * @property-read string $full_detail
- * @property-read \Domain\Address\Models\State|null $state
+ * @property-read \Domain\Address\Models\State $state
  * @method static \Illuminate\Database\Eloquent\Builder|Address newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Address newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Address query()
