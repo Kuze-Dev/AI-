@@ -6,7 +6,6 @@ namespace Domain\Address\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Domain\Address\Models\State
@@ -34,8 +33,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class State extends Model
 {
-    use SoftDeletes;
-
     protected $fillable = [
         'name',
         'country_id',
