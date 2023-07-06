@@ -14,6 +14,38 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 
+/**
+ * Domain\Taxation\Models\TaxZone
+ *
+ * @property int $id
+ * @property string $name
+ * @property PriceDisplay $price_display
+ * @property bool $is_active
+ * @property bool $is_default
+ * @property TaxZoneType $type
+ * @property string $percentage
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Country> $countries
+ * @property-read int|null $countries_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, State> $states
+ * @property-read int|null $states_count
+ * @method static \Illuminate\Database\Eloquent\Builder|TaxZone newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|TaxZone newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|TaxZone query()
+ * @method static \Illuminate\Database\Eloquent\Builder|TaxZone whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TaxZone whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TaxZone whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TaxZone whereIsDefault($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TaxZone whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TaxZone wherePercentage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TaxZone wherePriceDisplay($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TaxZone whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TaxZone whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class TaxZone extends Model
 {
     use LogsActivity;

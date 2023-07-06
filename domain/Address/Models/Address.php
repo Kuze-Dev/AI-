@@ -29,9 +29,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
- * @property-read Customer $customer
- * @property-read string $full_detail
- * @property-read \Domain\Address\Models\State $state
+ * @property-read Customer|null $customer
+ * @property-read \Domain\Address\Models\State|null $state
  * @method static \Illuminate\Database\Eloquent\Builder|Address newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Address newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Address query()
@@ -42,6 +41,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereIsDefaultBilling($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereIsDefaultShipping($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Address whereLabelAs($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereStateId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Address whereZipCode($value)
