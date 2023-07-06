@@ -10,6 +10,7 @@ use Domain\Cart\Models\CartLine;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CreateCartLineAction
 {
@@ -18,6 +19,7 @@ class CreateCartLineAction
         DB::beginTransaction();
 
         try {
+            $purchasableId = $cartLineData->purchasable_id;
             $purchasableType = '';
 
             match ($cartLineData->purchasable_type) {
@@ -26,21 +28,25 @@ class CreateCartLineAction
                 // 'Booking' => $purchasableType = Booking::class,
             };
 
-            $variant = ProductVariant::whereProductId($cartLineData->purchasable_id)
+            $productVariant = ProductVariant::whereProductId($cartLineData->purchasable_id)
                 ->whereJsonContains('combination', $cartLineData->variant)
                 ->first();
+
+            if ($productVariant) {
+                $purchasableId = $productVariant->id;
+                $purchasableType = ProductVariant::class;
+            }
 
             $cartLine = CartLine::updateOrCreate(
                 [
                     'cart_id' => $cart->id,
-                    'purchasable_id' => $cartLineData->purchasable_id,
-                    'variant_id' => $variant ? $variant->id : null,
+                    'purchasable_id' => $purchasableId,
                     'purchasable_type' => $purchasableType,
                     'checked_out_at' => null,
                 ],
                 [
                     'quantity' => DB::raw('quantity + ' . $cartLineData->quantity),
-                    'notes' => $cartLineData->notes,
+                    'meta' => $cartLineData->meta,
                 ]
             );
 
@@ -48,6 +54,7 @@ class CreateCartLineAction
             return $cartLine;
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::info($e);
             return $e;
         }
     }

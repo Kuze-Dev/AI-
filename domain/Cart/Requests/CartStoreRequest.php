@@ -109,10 +109,9 @@ class CartStoreRequest extends FormRequest
                     }
                 },
             ],
-            'notes' => [
+            'meta' => [
                 'nullable',
-                'string',
-                'max:500',
+                'array'
             ],
         ];
     }

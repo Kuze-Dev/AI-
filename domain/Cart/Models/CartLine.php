@@ -34,6 +34,7 @@ class CartLine extends Model implements HasMedia
         'purchasable_id',
         'purchasable_type',
         'quantity',
+        'meta',
         'checkout_reference',
         'checked_out_at',
     ];
