@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\Http\Controllers\Controller;
-use App\HttpTenantApi\Resources\CartLineResource;
 use App\HttpTenantApi\Resources\CartResource;
 use Domain\Cart\Actions\CartNotesUpdateAction;
 use Domain\Cart\Actions\CartQuantityUpdateAction;
@@ -36,7 +35,6 @@ use Illuminate\Database\Eloquent\Builder;
 ]
 class CartController extends Controller
 {
-
     #[Get('/{cartId}', name: 'cart.show.{cartId}')]
     public function show(int $cartId)
     {
@@ -46,7 +44,7 @@ class CartController extends Controller
             Cart::where('id', $cartId)->whereCustomerId($customerId)->firstOrFail();
 
             $model = QueryBuilder::for(
-                Cart::with(["cartLines", 'cartLines.purchasable', 'cartLines.media'])
+                Cart::with(['cartLines', 'cartLines.purchasable', 'cartLines.media'])
                     ->whereHas('cartLines', function (Builder $query) {
                         $query->whereNull('checked_out_at');
                     })
@@ -77,7 +75,7 @@ class CartController extends Controller
         if (CartActionResult::SUCCESS != $result) {
             return response()->json([
                 'error' => 'Bad Request',
-                'message' => $result
+                'message' => $result,
             ], 400);
         }
 
@@ -153,7 +151,7 @@ class CartController extends Controller
                 ->get();
 
             if (count($cartLineIds) !== $cartLines->count()) {
-                throw new ModelNotFoundException;
+                throw new ModelNotFoundException();
             }
 
             $cartLines = CartLine::whereIn('id', $cartLineIds)->get();
@@ -188,7 +186,7 @@ class CartController extends Controller
             if ($result instanceof CartLine) {
                 return response()
                     ->json([
-                        'message' => 'Cart quantity updated successfully'
+                        'message' => 'Cart quantity updated successfully',
                         // 'data' => $result,
                     ]);
             }

@@ -28,7 +28,7 @@ class ProductResource extends JsonApiResource
             'is_featured' => $this->is_featured,
             'is_special_offer' => $this->is_special_offer,
             'allow_customer_remarks' => $this->allow_customer_remarks,
-            'image_url' => $this->getFirstMediaUrl('image')
+            'image_url' => $this->getFirstMediaUrl('image'),
         ];
     }
 

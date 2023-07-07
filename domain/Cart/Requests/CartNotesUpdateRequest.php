@@ -35,7 +35,7 @@ class CartNotesUpdateRequest extends FormRequest
             ],
             'meta' => [
                 'nullable',
-                'array'
+                'array',
             ],
             'file' => 'nullable|array',
             'file.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',

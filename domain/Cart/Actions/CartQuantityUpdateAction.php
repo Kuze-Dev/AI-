@@ -25,8 +25,8 @@ class CartQuantityUpdateAction
 
         Log::info($cartLine);
 
-        if (!$cartLine) {
-            throw new ModelNotFoundException;
+        if ( ! $cartLine) {
+            throw new ModelNotFoundException();
         }
 
         $product = null;
@@ -38,24 +38,24 @@ class CartQuantityUpdateAction
         }
 
         if (
-            $cartLineData->action === "decrease" && $cartLine->quantity <= 1 ||
-            $cartLineData->action === "increase" && $cartLine->quantity >= $product->stock
+            $cartLineData->action === 'decrease' && $cartLine->quantity <= 1 ||
+            $cartLineData->action === 'increase' && $cartLine->quantity >= $product->stock
         ) {
             return [
-                'message' => "Invalid Action"
+                'message' => 'Invalid Action',
             ];
-        } else if ($cartLineData->action === "edit" && $cartLineData->quantity > $product->stock) {
+        } elseif ($cartLineData->action === 'edit' && $cartLineData->quantity > $product->stock) {
             return [
-                'message' => "Quantity exceeds product stock"
+                'message' => 'Quantity exceeds product stock',
             ];
         }
 
         match ($cartLineData->action) {
-            "increase" => $cartLine->increment("quantity"),
-            "decrease" => $cartLine->decrement("quantity"),
-            "edit" =>  $cartLine->update(
+            'increase' => $cartLine->increment('quantity'),
+            'decrease' => $cartLine->decrement('quantity'),
+            'edit' => $cartLine->update(
                 [
-                    'quantity' => $cartLineData->quantity
+                    'quantity' => $cartLineData->quantity,
                 ]
             )
         };

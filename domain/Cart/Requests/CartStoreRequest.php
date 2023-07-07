@@ -49,8 +49,9 @@ class CartStoreRequest extends FormRequest
                     foreach ($value as $variantKey => $variantValue) {
                         $keyExists = ProductOption::whereProductId($purchasableId)->whereName($variantKey)->exists();
 
-                        if (!$keyExists) {
+                        if ( ! $keyExists) {
                             $fail("Invalid $variantKey option.");
+
                             return;
                         }
 
@@ -61,12 +62,13 @@ class CartStoreRequest extends FormRequest
                             ->whereName($variantValue)
                             ->exists();
 
-                        if (!$valueExists) {
+                        if ( ! $valueExists) {
                             $fail("Invalid $variantValue option value.");
+
                             return;
                         }
                     }
-                }
+                },
             ],
             'purchasable_type' => [
                 'required',
@@ -85,37 +87,40 @@ class CartStoreRequest extends FormRequest
                             ->whereJsonContains('combination', $hasVariant)
                             ->first();
 
-                        if (!$product) {
+                        if ( ! $product) {
                             $fail('Invalid product.');
+
                             return;
                         }
 
                         if ($value > $product->stock) {
                             $fail('The quantity exceeds the available quantity of the product.');
+
                             return;
                         }
                     }
 
                     $product = Product::find($purchasableId);
 
-                    if (!$product) {
+                    if ( ! $product) {
                         $fail('Invalid product.');
+
                         return;
                     }
 
                     if ($value > $product->stock) {
                         $fail('The quantity exceeds the available quantity of the product.');
+
                         return;
                     }
                 },
             ],
             'meta' => [
                 'nullable',
-                'array'
+                'array',
             ],
         ];
     }
-
 
     /**
      * Handle a failed validation attempt.

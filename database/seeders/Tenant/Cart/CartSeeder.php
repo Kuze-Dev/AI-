@@ -8,7 +8,6 @@ use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class CartSeeder extends Seeder
 {

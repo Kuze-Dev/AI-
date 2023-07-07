@@ -21,13 +21,13 @@ class CartNotesUpdateAction
             })
             ->whereNull('checked_out_at')->first();
 
-        if (!$cartLine) {
-            throw new ModelNotFoundException;
+        if ( ! $cartLine) {
+            throw new ModelNotFoundException();
         }
 
         $cartLine = CartLine::find($cartLineData->cart_line_id);
 
-        if (!is_null($cartLineData->files)) {
+        if ( ! is_null($cartLineData->files)) {
             foreach ($cartLineData->files as $file) {
                 $uploadedFile = new UploadedFile(
                     $file->getRealPath(),

@@ -51,7 +51,7 @@ class CartQuantityUpdateRequest extends FormRequest
     protected function prepareForValidation()
     {
         $this->merge([
-            'cartLineId' =>  (int) $this->route('cartLineId'),
+            'cartLineId' => (int) $this->route('cartLineId'),
         ]);
     }
 

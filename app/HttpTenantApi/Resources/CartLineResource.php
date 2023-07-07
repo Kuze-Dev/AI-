@@ -6,8 +6,6 @@ namespace App\HttpTenantApi\Resources;
 
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Spatie\QueryBuilder\QueryBuilder;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 class CartLineResource extends JsonApiResource
@@ -22,17 +20,17 @@ class CartLineResource extends JsonApiResource
             'purchasable' => function () {
                 switch ($this->purchasable_type) {
                     case 'Domain\Product\Models\Product': {
-                            return ProductResource::make($this->purchasable);
-                        }
+                        return ProductResource::make($this->purchasable);
+                    }
                     case 'Domain\Product\Models\ProductVariant': {
-                            $model = ProductVariant::with(["product"])
-                                ->where('id', $this->purchasable_id)->first();
+                        $model = ProductVariant::with(['product'])
+                            ->where('id', $this->purchasable_id)->first();
 
-                            return $model;
-                        }
+                        return $model;
+                    }
                 }
             },
-            'remarks_images' => $this->media->toArray()
+            'remarks_images' => $this->media->toArray(),
         ];
     }
 }

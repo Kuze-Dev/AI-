@@ -9,7 +9,6 @@ use App\HttpTenantApi\Resources\CartLineResource;
 use Domain\Cart\DataTransferObjects\CheckoutData;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CheckoutRequest;
-use Domain\Product\Models\ProductVariant;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 use Spatie\RouteAttributes\Attributes\Prefix;
@@ -51,14 +50,14 @@ class CheckoutController extends Controller
         CartLine::whereIn('id', $cartLineIds)
             ->update([
                 'checkout_reference' => $checkoutReference,
-                'checkout_expiration' => now()->addMinutes(20)
+                'checkout_expiration' => now()->addMinutes(20),
             ]);
 
         return response()
             ->json([
                 'message' => 'Success',
                 'purchasables_for_checkout' => $purchasablesForCheckout,
-                'reference' => $checkoutReference
+                'reference' => $checkoutReference,
             ]);
     }
 
@@ -69,20 +68,20 @@ class CheckoutController extends Controller
 
         $reference = $request->input('reference');
 
-        if (!$reference) {
+        if ( ! $reference) {
             return response()->json([
                 'error' => 'Bad Request',
-                'message' => 'Invalid reference.'
+                'message' => 'Invalid reference.',
             ], 400);
         }
 
         $purchasableIds = json_decode($request->input('purchasable_ids', '[]'), true);
 
-        if (!is_array($purchasableIds)) {
+        if ( ! is_array($purchasableIds)) {
             $purchasableIds = [];
         }
 
-        $cartLineQuery = CartLine::with(["purchasable", 'media'])->whereHas('cart', function ($query) use ($customerId) {
+        $cartLineQuery = CartLine::with(['purchasable', 'media'])->whereHas('cart', function ($query) use ($customerId) {
             $query->whereCustomerId($customerId);
         })->whereIn('purchasable_id', $purchasableIds)
             ->whereCheckoutReference($reference)
@@ -93,7 +92,7 @@ class CheckoutController extends Controller
         if (count($cartLines) <= 0) {
             return response()->json([
                 'error' => 'Bad Request',
-                'message' => 'Invalid cart line IDs.'
+                'message' => 'Invalid cart line IDs.',
             ], 400);
         }
 

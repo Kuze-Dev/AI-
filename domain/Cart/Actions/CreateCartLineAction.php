@@ -11,6 +11,7 @@ use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Exception;
 
 class CreateCartLineAction
 {
@@ -51,10 +52,12 @@ class CreateCartLineAction
             );
 
             DB::commit();
+
             return $cartLine;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             Log::info($e);
+
             return $e;
         }
     }

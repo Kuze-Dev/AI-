@@ -21,7 +21,7 @@ class ProductVariantResource extends JsonApiResource
             'selling_price' => $this->selling_price,
             'stock' => $this->stock,
             'status' => $this->status,
-            'product' => $this->product
+            'product' => $this->product,
         ];
     }
 

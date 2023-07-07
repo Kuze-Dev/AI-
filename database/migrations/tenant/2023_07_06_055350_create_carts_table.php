@@ -8,8 +8,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class() extends Migration
-{
+return new class () extends Migration {
     public function up(): void
     {
         Schema::create('carts', function (Blueprint $table) {
@@ -31,8 +30,8 @@ return new class() extends Migration
             $table->json('meta')->nullable()->default(null);
             $table->string('checkout_reference')->nullable()->default(null);
 
-            $table->dateTime("checkout_expiration")->nullable()->default(null);
-            $table->dateTime("checked_out_at")->nullable()->default(null);
+            $table->dateTime('checkout_expiration')->nullable()->default(null);
+            $table->dateTime('checked_out_at')->nullable()->default(null);
             $table->timestamps();
         });
     }

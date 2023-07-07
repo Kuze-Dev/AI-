@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Cart\DataTransferObjects;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-
 class CartNotesUpdateData
 {
     public function __construct(
