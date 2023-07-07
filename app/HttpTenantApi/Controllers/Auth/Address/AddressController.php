@@ -28,6 +28,7 @@ class AddressController
     {
         return AddressResource::collection(
             QueryBuilder::for(Address::class)
+                ->defaultSort('-updated_at')
                 ->jsonPaginate()
         );
     }
