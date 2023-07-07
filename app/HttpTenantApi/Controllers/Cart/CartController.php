@@ -18,6 +18,7 @@ use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartNotesUpdateRequest;
 use Domain\Cart\Requests\CartQuantityUpdateRequest;
 use Domain\Cart\Requests\CartStoreRequest;
+use Domain\Customer\Models\Customer;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Post;
@@ -35,11 +36,32 @@ use TiMacDonald\JsonApi\JsonApiResource;
     Prefix('carts'),
     Middleware(['auth:sanctum'])
 ]
-class CartController extends Controller
+class CartController
 {
+    protected function isCostumerValidated(): bool
+    {
+        $customerId = auth()->user()?->id;
+
+        $customer = Customer::where("id", $customerId)->whereStatus('active')->first();
+
+        if (!$customer) {
+            return false;
+        }
+
+        return true;
+    }
+
     #[Get('/{cartId}', name: 'cart.show.{cartId}')]
     public function show(int $cartId): JsonApiResource|JsonResponse
     {
+        $authenticated = $this->isCostumerValidated();
+
+        if (!$authenticated) {
+            return response()->json([
+                'error' => "User Unauthorized",
+            ], 403);
+        }
+
         try {
             $customerId = auth()->user()?->id;
 
@@ -71,7 +93,7 @@ class CartController extends Controller
 
         $validatedData['customer_id'] = auth()->user() ? auth()->user()->id : null;
 
-        if ( ! $validatedData['customer_id']) {
+        if (!$validatedData['customer_id']) {
             return response()
                 ->json([
                     'error' => 'Access denied',
@@ -84,7 +106,8 @@ class CartController extends Controller
         if (CartActionResult::SUCCESS != $result) {
             return response()->json([
                 'error' => 'Bad Request',
-                'message' => $result,
+                'message' => 'Invalid action'
+                // 'message' => $result,
             ], 400);
         }
 
@@ -97,6 +120,14 @@ class CartController extends Controller
     #[Delete('/items/{cartLineId}', name: 'cart.items.{cartLineId}')]
     public function delete(int $cartLineId): JsonResponse
     {
+        $authenticated = $this->isCostumerValidated();
+
+        if (!$authenticated) {
+            return response()->json([
+                'error' => "User Unauthorized",
+            ], 403);
+        }
+
         try {
             $customerId = auth()->user()?->id;
 
@@ -130,6 +161,14 @@ class CartController extends Controller
     #[Delete('/clear/{cartId}', name: 'cart.clear.{cartId}')]
     public function clear(int $cartId): JsonResponse
     {
+        $authenticated = $this->isCostumerValidated();
+
+        if (!$authenticated) {
+            return response()->json([
+                'error' => "User Unauthorized",
+            ], 403);
+        }
+
         try {
             $customerId = auth()->user()?->id;
 
@@ -152,6 +191,14 @@ class CartController extends Controller
     #[Post('/bulk-remove', name: 'cart.bulk-remove')]
     public function bulkRemove(Request $request): JsonResponse
     {
+        $authenticated = $this->isCostumerValidated();
+
+        if (!$authenticated) {
+            return response()->json([
+                'error' => "User Unauthorized",
+            ], 403);
+        }
+
         try {
             $cartLineIds = $request->input('cart_line_ids');
 
@@ -189,6 +236,14 @@ class CartController extends Controller
     #[Patch('/items/quantity/{cartLineId}', name: 'cart.items.quantity.{cartLineId}')]
     public function update(CartQuantityUpdateRequest $request): JsonResponse
     {
+        $authenticated = $this->isCostumerValidated();
+
+        if (!$authenticated) {
+            return response()->json([
+                'error' => "User Unauthorized",
+            ], 403);
+        }
+
         try {
             $validatedData = $request->validated();
 
@@ -221,6 +276,14 @@ class CartController extends Controller
     #[Post('/items/notes', name: 'cart.items.notes')]
     public function updateNotes(CartNotesUpdateRequest $request): JsonResponse
     {
+        $authenticated = $this->isCostumerValidated();
+
+        if (!$authenticated) {
+            return response()->json([
+                'error' => "User Unauthorized",
+            ], 403);
+        }
+
         try {
             $validatedData = $request->validated();
 
