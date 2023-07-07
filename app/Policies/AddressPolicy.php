@@ -23,10 +23,11 @@ class AddressPolicy
 
         if (
             $user instanceof Customer &&
-            $address instanceof Address &&
-            $address->customer->isNot($user)
+            $address instanceof Address
         ) {
-            return Response::denyAsNotFound();
+            return $address->customer->is($user)
+                ? Response::allow()
+                : Response::denyAsNotFound();
         }
 
         return null;
