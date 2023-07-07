@@ -27,8 +27,11 @@ class AddressController extends Controller
 {
     public function index(): mixed
     {
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = Auth::user();
+
         return AddressResource::collection(
-            QueryBuilder::for(Address::whereBelongsTo(Auth::user()))
+            QueryBuilder::for(Address::whereBelongsTo($customer))
                 ->defaultSort('-updated_at')
                 ->jsonPaginate()
         );

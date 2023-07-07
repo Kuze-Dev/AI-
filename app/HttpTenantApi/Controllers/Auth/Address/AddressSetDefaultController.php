@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Auth\Address;
 
 use App\Features\ECommerce\ECommerceBase;
+use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\AddressResource;
 use Domain\Address\Actions\SetAddressAsDefaultBillingAction;
 use Domain\Address\Actions\SetAddressAsDefaultShippingAction;
@@ -19,12 +20,14 @@ use Throwable;
     Prefix('addresses'),
     Middleware(['auth:sanctum', 'feature.tenant:' . ECommerceBase::class])
 ]
-class AddressSetDefaultController
+class AddressSetDefaultController extends Controller
 {
     /** @throws Throwable */
     #[Post('{address}/set-shipping', name: 'address.set-shipping')]
     public function shipping(Address $address): AddressResource
     {
+        $this->authorize('update', $address);
+
         DB::transaction(
             fn () => app(SetAddressAsDefaultShippingAction::class)
                 ->execute($address)
@@ -38,6 +41,8 @@ class AddressSetDefaultController
     #[Post('{address}/set-billing', name: 'address.set-billing')]
     public function billing(Address $address): AddressResource
     {
+        $this->authorize('update', $address);
+
         DB::transaction(
             fn () => app(SetAddressAsDefaultBillingAction::class)
                 ->execute($address)
