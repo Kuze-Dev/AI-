@@ -27,7 +27,7 @@ class AddressController
     public function index(): mixed
     {
         return AddressResource::collection(
-            QueryBuilder::for(Address::class)
+            QueryBuilder::for(Address::whereBelongsTo(Auth::user()))
                 ->defaultSort('-updated_at')
                 ->jsonPaginate()
         );
