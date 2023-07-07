@@ -14,7 +14,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Prefix;
@@ -50,7 +49,6 @@ class AccountController extends Controller
             ],
             'mobile' => 'required|string|max:255',
             'birth_date' => 'required|date',
-            'password' => ['required', 'confirmed', Password::default()],
         ]);
 
         $customer = DB::transaction(
@@ -61,7 +59,6 @@ class AccountController extends Controller
                     mobile: $validated['mobile'],
                     birth_date: now()->parse($validated['birth_date']),
                     email: $validated['email'],
-                    password: $validated['password']
                 ))
         );
 
