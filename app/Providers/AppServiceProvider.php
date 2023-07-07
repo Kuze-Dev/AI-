@@ -17,6 +17,8 @@ use Domain\Form\Models\FormSubmission;
 use Domain\Globals\Models\Globals;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
+use Domain\Shipment\Models\Shipment;
+use Domain\ShippingMethod\Models\ShippingMethod;
 use Support\Captcha\CaptchaManager;
 use Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Models\Taxonomy;
@@ -69,6 +71,8 @@ class AppServiceProvider extends ServiceProvider
             ContentEntry::class,
             Globals::class,
             MetaData::class,
+            Shipment::class,
+            ShippingMethod::class,
         ]);
 
         Password::defaults(
