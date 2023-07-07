@@ -51,7 +51,7 @@ class CustomerRegisterRequest extends FormRequest
             // billing address
             'billing_same_as_shipping' => 'required|bool',
             'billing_country_id' => [
-                'required',
+                'required_if:billing_same_as_shipping,0',
                 Rule::exists(Country::class, (new Country())->getRouteKeyName()),
             ],
             'billing_state_id' => [
