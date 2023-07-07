@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Requests\Auth\Address\AddressRequest;
 use App\HttpTenantApi\Resources\AddressResource;
 use Domain\Address\Actions\CreateCustomerAddressAction;
+use Domain\Address\Actions\DeleteAddressAction;
 use Domain\Address\Actions\EditCustomerAddressAction;
 use Domain\Address\Models\Address;
 use Illuminate\Http\Response;
@@ -64,12 +65,15 @@ class AddressController extends Controller
         return AddressResource::make($address);
     }
 
+    /** @throws Throwable */
     public function destroy(Address $address): Response
     {
         $this->authorize('delete', $address);
 
-        // TODO: use action
-        $address->delete();
+        DB::transaction(
+            fn () => app(DeleteAddressAction::class)
+                ->execute($address)
+        );
 
         return response()->noContent();
     }
