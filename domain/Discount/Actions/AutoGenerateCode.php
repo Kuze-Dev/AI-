@@ -8,7 +8,7 @@ use Str;
 
 final class AutoGenerateCode
 {
-    public function __invoke()
+    public function __invoke(): string
     {
         return Str::random(8);
     }

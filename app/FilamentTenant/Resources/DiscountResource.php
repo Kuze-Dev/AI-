@@ -29,7 +29,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
-use Filament\Tables;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
@@ -41,6 +40,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\HtmlString;
 use Str;
+use Illuminate\Database\Eloquent\Builder;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class DiscountResource extends Resource
@@ -256,6 +256,7 @@ class DiscountResource extends Resource
         ];
     }
 
+    /** @return Builder<\Domain\Discount\Models\Discount> */
     public static function getEloquentQuery(): EloquentBuilder
     {
         return parent::getEloquentQuery()

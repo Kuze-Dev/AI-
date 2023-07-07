@@ -11,11 +11,11 @@ use Domain\Discount\Actions\ForceDeleteDiscountAction;
 use Domain\Discount\Actions\UpdateDiscountAction;
 use Domain\Discount\DataTransferObjects\DiscountData;
 use Domain\Discount\Models\Discount;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException as ExceptionsDeleteRestrictedException;
 
 class EditDiscount extends EditRecord
 {
@@ -36,7 +36,7 @@ class EditDiscount extends EditRecord
                 ->using(function (Discount $record) {
                     try {
                         return app(ForceDeleteDiscountAction::class)->execute($record);
-                    } catch (DeleteRestrictedException $e) {
+                    } catch (ExceptionsDeleteRestrictedException $e) {
                         return false;
                     }
                 }),
@@ -49,6 +49,7 @@ class EditDiscount extends EditRecord
         return $this->getCachedActions();
     }
 
+    /** @param \Domain\Discount\Models\Discount $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(
