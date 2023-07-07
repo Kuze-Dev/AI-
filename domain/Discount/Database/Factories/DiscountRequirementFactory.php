@@ -15,7 +15,7 @@ class DiscountRequirementFactory extends Factory
     {
         return [
             'requirement_type' => 'minimum_order_amount',
-            'minimum_amount' => fake()->randomNumber(),
+            'minimum_amount' => fake()->numberBetween(100, 1000),
         ];
     }
 }

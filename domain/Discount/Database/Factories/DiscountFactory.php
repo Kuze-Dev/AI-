@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Discount\Database\Factories;
 
+use Domain\Discount\Actions\AutoGenerateCode;
+use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -13,16 +15,23 @@ class DiscountFactory extends Factory
 
     public function definition(): array
     {
-        return [
-            'name' => fake()->firstName(),
-            'slug' => fake()->firstName(),
-            'description' => fake()->word(),
-            'code' => fake()->unique()->word(),
-            'max_uses' => 10,
-            'status' => 'active',
+        $name = fake()->firstName();
 
-            'valid_start_at' => fake()->dateTime(),
-            'valid_end_at' => fake()->dateTime(),
+        return [
+            'name' => $name,
+            'slug' => $name,
+            'description' => fake()->word(),
+            'code' => new AutoGenerateCode(),
+            'max_uses' => 10,
+            'status' => DiscountStatus::ACTIVE,
+
+            'valid_start_at' => fake()->dateTimeBetween('-1 month', 'now'),
+            'valid_end_at' => fake()->dateTimeBetween('now', '+1 month'),
         ];
+    }
+
+    public function deleted(): self
+    {
+        return $this->state(['deleted_at' => now()]);
     }
 }

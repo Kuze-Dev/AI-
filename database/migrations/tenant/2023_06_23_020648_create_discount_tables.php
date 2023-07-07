@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Domain\Customer\Models\Customer;
 use Domain\Discount\Models\Discount;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -72,8 +73,8 @@ return new class () extends Migration {
             $table->foreignIdFor(Discount::class)
                 ->index()
                 ->nullable();
-            $table->morphs(Customer::class);
-            $table->morphs(Order::class);
+            $table->foreignIdFor(Customer::class);
+            // $table->foreignIdFor(Order::class);
 
             $table->string('code')->index();
             $table->bigInteger('times_used')
