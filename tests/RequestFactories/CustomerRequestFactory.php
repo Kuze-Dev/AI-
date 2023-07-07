@@ -22,6 +22,7 @@ class CustomerRequestFactory extends RequestFactory
                 return "{$firstName}.{$lastName}@fake.com";
             },
             'password' => 'secret',
+            'password_confirmation' => 'secret',
             'mobile' => $this->faker->phoneNumber(),
             'birth_date' => now()->subYears($this->faker->randomDigitNotNull())->format('Y-m-d'),
         ];
@@ -30,6 +31,7 @@ class CustomerRequestFactory extends RequestFactory
     public function shippingAddress(State $state): self
     {
         return $this->state([
+            'shipping_country_id' => $state->country->getRouteKey(),
             'shipping_state_id' => $state->getRouteKey(),
             'shipping_address_line_1' => $this->faker->address(),
             'shipping_zip_code' => $this->faker->postcode(),
@@ -49,6 +51,7 @@ class CustomerRequestFactory extends RequestFactory
     {
         return $this->state([
             'billing_same_as_shipping' => false,
+            'billing_country_id' => $state->country->getRouteKey(),
             'billing_state_id' => $state->getRouteKey(),
             'billing_address_line_1' => $this->faker->address(),
             'billing_zip_code' => $this->faker->postcode(),
