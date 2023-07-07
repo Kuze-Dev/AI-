@@ -50,7 +50,13 @@ class CartQuantityUpdateRequest extends FormRequest
 
     protected function prepareForValidation()
     {
+
         $this->merge([
+            /**
+             * @phpstan-ignore-next-line
+             *  Cannot cast object|string|null to int.
+             * PHPStan doesn't analyze the vendor files.
+             */
             'cartLineId' => (int) $this->route('cartLineId'),
         ]);
     }

@@ -7,6 +7,9 @@ namespace App\HttpTenantApi\Resources;
 use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
+/**
+ * @mixin \Domain\Cart\Models\Cart
+ */
 class CartResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
@@ -17,6 +20,7 @@ class CartResource extends JsonApiResource
         ];
     }
 
+    /** @return array<string, callable> */
     public function toRelationships(Request $request): array
     {
         return [

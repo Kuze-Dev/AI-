@@ -80,6 +80,11 @@ class CartStoreRequest extends FormRequest
                 'min:1',
                 function ($attribute, $value, $fail) {
                     $purchasableId = $this->input('purchasable_id');
+
+                    if ( ! $purchasableId) {
+                        $fail('Invalid product.');
+                    }
+
                     $hasVariant = $this->input('variant');
 
                     if ($hasVariant) {

@@ -15,7 +15,7 @@ use Exception;
 
 class CreateCartLineAction
 {
-    public function execute(Cart $cart, CartStoreData $cartLineData): CartLine
+    public function execute(Cart $cart, CartStoreData $cartLineData): CartLine|Exception
     {
         DB::beginTransaction();
 
@@ -27,6 +27,7 @@ class CreateCartLineAction
                 'Product' => $purchasableType = Product::class,
                 // 'Service' => $purchasableType = Service::class,
                 // 'Booking' => $purchasableType = Booking::class,
+                default => null
             };
 
             $productVariant = ProductVariant::whereProductId($cartLineData->purchasable_id)
@@ -56,7 +57,7 @@ class CreateCartLineAction
             return $cartLine;
         } catch (Exception $e) {
             DB::rollBack();
-            Log::info($e);
+            // Log::info($e);
 
             return $e;
         }

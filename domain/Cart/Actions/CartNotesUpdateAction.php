@@ -11,21 +11,25 @@ use Illuminate\Http\UploadedFile;
 
 class CartNotesUpdateAction
 {
-    public function execute(CartNotesUpdateData $cartLineData)
+    public function execute(CartNotesUpdateData $cartLineData): CartLine
     {
-        $customerId = auth()->user()->id;
+        $customerId = auth()->user()?->id;
 
-        $cartLine = CartLine::where('id', $cartLineData->cart_line_id)
+        $checkCart = CartLine::where('id', $cartLineData->cart_line_id)
             ->whereHas('cart', function ($query) use ($customerId) {
                 $query->whereCustomerId($customerId);
             })
             ->whereNull('checked_out_at')->first();
 
-        if ( ! $cartLine) {
+        if ( ! $checkCart) {
             throw new ModelNotFoundException();
         }
 
         $cartLine = CartLine::find($cartLineData->cart_line_id);
+
+        if ( ! $cartLine) {
+            throw new ModelNotFoundException();
+        }
 
         if ( ! is_null($cartLineData->files)) {
             foreach ($cartLineData->files as $file) {

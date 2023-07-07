@@ -27,7 +27,7 @@ class CartStoreAction
         return $this->createCartLine($cart, $cartData);
     }
 
-    private function createCartLine(Cart $cart, CartStoreData $cartData): CartActionResult|Exception
+    private function createCartLine(Cart $cart, CartStoreData $cartData): CartActionResult
     {
         $result = app(CreateCartLineAction::class)->execute($cart, $cartData);
 
@@ -35,6 +35,6 @@ class CartStoreAction
             return CartActionResult::SUCCESS;
         }
 
-        return $result;
+        return CartActionResult::FAILED;
     }
 }

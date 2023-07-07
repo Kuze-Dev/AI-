@@ -10,6 +10,8 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Eloquent;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * Domain\Cart\Models\CartLine
@@ -43,7 +45,7 @@ use Eloquent;
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine wherePurchasableType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereQuantity($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class CartLine extends Model implements HasMedia
 {
@@ -66,12 +68,14 @@ class CartLine extends Model implements HasMedia
         'checked_out_at' => 'datetime',
     ];
 
-    public function cart()
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Cart\Models\Cart, \Domain\Cart\Models\CartLine> */
+    public function cart(): BelongsTo
     {
         return $this->belongsTo(Cart::class);
     }
 
-    public function purchasable()
+    /** @return MorphTo<Model, self> */
+    public function purchasable(): MorphTo
     {
         return $this->morphTo();
     }

@@ -17,6 +17,8 @@ use Illuminate\Support\Str;
 use Spatie\RouteAttributes\Attributes\Get;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
+use Illuminate\Http\JsonResponse;
+use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     Prefix('checkouts'),
@@ -25,7 +27,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 class CheckoutController extends Controller
 {
     #[Post('/', name: 'checkouts')]
-    public function checkout(CheckoutRequest $request)
+    public function checkout(CheckoutRequest $request): JsonResponse
     {
         $validatedData = $request->validated();
 
@@ -62,9 +64,16 @@ class CheckoutController extends Controller
     }
 
     #[Get('/', 'checkouts')]
-    public function checkoutItems(Request $request)
+    public function checkoutItems(Request $request): JsonResponse|JsonApiResourceCollection
     {
-        $customerId = auth()->user()->id;
+        $customerId = auth()->user() ? auth()->user()->id : null;
+
+        if ( ! $customerId) {
+            return response()
+                ->json([
+                    'error' => 'Access denied',
+                ], 403);
+        }
 
         $reference = $request->input('reference');
 

@@ -34,7 +34,7 @@ class CheckoutRequest extends FormRequest
                 'array',
                 function ($attribute, $value, $fail) {
 
-                    $customerId = auth()->user()->id;
+                    $customerId = auth()->user()?->id;
 
                     $cartLines = CartLine::with('purchasable')->whereIn('id', $value)
                         ->whereHas('cart', function ($query) use ($customerId) {

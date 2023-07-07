@@ -14,7 +14,7 @@ return new class () extends Migration {
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(Customer::class)->index()->onDelete('cascade');
+            $table->foreignIdFor(Customer::class)->index();
             $table->string('coupon_code')->nullable()->default(null)->index();
 
             $table->timestamps();
@@ -22,9 +22,9 @@ return new class () extends Migration {
 
         Schema::create('cart_lines', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Cart::class)->index()->onDelete('cascade');
+            $table->foreignIdFor(Cart::class)->index();
 
-            $table->unsignedInteger('purchasable_id')->index()->onDelete('cascade');
+            $table->unsignedInteger('purchasable_id')->index();
             $table->string('purchasable_type')->index();
             $table->integer('quantity');
             $table->json('meta')->nullable()->default(null);

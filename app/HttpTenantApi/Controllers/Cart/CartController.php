@@ -41,14 +41,7 @@ class CartController extends Controller
     public function show(int $cartId): JsonApiResource|JsonResponse
     {
         try {
-            $customerId = auth()->user() ? auth()->user()->id : null;
-
-            if (!$customerId) {
-                return response()
-                    ->json([
-                        'error' => 'Access denied',
-                    ], 403);
-            }
+            $customerId = auth()->user()?->id;
 
             Cart::where('id', $cartId)->whereCustomerId($customerId)->firstOrFail();
 
@@ -76,7 +69,14 @@ class CartController extends Controller
     {
         $validatedData = $request->validated();
 
-        $validatedData['customer_id'] = auth()->user()->id;
+        $validatedData['customer_id'] = auth()->user() ? auth()->user()->id : null;
+
+        if ( ! $validatedData['customer_id']) {
+            return response()
+                ->json([
+                    'error' => 'Access denied',
+                ], 403);
+        }
 
         $result = app(CartStoreAction::class)
             ->execute(CartStoreData::fromArray($validatedData));
@@ -98,11 +98,16 @@ class CartController extends Controller
     public function delete(int $cartLineId): JsonResponse
     {
         try {
-            $customerId = auth()->user()->id;
+            $customerId = auth()->user()?->id;
 
             $cartLine = CartLine::whereHas(
                 'cart',
                 function (Builder $query) use ($customerId) {
+                    /**
+                     * @phpstan-ignore-next-line
+                     *  Call to an undefined method Illuminate\Database\Eloquent\Builder::whereCustomerId().
+                     * PHPStan doesn't analyze the vendor files.
+                     */
                     $query->whereCustomerId($customerId);
                 }
             )->where('id', $cartLineId)
@@ -126,7 +131,7 @@ class CartController extends Controller
     public function clear(int $cartId): JsonResponse
     {
         try {
-            $customerId = auth()->user()->id;
+            $customerId = auth()->user()?->id;
 
             $cart = Cart::where('id', $cartId)->whereCustomerId($customerId)->firstOrFail();
 
@@ -150,7 +155,7 @@ class CartController extends Controller
         try {
             $cartLineIds = $request->input('cart_line_ids');
 
-            $customerId = auth()->user()->id;
+            $customerId = auth()->user()?->id;
 
             $cartLines = CartLine::whereIn('id', $cartLineIds)
                 ->whereHas('cart', function ($query) use ($customerId) {
@@ -199,6 +204,12 @@ class CartController extends Controller
                         // 'data' => $result,
                     ]);
             }
+
+            return response()
+                ->json([
+                    'message' => 'Cart didnt update',
+                    // 'data' => $result,
+                ]);
         } catch (ModelNotFoundException $e) {
             return response()
                 ->json([

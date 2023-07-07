@@ -9,21 +9,18 @@ use Domain\Cart\Models\CartLine;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Log;
 
 class CartQuantityUpdateAction
 {
-    public function execute(CartQuantityUpdateData $cartLineData)
+    public function execute(CartQuantityUpdateData $cartLineData): CartLine|array
     {
-        $customerId = auth()->user()->id;
+        $customerId = auth()->user()?->id;
 
         $cartLine = CartLine::with('purchasable')->where('id', $cartLineData->cart_line_id)
             ->whereHas('cart', function ($query) use ($customerId) {
                 $query->whereCustomerId($customerId);
             })
             ->whereNull('checked_out_at')->first();
-
-        Log::info($cartLine);
 
         if ( ! $cartLine) {
             throw new ModelNotFoundException();
@@ -35,6 +32,12 @@ class CartQuantityUpdateAction
             $product = Product::find($cartLine->purchasable_id);
         } elseif ($cartLine->purchasable instanceof ProductVariant) {
             $product = ProductVariant::find($cartLine->purchasable_id);
+        }
+
+        if ( ! $product) {
+            return [
+                'message' => 'Product not found',
+            ];
         }
 
         if (
@@ -57,7 +60,8 @@ class CartQuantityUpdateAction
                 [
                     'quantity' => $cartLineData->quantity,
                 ]
-            )
+            ),
+            default => null
         };
 
         return $cartLine;

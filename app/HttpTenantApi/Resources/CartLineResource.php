@@ -8,6 +8,9 @@ use Domain\Product\Models\ProductVariant;
 use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
+/**
+ * @mixin \Domain\Cart\Models\CartLine
+ */
 class CartLineResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
