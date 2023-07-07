@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\Http\Controllers\Controller;
+use App\HttpTenantApi\Resources\CartLineResource;
 use Domain\Cart\DataTransferObjects\CheckoutData;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CheckoutRequest;
+use Domain\Product\Models\ProductVariant;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 use Spatie\RouteAttributes\Attributes\Prefix;
@@ -15,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Spatie\RouteAttributes\Attributes\Get;
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
 
 #[
     Prefix('checkouts'),
@@ -31,6 +34,7 @@ class CheckoutController extends Controller
 
         $cartLinesForCheckout = CartLine::select(['cart_lines.id', 'cart_lines.purchasable_id'])
             ->join('products', 'cart_lines.purchasable_id', '=', 'products.id')
+            ->whereNull('checked_out_at')
             ->where('products.stock', '>', DB::raw('cart_lines.quantity'))
             ->whereIn('cart_lines.id', $payload->cart_line_ids)
             ->get();
@@ -46,7 +50,8 @@ class CheckoutController extends Controller
 
         CartLine::whereIn('id', $cartLineIds)
             ->update([
-                'checkout_reference' => $checkoutReference
+                'checkout_reference' => $checkoutReference,
+                'checkout_expiration' => now()->addMinutes(20)
             ]);
 
         return response()
@@ -77,11 +82,13 @@ class CheckoutController extends Controller
             $purchasableIds = [];
         }
 
-        $cartLines = CartLine::with(["purchasable", "variant"])->whereHas('cart', function ($query) use ($customerId) {
+        $cartLineQuery = CartLine::with(["purchasable", 'media'])->whereHas('cart', function ($query) use ($customerId) {
             $query->whereCustomerId($customerId);
         })->whereIn('purchasable_id', $purchasableIds)
             ->whereCheckoutReference($reference)
-            ->get();
+            ->where('checkout_expiration', '>', now());
+
+        $cartLines = $cartLineQuery->get();
 
         if (count($cartLines) <= 0) {
             return response()->json([
@@ -90,33 +97,10 @@ class CheckoutController extends Controller
             ], 400);
         }
 
-        return $cartLines;
-
-
-
-
-        // $cartLines->each(function ($cartLine) {
-        //     $mediaCollection = $cartLine->getMedia('cart_line_notes');
-        //     $previewUrl = $mediaCollection->isEmpty() ? null : $mediaCollection->first()->getUrl('preview');
-        //     $cartLine->unsetRelation('media');
-        //     if ($previewUrl) {
-        //         $cartLine->notes_image = [
-        //             'preview_url' => $previewUrl,
-        //         ];
-        //     }
-
-        //     $productImageCollection = $cartLine->purchasable->getFirstMediaUrl('image');
-        //     $productImageUrl = $productImageCollection;
-        //     $cartLine->purchasable->unsetRelation('media');
-        //     if (!empty($productImageUrl)) {
-        //         $cartLine->purchasable->image = $productImageUrl;
-        //     }
-        // });
-
-        // return response()
-        //     ->json([
-        //         'message' => 'Cart Lines for checkout',
-        //         'data' => $cartLines
-        //     ]);
+        return CartLineResource::collection(
+            QueryBuilder::for(
+                $cartLineQuery
+            )->jsonPaginate()
+        );
     }
 }

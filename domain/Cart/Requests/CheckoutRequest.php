@@ -6,10 +6,8 @@ namespace Domain\Cart\Requests;
 
 use Domain\Cart\Models\CartLine;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Support\Facades\Log;
 
 class CheckoutRequest extends FormRequest
 {
@@ -43,16 +41,6 @@ class CheckoutRequest extends FormRequest
                             $query->whereCustomerId($customerId);
                         })
                         ->get();
-
-                    foreach ($cartLines as $cartLine) {
-                        if ($cartLine->purchasable->allow_customer_remarks) {
-                            $remarks = $cartLine->notes;
-                            $remarkImage = $cartLine->getFirstMediaUrl('cart_line_notes') ?? null;
-                            if (empty($remarks) && empty($remarkImage)) {
-                                $fail('Remarks are required for this cart line.');
-                            }
-                        }
-                    }
 
                     if (count($value) !== $cartLines->count()) {
                         $fail('Invalid cart line IDs.');
