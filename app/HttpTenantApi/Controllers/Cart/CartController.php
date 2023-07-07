@@ -6,6 +6,7 @@ namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartLineResource;
+use App\HttpTenantApi\Resources\CartResource;
 use Domain\Cart\Actions\CartNotesUpdateAction;
 use Domain\Cart\Actions\CartQuantityUpdateAction;
 use Domain\Cart\Actions\CartStoreAction;
@@ -44,14 +45,14 @@ class CartController extends Controller
 
             Cart::where('id', $cartId)->whereCustomerId($customerId)->firstOrFail();
 
-            return CartLineResource::collection(
-                QueryBuilder::for(
-                    CartLine::with(["purchasable", 'variant'])
-                        ->whereCartId($cartId)
-                        ->whereNull("checked_out_at")
-                )->allowedIncludes(['purchasable', 'variant'])
-                    ->jsonPaginate()
-            );
+            $model = QueryBuilder::for(
+                Cart::with(["cartLines", 'cartLines.purchasable'])
+                    ->where('id', $cartId)
+                    ->whereCustomerId($customerId)
+            )->allowedIncludes(['cartLines', 'cartLines.purchasable'])
+                ->firstOrFail();
+
+            return CartResource::make($model);
         } catch (ModelNotFoundException $e) {
             return response()
                 ->json([

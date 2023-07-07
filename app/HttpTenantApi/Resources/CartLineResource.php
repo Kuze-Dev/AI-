@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
+use Domain\Product\Models\ProductVariant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Spatie\QueryBuilder\QueryBuilder;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 class CartLineResource extends JsonApiResource
@@ -13,17 +16,26 @@ class CartLineResource extends JsonApiResource
     {
         return [
             'id' => $this->id,
+            'cart_id' => $this->cart_id,
             'quantity' => $this->quantity,
-            'notes' => $this->notes,
-            'notes_image_url' => $this->getFirstMediaUrl('cart_line_notes')
+            'meta' => $this->meta,
+            'purchasable' => $this->purchasable->toArray()
         ];
     }
 
     public function toRelationships(Request $request): array
     {
         return [
-            'purchasable' => fn () => ProductResource::make($this->purchasable),
-            'variant' => fn () => ProductVariantResource::make($this->variant),
+            'purchasable' => function () {
+                switch ($this->purchasable_type) {
+                    case 'Domain\Product\Models\Product': {
+                            return ProductResource::make($this->purchasable);
+                        }
+                    case 'Domain\Product\Models\ProductVariant': {
+                            return ProductVariantResource::make($this->purchasable);
+                        }
+                }
+            }
         ];
     }
 }

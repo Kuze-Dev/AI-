@@ -30,7 +30,7 @@ class Cart extends Model
         'coupon_code'
     ];
 
-    public function cart_lines()
+    public function cartLines()
     {
         return $this->hasMany(CartLine::class);
     }

@@ -55,11 +55,6 @@ class CartLine extends Model implements HasMedia
         return $this->morphTo();
     }
 
-    public function variant()
-    {
-        return $this->belongsTo(ProductVariant::class, 'variant_id');
-    }
-
     public function registerMediaCollections(): void
     {
         $registerMediaConversions = function (Media $media) {
