@@ -121,7 +121,7 @@ class CartController extends Controller
         try {
             $customerId = auth()->user()->id;
 
-            $cart =  Cart::where('id', $cartId)->whereCustomerId($customerId)->firstOrFail();
+            $cart = Cart::where('id', $cartId)->whereCustomerId($customerId)->firstOrFail();
 
             $cart->delete();
 

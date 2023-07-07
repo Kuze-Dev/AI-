@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 
-#[OnDeleteCascade(['cart_lines'])]
 /**
  * Domain\Cart\Models\Cart
  *
@@ -20,6 +19,8 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @method static \Illuminate\Database\Eloquent\Builder|Cart query()
  * @mixin \Eloquent
  */
+
+#[OnDeleteCascade(['cartLines'])]
 class Cart extends Model
 {
     use HasFactory;
