@@ -10,12 +10,13 @@ use Exception;
 
 class CountrySeeder extends Seeder
 {
+    /** @throws Exception */
     public function run(): void
     {
-        $countriesData = $this->getCountriesData();
+        $countries = $this->getCountryData();
 
-        if ($countriesData) {
-            foreach ($countriesData as $countryData) {
+        if ($countries) {
+            foreach ($countries as $countryData) {
                 $country = Country::create([
                     'code' => $countryData['iso2'],
                     'name' => $countryData['name'],
@@ -33,7 +34,8 @@ class CountrySeeder extends Seeder
         }
     }
 
-    protected function getCountriesData(): array
+    /** @throws Exception */
+    protected function getCountryData(): array
     {
         $response = file_get_contents('https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/countries%2Bstates.json');
 
