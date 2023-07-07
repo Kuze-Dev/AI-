@@ -10,7 +10,7 @@ use InvalidArgumentException;
 
 trait HasProductOptions
 {
-    public ?string $productOption = null;
+    public ?string $activeProductOption = null;
 
     public ?string $activeProductOptionItemStatePath = null;
 
@@ -18,7 +18,7 @@ trait HasProductOptions
 
     public function getActiveProductOption(): ?string
     {
-        return $this->productOption;
+        return $this->activeProductOption;
     }
 
     public function getActiveProductOptionItemStatePath(): ?string
@@ -28,7 +28,7 @@ trait HasProductOptions
 
     public function mountProductOptionItem(string $productOption, string $itemStatePath): void
     {
-        $this->productOption = $productOption;
+        $this->activeProductOption = $productOption;
         $this->activeProductOptionItemStatePath = $itemStatePath;
 
         $this->mountAction('product-option-form');
@@ -36,7 +36,7 @@ trait HasProductOptions
 
     public function unmountProductOptionItem(): void
     {
-        $this->productOption = null;
+        $this->activeProductOption = null;
         $this->activeProductOptionItemStatePath = null;
     }
 

@@ -12,7 +12,7 @@ interface HasProductOptions
 
     public function getActiveProductOptionItemStatePath(): ?string;
 
-    public function mountProductOptionItem(string $tree, string $itemStatePath): void;
+    public function mountProductOptionItem(string $productOption, string $itemStatePath): void;
 
     public function unmountProductOptionItem(): void;
 

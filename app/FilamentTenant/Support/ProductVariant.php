@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Support;
 
+use App\FilamentTenant\Support\Contracts\HasProductVariants;
 use Closure;
 use Filament\Forms\Components\Concerns\CanLimitItemsLength;
 use Filament\Forms\Components\Field;
+use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class ProductVariant extends Field
 {
@@ -18,11 +21,29 @@ class ProductVariant extends Field
 
     protected string|Closure $childrenStateName = 'children';
 
+    protected array|Closure $productVariants = [];
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->registerListeners([]);
+        $this->registerListeners([
+            'productVariant::editItem' => [
+                function (self $component, string $statePath): void {
+                    if ( ! Str::startsWith($statePath, $component->getStatePath())) {
+                        return;
+                    }
+
+                    $livewire = $component->getLivewire();
+
+                    if ( ! $livewire instanceof HasProductVariants) {
+                        throw new InvalidArgumentException();
+                    }
+
+                    $livewire->mountProductVariantItem($this->getName(), "{$statePath}." . (string) Str::uuid());
+                },
+            ],
+        ]);
 
         $this->mutateDehydratedStateUsing(static function (?array $state): array {
             return array_values($state ?? []);
