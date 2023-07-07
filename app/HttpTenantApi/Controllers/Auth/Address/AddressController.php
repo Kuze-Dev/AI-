@@ -34,6 +34,7 @@ class AddressController extends Controller
         return AddressResource::collection(
             QueryBuilder::for(Address::whereBelongsTo($customer))
                 ->defaultSort('-updated_at')
+                ->allowedIncludes('state')
                 ->jsonPaginate()
         );
     }
