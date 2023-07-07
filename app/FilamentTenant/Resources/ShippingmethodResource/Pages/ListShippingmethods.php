@@ -1,0 +1,19 @@
+<?php
+
+namespace App\FilamentTenant\Resources\ShippingmethodResource\Pages;
+
+use App\FilamentTenant\Resources\ShippingmethodResource;
+use Filament\Pages\Actions;
+use Filament\Resources\Pages\ListRecords;
+
+class ListShippingmethods extends ListRecords
+{
+    protected static string $resource = ShippingmethodResource::class;
+
+    protected function getActions(): array
+    {
+        return [
+            Actions\CreateAction::make(),
+        ];
+    }
+}
