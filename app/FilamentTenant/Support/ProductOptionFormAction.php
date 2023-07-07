@@ -44,7 +44,7 @@ class ProductOptionFormAction extends Action
         parent::setUp();
 
         $this->modalHeading(function (HasProductOptions $livewire) {
-            if (!$activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
+            if ( ! $activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
                 return;
             }
 
@@ -64,7 +64,7 @@ class ProductOptionFormAction extends Action
         $this->slideOver(true);
 
         $this->mountUsing(function (HasProductOptions $livewire, ComponentContainer $form) {
-            if (!$activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
+            if ( ! $activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
                 return;
             }
 
@@ -82,7 +82,7 @@ class ProductOptionFormAction extends Action
 
             $updatedVariants = $this->updatingProductVariants($livewire->record, $productVariants);
 
-            if (!$activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
+            if ( ! $activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
                 return;
             }
 
@@ -100,7 +100,6 @@ class ProductOptionFormAction extends Action
 
         $existingCombination = $record->productVariants->toArray();
         $newCombination = $productVariants;
-
 
         // $newCombination = [
         //     [
@@ -125,7 +124,7 @@ class ProductOptionFormAction extends Action
         //         ],
         //     ]
         // ];
-        
+
         // $existingCombination = [
         //     [
         //         'id' => 1,
@@ -144,10 +143,10 @@ class ProductOptionFormAction extends Action
         //         'selling_price' => 5,
         //     ]
         // ];
-        
+
         $mergedCombination = array_merge_recursive($newCombination, $existingCombination);
         $result = [];
-        
+
         foreach ($mergedCombination as $key => $combination) {
             $keyData = serialize($combination['combination']);
 
@@ -164,15 +163,14 @@ class ProductOptionFormAction extends Action
             $combination['stock'] = isset($combination['stock']) ? $combination['stock'] : $record->stock;
             $combination['status'] = isset($combination['status']) ? $combination['status'] : $record->status;
             $combination['sku'] = isset($combination['sku']) ? $combination['sku'] : $record->sku . $key;
-            unset($combination['product_id']);
-            unset($combination['created_at']);
-            unset($combination['updated_at']);
+            unset($combination['product_id'], $combination['created_at'], $combination['updated_at']);
+
             $result[$keyData] = $combination;
 
         }
-        
+
         $result = array_values($result);
-        
+
         // print_r($result);
         // dd('resulttt : ', $result);
         return $result;

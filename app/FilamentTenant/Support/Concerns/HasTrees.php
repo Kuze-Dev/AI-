@@ -42,7 +42,7 @@ trait HasTrees
 
     public function getTreeComponent(): Tree
     {
-        if (!isset($this->treeComponent)) {
+        if ( ! isset($this->treeComponent)) {
             $this->cacheTreeComponent();
         }
 
