@@ -24,7 +24,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property string|null $subtitle
  * @property bool $status
  * @property string|null $description
- * @property array|null $credentials
+ * @property string|null $instruction
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -37,11 +37,11 @@ use Spatie\Sluggable\SlugOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod query()
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod whereCredentials($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod whereGateway($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod whereInstruction($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod whereSubtitle($value)

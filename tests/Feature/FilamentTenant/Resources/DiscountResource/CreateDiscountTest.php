@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\DiscountResource\Pages\CreateDiscount;
 use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
-use Domain\Discount\Models\DiscountCondition;
 use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -17,7 +16,7 @@ beforeEach(function () {
     loginAsSuperAdmin();
 });
 
-it('can render discounts', function () {
+it('can render page', function () {
     livewire(CreateDiscount::class)
         ->assertFormExists()
         ->assertOk();
@@ -33,12 +32,12 @@ it('can create discount', function () {
             'max_uses' => 10,
             'status' => DiscountStatus::ACTIVE->value,
             'valid_start_at' => ($valid_start_at = now(Auth::user()->timezone)->toImmutable()),
-            // 'valid_end_at' => now()->subDay()->addDay()->format('Y-m-d'),
+            'valid_end_at' => ($valid_end_at = now(Auth::user()->timezone)->addDay()->toImmutable()),
 
             'discountCondition.discount_type' => 'order_sub_total',
             'discountCondition.amount_type' => 'percentage',
             'discountCondition.amount' => 50,
-            'discountRequirement.requirement_type' => 'minimimun_order_amount',
+            'discountRequirement.requirement_type' => null,
             'discountRequirement.minimum_amount' => 1000,
         ])
         ->call('create')
@@ -46,7 +45,6 @@ it('can create discount', function () {
         ->assertOk();
 
     assertDatabaseHas(Discount::class, [
-        'id' => 1,
         'name' => 'discount name',
         'slug' => 'discount-name',
         'description' => 'this is the description',
@@ -54,20 +52,20 @@ it('can create discount', function () {
         'max_uses' => 10,
         'status' => DiscountStatus::ACTIVE->value,
         'valid_start_at' => $valid_start_at,
-        // 'valid_end_at' => now()->subDay()->addDay()->toDateString().'00:00:00',
+        'valid_end_at' => $valid_end_at,
     ]);
 
-    // assertDatabaseHas(DiscountCondition::class, [
-    //     'discount_id' => 1,
-    //     'discount_type' => 'order_sub_total',
-    //     'amount_type' => 'percentage',
-    //     'amount' => 50,
-    // ]);
+    assertDatabaseHas('discount_conditions', [
+        'discount_id' => Discount::first()->getKey(),
+        'discount_type' => 'order_sub_total',
+        'amount_type' => 'percentage',
+        'amount' => 50,
+    ]);
 
-    // assertDatabaseHas(DiscountRequirement::class, [
-    //     'discount_id' => 1,
-    //     'requirement_type' => 'minimimun_order_amount',
-    //     'minimum_amount' => 1000,
-    // ]);
+    assertDatabaseHas('discount_requirements', [
+        'discount_id' => Discount::first()->getKey(),
+        'requirement_type' => null,
+        'minimum_amount' => 1000,
+    ]);
 
 });

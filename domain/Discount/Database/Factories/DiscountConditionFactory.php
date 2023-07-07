@@ -7,6 +7,9 @@ namespace Domain\Discount\Database\Factories;
 use Domain\Discount\Models\DiscountCondition;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Discount\Models\DiscountCondition>
+ */
 class DiscountConditionFactory extends Factory
 {
     protected $model = DiscountCondition::class;
@@ -16,7 +19,7 @@ class DiscountConditionFactory extends Factory
         return [
             'discount_type' => fake()->randomElement(['order_sub_total', 'delivery_fee']),
             'amount_type' => fake()->randomElement(['fixed_value', 'percentage']),
-            'amount' => fake()->randomNumber(),
+            'amount' => fake()->numberBetween(1, 100),
         ];
     }
 }

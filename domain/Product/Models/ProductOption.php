@@ -11,6 +11,29 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
+/**
+ * Domain\Product\Models\ProductOption
+ *
+ * @property int $id
+ * @property int $product_id
+ * @property string $name
+ * @property string $slug
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Domain\Product\Models\Product|null $product
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Product\Models\ProductOptionValue> $productOptionValues
+ * @property-read int|null $product_option_values_count
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductOption newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductOption newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductOption query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductOption whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductOption whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductOption whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductOption whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductOption whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductOption whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class ProductOption extends Model
 {
     use HasSlug;

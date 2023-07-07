@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-
 use App\Settings\FormSettings;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
@@ -12,12 +11,15 @@ use Domain\Currency\Models\Currency;
 use Domain\Address\Models\Address;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Cart\Models\Cart;
+use Domain\Cart\Models\CartLine;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Domain\Discount\Models\Discount;
 use Domain\Discount\Models\DiscountCondition;
 use Domain\Discount\Models\DiscountRequirement;
 use Domain\Customer\Models\Customer;
+use Domain\Discount\Models\DiscountLimit;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
@@ -87,6 +89,7 @@ class AppServiceProvider extends ServiceProvider
             Discount::class,
             DiscountRequirement::class,
             DiscountCondition::class,
+            DiscountLimit::class,
             TaxZone::class,
             Country::class,
             State::class,
@@ -94,6 +97,8 @@ class AppServiceProvider extends ServiceProvider
             Tier::class,
             Customer::class,
             Address::class,
+            Cart::class,
+            CartLine::class,
             PaymentMethod::class,
             Payment::class,
         ]);
@@ -134,6 +139,5 @@ class AppServiceProvider extends ServiceProvider
 
         Feature::discover('App\\Features\\CMS', app_path('Features/CMS'));
         Feature::discover('App\\Features\\ECommerce', app_path('Features/ECommerce'));
-
     }
 }

@@ -16,7 +16,6 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
-use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -32,6 +31,8 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string $sku
  * @property string $retail_price
  * @property string $selling_price
+ * @property array|null $dimension
+ * @property string|null $weight
  * @property int $stock
  * @property string|null $description
  * @property string $status
@@ -47,19 +48,21 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
  * @property-read \Support\MetaData\Models\MetaData|null $metaData
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Product\Models\ProductOption> $productOptions
+ * @property-read int|null $product_options_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Product\Models\ProductVariant> $productVariants
+ * @property-read int|null $product_variants_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Support\RouteUrl\Models\RouteUrl> $routeUrls
  * @property-read int|null $route_urls_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Taxonomy> $taxonomies
- * @property-read int|null $taxonomies_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
  * @method static \Illuminate\Database\Eloquent\Builder|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product query()
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereAllowCustomerRemarks($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereAllowRemarkWithImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereDimension($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsDigitalProduct($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsFeatured($value)
@@ -72,6 +75,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereStock($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereWeight($value)
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['metaData'])]

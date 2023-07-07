@@ -15,12 +15,13 @@ class ProductVariantResource extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         return [
-            'sku',
-            'combination',
-            'retail_price',
-            'selling_price',
-            'stock',
-            'status',
+            'sku' => $this->sku,
+            'combination' => $this->combination,
+            'retail_price' => $this->retail_price,
+            'selling_price' => $this->selling_price,
+            'stock' => $this->stock,
+            'status' => $this->status,
+            'product' => $this->product,
         ];
     }
 
