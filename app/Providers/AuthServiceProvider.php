@@ -61,7 +61,7 @@ class AuthServiceProvider extends ServiceProvider
                     'tenant.api.customer.verify',
                     now()->addMinutes(Config::get('auth.verification.expire', 60)),
                     [
-                        'id' => $notifiable->getKey(),
+                        'id' => $notifiable->getRouteKey(),
                         'hash' => sha1($notifiable->getEmailForVerification()),
                     ],
                     false
