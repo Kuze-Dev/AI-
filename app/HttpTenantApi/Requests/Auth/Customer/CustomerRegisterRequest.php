@@ -13,6 +13,7 @@ use Domain\Customer\DataTransferObjects\CustomerRegisterData;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -41,7 +42,14 @@ class CustomerRegisterRequest extends FormRequest
             ],
             'shipping_state_id' => [
                 'required',
-                Rule::exists(State::class, (new State())->getRouteKeyName()),
+                Rule::exists(State::class, (new State())->getRouteKeyName())
+                    ->where(function (Builder $query) {
+
+                        $country = app(Country::class)
+                            ->resolveRouteBinding($this->input('shipping_country_id'));
+
+                        return $query->where('country_id', $country?->getKey());
+                    }),
             ],
             'shipping_address_line_1' => 'required|string|max:255',
             'shipping_zip_code' => 'required|string|max:255',
@@ -56,7 +64,14 @@ class CustomerRegisterRequest extends FormRequest
             ],
             'billing_state_id' => [
                 'required_if:billing_same_as_shipping,0',
-                Rule::exists(State::class, (new State())->getRouteKeyName()),
+                Rule::exists(State::class, (new State())->getRouteKeyName())
+                    ->where(function (Builder $query) {
+
+                        $country = app(Country::class)
+                            ->resolveRouteBinding($this->input('billing_country_id'));
+
+                        return $query->where('country_id', $country?->getKey());
+                    }),
             ],
             'billing_address_line_1' => 'required_if:billing_same_as_shipping,0|string|max:255',
             'billing_zip_code' => 'required_if:billing_same_as_shipping,0|string|max:255',

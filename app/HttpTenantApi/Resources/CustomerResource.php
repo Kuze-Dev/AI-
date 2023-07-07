@@ -15,6 +15,7 @@ class CustomerResource extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         return  [
+            'cuid' => $this->cuid,
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
             'email' => $this->email,
