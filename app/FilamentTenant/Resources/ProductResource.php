@@ -95,14 +95,14 @@ class ProductResource extends Resource
                                         ->label('Height'),
                                 ])->columns(3),
                         ]),
-                    Forms\Components\Section::make(trans('Variants (work in progress)'))->schema([
+                    Forms\Components\Section::make(trans('Variant'))->schema([
                         // For Manage Variant
                         ProductOptionSupport::make('product_options')
                             ->formatStateUsing(fn () => [])
                             ->itemLabel(fn (array $state) => $state['name'] ?? null)
                             ->schema([
                                 Forms\Components\Repeater::make('options')
-                                    ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state) {
+                                    ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, Closure $set) {
                                         if ( ! $record) {
                                             return $state;
                                         }
@@ -116,6 +116,10 @@ class ProductResource extends Resource
                                             ];
                                         });
                                         $component->state($mappedOptions->toArray());
+                                        //     dd($mappedOptions->toArray());
+                                        // $productVariants = $this->generateCombinations($mappedOptions->toArray());
+                                        // dd($productVariants);
+                                        // $set('product_variants', $productVariants);
                                     })
                                     ->schema([
                                         Forms\Components\TextInput::make('name')
@@ -133,8 +137,22 @@ class ProductResource extends Resource
                                     ->maxItems(2)
                                     ->collapsible(),
                             ])->hiddenOn('create'),
-                        // ProductVariant::make('product_variants'),
-                        // Forms\Components\TextInput::make('product_variants')
+                        ProductVariant::make('product_variants')
+                            ->formatStateUsing(
+                                fn (Product $record) => $record->productVariants->toArray()
+                            ),
+                        // ->schema([
+                        //     Forms\Components\Section::make('Inventory & Shipping')
+                        //         ->schema([
+                        //             Forms\Components\TextInput::make('sku')
+                        //                 ->unique(ignoreRecord: true)
+                        //                 ->required(),
+                        //             Forms\Components\TextInput::make('stock')
+                        //                 ->numeric()
+                        //                 ->dehydrateStateUsing(fn ($state) => (int) $state)
+                        //                 ->required(),
+                        //         ])->columns(2),
+                        // ])
                     ]),
                     Forms\Components\Section::make('Inventory')
                         ->schema([
@@ -214,6 +232,26 @@ class ProductResource extends Resource
                     MetaDataForm::make('Meta Data'),
                 ])->columnSpan(1),
             ]);
+    }
+
+    private function generateCombinations($options, $current = [], $index = 0, $result = [])
+    {
+        if ($index === count($options)) {
+            $result[] = [
+                'id' => uniqid(), // Add a unique ID
+                'data' => $current,
+            ];
+
+            return $result;
+        }
+
+        foreach ($options[$index]['productOptionValues'] as $value) {
+            $newCurrent = $current;
+            $newCurrent[$options[$index]['name']] = $value['name'];
+            $result = $this->generateCombinations($options, $newCurrent, $index + 1, $result);
+        }
+
+        return $result;
     }
 
     public static function table(Table $table): Table
