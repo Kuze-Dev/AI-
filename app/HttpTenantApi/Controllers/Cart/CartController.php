@@ -225,30 +225,4 @@ class CartController extends Controller
                 ], 404);
         }
     }
-
-    #[Delete('/items/notes/{cartLineId}', name: 'cart.items.notes.{cartLineId}')]
-    public function deleteNotesImage(int $cartLineId)
-    {
-        try {
-            $customerId = auth()->user()->id;
-
-            $cartLine = CartLine::where('id', $cartLineId)
-                ->whereHas('cart', function ($query) use ($customerId) {
-                    $query->whereCustomerId($customerId);
-                })
-                ->whereNull('checked_out_at')->firstOrFail();
-
-            $cartLine->clearMediaCollection('cart_line_notes');
-
-            return response()
-                ->json([
-                    'message' => 'Image deleted successfully',
-                ]);
-        } catch (ModelNotFoundException $e) {
-            return response()
-                ->json([
-                    'error' => 'Cart line not found',
-                ], 404);
-        }
-    }
 }
