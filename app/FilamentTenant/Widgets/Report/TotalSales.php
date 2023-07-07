@@ -6,7 +6,7 @@ use Filament\Widgets\BarChartWidget;
 
 class TotalSales extends BarChartWidget
 {
-    protected static ?string $heading = 'Conversion Rate';
+    protected static ?string $heading = 'Total sales';
 
     protected function getData(): array
     {
@@ -16,18 +16,8 @@ class TotalSales extends BarChartWidget
                     'label' => 'Added to Cart',
                     'data' => [0, 10, 5, 2, 21, 32, 45, 74, 65, 45, 77, 89],
                 ],
-                [
-                    'label' => 'Reached Checkout',
-                    'data' => [0, 10, 5, 2, 21, 32, 45, 74, 65, 45, 77, 89],
-                    'fill'=> false,
-                    'borderColor'=> 'rgb(75, 192, 192)',
-                ],
-                [
-                    'label' => 'Registered User',
-                    'data' => [0, 2, 7, 26, 21, 32, 45, 74, 65, 45, 77, 89],
-                    'fill'=> false,
-                    'borderColor'=> 'rgb(75, 192, 192)',
-                ],
+     
+          
             ],
             'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         ];

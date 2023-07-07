@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Pages;
 
-use App\FilamentTenant\Widgets\Report\ConversionRate;
+use App\FilamentTenant\Widgets\Report as Widgets;
 use Artificertech\FilamentMultiContext\Concerns\ContextualPage;
 use Filament\Pages\Page;
 
@@ -23,10 +23,23 @@ class Report extends Page
     protected function getWidgets(): array
     {
         return [
-            ConversionRate::class,
+            Widgets\ConversionRate::class,
+            Widgets\TotalSales::class,
         ];
     }
 
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            Widgets\ConversionRate::class,
+            Widgets\TotalSales::class,
+            Widgets\ConversionRate::class,
+            Widgets\TotalSales::class,
+            Widgets\ConversionRate::class,
+            Widgets\TotalSales::class,
+        ];
+    }
 
     protected function getColumns(): int | string | array
     {
