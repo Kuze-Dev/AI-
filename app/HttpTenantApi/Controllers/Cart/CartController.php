@@ -46,7 +46,7 @@ class CartController extends Controller
             Cart::where('id', $cartId)->whereCustomerId($customerId)->firstOrFail();
 
             $model = QueryBuilder::for(
-                Cart::with(["cartLines", 'cartLines.purchasable'])
+                Cart::with(["cartLines", 'cartLines.purchasable', 'cartLines.media'])
                     ->whereHas('cartLines', function (Builder $query) {
                         $query->whereNull('checked_out_at');
                     })

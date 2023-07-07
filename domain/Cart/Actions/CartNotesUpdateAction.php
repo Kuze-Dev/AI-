@@ -7,6 +7,7 @@ namespace Domain\Cart\Actions;
 use Domain\Cart\DataTransferObjects\CartNotesUpdateData;
 use Domain\Cart\Models\CartLine;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\UploadedFile;
 
 class CartNotesUpdateAction
 {
@@ -26,12 +27,22 @@ class CartNotesUpdateAction
 
         $cartLine = CartLine::find($cartLineData->cart_line_id);
 
-        if (!is_null($cartLineData->file)) {
-            $cartLine->addMedia($cartLineData->file)->toMediaCollection('cart_line_notes');
+        if (!is_null($cartLineData->files)) {
+            foreach ($cartLineData->files as $file) {
+                $uploadedFile = new UploadedFile(
+                    $file->getRealPath(),
+                    $file->getClientOriginalName(),
+                    $file->getClientMimeType(),
+                    null,
+                    true
+                );
+
+                $cartLine->addMedia($uploadedFile)->toMediaCollection('cart_line_notes');
+            }
         }
 
         $cartLine->update([
-            'notes' => $cartLineData->notes,
+            'meta' => $cartLineData->meta,
         ]);
 
         return $cartLine;

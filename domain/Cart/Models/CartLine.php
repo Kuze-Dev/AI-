@@ -62,7 +62,6 @@ class CartLine extends Model implements HasMedia
         };
 
         $this->addMediaCollection('cart_line_notes')
-            ->singleFile()
             ->registerMediaConversions($registerMediaConversions);
     }
 }

@@ -33,8 +33,12 @@ class CartNotesUpdateRequest extends FormRequest
                 'required',
                 Rule::exists('cart_lines', 'id'),
             ],
-            'notes' => 'required|string',
-            'file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'meta' => [
+                'nullable',
+                'array'
+            ],
+            'file' => 'nullable|array',
+            'file.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 

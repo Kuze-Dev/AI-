@@ -10,8 +10,8 @@ class CartNotesUpdateData
 {
     public function __construct(
         public readonly int $cart_line_id,
-        public readonly ?string $notes,
-        public readonly ?UploadedFile $file,
+        public readonly mixed $meta,
+        public readonly ?array $files,
     ) {
     }
 
@@ -19,8 +19,8 @@ class CartNotesUpdateData
     {
         return new self(
             cart_line_id: (int) $data['cart_line_id'],
-            notes: $data['notes'],
-            file: $data['file'] ?? null,
+            meta: $data['meta'],
+            files: $data['file'] ?? null,
         );
     }
 }

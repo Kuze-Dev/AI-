@@ -19,7 +19,8 @@ class CartLineResource extends JsonApiResource
             'cart_id' => $this->cart_id,
             'quantity' => $this->quantity,
             'meta' => $this->meta,
-            'purchasable' => $this->purchasable->toArray()
+            'purchasable' => $this->purchasable->toArray(),
+            'remarks_images' => $this->media->toArray()
         ];
     }
 
