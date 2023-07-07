@@ -28,6 +28,8 @@ use Spatie\RouteAttributes\Attributes\Delete;
 use Spatie\RouteAttributes\Attributes\Patch;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
+use TiMacDonald\JsonApi\JsonApiResource;
 
 #[
     Prefix('carts'),
@@ -36,10 +38,17 @@ use Illuminate\Database\Eloquent\Builder;
 class CartController extends Controller
 {
     #[Get('/{cartId}', name: 'cart.show.{cartId}')]
-    public function show(int $cartId)
+    public function show(int $cartId): JsonApiResource|JsonResponse
     {
         try {
-            $customerId = auth()->user()->id;
+            $customerId = auth()->user() ? auth()->user()->id : null;
+
+            if (!$customerId) {
+                return response()
+                    ->json([
+                        'error' => 'Access denied',
+                    ], 403);
+            }
 
             Cart::where('id', $cartId)->whereCustomerId($customerId)->firstOrFail();
 
@@ -63,7 +72,7 @@ class CartController extends Controller
     }
 
     #[Post('/items', name: 'cart.items')]
-    public function store(CartStoreRequest $request)
+    public function store(CartStoreRequest $request): JsonResponse
     {
         $validatedData = $request->validated();
 
@@ -86,7 +95,7 @@ class CartController extends Controller
     }
 
     #[Delete('/items/{cartLineId}', name: 'cart.items.{cartLineId}')]
-    public function delete(int $cartLineId)
+    public function delete(int $cartLineId): JsonResponse
     {
         try {
             $customerId = auth()->user()->id;
@@ -114,7 +123,7 @@ class CartController extends Controller
     }
 
     #[Delete('/clear/{cartId}', name: 'cart.clear.{cartId}')]
-    public function clear(int $cartId)
+    public function clear(int $cartId): JsonResponse
     {
         try {
             $customerId = auth()->user()->id;
@@ -136,7 +145,7 @@ class CartController extends Controller
     }
 
     #[Post('/bulk-remove', name: 'cart.bulk-remove')]
-    public function bulkRemove(Request $request)
+    public function bulkRemove(Request $request): JsonResponse
     {
         try {
             $cartLineIds = $request->input('cart_line_ids');
@@ -173,7 +182,7 @@ class CartController extends Controller
     }
 
     #[Patch('/items/quantity/{cartLineId}', name: 'cart.items.quantity.{cartLineId}')]
-    public function update(CartQuantityUpdateRequest $request)
+    public function update(CartQuantityUpdateRequest $request): JsonResponse
     {
         try {
             $validatedData = $request->validated();
@@ -199,7 +208,7 @@ class CartController extends Controller
     }
 
     #[Post('/items/notes', name: 'cart.items.notes')]
-    public function updateNotes(CartNotesUpdateRequest $request)
+    public function updateNotes(CartNotesUpdateRequest $request): JsonResponse
     {
         try {
             $validatedData = $request->validated();

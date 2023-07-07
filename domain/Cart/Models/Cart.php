@@ -41,6 +41,7 @@ class Cart extends Model
         'coupon_code',
     ];
 
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Cart\Models\CartLine> */
     public function cartLines()
     {
         return $this->hasMany(CartLine::class);
