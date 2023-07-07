@@ -15,8 +15,8 @@ class ProductOptionResource extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         return [
-            'name',
-            'slug',
+            'name' => $this->name,
+            'slug' => $this->slug,
         ];
     }
 
