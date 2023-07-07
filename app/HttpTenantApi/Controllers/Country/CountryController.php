@@ -33,7 +33,7 @@ class CountryController
     public function show(string $country): CountryResource
     {
         return CountryResource::make(
-            QueryBuilder::for(Country::whereCode($country))
+            QueryBuilder::for(Country::whereCode($country)->whereActive(true))
                 ->allowedIncludes([
                     'states',
                 ])
