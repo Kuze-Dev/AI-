@@ -60,6 +60,7 @@ class AccountController extends Controller
                     last_name: $validated['last_name'],
                     mobile: $validated['mobile'],
                     birth_date: now()->parse($validated['birth_date']),
+                    email: $validated['email'],
                     password: $validated['password']
                 ))
         );
