@@ -30,7 +30,7 @@ trait HasTrees
     {
         $this->activeTree = $tree;
         $this->activeTreeItemStatePath = $itemStatePath;
-
+        dd($this);
         $this->mountAction('tree-form');
     }
 

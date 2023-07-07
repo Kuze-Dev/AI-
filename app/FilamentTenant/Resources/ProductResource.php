@@ -95,7 +95,7 @@ class ProductResource extends Resource
                                         ->label('Height'),
                                 ])->columns(3),
                         ]),
-                    Forms\Components\Section::make(trans('Variant (work in progress)'))->schema([
+                    Forms\Components\Section::make(trans('Variant'))->schema([
                         // For Manage Variant
                         ProductOptionSupport::make('product_options')
                             ->formatStateUsing(fn () => [])
@@ -139,14 +139,20 @@ class ProductResource extends Resource
                             ])->hiddenOn('create'),
                         ProductVariant::make('product_variants')
                             ->formatStateUsing(
-                                fn (Product $record) =>
-                                $record->productVariants->toArray()
+                                fn (Product $record) => $record->productVariants->toArray()
                             )
-                        // ->afterStateHydrated(function (ProductVariant $component, $state) {
-                        // $component->state(ucwords($state));
-                        // dd($component, $state);
-                        // }),
-                        // Forms\Components\TextInput::make('product_variants')
+                            // ->schema([
+                            //     Forms\Components\Section::make('Inventory & Shipping')
+                            //         ->schema([
+                            //             Forms\Components\TextInput::make('sku')
+                            //                 ->unique(ignoreRecord: true)
+                            //                 ->required(),
+                            //             Forms\Components\TextInput::make('stock')
+                            //                 ->numeric()
+                            //                 ->dehydrateStateUsing(fn ($state) => (int) $state)
+                            //                 ->required(),
+                            //         ])->columns(2),
+                            // ])
                     ]),
                     Forms\Components\Section::make('Inventory')
                         ->schema([

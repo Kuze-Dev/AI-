@@ -6,24 +6,11 @@
             productVariants: null,
             state: $wire.entangle('{{ $getStatePath() }}').defer,
         }">
-
-            <x-forms::button :wire:click="'dispatchFormEvent(\'productVariant::editItem\', \'' . $getStatePath() . '\')'"
-                size="sm" type="button">
-                @lang('Manage product option')
-            </x-forms::button>
-            {{-- @dd($getStatePath()) --}}
-            {{-- <ul>
-            <template x-for="item in state" :key="item.id">
-                <li x-text="item.data.size"></li>
-            </template>
-        </ul> --}}
             <div class="rounded-lg shadow">
                 <div>
                     <!-- Option List -->
                     <ul class="grid grid-cols-1 gap-2">
                         <!-- Option Item -->
-                        {{-- <template x-for="item in productVariants" :key="item.id">
-                        </template> --}}
                         @foreach ($getState() as $key => $item)
                             @include('filament.forms.product-variant.item', [
                                 'key' => $key,
