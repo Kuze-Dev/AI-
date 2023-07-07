@@ -47,6 +47,9 @@ class CartController extends Controller
 
             $model = QueryBuilder::for(
                 Cart::with(["cartLines", 'cartLines.purchasable'])
+                    ->whereHas('cartLines', function (Builder $query) {
+                        $query->whereNull('checked_out_at');
+                    })
                     ->where('id', $cartId)
                     ->whereCustomerId($customerId)
             )->allowedIncludes(['cartLines', 'cartLines.purchasable'])
@@ -95,7 +98,8 @@ class CartController extends Controller
                 function (Builder $query) use ($customerId) {
                     $query->whereCustomerId($customerId);
                 }
-            )->where('id', $cartLineId)->firstOrFail();
+            )->where('id', $cartLineId)
+                ->whereNull('checked_out_at')->firstOrFail();
 
             $cartLine->delete();
 
@@ -145,6 +149,7 @@ class CartController extends Controller
                 ->whereHas('cart', function ($query) use ($customerId) {
                     $query->whereCustomerId($customerId);
                 })
+                ->whereNull('checked_out_at')
                 ->get();
 
             if (count($cartLineIds) !== $cartLines->count()) {
