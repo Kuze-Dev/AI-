@@ -5,25 +5,36 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Settings\FormSettings;
+use Domain\Address\Models\Country;
+use Domain\Address\Models\State;
+use Domain\Currency\Models\Currency;
+use Domain\Address\Models\Address;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
-use Domain\Menu\Models\Menu;
-use Domain\Menu\Models\Node;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Domain\Discount\Models\Discount;
 use Domain\Discount\Models\DiscountCondition;
 use Domain\Discount\Models\DiscountRequirement;
+use Domain\Customer\Models\Customer;
+use Domain\Discount\Models\DiscountLimit;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
 use Domain\Globals\Models\Globals;
-use Domain\Page\Models\Page;
+use Domain\Menu\Models\Menu;
+use Domain\Menu\Models\Node;
 use Domain\Page\Models\Block;
+use Domain\Taxation\Models\TaxZone;
+use Domain\Page\Models\Page;
 use Support\Captcha\CaptchaManager;
 use Support\MetaData\Models\MetaData;
+use Domain\Product\Models\Product;
+use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\Payments\Models\Payment;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Domain\Tier\Models\Tier;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -66,6 +77,7 @@ class AppServiceProvider extends ServiceProvider
             Form::class,
             FormSubmission::class,
             FormEmailNotification::class,
+            Product::class,
             Taxonomy::class,
             TaxonomyTerm::class,
             Content::class,
@@ -75,6 +87,16 @@ class AppServiceProvider extends ServiceProvider
             Discount::class,
             DiscountRequirement::class,
             DiscountCondition::class,
+            DiscountLimit::class,
+            TaxZone::class,
+            Country::class,
+            State::class,
+            Currency::class,
+            Tier::class,
+            Customer::class,
+            Address::class,
+            PaymentMethod::class,
+            Payment::class,
         ]);
 
         Password::defaults(
@@ -113,5 +135,6 @@ class AppServiceProvider extends ServiceProvider
 
         Feature::discover('App\\Features\\CMS', app_path('Features/CMS'));
         Feature::discover('App\\Features\\ECommerce', app_path('Features/ECommerce'));
+
     }
 }

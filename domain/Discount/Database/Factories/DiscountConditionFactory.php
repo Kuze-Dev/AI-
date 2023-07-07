@@ -16,7 +16,7 @@ class DiscountConditionFactory extends Factory
         return [
             'discount_type' => fake()->randomElement(['order_sub_total', 'delivery_fee']),
             'amount_type' => fake()->randomElement(['fixed_value', 'percentage']),
-            'amount' => fake()->randomNumber(),
+            'amount' => fake()->numberBetween(1, 100),
         ];
     }
 }
