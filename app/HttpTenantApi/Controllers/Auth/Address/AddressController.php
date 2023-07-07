@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Auth\Address;
 
 use App\Features\ECommerce\ECommerceBase;
+use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Requests\Auth\Address\AddressRequest;
 use App\HttpTenantApi\Resources\AddressResource;
 use Domain\Address\Actions\CreateCustomerAddressAction;
@@ -22,7 +23,7 @@ use Throwable;
     Resource('addresses', apiResource: true, except: 'show'),
     Middleware(['auth:sanctum', 'feature.tenant:' . ECommerceBase::class])
 ]
-class AddressController
+class AddressController extends Controller
 {
     public function index(): mixed
     {
@@ -50,6 +51,8 @@ class AddressController
     /** @throws Throwable */
     public function update(AddressRequest $request, Address $address): AddressResource
     {
+        $this->authorize('update', $address);
+
         $address = DB::transaction(
             fn () => app(EditCustomerAddressAction::class)
                 ->execute($address, $request->toDTO())
@@ -60,6 +63,8 @@ class AddressController
 
     public function destroy(Address $address): Response
     {
+        $this->authorize('delete', $address);
+
         // TODO: use action
         $address->delete();
 
