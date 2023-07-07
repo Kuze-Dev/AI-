@@ -80,6 +80,28 @@ class CustomerRegisterRequest extends FormRequest
         ];
     }
 
+    public function messages(): array
+    {
+        return [
+            'billing_country_id.required_if' => trans('validation.required'),
+            'billing_state_id.required_if' => trans('validation.required'),
+            'billing_address_line_1.required_if' => trans('validation.required'),
+            'billing_zip_code.required_if' => trans('validation.required'),
+            'billing_city.required_if' => trans('validation.required'),
+            'billing_label_as.required_if' => trans('validation.required'),
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'shipping_country_id' => 'shipping country',
+            'shipping_state_id' => 'shipping state',
+            'billing_country_id' => 'billing country',
+            'billing_state_id' => 'billing state',
+        ];
+    }
+
     public function toDTO(Tier $tier): CustomerRegisterData
     {
         $validated = $this->validated();
