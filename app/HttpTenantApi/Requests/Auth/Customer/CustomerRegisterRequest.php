@@ -6,6 +6,7 @@ namespace App\HttpTenantApi\Requests\Auth\Customer;
 
 use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Address\Enums\AddressLabelAs;
+use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\DataTransferObjects\CustomerRegisterData;
@@ -31,9 +32,13 @@ class CustomerRegisterRequest extends FormRequest
             ],
             'mobile' => 'required|string|max:255',
             'birth_date' => 'required|date',
-            'password' => Password::required(),
+            'password' => ['required', 'confirmed', Password::default()],
 
             // shipping address
+            'shipping_country_id' => [
+                'required',
+                Rule::exists(Country::class, (new Country())->getRouteKeyName()),
+            ],
             'shipping_state_id' => [
                 'required',
                 Rule::exists(State::class, (new State())->getRouteKeyName()),
@@ -45,6 +50,10 @@ class CustomerRegisterRequest extends FormRequest
 
             // billing address
             'billing_same_as_shipping' => 'required|bool',
+            'billing_country_id' => [
+                'required',
+                Rule::exists(Country::class, (new Country())->getRouteKeyName()),
+            ],
             'billing_state_id' => [
                 'required_if:billing_same_as_shipping,0',
                 Rule::exists(State::class, (new State())->getRouteKeyName()),
