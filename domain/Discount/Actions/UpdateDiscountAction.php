@@ -24,14 +24,14 @@ final class UpdateDiscountAction
         ]);
 
         $discount->discountCondition()->update([
-            'discount_type' => $discountData->discountConditionData->discount_type,
-            'amount_type' => $discountData->discountConditionData->discount_amount_type,
-            'amount' => $discountData->discountConditionData->amount,
+            'discount_type' => $discountData->discountConditionData->discount_type ?? null,
+            'amount_type' => $discountData->discountConditionData->discount_amount_type ?? null,
+            'amount' => $discountData->discountConditionData->amount ?? null,
         ]);
 
         $discount->discountRequirement()->update([
-            'requirement_type' => $discountData->discountRequirementData->discount_requirement_type,
-            'minimum_amount' => $discountData->discountRequirementData->minimum_amount,
+            'requirement_type' => $discountData->discountRequirementData->discount_requirement_type ?? null,
+            'minimum_amount' => $discountData->discountRequirementData->minimum_amount ?? null,
         ]);
 
         return $discount;

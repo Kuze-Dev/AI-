@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-
 use App\Settings\FormSettings;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
@@ -20,6 +19,7 @@ use Domain\Discount\Models\Discount;
 use Domain\Discount\Models\DiscountCondition;
 use Domain\Discount\Models\DiscountRequirement;
 use Domain\Customer\Models\Customer;
+use Domain\Discount\Models\DiscountLimit;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
@@ -89,6 +89,7 @@ class AppServiceProvider extends ServiceProvider
             Discount::class,
             DiscountRequirement::class,
             DiscountCondition::class,
+            DiscountLimit::class,
             TaxZone::class,
             Country::class,
             State::class,

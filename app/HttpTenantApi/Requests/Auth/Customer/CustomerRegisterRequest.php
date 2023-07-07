@@ -6,12 +6,14 @@ namespace App\HttpTenantApi\Requests\Auth\Customer;
 
 use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Address\Enums\AddressLabelAs;
+use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\DataTransferObjects\CustomerRegisterData;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -31,12 +33,23 @@ class CustomerRegisterRequest extends FormRequest
             ],
             'mobile' => 'required|string|max:255',
             'birth_date' => 'required|date',
-            'password' => Password::required(),
+            'password' => ['required', 'confirmed', Password::default()],
 
             // shipping address
+            'shipping_country_id' => [
+                'required',
+                Rule::exists(Country::class, (new Country())->getRouteKeyName()),
+            ],
             'shipping_state_id' => [
                 'required',
-                Rule::exists(State::class, (new State())->getRouteKeyName()),
+                Rule::exists(State::class, (new State())->getRouteKeyName())
+                    ->where(function (Builder $query) {
+
+                        $country = app(Country::class)
+                            ->resolveRouteBinding($this->input('shipping_country_id'));
+
+                        return $query->where('country_id', $country?->getKey());
+                    }),
             ],
             'shipping_address_line_1' => 'required|string|max:255',
             'shipping_zip_code' => 'required|string|max:255',
@@ -45,14 +58,47 @@ class CustomerRegisterRequest extends FormRequest
 
             // billing address
             'billing_same_as_shipping' => 'required|bool',
+            'billing_country_id' => [
+                'required_if:billing_same_as_shipping,0',
+                Rule::exists(Country::class, (new Country())->getRouteKeyName()),
+            ],
             'billing_state_id' => [
                 'required_if:billing_same_as_shipping,0',
-                Rule::exists(State::class, (new State())->getRouteKeyName()),
+                Rule::exists(State::class, (new State())->getRouteKeyName())
+                    ->where(function (Builder $query) {
+
+                        $country = app(Country::class)
+                            ->resolveRouteBinding($this->input('billing_country_id'));
+
+                        return $query->where('country_id', $country?->getKey());
+                    }),
             ],
             'billing_address_line_1' => 'required_if:billing_same_as_shipping,0|string|max:255',
             'billing_zip_code' => 'required_if:billing_same_as_shipping,0|string|max:255',
             'billing_city' => 'required_if:billing_same_as_shipping,0|string|max:255',
             'billing_label_as' => ['required_if:billing_same_as_shipping,0', Rule::enum(AddressLabelAs::class)],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'billing_country_id.required_if' => trans('validation.required'),
+            'billing_state_id.required_if' => trans('validation.required'),
+            'billing_address_line_1.required_if' => trans('validation.required'),
+            'billing_zip_code.required_if' => trans('validation.required'),
+            'billing_city.required_if' => trans('validation.required'),
+            'billing_label_as.required_if' => trans('validation.required'),
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'shipping_country_id' => 'shipping country',
+            'shipping_state_id' => 'shipping state',
+            'billing_country_id' => 'billing country',
+            'billing_state_id' => 'billing state',
         ];
     }
 

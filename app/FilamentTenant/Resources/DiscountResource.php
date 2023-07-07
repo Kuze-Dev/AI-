@@ -8,10 +8,8 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use App\FilamentTenant\Resources\DiscountResource\Pages\CreateDiscount;
 use App\FilamentTenant\Resources\DiscountResource\Pages\EditDiscount;
 use App\FilamentTenant\Resources\DiscountResource\Pages\ListDiscounts;
-use Carbon\Carbon;
 use Closure;
 use Domain\Discount\Actions\AutoGenerateCode;
-use Filament\Facades\Filament;
 use Domain\Discount\Actions\ForceDeleteDiscountAction;
 use Domain\Discount\Actions\RestoreDiscountAction;
 use Domain\Discount\Actions\SoftDeleteDiscountAction;
@@ -29,7 +27,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
-use Filament\Tables;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
@@ -39,8 +36,10 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 use Str;
+use Illuminate\Database\Eloquent\Builder;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class DiscountResource extends Resource
@@ -49,7 +48,7 @@ class DiscountResource extends Resource
 
     protected static ?string $model = Discount::class;
 
-    protected static ?string $navigationGroup = 'SHOP CONFIGURATION';
+    protected static ?string $navigationGroup = 'eCommerce';
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
 
@@ -103,11 +102,9 @@ class DiscountResource extends Resource
 
                             DateTimePicker::make('valid_start_at')
                                 ->required()
-                                ->timezone(timezone: Filament::auth()->user()?->timezone)
                                 ->label(trans('Start Date')),
 
                             DateTimePicker::make('valid_end_at')
-                                ->timezone(timezone: Filament::auth()->user()?->timezone)
                                 ->after('valid_start_at')
                                 ->label(trans('Expiration Date'))
                                 ->helperText(new HtmlString(<<<HTML
@@ -187,12 +184,12 @@ class DiscountResource extends Resource
                     })
                     ->label(trans('Amount')),
                 TextColumn::make('valid_start_at')
-                    ->dateTime(timezone: Filament::auth()->user()?->timezone)
+                    ->dateTime(timezone: Auth::user()?->timezone)
                     ->date('F j, Y, g:i a')
                     ->label(trans('Start Date')),
 
                 TextColumn::make('valid_end_at')
-                    ->dateTime(timezone: Filament::auth()->user()?->timezone)
+                    ->dateTime(timezone: Auth::user()?->timezone)
                     ->date('F j, Y, g:i a')
                     ->label(trans('Expiration Date')),
 
@@ -220,12 +217,6 @@ class DiscountResource extends Resource
                     }),
 
                 DeleteAction::make()
-                    ->before(function (DeleteAction $action, $record) {
-                        $endDate = Carbon::parse($record->valid_end_at);
-                        if($endDate->isPast()) {
-                            return $action->halt();
-                        }
-                    })
                     ->using(function (Discount $record) {
                         try {
                             return app(SoftDeleteDiscountAction::class)->execute($record);
@@ -256,6 +247,7 @@ class DiscountResource extends Resource
         ];
     }
 
+    /** @return Builder<\Domain\Discount\Models\Discount> */
     public static function getEloquentQuery(): EloquentBuilder
     {
         return parent::getEloquentQuery()
