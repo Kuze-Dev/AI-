@@ -21,7 +21,9 @@ class Shipment extends Model
      * that are mass assignable.
      */
     protected $fillable = [
-        'shipping_method',
+        'model_type',
+        'model_id',
+        'shipping_method_id',
         'tracking_id',
         'shipping_details',
         'destination_address',

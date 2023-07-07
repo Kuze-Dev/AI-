@@ -35,8 +35,9 @@ return new class extends Migration
         Schema::create('shipments', function (Blueprint $table) {
 
             $table->id();
+            $table->morphs('model');
 
-            $table->foreignId(ShippingMethod::class);
+            $table->foreignIdFor(ShippingMethod::class)->index();
 
             $table->string('tracking_id')->nullable();
             $table->string('status')->nullable();
@@ -46,7 +47,7 @@ return new class extends Migration
             $table->json('destiantion_address')->nullable();
 
             $table->timestamps();
-            
+
         });
 
     }
