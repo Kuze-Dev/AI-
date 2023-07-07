@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Domain\ShippingMethod\Models;
 
+use Domain\Shipment\Models\Shipment;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ShippingMethod extends Model
 {
@@ -52,6 +54,12 @@ class ShippingMethod extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    /** @return HasMany<Shipment> */
+    public function shipments(): HasMany
+    {
+        return $this->hasMany(Shipment::class);
     }
 
     /** @return SlugOptions */

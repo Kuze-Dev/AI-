@@ -6,7 +6,6 @@ namespace App\Policies;
 
 use App\Features\CMS\CMSBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
-use Domain\Globals\Models\Globals;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;

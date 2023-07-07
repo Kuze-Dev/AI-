@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\Models;
 
+use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 class Shipment extends Model
@@ -46,6 +45,17 @@ class Shipment extends Model
     }
 
     /**
+     * Declare relationship of
+     * current model to shippingMethod.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<ShippingMethod, self>
+     */
+    public function shippingMethod()
+    {
+        return $this->belongsTo(ShippingMethod::class);
+    }
+
+    /**
      * Set the column reference
      * for route keys.
      */
@@ -53,5 +63,4 @@ class Shipment extends Model
     {
         return 'slug';
     }
-
 }
