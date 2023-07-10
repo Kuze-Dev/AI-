@@ -96,7 +96,7 @@ class CartController
         if (!$validatedData['customer_id']) {
             return response()
                 ->json([
-                    'error' => 'Access denied',
+                    'error' => "User Unauthorized",
                 ], 403);
         }
 

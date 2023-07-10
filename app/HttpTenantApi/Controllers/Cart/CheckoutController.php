@@ -96,14 +96,7 @@ class CheckoutController
             ], 403);
         }
 
-        $customerId = auth()->user() ? auth()->user()->id : null;
-
-        if (!$customerId) {
-            return response()
-                ->json([
-                    'error' => 'Access denied',
-                ], 403);
-        }
+        $customerId = auth()->user()?->id;
 
         $reference = $request->input('reference');
 
