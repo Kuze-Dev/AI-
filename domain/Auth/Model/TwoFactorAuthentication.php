@@ -29,7 +29,7 @@ use Eloquent;
  * @property mixed $secret
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read Model|\Eloquent $authenticatable
+ * @property-read Model|Eloquent $authenticatable
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Auth\Model\RecoveryCode> $recoveryCodes
  * @property-read int|null $recovery_codes_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Auth\Model\SafeDevice> $safeDevices

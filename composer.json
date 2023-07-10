@@ -20,6 +20,7 @@
         "laravel/tinker": "^2.8",
         "laravel/vapor-core": "^2.28",
         "league/flysystem-aws-s3-v3": "^3.13",
+        "paypal/rest-api-sdk-php": "^1.6",
         "maatwebsite/excel": "^3.1.48",
         "pragmarx/google2fa": "^8.0",
         "saade/filament-laravel-log": "^1.2",
