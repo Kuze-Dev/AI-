@@ -28,7 +28,7 @@ class AddressResource extends JsonApiResource
     public function toRelationships(Request $request): array
     {
         return [
-            //            'state' => fn () => StateResource::make($this->state),
+            'state' => fn () => StateResource::make($this->state),
         ];
     }
 }

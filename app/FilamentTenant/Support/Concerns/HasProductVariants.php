@@ -10,7 +10,7 @@ use InvalidArgumentException;
 
 trait HasProductVariants
 {
-    public ?string $productVariant = null;
+    public ?string $activeProductVariant = null;
 
     public ?string $activeProductVariantItemStatePath = null;
 
@@ -18,7 +18,7 @@ trait HasProductVariants
 
     public function getActiveProductVariant(): ?string
     {
-        return $this->productVariant;
+        return $this->activeProductVariant;
     }
 
     public function getActiveProductVariantItemStatePath(): ?string
@@ -28,15 +28,18 @@ trait HasProductVariants
 
     public function mountProductVariantItem(string $productVariant, string $itemStatePath): void
     {
-        $this->productVariant = $productVariant;
+        $this->activeProductVariant = $productVariant;
         $this->activeProductVariantItemStatePath = $itemStatePath;
+        // dd($this);
 
-        $this->mountAction('product-option-form');
+        // $this->mountedActionData = $record->toArray
+        // \Log::info('MOUNT PRODUCT VARIANT ITEM TO');
+        $this->mountAction('product-variant-form');
     }
 
     public function unmountProductVariantItem(): void
     {
-        $this->productVariant = null;
+        $this->activeProductVariant = null;
         $this->activeProductVariantItemStatePath = null;
     }
 
