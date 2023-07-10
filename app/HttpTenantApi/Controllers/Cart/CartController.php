@@ -6,9 +6,11 @@ namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\HttpTenantApi\Resources\CartResource;
 use Domain\Cart\Models\Cart;
+use Domain\Product\Models\ProductVariant;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
@@ -20,7 +22,15 @@ class CartController
     public function index(): mixed
     {
         $model = QueryBuilder::for(
-            Cart::with(['cartLines', 'cartLines.purchasable', 'cartLines.media'])
+            Cart::with([
+                'cartLines',
+                'cartLines.purchasable' => function (MorphTo $query) {
+                    $query->morphWith([
+                        ProductVariant::class => ['product.media'],
+                    ]);
+                },
+                'cartLines.media'
+            ])
                 ->whereHas('cartLines', function (Builder $query) {
                     $query->whereNull('checked_out_at');
                 })
