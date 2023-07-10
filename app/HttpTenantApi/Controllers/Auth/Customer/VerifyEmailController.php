@@ -15,16 +15,10 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 #[Middleware(['feature.tenant:' . ECommerceBase::class])]
 class VerifyEmailController
 {
-    #[Get('verify/{id}/{hash}', name: 'customer.verify')]
-    public function __invoke(Request $request): mixed
+    #[Get('verify/{customer}/{hash}', name: 'customer.verify')]
+    public function __invoke(Request $request, Customer $customer): mixed
     {
-        $customer = app(Customer::class)->resolveRouteBinding($request->route('id'));
-
-        if ($customer === null) {
-            throw new AuthorizationException();
-        }
-
-        if ( ! hash_equals((string) $request->route('hash'), sha1($customer->getEmailForVerification()))) {
+        if ( ! hash_equals($request->route('hash'), sha1($customer->getEmailForVerification()))) {
             throw new AuthorizationException();
         }
 

@@ -38,4 +38,14 @@ class CustomerFactory extends Factory
     {
         return $this->state(['deleted_at' => now()]);
     }
+
+    public function active(): self
+    {
+        return $this->state(['status' => Status::ACTIVE]);
+    }
+
+    public function inactive(): self
+    {
+        return $this->state(['status' => Status::INACTIVE]);
+    }
 }
