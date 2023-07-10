@@ -25,14 +25,12 @@ class CreateCartLineAction
 
             match ($cartLineData->purchasable_type) {
                 'Product' => $purchasableType = Product::class,
-                // 'Service' => $purchasableType = Service::class,
-                // 'Booking' => $purchasableType = Booking::class,
+                    // 'Service' => $purchasableType = Service::class,
+                    // 'Booking' => $purchasableType = Booking::class,
                 default => null
             };
 
-            $productVariant = ProductVariant::whereProductId($cartLineData->purchasable_id)
-                ->whereJsonContains('combination', $cartLineData->variant)
-                ->first();
+            $productVariant = ProductVariant::find($cartLineData->variant_id);
 
             if ($productVariant) {
                 $purchasableId = $productVariant->id;
