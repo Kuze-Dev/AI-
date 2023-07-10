@@ -220,7 +220,7 @@ class FilamentServiceProvider extends ServiceProvider
                 /** @var Forms\Components\Select $this */
 
                 if (blank($this->getSearchColumns())) {
-                    $this->searchable(fn (Forms\Components\Select $component) => $component->evaluate($titleColumnName));
+                    $this->searchable([$this->evaluate($titleColumnName)]);
                 }
 
                 $this->getSearchResultsUsing(function (Forms\Components\Select $component, ?string $search) use ($model, $titleColumnName, $callback): array {
