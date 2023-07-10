@@ -11,7 +11,7 @@ class CartStoreData
         public readonly int $purchasable_id,
         public readonly string $purchasable_type,
         public readonly int $quantity,
-        public readonly mixed $variant,
+        public readonly ?int $variant_id,
         public readonly mixed $meta,
     ) {
     }
@@ -23,7 +23,7 @@ class CartStoreData
             purchasable_id: $data['purchasable_id'],
             purchasable_type: $data['purchasable_type'],
             quantity: $data['quantity'],
-            variant: $data['variant'] ?? null,
+            variant_id: $data['variant_id'] ?? null,
             meta: $data['meta'] ?? null,
         );
     }

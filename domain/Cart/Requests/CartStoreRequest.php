@@ -33,42 +33,13 @@ class CartStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'customer_id' => [
-            //     'required',
-            //     Rule::exists('customers', 'id'),
-            // ],
             'purchasable_id' => [
                 'required',
                 Rule::exists('products', 'id'),
             ],
-            'variant' => [
+            'variant_id' => [
                 'nullable',
-                function ($attribute, $value, $fail) {
-                    $purchasableId = $this->input('purchasable_id');
-
-                    foreach ($value as $variantKey => $variantValue) {
-                        $keyExists = ProductOption::whereProductId($purchasableId)->whereName($variantKey)->exists();
-
-                        if ( ! $keyExists) {
-                            $fail("Invalid $variantKey option.");
-
-                            return;
-                        }
-
-                        $valueExists = ProductOptionValue::whereHas('productOption', function ($query) use ($purchasableId, $variantKey) {
-                            $query->whereProductId($purchasableId)
-                                ->whereName($variantKey);
-                        })
-                            ->whereName($variantValue)
-                            ->exists();
-
-                        if ( ! $valueExists) {
-                            $fail("Invalid $variantValue option value.");
-
-                            return;
-                        }
-                    }
-                },
+                Rule::exists('product_variants', 'id'),
             ],
             'purchasable_type' => [
                 'required',
@@ -81,7 +52,7 @@ class CartStoreRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $purchasableId = $this->input('purchasable_id');
 
-                    if ( ! $purchasableId) {
+                    if (!$purchasableId) {
                         $fail('Invalid product.');
                     }
 
@@ -92,7 +63,7 @@ class CartStoreRequest extends FormRequest
                             ->whereJsonContains('combination', $hasVariant)
                             ->first();
 
-                        if ( ! $product) {
+                        if (!$product) {
                             $fail('Invalid product.');
 
                             return;
@@ -107,7 +78,7 @@ class CartStoreRequest extends FormRequest
 
                     $product = Product::find($purchasableId);
 
-                    if ( ! $product) {
+                    if (!$product) {
                         $fail('Invalid product.');
 
                         return;
