@@ -20,4 +20,4 @@ it('can globally search', function () {
 
     expect($results->getCategories()['shipping methods']->first()->url)
         ->toEqual(ShippingmethodResource::getUrl('edit', [$record]));
-})->only();
+});

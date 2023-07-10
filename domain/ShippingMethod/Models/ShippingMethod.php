@@ -12,12 +12,15 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class ShippingMethod extends Model
+class ShippingMethod extends Model implements HasMedia
 {
     use LogsActivity;
     use HasSlug;
     use ConstraintsRelationships;
+    use InteractsWithMedia;
 
     /**
      * Declare columns
@@ -36,6 +39,7 @@ class ShippingMethod extends Model
 
     protected $casts = [
         'ship_from_address' => 'array',
+        'status' => 'bool',
     ];
 
     /** @return LogOptions */
@@ -70,5 +74,11 @@ class ShippingMethod extends Model
             ->preventOverwrite()
             ->doNotGenerateSlugsOnUpdate()
             ->saveSlugsTo($this->getRouteKeyName());
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('logo')
+            ->singleFile();
     }
 }

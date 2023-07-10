@@ -12,6 +12,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ShippingmethodResource extends Resource
 {

@@ -2,11 +2,7 @@
 
 declare(strict_types=1);
 
-use App\FilamentTenant\Resources\GlobalsResource\Pages\CreateGlobals;
 use App\FilamentTenant\Resources\ShippingmethodResource\Pages\CreateShippingmethod;
-use Domain\Blueprint\Database\Factories\BlueprintFactory;
-use Domain\Blueprint\Enums\FieldType;
-use Domain\Globals\Models\Globals;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Filament\Facades\Filament;
 
@@ -23,10 +19,9 @@ it('can render shipping method', function () {
     livewire(CreateShippingmethod::class)
         ->assertFormExists()
         ->assertSuccessful();
-})->only();
+});
 
 it('can create shipping method', function () {
-  
 
     livewire(CreateShippingmethod::class)
         ->fillForm([
@@ -40,7 +35,7 @@ it('can create shipping method', function () {
                 'city' => 'SAN FRANCISCO',
                 'zip3' => '94107',
                 'zip4' => '1741',
-            ]
+            ],
         ])->call('create')
         ->assertHasNoFormErrors()
         ->assertOk()
@@ -48,8 +43,8 @@ it('can create shipping method', function () {
         ->record;
 
     assertDatabaseHas(ShippingMethod::class, [
-        'name' => 'Store Pickup',
+        'title' => 'Store Pickup',
         'slug' => 'store-pickup',
-       
+
     ]);
-})->only();
+});
