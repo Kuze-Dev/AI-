@@ -11,6 +11,6 @@ return new class () extends SettingsMigration {
         $this->migrator->add('shipping.usps_mode', false);
         $this->migrator->add('shipping.usp_credentials', null);
         $this->migrator->add('shipping.usp_mode', false);
-        
+
     }
 };

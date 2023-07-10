@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Resources\ShippingmethodResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;

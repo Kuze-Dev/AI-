@@ -43,7 +43,6 @@ class ShippingSettings extends TenantBaseSettings
                             ->helperText('If the feature is activated, it is necessary to provide production keys. However, if the feature is deactivated, payment processing will occur in sandbox mode')
                             ->reactive(),
                     ]),
-            
 
             ]),
 

@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Resources\ShippingmethodResource\Pages;
-use App\Filament\Resources\ShippingmethodResource\RelationManagers;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Filament\Forms;
@@ -11,8 +12,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ShippingmethodResource extends Resource
 {
@@ -20,13 +19,83 @@ class ShippingmethodResource extends Resource
 
     protected static ?string $model = ShippingMethod::class;
 
+    protected static ?string $navigationGroup = 'Shop Configuration';
+
     protected static ?string $navigationIcon = 'heroicon-o-truck';
+
+    protected static ?string $recordTitleAttribute = 'title';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                //
+                Forms\Components\Card::make([
+                    Forms\Components\TextInput::make('title')
+                        ->unique(ignoreRecord: true)
+                        ->required(),
+                    Forms\Components\TextInput::make('subtitle')
+                        ->required(),
+                    Forms\Components\RichEditor::make('description'),
+                    Forms\Components\FileUpload::make('logo')
+                        ->formatStateUsing(function ($record) {
+                            return $record?->getMedia('logo')
+                                ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                                ->toArray() ?? [];
+                        })
+                        ->image()
+                        ->beforeStateDehydrated(null)
+                        ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
+                        ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                            $mediaClass = config('media-library.media_model', Media::class);
+
+                            /** @var ?Media $media */
+                            $media = $mediaClass::findByUuid($file);
+
+                            if ($component->getVisibility() === 'private') {
+                                try {
+                                    return $media?->getTemporaryUrl(now()->addMinutes(5));
+                                } catch (Throwable $exception) {
+                                    // This driver does not support creating temporary URLs.
+                                }
+                            }
+
+                            return $media?->getUrl();
+                        }),
+                    Forms\Components\Toggle::make('status')
+                        ->inline(false)
+                        ->helperText('If enabled, message here')
+                        ->reactive(),
+                    Forms\Components\Select::make('driver')
+                        ->required()
+                        ->options(function () {
+
+                            return [
+                                'usps' => 'USPS',
+                                'store-pickup' => 'Store Pickup',
+                            ];
+
+                        })
+                        ->reactive(),
+                    Forms\Components\KeyValue::make('ship_from_address')
+                        ->label('Ship From Address')
+                        ->disableAddingRows()
+                        ->disableEditingKeys()
+                        ->disableDeletingRows()
+                        ->formatStateUsing(function ($state) {
+                            if ($state != null) {
+                                return $state;
+                            }
+
+                            return [
+                                'Address' => '',
+                                'City' => '',
+                                'State' => '',
+                                'zip4' => '',
+                                'zip5' => '',
+                            ];
+                        }),
+
+                ]),
             ]);
     }
 
@@ -34,10 +103,10 @@ class ShippingmethodResource extends Resource
     {
         return $table
             ->columns([
-                //
+
             ])
             ->filters([
-                //
+
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -46,14 +115,14 @@ class ShippingmethodResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
-            //
+
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -61,5 +130,5 @@ class ShippingmethodResource extends Resource
             'create' => Pages\CreateShippingmethod::route('/create'),
             'edit' => Pages\EditShippingmethod::route('/{record}/edit'),
         ];
-    }    
+    }
 }
