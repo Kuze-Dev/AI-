@@ -13,7 +13,6 @@ use Domain\Cart\Enums\CartActionResult;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartQuantityUpdateRequest;
 use Domain\Cart\Requests\CartStoreRequest;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
