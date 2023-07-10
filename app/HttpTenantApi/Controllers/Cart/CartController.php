@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
-    Resource('carts', apiResource: true, except: 'show'),
+    Resource('carts', apiResource: true, only: 'index'),
     Middleware(['auth:sanctum'])
 ]
 class CartController

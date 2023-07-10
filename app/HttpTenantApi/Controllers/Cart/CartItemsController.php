@@ -18,7 +18,7 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
-    Resource('carts/items', apiResource: true, except: 'show'),
+    Resource('carts/items', apiResource: true, except: ['show', 'index']),
     Middleware(['auth:sanctum'])
 ]
 class CartItemsController

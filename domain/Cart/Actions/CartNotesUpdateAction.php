@@ -13,25 +13,23 @@ class CartNotesUpdateAction
 {
     public function execute(CartNotesUpdateData $cartLineData): CartLine
     {
-        $customerId = auth()->user()?->id;
-
         $checkCart = CartLine::where('id', $cartLineData->cart_line_id)
-            ->whereHas('cart', function ($query) use ($customerId) {
-                $query->whereCustomerId($customerId);
+            ->whereHas('cart', function ($query) {
+                $query->whereBelongsTo(auth()->user());
             })
             ->whereNull('checked_out_at')->first();
 
-        if ( ! $checkCart) {
+        if (!$checkCart) {
             throw new ModelNotFoundException();
         }
 
         $cartLine = CartLine::find($cartLineData->cart_line_id);
 
-        if ( ! $cartLine) {
+        if (!$cartLine) {
             throw new ModelNotFoundException();
         }
 
-        if ( ! is_null($cartLineData->files)) {
+        if (!is_null($cartLineData->files)) {
             foreach ($cartLineData->files as $file) {
                 $uploadedFile = new UploadedFile(
                     $file->getRealPath(),
