@@ -86,7 +86,7 @@ class CheckoutController
     }
 
     #[Get('/', 'checkouts')]
-    public function checkoutItems(Request $request): JsonResponse|JsonApiResourceCollection
+    public function checkoutItems(Request $request)
     {
         $authenticated = $this->isCostumerValidated();
 
@@ -107,11 +107,9 @@ class CheckoutController
             ], 400);
         }
 
-        $purchasableIds = json_decode($request->input('purchasable_ids', '[]'), true);
+        $purchasableIdsArray = explode(',', $request->input('purchasable_ids'));
 
-        if (!is_array($purchasableIds)) {
-            $purchasableIds = [];
-        }
+        $purchasableIds = array_map('intval', $purchasableIdsArray);
 
         $cartLineQuery = CartLine::with(['purchasable', 'media'])->whereHas('cart', function ($query) use ($customerId) {
             $query->whereCustomerId($customerId);
