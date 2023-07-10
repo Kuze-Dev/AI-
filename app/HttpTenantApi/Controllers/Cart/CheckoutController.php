@@ -9,6 +9,7 @@ use App\HttpTenantApi\Resources\CartLineResource;
 use Domain\Cart\DataTransferObjects\CheckoutData;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CheckoutRequest;
+use Domain\Customer\Models\Customer;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 use Spatie\RouteAttributes\Attributes\Prefix;
@@ -24,11 +25,32 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
     Prefix('checkouts'),
     Middleware(['auth:sanctum'])
 ]
-class CheckoutController extends Controller
+class CheckoutController
 {
+    protected function isCostumerValidated(): bool
+    {
+        $customerId = auth()->user()?->id;
+
+        $customer = Customer::where("id", $customerId)->whereStatus('active')->first();
+
+        if (!$customer) {
+            return false;
+        }
+
+        return true;
+    }
+
     #[Post('/', name: 'checkouts')]
     public function checkout(CheckoutRequest $request): JsonResponse
     {
+        $authenticated = $this->isCostumerValidated();
+
+        if (!$authenticated) {
+            return response()->json([
+                'error' => "User Unauthorized",
+            ], 403);
+        }
+
         $validatedData = $request->validated();
 
         $payload = CheckoutData::fromArray($validatedData);
@@ -66,18 +88,19 @@ class CheckoutController extends Controller
     #[Get('/', 'checkouts')]
     public function checkoutItems(Request $request): JsonResponse|JsonApiResourceCollection
     {
-        $customerId = auth()->user() ? auth()->user()->id : null;
+        $authenticated = $this->isCostumerValidated();
 
-        if ( ! $customerId) {
-            return response()
-                ->json([
-                    'error' => 'Access denied',
-                ], 403);
+        if (!$authenticated) {
+            return response()->json([
+                'error' => "User Unauthorized",
+            ], 403);
         }
+
+        $customerId = auth()->user()?->id;
 
         $reference = $request->input('reference');
 
-        if ( ! $reference) {
+        if (!$reference) {
             return response()->json([
                 'error' => 'Bad Request',
                 'message' => 'Invalid reference.',
@@ -86,7 +109,7 @@ class CheckoutController extends Controller
 
         $purchasableIds = json_decode($request->input('purchasable_ids', '[]'), true);
 
-        if ( ! is_array($purchasableIds)) {
+        if (!is_array($purchasableIds)) {
             $purchasableIds = [];
         }
 
