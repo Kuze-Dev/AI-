@@ -16,6 +16,7 @@ beforeEach(function () {
 
 it('can generate token', function () {
     $customer = CustomerFactory::new()
+        ->active()
         ->createOne([
             'email' => 'me@me.me',
             'password' => 'secret-pass',
@@ -39,6 +40,7 @@ it('can generate token', function () {
 
 it('can not generate token when invalid credentials', function () {
     $customer = CustomerFactory::new()
+        ->active()
         ->createOne([
             'email' => 'me@me.me',
             'password' => 'secret-pass',
@@ -58,6 +60,7 @@ it('can not generate token when invalid credentials', function () {
 
 it('can access private route with valid token', function () {
     $customer = CustomerFactory::new()
+        ->active()
         ->createOne();
 
     $token = $customer
