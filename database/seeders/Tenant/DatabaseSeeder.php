@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Tenant;
 
-use Domain\Discount\Database\Seeders\DiscountSeeder;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
 
@@ -19,7 +18,6 @@ class DatabaseSeeder extends Seeder
             Auth\RoleSeeder::class,
             Auth\AdminSeeder::class,
             Page\PageSeeder::class,
-            // DiscountSeeder::class,
         ]);
     }
 }
