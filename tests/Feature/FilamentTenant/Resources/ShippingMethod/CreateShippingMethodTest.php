@@ -7,6 +7,7 @@ use App\FilamentTenant\Resources\ShippingmethodResource\Pages\CreateShippingmeth
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Globals\Models\Globals;
+use Domain\ShippingMethod\Models\ShippingMethod;
 use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -46,7 +47,7 @@ it('can create shipping method', function () {
         ->instance()
         ->record;
 
-    assertDatabaseHas(Globals::class, [
+    assertDatabaseHas(ShippingMethod::class, [
         'name' => 'Store Pickup',
         'slug' => 'store-pickup',
        

@@ -6,8 +6,12 @@ namespace App\FilamentTenant\Resources\ShippingmethodResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ShippingmethodResource;
+use Domain\ShippingMethod\Actions\CreateShippingMethodAction;
+use Domain\ShippingMethod\DataTransferObjects\ShippingMethodData;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Pages\Actions\Action;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class CreateShippingmethod extends CreateRecord
 {
@@ -28,5 +32,10 @@ class CreateShippingmethod extends CreateRecord
     protected function getFormActions(): array
     {
         return $this->getCachedActions();
+    }
+
+    protected function handleRecordCreation(array $data): Model
+    {
+        return DB::transaction(fn () => app(CreateShippingMethodAction::class)->execute(ShippingMethodData::fromArray($data)));
     }
 }
