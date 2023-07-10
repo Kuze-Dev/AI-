@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Models;
 
+use Domain\Customer\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
@@ -45,5 +46,10 @@ class Cart extends Model
     public function cartLines()
     {
         return $this->hasMany(CartLine::class);
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
     }
 }
