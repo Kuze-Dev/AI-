@@ -52,7 +52,7 @@ class CartController
     }
 
     #[Get('/', name: 'cart.show')]
-    public function show(): JsonApiResource|JsonResponse
+    public function show()
     {
         $authenticated = $this->isCostumerValidated();
 
@@ -64,9 +64,9 @@ class CartController
 
         $customerId = auth()->user()?->id;
 
-        $cart = Cart::whereCustomerId($customerId)->first();
+        $cart = Cart::with('cartLines')->whereCustomerId($customerId)->first();
 
-        if (!$cart) {
+        if (!$cart || count($cart->cartLines) == 0) {
             return response()
                 ->json([
                     'data' => [],
