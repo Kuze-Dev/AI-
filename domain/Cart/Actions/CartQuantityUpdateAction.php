@@ -14,15 +14,13 @@ class CartQuantityUpdateAction
 {
     public function execute(CartQuantityUpdateData $cartLineData): CartLine|array
     {
-        $customerId = auth()->user()?->id;
-
         $cartLine = CartLine::with('purchasable')->where('id', $cartLineData->cart_line_id)
-            ->whereHas('cart', function ($query) use ($customerId) {
-                $query->whereCustomerId($customerId);
+            ->whereHas('cart', function ($query) {
+                $query->whereBelongsTo(auth()->user());
             })
             ->whereNull('checked_out_at')->first();
 
-        if ( ! $cartLine) {
+        if (!$cartLine) {
             throw new ModelNotFoundException();
         }
 
@@ -34,7 +32,7 @@ class CartQuantityUpdateAction
             $product = ProductVariant::find($cartLine->purchasable_id);
         }
 
-        if ( ! $product) {
+        if (!$product) {
             return [
                 'message' => 'Product not found',
             ];

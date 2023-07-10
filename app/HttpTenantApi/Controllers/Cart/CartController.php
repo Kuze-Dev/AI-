@@ -6,8 +6,6 @@ namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\HttpTenantApi\Resources\CartResource;
 use Domain\Cart\Models\Cart;
-use Spatie\RouteAttributes\Attributes\Get;
-use Spatie\RouteAttributes\Attributes\Prefix;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Illuminate\Database\Eloquent\Builder;
