@@ -29,4 +29,3 @@ docker-compose.override.yml
 error.log
 output.txt
 Thumbs.db
-.env.ecommerce-branch

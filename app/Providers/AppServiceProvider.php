@@ -11,8 +11,6 @@ use Domain\Currency\Models\Currency;
 use Domain\Address\Models\Address;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
-use Domain\Cart\Models\Cart;
-use Domain\Cart\Models\CartLine;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Domain\Discount\Models\Discount;
@@ -79,7 +77,7 @@ class AppServiceProvider extends ServiceProvider
             Form::class,
             FormSubmission::class,
             FormEmailNotification::class,
-            Product::class,
+            // Product::class,
             Taxonomy::class,
             TaxonomyTerm::class,
             Content::class,
@@ -90,17 +88,15 @@ class AppServiceProvider extends ServiceProvider
             DiscountRequirement::class,
             DiscountCondition::class,
             DiscountLimit::class,
-            TaxZone::class,
-            Country::class,
-            State::class,
-            Currency::class,
-            Tier::class,
-            Customer::class,
-            Address::class,
-            Cart::class,
-            CartLine::class,
-            PaymentMethod::class,
-            Payment::class,
+            // TaxZone::class,
+            // Country::class,
+            // State::class,
+            // Currency::class,
+            // Tier::class,
+            // Customer::class,
+            // Address::class,
+            // PaymentMethod::class,
+            // Payment::class,
         ]);
 
         Password::defaults(
@@ -139,5 +135,6 @@ class AppServiceProvider extends ServiceProvider
 
         Feature::discover('App\\Features\\CMS', app_path('Features/CMS'));
         Feature::discover('App\\Features\\ECommerce', app_path('Features/ECommerce'));
+
     }
 }

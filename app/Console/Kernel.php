@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Console;
 
-use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Support\Excel\Commands\PruneExcelCommand;
@@ -16,9 +15,6 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command(PruneExcelCommand::class)
             ->daily();
-
-        $schedule->command(ClearResetsCommand::class, ['name' => 'customer'])
-            ->everyFifteenMinutes();
     }
 
     /** Register the commands for the application. */

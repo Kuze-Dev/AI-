@@ -51,8 +51,8 @@ class CartController
         return true;
     }
 
-    #[Get('/', name: 'cart.show')]
-    public function show(): JsonApiResource|JsonResponse
+    #[Get('/{cartId}', name: 'cart.show.{cartId}')]
+    public function show(int $cartId): JsonApiResource|JsonResponse
     {
         $authenticated = $this->isCostumerValidated();
 
@@ -62,28 +62,28 @@ class CartController
             ], 403);
         }
 
-        $customerId = auth()->user()?->id;
+        try {
+            $customerId = auth()->user()?->id;
 
-        $cart = Cart::whereCustomerId($customerId)->first();
+            Cart::where('id', $cartId)->whereCustomerId($customerId)->firstOrFail();
 
-        if (!$cart) {
+            $model = QueryBuilder::for(
+                Cart::with(['cartLines', 'cartLines.purchasable', 'cartLines.media'])
+                    ->whereHas('cartLines', function (Builder $query) {
+                        $query->whereNull('checked_out_at');
+                    })
+                    ->where('id', $cartId)
+                    ->whereCustomerId($customerId)
+            )->allowedIncludes(['cartLines', 'cartLines.purchasable'])
+                ->firstOrFail();
+
+            return CartResource::make($model);
+        } catch (ModelNotFoundException $e) {
             return response()
                 ->json([
-                    'data' => [],
-                ], 200);
+                    'error' => 'Cart not found',
+                ], 404);
         }
-
-        $model = QueryBuilder::for(
-            Cart::with(['cartLines', 'cartLines.purchasable', 'cartLines.media'])
-                ->whereHas('cartLines', function (Builder $query) {
-                    $query->whereNull('checked_out_at');
-                })
-                ->where('id', $cart->id)
-                ->whereCustomerId($customerId)
-        )->allowedIncludes(['cartLines', 'cartLines.purchasable'])
-            ->firstOrFail();
-
-        return CartResource::make($model);
     }
 
     #[Post('/items', name: 'cart.items')]

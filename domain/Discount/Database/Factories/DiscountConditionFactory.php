@@ -7,9 +7,6 @@ namespace Domain\Discount\Database\Factories;
 use Domain\Discount\Models\DiscountCondition;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Discount\Models\DiscountCondition>
- */
 class DiscountConditionFactory extends Factory
 {
     protected $model = DiscountCondition::class;

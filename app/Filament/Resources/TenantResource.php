@@ -108,12 +108,7 @@ class TenantResource extends Resource
                                 ],
                                 Features\ECommerce\ECommerceBase::class => [
                                     'label' => trans('eCommerce'),
-                                    'extras' => [
-                                        Features\ECommerce\PaypalGateway::class => app(Features\ECommerce\PaypalGateway::class)->label,
-                                        Features\ECommerce\StripeGateway::class => app(Features\ECommerce\StripeGateway::class)->label,
-                                        Features\ECommerce\OfflineGateway::class => app(Features\ECommerce\OfflineGateway::class)->label,
-                                        Features\ECommerce\BankTransfer::class => app(Features\ECommerce\BankTransfer::class)->label,
-                                    ],
+                                    'extras' => [],
                                 ],
                             ]),
                     ]),
