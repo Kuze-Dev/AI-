@@ -192,12 +192,15 @@ class ProductResource extends Resource
                                                     ))
                                                     ->dehydrateStateUsing(fn ($state) => (float) $state)
                                                     ->required(),
+                                            ])->columns(2),
+                                        Forms\Components\Section::make('Status')
+                                            ->schema([
                                                 Forms\Components\Toggle::make('status')
                                                     ->label(
                                                         fn ($state) => $state ? 'Active' : 'Inactive'
                                                     )
-                                                    ->helperText('This variant will be hidden from all sales channels.'),
-                                            ])->columns(2),
+                                                    ->helperText('This product variant will be hidden from all sales channels.'),
+                                            ]),
                                     ]),
                             ]),
                     ])->hiddenOn('create'),
