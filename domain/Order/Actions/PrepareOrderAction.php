@@ -23,20 +23,20 @@ class PrepareOrderAction
 
         $billingAddress = Address::find($placeOrderData->addresses->billing);
 
-        $currency = Currency::where('enabled', true)->first();
+        $currency = Currency::where('default', true)->first();
 
         $totals = CartLine::whereIn('id', $placeOrderData->cart_line_ids)
-            ->with(['purchasable', 'variant'])
+            ->with(['purchasable'])
             ->get()
             ->reduce(function ($totals, $cartLine) {
-                $variant = $cartLine->variant;
+                // $variant = $cartLine->variant;
                 $product = $cartLine->purchasable;
 
-                if ($variant) {
-                    $totals['sub_total'] += (float) $variant->selling_price * $cartLine->quantity;
-                } else {
-                    $totals['sub_total'] += $product->selling_price * $cartLine->quantity;
-                }
+                // if ($variant) {
+                //     $totals['sub_total'] += (float) $variant->selling_price * $cartLine->quantity;
+                // } else {
+                $totals['sub_total'] += $product->selling_price * $cartLine->quantity;
+                // }
 
                 return $totals;
             }, [
@@ -55,7 +55,7 @@ class PrepareOrderAction
             'notes' => $notes,
         ];
 
-        return $orderData;
+        // return $orderData;
 
         return PreparedOrderData::fromArray($orderData);
     }

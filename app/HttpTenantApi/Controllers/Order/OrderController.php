@@ -48,7 +48,7 @@ class OrderController
         $result = app(PlaceOrderAction::class)
             ->execute(PlaceOrderData::fromArray($validatedData));
 
-        return $result;
+        // return $result;
 
         if (PlaceOrderResult::SUCCESS != $result) {
             return response()->json([

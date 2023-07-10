@@ -69,11 +69,12 @@ class SplitOrderAction
             'tax_total' => 0,
             'sub_total' => $preparedOrderData->totals->sub_total,
             'discount_total' => 0,
-            'shipping_total' => $preparedOrderData->totals->shipping_total,
+            'shipping_total' => 0,
             'total' => $total,
 
             'notes' => $preparedOrderData->notes,
             'shipping_method' => "test shipping_method",
+            'shipping_details' => "test shipping details",
             'payment_method' => "COD",
             'payment_details' => "test payment details",
             'is_paid' => false
@@ -82,7 +83,7 @@ class SplitOrderAction
 
     private function createOrderLines(Order $order, PlaceOrderData $placeOrderData)
     {
-        $cartLines = CartLine::with(['purchasable', 'variant'])
+        $cartLines = CartLine::with(['purchasable'])
             ->whereIn('id', $placeOrderData->cart_line_ids)
             ->get();
 
