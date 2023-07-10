@@ -23,6 +23,7 @@ use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Builder;
+use App\FilamentTenant\Support\Contracts\HasProductOptions;
 
 class ProductResource extends Resource
 {
@@ -98,13 +99,18 @@ class ProductResource extends Resource
                     Forms\Components\Section::make(trans('Variant'))->schema([
                         // For Manage Variant
                         ProductOptionSupport::make('product_options')
-                            ->formatStateUsing(fn () => [])
                             ->itemLabel(fn (array $state) => $state['name'] ?? null)
                             ->schema([
                                 Forms\Components\Repeater::make('options')
-                                    ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, Closure $set) {
+                                    ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, HasProductOptions $livewire) {
                                         if ( ! $record) {
                                             return $state;
+                                        }
+
+                                        if (($livewire->data['product_options']) !== null) {
+                                            $component->state($livewire->data['product_options']['options']);
+
+                                            return;
                                         }
                                         $record->productOptions->load('productOptionValues');
                                         $mappedOptions = $record->productOptions->map(function (ProductOption $productOption) {
@@ -116,10 +122,6 @@ class ProductResource extends Resource
                                             ];
                                         });
                                         $component->state($mappedOptions->toArray());
-                                        //     dd($mappedOptions->toArray());
-                                        // $productVariants = $this->generateCombinations($mappedOptions->toArray());
-                                        // dd($productVariants);
-                                        // $set('product_variants', $productVariants);
                                     })
                                     ->schema([
                                         Forms\Components\TextInput::make('name')
@@ -131,29 +133,74 @@ class ProductResource extends Resource
                                                     ->lazy()
                                                     ->required(),
                                             ])
+                                            ->minItems(1)
                                             ->disableItemMovement(),
                                     ])
                                     ->disableItemMovement()
+                                    ->minItems(2)
                                     ->maxItems(2)
                                     ->collapsible(),
-                            ])->hiddenOn('create'),
+                            ]),
                         ProductVariant::make('product_variants')
+                            ->itemLabel(fn (array $state) => $state['name'] ?? null)
                             ->formatStateUsing(
-                                fn (Product $record) => $record->productVariants->toArray()
-                            ),
-                        // ->schema([
-                        //     Forms\Components\Section::make('Inventory & Shipping')
-                        //         ->schema([
-                        //             Forms\Components\TextInput::make('sku')
-                        //                 ->unique(ignoreRecord: true)
-                        //                 ->required(),
-                        //             Forms\Components\TextInput::make('stock')
-                        //                 ->numeric()
-                        //                 ->dehydrateStateUsing(fn ($state) => (int) $state)
-                        //                 ->required(),
-                        //         ])->columns(2),
-                        // ])
-                    ]),
+                                function (?Product $record) {
+                                    if ( ! $record) {
+                                        return [];
+                                    }
+
+                                    $newArray = [];
+                                    foreach ($record->productVariants->toArray() as $key => $value) {
+                                        $newKey = 'record-' . $value['id'];
+                                        $newArray[$newKey] = $value;
+                                    }
+
+                                    return $newArray;
+                                }
+                            )
+                            ->schema([
+                                Forms\Components\Group::make()
+                                    ->schema([
+                                        Forms\Components\Section::make('Inventory')
+                                            ->schema([
+                                                Forms\Components\TextInput::make('sku')
+                                                    ->unique(ignoreRecord: true)
+                                                    ->required(),
+                                                Forms\Components\TextInput::make('stock')
+                                                    ->numeric()
+                                                    ->dehydrateStateUsing(fn ($state) => (int) $state)
+                                                    ->required(),
+                                            ])->columns(2),
+                                        Forms\Components\Section::make('Pricing')
+                                            ->schema([
+                                                Forms\Components\TextInput::make('retail_price')
+                                                    ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
+                                                        prefix: '$',
+                                                        thousandsSeparator: ',',
+                                                        decimalPlaces: 2,
+                                                        isSigned: false
+                                                    ))
+                                                    ->dehydrateStateUsing(fn ($state) => (float) $state)
+                                                    ->required(),
+
+                                                Forms\Components\TextInput::make('selling_price')
+                                                    ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
+                                                        prefix: '$',
+                                                        thousandsSeparator: ',',
+                                                        decimalPlaces: 2,
+                                                        isSigned: false
+                                                    ))
+                                                    ->dehydrateStateUsing(fn ($state) => (float) $state)
+                                                    ->required(),
+                                                Forms\Components\Toggle::make('status')
+                                                    ->label(
+                                                        fn ($state) => $state ? 'Active' : 'Inactive'
+                                                    )
+                                                    ->helperText('This variant will be hidden from all sales channels.'),
+                                            ])->columns(2),
+                                    ]),
+                            ]),
+                    ])->hiddenOn('create'),
                     Forms\Components\Section::make('Inventory')
                         ->schema([
                             Forms\Components\TextInput::make('sku')
@@ -185,7 +232,6 @@ class ProductResource extends Resource
                                 ))
                                 ->dehydrateStateUsing(fn ($state) => (float) $state)
                                 ->required(),
-
                         ])->columns(2),
                 ])->columnSpan(2),
                 Forms\Components\Group::make()->schema([

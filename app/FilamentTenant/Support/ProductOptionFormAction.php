@@ -19,7 +19,7 @@ class ProductOptionFormAction extends Action
         return 'product-option-form';
     }
 
-    private function generateCombinations($options, $current = [], $index = 0, $result = [])
+    private function generateCombinations($existingCombination, $options, $current = [], $index = 0, $result = [])
     {
         if ($index === count($options)) {
             $result[] = [
@@ -33,7 +33,7 @@ class ProductOptionFormAction extends Action
         foreach ($options[$index]['productOptionValues'] as $value) {
             $newCurrent = $current;
             $newCurrent[$options[$index]['name']] = $value['name'];
-            $result = $this->generateCombinations($options, $newCurrent, $index + 1, $result);
+            $result = $this->generateCombinations($existingCombination, $options, $newCurrent, $index + 1, $result);
         }
 
         return $result;
@@ -44,19 +44,9 @@ class ProductOptionFormAction extends Action
         parent::setUp();
 
         $this->modalHeading(function (HasProductOptions $livewire) {
-            if ( ! $activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
-                return;
-            }
-
-            $state = data_get($livewire, $activeProductOptionStatePath);
-
             $productOptionComponent = $livewire->getProductOptionComponent();
 
             $name = (string) Str::of($productOptionComponent->getName())->headline()->singular();
-
-            if ($state !== null) {
-                return trans('Edit :label', ['label' => $productOptionComponent->getItemLabel($state) ?? $name]);
-            }
 
             return trans('Manage :name', ['name' => $name]);
         });
@@ -69,7 +59,6 @@ class ProductOptionFormAction extends Action
             }
 
             $state = data_get($livewire, $activeProductOptionStatePath) ?? [];
-
             $form->fill($state);
         });
 
@@ -78,8 +67,9 @@ class ProductOptionFormAction extends Action
         $this->action(function (HasProductOptions $livewire, array $data) {
             $options = $data['options'];
 
-            $productVariants = $this->generateCombinations($options);
+            $existingCombination = $livewire->record?->productVariants->toArray() ?? [];
 
+            $productVariants = $this->generateCombinations($existingCombination, $options);
             $updatedVariants = $this->updatingProductVariants($livewire->record, $productVariants);
 
             if ( ! $activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
@@ -87,7 +77,29 @@ class ProductOptionFormAction extends Action
             }
 
             $oldData = data_get($livewire, $activeProductOptionStatePath) ?? [];
+            foreach ($data['options'] as &$option) {
+                if ( ! isset($option['id'])) {
+                    $option['id'] = uniqid()/* generate or assign the desired value */;
+                }
+                if ( ! isset($option['slug'])) {
+                    $option['slug'] = $option['name']/* generate or assign the desired value */;
+                }
+
+                foreach ($option['productOptionValues'] as &$value) {
+                    if ( ! isset($value['id'])) {
+                        $value['id'] = uniqid()/* generate or assign the desired value */;
+                    }
+                    if ( ! isset($value['slug'])) {
+                        $value['slug'] = $value['name']/* generate or assign the desired value */;
+                    }
+                    if ( ! isset($value['product_option_id'])) {
+                        $value['product_option_id'] = $option['id'];
+                    }
+                }
+            }
+
             data_set($livewire, $activeProductOptionStatePath, array_merge($oldData, $data));
+            data_set($livewire, 'data.product_options', array_merge($oldData, $data));
             data_set($livewire, 'data.product_variants', $updatedVariants);
             $livewire->unmountProductOptionItem();
         });
@@ -95,68 +107,22 @@ class ProductOptionFormAction extends Action
 
     private function updatingProductVariants(Product $record, array $productVariants)
     {
-        // dd($record->productVariants->toArray(), $productVariants);
-        // $defaultSellingPrice = 2;
-
         $existingCombination = $record->productVariants->toArray();
         $newCombination = $productVariants;
+        $mergedCombination = [];
 
-        // $newCombination = [
-        //     [
-        //         'id' => 2313213,
-        //         'combination' => [
-        //             'size' => 'large',
-        //             'color' => 'white'
-        //         ],
-        //     ],
-        //     [
-        //         'id' => 2313214,
-        //         'combination' => [
-        //             'size' => 'large',
-        //             'color' => 'black'
-        //         ],
-        //     ],
-        //     [
-        //         'id' => 2313215,
-        //         'combination' => [
-        //             'size' => 'large',
-        //             'color' => 'gray'
-        //         ],
-        //     ]
-        // ];
-
-        // $existingCombination = [
-        //     [
-        //         'id' => 1,
-        //         'combination' => [
-        //             'size' => 'large',
-        //             'color' => 'white'
-        //         ],
-        //         'selling_price' => 4,
-        //     ],
-        //     [
-        //         'id' => 2,
-        //         'combination' => [
-        //             'size' => 'large',
-        //             'color' => 'black'
-        //         ],
-        //         'selling_price' => 5,
-        //     ]
-        // ];
-
-        $mergedCombination = array_merge_recursive($newCombination, $existingCombination);
+        foreach ($newCombination as $key => $item) {
+            if (array_key_exists($key, $existingCombination)) {
+                unset($item['id']);
+                $mergedCombination[$key] = array_replace($existingCombination[$key], $item);
+            } else {
+                $mergedCombination[$key] = $item;
+            }
+        }
         $result = [];
 
         foreach ($mergedCombination as $key => $combination) {
             $keyData = serialize($combination['combination']);
-
-            // $result[$keyData] = isset($combination['selling_price']) ? $combination : $combination['selling_price'];
-            // if (isset($combination['selling_price'])) {
-            //     $result[$keyData] = $combination;
-            // } else {
-            //     $combination['selling_price'] = $record->selling_price;
-            //     $result[$keyData] = $combination;
-            // }
 
             $combination['selling_price'] = isset($combination['selling_price']) ? $combination['selling_price'] : $record->selling_price;
             $combination['retail_price'] = isset($combination['retail_price']) ? $combination['retail_price'] : $record->retail_price;
@@ -166,13 +132,10 @@ class ProductOptionFormAction extends Action
             unset($combination['product_id'], $combination['created_at'], $combination['updated_at']);
 
             $result[$keyData] = $combination;
-
         }
 
         $result = array_values($result);
 
-        // print_r($result);
-        // dd('resulttt : ', $result);
         return $result;
     }
 }

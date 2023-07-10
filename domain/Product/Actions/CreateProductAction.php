@@ -6,6 +6,9 @@ namespace Domain\Product\Actions;
 
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
+use Domain\Product\Models\ProductOption;
+use Domain\Product\Models\ProductOptionValue;
+use Domain\Product\Models\ProductVariant;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 use Illuminate\Http\UploadedFile;
@@ -33,6 +36,34 @@ class CreateProductAction
                     ->usingName(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME))
                     ->toMediaCollection('image');
             }
+        }
+
+        if (count($productData->product_options)) {
+            foreach ($productData->product_options[0] as $productOption) {
+                $productOptionModel = ProductOption::findOrNew($productOption['id']);
+                $productOptionModel->name = $productOption['name'];
+                $productOptionModel->save();
+
+                foreach ($productOption['productOptionValues'] as $productOptionValue) {
+                    $optionValueModel = ProductOptionValue::findOrNew($productOptionValue['id']);
+                    $optionValueModel->name = $productOptionValue['name'];
+                    $optionValueModel->product_option_id = $productOptionValue['product_option_id'];
+                    $optionValueModel->save();
+                }
+            }
+        }
+
+        foreach ($productData->product_variants as $productVariant) {
+            $productVariantModel = ProductVariant::findOrNew($productVariant['id']);
+
+            $productVariantModel->product_id = $product['id'];
+            $productVariantModel->sku = $productVariant['sku'];
+            $productVariantModel->combination = $productVariant['combination'];
+            $productVariantModel->retail_price = $productVariant['retail_price'];
+            $productVariantModel->selling_price = $productVariant['selling_price'];
+            $productVariantModel->stock = $productVariant['stock'];
+            $productVariantModel->status = $productVariant['status'];
+            $productVariantModel->save();
         }
 
         if ($productData->images === null) {

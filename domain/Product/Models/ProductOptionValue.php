@@ -10,6 +10,23 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
+/**
+ * Domain\Product\Models\ProductOptionValue
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property int $product_option_id
+ * @property-read \Domain\Product\Models\ProductOption|null $productOption
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue whereProductOptionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue whereSlug($value)
+ * @mixin \Eloquent
+ */
 class ProductOptionValue extends Model
 {
     use HasSlug;
@@ -18,8 +35,8 @@ class ProductOptionValue extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'product_option_id',
         'name',
+        'product_option_id',
     ];
 
     public function getRouteKeyName(): string

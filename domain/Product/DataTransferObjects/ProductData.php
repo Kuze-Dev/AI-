@@ -24,6 +24,8 @@ class ProductData
         public readonly bool $allow_customer_remarks = false,
         public readonly array $taxonomy_terms = [],
         public readonly ?float $weight = null,
+        public readonly ?array $product_options = null,
+        public readonly ?array $product_variants = null,
         public readonly ?float $length = null,
         public readonly ?float $width = null,
         public readonly ?float $height = null,
@@ -53,6 +55,8 @@ class ProductData
             is_featured: $data['is_featured'],
             is_special_offer: $data['is_special_offer'],
             allow_customer_remarks: $data['allow_customer_remarks'],
+            product_options: $data['product_options'],
+            product_variants: $data['product_variants'],
             images: $data['images'],
         );
     }

@@ -5,6 +5,7 @@
     }">
     <li
         class="rounded-lg p-2 flex items-center justify-between w-full bg-transparent border border-gray-700">
+        @if($item)
         <div>
             <span class="ml-2">
                 @foreach ($item['combination'] as $key => $itemOne)
@@ -14,11 +15,10 @@
                 (Stock: {{ $item['stock'] }})
             </span>
         </div>
-
+        @endif
         <div class="relative">
             <x-forms::button
-                {{-- :wire:key="{{$item['id']}}" --}}
-                :wire:click="'dispatchFormEvent(\'productVariant::editItem\', \'' . $getStatePath() . '\')'"
+                :wire:click="'dispatchFormEvent(\'productVariant::editItem\', \'' . $statePath . '\')'"
                 size="sm" type="button">
                 @lang('Edit')
             </x-forms::button>
