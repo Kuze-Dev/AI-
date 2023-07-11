@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\HttpTenantApi\Resources\CartLineResource;
+use Domain\Cart\Actions\CheckoutAction;
 use Domain\Cart\DataTransferObjects\CheckoutData;
+use Domain\Cart\Enums\CartActionResult;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CheckoutRequest;
 use Domain\Product\Models\Product;
@@ -32,9 +34,8 @@ class CheckoutController
 
         $reference = $validated['reference'];
 
-        if ( ! $reference) {
+        if (!$reference) {
             return response()->json([
-                'error' => 'Bad Request',
                 'message' => 'Invalid reference.',
             ], 400);
         }
@@ -61,53 +62,19 @@ class CheckoutController
     {
         $validatedData = $request->validated();
 
-        $payload = CheckoutData::fromArray($validatedData);
+        $reference = app(CheckoutAction::class)
+            ->execute(CheckoutData::fromArray($validatedData));
 
-        $cartLinesForCheckout = CartLine::with('purchasable')
-            ->whereHas('cart', function ($query) {
-                $query->whereBelongsTo(auth()->user());
-            })
-            ->whereNull('checked_out_at')
-            ->whereIn('id', $payload->cart_line_ids)
-            ->where(function ($query) {
-                $query->where(function ($subQuery) {
-                    $subQuery->where('purchasable_type', Product::class)
-                        ->whereExists(function ($subSubQuery) {
-                            $subSubQuery->select('id')
-                                ->from('products')
-                                ->whereColumn('products.id', 'cart_lines.purchasable_id')
-                                ->where('stock', '>', DB::raw('cart_lines.quantity'));
-                        });
-                })->orWhere(function ($subQuery) {
-                    $subQuery->where('purchasable_type', ProductVariant::class)
-                        ->whereExists(function ($subSubQuery) {
-                            $subSubQuery->select('id')
-                                ->from('product_variants')
-                                ->whereColumn('product_variants.id', 'cart_lines.purchasable_id')
-                                ->where('stock', '>', DB::raw('cart_lines.quantity'));
-                        });
-                });
-            })
-            ->get();
-
-        if ($cartLinesForCheckout->count() !== count($payload->cart_line_ids)) {
-            return response()->json(['error' => 'Invalid request'], 400);
+        if (CartActionResult::FAILED == $reference) {
+            return response()->json([
+                'message' => 'Invalid action',
+            ], 400);
         }
-
-        $cartLineIds = $cartLinesForCheckout->pluck('id');
-
-        $checkoutReference = Str::upper(Str::random(12));
-
-        CartLine::whereIn('id', $cartLineIds)
-            ->update([
-                'checkout_reference' => $checkoutReference,
-                'checkout_expiration' => now()->addMinutes(20),
-            ]);
 
         return response()
             ->json([
                 'message' => 'Success',
-                'reference' => $checkoutReference,
+                'reference' => $reference,
             ]);
     }
 }
