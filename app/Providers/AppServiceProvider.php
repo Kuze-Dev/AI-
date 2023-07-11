@@ -34,6 +34,7 @@ use Support\MetaData\Models\MetaData;
 use Domain\Product\Models\Product;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Models\Payment;
+use Domain\Product\Models\ProductVariant;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tier\Models\Tier;
@@ -57,7 +58,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Model::shouldBeStrict( ! $this->app->isProduction());
+        Model::shouldBeStrict(!$this->app->isProduction());
 
         Model::handleMissingAttributeViolationUsing(function (Model $model, string $key) {
             if ($model instanceof Tenant && Str::startsWith($key, Tenant::internalPrefix())) {
@@ -80,6 +81,7 @@ class AppServiceProvider extends ServiceProvider
             FormSubmission::class,
             FormEmailNotification::class,
             Product::class,
+            ProductVariant::class,
             Taxonomy::class,
             TaxonomyTerm::class,
             Content::class,
@@ -107,13 +109,13 @@ class AppServiceProvider extends ServiceProvider
             $this->app->environment('local', 'testing')
                 ? Password::min(4)
                 : Password::min(8)
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols()
-                    ->when(
-                        $this->app->isProduction(),
-                        fn (Password $password) => $password->uncompromised()
-                    )
+                ->mixedCase()
+                ->numbers()
+                ->symbols()
+                ->when(
+                    $this->app->isProduction(),
+                    fn (Password $password) => $password->uncompromised()
+                )
         );
 
         Rule::macro(
