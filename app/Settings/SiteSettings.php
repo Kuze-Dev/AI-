@@ -18,6 +18,8 @@ class SiteSettings extends Settings
 
     public string $favicon;
 
+    public string $domain;
+
     public static function group(): string
     {
         return 'site';
