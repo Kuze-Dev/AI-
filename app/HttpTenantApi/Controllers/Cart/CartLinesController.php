@@ -74,7 +74,6 @@ class CartLinesController
             ], 400);
         }
 
-        return response()
-            ->noContent();
+        return response()->noContent();
     }
 }
