@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart;
 
-use Domain\Cart\Actions\CartLineDestroyAction;
+use Domain\Cart\Actions\DestroyCartLineAction;
 use Domain\Cart\Actions\UpdateCartLineAction;
 use Domain\Cart\Actions\CreateCartAction;
 use Domain\Cart\DataTransferObjects\UpdateCartLineData;
@@ -65,7 +65,7 @@ class CartLinesController
 
     public function destroy(CartLine $cartline): mixed
     {
-        $result = app(CartLineDestroyAction::class)
+        $result = app(DestroyCartLineAction::class)
             ->execute($cartline);
 
         if (!$result) {

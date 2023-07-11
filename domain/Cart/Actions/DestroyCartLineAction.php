@@ -7,7 +7,7 @@ namespace Domain\Cart\Actions;
 use Domain\Cart\Models\CartLine;
 use Illuminate\Database\Eloquent\Builder;
 
-class CartLineDestroyAction
+class DestroyCartLineAction
 {
     public function execute(CartLine $cartLine): bool
     {

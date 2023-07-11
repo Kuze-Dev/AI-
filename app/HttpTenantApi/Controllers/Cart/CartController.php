@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\HttpTenantApi\Resources\CartResource;
+use Domain\Cart\Actions\DestroyCartAction;
 use Domain\Cart\Models\Cart;
 use Domain\Product\Models\ProductVariant;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
-    Resource('carts', apiResource: true, only: 'index'),
+    Resource('carts', apiResource: true, only: ['index', 'destroy']),
     Middleware(['auth:sanctum'])
 ]
 class CartController
@@ -46,5 +47,20 @@ class CartController
             ->json([
                 'data' => [],
             ], 200);
+    }
+
+    public function destroy(Cart $cart): mixed
+    {
+        $result = app(DestroyCartAction::class)
+            ->execute($cart);
+
+        if (!$result) {
+            return response()->json([
+                'message' => 'Invalid action',
+            ], 400);
+        }
+
+        return response()
+            ->noContent();
     }
 }

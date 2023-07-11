@@ -17,7 +17,7 @@ class UpdateCartLineData
     {
         return new self(
             quantity: $data['quantity'] ?? null,
-            remarks: $data['remarks'],
+            remarks: $data['remarks'] ?? null,
             images: $data['image'] ?? null,
         );
     }

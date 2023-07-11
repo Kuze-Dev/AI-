@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart;
 
-use Domain\Cart\Actions\CartDestroyAction;
+use Domain\Cart\Actions\DestroyCartAction;
 use Domain\Cart\Actions\CartLineBulkDestroyAction;
 use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
@@ -22,31 +22,31 @@ use Spatie\RouteAttributes\Attributes\Prefix;
 ]
 class CartRemoveController
 {
-    #[Delete('clear/{cart}', name: 'carts.clear.{cart}')]
-    public function clear(Cart $cart): mixed
-    {
-        try {
-            $result = app(CartDestroyAction::class)
-                ->execute($cart);
+    // #[Delete('clear/{cart}', name: 'carts.clear.{cart}')]
+    // public function clear(Cart $cart): mixed
+    // {
+    //     try {
+    //         $result = app(DestroyCartAction::class)
+    //             ->execute($cart);
 
-            if (!$result) {
-                return response()->json([
-                    'error' => 'Bad Request',
-                    'message' => 'Invalid action',
-                ], 400);
-            }
+    //         if (!$result) {
+    //             return response()->json([
+    //                 'error' => 'Bad Request',
+    //                 'message' => 'Invalid action',
+    //             ], 400);
+    //         }
 
-            return response()
-                ->json([
-                    'message' => 'Cart Cleared Successfully',
-                ]);
-        } catch (ModelNotFoundException $e) {
-            return response()
-                ->json([
-                    'error' => 'Cart not found',
-                ], 404);
-        }
-    }
+    //         return response()
+    //             ->json([
+    //                 'message' => 'Cart Cleared Successfully',
+    //             ]);
+    //     } catch (ModelNotFoundException $e) {
+    //         return response()
+    //             ->json([
+    //                 'error' => 'Cart not found',
+    //             ], 404);
+    //     }
+    // }
 
     #[Post('/bulk-remove', name: 'carts.bulk-remove')]
     public function bulk(Request $request): mixed

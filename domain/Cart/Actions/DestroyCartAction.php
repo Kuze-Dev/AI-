@@ -6,12 +6,10 @@ namespace Domain\Cart\Actions;
 
 use Domain\Cart\Models\Cart;
 
-class CartDestroyAction
+class DestroyCartAction
 {
     public function execute(Cart $cart): bool
     {
-        $cart->whereBelongsTo(auth()->user())->first();
-
         return $cart->delete();
     }
 }
