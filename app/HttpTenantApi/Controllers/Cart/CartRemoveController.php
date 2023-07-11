@@ -8,7 +8,6 @@ use Domain\Cart\Actions\CartDestroyAction;
 use Domain\Cart\Actions\CartLineBulkDestroyAction;
 use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -32,10 +31,10 @@ class CartRemoveController
             $result = app(CartDestroyAction::class)
                 ->execute($cart);
 
-            if (!$result) {
+            if ( ! $result) {
                 return response()->json([
                     'error' => 'Bad Request',
-                    'message' => 'Invalid action'
+                    'message' => 'Invalid action',
                 ], 400);
             }
 
@@ -59,7 +58,7 @@ class CartRemoveController
                 'cart_line_ids' => 'required|array',
                 'cart_line_ids.*' => [
                     'required',
-                    Rule::exists(CartLine::class, 'id')
+                    Rule::exists(CartLine::class, 'id'),
                 ],
             ]);
 
@@ -68,10 +67,10 @@ class CartRemoveController
             $result = app(CartLineBulkDestroyAction::class)
                 ->execute($cartLineIds);
 
-            if (!$result) {
+            if ( ! $result) {
                 return response()->json([
                     'error' => 'Bad Request',
-                    'message' => 'Invalid action'
+                    'message' => 'Invalid action',
                 ], 400);
             }
 

@@ -21,7 +21,7 @@ class CartQuantityUpdateAction
             ->where('id', $cartLineData->cart_line_id)
             ->whereNull('checked_out_at')->first();
 
-        if (!$cartLine) {
+        if ( ! $cartLine) {
             throw new ModelNotFoundException();
         }
 
@@ -33,7 +33,7 @@ class CartQuantityUpdateAction
             $product = ProductVariant::find($cartLine->purchasable_id);
         }
 
-        if (!$product) {
+        if ( ! $product) {
             return [
                 'message' => 'Product not found',
             ];

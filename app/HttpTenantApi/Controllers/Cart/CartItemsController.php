@@ -35,7 +35,7 @@ class CartItemsController
         if (CartActionResult::SUCCESS != $result) {
             return response()->json([
                 'error' => 'Bad Request',
-                'message' => 'Invalid action'
+                'message' => 'Invalid action',
             ], 400);
         }
 
@@ -86,10 +86,10 @@ class CartItemsController
             $result = app(CartLineDestroyAction::class)
                 ->execute($cartLine);
 
-            if (!$result) {
+            if ( ! $result) {
                 return response()->json([
                     'error' => 'Bad Request',
-                    'message' => 'Invalid action'
+                    'message' => 'Invalid action',
                 ], 400);
             }
 

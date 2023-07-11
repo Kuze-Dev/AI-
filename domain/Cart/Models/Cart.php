@@ -20,6 +20,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $cartLines
  * @property-read int|null $cart_lines_count
+ * @property-read Customer|null $customer
  * @method static \Illuminate\Database\Eloquent\Builder|Cart newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Cart newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Cart query()

@@ -6,12 +6,9 @@ namespace Domain\Cart\Requests;
 
 use Domain\Cart\Models\CartLine;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
 class CheckoutRequest extends FormRequest
 {
-
     public function rules()
     {
         return [

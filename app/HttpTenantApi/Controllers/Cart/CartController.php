@@ -29,7 +29,7 @@ class CartController
                         ProductVariant::class => ['product.media'],
                     ]);
                 },
-                'cartLines.media'
+                'cartLines.media',
             ])
                 ->whereHas('cartLines', function (Builder $query) {
                     $query->whereNull('checked_out_at');

@@ -10,7 +10,6 @@ use Illuminate\Validation\Rule;
 
 class CartNotesUpdateRequest extends FormRequest
 {
-
     public function rules()
     {
         return [

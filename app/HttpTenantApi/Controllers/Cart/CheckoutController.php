@@ -27,12 +27,12 @@ class CheckoutController
     public function index(Request $request)
     {
         $validated = $request->validate([
-            'reference' => 'required|string'
+            'reference' => 'required|string',
         ]);
 
         $reference = $validated['reference'];
 
-        if (!$reference) {
+        if ( ! $reference) {
             return response()->json([
                 'error' => 'Bad Request',
                 'message' => 'Invalid reference.',
@@ -49,7 +49,6 @@ class CheckoutController
             })
             ->whereCheckoutReference($reference)
             ->where('checkout_expiration', '>', now());
-
 
         return CartLineResource::collection(
             QueryBuilder::for(
@@ -90,7 +89,6 @@ class CheckoutController
                 });
             })
             ->get();
-
 
         if ($cartLinesForCheckout->count() !== count($payload->cart_line_ids)) {
             return response()->json(['error' => 'Invalid request'], 400);

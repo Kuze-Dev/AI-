@@ -24,7 +24,7 @@ class CartLineResource extends JsonApiResource
             'purchasable' => function () {
                 if ($this->purchasable instanceof Product) {
                     return ProductResource::make($this->purchasable);
-                } else if ($this->purchasable instanceof ProductVariant) {
+                } elseif ($this->purchasable instanceof ProductVariant) {
                     return $this->purchasable;
                 }
             },
