@@ -4,132 +4,89 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart;
 
-use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartLineResource;
+use Domain\Cart\Actions\CheckoutAction;
 use Domain\Cart\DataTransferObjects\CheckoutData;
+use Domain\Cart\Enums\CartActionResult;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CheckoutRequest;
-use Domain\Customer\Models\Customer;
+use Domain\Product\Models\Product;
+use Domain\Product\Models\ProductVariant;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\RouteAttributes\Attributes\Middleware;
-use Spatie\RouteAttributes\Attributes\Post;
-use Spatie\RouteAttributes\Attributes\Prefix;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Spatie\RouteAttributes\Attributes\Get;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
-use Illuminate\Http\JsonResponse;
-use TiMacDonald\JsonApi\JsonApiResourceCollection;
+use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
-    Prefix('checkouts'),
+    Resource('carts/checkouts', apiResource: true, only: ['index', 'store']),
     Middleware(['auth:sanctum'])
 ]
 class CheckoutController
 {
-    protected function isCostumerValidated(): bool
+    public function index(Request $request)
     {
-        $customerId = auth()->user()?->id;
+        $validated = $request->validate([
+            'reference' => 'required|string',
+        ]);
 
-        $customer = Customer::where("id", $customerId)->whereStatus('active')->first();
-
-        if (!$customer) {
-            return false;
-        }
-
-        return true;
-    }
-
-    #[Post('/', name: 'checkouts')]
-    public function checkout(CheckoutRequest $request): JsonResponse
-    {
-        $authenticated = $this->isCostumerValidated();
-
-        if (!$authenticated) {
-            return response()->json([
-                'error' => "User Unauthorized",
-            ], 403);
-        }
-
-        $validatedData = $request->validated();
-
-        $payload = CheckoutData::fromArray($validatedData);
-
-        $cartLinesForCheckout = CartLine::select(['cart_lines.id', 'cart_lines.purchasable_id'])
-            ->join('products', 'cart_lines.purchasable_id', '=', 'products.id')
-            ->whereNull('checked_out_at')
-            ->where('products.stock', '>', DB::raw('cart_lines.quantity'))
-            ->whereIn('cart_lines.id', $payload->cart_line_ids)
-            ->get();
-
-        if ($cartLinesForCheckout->count() !== count($payload->cart_line_ids)) {
-            return response()->json(['error' => 'Invalid request'], 400);
-        }
-
-        $cartLineIds = $cartLinesForCheckout->pluck('id');
-        $purchasablesForCheckout = $cartLinesForCheckout->pluck('purchasable_id');
-
-        $checkoutReference = Str::upper(Str::random(12));
-
-        CartLine::whereIn('id', $cartLineIds)
-            ->update([
-                'checkout_reference' => $checkoutReference,
-                'checkout_expiration' => now()->addMinutes(20),
-            ]);
-
-        return response()
-            ->json([
-                'message' => 'Success',
-                'purchasables_for_checkout' => $purchasablesForCheckout,
-                'reference' => $checkoutReference,
-            ]);
-    }
-
-    #[Get('/', 'checkouts')]
-    public function checkoutItems(Request $request)
-    {
-        $authenticated = $this->isCostumerValidated();
-
-        if (!$authenticated) {
-            return response()->json([
-                'error' => "User Unauthorized",
-            ], 403);
-        }
-
-        $customerId = auth()->user()?->id;
-
-        $reference = $request->input('reference');
+        $reference = $validated['reference'];
 
         if (!$reference) {
             return response()->json([
-                'error' => 'Bad Request',
                 'message' => 'Invalid reference.',
             ], 400);
         }
 
-        $purchasableIdsArray = explode(',', $request->input('purchasable_ids'));
+        $cartLineQuery = CartLine::with(['purchasable' => function (MorphTo $query) {
+            $query->morphWith([
+                ProductVariant::class => ['product.media'],
+            ]);
+        }, 'media'])
+            ->whereHas('cart', function ($query) {
+                $query->whereBelongsTo(auth()->user());
+            })
+            ->whereCheckoutReference($reference);
 
-        $purchasableIds = array_map('intval', $purchasableIdsArray);
+        $model = QueryBuilder::for($cartLineQuery)->jsonPaginate();
 
-        $cartLineQuery = CartLine::with(['purchasable', 'media'])->whereHas('cart', function ($query) use ($customerId) {
-            $query->whereCustomerId($customerId);
-        })->whereIn('purchasable_id', $purchasableIds)
-            ->whereCheckoutReference($reference)
-            ->where('checkout_expiration', '>', now());
+        if ($model->isNotEmpty()) {
+            $expiredCartLines = $model->where('checkout_expiration', '<=', now());
 
-        $cartLines = $cartLineQuery->get();
+            // Check if there are expired cart lines
+            if ($expiredCartLines->isNotEmpty()) {
+                return response()->json([
+                    'message' => "Key has been expired, checkout again",
+                ], 200);
+            }
 
-        if (count($cartLines) <= 0) {
+            return CartLineResource::collection($model);
+        }
+
+        return response()->json([
+            'data' => [],
+        ], 200);
+    }
+
+    public function store(CheckoutRequest $request): mixed
+    {
+        $validatedData = $request->validated();
+
+        $reference = app(CheckoutAction::class)
+            ->execute(CheckoutData::fromArray($validatedData));
+
+        if (CartActionResult::FAILED == $reference) {
             return response()->json([
-                'error' => 'Bad Request',
-                'message' => 'Invalid cart line IDs.',
+                'message' => 'Invalid action',
             ], 400);
         }
 
-        return CartLineResource::collection(
-            QueryBuilder::for(
-                $cartLineQuery
-            )->jsonPaginate()
-        );
+        return response()
+            ->json([
+                'message' => 'Success',
+                'reference' => $reference,
+            ]);
     }
 }

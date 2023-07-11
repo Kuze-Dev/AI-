@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Domain\Cart\DataTransferObjects;
 
-class CartQuantityUpdateData
+class UpdateCartLineData
 {
     public function __construct(
-        public readonly int $cart_line_id,
-        public readonly string $action,
         public readonly ?int $quantity,
+        public readonly mixed $remarks,
+        public readonly ?array $medias,
     ) {
     }
 
     public static function fromArray(array $data): self
     {
         return new self(
-            cart_line_id: $data['cartLineId'],
-            action: $data['action'],
             quantity: $data['quantity'] ?? null,
+            remarks: $data['remarks'] ?? null,
+            medias: $data['media'] ?? null,
         );
     }
 }

@@ -4,27 +4,25 @@ declare(strict_types=1);
 
 namespace Domain\Cart\DataTransferObjects;
 
-class CartStoreData
+class CreateCartData
 {
     public function __construct(
-        public readonly ?int $customer_id,
         public readonly int $purchasable_id,
         public readonly string $purchasable_type,
         public readonly int $quantity,
         public readonly ?int $variant_id,
-        public readonly mixed $meta,
+        public readonly mixed $remarks,
     ) {
     }
 
     public static function fromArray(array $data): self
     {
         return new self(
-            customer_id: $data['customer_id'] ?? null,
             purchasable_id: $data['purchasable_id'],
             purchasable_type: $data['purchasable_type'],
             quantity: $data['quantity'],
             variant_id: $data['variant_id'] ?? null,
-            meta: $data['meta'] ?? null,
+            remarks: $data['remarks'] ?? null,
         );
     }
 }

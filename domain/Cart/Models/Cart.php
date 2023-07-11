@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Models;
 
+use Domain\Customer\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
@@ -19,6 +20,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $cartLines
  * @property-read int|null $cart_lines_count
+ * @property-read Customer|null $customer
  * @method static \Illuminate\Database\Eloquent\Builder|Cart newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Cart newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Cart query()
@@ -45,5 +47,10 @@ class Cart extends Model
     public function cartLines()
     {
         return $this->hasMany(CartLine::class);
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
+use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
@@ -19,18 +20,12 @@ class CartLineResource extends JsonApiResource
             'id' => $this->id,
             'cart_id' => $this->cart_id,
             'quantity' => $this->quantity,
-            'meta' => $this->meta,
+            'remarks' => $this->remarks,
             'purchasable' => function () {
-                switch ($this->purchasable_type) {
-                    case 'Domain\Product\Models\Product': {
-                        return ProductResource::make($this->purchasable);
-                    }
-                    case 'Domain\Product\Models\ProductVariant': {
-                        $model = ProductVariant::with(['product'])
-                            ->where('id', $this->purchasable_id)->first();
-
-                        return $model;
-                    }
+                if ($this->purchasable instanceof Product) {
+                    return ProductResource::make($this->purchasable);
+                } elseif ($this->purchasable instanceof ProductVariant) {
+                    return $this->purchasable;
                 }
             },
             'remarks_images' => $this->media->toArray(),

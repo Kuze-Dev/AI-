@@ -34,6 +34,7 @@ use Support\MetaData\Models\MetaData;
 use Domain\Product\Models\Product;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Models\Payment;
+use Domain\Product\Models\ProductVariant;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tier\Models\Tier;
@@ -80,6 +81,7 @@ class AppServiceProvider extends ServiceProvider
             FormSubmission::class,
             FormEmailNotification::class,
             Product::class,
+            ProductVariant::class,
             Taxonomy::class,
             TaxonomyTerm::class,
             Content::class,

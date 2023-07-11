@@ -43,6 +43,8 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Tier\Models\Tier::class => \App\Policies\TierPolicy::class,
         \Domain\Address\Models\Address::class => \App\Policies\AddressPolicy::class,
         \Domain\PaymentMethod\Models\PaymentMethod::class => \App\Policies\PaymentMethodPolicy::class,
+        \Domain\Cart\Models\Cart::class => \App\Policies\CartPolicy::class,
+        \Domain\Cart\Models\CartLine::class => \App\Policies\CartLinePolicy::class,
     ];
 
     /** Register any authentication / authorization services. */
@@ -104,7 +106,7 @@ class AuthServiceProvider extends ServiceProvider
                 $baseUrl = app(ECommerceSettings::class)->domainWithScheme()
                     ?? app(SiteSettings::class)->domainWithScheme();
 
-                return $baseUrl.'/password-reset'.'?'.http_build_query([
+                return $baseUrl . '/password-reset' . '?' . http_build_query([
                     'token' => $token,
                     'email' => $notifiable->getEmailForPasswordReset(),
                 ]);

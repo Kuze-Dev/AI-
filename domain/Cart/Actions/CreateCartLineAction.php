@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Actions;
 
-use Domain\Cart\DataTransferObjects\CartStoreData;
+use Domain\Cart\DataTransferObjects\CreateCartData;
 use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Exception;
 
 class CreateCartLineAction
 {
-    public function execute(Cart $cart, CartStoreData $cartLineData): CartLine|Exception
+    public function execute(Cart $cart, CreateCartData $cartLineData): CartLine|Exception
     {
         DB::beginTransaction();
 
@@ -46,7 +45,7 @@ class CreateCartLineAction
                 ],
                 [
                     'quantity' => DB::raw('quantity + ' . $cartLineData->quantity),
-                    'meta' => $cartLineData->meta,
+                    'remarks' => $cartLineData->remarks,
                 ]
             );
 
