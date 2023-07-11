@@ -42,8 +42,8 @@ class UpdateCartLineRequest extends FormRequest
                     return $this->input('type') === 'remarks';
                 }),
             ],
-            'image' => 'nullable|array',
-            'image.*' => 'image|max:2048',
+            'media' => 'nullable|array',
+            'media.*' => 'url',
         ];
     }
 }

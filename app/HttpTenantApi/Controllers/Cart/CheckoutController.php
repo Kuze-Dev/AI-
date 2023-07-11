@@ -48,14 +48,26 @@ class CheckoutController
             ->whereHas('cart', function ($query) {
                 $query->whereBelongsTo(auth()->user());
             })
-            ->whereCheckoutReference($reference)
-            ->where('checkout_expiration', '>', now());
+            ->whereCheckoutReference($reference);
 
-        return CartLineResource::collection(
-            QueryBuilder::for(
-                $cartLineQuery
-            )->jsonPaginate()
-        );
+        $model = QueryBuilder::for($cartLineQuery)->jsonPaginate();
+
+        if ($model->isNotEmpty()) {
+            $expiredCartLines = $model->where('checkout_expiration', '<=', now());
+
+            // Check if there are expired cart lines
+            if ($expiredCartLines->isNotEmpty()) {
+                return response()->json([
+                    'message' => "Key has been expired, checkout again",
+                ], 200);
+            }
+
+            return CartLineResource::collection($model);
+        }
+
+        return response()->json([
+            'data' => [],
+        ], 200);
     }
 
     public function store(CheckoutRequest $request): mixed

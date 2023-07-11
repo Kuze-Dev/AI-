@@ -15,13 +15,9 @@ class CreateCartAction
 {
     public function execute(Customer $customer, CreateCartData $cartData): CartActionResult|Exception
     {
-        $cart = Cart::whereCustomerId($customer->id)
-            ->whereHas('cart', function ($query) {
-                $query->where('user_id', auth()->user()->id);
-            })
-            ->firstOrCreate([
-                'customer_id' => $customer->id,
-            ]);
+        $cart = Cart::firstOrCreate([
+            'customer_id' => $customer->id,
+        ]);
 
         $result = app(CreateCartLineAction::class)->execute($cart, $cartData);
 

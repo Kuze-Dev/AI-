@@ -23,10 +23,16 @@ class UpdateCartLineAction
             ]);
         }
 
-        if ($cartLineData->images !== null) {
-            foreach ($cartLineData->images as $image) {
-                $cartLine->addMedia($image)
-                    ->toMediaCollection('cart_line_notes');
+        $cartLine->clearMediaCollection('cart_line_notes');
+
+        if ($cartLineData->medias !== null) {
+            foreach ($cartLineData->medias as $imageUrl) {
+                try {
+                    $cartLine->addMediaFromUrl($imageUrl)
+                        ->toMediaCollection('cart_line_notes');
+                } catch (\Exception $e) {
+                    // Log::info($e);
+                }
             }
         }
 
