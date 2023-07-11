@@ -10,6 +10,7 @@ use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\DataTransferObjects\CustomerRegisterData;
+use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
@@ -32,6 +33,7 @@ class CustomerRegisterRequest extends FormRequest
                 'max:255',
             ],
             'mobile' => 'required|string|max:255',
+            'gender' => ['required', Rule::enum(Gender::class)],
             'birth_date' => 'required|date',
             'password' => ['required', 'confirmed', Password::default()],
 
@@ -107,14 +109,15 @@ class CustomerRegisterRequest extends FormRequest
         $validated = $this->validated();
 
         $customerData = new CustomerData(
-            tier_id: $tier->getKey(),
             first_name: $validated['first_name'],
             last_name: $validated['last_name'],
             mobile: $validated['mobile'],
-            status: Status::ACTIVE,
+            gender: Gender::from($validated['gender']),
             birth_date: now()->parse($validated['birth_date']),
+            status: Status::ACTIVE,
+            tier_id: $tier->getKey(),
             email: $validated['email'],
-            password: $validated['password'],
+            password: $validated['password']
         );
 
         $shippingAddress = new AddressData(

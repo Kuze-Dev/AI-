@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\RequestFactories;
 
 use Domain\Address\Models\State;
+use Domain\Customer\Enums\Gender;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Worksome\RequestFactories\RequestFactory;
 
@@ -21,6 +23,7 @@ class CustomerRequestFactory extends RequestFactory
 
                 return "{$firstName}.{$lastName}@fake.com";
             },
+            'gender' => Arr::random(Gender::cases())->value,
             'password' => 'secret',
             'password_confirmation' => 'secret',
             'mobile' => $this->faker->phoneNumber(),

@@ -55,6 +55,7 @@ it('register', function () {
         'last_name' => $data['last_name'],
         'email' => $data['email'],
         'mobile' => $data['mobile'],
+        'gender' => $data['gender'],
         'status' => Status::ACTIVE->value,
         'birth_date' => $data['birth_date'] . ' 00:00:00',
     ]);

@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CustomerResource;
 use Domain\Customer\Actions\EditCustomerAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
+use Domain\Customer\Enums\Gender;
 use Domain\Customer\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,6 +48,7 @@ class AccountController extends Controller
                 Rule::email(),
                 'max:255',
             ],
+            'gender' => ['required', Rule::enum(Gender::class)],
             'mobile' => 'required|string|max:255',
             'birth_date' => 'required|date',
         ]);
@@ -57,6 +59,7 @@ class AccountController extends Controller
                     first_name: $validated['first_name'],
                     last_name: $validated['last_name'],
                     mobile: $validated['mobile'],
+                    gender: Gender::from($validated['gender']),
                     birth_date: now()->parse($validated['birth_date']),
                     email: $validated['email'],
                 ))

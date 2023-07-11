@@ -10,6 +10,7 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Actions\ForceDeleteCustomerAction;
 use Domain\Customer\Actions\RestoreCustomerAction;
+use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
@@ -108,6 +109,15 @@ class CustomerResource extends Resource
                         ->dehydrated(false)
                         ->rules(Password::sometimes())
                         ->visible(fn (?Customer $record) => $record === null || ! $record->exists),
+                    Forms\Components\Select::make('gender')
+                        ->translateLabel()
+                        ->required()
+                        ->options(
+                            collect(Gender::cases())
+                                ->mapWithKeys(fn (Gender $target) => [$target->value => Str::headline($target->value)])
+                                ->toArray()
+                        )
+                        ->in(collect(Gender::cases())->map(fn (Gender $status) => $status->value)->toArray()),
                     Forms\Components\Select::make('status')
                         ->translateLabel()
                         ->required()
