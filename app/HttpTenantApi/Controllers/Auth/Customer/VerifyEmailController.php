@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
 use App\Features\ECommerce\ECommerceBase;
+use App\Settings\ECommerceSettings;
+use App\Settings\SiteSettings;
 use Domain\Auth\Actions\VerifyEmailAction;
 use Domain\Customer\Models\Customer;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -24,10 +26,15 @@ class VerifyEmailController
             throw new AuthorizationException();
         }
 
-        return response([
-            'message' => app(VerifyEmailAction::class)->execute($customer) === true
-                ? trans('Email verified!')
-                : trans('Email already verified.'),
+        $params = http_build_query([
+            'status' => app(VerifyEmailAction::class)->execute($customer) === true
+                ? 'verified'
+                : 'already-verified',
         ]);
+
+        $baseUrl = app(ECommerceSettings::class)->domainWithScheme()
+            ?? app(SiteSettings::class)->domainWithScheme();
+
+        return redirect($baseUrl.'/verify?'.$params);
     }
 }

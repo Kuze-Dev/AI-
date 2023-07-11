@@ -24,4 +24,9 @@ class SiteSettings extends Settings
     {
         return 'site';
     }
+
+    public function domainWithScheme(): string
+    {
+        return parse_url(config('app.url'))['scheme'].'://'.$this->domain;
+    }
 }
