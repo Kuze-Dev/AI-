@@ -57,13 +57,13 @@ class CartLine extends Model implements HasMedia
         'purchasable_id',
         'purchasable_type',
         'quantity',
-        'meta',
+        'remarks',
         'checkout_reference',
         'checked_out_at',
     ];
 
     protected $casts = [
-        'meta' => 'array',
+        'remarks' => 'array',
         'checkout_expiration' => 'datetime',
         'checked_out_at' => 'datetime',
     ];

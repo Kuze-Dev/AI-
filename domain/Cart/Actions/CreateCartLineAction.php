@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Actions;
 
-use Domain\Cart\DataTransferObjects\CartStoreData;
+use Domain\Cart\DataTransferObjects\CreateCartData;
 use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
 use Domain\Product\Models\Product;
@@ -14,7 +14,7 @@ use Exception;
 
 class CreateCartLineAction
 {
-    public function execute(Cart $cart, CartStoreData $cartLineData): CartLine|Exception
+    public function execute(Cart $cart, CreateCartData $cartLineData): CartLine|Exception
     {
         DB::beginTransaction();
 
@@ -24,8 +24,8 @@ class CreateCartLineAction
 
             match ($cartLineData->purchasable_type) {
                 'Product' => $purchasableType = Product::class,
-                // 'Service' => $purchasableType = Service::class,
-                // 'Booking' => $purchasableType = Booking::class,
+                    // 'Service' => $purchasableType = Service::class,
+                    // 'Booking' => $purchasableType = Booking::class,
                 default => null
             };
 
@@ -45,7 +45,7 @@ class CreateCartLineAction
                 ],
                 [
                     'quantity' => DB::raw('quantity + ' . $cartLineData->quantity),
-                    'meta' => $cartLineData->meta,
+                    'remarks' => $cartLineData->remarks,
                 ]
             );
 

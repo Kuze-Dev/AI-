@@ -6,13 +6,13 @@ namespace App\HttpTenantApi\Controllers\Cart;
 
 use Domain\Cart\Actions\CartLineDestroyAction;
 use Domain\Cart\Actions\CartQuantityUpdateAction;
-use Domain\Cart\Actions\CartStoreAction;
+use Domain\Cart\Actions\CreateCartAction;
 use Domain\Cart\DataTransferObjects\CartQuantityUpdateData;
-use Domain\Cart\DataTransferObjects\CartStoreData;
+use Domain\Cart\DataTransferObjects\CreateCartData;
 use Domain\Cart\Enums\CartActionResult;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartQuantityUpdateRequest;
-use Domain\Cart\Requests\CartStoreRequest;
+use Domain\Cart\Requests\CreateCartLineRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
@@ -23,14 +23,14 @@ use Spatie\RouteAttributes\Attributes\Resource;
 ]
 class CartLinesController
 {
-    public function store(CartStoreRequest $request): mixed
+    public function store(CreateCartLineRequest $request): mixed
     {
         $validatedData = $request->validated();
 
-        $validatedData['customer_id'] = auth()->user()?->id;
+        $customer = auth()->user();
 
-        $result = app(CartStoreAction::class)
-            ->execute(CartStoreData::fromArray($validatedData));
+        $result = app(CreateCartAction::class)
+            ->execute($customer, CreateCartData::fromArray($validatedData));
 
         if (CartActionResult::SUCCESS != $result) {
             return response()->json([
