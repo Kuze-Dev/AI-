@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Customer\Database\Factories;
 
+use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Database\Factories\TierFactory;
@@ -28,6 +29,7 @@ class CustomerFactory extends Factory
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
             'mobile' => $this->faker->phoneNumber(),
+            'gender' => Arr::random(Gender::cases()),
             'status' => Arr::random(Status::cases()),
             'birth_date' => now()->subYears($this->faker->randomDigitNotNull()),
             'remember_token' => Str::random(10),
@@ -37,5 +39,15 @@ class CustomerFactory extends Factory
     public function deleted(): self
     {
         return $this->state(['deleted_at' => now()]);
+    }
+
+    public function active(): self
+    {
+        return $this->state(['status' => Status::ACTIVE]);
+    }
+
+    public function inactive(): self
+    {
+        return $this->state(['status' => Status::INACTIVE]);
     }
 }

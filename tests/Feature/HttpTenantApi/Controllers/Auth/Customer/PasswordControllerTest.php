@@ -53,6 +53,7 @@ it('can reset password', function () {
         'token' => PasswordBroker::broker('customer')->createToken($customer),
         'email' => $customer->email,
         'password' => 'new-password',
+        'password_confirmation' => 'new-password',
     ])
         ->assertValid()
         ->assertOk()

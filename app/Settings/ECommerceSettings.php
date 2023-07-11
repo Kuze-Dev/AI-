@@ -6,27 +6,21 @@ namespace App\Settings;
 
 use Spatie\LaravelSettings\Settings;
 
-class SiteSettings extends Settings
+class ECommerceSettings extends Settings
 {
-    public string $name;
-
-    public string $description;
-
-    public string $author;
-
-    public string $logo;
-
-    public string $favicon;
-
-    public string $domain;
+    public ?string $domain = null;
 
     public static function group(): string
     {
-        return 'site';
+        return 'e-commerce';
     }
 
-    public function domainWithScheme(): string
+    public function domainWithScheme(): ?string
     {
+        if ($this->domain === null) {
+            return null;
+        }
+
         /** @phpstan-ignore-next-line Cannot access offset 'scheme' on array{scheme?: string, host?: string, port?: int<0, 65535>, user?: string, pass?: string, path?: string,
          * query?: string, fragment?: string}|false. */
         $scheme = parse_url(config('app.url'))['scheme'];
