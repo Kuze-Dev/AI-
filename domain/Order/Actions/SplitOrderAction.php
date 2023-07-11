@@ -31,12 +31,12 @@ class SplitOrderAction
 
                 $order = Order::create($orderPayload);
 
-                $this->createOrderLines($order, $placeOrderData);
+                // $this->createOrderLines($order, $placeOrderData);
 
-                $this->createOrderAddresses($order, $preparedOrderData);
+                // $this->createOrderAddresses($order, $preparedOrderData);
 
-                CartLine::whereCheckoutReference($placeOrderData->cart_reference)
-                    ->update(['checked_out_at' => now()]);
+                // CartLine::whereCheckoutReference($placeOrderData->cart_reference)
+                //     ->update(['checked_out_at' => now()]);
 
                 DB::commit();
 
@@ -53,14 +53,14 @@ class SplitOrderAction
     {
         $referenceNumber = Str::upper(Str::random(12));
 
-        $subTotal = array_reduce($preparedOrderData->cartLines, function ($carry, $cartLine) {
+        $subTotal = $preparedOrderData->cartLine->reduce(function ($carry, $cartLine) {
             $purchasable = $cartLine->purchasable;
 
-            return $purchasable->selling_price * $cartLine->quantity;
+            return $carry + ($purchasable->selling_price * $cartLine->quantity);
         }, 0);
 
         //add tax and minus discount here
-        // $total = $preparedOrderData->cartLines->sub_total + $preparedOrderData->totals->shipping_total;
+        // $total = $subTotal + $preparedOrderData->totals->shipping_total;
 
         return [
             'customer_id' => $preparedOrderData->customer->id,
@@ -79,7 +79,7 @@ class SplitOrderAction
             'sub_total' => $subTotal,
             'discount_total' => 0,
             'shipping_total' => 0,
-            'total' => $total,
+            'total' => 0,
 
             'notes' => $preparedOrderData->notes,
             'shipping_method' => "test shipping_method",

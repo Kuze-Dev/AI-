@@ -15,7 +15,7 @@ class PreparedOrderData
         public readonly Address $shipping_address,
         public readonly Address $billing_address,
         public readonly Currency $currency,
-        public readonly mixed $cartLines,
+        public readonly mixed $cartLine,
         public readonly ?string $notes,
     ) {
     }
@@ -27,7 +27,7 @@ class PreparedOrderData
             shipping_address: $data['shipping_address'],
             billing_address: $data['billing_address'],
             currency: $data['currency'],
-            cartLines: $data['cartLines'],
+            cartLine: $data['cartLine'],
             notes: $data['notes'] ?? null
         );
     }
