@@ -38,17 +38,75 @@ class UpdateProductAction
             }
         }
 
+        $toRemoveOptions = [];
+
+
         if (count($productData->product_options)) {
+            // dd($productData->product_options);
             foreach ($productData->product_options[0] as $productOption) {
                 $productOptionModel = ProductOption::findOrNew($productOption['id']);
                 $productOptionModel->name = $productOption['name'];
                 $productOptionModel->save();
 
-                foreach ($productOption['productOptionValues'] as $productOptionValue) {
+                foreach ($productOption['productOptionValues'] as $key => $productOptionValue) {
                     $optionValueModel = ProductOptionValue::findOrNew($productOptionValue['id']);
                     $optionValueModel->name = $productOptionValue['name'];
                     $optionValueModel->product_option_id = $productOptionValue['product_option_id'];
                     $optionValueModel->save();
+
+                    $productOption['productOptionValues'][$key]['id'] = $optionValueModel->id;
+                }
+
+                // Remove option values
+                $uwu = array_map(function ($item) {
+                    return $item['id'];
+                }, $productOption['productOptionValues']);
+                // dd($uwu);
+                $toRemoveOptionValues = ProductOptionValue::where('product_option_id', $productOptionModel->id)->whereNotIn('id', $uwu)->get();
+                // dd('to remove shh : ', $toRemoveOptionValues);
+
+                if (count($toRemoveOptionValues->toArray())) {
+                    array_push($toRemoveOptions, array_map(function ($item) use ($productOptionModel) {
+                        return [
+                            'option_id' => $productOptionModel->id,
+                            'option_value_id' => $item['id'],
+                        ];
+                    }, $toRemoveOptionValues->toArray()));
+                }
+                foreach ($toRemoveOptionValues as $optionValue) {
+                    // $optionValue->delete();
+                }
+            }
+
+            // to delete product variant value
+            // dd($toRemoveOptions);
+            // dd($toRemoveOptions);
+            foreach ($toRemoveOptions as $toRemoveOption) {
+                foreach ($toRemoveOption as $toRemove) {
+
+                    $toRemoveProductVariant = ProductVariant::where('product_id', $product->id)
+                        // ->whereHas('combination', function ($query) use ($toRemove){
+                        //     $query->where('option_id', $toRemove['option_id'])
+                        //     ->where('option_value_id', $toRemove['option_value_id']);
+                        // })  
+                        // ->whereHas('combination', $toRemove['option_id'])
+                        // ->whereJsonContains('combination', $toRemove)
+                        ->get();
+
+
+
+                    dd($toRemoveProductVariant);
+                    foreach ($toRemoveProductVariant as $prodVariant) {
+                        $variantCombinations = $prodVariant->combination;
+                        dd($variantCombinations, $toRemove);
+                        foreach($variantCombinations as $key => $combination) {
+                            if ($combination['option_id'] === $toRemove['option_id'] && $combination['option_value_id'] === $toRemove['option_value_id']) {
+                                
+                                    \Log::info('naditooooooooooo ', $key );
+                                // $prodVariant->delete();
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -65,6 +123,8 @@ class UpdateProductAction
             $productVariantModel->status = $productVariant['status'];
             $productVariantModel->save();
         }
+
+
 
         if ($productData->images === null) {
             $product->clearMediaCollection('image');

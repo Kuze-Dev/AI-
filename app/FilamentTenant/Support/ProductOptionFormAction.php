@@ -19,24 +19,59 @@ class ProductOptionFormAction extends Action
         return 'product-option-form';
     }
 
-    private function generateCombinations($existingCombination, $options, $current = [], $index = 0, $result = [])
+    private function generateCombinations($inputArray)
     {
-        if ($index === count($options)) {
-            $result[] = [
-                'id' => uniqid(), // Add a unique ID
-                'combination' => $current,
-            ];
+        $outputArray = [];
+        foreach ($inputArray[0]['productOptionValues'] as $optionValue1) {
+            foreach ($inputArray[1]['productOptionValues'] as $optionValue2) {
+                $combination = [
+                    [
+                        'option' => $inputArray[0]['name'],
+                        'option_id' => $optionValue1['product_option_id'],
+                        'option_value' => $optionValue1['name'],
+                        'option_value_id' => $optionValue1['id'],
+                    ],
+                    [
 
-            return $result;
+                        'option' => $inputArray[1]['name'],
+                        'option_id' => $optionValue2['product_option_id'],
+                        'option_value' => $optionValue2['name'],
+                        'option_value_id' => $optionValue2['id'],
+                    ],
+                ];
+        
+                $outputArray[] = [
+                    'combination' => $combination,
+                    'id' => uniqid(),
+                ];
+            }
         }
+        return $outputArray;
+    }
 
-        foreach ($options[$index]['productOptionValues'] as $value) {
-            $newCurrent = $current;
-            $newCurrent[$options[$index]['name']] = $value['name'];
-            $result = $this->generateCombinations($existingCombination, $options, $newCurrent, $index + 1, $result);
+    private function assignProxiesToProductOption(array $options): array
+    {
+        foreach ($options as &$option) {
+            if (!isset($option['id'])) {
+                $option['id'] = uniqid();
+            }
+            if (!isset($option['slug'])) {
+                $option['slug'] = $option['name'];
+            }
+
+            foreach ($option['productOptionValues'] as &$value) {
+                if (!isset($value['id'])) {
+                    $value['id'] = uniqid();
+                }
+                if (!isset($value['slug'])) {
+                    $value['slug'] = $value['name'];
+                }
+                if (!isset($value['product_option_id'])) {
+                    $value['product_option_id'] = $option['id'];
+                }
+            }
         }
-
-        return $result;
+        return $options;
     }
 
     protected function setUp(): void
@@ -54,7 +89,7 @@ class ProductOptionFormAction extends Action
         $this->slideOver(true);
 
         $this->mountUsing(function (HasProductOptions $livewire, ComponentContainer $form) {
-            if ( ! $activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
+            if (!$activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
                 return;
             }
 
@@ -65,39 +100,19 @@ class ProductOptionFormAction extends Action
         $this->form(fn (HasProductOptions $livewire) => $livewire->getProductOptionFormSchema());
 
         $this->action(function (HasProductOptions $livewire, array $data) {
-            $options = $data['options'];
+            $optionsWithProxies = $this->assignProxiesToProductOption($data['options']);
 
-            $existingCombination = $livewire->record?->productVariants->toArray() ?? [];
-
-            $productVariants = $this->generateCombinations($existingCombination, $options);
+            $data['options'] = $optionsWithProxies;
+            
+            $productVariants = $this->generateCombinations($optionsWithProxies);
+            
             $updatedVariants = $this->updatingProductVariants($livewire->record, $productVariants);
 
-            if ( ! $activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
+            if (!$activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
                 return;
             }
 
             $oldData = data_get($livewire, $activeProductOptionStatePath) ?? [];
-            foreach ($data['options'] as &$option) {
-                if ( ! isset($option['id'])) {
-                    $option['id'] = uniqid()/* generate or assign the desired value */;
-                }
-                if ( ! isset($option['slug'])) {
-                    $option['slug'] = $option['name']/* generate or assign the desired value */;
-                }
-
-                foreach ($option['productOptionValues'] as &$value) {
-                    if ( ! isset($value['id'])) {
-                        $value['id'] = uniqid()/* generate or assign the desired value */;
-                    }
-                    if ( ! isset($value['slug'])) {
-                        $value['slug'] = $value['name']/* generate or assign the desired value */;
-                    }
-                    if ( ! isset($value['product_option_id'])) {
-                        $value['product_option_id'] = $option['id'];
-                    }
-                }
-            }
-
             data_set($livewire, $activeProductOptionStatePath, array_merge($oldData, $data));
             data_set($livewire, 'data.product_options', array_merge($oldData, $data));
             data_set($livewire, 'data.product_variants', $updatedVariants);

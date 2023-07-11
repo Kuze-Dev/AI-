@@ -12,7 +12,7 @@
             <div>
                 <span class="ml-2">
                     @foreach ($item['combination'] as $key => $itemOne)
-                        {{ ucfirst($item['combination'][$key]) }} /
+                        {{ ucfirst($itemOne['option_value']) }} /
                     @endforeach
                     (SKU: {{ $item['sku'] }})
                     (Stock: {{ $item['stock'] }})
@@ -26,7 +26,6 @@
                 <label for="toggle"
                     class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
             </div> --}}
-
             <x-forms::button :wire:click="'dispatchFormEvent(\'productVariant::editItem\', \'' . $statePath . '\')'"
                 size="sm" type="button">
                 @lang('Edit')

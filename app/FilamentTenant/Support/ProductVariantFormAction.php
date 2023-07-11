@@ -32,7 +32,7 @@ class ProductVariantFormAction extends Action
                 $combinationString = '';
                 $loopCounter = 0;
                 foreach ($state['combination'] as $key => $value) {
-                    $combinationString .= ucfirst($key) . ': ' . ucfirst($value);
+                    $combinationString .= ucfirst($value['option']) . ': ' . ucfirst($value['option_value']);
                     $loopCounter++;
                     if (count($state['combination']) != $loopCounter) {
                         $combinationString .= ' / ';
