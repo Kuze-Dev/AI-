@@ -25,21 +25,12 @@ it('can list all available discounts', function () {
     assertDatabaseEmpty(DiscountRequirement::class);
 
     DiscountFactory::new()
-        ->has(DiscountConditionFactory::new([
-            'discount_type' => DiscountConditionType::DELIVERY_FEE,
-            'amount_type' => DiscountAmountType::FIXED_VALUE,
-        ]))
-        ->has(DiscountRequirementFactory::new([
-            'requirement_type' => DiscountRequirementType::MINIMUM_ORDER_AMOUNT,
-            'minimum_amount' => 10,
-        ]))
+        ->has(DiscountConditionFactory::new())
+        ->has(DiscountRequirementFactory::new())
         ->count(5)
-        ->create([
-            'name' => 'discount name',
-        ]);
+        ->create();
 
     getJson('api/discounts?'.http_build_query(['include' => 'discountCondition', 'discountRequirement']))
-        ->dd()
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json->count('included', 5)
