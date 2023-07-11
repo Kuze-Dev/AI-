@@ -22,16 +22,14 @@ use Spatie\RouteAttributes\Attributes\Prefix;
 ]
 class CartRemoveController
 {
-    #[Delete('clear/{cartId}', name: 'carts.clear.{cartId}')]
-    public function clear(int $cartId): mixed
+    #[Delete('clear/{cart}', name: 'carts.clear.{cart}')]
+    public function clear(Cart $cart): mixed
     {
         try {
-            $cart = Cart::findOrFail($cartId);
-
             $result = app(CartDestroyAction::class)
                 ->execute($cart);
 
-            if ( ! $result) {
+            if (!$result) {
                 return response()->json([
                     'error' => 'Bad Request',
                     'message' => 'Invalid action',
@@ -67,7 +65,7 @@ class CartRemoveController
             $result = app(CartLineBulkDestroyAction::class)
                 ->execute($cartLineIds);
 
-            if ( ! $result) {
+            if (!$result) {
                 return response()->json([
                     'error' => 'Bad Request',
                     'message' => 'Invalid action',

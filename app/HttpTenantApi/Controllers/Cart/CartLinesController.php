@@ -18,10 +18,10 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
-    Resource('carts/items', apiResource: true, except: ['show', 'index']),
+    Resource('carts/cartlines', apiResource: true, except: ['show', 'index']),
     Middleware(['auth:sanctum'])
 ]
-class CartItemsController
+class CartLinesController
 {
     public function store(CartStoreRequest $request): mixed
     {
@@ -45,14 +45,12 @@ class CartItemsController
             ]);
     }
 
-    public function update(CartQuantityUpdateRequest $request, int $cartLineId): mixed
+    public function update(CartQuantityUpdateRequest $request, CartLine $cartline): mixed
     {
         try {
-            CartLine::findOrFail($cartLineId);
-
             $validatedData = $request->validated();
 
-            $validatedData['cartLineId'] = $cartLineId;
+            $validatedData['cartLineId'] = $cartline->id;
 
             $payload = CartQuantityUpdateData::fromArray($validatedData);
 
@@ -78,15 +76,13 @@ class CartItemsController
             ]);
     }
 
-    public function destroy(int $cartLineId): mixed
+    public function destroy(CartLine $cartline): mixed
     {
         try {
-            $cartLine = CartLine::findOrFail($cartLineId);
-
             $result = app(CartLineDestroyAction::class)
-                ->execute($cartLine);
+                ->execute($cartline);
 
-            if ( ! $result) {
+            if (!$result) {
                 return response()->json([
                     'error' => 'Bad Request',
                     'message' => 'Invalid action',
