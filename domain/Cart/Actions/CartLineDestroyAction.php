@@ -16,7 +16,7 @@ class CartLineDestroyAction
             function (Builder $query) {
                 $query->whereBelongsTo(auth()->user());
             }
-        )->whereNull('checked_out_at')->first();
+        )->whereNull('checked_out_at')->firstOrFail();
 
         return $cartLine->delete();
     }
