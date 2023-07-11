@@ -10,6 +10,8 @@ use Domain\Currency\Models\Currency;
 use Domain\Customer\Models\Customer;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
+use Domain\Product\Models\ProductVariant;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class PrepareOrderAction
 {
@@ -23,19 +25,27 @@ class PrepareOrderAction
 
         $currency = Currency::where('default', true)->first();
 
-        $totals = CartLine::with(['purchasable'])
-            ->whereCheckoutReference($placeOrderData->cart_reference)
-            ->get()
-            ->reduce(function ($totals, $cartLine) {
-                $purchasable = $cartLine->purchasable;
-
-                $totals['sub_total'] += $purchasable->selling_price * $cartLine->quantity;
-
-                return $totals;
-            }, [
-                'sub_total' => 0,
-                'shipping_total' => 0,
+        $cartLines = CartLine::with(['purchasable' => function (MorphTo $query) {
+            $query->morphWith([
+                ProductVariant::class => ['product'],
             ]);
+        },])
+            ->whereCheckoutReference($placeOrderData->cart_reference)
+            ->get();
+
+        // $cartLines = CartLine::with(['purchasable'])
+        //     ->whereCheckoutReference($placeOrderData->cart_reference)
+        //     ->get();
+        // ->reduce(function ($totals, $cartLine) {
+        //     $purchasable = $cartLine->purchasable;
+
+        //     $totals['sub_total'] += $purchasable->selling_price * $cartLine->quantity;
+
+        //     return $totals;
+        // }, [
+        //     'sub_total' => 0,
+        //     'shipping_total' => 0,
+        // ]);
 
         $notes = $placeOrderData->notes;
 
@@ -44,7 +54,8 @@ class PrepareOrderAction
             'shipping_address' => $shippingAddress,
             'billing_address' => $billingAddress,
             'currency' => $currency,
-            'totals' => $totals,
+            'cartLine' => $cartLines,
+            // 'totals' => $totals,
             'notes' => $notes,
         ];
 

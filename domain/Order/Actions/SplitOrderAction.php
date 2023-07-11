@@ -53,8 +53,14 @@ class SplitOrderAction
     {
         $referenceNumber = Str::upper(Str::random(12));
 
+        $subTotal = array_reduce($preparedOrderData->cartLines, function ($carry, $cartLine) {
+            $purchasable = $cartLine->purchasable;
+
+            return $purchasable->selling_price * $cartLine->quantity;
+        }, 0);
+
         //add tax and minus discount here
-        $total = $preparedOrderData->totals->sub_total + $preparedOrderData->totals->shipping_total;
+        // $total = $preparedOrderData->cartLines->sub_total + $preparedOrderData->totals->shipping_total;
 
         return [
             'customer_id' => $preparedOrderData->customer->id,
@@ -70,7 +76,7 @@ class SplitOrderAction
             'reference' =>  $referenceNumber,
 
             'tax_total' => 0,
-            'sub_total' => $preparedOrderData->totals->sub_total,
+            'sub_total' => $subTotal,
             'discount_total' => 0,
             'shipping_total' => 0,
             'total' => $total,

@@ -15,7 +15,7 @@ class PreparedOrderData
         public readonly Address $shipping_address,
         public readonly Address $billing_address,
         public readonly Currency $currency,
-        public readonly OrderTotalsData $totals,
+        public readonly mixed $cartLines,
         public readonly ?string $notes,
     ) {
     }
@@ -27,20 +27,8 @@ class PreparedOrderData
             shipping_address: $data['shipping_address'],
             billing_address: $data['billing_address'],
             currency: $data['currency'],
-            totals: new OrderTotalsData(
-                sub_total: $data['totals']['sub_total'],
-                shipping_total: $data['totals']['shipping_total']
-            ),
+            cartLines: $data['cartLines'],
             notes: $data['notes'] ?? null
         );
-    }
-}
-
-class OrderTotalsData
-{
-    public function __construct(
-        public readonly float $sub_total,
-        public readonly float $shipping_total
-    ) {
     }
 }
