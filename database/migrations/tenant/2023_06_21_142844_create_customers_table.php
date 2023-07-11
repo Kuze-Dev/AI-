@@ -32,6 +32,7 @@ return new class () extends Migration {
             $table->string('first_name')->index();
             $table->string('last_name')->index();
             $table->string('mobile');
+            $table->string('gender');
             $table->string('status')->default(Status::ACTIVE->value)->index();
 
             $table->rememberToken();
