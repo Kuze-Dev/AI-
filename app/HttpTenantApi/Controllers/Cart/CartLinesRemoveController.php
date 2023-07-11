@@ -29,6 +29,9 @@ class CartLinesRemoveController
                     $cartLineIds = $value;
 
                     $cartLines = CartLine::query()
+                        ->whereHas('cart', function ($query) {
+                            $query->whereBelongsTo(auth()->user());
+                        })
                         ->whereIn('id', $cartLineIds)
                         ->whereNull('checked_out_at');
 

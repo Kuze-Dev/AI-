@@ -15,12 +15,13 @@ use Domain\Cart\Requests\UpdateCartLineRequest;
 use Domain\Cart\Requests\CreateCartLineRequest;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
+use App\Http\Controllers\Controller;
 
 #[
     Resource('carts/cartlines', apiResource: true, except: ['show', 'index']),
     Middleware(['auth:sanctum'])
 ]
-class CartLinesController
+class CartLinesController extends Controller
 {
     public function store(CreateCartLineRequest $request): mixed
     {
@@ -45,6 +46,8 @@ class CartLinesController
 
     public function update(UpdateCartLineRequest $request, CartLine $cartline): mixed
     {
+        $this->authorize('update', $cartline);
+
         $validatedData = $request->validated();
 
         $result = app(UpdateCartLineAction::class)
@@ -65,6 +68,8 @@ class CartLinesController
 
     public function destroy(CartLine $cartline): mixed
     {
+        $this->authorize('delete', $cartline);
+
         $result = app(DestroyCartLineAction::class)
             ->execute($cartline);
 

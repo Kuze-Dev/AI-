@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart;
 
+use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartResource;
 use Domain\Cart\Actions\DestroyCartAction;
 use Domain\Cart\Models\Cart;
@@ -18,7 +19,7 @@ use Spatie\RouteAttributes\Attributes\Resource;
     Resource('carts', apiResource: true, only: ['index', 'destroy']),
     Middleware(['auth:sanctum'])
 ]
-class CartController
+class CartController extends Controller
 {
     public function index(): mixed
     {
@@ -51,6 +52,8 @@ class CartController
 
     public function destroy(Cart $cart): mixed
     {
+        $this->authorize('delete', $cart);
+
         $result = app(DestroyCartAction::class)
             ->execute($cart);
 
