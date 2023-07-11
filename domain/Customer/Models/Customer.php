@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Customer\Models;
 
 use Domain\Address\Models\Address;
+use Domain\Customer\Enums\Gender;
 use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Customer\Enums\Status;
 use Domain\Tier\Models\Tier;
@@ -33,6 +34,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string $first_name
  * @property string $last_name
  * @property string $mobile
+ * @property \Domain\Customer\Enums\Gender $gender
  * @property Status $status
  * @property \Illuminate\Support\Carbon $birth_date
  * @property \Illuminate\Support\Carbon|null $email_verified_at
@@ -88,6 +90,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
         'first_name',
         'last_name',
         'mobile',
+        'gender',
         'status',
         'birth_date',
     ];
@@ -100,6 +103,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
         'password' => 'hashed',
         'birth_date' => 'date',
         'status' => Status::class,
+        'gender' => Gender::class,
         'email_verified_at' => 'datetime',
     ];
 
