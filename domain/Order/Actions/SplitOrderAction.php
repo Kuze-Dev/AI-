@@ -32,8 +32,8 @@ class SplitOrderAction
 
                 $this->createOrderAddresses($order, $preparedOrderData);
 
-                CartLine::whereIn('id', $placeOrderData->cart_line_ids)
-                    ->update(['checked_out_at' => now()]);
+                // CartLine::whereIn('id', $placeOrderData->cart_line_ids)
+                //     ->update(['checked_out_at' => now()]);
 
                 DB::commit();
 
@@ -84,27 +84,16 @@ class SplitOrderAction
     private function createOrderLines(Order $order, PlaceOrderData $placeOrderData)
     {
         $cartLines = CartLine::with(['purchasable'])
-            ->whereIn('id', $placeOrderData->cart_line_ids)
+            ->whereCheckoutReference($placeOrderData->cart_reference)
             ->get();
 
         $orderLines = [];
 
         foreach ($cartLines as $cartLine) {
-            $purchasableSku = "";
             $subTotal = 0;
-            $unitPrice = 0;
-            $variantData = null;
+            $purchasableData = null;
 
-            if ($cartLine->variant) {
-                $purchasableSku = $cartLine->variant->sku;
-                $subTotal = (float) $cartLine->variant->selling_price * $cartLine->quantity;
-                $unitPrice = (float) $cartLine->variant->selling_price;
-                $variantData = $cartLine->variant;
-            } else {
-                $purchasableSku = $cartLine->purchasable->sku;
-                $subTotal = $cartLine->purchasable->selling_price * $cartLine->quantity;
-                $unitPrice = $cartLine->purchasable->selling_price;
-            }
+            $subTotal = $cartLine->purchasable->selling_price * $cartLine->quantity;
 
             //add tax minus discount
             $total = 0 + $subTotal - 0;
@@ -113,30 +102,27 @@ class SplitOrderAction
                 'order_id' => $order->id,
                 'purchasable_id' => $cartLine->purchasable_id,
                 'purchasable_type' => $cartLine->purchasable_type,
-                'purchasable_sku' => $purchasableSku,
+                'purchasable_sku' => $cartLine->purchasable->sku,
                 'name' => $cartLine->purchasable->name,
-                'unit_price' => $unitPrice,
+                'unit_price' => $cartLine->purchasable->selling_price,
                 'quantity' => $cartLine->quantity,
                 'tax_total' => 0,
                 'sub_total' => $subTotal,
                 'discount_total' => 0,
                 'total' => $total,
-                'notes' => $cartLine->notes,
-                'purchasable_data' => $cartLine->purchasable,
-                'variant_data' => $variantData,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'remarks_data' => $cartLine->remarks,
+                'purchasable_data' => $cartLine->purchasable
             ];
 
             $orderLine = OrderLine::create($orderLines);
 
-            $imageUrl = $cartLine->purchasable->getFirstMediaUrl('image');
-            $orderLine->addMediaFromUrl($imageUrl)->toMediaCollection('order_line_image');
+            // $imageUrl = $cartLine->purchasable->getMedia('image');
+            // $orderLine->addMediaFromUrl($imageUrl)->toMediaCollection('order_line_image');
 
-            $remarkImageUrl = $cartLine->getFirstMediaUrl('cart_line_notes');
-            if (!empty($remarkImageUrl)) {
-                $orderLine->addMediaFromUrl($remarkImageUrl)->toMediaCollection('order_line_notes');
-            }
+            // $remarkImageUrl = $cartLine->getFirstMediaUrl('cart_line_notes');
+            // if (!empty($remarkImageUrl)) {
+            //     $orderLine->addMediaFromUrl($remarkImageUrl)->toMediaCollection('order_line_notes');
+            // }
         }
     }
 
@@ -146,26 +132,30 @@ class SplitOrderAction
             [
                 'order_id' => $order->id,
                 'type' => 'Shipping',
-                'country' => $preparedOrderData->shipping_address->country->name,
+                // 'country' => $preparedOrderData->shipping_address->country->name,
                 'state' =>  $preparedOrderData->shipping_address->state ? $preparedOrderData->shipping_address->state->name : null,
-                'region' => $preparedOrderData->shipping_address->region ? $preparedOrderData->shipping_address->region->name : null,
-                'city' => $preparedOrderData->shipping_address->city->name,
+                'label_as' =>  $preparedOrderData->shipping_address->label_as,
+                // 'region' => $preparedOrderData->shipping_address->region ? $preparedOrderData->shipping_address->region->name : null,
+                // 'city' => $preparedOrderData->shipping_address->city->name,
                 'address_line_1' => $preparedOrderData->shipping_address->address_line_1,
-                'address_line_2' => $preparedOrderData->shipping_address->address_line_2,
+                // 'address_line_2' => $preparedOrderData->shipping_address->address_line_2,
                 'zip_code' => $preparedOrderData->shipping_address->zip_code,
+                'city' => $preparedOrderData->shipping_address->city,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'order_id' => $order->id,
                 'type' => 'Billing',
-                'country' => $preparedOrderData->billing_address->country->name,
+                // 'country' => $preparedOrderData->billing_address->country->name,
                 'state' =>  $preparedOrderData->billing_address->state ? $preparedOrderData->billing_address->state->name : null,
-                'region' => $preparedOrderData->billing_address->region ? $preparedOrderData->billing_address->region->name : null,
-                'city' => $preparedOrderData->billing_address->city->name,
+                'label_as' => 'test label as',
+                // 'region' => $preparedOrderData->billing_address->region ? $preparedOrderData->billing_address->region->name : null,
+                // 'city' => $preparedOrderData->billing_address->city->name,
                 'address_line_1' => $preparedOrderData->billing_address->address_line_1,
-                'address_line_2' => $preparedOrderData->billing_address->address_line_2,
+                // 'address_line_2' => $preparedOrderData->billing_address->address_line_2,
                 'zip_code' => $preparedOrderData->billing_address->zip_code,
+                'city' => $preparedOrderData->billing_address->city,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

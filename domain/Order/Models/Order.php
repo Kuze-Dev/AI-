@@ -14,7 +14,6 @@ class Order extends Model implements HasMedia
 {
     use InteractsWithMedia;
 
-
     protected $fillable = [
         'customer_id',
         'customer_first_name',

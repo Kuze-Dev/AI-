@@ -29,20 +29,20 @@ return new class() extends Migration
             $table->decimal('discount_total');
             $table->decimal('shipping_total');
             $table->decimal('total')->index();
-            $table->longText('notes')->nullable()->default(null);
+            $table->longText('notes')->nullable();
             $table->string('shipping_method')->index();
             $table->string('shipping_details');
             $table->string('payment_method')->index();
             $table->string('payment_details');
-            $table->enum('payment_status', ['Approved', 'Declined'])->nullable()->default(null);
-            $table->text('payment_message')->nullable()->default(null);
+            $table->enum('payment_status', ['Approved', 'Declined'])->nullable();
+            $table->text('payment_message')->nullable();
             $table->boolean('is_paid')->default(false);
             $table->enum('status', [
                 'Pending', 'Cancelled', 'For Cancellation', 'Refunded', 'Packed', 'Shipped', 'Delivered', 'Fulfilled',
             ])->default('Pending')->index();;
-            $table->string('cancelled_reason')->nullable()->default(null);
+            $table->string('cancelled_reason')->nullable();
 
-            $table->timestamp('cancelled_at')->nullable()->default(null);
+            $table->timestamp('cancelled_at')->nullable();
             $table->timestamps();
         });
 
@@ -74,10 +74,9 @@ return new class() extends Migration
             $table->decimal('sub_total');
             $table->decimal('discount_total');
             $table->decimal('total')->index();
-            $table->longText('notes')->nullable()->default(null);
 
+            $table->json('remarks_data')->nullable();
             $table->json('purchasable_data')->nullable();
-            $table->json('variant_data')->nullable();
 
             $table->timestamps();
         });

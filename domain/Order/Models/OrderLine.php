@@ -25,9 +25,8 @@ class OrderLine extends Model implements HasMedia
         'sub_total',
         'discount_total',
         'total',
-        'notes',
+        'remarks_data',
         'purchasable_data',
-        'variant_data'
     ];
 
     protected $casts = [
@@ -37,8 +36,8 @@ class OrderLine extends Model implements HasMedia
         'sub_total' => 'float',
         'discount_total' => 'float',
         'total' => 'float',
+        'remarks_data'  => 'array',
         'purchasable_data' => 'array',
-        'variant_data' => 'array',
     ];
 
     public function order()

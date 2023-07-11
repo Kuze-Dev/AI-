@@ -15,9 +15,7 @@ class PrepareOrderAction
 {
     public function execute(PlaceOrderData $placeOrderData)
     {
-        $customerId = auth()->user()?->id;
-
-        $customer = Customer::find($customerId);
+        $customer = auth()->user();
 
         $shippingAddress = Address::find($placeOrderData->addresses->shipping);
 
@@ -25,18 +23,13 @@ class PrepareOrderAction
 
         $currency = Currency::where('default', true)->first();
 
-        $totals = CartLine::whereIn('id', $placeOrderData->cart_line_ids)
-            ->with(['purchasable'])
+        $totals = CartLine::with(['purchasable'])
+            ->whereCheckoutReference($placeOrderData->cart_reference)
             ->get()
             ->reduce(function ($totals, $cartLine) {
-                // $variant = $cartLine->variant;
-                $product = $cartLine->purchasable;
+                $purchasable = $cartLine->purchasable;
 
-                // if ($variant) {
-                //     $totals['sub_total'] += (float) $variant->selling_price * $cartLine->quantity;
-                // } else {
-                $totals['sub_total'] += $product->selling_price * $cartLine->quantity;
-                // }
+                $totals['sub_total'] += $purchasable->selling_price * $cartLine->quantity;
 
                 return $totals;
             }, [

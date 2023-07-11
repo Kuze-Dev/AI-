@@ -8,7 +8,7 @@ class PlaceOrderData
 {
     public function __construct(
         public readonly OrderAddressData $addresses,
-        public readonly array $cart_line_ids,
+        public readonly string $cart_reference,
         public readonly ?string $notes,
     ) {
     }
@@ -20,7 +20,7 @@ class PlaceOrderData
                 shipping: $data['addresses']['shipping'],
                 billing: $data['addresses']['billing']
             ),
-            cart_line_ids: $data['cart_line_ids'],
+            cart_reference: $data['cart_reference'],
             notes: $data['notes'] ?? null
         );
     }
