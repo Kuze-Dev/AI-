@@ -11,8 +11,11 @@ use Domain\Order\Enums\PlaceOrderResult;
 use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderAddress;
 use Domain\Order\Models\OrderLine;
+use Domain\Product\Models\Product;
+use Domain\Product\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -32,8 +35,8 @@ class SplitOrderAction
 
                 $this->createOrderAddresses($order, $preparedOrderData);
 
-                // CartLine::whereIn('id', $placeOrderData->cart_line_ids)
-                //     ->update(['checked_out_at' => now()]);
+                CartLine::whereCheckoutReference($placeOrderData->cart_reference)
+                    ->update(['checked_out_at' => now()]);
 
                 DB::commit();
 
@@ -83,7 +86,11 @@ class SplitOrderAction
 
     private function createOrderLines(Order $order, PlaceOrderData $placeOrderData)
     {
-        $cartLines = CartLine::with(['purchasable'])
+        $cartLines = CartLine::with(['purchasable' => function (MorphTo $query) {
+            $query->morphWith([
+                ProductVariant::class => ['product'],
+            ]);
+        },])
             ->whereCheckoutReference($placeOrderData->cart_reference)
             ->get();
 
@@ -91,9 +98,16 @@ class SplitOrderAction
 
         foreach ($cartLines as $cartLine) {
             $subTotal = 0;
-            $purchasableData = null;
 
             $subTotal = $cartLine->purchasable->selling_price * $cartLine->quantity;
+
+            $name = null;
+
+            if ($cartLine->purchasable instanceof Product) {
+                $name = $cartLine->purchasable->name;
+            } else if ($cartLine->purchasable instanceof ProductVariant) {
+                $name = $cartLine->purchasable->product->name;
+            }
 
             //add tax minus discount
             $total = 0 + $subTotal - 0;
@@ -103,7 +117,7 @@ class SplitOrderAction
                 'purchasable_id' => $cartLine->purchasable_id,
                 'purchasable_type' => $cartLine->purchasable_type,
                 'purchasable_sku' => $cartLine->purchasable->sku,
-                'name' => $cartLine->purchasable->name,
+                'name' => $name,
                 'unit_price' => $cartLine->purchasable->selling_price,
                 'quantity' => $cartLine->quantity,
                 'tax_total' => 0,
@@ -116,8 +130,18 @@ class SplitOrderAction
 
             $orderLine = OrderLine::create($orderLines);
 
-            // $imageUrl = $cartLine->purchasable->getMedia('image');
-            // $orderLine->addMediaFromUrl($imageUrl)->toMediaCollection('order_line_image');
+            if ($cartLine->purchasable instanceof Product) {
+                $cartLineMedias = $cartLine->purchasable->getMedia('image');
+                foreach ($cartLineMedias as $cartLineMedia) {
+                    $orderLine->addMediaFromUrl($cartLineMedia->getUrl())->toMediaCollection('order_line_images');
+                }
+            } else if ($cartLine->purchasable instanceof ProductVariant) {
+                $cartLineMedias = $cartLine->purchasable->product->getMedia('image');
+                foreach ($cartLineMedias as $cartLineMedia) {
+                    $orderLine->addMediaFromUrl($cartLineMedia->getUrl())->toMediaCollection('order_line_images');
+                }
+            }
+
 
             // $remarkImageUrl = $cartLine->getFirstMediaUrl('cart_line_notes');
             // if (!empty($remarkImageUrl)) {
@@ -132,13 +156,9 @@ class SplitOrderAction
             [
                 'order_id' => $order->id,
                 'type' => 'Shipping',
-                // 'country' => $preparedOrderData->shipping_address->country->name,
                 'state' =>  $preparedOrderData->shipping_address->state ? $preparedOrderData->shipping_address->state->name : null,
                 'label_as' =>  $preparedOrderData->shipping_address->label_as,
-                // 'region' => $preparedOrderData->shipping_address->region ? $preparedOrderData->shipping_address->region->name : null,
-                // 'city' => $preparedOrderData->shipping_address->city->name,
                 'address_line_1' => $preparedOrderData->shipping_address->address_line_1,
-                // 'address_line_2' => $preparedOrderData->shipping_address->address_line_2,
                 'zip_code' => $preparedOrderData->shipping_address->zip_code,
                 'city' => $preparedOrderData->shipping_address->city,
                 'created_at' => now(),
@@ -147,13 +167,9 @@ class SplitOrderAction
             [
                 'order_id' => $order->id,
                 'type' => 'Billing',
-                // 'country' => $preparedOrderData->billing_address->country->name,
                 'state' =>  $preparedOrderData->billing_address->state ? $preparedOrderData->billing_address->state->name : null,
                 'label_as' => 'test label as',
-                // 'region' => $preparedOrderData->billing_address->region ? $preparedOrderData->billing_address->region->name : null,
-                // 'city' => $preparedOrderData->billing_address->city->name,
                 'address_line_1' => $preparedOrderData->billing_address->address_line_1,
-                // 'address_line_2' => $preparedOrderData->billing_address->address_line_2,
                 'zip_code' => $preparedOrderData->billing_address->zip_code,
                 'city' => $preparedOrderData->billing_address->city,
                 'created_at' => now(),

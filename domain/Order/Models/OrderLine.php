@@ -51,8 +51,8 @@ class OrderLine extends Model implements HasMedia
             $this->addMediaConversion('preview');
         };
 
-        $this->addMediaCollection('order_line_image')
-            ->onlyKeepLatest(3)
+        $this->addMediaCollection('order_line_images')
+            ->onlyKeepLatest(5)
             ->registerMediaConversions($registerMediaConversions);
 
         $this->addMediaCollection('order_line_notes')

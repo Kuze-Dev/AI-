@@ -26,6 +26,8 @@ use Domain\Form\Models\FormSubmission;
 use Domain\Globals\Models\Globals;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
+use Domain\Order\Models\Order;
+use Domain\Order\Models\OrderLine;
 use Domain\Page\Models\Block;
 use Domain\Taxation\Models\TaxZone;
 use Domain\Page\Models\Page;
@@ -58,7 +60,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Model::shouldBeStrict( ! $this->app->isProduction());
+        Model::shouldBeStrict(!$this->app->isProduction());
 
         Model::handleMissingAttributeViolationUsing(function (Model $model, string $key) {
             if ($model instanceof Tenant && Str::startsWith($key, Tenant::internalPrefix())) {
@@ -103,19 +105,21 @@ class AppServiceProvider extends ServiceProvider
             CartLine::class,
             PaymentMethod::class,
             Payment::class,
+            Order::class,
+            OrderLine::class,
         ]);
 
         Password::defaults(
             $this->app->environment('local', 'testing')
                 ? Password::min(4)
                 : Password::min(8)
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols()
-                    ->when(
-                        $this->app->isProduction(),
-                        fn (Password $password) => $password->uncompromised()
-                    )
+                ->mixedCase()
+                ->numbers()
+                ->symbols()
+                ->when(
+                    $this->app->isProduction(),
+                    fn (Password $password) => $password->uncompromised()
+                )
         );
 
         Rule::macro(

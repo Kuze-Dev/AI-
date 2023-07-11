@@ -28,7 +28,6 @@ class OrderController
 
         if (PlaceOrderResult::SUCCESS != $result) {
             return response()->json([
-                'error' => 'Bad Request',
                 'message' => 'Order failed to be created'
                 // 'message' => $result
             ], 400);
