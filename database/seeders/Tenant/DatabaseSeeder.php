@@ -24,7 +24,6 @@ class DatabaseSeeder extends Seeder
             Address\CountrySeeder::class,
             Currency\CurrencySeeder::class,
             Tier\TierSeeder::class,
-            Cart\CartSeeder::class,
         ]);
     }
 }
