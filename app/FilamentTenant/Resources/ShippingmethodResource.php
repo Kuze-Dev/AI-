@@ -12,7 +12,9 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Support\Facades\Auth;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Throwable;
 
 class ShippingmethodResource extends Resource
 {
@@ -104,7 +106,18 @@ class ShippingmethodResource extends Resource
     {
         return $table
             ->columns([
-
+                Tables\Columns\TextColumn::make('title')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('subtitle')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('driver')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->sortable(),
             ])
             ->filters([
 

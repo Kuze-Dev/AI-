@@ -14,6 +14,7 @@ use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Throwable;
+
 class EditShippingmethod extends EditRecord
 {
     use LogsFormActivity;

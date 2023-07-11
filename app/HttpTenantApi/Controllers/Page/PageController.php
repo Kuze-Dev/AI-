@@ -9,6 +9,7 @@ use App\HttpTenantApi\Resources\PageResource;
 use Carbon\Carbon;
 use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Page\Models\Page;
+use Domain\Shipment\Drivers\UspsDriver;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -26,6 +27,10 @@ class PageController
 {
     public function index(): JsonApiResourceCollection
     {
+        $usps = new UspsDriver();
+
+        dd($usps->getRate());
+
         return PageResource::collection(
             QueryBuilder::for(
                 Page::with('activeRouteUrl')
