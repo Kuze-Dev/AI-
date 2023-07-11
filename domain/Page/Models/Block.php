@@ -31,7 +31,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Page\Models\BlockContent> $blockContents
  * @property-read int|null $block_contents_count
- * @property-read Blueprint $blueprint
+ * @property-read Blueprint|null $blueprint
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
  * @method static \Illuminate\Database\Eloquent\Builder|Block newModelQuery()

@@ -21,7 +21,7 @@ use Spatie\EloquentSortable\SortableTrait;
  * @property int $order
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Domain\Page\Models\Block $block
+ * @property-read \Domain\Page\Models\Block|null $block
  * @method static Builder|BlockContent newModelQuery()
  * @method static Builder|BlockContent newQuery()
  * @method static Builder|BlockContent ordered(string $direction = 'asc')
