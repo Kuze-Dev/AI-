@@ -20,6 +20,7 @@ use Domain\Discount\Models\DiscountCondition;
 use Domain\Discount\Models\DiscountRequirement;
 use Domain\Customer\Models\Customer;
 use Domain\Discount\Models\DiscountLimit;
+use Domain\Favorite\Models\Favorite;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
@@ -101,6 +102,7 @@ class AppServiceProvider extends ServiceProvider
             CartLine::class,
             PaymentMethod::class,
             Payment::class,
+            Favorite::class,
         ]);
 
         Password::defaults(
