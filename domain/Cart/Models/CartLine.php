@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property int $purchasable_id
  * @property string $purchasable_type
  * @property int $quantity
- * @property array|null $meta
+ * @property array|null $remarks
  * @property string|null $checkout_reference
  * @property \Illuminate\Support\Carbon|null $checkout_expiration
  * @property \Illuminate\Support\Carbon|null $checked_out_at
@@ -30,7 +30,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property-read \Domain\Cart\Models\Cart|null $cart
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
- * @property-read Model|Eloquent $purchasable
+ * @property-read Model|\Eloquent $purchasable
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine query()
@@ -40,10 +40,10 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereCheckoutReference($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereMeta($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine wherePurchasableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine wherePurchasableType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereQuantity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereRemarks($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereUpdatedAt($value)
  * @mixin Eloquent
  */
