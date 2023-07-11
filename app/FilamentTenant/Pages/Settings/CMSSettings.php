@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Pages\Settings;
 
+use App\Filament\Rules\FullyQualifiedDomainNameRule;
 use App\FilamentTenant\Widgets\DeployStaticSite;
 use App\Settings\CMSSettings as SettingsCMSSettings;
 use Filament\Forms\Components\Card;
@@ -36,6 +37,13 @@ class CMSSettings extends TenantBaseSettings
             Card::make([
                 TextInput::make('front_end_preview_page_url')
                     ->label('Front end preview page url ( URL must have "{slug}" )')
+                    ->columnSpan('full'),
+            ]),
+            Card::make([
+                TextInput::make('domain')
+                    ->nullable()
+                    ->rules([new FullyQualifiedDomainNameRule()])
+                    ->maxLength(100)
                     ->columnSpan('full'),
             ]),
         ];

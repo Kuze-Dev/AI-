@@ -6,7 +6,9 @@ namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
 use App\Features\ECommerce\ECommerceBase;
 use App\Http\Controllers\Controller;
+use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -16,6 +18,7 @@ use Spatie\RouteAttributes\Attributes\Post;
 #[Middleware('feature.tenant:' . ECommerceBase::class)]
 class LoginController extends Controller
 {
+    /** @throws \Illuminate\Auth\AuthenticationException */
     #[Post(uri: 'login', name: 'login')]
     public function __invoke(Request $request): mixed
     {
@@ -24,24 +27,21 @@ class LoginController extends Controller
             'password' => 'required|string',
         ]);
 
-        $ok = Auth::guard('api')->attempt($validated);
-
-        if ( ! $ok) {
-            return response()->json([
-                'Invalid credentials.',
-            ], 401);
+        if ( ! Auth::guard('api')->attempt($validated)) {
+            throw new AuthenticationException(trans('Invalid credentials.'));
         }
 
-        /** @var \Domain\Customer\Models\Customer $costumer */
-        $costumer = Customer::whereEmail($validated['email'])
+        $customer = Customer::whereEmail($validated['email'])
+            ->whereStatus(Status::ACTIVE)
             ->first();
 
+        if ($customer === null) {
+            throw new AuthenticationException(trans('Invalid credentials.'));
+        }
+
         return response([
-            'token' => $costumer
-                ->createToken(
-                    name:'costumer auth',
-                    expiresAt: now()->addHour(),
-                )
+            'token' => $customer
+                ->createToken('customer auth')
                 ->plainTextToken,
         ]);
     }

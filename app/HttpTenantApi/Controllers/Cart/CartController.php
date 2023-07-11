@@ -52,7 +52,7 @@ class CartController
     }
 
     #[Get('/', name: 'cart.show')]
-    public function show(): JsonApiResource|JsonResponse
+    public function show()
     {
         $authenticated = $this->isCostumerValidated();
 
@@ -62,28 +62,28 @@ class CartController
             ], 403);
         }
 
-        try {
-            $customerId = auth()->user()?->id;
+        $customerId = auth()->user()?->id;
 
-            $cart = Cart::whereCustomerId($customerId)->firstOrFail();
+        $cart = Cart::with('cartLines')->whereCustomerId($customerId)->first();
 
-            $model = QueryBuilder::for(
-                Cart::with(['cartLines', 'cartLines.purchasable', 'cartLines.media'])
-                    ->whereHas('cartLines', function (Builder $query) {
-                        $query->whereNull('checked_out_at');
-                    })
-                    ->where('id', $cart->id)
-                    ->whereCustomerId($customerId)
-            )->allowedIncludes(['cartLines', 'cartLines.purchasable'])
-                ->firstOrFail();
-
-            return CartResource::make($model);
-        } catch (ModelNotFoundException $e) {
+        if (!$cart || count($cart->cartLines) == 0) {
             return response()
                 ->json([
-                    'error' => 'Cart not found',
-                ], 404);
+                    'data' => [],
+                ], 200);
         }
+
+        $model = QueryBuilder::for(
+            Cart::with(['cartLines', 'cartLines.purchasable', 'cartLines.media'])
+                ->whereHas('cartLines', function (Builder $query) {
+                    $query->whereNull('checked_out_at');
+                })
+                ->where('id', $cart->id)
+                ->whereCustomerId($customerId)
+        )->allowedIncludes(['cartLines', 'cartLines.purchasable'])
+            ->firstOrFail();
+
+        return CartResource::make($model);
     }
 
     #[Post('/items', name: 'cart.items')]

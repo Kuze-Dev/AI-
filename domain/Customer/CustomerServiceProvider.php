@@ -22,10 +22,9 @@ class CustomerServiceProvider extends EventServiceProvider
         ],
     ];
 
-    public function register(): void
-    {
-        parent::register();
-
-        $this->mergeConfigFrom(__DIR__.'/config/customer.php', 'domain.customer');
-    }
+    //    public function register(): void
+    //    {
+    //        parent::register();
+    //
+    //    }
 }

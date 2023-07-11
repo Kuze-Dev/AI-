@@ -8,6 +8,7 @@ use App\FilamentTenant\Resources\CustomerResource;
 use Domain\Customer\Actions\CreateCustomerAction;
 use Domain\Customer\Actions\EditCustomerAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
+use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
@@ -36,6 +37,7 @@ class ListCustomers extends ListRecords
                             'first_name' => $row['first_name'],
                             'last_name' => $row['last_name'],
                             'mobile' => $row['mobile'],
+                            'gender' => Gender::from($row['gender']),
                             'status' => Status::from($row['status']),
                             'birth_date' => now()->parse($row['birth_date']),
                             'tier_id' => isset($row['tier']) ? (Tier::whereName($row['tier'])->first()?->getKey()) : null,
@@ -61,7 +63,8 @@ class ListCustomers extends ListRecords
                         'first_name' => 'required|string|min:3|max:100',
                         'last_name' => 'required|string|min:3|max:100',
                         'mobile' => 'required|string|min:3|max:100',
-                        'status' => ['nullable', Rule::enum(Status::class)],
+                        'gender' => ['required', Rule::enum(Gender::class)],
+                        'status' => ['required', Rule::enum(Status::class)],
                         'birth_date' => 'required|date',
                         'tier' => [
                             'nullable',
@@ -74,13 +77,14 @@ class ListCustomers extends ListRecords
                 ->queue()
                 ->query(fn (Builder $query) => $query->with('tier')->latest())
                 ->mapUsing(
-                    ['CUID', 'Email', 'First Name',  'Last Name', 'Mobile', 'Status', 'Birth Date', 'Tier', 'Created At'],
+                    ['CUID', 'Email', 'First Name',  'Last Name', 'Mobile', 'Gender', 'Status', 'Birth Date', 'Tier', 'Created At'],
                     fn (Customer $customer): array => [
                         $customer->cuid,
                         $customer->email,
                         $customer->first_name,
                         $customer->last_name,
                         $customer->mobile,
+                        $customer->gender->value,
                         $customer->status->value,
                         $customer->birth_date->format(config('tables.date_format')),
                         $customer->tier->name,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Settings;
 
+use App\Filament\Rules\FullyQualifiedDomainNameRule;
 use App\Settings\SiteSettings as ManageSiteSettings;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\FileUpload;
@@ -49,6 +50,11 @@ class SiteSettings extends BaseSettings
                     ->getUploadedFileNameForStorageUsing(static function (TemporaryUploadedFile $file) {
                         return 'favicon.'.$file->extension();
                     }),
+                TextInput::make('domain')
+                    ->required()
+                    ->rules([new FullyQualifiedDomainNameRule()])
+                    ->maxLength(100)
+                    ->columnSpan('full'),
             ])
                 ->columns(2),
         ];
