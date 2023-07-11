@@ -7,8 +7,6 @@ namespace Domain\Cart\Requests;
 use Domain\Cart\Models\CartLine;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
 class CartNotesUpdateRequest extends FormRequest
 {

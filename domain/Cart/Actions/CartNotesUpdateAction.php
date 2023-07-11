@@ -13,10 +13,10 @@ class CartNotesUpdateAction
 {
     public function execute(CartNotesUpdateData $cartLineData): CartLine
     {
-        $checkCart = CartLine::where('id', $cartLineData->cart_line_id)
-            ->whereHas('cart', function ($query) {
-                $query->whereBelongsTo(auth()->user());
-            })
+        $checkCart = CartLine::whereHas('cart', function ($query) {
+            $query->whereBelongsTo(auth()->user());
+        })
+            ->where('id', $cartLineData->cart_line_id)
             ->whereNull('checked_out_at')->first();
 
         if (!$checkCart) {

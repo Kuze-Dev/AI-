@@ -14,10 +14,11 @@ class CartQuantityUpdateAction
 {
     public function execute(CartQuantityUpdateData $cartLineData): CartLine|array
     {
-        $cartLine = CartLine::with('purchasable')->where('id', $cartLineData->cart_line_id)
+        $cartLine = CartLine::with('purchasable')
             ->whereHas('cart', function ($query) {
                 $query->whereBelongsTo(auth()->user());
             })
+            ->where('id', $cartLineData->cart_line_id)
             ->whereNull('checked_out_at')->first();
 
         if (!$cartLine) {
