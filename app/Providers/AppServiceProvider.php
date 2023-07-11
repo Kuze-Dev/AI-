@@ -79,6 +79,9 @@ class AppServiceProvider extends ServiceProvider
             Address::class,
             Country::class,
             State::class,
+            Tier::class,
+            Customer::class,
+            Address::class,
         ]);
 
         Password::defaults(

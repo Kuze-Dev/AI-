@@ -63,7 +63,7 @@ class AuthServiceProvider extends ServiceProvider
                     'tenant.api.customer.verify',
                     now()->addMinutes(Config::get('auth.verification.expire', 60)),
                     [
-                        'id' => $notifiable->getKey(),
+                        'customer' => $notifiable->getRouteKey(),
                         'hash' => sha1($notifiable->getEmailForVerification()),
                     ],
                     false
@@ -95,9 +95,35 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         ResetPasswordNotification::createUrlUsing(function (mixed $notifiable, string $token) {
+
+            if ($notifiable instanceof Customer) {
+
+                /** @var Tenant $tenant */
+                $tenant = tenancy()->tenant;
+
+                if ($url = config('domain.customer.password_reset_url')) {
+                    return $url.'?'.http_build_query([
+                        'token' => $token,
+                        'email' => $notifiable->getEmailForPasswordReset(),
+                    ]);
+                }
+
+                $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;
+                $routeName = 'filament-tenant.auth.password.reset';
+
+                return $hostName . URL::route(
+                    $routeName,
+                    [
+                        'token' => $token,
+                        'email' => $notifiable->getEmailForPasswordReset(),
+                    ],
+                    false
+                );
+            }
+
             if ($notifiable instanceof Admin) {
                 if (tenancy()->initialized) {
-                    /** @var Tenant */
+                    /** @var Tenant $tenant */
                     $tenant = tenancy()->tenant;
 
                     $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;

@@ -28,6 +28,7 @@ class CreateCustomerAction
             'last_name' => $customerData->last_name,
             'mobile' => $customerData->mobile,
             'status' => $customerData->status,
+            'gender' => $customerData->gender,
             'birth_date' => $customerData->birth_date,
             'password' => $customerData->password,
         ]);
