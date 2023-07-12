@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\FilamentTenant\Support;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Order\Models\Order;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Resources\Form;
 use Filament\Forms;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
+use Closure;
+use Filament\Notifications\Notification;
 
 class OrderResource extends Resource
 {
@@ -23,6 +27,72 @@ class OrderResource extends Resource
     protected static ?string $model = Order::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make('Customer')
+                            ->schema([
+                                Forms\Components\Grid::make(2)
+                                    ->schema([
+                                        Forms\Components\Placeholder::make('first_name')->label('First Name')
+                                            ->content(fn (Order $record): ?string => $record->customer->first_name),
+                                        Forms\Components\Placeholder::make('last_name')->label('Last Name')
+                                            ->content(fn (Order $record): ?string => $record->customer->last_name),
+                                    ]),
+                                Forms\Components\Grid::make(2)
+                                    ->schema([
+                                        Forms\Components\Placeholder::make('email')->label('Email')
+                                            ->content(fn (Order $record): ?string => $record->customer->email),
+                                        Forms\Components\Placeholder::make('contact_number')->label("Contact Number")
+                                            ->content(fn (Order $record): ?string => $record->customer->mobile),
+                                    ])
+                            ])->collapsible(),
+                        Forms\Components\Section::make('Shipping Address')
+                            ->schema([
+                                Forms\Components\Placeholder::make('sa_line_one')->label('House/Unit/Flr #, Bldg Name, Blk or Lot #')
+                                    ->content(fn (Order $record): ?string => $record->shippingAddress->address_line_1),
+                                Forms\Components\Grid::make(2)
+                                    ->schema([
+                                        Forms\Components\Placeholder::make('sa_country')->label('Country')
+                                            ->content(fn (Order $record): ?string => 'Test Country'),
+                                        Forms\Components\Placeholder::make('sa_state')->label('State')
+                                            ->content(fn (Order $record): ?string => $record->shippingAddress->state),
+                                    ]),
+                                Forms\Components\Grid::make(2)
+                                    ->schema([
+                                        Forms\Components\Placeholder::make('sa_city_province')->label('City/Province')
+                                            ->content(fn (Order $record): ?string => $record->shippingAddress->city),
+                                        Forms\Components\Placeholder::make('sa_zip_code')->label('Zip Code')
+                                            ->content(fn (Order $record): ?string => $record->shippingAddress->zip_code),
+                                    ]),
+                            ])->collapsible(),
+                        Forms\Components\Section::make('Billing Address')
+                            ->schema([
+                                Forms\Components\Placeholder::make('ba_line_one')->label('House/Unit/Flr #, Bldg Name, Blk or Lot #')
+                                    ->content(fn (Order $record): ?string => $record->billingAddress->address_line_1),
+                                Forms\Components\Grid::make(2)
+                                    ->schema([
+                                        Forms\Components\Placeholder::make('ba_country')->label('Country')
+                                            ->content(fn (Order $record): ?string => 'Test Country'),
+                                        Forms\Components\Placeholder::make('ba_state')->label('State')
+                                            ->content(fn (Order $record): ?string => $record->billingAddress->state),
+                                    ]),
+                                Forms\Components\Grid::make(2)
+                                    ->schema([
+                                        Forms\Components\Placeholder::make('ba_city_province')->label('City/Province')
+                                            ->content(fn (Order $record): ?string => $record->billingAddress->city),
+                                        Forms\Components\Placeholder::make('ba_zip_code')->label('Zip Code')
+                                            ->content(fn (Order $record): ?string => $record->billingAddress->zip_code),
+                                    ]),
+                            ])->collapsible(),
+                    ])->columnSpan(2),
+                self::summaryCard()
+            ])->columns(3);
+    }
 
     public static function table(Table $table): Table
     {
@@ -104,6 +174,148 @@ class OrderResource extends Resource
     {
         return [
             'index' => OrderResource\Pages\ListOrders::route('/'),
+            'view' => OrderResource\Pages\ViewOrder::route('/{record}'),
         ];
+    }
+
+    public static function summaryCard()
+    {
+        return  Forms\Components\Section::make('Summary')
+            ->schema([
+                Forms\Components\Grid::make(2)
+                    ->schema([
+                        Support\BadgeLabel::make('status')
+                            ->inline()
+                            ->alignLeft(),
+                        Support\ButtonAction::make('Edit')
+                            ->execute(function (Closure $get, Closure $set) {
+                                return Forms\Components\Actions\Action::make('edit')
+                                    ->color('primary')
+                                    ->label('Edit')
+                                    ->size('sm')
+                                    ->modalHeading('Edit Status')
+                                    ->modalWidth('md')
+                                    ->form([
+                                        Forms\Components\Select::make('status_options')
+                                            ->label('')
+                                            ->options([
+                                                'Pending' => 'Pending',
+                                                'Cancelled' => 'Cancelled',
+                                                'Refunded' => 'Refunded',
+                                                'Packed' => 'Packed',
+                                                'Shipped' => 'Shipped',
+                                                'Delivered' => 'Delivered',
+                                                'Fulfilled' => 'Fulfilled'
+                                            ])
+                                            ->disablePlaceholderSelection()
+                                            ->formatStateUsing(function () use ($get) {
+                                                return $get('status');
+                                            }),
+                                        Forms\Components\Toggle::make('send_email')->label('Send email notification')->default(false),
+                                    ])
+                                    ->action(
+                                        function (array $data) use ($get, $set) {
+                                            $order = Order::find($get('id'));
+
+                                            $status = $data['status_options'];
+                                            $updateData = ['status' => $status];
+
+                                            if ($status === 'Cancelled') {
+                                                $updateData['cancelled_at'] = now(Auth::user()?->timezone);
+                                            }
+
+                                            $result = $order->update($updateData);
+
+                                            if ($result) {
+                                                $set('status', $data['status_options']);
+                                                Notification::make()
+                                                    ->title('Order updated successfully')
+                                                    ->success()
+                                                    ->send();
+                                            }
+                                        }
+                                    );
+                            })->disableLabel()->columnSpan(1)->alignRight()->size("sm"),
+                    ]),
+                Forms\Components\Grid::make(2)
+                    ->schema([
+                        Support\TextLabel::make("")->label("Order Date")->alignLeft()->size("md")->inline()->readOnly(),
+                        Support\TextLabel::make("created_at")->alignRight()->size("md")->inline()
+                            ->formatStateUsing(function ($state) {
+                                $format ??= config('tables.date_format');
+                                $formattedState = Carbon::parse($state)
+                                    ->setTimezone(Auth::user()?->timezone)
+                                    ->translatedFormat($format);
+                                return $formattedState;
+                            }),
+                    ]),
+                Support\ButtonAction::make('mark_as_paid')
+                    ->disableLabel()
+                    ->execute(function (Closure $get, Closure $set) {
+                        return Forms\Components\Actions\Action::make('mark_as_paid')
+                            ->color(function () use ($get) {
+                                if ($get('is_paid')) {
+                                    return 'secondary';
+                                }
+                                return 'primary';
+                            })
+                            ->label(function () use ($get) {
+                                if ($get('is_paid')) {
+                                    return 'Unmark as paid';
+                                }
+                                return 'Mark as paid';
+                            })
+                            ->size('sm')
+                            ->action(function () use ($get, $set) {
+                                $order = Order::find($get('id'));
+
+                                $isPaid = !$order->is_paid;
+
+                                $result = $order->update([
+                                    'is_paid' => $isPaid
+                                ]);
+
+                                if ($result) {
+                                    $set('is_paid', $isPaid);
+                                    Notification::make()
+                                        ->title('Order marked successfully')
+                                        ->success()
+                                        ->send();
+                                }
+                            })
+                            ->requiresConfirmation();
+                    })->fullWidth()->size("md"),
+                Support\ButtonAction::make('proof_of_payment')
+                    ->disableLabel()
+                    ->execute(function (Closure $get, Closure $set) {
+                        return Forms\Components\Actions\Action::make('proof_of_payment')
+                            ->color('secondary')
+                            ->label('View Proof of payment')
+                            ->size('sm')
+                            ->action(function () use ($get, $set) {
+                            })
+                            ->icon('heroicon-s-eye');
+                    })->fullWidth()->size("md"),
+                Forms\Components\Grid::make(2)
+                    ->schema([
+                        Support\TextLabel::make("")->label("Subtotal")->alignLeft()->size("md")->inline()->readOnly(),
+                        Support\TextLabel::make("sub_total")->alignRight()->size("md")->inline(),
+                    ]),
+                Forms\Components\Grid::make(2)
+                    ->schema([
+                        Support\TextLabel::make("")->label("Shipping Fee")->alignLeft()->size("md")->inline()->readOnly(),
+                        Support\TextLabel::make("shipping_total")->alignRight()->size("md")->inline(),
+                    ]),
+                Forms\Components\Grid::make(2)
+                    ->schema([
+                        Support\TextLabel::make("")->label("Discount")->alignLeft()->size("md")->inline()->readOnly(),
+                        Support\TextLabel::make("discount_total")->alignRight()->size("md")->inline(),
+                    ]),
+                Forms\Components\Grid::make(2)
+                    ->schema([
+                        Support\TextLabel::make("")->label("Grand Total")->alignLeft()->size("lg")->color("primary")->inline()->readOnly(),
+                        Support\TextLabel::make("total")->alignRight()->size("lg")->color("primary")->inline(),
+                    ]),
+            ])->columnSpan(1);
     }
 }
