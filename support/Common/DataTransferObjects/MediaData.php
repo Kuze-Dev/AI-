@@ -18,7 +18,7 @@ class MediaData
     {
         return new self(
             media: $data['media'],
-            custom_properties: $data['custom_properties'],
+            custom_properties: $data['custom_properties'] ?? [],
         );
     }
 }

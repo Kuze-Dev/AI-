@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Settings\ECommerceSettings;
+use App\Settings\SiteSettings;
 use Domain\Admin\Models\Admin;
+use Domain\Customer\Models\Customer;
 use Domain\Tenant\Models\Tenant;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Auth\Notifications\VerifyEmail as VerifyEmailNotification;
@@ -35,6 +38,14 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Content\Models\Content::class => \App\Policies\ContentPolicy::class,
         \Domain\Content\Models\ContentEntry::class => \App\Policies\ContentEntryPolicy::class,
         \Domain\Globals\Models\Globals::class => \App\Policies\GlobalsPolicy::class,
+        \Domain\Currency\Models\Currency::class => \App\Policies\CurrencyPolicy::class,
+        \Domain\Customer\Models\Customer::class => \App\Policies\CustomerPolicy::class,
+        \Domain\Tier\Models\Tier::class => \App\Policies\TierPolicy::class,
+        \Domain\Address\Models\Address::class => \App\Policies\AddressPolicy::class,
+        \Domain\PaymentMethod\Models\PaymentMethod::class => \App\Policies\PaymentMethodPolicy::class,
+        \Domain\Cart\Models\Cart::class => \App\Policies\CartPolicy::class,
+        \Domain\Cart\Models\CartLine::class => \App\Policies\CartLinePolicy::class,
+        \Domain\Order\Models\Order::class => \App\Policies\OrderPolicy::class,
     ];
 
     /** Register any authentication / authorization services. */
@@ -49,9 +60,26 @@ class AuthServiceProvider extends ServiceProvider
     protected function configureNotificationUrls(): void
     {
         VerifyEmailNotification::createUrlUsing(function (mixed $notifiable) {
+            if ($notifiable instanceof Customer) {
+                /** @var Tenant $tenant */
+                $tenant = tenancy()->tenant;
+
+                $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;
+
+                return $hostName . URL::temporarySignedRoute(
+                    'tenant.api.customer.verify',
+                    now()->addMinutes(Config::get('auth.verification.expire', 60)),
+                    [
+                        'customer' => $notifiable->getRouteKey(),
+                        'hash' => sha1($notifiable->getEmailForVerification()),
+                    ],
+                    false
+                );
+            }
+
             if ($notifiable instanceof Admin) {
                 if (tenancy()->initialized) {
-                    /** @var Tenant */
+                    /** @var Tenant $tenant */
                     $tenant = tenancy()->tenant;
 
                     $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;
@@ -74,9 +102,20 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         ResetPasswordNotification::createUrlUsing(function (mixed $notifiable, string $token) {
+
+            if ($notifiable instanceof Customer) {
+                $baseUrl = app(ECommerceSettings::class)->domainWithScheme()
+                    ?? app(SiteSettings::class)->domainWithScheme();
+
+                return $baseUrl.'/password/reset'.'?'.http_build_query([
+                    'token' => $token,
+                    'email' => $notifiable->getEmailForPasswordReset(),
+                ]);
+            }
+
             if ($notifiable instanceof Admin) {
                 if (tenancy()->initialized) {
-                    /** @var Tenant */
+                    /** @var Tenant $tenant */
                     $tenant = tenancy()->tenant;
 
                     $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;

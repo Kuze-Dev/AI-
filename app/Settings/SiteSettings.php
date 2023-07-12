@@ -18,8 +18,19 @@ class SiteSettings extends Settings
 
     public string $favicon;
 
+    public string $domain;
+
     public static function group(): string
     {
         return 'site';
+    }
+
+    public function domainWithScheme(): string
+    {
+        /** @phpstan-ignore-next-line Cannot access offset 'scheme' on array{scheme?: string, host?: string, port?: int<0, 65535>, user?: string, pass?: string, path?: string,
+         * query?: string, fragment?: string}|false. */
+        $scheme = parse_url(config('app.url'))['scheme'];
+
+        return $scheme.'://'.$this->domain;
     }
 }

@@ -23,6 +23,7 @@ it('log settings', function () {
             'author' => 'new author',
             'logo' => UploadedFile::fake()->image('test.png'),
             'favicon' => UploadedFile::fake()->image('test.png'),
+            'domain' => 'example-new.com',
         ])
         ->call('save')
         ->assertHasNoFormErrors();

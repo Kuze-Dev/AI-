@@ -35,7 +35,7 @@ use Eloquent;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Node> $children
  * @property-read int|null $children_count
  * @property-read \Domain\Menu\Models\Menu|null $menu
- * @property-read Model|Eloquent $model
+ * @property-read Model|\Eloquent $model
  * @method static Builder|Node newModelQuery()
  * @method static Builder|Node newQuery()
  * @method static Builder|Node ordered(string $direction = 'asc')
