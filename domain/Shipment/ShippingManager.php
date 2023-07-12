@@ -15,6 +15,6 @@ class ShippingManager extends Manager
      */
     public function getDefaultDriver(): string
     {
-        return config('shipping-gateway.default');
+        return config('shipping.default');
     }
 }

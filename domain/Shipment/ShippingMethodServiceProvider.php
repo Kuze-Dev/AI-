@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Payments;
+namespace Domain\Shipment;
 
 use Domain\Payments\Providers\OfflinePayment;
 use Domain\Payments\Providers\PaypalProvider;
