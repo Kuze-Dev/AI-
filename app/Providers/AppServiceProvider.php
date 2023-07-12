@@ -20,6 +20,7 @@ use Domain\Discount\Models\DiscountCondition;
 use Domain\Discount\Models\DiscountRequirement;
 use Domain\Customer\Models\Customer;
 use Domain\Discount\Models\DiscountLimit;
+use Domain\Favorite\Models\Favorite;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
@@ -60,7 +61,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Model::shouldBeStrict( ! $this->app->isProduction());
+        Model::shouldBeStrict(!$this->app->isProduction());
 
         Model::handleMissingAttributeViolationUsing(function (Model $model, string $key) {
             if ($model instanceof Tenant && Str::startsWith($key, Tenant::internalPrefix())) {
@@ -107,19 +108,20 @@ class AppServiceProvider extends ServiceProvider
             Payment::class,
             Order::class,
             OrderLine::class,
+            Favorite::class,
         ]);
 
         Password::defaults(
             $this->app->environment('local', 'testing')
                 ? Password::min(4)
                 : Password::min(8)
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols()
-                    ->when(
-                        $this->app->isProduction(),
-                        fn (Password $password) => $password->uncompromised()
-                    )
+                ->mixedCase()
+                ->numbers()
+                ->symbols()
+                ->when(
+                    $this->app->isProduction(),
+                    fn (Password $password) => $password->uncompromised()
+                )
         );
 
         Rule::macro(

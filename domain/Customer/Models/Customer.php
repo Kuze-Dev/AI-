@@ -8,6 +8,7 @@ use Domain\Address\Models\Address;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Customer\Enums\Status;
+use Domain\Favorite\Models\Favorite;
 use Domain\Tier\Models\Tier;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -45,6 +46,8 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Address> $addresses
  * @property-read int|null $addresses_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Favorite> $favorites
+ * @property-read int|null $favorites_count
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
@@ -151,5 +154,10 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new VerifyEmail());
+    }
+
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
     }
 }

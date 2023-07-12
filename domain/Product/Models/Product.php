@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Product\Models;
 
+use Domain\Favorite\Models\Favorite;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\MetaData\HasMetaData;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -45,6 +46,8 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property-read \Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Favorite> $favorites
+ * @property-read int|null $favorites_count
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
  * @property-read \Support\MetaData\Models\MetaData|null $metaData
@@ -159,6 +162,11 @@ class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, 
     public function productOptions(): HasMany
     {
         return $this->hasMany(ProductOption::class);
+    }
+
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
     }
 
     public function getSlugOptions(): SlugOptions

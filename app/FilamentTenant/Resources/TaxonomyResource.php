@@ -105,7 +105,10 @@ class TaxonomyResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->sortable()
+                    ->searchable()
+                    ->truncate('max-w-xs 2xl:max-w-xl', true),
                 Tables\Columns\BadgeColumn::make('taxonomy_terms_count')
                     ->counts('taxonomyTerms')
                     ->sortable(),
