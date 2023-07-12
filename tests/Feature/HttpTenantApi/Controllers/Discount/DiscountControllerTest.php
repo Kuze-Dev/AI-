@@ -76,4 +76,4 @@ it('can show discount', function () {
                 ->whereType('included.1.attributes.minimum_amount', 'integer')
                 ->etc();
         });
-})->only();
+});
