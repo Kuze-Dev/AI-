@@ -78,19 +78,19 @@ class ProductResource extends Resource
                                 ->schema([
                                     Forms\Components\TextInput::make('length')
                                         ->numeric()
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['length']))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['length']))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Length'),
 
                                     Forms\Components\TextInput::make('width')
                                         ->numeric()
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['width']))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['width']))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Width'),
 
                                     Forms\Components\TextInput::make('height')
                                         ->numeric()
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['height']))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['height']))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Height'),
                                 ])->columns(3),
@@ -103,7 +103,7 @@ class ProductResource extends Resource
                             ->schema([
                                 Forms\Components\Repeater::make('options')
                                     ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, Closure $set) {
-                                        if ( ! $record) {
+                                        if (!$record) {
                                             return $state;
                                         }
                                         $record->productOptions->load('productOptionValues');
@@ -227,7 +227,7 @@ class ProductResource extends Resource
                                     Forms\Components\Hidden::make('taxonomy_terms')
                                         ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                                 ])
-                                ->when(fn () => ! empty($taxonomies->toArray())),
+                                ->when(fn () => !empty($taxonomies->toArray())),
                         ]),
                     MetaDataForm::make('Meta Data'),
                 ])->columnSpan(1),
