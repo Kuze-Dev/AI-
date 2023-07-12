@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Order;
 
+use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\OrderResource;
 use Domain\Order\Actions\PlaceOrderAction;
 use Domain\Order\Actions\UpdateOrderAction;
@@ -21,13 +22,13 @@ use Spatie\RouteAttributes\Attributes\Resource;
     Resource('orders', apiResource: true, except: 'destroy'),
     Middleware(['auth:sanctum'])
 ]
-class OrderController
+class OrderController extends Controller
 {
     public function index()
     {
         return OrderResource::collection(
             QueryBuilder::for(
-                Order::whereBelongsTo(auth()->user())
+                Order::with(['shipping_address', 'billing_address'])->whereBelongsTo(auth()->user())
             )
                 ->allowedFilters(['status'])
                 ->allowedSorts(['reference', 'total', 'status', 'created_at'])
@@ -37,6 +38,7 @@ class OrderController
 
     public function store(PlaceOrderRequest $request)
     {
+
         $validatedData = $request->validated();
 
         $result = app(PlaceOrderAction::class)
@@ -56,6 +58,8 @@ class OrderController
 
     public function show(Order $order)
     {
+        $this->authorize('view', $order);
+
         $model = QueryBuilder::for(
             $order->whereBelongsTo(auth()->user())
         )
@@ -66,6 +70,8 @@ class OrderController
 
     public function update(UpdateOrderRequest $request, Order $order)
     {
+        $this->authorize('update', $order);
+
         $validatedData = $request->validated();
 
         $result = app(UpdateOrderAction::class)
