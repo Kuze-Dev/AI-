@@ -31,6 +31,6 @@ class SiteSettings extends Settings
          * query?: string, fragment?: string}|false. */
         $scheme = parse_url(config('app.url'))['scheme'];
 
-        return $scheme.'://'.$this->domain;
+        return $scheme.'://'.$this->front_end_domain;
     }
 }
