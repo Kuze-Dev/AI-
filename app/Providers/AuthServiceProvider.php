@@ -102,7 +102,7 @@ class AuthServiceProvider extends ServiceProvider
                 $baseUrl = app(ECommerceSettings::class)->domainWithScheme()
                     ?? app(SiteSettings::class)->domainWithScheme();
 
-                return $baseUrl.'/password-reset'.'?'.http_build_query([
+                return $baseUrl.'/password/reset'.'?'.http_build_query([
                     'token' => $token,
                     'email' => $notifiable->getEmailForPasswordReset(),
                 ]);
