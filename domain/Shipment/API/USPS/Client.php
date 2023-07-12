@@ -26,8 +26,7 @@ final class Client
                     'API' => 'RateV4',
                     'XML' => self::buildXMLQueryParameter($this->username, $clientQueryParameterData),
                 ],
-            ])
-            ->contentType('text/xml; charset=UTF8');
+            ]);
     }
 
     private static function buildXMLQueryParameter(string $username, ClientQueryParameterData $clientQueryParameterData): string
