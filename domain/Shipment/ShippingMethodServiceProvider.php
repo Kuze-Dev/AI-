@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Domain\Shipment;
 
 use App\Settings\ShippingSettings;
-use Domain\Payments\Providers\OfflinePayment;
-use Domain\Payments\Providers\PaypalProvider;
 use Domain\Shipment\API\USPS\Connection;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\Drivers\UspsDriver;
@@ -65,6 +63,7 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
     {
         return [
             ShippingManagerInterface::class,
+            Connection::class,
         ];
     }
 }
