@@ -239,7 +239,7 @@ abstract class USPSBase
     {
         // Add in the defaults
         $postFields = [
-            '@attributes' => ['USERID' => $this->username, 'PASSWORD' => $this->password ],
+            '@attributes' => ['USERID' => $this->username, 'PASSWORD' => $this->password],
         ];
 
         // Add in the sub class data

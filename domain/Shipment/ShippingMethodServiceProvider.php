@@ -8,7 +8,6 @@ use Domain\Payments\Providers\OfflinePayment;
 use Domain\Payments\Providers\PaypalProvider;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\Drivers\UspsDriver;
-use Domain\Shipment\ShippingManager;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;

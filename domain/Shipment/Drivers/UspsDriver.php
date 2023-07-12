@@ -31,8 +31,8 @@ class UspsDriver
         $rate = new Rate($this->uspsCredentials['username']);
 
         $rate->setPassword($this->uspsCredentials['password']);
-        $rate->addExtraOption('Revision','1');
-        $rate->setInternationalCall(true);   
+        $rate->addExtraOption('Revision', '1');
+        $rate->setInternationalCall(true);
         $package = new RatePackage();
         // $package->setService(RatePackage::SERVICE_PRIORITY);
 
@@ -50,21 +50,19 @@ class UspsDriver
 
         $package->setContainer('VARIABLE');
 
-        $package->setField('Container','VARIABLE')
-        ->setField('MailType',RatePackage::MAIL_TYPE_PACKAGE)
-        ->setField('ValueOfContents','200')
-        ->setField('Country','Australia')
-        ->setField('Width','10')
-        ->setField('Length','15')
-        ->setField('Height','10')
-        ->setField('CommercialFlag','N')
-        ->setField('AcceptanceDateTime','2023-07-11T13:15:00-06:00')
-        ->setField('DestinationPostalCode','2046')
-        ->setField('OriginZip','18701')
-     
-        ;
+        $package->setField('Container', 'VARIABLE')
+            ->setField('MailType', RatePackage::MAIL_TYPE_PACKAGE)
+            ->setField('ValueOfContents', '200')
+            ->setField('Country', 'Australia')
+            ->setField('Width', '10')
+            ->setField('Length', '15')
+            ->setField('Height', '10')
+            ->setField('CommercialFlag', 'N')
+            ->setField('AcceptanceDateTime', '2023-07-11T13:15:00-06:00')
+            ->setField('DestinationPostalCode', '2046')
+            ->setField('OriginZip', '18701');
         /**
-         * 
+         *
          *   <CommercialFlag>N</CommercialFlag>
          *  <DestinationPostalCode>2046</DestinationPostalCode>
          */
@@ -76,7 +74,7 @@ class UspsDriver
         // $rate->addExtraOption('MailType', 'Package');
 
         $rate->addPackage($package);
-     
+
         $rate->getRate();
 
         return $rate->convertResponseToArray();
