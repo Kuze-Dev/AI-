@@ -8,6 +8,7 @@ use Domain\Address\Models\Address;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Customer\Enums\Status;
+use Domain\Discount\Models\DiscountLimit;
 use Domain\Favorite\Models\Favorite;
 use Domain\Tier\Models\Tier;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -159,5 +160,10 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);
+    }
+
+    public function discountLimits(): HasMany
+    {
+        return $this->hasMany(DiscountLimit::class);
     }
 }

@@ -19,7 +19,7 @@ use Stringable;
  * @property bool $is_override
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read Model|\Eloquent $model
+ * @property-read Model|Eloquent $model
  * @method static \Illuminate\Database\Eloquent\Builder|RouteUrl newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|RouteUrl newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|RouteUrl query()

@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Discount\Models;
 
+use Domain\Customer\Models\Customer;
+use Domain\Order\Models\Order;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * Domain\Discount\Models\DiscountLimit
@@ -38,10 +42,26 @@ class DiscountLimit extends Model
 {
     protected $fillable = [
         'discount_id',
-        'user_type',
-        'user_id',
+        'customer_id',
+        'customer_type',
         'order_type',
         'order_id',
+        'times_used',
         'code',
     ];
+
+    public function discount(): BelongsTo
+    {
+        return $this->belongsTo(Discount::class);
+    }
+
+    public function customer(): MorphTo
+    {
+        return $this->morphTo();
+    }
+
+    public function order(): MorphTo
+    {
+        return $this->morphTo();
+    }
 }

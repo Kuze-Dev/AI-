@@ -25,7 +25,7 @@ use Illuminate\Support\Str;
 
 /**
  * Domain\Content\Models\ContentEntry
- * 
+ *
  * <<<<<<< .merge_file_ckTEN1
  *
  * @property int $id
