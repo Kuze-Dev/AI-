@@ -110,10 +110,10 @@ class OrderResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('reference')->label("Order ID")->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('customer')->label("Customer")
+                Tables\Columns\TextColumn::make('customer_name')->label("Customer")
                     ->sortable()
                     ->formatStateUsing(function ($record) {
-                        return $record->customer->fullName;
+                        return $record->customer_first_name . " " . $record->customer_last_name;
                     }),
                 Tables\Columns\TextColumn::make('tax_total')->label("Tax Total")->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('total')->sortable(),

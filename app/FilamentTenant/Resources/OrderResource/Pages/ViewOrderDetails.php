@@ -91,18 +91,14 @@ class ViewOrderDetails extends ViewRecord
                                                     Forms\Components\Placeholder::make('product_'  . $sectionIndex)->label('Product')
                                                         ->content($orderLine->name),
                                                     Forms\Components\Placeholder::make('variant_'  . $sectionIndex)->label('Variant')
-                                                        ->hidden(function () use ($orderLine) {
-                                                            if ($orderLine->purchasable_type == ProductVariant::class) {
-                                                                if (!is_null($orderLine->purchasable_data['combination'])) {
-                                                                    return false;
-                                                                }
-                                                            }
-                                                            return true;
-                                                        })
                                                         ->content(function () use ($orderLine) {
-                                                            $variant = array_values($orderLine->purchasable_data['combination']);
-                                                            $variantString = implode(' / ', array_map('ucfirst', $variant));
-                                                            return $variantString;
+                                                            if ($orderLine->purchasable_type == ProductVariant::class) {
+                                                                $variant = array_values($orderLine->purchasable_data['combination']);
+                                                                $variantString = implode(' / ', array_map('ucfirst', $variant));
+                                                                return $variantString;
+                                                            }
+
+                                                            return "N/A";
                                                         }),
                                                 ]),
                                             Forms\Components\Grid::make(2)
