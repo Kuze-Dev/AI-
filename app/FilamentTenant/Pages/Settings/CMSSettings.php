@@ -40,7 +40,7 @@ class CMSSettings extends TenantBaseSettings
                     ->columnSpan('full'),
             ]),
             Card::make([
-                TextInput::make('domain')
+                TextInput::make('front_end_domain')
                     ->nullable()
                     ->rules([new FullyQualifiedDomainNameRule()])
                     ->maxLength(100)
