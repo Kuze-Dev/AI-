@@ -12,9 +12,16 @@ class UpdateOrderRequest extends FormRequest
     public function rules()
     {
         return [
-            'status' => [
+            'type' => [
                 'required',
+                Rule::in(['status', 'bank_proof']),
+            ],
+            'status' => [
+                'nullable',
                 Rule::in(['For Cancellation', 'Fulfilled']),
+                Rule::requiredIf(function () {
+                    return $this->input('type') === 'status';
+                }),
             ],
             'notes' => [
                 'nullable',
@@ -22,6 +29,8 @@ class UpdateOrderRequest extends FormRequest
                 'min:1',
                 'max:500',
             ],
+            'bank_proof_media' => 'nullable|array',
+            'bank_proof_media.*' => 'url',
         ];
     }
 }

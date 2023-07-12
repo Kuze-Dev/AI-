@@ -90,8 +90,7 @@ class Order extends Model implements HasMedia
             $this->addMediaConversion('preview');
         };
 
-        $this->addMediaCollection('bank_proof_image')
-            ->onlyKeepLatest(3)
+        $this->addMediaCollection('bank_proof_images')
             ->registerMediaConversions($registerMediaConversions);
     }
 

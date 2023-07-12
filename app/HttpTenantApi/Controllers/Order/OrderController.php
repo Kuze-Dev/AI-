@@ -79,7 +79,7 @@ class OrderController
 
         return response()
             ->json([
-                'message' => 'Order status updated successfully',
+                'message' => 'Order updated successfully',
             ]);
     }
 }

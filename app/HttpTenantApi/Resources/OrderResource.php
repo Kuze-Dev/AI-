@@ -25,6 +25,7 @@ class OrderResource extends JsonApiResource
             'payment_details' => $this->payment_details,
             'shipping_address' => $this->shipping_address,
             'billing_address' => $this->billing_address,
+            'bank_proof_images' => $this->getMedia('bank_proof_images')
         ];
     }
 
