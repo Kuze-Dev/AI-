@@ -53,17 +53,19 @@ class CreateProductAction
             }
         }
 
-        foreach ($productData->product_variants as $productVariant) {
-            $productVariantModel = ProductVariant::findOrNew($productVariant['id']);
+        if (count($productData->product_variants)) {
+            foreach ($productData->product_variants as $productVariant) {
+                $productVariantModel = ProductVariant::findOrNew($productVariant['id']);
 
-            $productVariantModel->product_id = $product['id'];
-            $productVariantModel->sku = $productVariant['sku'];
-            $productVariantModel->combination = $productVariant['combination'];
-            $productVariantModel->retail_price = $productVariant['retail_price'];
-            $productVariantModel->selling_price = $productVariant['selling_price'];
-            $productVariantModel->stock = $productVariant['stock'];
-            $productVariantModel->status = $productVariant['status'];
-            $productVariantModel->save();
+                $productVariantModel->product_id = $product['id'];
+                $productVariantModel->sku = $productVariant['sku'];
+                $productVariantModel->combination = $productVariant['combination'];
+                $productVariantModel->retail_price = $productVariant['retail_price'];
+                $productVariantModel->selling_price = $productVariant['selling_price'];
+                $productVariantModel->stock = $productVariant['stock'];
+                $productVariantModel->status = $productVariant['status'];
+                $productVariantModel->save();
+            }
         }
 
         if ($productData->images === null) {
@@ -88,6 +90,7 @@ class CreateProductAction
                 'weight' => $productData->weight,
                 'status' => $productData->status,
                 'stock' => $productData->stock,
+                'minimum_order_quantity' => $productData->minimum_order_quantity,
                 'is_digital_product' => $productData->is_digital_product,
                 'is_featured' => $productData->is_featured,
                 'is_special_offer' => $productData->is_special_offer,

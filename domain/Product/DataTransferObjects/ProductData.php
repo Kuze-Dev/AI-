@@ -17,6 +17,7 @@ class ProductData
         public readonly float $retail_price,
         public readonly float $selling_price,
         public readonly int $stock,
+        public readonly int $minimum_order_quantity = 1,
         public readonly bool $status = true,
         public readonly bool $is_digital_product = false,
         public readonly bool $is_featured = false,
@@ -24,7 +25,7 @@ class ProductData
         public readonly bool $allow_customer_remarks = false,
         public readonly array $taxonomy_terms = [],
         public readonly ?float $weight = null,
-        public readonly ?array $product_options = null,
+        public ?array $product_options = null,
         public ?array $product_variants = null,
         public readonly ?float $length = null,
         public readonly ?float $width = null,
@@ -51,13 +52,14 @@ class ProductData
             weight: $data['weight'],
             status: $data['status'],
             stock: $data['stock'],
+            minimum_order_quantity: $data['minimum_order_quantity'],
             // is_digital_product: $data['is_digital_product'],
             is_featured: $data['is_featured'],
             is_special_offer: $data['is_special_offer'],
             allow_customer_remarks: $data['allow_customer_remarks'],
-            product_options: $data['product_options'],
-            product_variants: $data['product_variants'],
             images: $data['images'],
+            product_options: $data['product_options'] ?? [],
+            product_variants: $data['product_variants'] ?? [],
         );
     }
 }

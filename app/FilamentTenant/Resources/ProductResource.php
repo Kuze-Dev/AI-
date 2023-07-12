@@ -137,7 +137,7 @@ class ProductResource extends Resource
                                             ->disableItemMovement(),
                                     ])
                                     ->disableItemMovement()
-                                    ->minItems(2)
+                                    ->minItems(1)
                                     ->maxItems(2)
                                     ->collapsible(),
                             ]),
@@ -206,6 +206,12 @@ class ProductResource extends Resource
                     ])->hiddenOn('create'),
                     Forms\Components\Section::make('Inventory')
                         ->schema([
+                            Forms\Components\TextInput::make('minimum_order_quantity')
+                                ->numeric()
+                                ->integer()
+                                ->required()
+                                ->default(1)
+                                ->dehydrateStateUsing(fn ($state) => (int) $state),
                             Forms\Components\TextInput::make('sku')
                                 ->unique(ignoreRecord: true)
                                 ->required(),

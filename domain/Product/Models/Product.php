@@ -98,6 +98,7 @@ class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, 
         'allow_customer_remarks',
         'weight',
         'dimension',
+        'minimum_order_quantity',
     ];
 
     /**

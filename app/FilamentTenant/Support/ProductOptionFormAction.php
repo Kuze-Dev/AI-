@@ -46,11 +46,9 @@ class ProductOptionFormAction extends Action
 
         $this->action(function (HasProductOptions $livewire, array $data) {
             $optionsWithProxies = $this->assignProxiesToProductOption($data['options']);
-
             $data['options'] = $optionsWithProxies;
 
             $productVariants = $this->generateCombinations($optionsWithProxies);
-
             $updatedVariants = $this->updatingProductVariants($livewire->record, $productVariants);
 
             if ( ! $activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
@@ -69,20 +67,36 @@ class ProductOptionFormAction extends Action
     {
         $outputArray = [];
         foreach ($inputArray[0]['productOptionValues'] as $optionValue1) {
-            foreach ($inputArray[1]['productOptionValues'] as $optionValue2) {
+            if (isset($inputArray[1]['productOptionValues'])) {
+                foreach ($inputArray[1]['productOptionValues'] as $optionValue2) {
+                    $combination = [
+                        [
+                            'option' => $inputArray[0]['name'],
+                            'option_id' => $optionValue1['product_option_id'],
+                            'option_value' => $optionValue1['name'],
+                            'option_value_id' => $optionValue1['id'],
+                        ],
+                        [
+
+                            'option' => $inputArray[1]['name'],
+                            'option_id' => $optionValue2['product_option_id'],
+                            'option_value' => $optionValue2['name'],
+                            'option_value_id' => $optionValue2['id'],
+                        ],
+                    ];
+
+                    $outputArray[] = [
+                        'combination' => $combination,
+                        'id' => uniqid(),
+                    ];
+                }
+            } else {
                 $combination = [
                     [
                         'option' => $inputArray[0]['name'],
                         'option_id' => $optionValue1['product_option_id'],
                         'option_value' => $optionValue1['name'],
                         'option_value_id' => $optionValue1['id'],
-                    ],
-                    [
-
-                        'option' => $inputArray[1]['name'],
-                        'option_id' => $optionValue2['product_option_id'],
-                        'option_value' => $optionValue2['name'],
-                        'option_value_id' => $optionValue2['id'],
                     ],
                 ];
 
