@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\API\USPS;
 
-use Domain\Shipment\DataTransferObjects\ClientQueryParameterData;
 use Domain\Shipment\DataTransferObjects\RateResponseData;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
@@ -14,18 +13,17 @@ class RateClient
     private const URI = 'ShippingAPI.dll';
 
     public function __construct(
-        private readonly Connection $client,
-        readonly ClientQueryParameterData $clientQueryParameterData
+        private readonly Connection $client
     ) {
         $this->client->getClient()->withOptions([ // withQueryParameters() laravel v10.14
             'query' => [
                 'API' => 'RateV4',
-                'XML' => self::buildXMLQueryParameter($client->username, $clientQueryParameterData),
+                'XML' => self::buildXMLQueryParameter($client->username),
             ],
         ]);
     }
 
-    private static function buildXMLQueryParameter(string $username, ClientQueryParameterData $clientQueryParameterData): string
+    private static function buildXMLQueryParameter(string $username): string
     {
         return <<<XML
               <RateV4Request USERID="$username">

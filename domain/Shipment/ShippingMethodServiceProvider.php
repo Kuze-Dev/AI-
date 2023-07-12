@@ -8,9 +8,7 @@ use App\Settings\ShippingSettings;
 use Domain\Payments\Providers\OfflinePayment;
 use Domain\Payments\Providers\PaypalProvider;
 use Domain\Shipment\API\USPS\Connection;
-use Domain\Shipment\API\USPS\RateClient;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
-use Domain\Shipment\DataTransferObjects\ClientQueryParameterData;
 use Domain\Shipment\Drivers\UspsDriver;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Contracts\Support\DeferrableProvider;
@@ -34,18 +32,6 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
                 return new Connection(
                     username: $setting->usps_credentials['username'],
                     password: $setting->usps_credentials['password'],
-                );
-            }
-        );
-
-        $this->app->singleton(
-            RateClient::class,
-            function () {
-                $clientQueryParameterData = new ClientQueryParameterData();
-
-                return new RateClient(
-                    client: app(Connection::class),
-                    clientQueryParameterData: $clientQueryParameterData
                 );
             }
         );
