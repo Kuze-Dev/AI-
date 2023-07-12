@@ -7,7 +7,7 @@ namespace Domain\Order\Actions;
 use Domain\Cart\Models\CartLine;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
-use Domain\Order\Enums\PlaceOrderResult;
+use Domain\Order\Enums\OrderResult;
 use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderAddress;
 use Domain\Order\Models\OrderLine;
@@ -21,7 +21,7 @@ use Illuminate\Support\Str;
 
 class SplitOrderAction
 {
-    public function execute(PreparedOrderData $preparedOrderData, PlaceOrderData $placeOrderData): PlaceOrderResult|Exception
+    public function execute(PreparedOrderData $preparedOrderData, PlaceOrderData $placeOrderData): OrderResult|Exception
     {
         return DB::transaction(function () use ($preparedOrderData, $placeOrderData) {
             try {
@@ -41,7 +41,7 @@ class SplitOrderAction
 
                 DB::commit();
 
-                return PlaceOrderResult::SUCCESS;
+                return OrderResult::SUCCESS;
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::info('Error on SplitOrderAction->execute() ' . $e);

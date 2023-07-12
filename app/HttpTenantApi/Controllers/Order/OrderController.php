@@ -6,16 +6,19 @@ namespace App\HttpTenantApi\Controllers\Order;
 
 use App\HttpTenantApi\Resources\OrderResource;
 use Domain\Order\Actions\PlaceOrderAction;
+use Domain\Order\Actions\UpdateOrderAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
-use Domain\Order\Enums\PlaceOrderResult;
+use Domain\Order\DataTransferObjects\UpdateOrderData;
+use Domain\Order\Enums\OrderResult;
 use Domain\Order\Models\Order;
 use Domain\Order\Requests\PlaceOrderRequest;
+use Domain\Order\Requests\UpdateOrderRequest;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
-    Resource('orders', apiResource: true),
+    Resource('orders', apiResource: true, except: 'destroy'),
     Middleware(['auth:sanctum'])
 ]
 class OrderController
@@ -39,7 +42,7 @@ class OrderController
         $result = app(PlaceOrderAction::class)
             ->execute(PlaceOrderData::fromArray($validatedData));
 
-        if (PlaceOrderResult::SUCCESS != $result) {
+        if (OrderResult::SUCCESS != $result) {
             return response()->json([
                 'message' => 'Order failed to be created'
             ], 400);
@@ -59,5 +62,24 @@ class OrderController
             ->allowedIncludes(['order_lines'])->firstOrFail();
 
         return OrderResource::make($model);
+    }
+
+    public function update(UpdateOrderRequest $request, Order $order)
+    {
+        $validatedData = $request->validated();
+
+        $result = app(UpdateOrderAction::class)
+            ->execute($order, UpdateOrderData::fromArray($validatedData));
+
+        if (OrderResult::SUCCESS != $result) {
+            return response()->json([
+                'message' => 'Order failed to be updated'
+            ], 400);
+        }
+
+        return response()
+            ->json([
+                'message' => 'Order status updated successfully',
+            ]);
     }
 }

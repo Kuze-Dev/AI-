@@ -6,7 +6,7 @@ namespace Domain\Order\Actions;
 
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
-use Domain\Order\Enums\PlaceOrderResult;
+use Domain\Order\Enums\OrderResult;
 use Domain\Order\Models\Order;
 use Illuminate\Support\Str;
 

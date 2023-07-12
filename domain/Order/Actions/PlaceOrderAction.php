@@ -6,7 +6,7 @@ namespace Domain\Order\Actions;
 
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
-use Domain\Order\Enums\PlaceOrderResult;
+use Domain\Order\Enums\OrderResult;
 
 class PlaceOrderAction
 {
@@ -20,6 +20,6 @@ class PlaceOrderAction
             return $result;
         }
 
-        return PlaceOrderResult::FAILED;
+        return OrderResult::FAILED;
     }
 }

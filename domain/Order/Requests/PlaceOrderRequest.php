@@ -8,8 +8,6 @@ use Domain\Address\Models\Address;
 use Domain\Cart\Models\CartLine;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
 class PlaceOrderRequest extends FormRequest
 {
