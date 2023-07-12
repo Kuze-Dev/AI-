@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Domain\Order\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class OrderLine extends Model implements HasMedia
 {
+    use LogsActivity;
     use InteractsWithMedia;
 
     protected $fillable = [
@@ -58,5 +61,13 @@ class OrderLine extends Model implements HasMedia
         $this->addMediaCollection('order_line_notes')
             ->onlyKeepLatest(3)
             ->registerMediaConversions($registerMediaConversions);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

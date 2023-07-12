@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace Domain\Order\Models;
 
+use Domain\Customer\Models\Customer;
 use Domain\Order\Enums\OrderAddressTypes;
+use Domain\Order\Enums\OrderStatuses;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Order extends Model implements HasMedia
 {
+    use LogsActivity;
     use InteractsWithMedia;
 
     protected $fillable = [
@@ -54,6 +59,16 @@ class Order extends Model implements HasMedia
         'cancelled_at' => 'datetime',
     ];
 
+    public function getRouteKeyName(): string
+    {
+        return 'reference';
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
     public function order_lines()
     {
         return $this->hasMany(OrderLine::class);
@@ -78,5 +93,13 @@ class Order extends Model implements HasMedia
         $this->addMediaCollection('bank_proof_image')
             ->onlyKeepLatest(3)
             ->registerMediaConversions($registerMediaConversions);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

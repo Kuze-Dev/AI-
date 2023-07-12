@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Order;
 
+use App\HttpTenantApi\Resources\OrderResource;
 use Domain\Order\Actions\PlaceOrderAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\Enums\PlaceOrderResult;
+use Domain\Order\Models\Order;
 use Domain\Order\Requests\PlaceOrderRequest;
+use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
 
@@ -17,6 +20,18 @@ use Spatie\RouteAttributes\Attributes\Resource;
 ]
 class OrderController
 {
+    public function index()
+    {
+        return OrderResource::collection(
+            QueryBuilder::for(
+                Order::whereBelongsTo(auth()->user())
+            )
+                ->allowedFilters(['status'])
+                ->allowedSorts(['reference', 'total', 'status', 'created_at'])
+                ->jsonPaginate()
+        );
+    }
+
     public function store(PlaceOrderRequest $request)
     {
         $validatedData = $request->validated();
