@@ -193,7 +193,7 @@ class OrderResource extends Resource
         return [
             'index' => OrderResource\Pages\ListOrders::route('/'),
             'view' => OrderResource\Pages\ViewOrder::route('/{record}'),
-            // 'details' => OrderResource\Pages\ViewOrderDetails::route('/details/{record}'),
+            'details' => OrderResource\Pages\ViewOrderDetails::route('/details/{record}'),
         ];
     }
 
@@ -316,7 +316,7 @@ class OrderResource extends Resource
                             ->modalHeading('Proof of Payment')
                             ->modalWidth('lg')
                             ->form([
-                                Forms\Components\Select::make('remarks')
+                                Forms\Components\Select::make('payment_status')
                                     ->label('')
                                     ->options([
                                         'Approved' => 'Approved',

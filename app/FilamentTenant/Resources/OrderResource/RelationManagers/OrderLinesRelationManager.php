@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\OrderResource\RelationManagers;
 
+use App\FilamentTenant\Resources\OrderResource;
 use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\ProductVariant;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -21,8 +22,7 @@ class OrderLinesRelationManager extends RelationManager
 
     public function viewDetails()
     {
-        dd("view kosang lando");
-        // return redirect(OrderResource::getUrl('details', ['record' => $this->ownerRecord]));
+        return redirect(OrderResource::getUrl('details', ['record' => $this->ownerRecord]));
     }
 
     protected function getTableHeader(): View | Htmlable | null
