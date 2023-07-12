@@ -8,6 +8,7 @@ use App\Settings\ShippingSettings;
 use Domain\Payments\Providers\OfflinePayment;
 use Domain\Payments\Providers\PaypalProvider;
 use Domain\Shipment\API\USPS\Connection;
+use Domain\Shipment\API\USPS\RateClient;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\DataTransferObjects\ClientQueryParameterData;
 use Domain\Shipment\Drivers\UspsDriver;
@@ -18,7 +19,7 @@ use InvalidArgumentException;
 
 class ShippingMethodServiceProvider extends ServiceProvider implements DeferrableProvider
 {
-    public function register()
+    public function register(): void
     {
         $this->app->singleton(
             ShippingManagerInterface::class,
@@ -27,14 +28,24 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
 
         $this->app->singleton(
             Connection::class,
-            function ($app) {
+            function () {
                 $setting = app(ShippingSettings::class);
-                $clientQueryParameterData = new ClientQueryParameterData();
 
                 return new Connection(
                     username: $setting->usps_credentials['username'],
                     password: $setting->usps_credentials['password'],
-                    clientQueryParameterData: $clientQueryParameterData,
+                );
+            }
+        );
+
+        $this->app->singleton(
+            RateClient::class,
+            function () {
+                $clientQueryParameterData = new ClientQueryParameterData();
+
+                return new RateClient(
+                    client: app(Connection::class),
+                    clientQueryParameterData: $clientQueryParameterData
                 );
             }
         );
@@ -64,9 +75,8 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
 
     }
 
-    public function provides()
+    public function provides(): array
     {
-
         return [
             ShippingManagerInterface::class,
         ];
