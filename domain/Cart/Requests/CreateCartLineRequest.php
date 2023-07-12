@@ -20,7 +20,14 @@ class CreateCartLineRequest extends FormRequest
             ],
             'variant_id' => [
                 'nullable',
-                Rule::exists(ProductVariant::class, 'id'),
+                Rule::exists(ProductVariant::class, 'id')->where(function ($query) {
+                    $purchasableId = $this->input('purchasable_id');
+                    $purchasableType = $this->input('purchasable_type');
+
+                    if ($purchasableType === 'Product') {
+                        $query->where('product_id', $purchasableId);
+                    }
+                }),
             ],
             'purchasable_type' => [
                 'required',
@@ -33,13 +40,13 @@ class CreateCartLineRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $purchasableId = $this->input('purchasable_id');
 
-                    if (!$purchasableId) {
+                    if ( ! $purchasableId) {
                         $fail('Invalid product.');
                     }
 
                     $product = Product::find($purchasableId);
 
-                    if (!$product) {
+                    if ( ! $product) {
                         $fail('Invalid product.');
 
                         return;

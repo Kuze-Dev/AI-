@@ -31,9 +31,10 @@ class UpdateCartLineRequest extends FormRequest
 
                     if ($value > $purchasable->stock) {
                         $fail('Quantity exceeds stock');
+
                         return;
                     }
-                }
+                },
             ],
             'remarks' => [
                 'nullable',
