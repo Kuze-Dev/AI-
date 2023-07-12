@@ -58,12 +58,13 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
+        // return $order;
         $this->authorize('view', $order);
 
         $model = QueryBuilder::for(
-            $order->whereBelongsTo(auth()->user())
+            $order->whereBelongsTo(auth()->user())->whereReference($order->reference)
         )
-            ->allowedIncludes(['orderLines'])->firstOrFail();
+            ->allowedIncludes(['orderLines'])->first();
 
         return OrderResource::make($model);
     }
