@@ -7,6 +7,6 @@ use Spatie\LaravelSettings\Migrations\SettingsMigration;
 return new class () extends SettingsMigration {
     public function up(): void
     {
-        $this->migrator->add('site.domain', '');
+        $this->migrator->add('site.front_end_domain', '');
     }
 };
