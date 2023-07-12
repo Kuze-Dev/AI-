@@ -23,8 +23,10 @@ class CustomerRegisterAction
         $this->createCustomerAddress
             ->execute($customer, $customerRegisterData->shippingAddressData);
 
-        $this->createCustomerAddress
-            ->execute($customer, $customerRegisterData->billingAddressData);
+        if ($customerRegisterData->billingAddressData !== null) {
+            $this->createCustomerAddress
+                ->execute($customer, $customerRegisterData->billingAddressData);
+        }
 
         return $customer;
     }

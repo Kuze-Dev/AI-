@@ -120,6 +120,8 @@ class CustomerRegisterRequest extends FormRequest
             password: $validated['password']
         );
 
+        $same = $this->boolean('billing_same_as_shipping');
+
         $shippingAddress = new AddressData(
             label_as: $validated['shipping_label_as'],
             address_line_1: $validated['shipping_address_line_1'],
@@ -127,30 +129,21 @@ class CustomerRegisterRequest extends FormRequest
             zip_code: $validated['shipping_zip_code'],
             city: $validated['shipping_city'],
             is_default_shipping: true,
-            is_default_billing: false,
+            is_default_billing: $same,
         );
 
-        $same = $this->boolean('billing_same_as_shipping');
-
-        $billingAddress = new AddressData(
-            label_as: $same
-                ? $validated['shipping_label_as']
-                : $validated['billing_label_as'],
-            address_line_1: $same
-                ? $validated['shipping_address_line_1']
-                : $validated['billing_address_line_1'],
-            state_id: $same
-                ? (int) $validated['shipping_state_id']
-                : (int) $validated['billing_state_id'],
-            zip_code: $same
-                ? $validated['shipping_zip_code']
-                : $validated['billing_zip_code'],
-            city: $same
-                ? $validated['shipping_city']
-                : $validated['billing_city'],
-            is_default_shipping: false,
-            is_default_billing: true,
-        );
+        $billingAddress = null;
+        if ( ! $same) {
+            $billingAddress = new AddressData(
+                label_as: $validated['billing_label_as'],
+                address_line_1: $validated['billing_address_line_1'],
+                state_id: (int) $validated['billing_state_id'],
+                zip_code: $validated['billing_zip_code'],
+                city:$validated['billing_city'],
+                is_default_shipping: false,
+                is_default_billing: true,
+            );
+        }
 
         return new CustomerRegisterData(
             customerData: $customerData,
