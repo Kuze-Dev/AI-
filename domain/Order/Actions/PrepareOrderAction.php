@@ -33,20 +33,6 @@ class PrepareOrderAction
             ->whereCheckoutReference($placeOrderData->cart_reference)
             ->get();
 
-        // $cartLines = CartLine::with(['purchasable'])
-        //     ->whereCheckoutReference($placeOrderData->cart_reference)
-        //     ->get();
-        // ->reduce(function ($totals, $cartLine) {
-        //     $purchasable = $cartLine->purchasable;
-
-        //     $totals['sub_total'] += $purchasable->selling_price * $cartLine->quantity;
-
-        //     return $totals;
-        // }, [
-        //     'sub_total' => 0,
-        //     'shipping_total' => 0,
-        // ]);
-
         $notes = $placeOrderData->notes;
 
         $orderData =  [
@@ -55,11 +41,8 @@ class PrepareOrderAction
             'billing_address' => $billingAddress,
             'currency' => $currency,
             'cartLine' => $cartLines,
-            // 'totals' => $totals,
             'notes' => $notes,
         ];
-
-        // return $orderData;
 
         return PreparedOrderData::fromArray($orderData);
     }

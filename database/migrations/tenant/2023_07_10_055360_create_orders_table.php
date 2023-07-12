@@ -15,7 +15,7 @@ return new class() extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(Customer::class)->index()->onDelete('cascade');
+            $table->foreignIdFor(Customer::class);
             $table->string('customer_first_name');
             $table->string('customer_last_name');
             $table->string('customer_mobile')->index();
@@ -49,7 +49,7 @@ return new class() extends Migration
         Schema::create('order_addresses', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(Order::class)->index()->onDelete('cascade');
+            $table->foreignIdFor(Order::class);
             $table->enum('type', ['Shipping', 'Billing'])->index();
             $table->string('state');
             $table->string('label_as');
@@ -63,7 +63,7 @@ return new class() extends Migration
         Schema::create('order_lines', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(Order::class)->index()->onDelete('cascade');
+            $table->foreignIdFor(Order::class);
             $table->unsignedInteger('purchasable_id');
             $table->string('purchasable_type')->index();
             $table->string('purchasable_sku');

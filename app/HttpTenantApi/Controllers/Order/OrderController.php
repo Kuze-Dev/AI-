@@ -24,12 +24,9 @@ class OrderController
         $result = app(PlaceOrderAction::class)
             ->execute(PlaceOrderData::fromArray($validatedData));
 
-        // return $result;
-
         if (PlaceOrderResult::SUCCESS != $result) {
             return response()->json([
                 'message' => 'Order failed to be created'
-                // 'message' => $result
             ], 400);
         }
 

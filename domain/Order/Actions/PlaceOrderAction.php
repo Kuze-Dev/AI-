@@ -15,8 +15,6 @@ class PlaceOrderAction
         $payload = app(PrepareOrderAction::class)
             ->execute($placeOrderData);
 
-        // return $payload;
-
         if ($payload instanceof PreparedOrderData) {
             $result = app(SplitOrderAction::class)->execute($payload, $placeOrderData);
             return $result;
