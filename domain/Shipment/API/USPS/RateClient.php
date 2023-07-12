@@ -15,18 +15,12 @@ class RateClient
     public function __construct(
         private readonly Connection $client
     ) {
-        $this->client->getClient()->withOptions([ // withQueryParameters() laravel v10.14
-            'query' => [
-                'API' => 'RateV4',
-                'XML' => self::buildXMLQueryParameter($client->username),
-            ],
-        ]);
     }
 
-    private static function buildXMLQueryParameter(string $username): string
+    public function APIRateV4(): self
     {
-        return <<<XML
-              <RateV4Request USERID="$username">
+        $xml = <<<XML
+              <RateV4Request USERID="{$this->client->username}">
                 <Revision>1</Revision>
                 <Package ID="0">
                     <Service>PRIORITY</Service>
@@ -39,9 +33,31 @@ class RateClient
                 </Package>
             </RateV4Request>
             XML;
+
+        $this->client->getClient()
+            ->withOptions([ // withQueryParameters() laravel v10.14
+                'query' => [
+                    'API' => 'RateV4',
+                    'XML' => $xml,
+                ],
+            ]);
+
+        return $this;
     }
 
-    private function get(): PromiseInterface|Response
+    public function APIIntlRateV2(): self
+    {
+        $this->client->getClient()
+            ->withOptions([ // withQueryParameters() laravel v10.14
+                'query' => [
+                    'API' => 'IntlRateV2',
+                ],
+            ]);
+
+        return $this;
+    }
+
+    public function get(): PromiseInterface|Response
     {
         return $this->client->getClient()->get(self::URI);
     }
