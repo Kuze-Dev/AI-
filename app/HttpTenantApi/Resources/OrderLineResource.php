@@ -24,8 +24,8 @@ class OrderLineResource extends JsonApiResource
             'total' => $this->total,
             'remarks_data' => $this->remarks_data,
             'purchasable_data' => $this->purchasable_data,
-            'remark_images' => $this->getMedia('order_line_notes'),
-            'images' => $this->getMedia('order_line_images'),
+            'remark_images' => $this->getMedia('order_line_notes')->toArray(),
+            'purchasable_images' => $this->getMedia('order_line_images')->toArray(),
         ];
     }
 }

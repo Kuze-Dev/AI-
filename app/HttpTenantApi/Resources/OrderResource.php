@@ -18,14 +18,23 @@ class OrderResource extends JsonApiResource
             'reference' => $this->reference,
             'status' => $this->status,
             'created_at' => $this->created_at?->format('F d, Y H:i:s'),
+            'tax_total' => $this->tax_total,
             'sub_total' => $this->sub_total,
             'discount_total' => $this->discount_total,
+            'shipping_total' => $this->shipping_total,
             'total' => $this->total,
+            'notes' => $this->notes,
+            'shipping_method' => $this->shipping_method,
+            'shipping_details' => $this->shipping_details,
             'payment_method' => $this->payment_method,
             'payment_details' => $this->payment_details,
+            'payment_status' => $this->payment_status,
+            'payment_message' => $this->payment_message,
+            'is_paid' => $this->is_paid,
+            'status' => $this->status,
             'shipping_address' => $this->shipping_address,
             'billing_address' => $this->billing_address,
-            'bank_proof_images' => $this->getMedia('bank_proof_images')
+            'bank_proof_images' => $this->getMedia('bank_proof_images')->toArray()
         ];
     }
 
