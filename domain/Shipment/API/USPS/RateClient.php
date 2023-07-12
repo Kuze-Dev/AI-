@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\API\USPS;
 
-use Domain\Shipment\DataTransferObjects\RateResponseData;
-use GuzzleHttp\Promise\PromiseInterface;
-use Illuminate\Http\Client\Response;
+use Domain\Shipment\DataTransferObjects\RateInternationalV2ResponseData;
+use Domain\Shipment\DataTransferObjects\RateV4ResponseData;
+use Vyuldashev\XmlToArray\XmlToArray;
 
 class RateClient
 {
@@ -17,7 +17,7 @@ class RateClient
     ) {
     }
 
-    public function getV4(): PromiseInterface|Response
+    public function getV4(): RateV4ResponseData
     {
         $xml = <<<XML
               <RateV4Request USERID="{$this->client->username}">
@@ -34,17 +34,22 @@ class RateClient
             </RateV4Request>
             XML;
 
-        return $this->client->getClient()
+        $body = $this->client->getClient()
             ->withOptions([ // TODO: withQueryParameters() laravel v10.14
                 'query' => [
                     'API' => 'RateV4',
                     'XML' => $xml,
                 ],
             ])
-            ->get(self::URI);
+            ->get(self::URI)
+            ->body();
+
+        return new RateV4ResponseData(
+            rate: (float) XmlToArray::convert($body)['RateV4Response']['Package']['Postage']['Rate']
+        );
     }
 
-    public function getInternationalVersion2(): PromiseInterface|Response
+    public function getInternationalVersion2(): RateInternationalV2ResponseData
     {
         $xml = <<<XML
             <IntlRateV2Request USERID="{$this->client->username}" PASSWORD="{$this->client->password}">
@@ -65,17 +70,15 @@ class RateClient
             </IntlRateV2Request>
             XML;
 
-        return $this->client->getClient()
+        $this->client->getClient()
             ->withOptions([ // TODO: withQueryParameters() laravel v10.14
                 'query' => [
                     'API' => 'IntlRateV2',
                     'XML' => $xml,
                 ],
-            ])->get(self::URI);
-    }
+            ])
+            ->get(self::URI);
 
-    public function toDTO(): RateResponseData
-    {
-        return new RateResponseData(rate: 1.2);
+        return new RateInternationalV2ResponseData();
     }
 }

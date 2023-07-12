@@ -38,7 +38,8 @@
         "stancl/tenancy": "^3.6",
         "stechstudio/filament-impersonate": "^2.10",
         "timacdonald/json-api": "^1.0.0-beta.4",
-        "victord11/ssl-certification-health-check": "^1.0"
+        "victord11/ssl-certification-health-check": "^1.0",
+        "vyuldashev/xml-to-array": "^1.1"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",
