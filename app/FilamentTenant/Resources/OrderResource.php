@@ -39,16 +39,16 @@ class OrderResource extends Resource
                                 Forms\Components\Grid::make(2)
                                     ->schema([
                                         Forms\Components\Placeholder::make('first_name')->label('First Name')
-                                            ->content(fn (Order $record): ?string => $record->customer->first_name),
+                                            ->content(fn (Order $record): ?string => $record->customer_first_name),
                                         Forms\Components\Placeholder::make('last_name')->label('Last Name')
-                                            ->content(fn (Order $record): ?string => $record->customer->last_name),
+                                            ->content(fn (Order $record): ?string => $record->customer_last_name),
                                     ]),
                                 Forms\Components\Grid::make(2)
                                     ->schema([
                                         Forms\Components\Placeholder::make('email')->label('Email')
-                                            ->content(fn (Order $record): ?string => $record->customer->email),
+                                            ->content(fn (Order $record): ?string => $record->customer_email),
                                         Forms\Components\Placeholder::make('contact_number')->label("Contact Number")
-                                            ->content(fn (Order $record): ?string => $record->customer->mobile),
+                                            ->content(fn (Order $record): ?string => $record->customer_mobile),
                                     ])
                             ])->collapsible(),
                         Forms\Components\Section::make('Shipping Address')
@@ -87,6 +87,16 @@ class OrderResource extends Resource
                                             ->content(fn (Order $record): ?string => $record->billingAddress->city),
                                         Forms\Components\Placeholder::make('ba_zip_code')->label('Zip Code')
                                             ->content(fn (Order $record): ?string => $record->billingAddress->zip_code),
+                                    ]),
+                            ])->collapsible(),
+                        Forms\Components\Section::make('Payment Method')
+                            ->schema([
+                                Forms\Components\Grid::make(2)
+                                    ->schema([
+                                        Forms\Components\Placeholder::make('card_image')->label('')
+                                            ->content(fn (Order $record): ?string => 'Test Image here'),
+                                        Forms\Components\Placeholder::make('card_info')->label('Card Info')
+                                            ->content(fn (Order $record): ?string => '*************Test'),
                                     ]),
                             ])->collapsible(),
                     ])->columnSpan(2),
@@ -170,11 +180,19 @@ class OrderResource extends Resource
         return false;
     }
 
+    public static function getRelations(): array
+    {
+        return [
+            OrderResource\RelationManagers\OrderLinesRelationManager::class,
+        ];
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => OrderResource\Pages\ListOrders::route('/'),
             'view' => OrderResource\Pages\ViewOrder::route('/{record}'),
+            // 'details' => OrderResource\Pages\ViewOrderDetails::route('/details/{record}'),
         ];
     }
 
@@ -239,8 +257,8 @@ class OrderResource extends Resource
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Order Date")->alignLeft()->size("md")->inline()->readOnly(),
-                        Support\TextLabel::make("created_at")->alignRight()->size("md")->inline()
+                        Support\TextLabel::make("")->label("Order Date")->alignLeft()->size("sm")->inline()->readOnly(),
+                        Support\TextLabel::make("created_at")->alignRight()->size("sm")->inline()
                             ->formatStateUsing(function ($state) {
                                 $format ??= config('tables.date_format');
                                 $formattedState = Carbon::parse($state)
@@ -298,23 +316,23 @@ class OrderResource extends Resource
                     })->fullWidth()->size("md"),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Subtotal")->alignLeft()->size("md")->inline()->readOnly(),
-                        Support\TextLabel::make("sub_total")->alignRight()->size("md")->inline(),
+                        Support\TextLabel::make("")->label("Subtotal")->alignLeft()->size("sm")->inline()->readOnly(),
+                        Support\TextLabel::make("sub_total")->alignRight()->size("sm")->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Shipping Fee")->alignLeft()->size("md")->inline()->readOnly(),
-                        Support\TextLabel::make("shipping_total")->alignRight()->size("md")->inline(),
+                        Support\TextLabel::make("")->label("Shipping Fee")->alignLeft()->size("sm")->inline()->readOnly(),
+                        Support\TextLabel::make("shipping_total")->alignRight()->size("sm")->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Discount")->alignLeft()->size("md")->inline()->readOnly(),
-                        Support\TextLabel::make("discount_total")->alignRight()->size("md")->inline(),
+                        Support\TextLabel::make("")->label("Discount")->alignLeft()->size("sm")->inline()->readOnly(),
+                        Support\TextLabel::make("discount_total")->alignRight()->size("sm")->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Grand Total")->alignLeft()->size("lg")->color("primary")->inline()->readOnly(),
-                        Support\TextLabel::make("total")->alignRight()->size("lg")->color("primary")->inline(),
+                        Support\TextLabel::make("")->label("Grand Total")->alignLeft()->size("md")->color("primary")->inline()->readOnly(),
+                        Support\TextLabel::make("total")->alignRight()->size("md")->color("primary")->inline(),
                     ]),
             ])->columnSpan(1);
     }
