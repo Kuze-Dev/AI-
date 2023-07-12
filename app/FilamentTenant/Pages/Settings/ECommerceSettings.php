@@ -21,7 +21,7 @@ class ECommerceSettings extends TenantBaseSettings
     {
         return [
             Card::make([
-                TextInput::make('domain')
+                TextInput::make('front_end_domain')
                     ->nullable()
                     ->rules([new FullyQualifiedDomainNameRule()])
                     ->maxLength(100)

@@ -8,7 +8,7 @@ use Spatie\LaravelSettings\Settings;
 
 class ECommerceSettings extends Settings
 {
-    public ?string $domain = null;
+    public ?string $front_end_domain = null;
 
     public static function group(): string
     {
@@ -17,7 +17,7 @@ class ECommerceSettings extends Settings
 
     public function domainWithScheme(): ?string
     {
-        if ($this->domain === null) {
+        if ($this->front_end_domain === null) {
             return null;
         }
 
@@ -25,6 +25,6 @@ class ECommerceSettings extends Settings
          * query?: string, fragment?: string}|false. */
         $scheme = parse_url(config('app.url'))['scheme'];
 
-        return $scheme.'://'.$this->domain;
+        return $scheme.'://'.$this->front_end_domain;
     }
 }
