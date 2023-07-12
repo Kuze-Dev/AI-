@@ -50,11 +50,6 @@ class SiteSettings extends BaseSettings
                     ->getUploadedFileNameForStorageUsing(static function (TemporaryUploadedFile $file) {
                         return 'favicon.'.$file->extension();
                     }),
-                TextInput::make('domain')
-                    ->required()
-                    ->rules([new FullyQualifiedDomainNameRule()])
-                    ->maxLength(100)
-                    ->columnSpan('full'),
             ])
                 ->columns(2),
         ];
