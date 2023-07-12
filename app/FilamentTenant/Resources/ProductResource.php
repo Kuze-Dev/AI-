@@ -154,6 +154,7 @@ class ProductResource extends Resource
                                         $newKey = 'record-' . $value['id'];
                                         $newArray[$newKey] = $value;
                                     }
+
                                     return $newArray;
                                 }
                             )

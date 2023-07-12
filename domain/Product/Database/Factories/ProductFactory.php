@@ -40,7 +40,7 @@ class ProductFactory extends Factory
         $blueprint = Blueprint::where('name', 'Image with Heading Block Blueprint')->first();
         $data = (new ProductSeeder())->data();
 
-        if (!$blueprint) {
+        if ( ! $blueprint) {
             $blueprint = Blueprint::create($data['blueprint_for_taxonomy']);
         }
 
@@ -74,7 +74,7 @@ class ProductFactory extends Factory
     {
         $taxonomyTermIds = TaxonomyTerm::whereIn('slug', ['brand-one', 'clothing'])->pluck('id');
 
-        collect($products)->each(function ($productData) use ($taxonomyTermIds, $productOptions, $variantCombinations) {
+        collect($products)->each(function ($productData) use ($taxonomyTermIds, $productOptions) {
             $productImageUrl = $productData['image_url'];
             unset($productData['image_url']);
             $product = Product::create($productData);
@@ -107,10 +107,10 @@ class ProductFactory extends Factory
                 array_push(
                     $optionValues,
                     [
-                        "option_id" => $productOptionModel->id,
-                        "option" => $productOptionModel->name,
-                        "option_value_id" => $optionValueModel->id,
-                        "option_value" => $optionValueModel->name,
+                        'option_id' => $productOptionModel->id,
+                        'option' => $productOptionModel->name,
+                        'option_value_id' => $optionValueModel->id,
+                        'option_value' => $optionValueModel->name,
                     ]
                 );
             }
@@ -120,11 +120,11 @@ class ProductFactory extends Factory
         $variantCombinations = [
             [
                 $combination[0][0],
-                $combination[1][0]
+                $combination[1][0],
             ],
             [
                 $combination[0][0],
-                $combination[1][1]
+                $combination[1][1],
             ],
         ];
 

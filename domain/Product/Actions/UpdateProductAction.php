@@ -38,93 +38,72 @@ class UpdateProductAction
             }
         }
 
-        $toRemoveOptions = [];
-
-
         if (count($productData->product_options)) {
-            // dd($productData->product_options);
             foreach ($productData->product_options[0] as $productOption) {
                 $productOptionModel = ProductOption::findOrNew($productOption['id']);
                 $productOptionModel->name = $productOption['name'];
                 $productOptionModel->save();
 
                 foreach ($productOption['productOptionValues'] as $key => $productOptionValue) {
-                    $optionValueModel = ProductOptionValue::findOrNew($productOptionValue['id']);
-                    $optionValueModel->name = $productOptionValue['name'];
-                    $optionValueModel->product_option_id = $productOptionValue['product_option_id'];
-                    $optionValueModel->save();
+                    $optionValueModel = ProductOptionValue::find($productOptionValue['id']);
 
-                    $productOption['productOptionValues'][$key]['id'] = $optionValueModel->id;
-                }
+                    if ($optionValueModel) {
+                        $optionValueModel->name = $productOptionValue['name'];
+                        $optionValueModel->product_option_id = $productOptionValue['product_option_id'];
+                        $optionValueModel->save();
+                    } else {
+                        $newOptionValueModel = ProductOptionValue::create([
+                            'name' => $productOptionValue['name'],
+                            'product_option_id' => $productOptionValue['product_option_id'],
+                        ]);
 
-                // Remove option values
-                $uwu = array_map(function ($item) {
-                    return $item['id'];
-                }, $productOption['productOptionValues']);
-                // dd($uwu);
-                $toRemoveOptionValues = ProductOptionValue::where('product_option_id', $productOptionModel->id)->whereNotIn('id', $uwu)->get();
-                // dd('to remove shh : ', $toRemoveOptionValues);
-
-                if (count($toRemoveOptionValues->toArray())) {
-                    array_push($toRemoveOptions, array_map(function ($item) use ($productOptionModel) {
-                        return [
-                            'option_id' => $productOptionModel->id,
-                            'option_value_id' => $item['id'],
-                        ];
-                    }, $toRemoveOptionValues->toArray()));
-                }
-                foreach ($toRemoveOptionValues as $optionValue) {
-                    // $optionValue->delete();
-                }
-            }
-
-            // to delete product variant value
-            // dd($toRemoveOptions);
-            // dd($toRemoveOptions);
-            foreach ($toRemoveOptions as $toRemoveOption) {
-                foreach ($toRemoveOption as $toRemove) {
-
-                    $toRemoveProductVariant = ProductVariant::where('product_id', $product->id)
-                        // ->whereHas('combination', function ($query) use ($toRemove){
-                        //     $query->where('option_id', $toRemove['option_id'])
-                        //     ->where('option_value_id', $toRemove['option_value_id']);
-                        // })  
-                        // ->whereHas('combination', $toRemove['option_id'])
-                        // ->whereJsonContains('combination', $toRemove)
-                        ->get();
-
-
-
-                    dd($toRemoveProductVariant);
-                    foreach ($toRemoveProductVariant as $prodVariant) {
-                        $variantCombinations = $prodVariant->combination;
-                        dd($variantCombinations, $toRemove);
-                        foreach($variantCombinations as $key => $combination) {
-                            if ($combination['option_id'] === $toRemove['option_id'] && $combination['option_value_id'] === $toRemove['option_value_id']) {
-                                
-                                    \Log::info('naditooooooooooo ', $key );
-                                // $prodVariant->delete();
-                            }
-                        }
+                        $productOption['productOptionValues'][$key]['id'] = $newOptionValueModel->id;
+                        $productData->product_variants = $this->searchAndChangeValue(
+                            $productOptionValue['id'],
+                            $productData->product_variants,
+                            $newOptionValueModel->id
+                        );
                     }
                 }
+
+                // Removal of Option Values
+                $mappedOptionValueIds = array_map(function ($item) {
+                    return $item['id'];
+                }, $productOption['productOptionValues']);
+                $toRemoveOptionValues = ProductOptionValue::where(
+                    'product_option_id',
+                    $productOptionModel->id
+                )->whereNotIn('id', $mappedOptionValueIds)->get();
+                foreach ($toRemoveOptionValues as $optionValue) {
+                    $optionValue->delete();
+                }
             }
         }
 
-        foreach ($productData->product_variants as $productVariant) {
-            $productVariantModel = ProductVariant::findOrNew($productVariant['id']);
+        if (count($productData->product_variants)) {
+            // Remove of Product Variants
+            $mappedVariantIds = array_map(function ($item) {
+                return $item['id'];
+            }, $productData->product_variants);
+            $toRemoveProductVariants = ProductVariant::where('product_id', $product->id)
+                ->whereNotIn('id', $mappedVariantIds)->get();
+            foreach ($toRemoveProductVariants as $productVariant) {
+                $productVariant->delete();
+            }
 
-            $productVariantModel->product_id = $product['id'];
-            $productVariantModel->sku = $productVariant['sku'];
-            $productVariantModel->combination = $productVariant['combination'];
-            $productVariantModel->retail_price = $productVariant['retail_price'];
-            $productVariantModel->selling_price = $productVariant['selling_price'];
-            $productVariantModel->stock = $productVariant['stock'];
-            $productVariantModel->status = $productVariant['status'];
-            $productVariantModel->save();
+            foreach ($productData->product_variants as $productVariant) {
+                $productVariantModel = ProductVariant::findOrNew($productVariant['id']);
+
+                $productVariantModel->product_id = $product['id'];
+                $productVariantModel->sku = $productVariant['sku'];
+                $productVariantModel->combination = $productVariant['combination'];
+                $productVariantModel->retail_price = $productVariant['retail_price'];
+                $productVariantModel->selling_price = $productVariant['selling_price'];
+                $productVariantModel->stock = $productVariant['stock'];
+                $productVariantModel->status = $productVariant['status'];
+                $productVariantModel->save();
+            }
         }
-
-
 
         if ($productData->images === null) {
             $product->clearMediaCollection('image');
@@ -133,6 +112,19 @@ class UpdateProductAction
         $product->taxonomyTerms()->sync($productData->taxonomy_terms);
 
         return $product;
+    }
+
+    private function searchAndChangeValue($needle, &$haystack, $newValue)
+    {
+        foreach ($haystack as $key => $variant) {
+            foreach ($variant['combination'] as $key2 => $combination) {
+                if ($combination['option_value_id'] == $needle) {
+                    $haystack[$key]['combination'][$key2]['option_value_id'] = $newValue;
+                }
+            }
+        }
+
+        return $haystack;
     }
 
     protected function getProductAttributes(ProductData $productData): array

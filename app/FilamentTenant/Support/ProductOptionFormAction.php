@@ -19,6 +19,52 @@ class ProductOptionFormAction extends Action
         return 'product-option-form';
     }
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->modalHeading(function (HasProductOptions $livewire) {
+            $productOptionComponent = $livewire->getProductOptionComponent();
+
+            $name = (string) Str::of($productOptionComponent->getName())->headline()->singular();
+
+            return trans('Manage :name', ['name' => $name]);
+        });
+
+        $this->slideOver(true);
+
+        $this->mountUsing(function (HasProductOptions $livewire, ComponentContainer $form) {
+            if ( ! $activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
+                return;
+            }
+
+            $state = data_get($livewire, $activeProductOptionStatePath) ?? [];
+            $form->fill($state);
+        });
+
+        $this->form(fn (HasProductOptions $livewire) => $livewire->getProductOptionFormSchema());
+
+        $this->action(function (HasProductOptions $livewire, array $data) {
+            $optionsWithProxies = $this->assignProxiesToProductOption($data['options']);
+
+            $data['options'] = $optionsWithProxies;
+
+            $productVariants = $this->generateCombinations($optionsWithProxies);
+
+            $updatedVariants = $this->updatingProductVariants($livewire->record, $productVariants);
+
+            if ( ! $activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
+                return;
+            }
+
+            $oldData = data_get($livewire, $activeProductOptionStatePath) ?? [];
+            data_set($livewire, $activeProductOptionStatePath, array_merge($oldData, $data));
+            data_set($livewire, 'data.product_options', array_merge($oldData, $data));
+            data_set($livewire, 'data.product_variants', $updatedVariants);
+            $livewire->unmountProductOptionItem();
+        });
+    }
+
     private function generateCombinations($inputArray)
     {
         $outputArray = [];
@@ -39,85 +85,61 @@ class ProductOptionFormAction extends Action
                         'option_value_id' => $optionValue2['id'],
                     ],
                 ];
-        
+
                 $outputArray[] = [
                     'combination' => $combination,
                     'id' => uniqid(),
                 ];
             }
         }
+
         return $outputArray;
     }
 
     private function assignProxiesToProductOption(array $options): array
     {
         foreach ($options as &$option) {
-            if (!isset($option['id'])) {
+            if ( ! isset($option['id'])) {
                 $option['id'] = uniqid();
             }
-            if (!isset($option['slug'])) {
+
+            if ( ! isset($option['slug'])) {
                 $option['slug'] = $option['name'];
             }
 
             foreach ($option['productOptionValues'] as &$value) {
-                if (!isset($value['id'])) {
+                if ( ! isset($value['id'])) {
                     $value['id'] = uniqid();
                 }
-                if (!isset($value['slug'])) {
+                if ( ! isset($value['slug'])) {
                     $value['slug'] = $value['name'];
                 }
-                if (!isset($value['product_option_id'])) {
+                if ( ! isset($value['product_option_id'])) {
                     $value['product_option_id'] = $option['id'];
                 }
             }
         }
+
         return $options;
     }
 
-    protected function setUp(): void
+    private function hasMatchingCombination($combination1, $combination2)
     {
-        parent::setUp();
+        foreach ($combination1 as $option1) {
+            $matched = false;
+            foreach ($combination2 as $option2) {
+                if ($option1['option_id'] === $option2['option_id'] && $option1['option_value_id'] === $option2['option_value_id']) {
+                    $matched = true;
 
-        $this->modalHeading(function (HasProductOptions $livewire) {
-            $productOptionComponent = $livewire->getProductOptionComponent();
-
-            $name = (string) Str::of($productOptionComponent->getName())->headline()->singular();
-
-            return trans('Manage :name', ['name' => $name]);
-        });
-
-        $this->slideOver(true);
-
-        $this->mountUsing(function (HasProductOptions $livewire, ComponentContainer $form) {
-            if (!$activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
-                return;
+                    break;
+                }
             }
-
-            $state = data_get($livewire, $activeProductOptionStatePath) ?? [];
-            $form->fill($state);
-        });
-
-        $this->form(fn (HasProductOptions $livewire) => $livewire->getProductOptionFormSchema());
-
-        $this->action(function (HasProductOptions $livewire, array $data) {
-            $optionsWithProxies = $this->assignProxiesToProductOption($data['options']);
-
-            $data['options'] = $optionsWithProxies;
-            
-            $productVariants = $this->generateCombinations($optionsWithProxies);
-            
-            $updatedVariants = $this->updatingProductVariants($livewire->record, $productVariants);
-
-            if (!$activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
-                return;
+            if ( ! $matched) {
+                return false;
             }
+        }
 
-            $oldData = data_get($livewire, $activeProductOptionStatePath) ?? [];
-            data_set($livewire, $activeProductOptionStatePath, array_merge($oldData, $data));
-            data_set($livewire, 'data.product_options', array_merge($oldData, $data));
-            data_set($livewire, 'data.product_variants', $updatedVariants);
-            $livewire->unmountProductOptionItem();
-        });
+        return true;
     }
 
     private function updatingProductVariants(Product $record, array $productVariants)
@@ -126,14 +148,21 @@ class ProductOptionFormAction extends Action
         $newCombination = $productVariants;
         $mergedCombination = [];
 
-        foreach ($newCombination as $key => $item) {
-            if (array_key_exists($key, $existingCombination)) {
-                unset($item['id']);
-                $mergedCombination[$key] = array_replace($existingCombination[$key], $item);
-            } else {
-                $mergedCombination[$key] = $item;
+        foreach ($newCombination as $item1) {
+            $hasMerged = false;
+            foreach ($existingCombination as $item2) {
+                if ($this->hasMatchingCombination($item1['combination'], $item2['combination'])) {
+                    $mergedItem = array_replace($item2, $item1);
+                    $mergedCombination[] = $mergedItem;
+                    $hasMerged = true;
+                }
+            }
+
+            if ( ! $hasMerged) {
+                $mergedCombination[] = $item1;
             }
         }
+
         $result = [];
 
         foreach ($mergedCombination as $key => $combination) {

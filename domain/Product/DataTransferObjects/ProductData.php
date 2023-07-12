@@ -25,7 +25,7 @@ class ProductData
         public readonly array $taxonomy_terms = [],
         public readonly ?float $weight = null,
         public readonly ?array $product_options = null,
-        public readonly ?array $product_variants = null,
+        public ?array $product_variants = null,
         public readonly ?float $length = null,
         public readonly ?float $width = null,
         public readonly ?float $height = null,
