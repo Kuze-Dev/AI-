@@ -14,7 +14,9 @@ it('log settings', function () {
     $user = loginAsSuperAdmin();
 
     $setting = app(SiteSettings::class);
-    $old = $setting->toCollection()->map(fn ($value) => blank($value) ? null : $value)->toArray();
+    $old = $setting->toCollection()
+        ->except('front_end_domain')
+        ->map(fn ($value) => blank($value) ? null : $value)->toArray();
 
     livewire(SiteSettingsForm::class)
         ->fillForm([
@@ -23,7 +25,6 @@ it('log settings', function () {
             'author' => 'new author',
             'logo' => UploadedFile::fake()->image('test.png'),
             'favicon' => UploadedFile::fake()->image('test.png'),
-            'domain' => 'example-new.com',
         ])
         ->call('save')
         ->assertHasNoFormErrors();
@@ -34,7 +35,10 @@ it('log settings', function () {
         'log_name' => 'admin',
         'description' => 'Site Settings updated',
         'properties' => json_encode([
-            'attributes' => app(SiteSettings::class)->toArray(),
+            'attributes' => app(SiteSettings::class)
+                ->toCollection()
+                ->except('front_end_domain')
+                ->toArray(),
             'old' => $old,
         ]),
     ]);
