@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Domain\Shipment;
 
 use App\Settings\ShippingSettings;
-use Domain\Shipment\API\USPS\Connection;
+use Domain\Shipment\API\USPS\Client;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\Drivers\UspsDriver;
 use Domain\ShippingMethod\Models\ShippingMethod;
@@ -23,11 +23,11 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
         );
 
         $this->app->singleton(
-            Connection::class,
+            Client::class,
             function () {
                 $setting = app(ShippingSettings::class);
 
-                return new Connection(
+                return new Client(
                     username: $setting->usps_credentials['username'],
                     password: $setting->usps_credentials['password'],
                     isProduction: $setting->usps_mode,
@@ -64,7 +64,7 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
     {
         return [
             ShippingManagerInterface::class,
-            Connection::class,
+            Client::class,
         ];
     }
 }

@@ -13,7 +13,7 @@ class RateClient
     private const URI = 'ShippingAPI.dll';
 
     public function __construct(
-        private readonly Connection $client
+        private readonly Client $client
     ) {
     }
 

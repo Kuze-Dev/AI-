@@ -7,7 +7,7 @@ namespace Domain\Shipment\API\USPS;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 
-final class Connection
+final class Client
 {
     public const PRODUCTION_URL = 'https://secure.shippingapis.com';
     public const SANDBOX_URL = 'http://production.shippingapis.com';
