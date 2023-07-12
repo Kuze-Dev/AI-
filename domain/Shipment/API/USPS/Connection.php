@@ -15,7 +15,7 @@ final class Connection
 
     public function __construct(
         public readonly string $username,
-        readonly string $password,
+        public readonly string $password,
         readonly bool $isSandbox = true,
     ) {
         $this->client = Http::baseUrl(

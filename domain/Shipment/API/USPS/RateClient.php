@@ -35,7 +35,7 @@ class RateClient
             XML;
 
         $this->client->getClient()
-            ->withOptions([ // withQueryParameters() laravel v10.14
+            ->withOptions([ // TODO: withQueryParameters() laravel v10.14
                 'query' => [
                     'API' => 'RateV4',
                     'XML' => $xml,
@@ -47,10 +47,30 @@ class RateClient
 
     public function APIIntlRateV2(): self
     {
+        $xml = <<<XML
+            <IntlRateV2Request USERID="{$this->client->username}" PASSWORD="{$this->client->password}">
+            <Revision>2</Revision>
+                <Package ID="1">
+                    <Pounds>15.12345678</Pounds>
+                    <Ounces>0</Ounces>
+                    <MailType>Package</MailType>
+                    <ValueOfContents>200</ValueOfContents>
+                    <Country>Philippines</Country>
+                    <Width>10</Width>
+                    <Length>15</Length>
+                    <Height>10</Height>
+                    <OriginZip>18701</OriginZip>
+                    <AcceptanceDateTime>2023-07-14T13:15:00-06:00</AcceptanceDateTime>
+                    <DestinationPostalCode>1603</DestinationPostalCode>
+                </Package>
+            </IntlRateV2Request>
+            XML;
+
         $this->client->getClient()
-            ->withOptions([ // withQueryParameters() laravel v10.14
+            ->withOptions([ // TODO: withQueryParameters() laravel v10.14
                 'query' => [
                     'API' => 'IntlRateV2',
+                    'XML' => $xml,
                 ],
             ]);
 
