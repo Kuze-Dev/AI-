@@ -73,7 +73,7 @@ return new class () extends Migration {
             $table->foreignIdFor(Discount::class)
                 ->index()
                 ->nullable();
-            // $table->foreignIdFor(Customer::class);
+            $table->foreignIdFor(Customer::class);
             // $table->foreignIdFor(Order::class);
 
             $table->string('code')->index();

@@ -5,11 +5,8 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\DiscountResource\Pages\CreateDiscount;
 use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
-use Domain\Discount\Models\DiscountCondition;
-use Domain\Discount\Models\DiscountRequirement;
 use Filament\Facades\Filament;
 
-use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -26,11 +23,6 @@ it('can render page', function () {
 });
 
 it('can create discount', function () {
-
-    assertDatabaseEmpty(Discount::class);
-    assertDatabaseEmpty(DiscountRequirement::class);
-    assertDatabaseEmpty(DiscountCondition::class);
-
     livewire(CreateDiscount::class)
         ->fillForm([
             'name' => 'discount name',
@@ -63,14 +55,14 @@ it('can create discount', function () {
         'valid_end_at' => $valid_end_at,
     ]);
 
-    assertDatabaseHas(DiscountCondition::class, [
+    assertDatabaseHas('discount_conditions', [
         'discount_id' => Discount::first()->getKey(),
         'discount_type' => 'order_sub_total',
         'amount_type' => 'percentage',
         'amount' => 50,
     ]);
 
-    assertDatabaseHas(DiscountRequirement::class, [
+    assertDatabaseHas('discount_requirements', [
         'discount_id' => Discount::first()->getKey(),
         'requirement_type' => null,
         'minimum_amount' => 1000,

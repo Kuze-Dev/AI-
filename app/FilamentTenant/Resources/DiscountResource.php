@@ -27,7 +27,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
-use Filament\Tables;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
@@ -40,6 +39,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 use Str;
+use Illuminate\Database\Eloquent\Builder;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class DiscountResource extends Resource
@@ -176,10 +176,10 @@ class DiscountResource extends Resource
                 TextColumn::make('name'),
                 TextColumn::make('discountCondition.amount')
                     ->formatStateUsing(function ($record) {
-                        return $record?->discountCondition?->amount_type === DiscountAmountType::PERCENTAGE
-                            ? (string) $record?->discountCondition?->amount . '%'
-                            : ($record?->discountCondition?->amount_type === DiscountAmountType::FIXED_VALUE
-                                ? (string) $record?->discountCondition?->amount . 'PHP'
+                        return $record->discountCondition->amount_type === DiscountAmountType::PERCENTAGE
+                            ? (string) $record->discountCondition->amount . '%'
+                            : ($record->discountCondition->amount_type === DiscountAmountType::FIXED_VALUE
+                                ? (string) $record->discountCondition->amount . 'PHP'
                                 : null);
                     })
                     ->label(trans('Amount')),
@@ -247,6 +247,7 @@ class DiscountResource extends Resource
         ];
     }
 
+    /** @return Builder<\Domain\Discount\Models\Discount> */
     public static function getEloquentQuery(): EloquentBuilder
     {
         return parent::getEloquentQuery()
