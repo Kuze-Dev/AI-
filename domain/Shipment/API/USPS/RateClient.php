@@ -17,7 +17,7 @@ class RateClient
     ) {
     }
 
-    public function APIRateV4(): self
+    public function getV4(): PromiseInterface|Response
     {
         $xml = <<<XML
               <RateV4Request USERID="{$this->client->username}">
@@ -34,18 +34,17 @@ class RateClient
             </RateV4Request>
             XML;
 
-        $this->client->getClient()
+        return $this->client->getClient()
             ->withOptions([ // TODO: withQueryParameters() laravel v10.14
                 'query' => [
                     'API' => 'RateV4',
                     'XML' => $xml,
                 ],
-            ]);
-
-        return $this;
+            ])
+            ->get(self::URI);
     }
 
-    public function APIIntlRateV2(): self
+    public function getInternationalVersion2(): PromiseInterface|Response
     {
         $xml = <<<XML
             <IntlRateV2Request USERID="{$this->client->username}" PASSWORD="{$this->client->password}">
@@ -66,20 +65,13 @@ class RateClient
             </IntlRateV2Request>
             XML;
 
-        $this->client->getClient()
+        return $this->client->getClient()
             ->withOptions([ // TODO: withQueryParameters() laravel v10.14
                 'query' => [
                     'API' => 'IntlRateV2',
                     'XML' => $xml,
                 ],
-            ]);
-
-        return $this;
-    }
-
-    public function get(): PromiseInterface|Response
-    {
-        return $this->client->getClient()->get(self::URI);
+            ])->get(self::URI);
     }
 
     public function toDTO(): RateResponseData
