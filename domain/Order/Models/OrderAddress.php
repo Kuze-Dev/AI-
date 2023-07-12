@@ -45,6 +45,7 @@ class OrderAddress extends Model
     protected $fillable = [
         'order_id',
         'type',
+        'country',
         'state',
         'label_as',
         'address_line_1',

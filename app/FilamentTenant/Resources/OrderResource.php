@@ -59,7 +59,7 @@ class OrderResource extends Resource
                                 Forms\Components\Grid::make(2)
                                     ->schema([
                                         Forms\Components\Placeholder::make('sa_country')->label('Country')
-                                            ->content(fn (Order $record): ?string => 'Test Country'),
+                                            ->content(fn (Order $record): ?string => $record->shippingAddress->country),
                                         Forms\Components\Placeholder::make('sa_state')->label('State')
                                             ->content(fn (Order $record): ?string => $record->shippingAddress->state),
                                     ]),
@@ -78,7 +78,7 @@ class OrderResource extends Resource
                                 Forms\Components\Grid::make(2)
                                     ->schema([
                                         Forms\Components\Placeholder::make('ba_country')->label('Country')
-                                            ->content(fn (Order $record): ?string => 'Test Country'),
+                                            ->content(fn (Order $record): ?string => $record->billingAddress->country),
                                         Forms\Components\Placeholder::make('ba_state')->label('State')
                                             ->content(fn (Order $record): ?string => $record->billingAddress->state),
                                     ]),
