@@ -48,6 +48,7 @@ class OrderLinesRelationManager extends RelationManager
                             $variantString = implode(' / ', array_map('ucfirst', $variant));
                             return $variantString;
                         }
+                        return "";
                     })
                     ->alignLeft(),
                 Tables\Columns\TextColumn::make('unit_price')->label('Unit Price'),

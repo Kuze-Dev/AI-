@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use Closure;
+use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 
 class OrderResource extends Resource
@@ -312,6 +313,18 @@ class OrderResource extends Resource
                             ->size('sm')
                             ->action(function () use ($get, $set) {
                             })
+                            ->modalHeading('Proof of Payment')
+                            ->modalWidth('lg')
+                            ->form([
+                                Forms\Components\Select::make('remarks')
+                                    ->label('')
+                                    ->options([
+                                        'Approved' => 'Approved',
+                                        'Declined' => 'Declined'
+                                    ]),
+                                Forms\Components\Textarea::make('Message')
+                            ])
+                            ->slideOver()
                             ->icon('heroicon-s-eye');
                     })->fullWidth()->size("md"),
                 Forms\Components\Grid::make(2)
