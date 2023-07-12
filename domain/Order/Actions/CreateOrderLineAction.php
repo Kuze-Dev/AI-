@@ -20,7 +20,7 @@ class CreateOrderLineAction
             $name = null;
             if ($cartLine->purchasable instanceof Product) {
                 $name = $cartLine->purchasable->name;
-            } else if ($cartLine->purchasable instanceof ProductVariant) {
+            } elseif ($cartLine->purchasable instanceof ProductVariant) {
                 $name = $cartLine->purchasable->product->name;
             }
 
@@ -40,13 +40,13 @@ class CreateOrderLineAction
                 'discount_total' => 0,
                 'total' => $total,
                 'remarks_data' => $cartLine->remarks,
-                'purchasable_data' => $cartLine->purchasable
+                'purchasable_data' => $cartLine->purchasable,
             ]);
 
             if ($cartLine->purchasable instanceof Product) {
                 $purchasableMedias = $cartLine->purchasable->getMedia('image');
                 $this->copyMediaToOrderLine($orderLine, $purchasableMedias, 'order_line_images');
-            } else if ($cartLine->purchasable instanceof ProductVariant) {
+            } elseif ($cartLine->purchasable instanceof ProductVariant) {
                 $purchasableMedias = $cartLine->purchasable->product->getMedia('image');
                 $this->copyMediaToOrderLine($orderLine, $purchasableMedias, 'order_line_images');
             }

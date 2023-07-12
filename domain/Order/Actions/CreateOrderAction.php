@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Order\Actions;
 
-use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
-use Domain\Order\Enums\OrderResult;
 use Domain\Order\Models\Order;
 use Illuminate\Support\Str;
 
@@ -37,7 +35,7 @@ class CreateOrderAction
             'currency_name' => $preparedOrderData->currency->name,
             'currency_exchange_rate' => $preparedOrderData->currency->exchange_rate,
 
-            'reference' =>  $referenceNumber,
+            'reference' => $referenceNumber,
 
             'tax_total' => 0,
             'sub_total' => $subTotal,
@@ -46,11 +44,11 @@ class CreateOrderAction
             'total' => $total,
 
             'notes' => $preparedOrderData->notes,
-            'shipping_method' => "test shipping_method",
-            'shipping_details' => "test shipping details",
-            'payment_method' => "COD",
-            'payment_details' => "test payment details",
-            'is_paid' => false
+            'shipping_method' => 'test shipping_method',
+            'shipping_details' => 'test shipping details',
+            'payment_method' => 'COD',
+            'payment_details' => 'test payment details',
+            'is_paid' => false,
         ]);
 
         return $order;

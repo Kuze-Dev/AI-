@@ -44,7 +44,7 @@ class OrderController
 
         if (OrderResult::SUCCESS != $result) {
             return response()->json([
-                'message' => 'Order failed to be created'
+                'message' => 'Order failed to be created',
             ], 400);
         }
 
@@ -73,7 +73,7 @@ class OrderController
 
         if (OrderResult::SUCCESS != $result) {
             return response()->json([
-                'message' => 'Order failed to be updated'
+                'message' => 'Order failed to be updated',
             ], 400);
         }
 

@@ -33,7 +33,6 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string $first_name
  * @property string $last_name
  * @property string $mobile
- * @property \Domain\Customer\Enums\Gender $gender
  * @property Status $status
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon $birth_date
@@ -41,6 +40,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property Gender $gender
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Address> $addresses

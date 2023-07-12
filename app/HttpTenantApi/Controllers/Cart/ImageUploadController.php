@@ -6,7 +6,6 @@ namespace App\HttpTenantApi\Controllers\Cart;
 
 use Spatie\RouteAttributes\Attributes\Post;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;

@@ -6,8 +6,6 @@ namespace App\HttpTenantApi\Controllers\Cart;
 
 use Domain\Cart\Actions\BulkDestroyCartLineAction;
 use Domain\Cart\Models\CartLine;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -51,7 +49,7 @@ class CartLinesRemoveController
         $result = app(BulkDestroyCartLineAction::class)
             ->execute($cartLineIds);
 
-        if (!$result) {
+        if ( ! $result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

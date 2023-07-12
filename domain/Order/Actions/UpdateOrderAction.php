@@ -8,6 +8,7 @@ use Domain\Order\DataTransferObjects\UpdateOrderData;
 use Domain\Order\Enums\OrderResult;
 use Domain\Order\Models\Order;
 use Exception;
+use Log;
 
 class UpdateOrderAction
 {
@@ -15,7 +16,7 @@ class UpdateOrderAction
     {
         try {
             if ($updateOrderData->status) {
-                if ($updateOrderData->status == "For Cancellation") {
+                if ($updateOrderData->status == 'For Cancellation') {
                     $order->update([
                         'status' => $updateOrderData->status,
                         'cancelled_reason' => $updateOrderData->notes,
@@ -28,21 +29,20 @@ class UpdateOrderAction
                 }
             }
 
-
             $order->clearMediaCollection('bank_proof_images');
             if ($updateOrderData->bank_proof_medias !== null) {
                 foreach ($updateOrderData->bank_proof_medias as $imageUrl) {
                     try {
                         $order->addMediaFromUrl($imageUrl)
                             ->toMediaCollection('bank_proof_images');
-                    } catch (\Exception $e) {
-                        \Log::info($e);
+                    } catch (Exception $e) {
+                        Log::info($e);
                     }
                 }
             }
 
             return OrderResult::SUCCESS;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $e;
         }
     }

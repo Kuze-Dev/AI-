@@ -20,7 +20,6 @@ beforeEach(fn () => testInTenantContext());
 
 it('can list all available discounts', function () {
 
-
     assertDatabaseEmpty(Discount::class);
     assertDatabaseEmpty(DiscountCondition::class);
     assertDatabaseEmpty(DiscountRequirement::class);

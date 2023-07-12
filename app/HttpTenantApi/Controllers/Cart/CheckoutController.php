@@ -10,12 +10,9 @@ use Domain\Cart\DataTransferObjects\CheckoutData;
 use Domain\Cart\Enums\CartActionResult;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CheckoutRequest;
-use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\RouteAttributes\Attributes\Middleware;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Resource;
@@ -34,7 +31,7 @@ class CheckoutController
 
         $reference = $validated['reference'];
 
-        if (!$reference) {
+        if ( ! $reference) {
             return response()->json([
                 'message' => 'Invalid reference.',
             ], 400);
@@ -58,7 +55,7 @@ class CheckoutController
             // Check if there are expired cart lines
             if ($expiredCartLines->isNotEmpty()) {
                 return response()->json([
-                    'message' => "Key has been expired, checkout again",
+                    'message' => 'Key has been expired, checkout again',
                 ], 200);
             }
 

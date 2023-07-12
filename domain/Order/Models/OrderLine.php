@@ -11,6 +11,51 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
+/**
+ * Domain\Order\Models\OrderLine
+ *
+ * @property int $id
+ * @property int $order_id
+ * @property int $purchasable_id
+ * @property string $purchasable_type
+ * @property string $purchasable_sku
+ * @property string $name
+ * @property float $unit_price
+ * @property int $quantity
+ * @property float $tax_total
+ * @property float $sub_total
+ * @property float $discount_total
+ * @property float $total
+ * @property array|null $remarks_data
+ * @property array|null $purchasable_data
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
+ * @property-read int|null $media_count
+ * @property-read \Domain\Order\Models\Order|null $order
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine query()
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereDiscountTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereOrderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine wherePurchasableData($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine wherePurchasableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine wherePurchasableSku($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine wherePurchasableType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereQuantity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereRemarksData($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereSubTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereTaxTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereUnitPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class OrderLine extends Model implements HasMedia
 {
     use LogsActivity;
@@ -39,7 +84,7 @@ class OrderLine extends Model implements HasMedia
         'sub_total' => 'float',
         'discount_total' => 'float',
         'total' => 'float',
-        'remarks_data'  => 'array',
+        'remarks_data' => 'array',
         'purchasable_data' => 'array',
     ];
 

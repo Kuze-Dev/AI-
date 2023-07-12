@@ -45,7 +45,6 @@ class CheckoutAction
             })
             ->get();
 
-
         Log::info($cartLinesForCheckout->count());
         Log::info(count($checkoutData->cart_line_ids));
         if ($cartLinesForCheckout->count() !== count($checkoutData->cart_line_ids)) {

@@ -16,8 +16,8 @@ class CreateOrderAddressAction
             [
                 'order_id' => $order->id,
                 'type' => 'Shipping',
-                'state' =>  $preparedOrderData->shipping_address->state ? $preparedOrderData->shipping_address->state->name : null,
-                'label_as' =>  $preparedOrderData->shipping_address->label_as,
+                'state' => $preparedOrderData->shipping_address->state ? $preparedOrderData->shipping_address->state->name : null,
+                'label_as' => $preparedOrderData->shipping_address->label_as,
                 'address_line_1' => $preparedOrderData->shipping_address->address_line_1,
                 'zip_code' => $preparedOrderData->shipping_address->zip_code,
                 'city' => $preparedOrderData->shipping_address->city,
@@ -27,7 +27,7 @@ class CreateOrderAddressAction
             [
                 'order_id' => $order->id,
                 'type' => 'Billing',
-                'state' =>  $preparedOrderData->billing_address->state ? $preparedOrderData->billing_address->state->name : null,
+                'state' => $preparedOrderData->billing_address->state ? $preparedOrderData->billing_address->state->name : null,
                 'label_as' => $preparedOrderData->shipping_address->label_as,
                 'address_line_1' => $preparedOrderData->billing_address->address_line_1,
                 'zip_code' => $preparedOrderData->billing_address->zip_code,

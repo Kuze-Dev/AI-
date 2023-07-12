@@ -7,7 +7,6 @@ namespace Domain\Order\Actions;
 use Domain\Address\Models\Address;
 use Domain\Cart\Models\CartLine;
 use Domain\Currency\Models\Currency;
-use Domain\Customer\Models\Customer;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Product\Models\ProductVariant;
@@ -29,13 +28,13 @@ class PrepareOrderAction
             $query->morphWith([
                 ProductVariant::class => ['product'],
             ]);
-        },])
+        }, ])
             ->whereCheckoutReference($placeOrderData->cart_reference)
             ->get();
 
         $notes = $placeOrderData->notes;
 
-        $orderData =  [
+        $orderData = [
             'customer' => $customer,
             'shipping_address' => $shippingAddress,
             'billing_address' => $billingAddress,

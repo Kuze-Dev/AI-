@@ -6,6 +6,7 @@ namespace Domain\Cart\Actions;
 
 use Domain\Cart\DataTransferObjects\UpdateCartLineData;
 use Domain\Cart\Models\CartLine;
+use Exception;
 
 class UpdateCartLineAction
 {
@@ -30,7 +31,7 @@ class UpdateCartLineAction
                 try {
                     $cartLine->addMediaFromUrl($imageUrl)
                         ->toMediaCollection('cart_line_notes');
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     // Log::info($e);
                 }
             }
