@@ -8,7 +8,7 @@ use Domain\Shipment\DataTransferObjects\ClientQueryParameterData;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 
-final class Client
+final class Connection
 {
     public const PRODUCTION_URL = 'https://secure.shippingapis.com';
     public const SANDBOX_URL = 'http://production.shippingapis.com';

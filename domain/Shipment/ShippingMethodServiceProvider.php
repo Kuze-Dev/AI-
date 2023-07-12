@@ -7,7 +7,7 @@ namespace Domain\Shipment;
 use App\Settings\ShippingSettings;
 use Domain\Payments\Providers\OfflinePayment;
 use Domain\Payments\Providers\PaypalProvider;
-use Domain\Shipment\API\USPS\Client;
+use Domain\Shipment\API\USPS\Connection;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\DataTransferObjects\ClientQueryParameterData;
 use Domain\Shipment\Drivers\UspsDriver;
@@ -26,12 +26,12 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
         );
 
         $this->app->singleton(
-            Client::class,
+            Connection::class,
             function ($app) {
                 $setting = app(ShippingSettings::class);
                 $clientQueryParameterData = new ClientQueryParameterData();
 
-                return new Client(
+                return new Connection(
                     username: $setting->usps_credentials['username'],
                     password: $setting->usps_credentials['password'],
                     clientQueryParameterData: $clientQueryParameterData,
