@@ -31,12 +31,13 @@ class PageController
 
         $rate = app(RateClient::class);
 
-        dd($rate->getV4());
+   
         //$rate->rateValue();
-        $usps = new UspsDriver();
+   
+        $usps = new UspsDriver($rate);
 
         dd($usps->getRate());
-
+     
         return PageResource::collection(
             QueryBuilder::for(
                 Page::with('activeRouteUrl')
