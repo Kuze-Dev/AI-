@@ -142,17 +142,17 @@ class Order extends Model implements HasMedia
         return $this->belongsTo(Customer::class);
     }
 
-    public function order_lines()
+    public function orderLines()
     {
         return $this->hasMany(OrderLine::class);
     }
 
-    public function shipping_address()
+    public function shippingAddress()
     {
         return $this->hasOne(OrderAddress::class)->where('type', OrderAddressTypes::SHIPPING);
     }
 
-    public function billing_address()
+    public function billingAddress()
     {
         return $this->hasOne(OrderAddress::class)->where('type', OrderAddressTypes::BILLING);
     }

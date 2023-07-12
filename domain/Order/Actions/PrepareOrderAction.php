@@ -36,8 +36,8 @@ class PrepareOrderAction
 
         $orderData = [
             'customer' => $customer,
-            'shipping_address' => $shippingAddress,
-            'billing_address' => $billingAddress,
+            'shippingAddress' => $shippingAddress,
+            'billingAddress' => $billingAddress,
             'currency' => $currency,
             'cartLine' => $cartLines,
             'notes' => $notes,

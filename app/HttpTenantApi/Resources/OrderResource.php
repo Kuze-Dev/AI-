@@ -32,8 +32,8 @@ class OrderResource extends JsonApiResource
             'payment_message' => $this->payment_message,
             'is_paid' => $this->is_paid,
             'status' => $this->status,
-            'shipping_address' => $this->shipping_address,
-            'billing_address' => $this->billing_address,
+            'shipping_address' => $this->shippingAddress,
+            'billing_address' => $this->billingAddress,
             'bank_proof_images' => $this->getMedia('bank_proof_images')->toArray(),
         ];
     }
@@ -41,7 +41,7 @@ class OrderResource extends JsonApiResource
     public function toRelationships(Request $request): array
     {
         return [
-            'order_lines' => fn () => OrderLineResource::collection($this->order_lines),
+            'orderLines' => fn () => OrderLineResource::collection($this->orderLines),
         ];
     }
 }

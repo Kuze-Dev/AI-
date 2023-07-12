@@ -12,8 +12,8 @@ class PreparedOrderData
 {
     public function __construct(
         public readonly Customer $customer,
-        public readonly Address $shipping_address,
-        public readonly Address $billing_address,
+        public readonly Address $shippingAddress,
+        public readonly Address $billingAddress,
         public readonly Currency $currency,
         public readonly mixed $cartLine,
         public readonly ?string $notes,
@@ -24,8 +24,8 @@ class PreparedOrderData
     {
         return new self(
             customer: $data['customer'],
-            shipping_address: $data['shipping_address'],
-            billing_address: $data['billing_address'],
+            shippingAddress: $data['shippingAddress'],
+            billingAddress: $data['billingAddress'],
             currency: $data['currency'],
             cartLine: $data['cartLine'],
             notes: $data['notes'] ?? null
