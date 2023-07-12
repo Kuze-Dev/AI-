@@ -35,11 +35,9 @@ class RateClient
             XML;
 
         $body = $this->client->getClient()
-            ->withOptions([ // TODO: withQueryParameters() laravel v10.14
-                'query' => [
-                    'API' => 'RateV4',
-                    'XML' => $xml,
-                ],
+            ->withQueryParameters([
+                'API' => 'RateV4',
+                'XML' => $xml,
             ])
             ->get(self::URI)
             ->body();
@@ -71,11 +69,9 @@ class RateClient
             XML;
 
         $this->client->getClient()
-            ->withOptions([ // TODO: withQueryParameters() laravel v10.14
-                'query' => [
-                    'API' => 'IntlRateV2',
-                    'XML' => $xml,
-                ],
+            ->withQueryParameters([
+                'API' => 'IntlRateV2',
+                'XML' => $xml,
             ])
             ->get(self::URI);
 
