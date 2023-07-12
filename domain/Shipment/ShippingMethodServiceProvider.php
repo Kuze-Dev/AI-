@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Shipment;
 
+use App\Settings\ShippingSettings;
 use Domain\Payments\Providers\OfflinePayment;
 use Domain\Payments\Providers\PaypalProvider;
+use Domain\Shipment\API\USPS\Client;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\Drivers\UspsDriver;
 use Domain\ShippingMethod\Models\ShippingMethod;
@@ -20,6 +22,15 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
         $this->app->singleton(
             ShippingManagerInterface::class,
             fn ($app) => $app->make(ShippingManager::class)
+        );
+
+        $this->app->singleton(
+            Client::class,
+            function ($app) {
+                $setting = app(ShippingSettings::class);
+
+                return new Client($setting->usps_credentials['username'], $setting->usps_credentials['password']);
+            }
         );
 
         $this->mergeConfigFrom(__DIR__ . '/config/shipping.php', 'shipping');
