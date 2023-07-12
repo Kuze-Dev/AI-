@@ -8,7 +8,7 @@ use App\Features\ECommerce\ECommerceBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Discount\Models\Discount;
 use Illuminate\Foundation\Auth\User;
-use Illuminate\Auth\Access\Response;
+use Response;
 
 class DiscountPolicy
 {

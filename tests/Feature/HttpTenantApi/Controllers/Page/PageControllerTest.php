@@ -26,7 +26,7 @@ it('can list pages', function () {
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json
-                ->count('data', 10)
+                ->count('data', 11)
                 ->where('data.0.type', 'pages')
                 ->whereType('data.0.attributes.name', 'string')
                 ->etc();
