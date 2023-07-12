@@ -9,6 +9,7 @@ use App\HttpTenantApi\Resources\PageResource;
 use Carbon\Carbon;
 use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Page\Models\Page;
+use Domain\Shipment\API\USPS\RateClient;
 use Domain\Shipment\Drivers\UspsDriver;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -27,6 +28,11 @@ class PageController
 {
     public function index(): JsonApiResourceCollection
     {
+
+        $rate = app(RateClient::class);
+
+        dd($rate->getV4());
+        //$rate->rateValue();
         $usps = new UspsDriver();
 
         dd($usps->getRate());

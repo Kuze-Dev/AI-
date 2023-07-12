@@ -30,6 +30,7 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
                 return new Connection(
                     username: $setting->usps_credentials['username'],
                     password: $setting->usps_credentials['password'],
+                    isProduction: $setting->usps_mode,
                 );
             }
         );

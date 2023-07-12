@@ -16,12 +16,12 @@ final class Connection
     public function __construct(
         public readonly string $username,
         public readonly string $password,
-        readonly bool $isSandbox = true,
+        readonly bool $isProduction,
     ) {
         $this->client = Http::baseUrl(
-            $isSandbox
-                ? self::SANDBOX_URL
-                : self::PRODUCTION_URL
+            $isProduction
+                ? self::PRODUCTION_URL
+                : self::SANDBOX_URL
         );
     }
 
