@@ -50,4 +50,14 @@ class OrderController
                 'message' => 'Order placed successfully',
             ]);
     }
+
+    public function show(Order $order)
+    {
+        $model = QueryBuilder::for(
+            $order->whereBelongsTo(auth()->user())
+        )
+            ->allowedIncludes(['order_lines'])->firstOrFail();
+
+        return OrderResource::make($model);
+    }
 }

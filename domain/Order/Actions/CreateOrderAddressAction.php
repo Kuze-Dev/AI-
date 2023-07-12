@@ -28,7 +28,7 @@ class CreateOrderAddressAction
                 'order_id' => $order->id,
                 'type' => 'Billing',
                 'state' =>  $preparedOrderData->billing_address->state ? $preparedOrderData->billing_address->state->name : null,
-                'label_as' => 'test label as',
+                'label_as' => $preparedOrderData->shipping_address->label_as,
                 'address_line_1' => $preparedOrderData->billing_address->address_line_1,
                 'zip_code' => $preparedOrderData->billing_address->zip_code,
                 'city' => $preparedOrderData->billing_address->city,
