@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\API\USPS;
 
+use Domain\Shipment\DataTransferObjects\ClientQueryParameterData;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 
@@ -16,21 +17,34 @@ final class Client
     public function __construct(
         readonly string $username,
         readonly string $password,
+        readonly ClientQueryParameterData $clientQueryParameterData,
         readonly bool $isSandbox = true,
     ) {
         $this->client = Http::baseUrl($isSandbox ? self::SANDBOX_URL : self::PRODUCTION_URL)
             ->withOptions([ // withQueryParameters() laravel v10.14
                 'query' => [
                     'API' => 'RateV4',
-                    'XML' => self::buildXMLQueryParameter($this->username, $this->password),
+                    'XML' => self::buildXMLQueryParameter($this->username, $clientQueryParameterData),
                 ],
-            ]);
+            ])
+            ->contentType('text/xml; charset=UTF8');
     }
 
-    private static function buildXMLQueryParameter(string $username, string $password): string
+    private static function buildXMLQueryParameter(string $username, ClientQueryParameterData $clientQueryParameterData): string
     {
         return <<<XML
-            <IntlRateV2Request USERID="$username" PASSWORD="$password"><Revision>2</Revision><Package ID="1"><Pounds>15.12345678</Pounds><Ounces>0</Ounces><MailType>Package</MailType><ValueOfContents>200</ValueOfContents><Country>Philippines</Country><Width>10</Width><Length>15</Length><Height>10</Height><OriginZip>18701</OriginZip><AcceptanceDateTime>2023-07-14T13:15:00-06:00</AcceptanceDateTime><DestinationPostalCode>1603</DestinationPostalCode></Package></IntlRateV2Request>
+              <RateV4Request USERID="$username">
+                <Revision>1</Revision>
+                <Package ID="0">
+                    <Service>PRIORITY</Service>
+                    <ZipOrigination>94107</ZipOrigination>
+                    <ZipDestination>26301</ZipDestination>
+                    <Pounds>8</Pounds>
+                    <Ounces>2</Ounces>
+                    <Container></Container>
+                    <Machinable>TRUE</Machinable>
+                </Package>
+            </RateV4Request>
             XML;
     }
 
