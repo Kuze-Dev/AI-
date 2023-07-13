@@ -24,8 +24,8 @@ class CreateCartLineAction
 
             match ($cartLineData->purchasable_type) {
                 'Product' => $purchasableType = Product::class,
-                // 'Service' => $purchasableType = Service::class,
-                // 'Booking' => $purchasableType = Booking::class,
+                    // 'Service' => $purchasableType = Service::class,
+                    // 'Booking' => $purchasableType = Booking::class,
                 default => null
             };
 
@@ -48,6 +48,19 @@ class CreateCartLineAction
                     'remarks' => $cartLineData->remarks,
                 ]
             );
+
+            $cartLine->clearMediaCollection('cart_line_notes');
+
+            if ($cartLineData->medias !== null) {
+                foreach ($cartLineData->medias as $imageUrl) {
+                    try {
+                        $cartLine->addMediaFromUrl($imageUrl)
+                            ->toMediaCollection('cart_line_notes');
+                    } catch (Exception $e) {
+                        // Log::info($e);
+                    }
+                }
+            }
 
             DB::commit();
 

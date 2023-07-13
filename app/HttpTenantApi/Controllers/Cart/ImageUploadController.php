@@ -16,23 +16,24 @@ class ImageUploadController
     public function __invoke(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'image' => 'required|image|max:2048',
+            'images.*' => 'required|image|max:2048',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 400);
         }
 
-        if ($request->file('image')->isValid()) {
-            $file = $request->file('image');
-            $fileName = Str::random(20) . '.' . $file->getClientOriginalExtension();
-            $path = Storage::disk('s3')->putFileAs('livewire-tmp', $file, $fileName, 'public');
+        $urls = [];
 
-            $url = Storage::disk('s3')->url($path);
-
-            return response()->json(['url' => $url], 200);
+        foreach ($request->file('images') as $image) {
+            if ($image->isValid()) {
+                $fileName = Str::random(20) . '.' . $image->getClientOriginalExtension();
+                $path = Storage::disk('s3')->putFileAs('livewire-tmp', $image, $fileName, 'public');
+                $url = Storage::disk('s3')->url($path);
+                $urls[] = $url;
+            }
         }
 
-        return response()->json(['error' => 'File upload failed'], 500);
+        return response()->json(['urls' => $urls], 200);
     }
 }
