@@ -38,7 +38,7 @@ class ReviewStoreRequest extends FormRequest
                 'required',
                 'integer',
                 'min:1',
-                'max:5'
+                'max:5',
 
             ],
             'comment' => [
@@ -47,35 +47,36 @@ class ReviewStoreRequest extends FormRequest
             'customer_id' => [
                 'nullable',
                 Rule::exists('customers', 'id'),
-                Rule::exists('orders', 'customer_id')
+                Rule::exists('orders', 'customer_id'),
             ],
             'order_id' => [
                 'required',
-                Rule::exists('orders', 'id'),
+                Rule::exists('orders', 'id')->where('status', 'Fulfilled'),
                 Rule::exists('order_lines', 'order_id')
-                ->where(function ($query) {
-                    $productId = $this->input('product_id');
-                    $query->where('purchasable_id', $productId);
-                }),
-                function ($attribute, $value, $fail) {  
+                    ->where(function ($query) {
+                        $productId = $this->input('product_id');
+                        $query->where('purchasable_id', $productId);
+                    }),
+                function ($attribute, $value, $fail) {
                     $productId = $this->input('product_id');
                     $orderId = $this->input('order_id');
-                    $review = Review::where('product_id', $productId)->where('order_id',$orderId);
-                    if($review->exists()){
+                    $customerId = $this->input('customerId');
+                    $review = Review::where('product_id', $productId)->where('order_id', $orderId)->where('customer_id', $customerId);
+                    if($review->exists()) {
                         $fail('You already review this product');
                     }
                 },
-                
+
             ],
             'product_id' => [
                 'required',
                 Rule::exists('products', 'id'),
-                Rule::exists('order_lines', 'purchasable_id')
+                Rule::exists('order_lines', 'purchasable_id'),
             ],
             'product_review_images' => [
                 'nullable',
-                'array'
-            ]
+                'array',
+            ],
         ];
     }
 

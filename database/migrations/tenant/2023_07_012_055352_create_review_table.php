@@ -7,9 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Domain\Product\Models\Product;
 use Domain\Customer\Models\Customer;
-use phpDocumentor\Reflection\Types\Nullable;
 use Domain\Order\Models\Order;
-use Domain\Order\Models\OrderLine;
 
 return new class () extends Migration {
     public function up(): void

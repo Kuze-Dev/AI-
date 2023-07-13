@@ -11,10 +11,12 @@ use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Spatie\QueryBuilder\QueryBuilder;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use Exception;
 
 #[
     Resource('reviews', apiResource: true, except: ['index', 'update']),
+    Middleware(['auth:sanctum', 'feature.tenant:' . ECommerceBase::class])
 ]
 class ReviewController
 {
@@ -41,17 +43,17 @@ class ReviewController
         $review->order_id = $validatedData['order_id'];
         $review->customer_id = $validatedData['customer_id'];
 
-        // if ($validatedData['product_review_images'] !== null) {
-      
-        //     foreach ($validatedData['product_review_images'] as $imageUrl) {
-        //         try {
-        //             $review->addMediaFromUrl($imageUrl)
-        //                 ->toMediaCollection('product_review_images');
-        //         } catch (Exception $e) {
-        //             dd($e);
-        //         }
-        //     }
-        // }
+        if ($validatedData['product_review_images'] !== null) {
+
+            foreach ($validatedData['product_review_images'] as $imageUrl) {
+                try {
+                    $review->addMediaFromUrl($imageUrl)
+                        ->toMediaCollection('product_review_images');
+                } catch (Exception $e) {
+                    dd($e);
+                }
+            }
+        }
 
         $review->save();
 

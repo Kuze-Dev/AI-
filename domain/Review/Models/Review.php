@@ -48,7 +48,7 @@ class Review extends Model implements HasMedia
     protected $fillable = [
         'title',
         'ratings',
-        'comment'
+        'comment',
     ];
 
     public function registerMediaCollections(): void
@@ -75,5 +75,4 @@ class Review extends Model implements HasMedia
     {
         return $this->belongsTo(Order::class);
     }
-
 }
