@@ -6,6 +6,7 @@ namespace Domain\Order\Actions;
 
 use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Models\Order;
+use Domain\Taxation\Enums\PriceDisplay;
 use Illuminate\Support\Str;
 
 class CreateOrderAction
@@ -20,9 +21,19 @@ class CreateOrderAction
             return $carry + ($purchasable->selling_price * $cartLine->quantity);
         }, 0);
 
-        //add tax and minus discount here
-        // $total = $subTotal + $preparedOrderData->totals->shipping_total;
-        $total = $subTotal;
+        $taxDisplay = $preparedOrderData->taxZone->price_display;
+        $taxPercentage = (float) $preparedOrderData->taxZone->percentage;
+        $taxTotal = round($subTotal * $taxPercentage / 100, 2);
+
+        $grandTotal = 0;
+
+        if ($taxDisplay == PriceDisplay::INCLUSIVE) {
+            $subTotal += $taxTotal;
+            //for now, but the shipping fee and discount will be added
+            $grandTotal = $subTotal;
+        } else {
+            $grandTotal = $subTotal + $taxTotal;
+        }
 
         $order = Order::create([
             'customer_id' => $preparedOrderData->customer->id,
@@ -37,11 +48,12 @@ class CreateOrderAction
 
             'reference' => $referenceNumber,
 
-            'tax_total' => 0,
+            'tax_total' => $taxTotal,
+            'tax_display' => $taxDisplay,
             'sub_total' => $subTotal,
             'discount_total' => 0,
             'shipping_total' => 0,
-            'total' => $total,
+            'total' => $grandTotal,
 
             'notes' => $preparedOrderData->notes,
             'shipping_method' => 'test shipping_method',

@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use Closure;
 use Domain\Order\Enums\OrderStatuses;
+use Domain\Taxation\Enums\PriceDisplay;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -273,8 +274,8 @@ class OrderResource extends Resource
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Order Date")->alignLeft()->size("sm")->inline()->readOnly(),
-                        Support\TextLabel::make("created_at")->alignRight()->size("sm")->inline()
+                        Support\TextLabel::make("")->label("Order Date")->alignLeft()->size("md")->inline()->readOnly(),
+                        Support\TextLabel::make("created_at")->alignRight()->size("md")->inline()
                             ->formatStateUsing(function ($state) {
                                 $format ??= config('tables.date_format');
                                 $formattedState = Carbon::parse($state)
@@ -374,18 +375,29 @@ class OrderResource extends Resource
                 Support\Divider::make(''),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Subtotal")->alignLeft()->size("sm")->inline()->readOnly(),
-                        Support\TextLabel::make("sub_total")->alignRight()->size("sm")->inline(),
+                        Support\TextLabel::make("")->label(function (Order $record) {
+                            if ($record->tax_display == PriceDisplay::INCLUSIVE) {
+                                return "Subtotal " . " (Tax Included)";
+                            }
+                            // dd($record->tax_display);
+                            return "Subtotal";
+                        })->alignLeft()->size("md")->inline()->readOnly(),
+                        Support\TextLabel::make("sub_total")->alignRight()->size("md")->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Shipping Fee")->alignLeft()->size("sm")->inline()->readOnly(),
-                        Support\TextLabel::make("shipping_total")->alignRight()->size("sm")->inline(),
+                        Support\TextLabel::make("")->label("Shipping Fee")->alignLeft()->size("md")->inline()->readOnly(),
+                        Support\TextLabel::make("shipping_total")->alignRight()->size("md")->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Discount")->alignLeft()->size("sm")->inline()->readOnly(),
-                        Support\TextLabel::make("discount_total")->alignRight()->size("sm")->inline(),
+                        Support\TextLabel::make("")->label("Tax total")->alignLeft()->size("md")->inline()->readOnly(),
+                        Support\TextLabel::make("tax_total")->alignRight()->size("md")->inline(),
+                    ]),
+                Forms\Components\Grid::make(2)
+                    ->schema([
+                        Support\TextLabel::make("")->label("Discount")->alignLeft()->size("md")->inline()->readOnly(),
+                        Support\TextLabel::make("discount_total")->alignRight()->size("md")->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([

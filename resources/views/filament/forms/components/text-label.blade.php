@@ -10,7 +10,7 @@
 
 <div
     {{ $attributes->merge($getExtraAttributes())->class([
-        'filament-tables-text-column',
+        'filament-forms-placeholder-component',
         'px-4 py-3' => !$isInline(),
         match ($getColor()) {
             'danger' => 'text-danger-600',

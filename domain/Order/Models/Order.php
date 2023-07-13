@@ -7,6 +7,7 @@ namespace Domain\Order\Models;
 use Domain\Customer\Models\Customer;
 use Domain\Order\Enums\OrderAddressTypes;
 use Domain\Order\Enums\OrderStatuses;
+use Domain\Taxation\Enums\PriceDisplay;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -103,6 +104,7 @@ class Order extends Model implements HasMedia
         'currency_exchange_rate',
         'reference',
         'tax_total',
+        'tax_display',
         'sub_total',
         'discount_total',
         'shipping_total',
@@ -123,6 +125,7 @@ class Order extends Model implements HasMedia
     protected $casts = [
         'currency_exchange_rate' => 'float',
         'tax_total' => 'float',
+        'tax_display' => PriceDisplay::class,
         'sub_total' => 'float',
         'discount_total' => 'float',
         'shipping_total' => 'float',

@@ -25,6 +25,7 @@ return new class() extends Migration
             $table->decimal('currency_exchange_rate');
             $table->string('reference')->unique();
             $table->decimal('tax_total');
+            $table->string('tax_display');
             $table->decimal('sub_total');
             $table->decimal('discount_total');
             $table->decimal('shipping_total');

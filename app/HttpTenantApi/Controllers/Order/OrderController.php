@@ -38,7 +38,6 @@ class OrderController extends Controller
 
     public function store(PlaceOrderRequest $request)
     {
-
         $validatedData = $request->validated();
 
         $result = app(PlaceOrderAction::class)

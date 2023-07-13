@@ -11,6 +11,7 @@ use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Domain\Taxation\Facades\Taxation;
 
 class PrepareOrderAction
 {
@@ -32,6 +33,8 @@ class PrepareOrderAction
             ->whereCheckoutReference($placeOrderData->cart_reference)
             ->get();
 
+        $taxZone = Taxation::getTaxZone($placeOrderData->taxation_data->country_id, $placeOrderData->taxation_data->state_id);
+
         $notes = $placeOrderData->notes;
 
         $orderData = [
@@ -41,6 +44,7 @@ class PrepareOrderAction
             'currency' => $currency,
             'cartLine' => $cartLines,
             'notes' => $notes,
+            'taxZone' => $taxZone
         ];
 
         return PreparedOrderData::fromArray($orderData);
