@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Review\Requests;
 
+use Domain\Review\Models\Review;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
@@ -36,15 +37,44 @@ class ReviewStoreRequest extends FormRequest
             'rating' => [
                 'required',
                 'integer',
+                'min:1',
+                'max:5'
 
             ],
             'comment' => [
                 'nullable',
-                'required',
             ],
-            'image' => [
+            'customer_id' => [
                 'nullable',
-                Rule::imageFile()
+                Rule::exists('customers', 'id'),
+                Rule::exists('orders', 'customer_id')
+            ],
+            'order_id' => [
+                'required',
+                Rule::exists('orders', 'id'),
+                Rule::exists('order_lines', 'order_id')
+                ->where(function ($query) {
+                    $productId = $this->input('product_id');
+                    $query->where('purchasable_id', $productId);
+                }),
+                function ($attribute, $value, $fail) {  
+                    $productId = $this->input('product_id');
+                    $orderId = $this->input('order_id');
+                    $review = Review::where('product_id', $productId)->where('order_id',$orderId);
+                    if($review->exists()){
+                        $fail('You already review this product');
+                    }
+                },
+                
+            ],
+            'product_id' => [
+                'required',
+                Rule::exists('products', 'id'),
+                Rule::exists('order_lines', 'purchasable_id')
+            ],
+            'product_review_images' => [
+                'nullable',
+                'array'
             ]
         ];
     }

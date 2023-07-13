@@ -31,7 +31,6 @@ class FavoriteController
 
     public function store(FavoriteStoreRequest $request, Favorite $favorite): JsonResponse
     {
-
         $validatedData = $request->validated();
         $favorite->product_id = $validatedData['product_id'];
         $favorite->customer_id = $validatedData['customer_id'];

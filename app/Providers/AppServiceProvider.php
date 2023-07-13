@@ -30,6 +30,7 @@ use Domain\Menu\Models\Node;
 use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderLine;
 use Domain\Page\Models\Block;
+use Domain\Review\Models\Review;
 use Domain\Taxation\Models\TaxZone;
 use Domain\Page\Models\Page;
 use Support\Captcha\CaptchaManager;
@@ -109,6 +110,7 @@ class AppServiceProvider extends ServiceProvider
             Order::class,
             OrderLine::class,
             Favorite::class,
+            Review::class,
         ]);
 
         Password::defaults(

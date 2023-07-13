@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Schema;
 use Domain\Product\Models\Product;
 use Domain\Customer\Models\Customer;
 use phpDocumentor\Reflection\Types\Nullable;
+use Domain\Order\Models\Order;
+use Domain\Order\Models\OrderLine;
 
 return new class () extends Migration {
     public function up(): void
@@ -15,7 +17,8 @@ return new class () extends Migration {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Product::class)->index();
-            $table->foreignIdFor(Customer::class)->index();
+            $table->foreignIdFor(Order::class)->index();
+            $table->foreignIdFor(Customer::class)->nullable()->index();
 
             $table->string('title')->index();
             $table->smallInteger('rating');
