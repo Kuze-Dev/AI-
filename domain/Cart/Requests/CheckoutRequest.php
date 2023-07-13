@@ -21,6 +21,7 @@ class CheckoutRequest extends FormRequest
                         ->whereHas('cart', function ($query) {
                             $query->whereBelongsTo(auth()->user());
                         })
+                        ->whereNull('checked_out_at')
                         ->get();
 
                     if (count($value) !== $cartLines->count()) {
