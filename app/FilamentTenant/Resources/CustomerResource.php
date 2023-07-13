@@ -145,6 +145,10 @@ class CustomerResource extends Resource
                     ->translateLabel()
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\IconColumn::make('email_verified_at')
+                    ->label(trans('Verified'))
+                    ->getStateUsing(fn (Customer $record): bool => $record->hasVerifiedEmail())
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('mobile')
                     ->translateLabel()
                     ->searchable()
@@ -156,27 +160,46 @@ class CustomerResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->wrap(),
                 Tables\Columns\BadgeColumn::make('status')
+                    ->translateLabel()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->translateLabel()
                     ->dateTime(timezone: Filament::auth()->user()?->timezone)
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\TrashedFilter::make()
+                    ->translateLabel(),
                 Tables\Filters\SelectFilter::make('tier')
                     ->translateLabel()
                     ->relationship('tier', 'name'),
                 Tables\Filters\SelectFilter::make('status')
+                    ->translateLabel()
                     ->options(
                         collect(Status::cases())
                             ->mapWithKeys(fn (Status $target) => [$target->value => Str::headline($target->value)])
                             ->toArray()
                     ),
+                Tables\Filters\SelectFilter::make('email_verified')
+                    ->translateLabel()
+                    ->options(['1' => 'Verified', '0' => 'Not Verified'])
+                    ->query(function (Builder $query, array $data) {
+                        $query->when(filled($data['value']), function (Builder $query) use ($data) {
+                            /** @var \Domain\Customer\Models\Customer|\Illuminate\Database\Eloquent\Builder $query */
+                            match ($data['value']) {
+                                '1' => $query->whereNotNull('email_verified_at'),
+                                '0' => $query->whereNull('email_verified_at'),
+                                default => '',
+                            };
+                        });
+                    }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->translateLabel(),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
+                        ->translateLabel()
                         ->using(function (Customer $record) {
                             try {
                                 return app(DeleteCustomerAction::class)->execute($record);
@@ -185,6 +208,7 @@ class CustomerResource extends Resource
                             }
                         }),
                     Tables\Actions\RestoreAction::make()
+                        ->translateLabel()
                         ->using(
                             fn (Customer $record) => DB::transaction(
                                 fn () => app(RestoreCustomerAction::class)
@@ -192,6 +216,7 @@ class CustomerResource extends Resource
                             )
                         ),
                     Tables\Actions\ForceDeleteAction::make()
+                        ->translateLabel()
                         ->using(function (Customer $record) {
                             try {
                                 return app(ForceDeleteCustomerAction::class)->execute($record);
