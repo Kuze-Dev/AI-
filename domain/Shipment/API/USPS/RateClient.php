@@ -69,24 +69,31 @@ class RateClient
 
     public function getInternationalVersion2(): RateInternationalV2ResponseData
     {
-        $xml = <<<XML
-            <IntlRateV2Request USERID="{$this->client->username}" PASSWORD="{$this->client->password}">
-            <Revision>2</Revision>
-                <Package ID="1">
-                    <Pounds>15.12345678</Pounds>
-                    <Ounces>0</Ounces>
-                    <MailType>Package</MailType>
-                    <ValueOfContents>200</ValueOfContents>
-                    <Country>Philippines</Country>
-                    <Width>10</Width>
-                    <Length>15</Length>
-                    <Height>10</Height>
-                    <OriginZip>18701</OriginZip>
-                    <AcceptanceDateTime>2023-07-14T13:15:00-06:00</AcceptanceDateTime>
-                    <DestinationPostalCode>1603</DestinationPostalCode>
-                </Package>
-            </IntlRateV2Request>
-            XML;
+        $array = [
+            'Revision' => '2',
+            'Package' => [
+                '_attributes' => ['ID' => '1'],
+                'Pounds' => 15.12345678,
+                'Ounces' => 0,
+                'MailType' => 'Package',
+                'ValueOfContents' => 200,
+                'Country' => 'Philippines',
+                'Width' => 10,
+                'Length' => 15,
+                'Height' => 10,
+                'OriginZip' => 18701,
+                'AcceptanceDateTime' => '2023-07-14T13:15:00-06:00',
+                'DestinationPostalCode' => 1603,
+            ],
+        ];
+
+        $xml = ArrayToXml::convert($array, [
+            'rootElementName' => 'IntlRateV2Request',
+            '_attributes' => [
+                'USERID' => $this->client->username,
+                'PASSWORD' => $this->client->password,
+            ],
+        ], true, 'UTF-8');
 
         $this->client->getClient()
             ->withQueryParameters([
