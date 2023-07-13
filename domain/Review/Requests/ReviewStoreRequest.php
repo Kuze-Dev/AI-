@@ -39,15 +39,13 @@ class ReviewStoreRequest extends FormRequest
                 'integer',
                 'min:1',
                 'max:5',
-
+            ],
+            'anonymous' => [
+                'required',
+                'bool',
             ],
             'comment' => [
                 'nullable',
-            ],
-            'customer_id' => [
-                'nullable',
-                Rule::exists('customers', 'id'),
-                Rule::exists('orders', 'customer_id'),
             ],
             'order_id' => [
                 'required',
