@@ -34,6 +34,8 @@ class PrepareOrderAction
 
         $notes = $placeOrderData->notes;
 
+        $discountCode = $placeOrderData->discountCode;
+
         $orderData = [
             'customer' => $customer,
             'shippingAddress' => $shippingAddress,
@@ -41,6 +43,7 @@ class PrepareOrderAction
             'currency' => $currency,
             'cartLine' => $cartLines,
             'notes' => $notes,
+            'discountCode' => $discountCode,
         ];
 
         return PreparedOrderData::fromArray($orderData);

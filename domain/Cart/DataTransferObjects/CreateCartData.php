@@ -19,10 +19,10 @@ class CreateCartData
     public static function fromArray(array $data): self
     {
         return new self(
-            purchasable_id: $data['purchasable_id'],
+            purchasable_id: (int) $data['purchasable_id'],
             purchasable_type: $data['purchasable_type'],
-            quantity: $data['quantity'],
-            variant_id: $data['variant_id'] ?? null,
+            quantity: (int) $data['quantity'],
+            variant_id: (int) $data['variant_id'] ?? null,
             medias: $data['media'] ?? null,
             remarks: $data['remarks'] ?? null,
         );

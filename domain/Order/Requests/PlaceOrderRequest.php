@@ -56,6 +56,12 @@ class PlaceOrderRequest extends FormRequest
                 'min:1',
                 'max:500',
             ],
+            'discount_code' => [
+                'nullable',
+                'string',
+                'min:1',
+                'max:500',
+            ],
         ];
     }
 }
