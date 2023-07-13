@@ -6,6 +6,7 @@ namespace Domain\Shipment\Models;
 
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -15,10 +16,6 @@ class Shipment extends Model
     use LogsActivity;
     use ConstraintsRelationships;
 
-    /**
-     * Declare columns
-     * that are mass assignable.
-     */
     protected $fillable = [
         'model_type',
         'model_id',
@@ -27,7 +24,6 @@ class Shipment extends Model
         'shipping_details',
         'destination_address',
         'rate',
-
     ];
 
     protected $casts = [
@@ -44,21 +40,12 @@ class Shipment extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    /**
-     * Declare relationship of
-     * current model to shippingMethod.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<ShippingMethod, self>
-     */
-    public function shippingMethod()
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<ShippingMethod, self> */
+    public function shippingMethod(): BelongsTo
     {
         return $this->belongsTo(ShippingMethod::class);
     }
 
-    /**
-     * Set the column reference
-     * for route keys.
-     */
     public function getRouteKeyName(): string
     {
         return 'slug';

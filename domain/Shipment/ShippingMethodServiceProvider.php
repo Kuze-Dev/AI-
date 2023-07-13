@@ -57,7 +57,6 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
                 }
             }
         }
-
     }
 
     public function provides(): array
