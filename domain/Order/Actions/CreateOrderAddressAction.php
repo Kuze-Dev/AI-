@@ -16,6 +16,7 @@ class CreateOrderAddressAction
             [
                 'order_id' => $order->id,
                 'type' => 'Shipping',
+                'country' => $preparedOrderData->shippingAddress->state->country->name,
                 'state' => $preparedOrderData->shippingAddress->state ? $preparedOrderData->shippingAddress->state->name : null,
                 'label_as' => $preparedOrderData->shippingAddress->label_as,
                 'address_line_1' => $preparedOrderData->shippingAddress->address_line_1,
@@ -27,6 +28,7 @@ class CreateOrderAddressAction
             [
                 'order_id' => $order->id,
                 'type' => 'Billing',
+                'country' => $preparedOrderData->billingAddress->state->country->name,
                 'state' => $preparedOrderData->billingAddress->state ? $preparedOrderData->billingAddress->state->name : null,
                 'label_as' => $preparedOrderData->shippingAddress->label_as,
                 'address_line_1' => $preparedOrderData->billingAddress->address_line_1,

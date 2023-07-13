@@ -68,11 +68,8 @@ class PasswordController extends Controller
                 }
             );
 
-        return $response == PasswordBroker::PASSWORD_RESET
-            ? new JsonResponse(['message' => trans($response)], 200)
-            : throw ValidationException::withMessages([
-                'email' => [trans($response)],
-            ]);
+        return new JsonResponse([
+            'message' => trans($response)], $response == PasswordBroker::PASSWORD_RESET ? 200 : 422);
     }
 
     /** @throws Throwable */
