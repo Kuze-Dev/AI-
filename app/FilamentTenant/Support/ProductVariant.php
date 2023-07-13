@@ -40,7 +40,7 @@ class ProductVariant extends Field
                         throw new InvalidArgumentException();
                     }
 
-                    $livewire->mountProductVariantItem($this->getName(), "{$statePath}." . (string) Str::uuid());
+                    $livewire->mountProductVariantItem($this->getName(), $statePath);
                 },
             ],
         ]);

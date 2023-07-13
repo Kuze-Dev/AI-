@@ -35,8 +35,8 @@ class ProductOptionValue extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'product_option_id',
         'name',
+        'product_option_id',
     ];
 
     public function getRouteKeyName(): string

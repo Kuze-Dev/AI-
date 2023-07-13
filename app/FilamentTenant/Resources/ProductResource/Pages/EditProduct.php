@@ -11,6 +11,7 @@ use App\FilamentTenant\Support\Concerns\HasProductVariants;
 use App\FilamentTenant\Support\Contracts\HasProductOptions as HasProductOptionsContracts;
 use App\FilamentTenant\Support\Contracts\HasProductVariants as HasProductVariantsContracts;
 use App\FilamentTenant\Support\ProductOptionFormAction;
+use App\FilamentTenant\Support\ProductVariantFormAction;
 use Domain\Product\Actions\UpdateProductAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Filament\Pages\Actions;
@@ -20,10 +21,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class EditProduct extends EditRecord implements HasProductVariantsContracts, HasProductOptionsContracts
+class EditProduct extends EditRecord implements HasProductOptionsContracts, HasProductVariantsContracts
 {
-    use HasProductVariants;
     use HasProductOptions;
+    use HasProductVariants;
     use LogsFormActivity;
 
     protected static string $resource = ProductResource::class;
@@ -36,6 +37,7 @@ class EditProduct extends EditRecord implements HasProductVariantsContracts, Has
                 ->action('save')
                 ->keyBindings(['mod+s']),
             ProductOptionFormAction::make(),
+            ProductVariantFormAction::make(),
             Actions\DeleteAction::make(),
         ];
     }
