@@ -40,6 +40,8 @@ return new class () extends Migration {
     /** Reverse the migrations. */
     public function down(): void
     {
-        Schema::dropIfExists('taxations');
+        Schema::dropIfExists('tax_zones');
+        Schema::dropIfExists('tax_zone_country');
+        Schema::dropIfExists('tax_zone_state');
     }
 };
