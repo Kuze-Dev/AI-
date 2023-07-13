@@ -9,7 +9,9 @@ use App\HttpTenantApi\Resources\PageResource;
 use Carbon\Carbon;
 use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Page\Models\Page;
+use Domain\Shipment\API\USPS\Address\AddressClient;
 use Domain\Shipment\API\USPS\RateClient;
+use Domain\Shipment\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\Drivers\UspsDriver;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -29,15 +31,25 @@ class PageController
     public function index(): JsonApiResourceCollection
     {
 
-        $rate = app(RateClient::class);
+        // $rate = app(RateClient::class);
 
-   
+        $address = app(AddressClient::class)->verify(
+            AddressValidateRequestData::fromArray([
+                'Address1' => '',
+                'Address2' => 'STE K 185 Berry Street',
+                'City' => 'San Francisco',
+                'State' => 'CA',
+                'Zip5' => '5656',
+                'Zip4' => '2342',
+            ])
+        );
+
         //$rate->rateValue();
-   
-        $usps = new UspsDriver($rate);
 
-        dd($usps->getRate());
-     
+        // $usps = new UspsDriver($rate);
+
+        // dd($usps->getRate());
+
         return PageResource::collection(
             QueryBuilder::for(
                 Page::with('activeRouteUrl')
