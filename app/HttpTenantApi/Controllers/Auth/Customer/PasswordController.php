@@ -26,7 +26,7 @@ use Spatie\RouteAttributes\Attributes\Put;
 use Throwable;
 
 #[
-    Prefix('password'),
+    Prefix('account/password'),
     Middleware('feature.tenant:' . ECommerceBase::class)
 ]
 class PasswordController extends Controller

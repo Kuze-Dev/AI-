@@ -67,7 +67,7 @@ class AuthServiceProvider extends ServiceProvider
                 $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;
 
                 return $hostName . URL::temporarySignedRoute(
-                    'tenant.api.customer.verify',
+                    'tenant.api.customer.verification.verify',
                     now()->addMinutes(Config::get('auth.verification.expire', 60)),
                     [
                         'customer' => $notifiable->getRouteKey(),
