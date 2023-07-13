@@ -19,12 +19,14 @@ class RateController
     public function __invoke(string $slug)
     {
 
-        return app(GetShippingRateAction::class)->execute(
-            new ParcelData(
-                pounds: '10',
-                ounces: '0'
-            ),
-            $slug
+        dump(
+            app(GetShippingRateAction::class)->execute(
+                new ParcelData(
+                    pounds: '10',
+                    ounces: '0'
+                ),
+                $slug
+            )
         );
 
     }

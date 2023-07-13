@@ -7,6 +7,7 @@ namespace Domain\Shipment;
 use App\Settings\ShippingSettings;
 use Domain\Shipment\API\USPS\Clients\Client;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
+use Domain\Shipment\Drivers\StorePickup;
 use Domain\Shipment\Drivers\UspsDriver;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Contracts\Support\DeferrableProvider;
@@ -48,9 +49,8 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
                 foreach ($paymentMethods as $courier) {
                     app(ShippingManagerInterface::class)->extend($courier->slug, function () use ($courier) {
                         return match ($courier->driver) {
-                            // 'store-pickup' => new PaypalProvider(),
+                            'store-pickup' => new StorePickup(),
                             'usps' => new UspsDriver(),
-                            // 'ups' => new OfflinePayment(),
                             default => throw new InvalidArgumentException(),
                         };
                     });
