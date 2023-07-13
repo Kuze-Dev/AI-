@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\RequestFactories;
 
+use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\State;
 use Domain\Customer\Enums\Gender;
 use Illuminate\Support\Arr;
@@ -34,32 +35,38 @@ class CustomerRequestFactory extends RequestFactory
     public function shippingAddress(State $state): self
     {
         return $this->state([
-            'shipping_country_id' => $state->country->getRouteKey(),
-            'shipping_state_id' => $state->getRouteKey(),
-            'shipping_address_line_1' => $this->faker->address(),
-            'shipping_zip_code' => $this->faker->postcode(),
-            'shipping_city' => $this->faker->city(),
-            'shipping_label_as' => 'home',
+            'shipping' => [
+                'country_id' => $state->country->getRouteKey(),
+                'state_id' => $state->getRouteKey(),
+                'address_line_1' => $this->faker->address(),
+                'zip_code' => $this->faker->postcode(),
+                'city' => $this->faker->city(),
+                'label_as' => Arr::random(AddressLabelAs::cases())->value,
+            ],
         ]);
     }
 
     public function billingSameAsShipping(): self
     {
         return $this->state([
-            'billing_same_as_shipping' => true,
+            'billing' => [
+                'same_as_shipping' => true,
+            ],
         ]);
     }
 
     public function billingAddress(State $state): self
     {
         return $this->state([
-            'billing_same_as_shipping' => false,
-            'billing_country_id' => $state->country->getRouteKey(),
-            'billing_state_id' => $state->getRouteKey(),
-            'billing_address_line_1' => $this->faker->address(),
-            'billing_zip_code' => $this->faker->postcode(),
-            'billing_city' => $this->faker->city(),
-            'billing_label_as' => 'home',
+            'billing' => [
+                'same_as_shipping' => false,
+                'country_id' => $state->country->getRouteKey(),
+                'state_id' => $state->getRouteKey(),
+                'address_line_1' => $this->faker->address(),
+                'zip_code' => $this->faker->postcode(),
+                'city' => $this->faker->city(),
+                'label_as' => Arr::random(AddressLabelAs::cases())->value,
+            ],
         ]);
     }
 }

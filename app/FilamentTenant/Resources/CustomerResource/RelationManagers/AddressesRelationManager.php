@@ -82,6 +82,7 @@ class AddressesRelationManager extends RelationManager
 
                 Forms\Components\Select::make('label_as')
                     ->translateLabel()
+                    ->required()
                     ->options(
                         collect(AddressLabelAs::cases())
                             ->mapWithKeys(fn (AddressLabelAs $target) => [

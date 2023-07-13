@@ -117,7 +117,7 @@ class CustomerResource extends Resource
                                 ->mapWithKeys(fn (Gender $target) => [$target->value => Str::headline($target->value)])
                                 ->toArray()
                         )
-                        ->in(collect(Gender::cases())->map(fn (Gender $status) => $status->value)->toArray()),
+                        ->enum(Gender::class),
                     Forms\Components\Select::make('status')
                         ->translateLabel()
                         ->required()
@@ -126,7 +126,7 @@ class CustomerResource extends Resource
                                 ->mapWithKeys(fn (Status $target) => [$target->value => Str::headline($target->value)])
                                 ->toArray()
                         )
-                        ->in(collect(Status::cases())->map(fn (Status $status) => $status->value)->toArray()),
+                        ->enum(Status::class),
                 ])->columns(2),
             ]);
     }

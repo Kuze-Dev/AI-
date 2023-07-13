@@ -13,7 +13,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 
+use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\postJson;
+use function Pest\Laravel\putJson;
 use function PHPUnit\Framework\assertNotSame;
 use function PHPUnit\Framework\assertTrue;
 
@@ -66,4 +69,47 @@ it('can reset password', function () {
 
     Notification::assertSentTo([$customer], PasswordHasBeenReset::class);
     Event::assertDispatched(PasswordReset::class);
+});
+
+it('can not update password', function () {
+    $customer = CustomerFactory::new()
+        ->createOne([
+            'password' => 'old-password',
+        ]);
+
+    Sanctum::actingAs($customer);
+
+    putJson('api/password', [
+        'current_password' => 'invalid-password',
+        'password' => 'new-password',
+        'password_confirmation' => 'new-password',
+    ])
+        ->assertInvalid(['current_password' => 'Invalid current password.'])
+        ->assertUnprocessable();
+
+    $customer->refresh();
+
+    assertTrue(Hash::check('old-password', $customer->password), 'password updated');
+});
+
+it('can update password', function () {
+    $customer = CustomerFactory::new()
+        ->createOne([
+            'password' => 'old-password',
+        ]);
+
+    Sanctum::actingAs($customer);
+
+    putJson('api/password', [
+        'current_password' => 'old-password',
+        'password' => 'new-password',
+        'password_confirmation' => 'new-password',
+    ])
+        ->assertValid()
+        ->assertOk()
+        ->assertJson(['message' => 'Your password has been updated!']);
+
+    $customer->refresh();
+
+    assertTrue(Hash::check('new-password', $customer->password), 'password not updated');
 });

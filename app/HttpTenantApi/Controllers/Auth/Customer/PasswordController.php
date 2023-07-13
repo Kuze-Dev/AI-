@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password as PasswordBroker;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password as PasswordRule;
@@ -68,26 +69,37 @@ class PasswordController extends Controller
                 }
             );
 
-        return new JsonResponse([
-            'message' => trans($response)], $response == PasswordBroker::PASSWORD_RESET ? 200 : 422);
+        return new JsonResponse(
+            ['message' => trans($response)],
+            $response == PasswordBroker::PASSWORD_RESET ? 200 : 422
+        );
     }
 
     /** @throws Throwable */
     #[Put('/', name: 'password.update', middleware: 'auth:sanctum')]
     public function update(Request $request): JsonResponse
     {
-        $validated = $this->validate($request, [
-            'password' => ['required', 'confirmed', PasswordRule::default()],
-        ]);
-
         /** @var \Domain\Customer\Models\Customer $customer */
         $customer = Auth::user();
+
+        $validated = $this->validate($request, [
+            'current_password' => [
+                'required',
+                'string',
+                function ($attributes, $value, $failed) use ($customer) {
+                    if( ! Hash::check($value, $customer->password)) {
+                        $failed(trans('Invalid :attribute.'));
+                    }
+                },
+            ],
+            'password' => ['required', 'confirmed', PasswordRule::default()],
+        ]);
 
         DB::transaction(
             fn () => app(EditCustomerPasswordAction::class)
                 ->execute($customer, $validated['password'])
         );
 
-        return new JsonResponse(['message' => trans('Password updated.')], 200);
+        return new JsonResponse(['message' => trans('Your password has been updated!')], 200);
     }
 }
