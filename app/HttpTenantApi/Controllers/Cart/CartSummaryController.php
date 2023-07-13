@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\Http\Controllers\Controller;
-use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
-use Illuminate\Database\Eloquent\Builder;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
-use Spatie\RouteAttributes\Attributes\Prefix;
 
 #[
     Middleware(['auth:sanctum'])

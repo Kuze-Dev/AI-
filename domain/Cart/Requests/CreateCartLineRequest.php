@@ -40,13 +40,13 @@ class CreateCartLineRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $purchasableId = $this->input('purchasable_id');
 
-                    if (!$purchasableId) {
+                    if ( ! $purchasableId) {
                         $fail('Invalid product.');
                     }
 
                     $product = Product::find($purchasableId);
 
-                    if (!$product) {
+                    if ( ! $product) {
                         $fail('Invalid product.');
 
                         return;

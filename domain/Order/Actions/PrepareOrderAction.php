@@ -18,9 +18,9 @@ class PrepareOrderAction
     {
         $customer = auth()->user();
 
-        $shippingAddress = Address::with("state.country")->find($placeOrderData->addresses->shipping);
+        $shippingAddress = Address::with('state.country')->find($placeOrderData->addresses->shipping);
 
-        $billingAddress = Address::with("state.country")->find($placeOrderData->addresses->billing);
+        $billingAddress = Address::with('state.country')->find($placeOrderData->addresses->billing);
 
         $currency = Currency::where('default', true)->first();
 

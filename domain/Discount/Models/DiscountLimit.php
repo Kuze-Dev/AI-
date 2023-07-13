@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Discount\Models;
 
-use Domain\Customer\Models\Customer;
-use Domain\Order\Models\Order;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;

@@ -9,9 +9,9 @@ use Illuminate\Contracts\View\View;
 
 trait HasTabHeader
 {
-    protected ?string $activeOption = "All";
+    protected ?string $activeOption = 'All';
 
-    protected function getTableHeader(): View | Htmlable | null
+    protected function getTableHeader(): View|Htmlable|null
     {
         return view('filament.forms.components.table-header-tabs');
     }
@@ -20,6 +20,7 @@ trait HasTabHeader
     {
         if ($option == 'All') {
             $this->activeOption = $option;
+
             return;
         }
 

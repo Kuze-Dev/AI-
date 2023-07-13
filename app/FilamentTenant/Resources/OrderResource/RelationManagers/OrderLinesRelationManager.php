@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\OrderResource\RelationManagers;
 
 use App\FilamentTenant\Resources\OrderResource;
-use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\ProductVariant;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
 
 class OrderLinesRelationManager extends RelationManager
@@ -37,9 +35,11 @@ class OrderLinesRelationManager extends RelationManager
                         if ($record->purchasable_type == ProductVariant::class) {
                             $variant = array_values($record->purchasable_data['combination']);
                             $variantString = implode(' / ', array_map('ucfirst', $variant));
+
                             return $variantString;
                         }
-                        return "";
+
+                        return '';
                     })
                     ->alignLeft(),
                 Tables\Columns\TextColumn::make('unit_price')->label('Unit Price'),
@@ -47,14 +47,14 @@ class OrderLinesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('sub_total')->label('Amount'),
             ])
             ->headerActions([
-                Tables\Actions\Action::make('view')->label("View Details")->color("secondary")->action(function ($livewire) {
+                Tables\Actions\Action::make('view')->label('View Details')->color('secondary')->action(function ($livewire) {
                     return redirect(OrderResource::getUrl('details', ['record' => $livewire->ownerRecord]));
-                })->button()
+                })->button(),
             ]);
     }
 
     protected function getTableContentFooter(): ?View
     {
-        return view('filament.tables.order.order-lines-footer');;
+        return view('filament.tables.order.order-lines-footer');
     }
 }

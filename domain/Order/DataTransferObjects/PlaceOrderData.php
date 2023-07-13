@@ -18,8 +18,8 @@ class PlaceOrderData
     {
         return new self(
             addresses: new OrderAddressData(
-                shipping: (int)$data['addresses']['shipping'],
-                billing: (int)$data['addresses']['billing']
+                shipping: (int) $data['addresses']['shipping'],
+                billing: (int) $data['addresses']['billing']
             ),
             cart_reference: $data['cart_reference'],
             notes: $data['notes'] ?? null,

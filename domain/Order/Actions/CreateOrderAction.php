@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Order\Actions;
 
+use Domain\Discount\Actions\CreateDiscountLimitAction;
 use Domain\Discount\Actions\DiscountHelperFunctions;
-use Domain\Discount\Models\Discount;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Models\Order;
 use Illuminate\Support\Str;
@@ -15,7 +15,6 @@ class CreateOrderAction
     public function execute(PreparedOrderData $preparedOrderData)
     {
         $referenceNumber = Str::upper(Str::random(12));
-
 
         // dd($deductable_subtotal_amount);
         $subTotal = $preparedOrderData->cartLine->reduce(function ($carry, $cartLine) {
@@ -57,6 +56,7 @@ class CreateOrderAction
             'payment_details' => 'test payment details',
             'is_paid' => false,
         ]);
+        app(CreateDiscountLimitAction::class)->execute($preparedOrderData->discountCode, $order, $preparedOrderData->customer);
 
         return $order;
     }

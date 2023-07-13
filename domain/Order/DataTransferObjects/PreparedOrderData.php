@@ -31,7 +31,6 @@ class PreparedOrderData
             cartLine: $data['cartLine'],
             notes: $data['notes'] ?? null,
             discountCode: $data['discountCode'] ?? null,
-
         );
     }
 }
