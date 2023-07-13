@@ -7,6 +7,7 @@ namespace Domain\Shipment\API\USPS;
 use Domain\Shipment\DataTransferObjects\RateInternationalV2ResponseData;
 use Domain\Shipment\DataTransferObjects\RateV4RequestData;
 use Domain\Shipment\DataTransferObjects\RateV4ResponseData;
+use Illuminate\Support\Facades\Log;
 use Vyuldashev\XmlToArray\XmlToArray;
 use Spatie\ArrayToXml\ArrayToXml;
 
@@ -21,8 +22,6 @@ class RateClient
 
     public function getV4(RateV4RequestData $requestData): RateV4ResponseData
     {
-        ray($requestData->toArray());
-
         $array = [
             'Revision' => '1',
             'Package' => array_merge([
@@ -37,8 +36,6 @@ class RateClient
             ],
         ], true, 'UTF-8');
 
-        dump($result);
-
         $body = $this->client->getClient()
             ->withQueryParameters([
                 'API' => 'RateV4',
@@ -47,9 +44,21 @@ class RateClient
             ->get(self::URI)
             ->body();
 
+        $array = XmlToArray::convert($body);
+
+        self::throwError($array);
+
         return new RateV4ResponseData(
-            rate: (float) XmlToArray::convert($body)['RateV4Response']['Package']['Postage']['Rate']
+            rate: (float) $array['RateV4Response']['Package']['Postage']['Rate']
         );
+    }
+
+    private static function throwError(array $array): void
+    {
+        if (isset($array['Error'])) {
+            Log::error('error', $array);
+            abort(422, 'Something wrong.');
+        }
     }
 
     public function getInternationalVersion2(): RateInternationalV2ResponseData
@@ -88,7 +97,11 @@ class RateClient
             ->get(self::URI)
             ->body();
 
-        dump(XmlToArray::convert($body));
+        $array = XmlToArray::convert($body);
+
+        self::throwError($array);
+
+        dump($array);
 
         return new RateInternationalV2ResponseData();
     }

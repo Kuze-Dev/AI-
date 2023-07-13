@@ -15,7 +15,7 @@ class RateV4RequestData
         public readonly string $ZipDestination,
         public readonly string $Pounds,
         public readonly string $Ounces,
-        public readonly Container $Container,
+        public readonly Container $Container = Container::VARIABLE,
         public readonly bool $Machinable = true,
     ) {
     }
@@ -24,8 +24,8 @@ class RateV4RequestData
     {
         $array = get_object_vars($this);
 
-        $array['Service'] = $array['Service'] ->value;
-        $array['Container'] = $array['Container'] ->value;
+        $array['Service'] = $array['Service']->value;
+        $array['Container'] = $array['Container']->value;
 
         return $array;
     }

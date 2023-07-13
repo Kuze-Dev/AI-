@@ -6,7 +6,6 @@ namespace Domain\Shipment\API\USPS\Enums;
 
 enum Container: string
 {
-    case NONE = '';
     case VARIABLE = 'VARIABLE';
     case FLAT_RATE_ENVELOPE = 'FLAT RATE ENVELOPE';
     case PADDED_FLAT_RATE_ENVELOPE = 'PADDED FLAT RATE ENVELOPE';

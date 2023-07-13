@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\Drivers;
 
-use Domain\Shipment\API\USPS\Enums\Container;
 use Domain\Shipment\API\USPS\Enums\ServiceType;
 use Domain\Shipment\API\USPS\RateClient;
 use Domain\Shipment\DataTransferObjects\RateV4RequestData;
@@ -35,8 +34,6 @@ class UspsDriver
                 ZipDestination:'26301',
                 Pounds:'8',
                 Ounces:'2',
-                Container:Container::NONE,
-                Machinable:true,
             )
         )->rate;
     }

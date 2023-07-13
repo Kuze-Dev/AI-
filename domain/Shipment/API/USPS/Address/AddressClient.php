@@ -41,7 +41,7 @@ class AddressClient
             ])
             ->get(self::URI)
             ->body();
-            
+
         return AddressValidateResponseData::fromArray(
             XmlToArray::convert($body)['AddressValidateResponse']['Address']
         );
