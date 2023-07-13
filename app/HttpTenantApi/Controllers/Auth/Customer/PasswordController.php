@@ -100,6 +100,6 @@ class PasswordController extends Controller
                 ->execute($customer, $validated['password'])
         );
 
-        return new JsonResponse(['message' => trans('Password updated.')], 200);
+        return new JsonResponse(['message' => trans('Your password has been updated!')], 200);
     }
 }
