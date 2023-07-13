@@ -161,7 +161,9 @@ class ViewOrderDetails extends ViewRecord
                                 ])
                                 ->slideOver()
                                 ->icon('heroicon-o-document');
-                        })->fullWidth()->size("md"),
+                        })
+                        ->hidden(is_null($orderLine->remarks_data) && empty($orderLine->getFirstMediaUrl('order_line_notes')) ? true : false)
+                        ->fullWidth()->size("md"),
                 ])->collapsible();
         }
 
