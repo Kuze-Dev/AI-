@@ -59,7 +59,7 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         // return $order;
-        $this->authorize('view', $order);
+        // $this->authorize('view', $order);
 
         $model = QueryBuilder::for(
             $order->whereBelongsTo(auth()->user())->whereReference($order->reference)
@@ -71,7 +71,7 @@ class OrderController extends Controller
 
     public function update(UpdateOrderRequest $request, Order $order)
     {
-        $this->authorize('update', $order);
+        // $this->authorize('update', $order);
 
         $validatedData = $request->validated();
 

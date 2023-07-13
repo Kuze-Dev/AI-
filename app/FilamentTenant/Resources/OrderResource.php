@@ -16,8 +16,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use Closure;
+use Domain\Order\Enums\OrderStatuses;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Throwable;
 
 class OrderResource extends Resource
 {
@@ -27,7 +30,12 @@ class OrderResource extends Resource
 
     protected static ?string $model = Order::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
+
+    protected static function getNavigationBadge(): ?string
+    {
+        return strval(static::$model::where('status', OrderStatuses::PENDING)->count());
+    }
 
     public static function form(Form $form): Form
     {
@@ -316,6 +324,35 @@ class OrderResource extends Resource
                             ->modalHeading('Proof of Payment')
                             ->modalWidth('lg')
                             ->form([
+                                Forms\Components\FileUpload::make('bank_proof_image')->label("Customer Upload")
+                                    ->formatStateUsing(function (Order $record) {
+                                        return $record?->getMedia('bank_proof_images')
+                                            ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                                            ->toArray() ?? [];
+                                    })
+                                    ->hidden(function (Order $record) {
+                                        if (empty($record?->getFirstMediaUrl('bank_proof_images'))) {
+                                            return true;
+                                        }
+                                        return false;
+                                    })
+                                    ->multiple()
+                                    ->image()
+                                    ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                                        $mediaClass = config('media-library.media_model', Media::class);
+
+                                        /** @var ?Media $media */
+                                        $media = $mediaClass::findByUuid($file);
+
+                                        if ($component->getVisibility() === 'private') {
+                                            try {
+                                                return $media?->getTemporaryUrl(now()->addMinutes(5));
+                                            } catch (Throwable $exception) {
+                                            }
+                                        }
+                                        return $media?->getUrl();
+                                    })->disabled(),
+
                                 Forms\Components\Select::make('payment_status')
                                     ->label('')
                                     ->options([
@@ -327,6 +364,7 @@ class OrderResource extends Resource
                             ->slideOver()
                             ->icon('heroicon-s-eye');
                     })->fullWidth()->size("md"),
+                Support\Divider::make(''),
                 Forms\Components\Grid::make(2)
                     ->schema([
                         Support\TextLabel::make("")->label("Subtotal")->alignLeft()->size("sm")->inline()->readOnly(),

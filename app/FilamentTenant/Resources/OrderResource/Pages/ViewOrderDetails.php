@@ -11,6 +11,8 @@ use Illuminate\Contracts\Support\Htmlable;
 use Filament\Forms;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
+use App\FilamentTenant\Support;
+use Closure;
 
 class ViewOrderDetails extends ViewRecord
 {
@@ -111,38 +113,55 @@ class ViewOrderDetails extends ViewRecord
                                         ]),
                                 ])->columnSpan(2),
                         ])->columns(3),
-                    // Forms\Components\FileUpload::make('customer_upload_' . $sectionIndex)
-                    //     ->formatStateUsing(function ($record) use ($orderLine) {
-                    //         return $orderLine?->getMedia('order_line_notes')
-                    //             ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                    //             ->toArray() ?? [];
-                    //     })
-                    //     ->hidden(function () use ($orderLine) {
-                    //         if (empty($orderLine->getFirstMediaUrl('order_line_notes'))) {
-                    //             return true;
-                    //         }
-                    //         return false;
-                    //     })
-                    //     ->image()
-                    //     ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
-                    //         $mediaClass = config('media-library.media_model', Media::class);
+                    Support\Divider::make(''),
+                    Support\ButtonAction::make('view_remarks_' . $sectionIndex)
+                        ->disableLabel()
+                        ->execute(function () use ($sectionIndex, $orderLine) {
+                            return Forms\Components\Actions\Action::make('view_remarks_btn_' . $sectionIndex)
+                                ->color('secondary')
+                                ->label('View Remarks')
+                                ->size('sm')
+                                ->action(function () {
+                                })
+                                ->modalActions([])
+                                ->modalHeading('Customer Remarks')
+                                ->modalWidth('lg')
+                                ->form([
+                                    Forms\Components\Placeholder::make('remarks_' . $sectionIndex)->label('Remarks')
+                                        ->hidden(is_null($orderLine->remarks_data) ? true : false)
+                                        ->content($orderLine->remarks_data['notes'] ?? ""),
+                                    Forms\Components\FileUpload::make('customer_upload_' . $sectionIndex)->label("Customer Upload")
+                                        ->formatStateUsing(function ($record) use ($orderLine) {
+                                            return $orderLine?->getMedia('order_line_notes')
+                                                ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                                                ->toArray() ?? [];
+                                        })
+                                        ->hidden(function () use ($orderLine) {
+                                            if (empty($orderLine->getFirstMediaUrl('order_line_notes'))) {
+                                                return true;
+                                            }
+                                            return false;
+                                        })
+                                        ->multiple()
+                                        ->image()
+                                        ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                                            $mediaClass = config('media-library.media_model', Media::class);
 
-                    //         /** @var ?Media $media */
-                    //         $media = $mediaClass::findByUuid($file);
+                                            /** @var ?Media $media */
+                                            $media = $mediaClass::findByUuid($file);
 
-                    //         if ($component->getVisibility() === 'private') {
-                    //             try {
-                    //                 return $media?->getTemporaryUrl(now()->addMinutes(5));
-                    //             } catch (Throwable $exception) {
-                    //                 // This driver does not support creating temporary URLs.
-                    //             }
-                    //         }
-
-                    //         return $media?->getUrl();
-                    //     })->columnSpan(1),
-                    Forms\Components\Placeholder::make('remarks_' . $sectionIndex)->label('Remarks')
-                        ->hidden(is_null($orderLine->remarks_data) ? true : false)
-                        ->content($orderLine->remarks_data['notes'] ?? ""),
+                                            if ($component->getVisibility() === 'private') {
+                                                try {
+                                                    return $media?->getTemporaryUrl(now()->addMinutes(5));
+                                                } catch (Throwable $exception) {
+                                                }
+                                            }
+                                            return $media?->getUrl();
+                                        })->disabled()
+                                ])
+                                ->slideOver()
+                                ->icon('heroicon-o-document');
+                        })->fullWidth()->size("md"),
                 ])->collapsible();
         }
 

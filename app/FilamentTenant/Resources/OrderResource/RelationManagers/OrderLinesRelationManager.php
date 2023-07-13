@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\OrderResource\RelationManagers;
 
 use App\FilamentTenant\Resources\OrderResource;
+use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\ProductVariant;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -19,16 +20,6 @@ class OrderLinesRelationManager extends RelationManager
     protected static string $relationship = 'orderLines';
 
     protected static ?string $recordTitleAttribute = 'label';
-
-    public function viewDetails()
-    {
-        return redirect(OrderResource::getUrl('details', ['record' => $this->ownerRecord]));
-    }
-
-    protected function getTableHeader(): View | Htmlable | null
-    {
-        return view('filament.tables.order.order-lines-header');
-    }
 
     public static function table(Table $table): Table
     {
@@ -54,6 +45,11 @@ class OrderLinesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('unit_price')->label('Unit Price'),
                 Tables\Columns\TextColumn::make('quantity')->label('Quantity'),
                 Tables\Columns\TextColumn::make('sub_total')->label('Amount'),
+            ])
+            ->headerActions([
+                Tables\Actions\Action::make('view')->label("View Details")->color("secondary")->action(function ($livewire) {
+                    return redirect(OrderResource::getUrl('details', ['record' => $livewire->ownerRecord]));
+                })->button()
             ]);
     }
 
