@@ -41,7 +41,7 @@ class LoginController extends Controller
 
         return response([
             'token' => $customer
-                ->createToken('customer auth')
+                ->createToken('customer')
                 ->plainTextToken,
         ]);
     }
