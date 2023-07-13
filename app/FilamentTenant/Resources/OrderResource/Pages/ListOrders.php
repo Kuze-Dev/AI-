@@ -19,7 +19,7 @@ class ListOrders extends ListRecords implements ContractsHasTabHeader
     public function getTabOptions(): array
     {
         return [
-            "All", "Pending", "Packed", "Shipped", "Fulfilled", "For Cancellation", "Cancelled", "Refunded"
+            "All", "Pending", "Delivered", "Packed", "Shipped", "Fulfilled", "For Cancellation", "Cancelled", "Refunded"
         ];
     }
 

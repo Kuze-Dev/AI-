@@ -247,7 +247,14 @@ class OrderResource extends Resource
                                             $status = $data['status_options'];
                                             $updateData = ['status' => $status];
 
-                                            if ($status === 'Cancelled') {
+                                            if ($status == "Cancelled") {
+                                                if ($order->status == OrderStatuses::PACKED) {
+                                                    Notification::make()
+                                                        ->title("You can't cancel this order, its already packed.")
+                                                        ->warning()
+                                                        ->send();
+                                                    return;
+                                                }
                                                 $updateData['cancelled_at'] = now(Auth::user()?->timezone);
                                             }
 

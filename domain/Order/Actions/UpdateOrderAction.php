@@ -6,6 +6,7 @@ namespace Domain\Order\Actions;
 
 use Domain\Order\DataTransferObjects\UpdateOrderData;
 use Domain\Order\Enums\OrderResult;
+use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
 use Exception;
 use Log;
@@ -17,6 +18,11 @@ class UpdateOrderAction
         try {
             if ($updateOrderData->status) {
                 if ($updateOrderData->status == 'For Cancellation') {
+                    //cant cancel if order is 
+                    if ($order->status != OrderStatuses::PENDING) {
+                        return OrderResult::FAILED;
+                    }
+
                     $order->update([
                         'status' => $updateOrderData->status,
                         'cancelled_reason' => $updateOrderData->notes,
