@@ -8,11 +8,6 @@ use Illuminate\Support\Manager;
 
 class ShippingManager extends Manager
 {
-    /**
-     * Get the default driver name.
-     *
-     * @return string
-     */
     public function getDefaultDriver(): string
     {
         return config('shipping.default');

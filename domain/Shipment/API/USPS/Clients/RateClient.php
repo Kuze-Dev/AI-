@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Domain\Shipment\API\USPS;
+namespace Domain\Shipment\API\USPS\Clients;
 
-use Domain\Shipment\DataTransferObjects\RateInternationalV2ResponseData;
-use Domain\Shipment\DataTransferObjects\RateV4RequestData;
-use Domain\Shipment\DataTransferObjects\RateV4ResponseData;
+use Domain\Shipment\API\USPS\DataTransferObjects\RateInternationalV2ResponseData;
+use Domain\Shipment\API\USPS\DataTransferObjects\RateV4RequestData;
+use Domain\Shipment\API\USPS\DataTransferObjects\RateV4ResponseData;
 use Illuminate\Support\Facades\Log;
-use Vyuldashev\XmlToArray\XmlToArray;
 use Spatie\ArrayToXml\ArrayToXml;
+use Vyuldashev\XmlToArray\XmlToArray;
 
 class RateClient
 {

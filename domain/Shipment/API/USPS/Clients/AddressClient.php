@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Domain\Shipment\API\USPS\Address;
+namespace Domain\Shipment\API\USPS\Clients;
 
-use Domain\Shipment\API\USPS\Client;
-use Domain\Shipment\DataTransferObjects\AddressValidateRequestData;
-use Domain\Shipment\DataTransferObjects\AddressValidateResponseData;
-use Vyuldashev\XmlToArray\XmlToArray;
+use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
+use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateResponseData;
 use Spatie\ArrayToXml\ArrayToXml;
+use Vyuldashev\XmlToArray\XmlToArray;
 
 class AddressClient
 {

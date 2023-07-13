@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Shipment\API\USPS;
+namespace Domain\Shipment\API\USPS\Clients;
 
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;

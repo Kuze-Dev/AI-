@@ -9,18 +9,16 @@ use App\HttpTenantApi\Resources\PageResource;
 use Carbon\Carbon;
 use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Page\Models\Page;
-use Domain\Shipment\API\USPS\Address\AddressClient;
-use Domain\Shipment\API\USPS\RateClient;
-use Domain\Shipment\DataTransferObjects\AddressValidateRequestData;
-use Domain\Shipment\Drivers\UspsDriver;
+use Domain\Shipment\API\USPS\Clients\AddressClient;
+use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\URL;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
-use TiMacDonald\JsonApi\JsonApiResourceCollection;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\URL;
 use Spatie\RouteAttributes\Attributes\Middleware;
+use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('pages', only: ['index', 'show']),

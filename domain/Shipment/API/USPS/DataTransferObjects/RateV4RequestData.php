@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Shipment\DataTransferObjects;
+namespace Domain\Shipment\API\USPS\DataTransferObjects;
 
 use Domain\Shipment\API\USPS\Enums\Container;
 use Domain\Shipment\API\USPS\Enums\ServiceType;

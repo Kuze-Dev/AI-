@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\Drivers;
 
+use Domain\Shipment\API\USPS\Clients\RateClient;
+use Domain\Shipment\API\USPS\DataTransferObjects\RateV4RequestData;
 use Domain\Shipment\API\USPS\Enums\ServiceType;
-use Domain\Shipment\API\USPS\RateClient;
-use Domain\Shipment\DataTransferObjects\RateV4RequestData;
 
 class UspsDriver
 {

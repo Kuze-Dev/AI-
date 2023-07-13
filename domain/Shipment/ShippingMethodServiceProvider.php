@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Domain\Shipment;
 
 use App\Settings\ShippingSettings;
-use Domain\Shipment\API\USPS\Client;
+use Domain\Shipment\API\USPS\Clients\Client;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\Drivers\UspsDriver;
 use Domain\ShippingMethod\Models\ShippingMethod;

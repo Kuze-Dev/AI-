@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Shipment\DataTransferObjects;
+namespace Domain\Shipment\API\USPS\DataTransferObjects;
 
 class AddressValidateResponseData
 {
@@ -19,12 +19,12 @@ class AddressValidateResponseData
     public static function fromArray(array $data): self
     {
         return new self(
-            address1: $data['Address1'] ?? null,
-            address2: $data['Address2'] ?? null,
             state: $data['State'],
             zip4: $data['Zip4'],
             zip5: $data['Zip5'],
             city: $data['City'],
+            address1: $data['Address1'] ?? null,
+            address2: $data['Address2'] ?? null,
         );
     }
 }
