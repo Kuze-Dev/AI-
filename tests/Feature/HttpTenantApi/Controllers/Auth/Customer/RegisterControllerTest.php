@@ -66,20 +66,20 @@ it('register', function () {
     assertDatabaseHas(Address::class, [
         'customer_id' => $customer->getKey(),
         'state_id' => $state->getKey(),
-        'label_as' => $data['shipping_label_as'],
-        'address_line_1' => $data['shipping_address_line_1'],
-        'zip_code' => $data['shipping_zip_code'],
-        'city' => $data['shipping_city'],
+        'label_as' => $data['shipping']['label_as'],
+        'address_line_1' => $data['shipping']['address_line_1'],
+        'zip_code' => $data['shipping']['zip_code'],
+        'city' => $data['shipping']['city'],
         'is_default_shipping' => 1,
         'is_default_billing' => 0,
     ]);
     assertDatabaseHas(Address::class, [
         'customer_id' => $customer->getKey(),
         'state_id' => $state->getKey(),
-        'label_as' => $data['billing_label_as'],
-        'address_line_1' => $data['billing_address_line_1'],
-        'zip_code' => $data['billing_zip_code'],
-        'city' => $data['billing_city'],
+        'label_as' => $data['billing']['label_as'],
+        'address_line_1' => $data['billing']['address_line_1'],
+        'zip_code' => $data['billing']['zip_code'],
+        'city' => $data['billing']['city'],
         'is_default_shipping' => 0,
         'is_default_billing' => 1,
     ]);
@@ -101,25 +101,15 @@ it('register w/ same address', function () {
 
     $customer = Customer::first();
 
-    assertDatabaseCount(Address::class, 2);
+    assertDatabaseCount(Address::class, 1);
     assertDatabaseHas(Address::class, [
         'customer_id' => $customer->getKey(),
         'state_id' => $state->getKey(),
-        'label_as' => $data['shipping_label_as'],
-        'address_line_1' => $data['shipping_address_line_1'],
-        'zip_code' => $data['shipping_zip_code'],
-        'city' => $data['shipping_city'],
+        'label_as' => $data['shipping']['label_as'],
+        'address_line_1' => $data['shipping']['address_line_1'],
+        'zip_code' => $data['shipping']['zip_code'],
+        'city' => $data['shipping']['city'],
         'is_default_shipping' => 1,
-        'is_default_billing' => 0,
-    ]);
-    assertDatabaseHas(Address::class, [
-        'customer_id' => $customer->getKey(),
-        'state_id' => $state->getKey(),
-        'label_as' => $data['shipping_label_as'],
-        'address_line_1' => $data['shipping_address_line_1'],
-        'zip_code' => $data['shipping_zip_code'],
-        'city' => $data['shipping_city'],
-        'is_default_shipping' => 0,
         'is_default_billing' => 1,
     ]);
 });
