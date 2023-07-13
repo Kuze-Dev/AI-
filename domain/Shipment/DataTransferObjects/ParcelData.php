@@ -17,6 +17,6 @@ class ParcelData
 
     public function toArray(): array
     {
-        return array_filter(get_object_vars($this), fn ($value) => !is_null($value) && $value !== '');
+        return array_filter(get_object_vars($this), fn ($value) => ! is_null($value) && $value !== '');
     }
 }
