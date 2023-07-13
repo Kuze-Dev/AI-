@@ -31,7 +31,7 @@ class CheckoutController
 
         $reference = $validated['reference'];
 
-        if ( ! $reference) {
+        if (!$reference) {
             return response()->json([
                 'message' => 'Invalid reference.',
             ], 400);
