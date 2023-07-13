@@ -16,7 +16,7 @@ final class Client
     public function __construct(
         public readonly string $username,
         public readonly string $password,
-        readonly bool $isProduction,
+        public readonly bool $isProduction,
     ) {
         $this->client = Http::baseUrl(
             $isProduction

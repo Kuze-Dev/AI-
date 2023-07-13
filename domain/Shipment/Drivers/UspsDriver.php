@@ -13,14 +13,17 @@ class UspsDriver
 {
     protected string $name = 'usps';
 
-    public function __construct(private readonly RateClient $rateClient)
-    {
+    protected RateClient $rateClient;
 
+    public function __construct()
+    {
+        $this->rateClient = app(RateClient::class);
     }
 
-    public function handle(): void
+    public function withAddress(): self
     {
 
+        return $this;
     }
 
     public function getRate(): float
