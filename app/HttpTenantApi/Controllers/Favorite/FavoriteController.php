@@ -11,9 +11,11 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
+use Spatie\RouteAttributes\Attributes\Middleware;
 
 #[
     Resource('favorites', apiResource: true, except: ['index', 'update']),
+    Middleware(['auth:sanctum', 'feature.tenant:' . ECommerceBase::class])
 ]
 class FavoriteController
 {

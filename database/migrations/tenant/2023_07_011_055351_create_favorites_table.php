@@ -13,7 +13,6 @@ return new class () extends Migration {
     {
         Schema::create('favorites', function (Blueprint $table) {
             $table->id();
-
             $table->foreignIdFor(Product::class)->index();
             $table->foreignIdFor(Customer::class)->index();
 
