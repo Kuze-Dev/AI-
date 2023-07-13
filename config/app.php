@@ -184,6 +184,7 @@ return [
         Domain\Tier\TierServiceProvider::class,
         Domain\Customer\CustomerServiceProvider::class,
         Domain\Tier\TierServiceProvider::class,
+        Domain\Taxation\TaxationServiceProvider::class,
 
         /*
         * Support Service Providers...
