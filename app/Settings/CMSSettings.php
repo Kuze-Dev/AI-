@@ -10,6 +10,7 @@ class CMSSettings extends Settings
 {
     public ?string $deploy_hook;
     public ?string $front_end_preview_page_url = null;
+    public ?string $front_end_domain = null;
 
     public static function group(): string
     {
