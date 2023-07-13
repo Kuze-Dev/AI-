@@ -95,12 +95,15 @@ class RateClient
             ],
         ], true, 'UTF-8');
 
-        $this->client->getClient()
+        $body = $this->client->getClient()
             ->withQueryParameters([
                 'API' => 'IntlRateV2',
                 'XML' => $xml,
             ])
-            ->get(self::URI);
+            ->get(self::URI)
+            ->body();
+
+        dump(XmlToArray::convert($body));
 
         return new RateInternationalV2ResponseData();
     }
