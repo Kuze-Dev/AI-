@@ -49,9 +49,8 @@ class CreateCartLineAction
                 ]
             );
 
-            $cartLine->clearMediaCollection('cart_line_notes');
-
             if ($cartLineData->medias !== null) {
+                $cartLine->clearMediaCollection('cart_line_notes');
                 foreach ($cartLineData->medias as $imageUrl) {
                     try {
                         $cartLine->addMediaFromUrl($imageUrl)
