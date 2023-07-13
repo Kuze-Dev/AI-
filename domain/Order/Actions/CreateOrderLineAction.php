@@ -9,6 +9,7 @@ use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
+use Domain\Taxation\Enums\PriceDisplay;
 
 class CreateOrderLineAction
 {
@@ -25,7 +26,22 @@ class CreateOrderLineAction
             }
 
             //add tax minus discount
-            $total = 0 + $subTotal - 0;
+            // $total = 0 + $subTotal - 0;
+
+            $taxDisplay = $preparedOrderData->taxZone->price_display;
+            $taxPercentage = (float) $preparedOrderData->taxZone->percentage;
+            $taxTotal = round($subTotal * $taxPercentage / 100, 2);
+
+            $grandTotal = 0;
+
+            if ($taxDisplay == PriceDisplay::INCLUSIVE) {
+                $subTotal += $taxTotal;
+                //for now, but the shipping fee and discount will be added
+                $grandTotal = $subTotal;
+            } else {
+                $grandTotal = $subTotal + $taxTotal;
+            }
+
 
             $orderLine = OrderLine::create([
                 'order_id' => $order->id,
@@ -35,10 +51,11 @@ class CreateOrderLineAction
                 'name' => $name,
                 'unit_price' => $cartLine->purchasable->selling_price,
                 'quantity' => $cartLine->quantity,
-                'tax_total' => 0,
+                'tax_total' => $taxTotal,
+                'tax_display' => $taxDisplay,
                 'sub_total' => $subTotal,
                 'discount_total' => 0,
-                'total' => $total,
+                'total' => $grandTotal,
                 'remarks_data' => $cartLine->remarks,
                 'purchasable_data' => $cartLine->purchasable,
             ]);

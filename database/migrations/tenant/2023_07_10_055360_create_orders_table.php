@@ -73,6 +73,7 @@ return new class() extends Migration
             $table->decimal('unit_price');
             $table->integer('quantity');
             $table->decimal('tax_total');
+            $table->string('tax_display');
             $table->decimal('sub_total');
             $table->decimal('discount_total');
             $table->decimal('total')->index();

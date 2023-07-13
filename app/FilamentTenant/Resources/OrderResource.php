@@ -379,7 +379,6 @@ class OrderResource extends Resource
                             if ($record->tax_display == PriceDisplay::INCLUSIVE) {
                                 return "Subtotal " . " (Tax Included)";
                             }
-                            // dd($record->tax_display);
                             return "Subtotal";
                         })->alignLeft()->size("md")->inline()->readOnly(),
                         Support\TextLabel::make("sub_total")->alignRight()->size("md")->inline(),

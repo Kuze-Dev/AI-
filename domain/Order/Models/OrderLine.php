@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Order\Models;
 
+use Domain\Taxation\Enums\PriceDisplay;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -70,6 +71,7 @@ class OrderLine extends Model implements HasMedia
         'unit_price',
         'quantity',
         'tax_total',
+        'tax_display',
         'sub_total',
         'discount_total',
         'total',
@@ -81,6 +83,7 @@ class OrderLine extends Model implements HasMedia
         'unit_price' => 'float',
         'quantity' => 'integer',
         'tax_total' => 'float',
+        'tax_display' => PriceDisplay::class,
         'sub_total' => 'float',
         'discount_total' => 'float',
         'total' => 'float',
