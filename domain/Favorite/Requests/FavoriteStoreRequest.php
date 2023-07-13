@@ -39,10 +39,6 @@ class FavoriteStoreRequest extends FormRequest
                     }),
 
             ],
-            'customer_id' => [
-                'required',
-                Rule::exists('customers', 'id'),
-            ],
         ];
     }
 
