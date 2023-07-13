@@ -7,7 +7,6 @@ namespace App\FilamentTenant\Support;
 use App\FilamentTenant\Support\Contracts\HasProductVariants;
 use Filament\Forms\ComponentContainer;
 use Filament\Pages\Actions\Action;
-use Illuminate\Support\Str;
 
 class ProductVariantFormAction extends Action
 {
@@ -21,48 +20,52 @@ class ProductVariantFormAction extends Action
     protected function setUp(): void
     {
         parent::setUp();
-        dd('not here yet #ProductVariantFormAction# ');
 
-        // $this->modalHeading(function (HasProductVariants $livewire) {
-        //     if ( ! $activeProductVariantStatePath = $livewire->getActiveProductVariantItemStatePath()) {
-        //         return;
-        //     }
+        $this->modalHeading(function (HasProductVariants $livewire) {
+            if ( ! $activeProductVariantStatePath = $livewire->getActiveProductVariantItemStatePath()) {
+                return;
+            }
 
-        //     $state = data_get($livewire, $activeProductVariantStatePath);
+            $state = data_get($livewire, $activeProductVariantStatePath);
 
-        //     $productVariantComponent = $livewire->getProductVariantComponent();
+            if ($state !== null) {
+                $combinationString = '';
+                $loopCounter = 0;
+                foreach ($state['combination'] as $key => $value) {
+                    $combinationString .= ucfirst($value['option']) . ': ' . ucfirst($value['option_value']);
+                    $loopCounter++;
+                    if (count($state['combination']) != $loopCounter) {
+                        $combinationString .= ' / ';
+                    }
+                }
 
-        //     $name = (string) Str::of($productVariantComponent->getName())->headline()->singular();
+                return trans('Edit Product Variant (:combination)', ['combination' => $combinationString]);
+            }
 
-        //     if ($state !== null) {
-        //         return trans('Edit :label', ['label' => $productVariantComponent->getItemLabel($state) ?? $name]);
-        //     }
+            return trans('Manage Product Variant');
+        });
 
-        //     return trans('Manage :name', ['name' => $name]);
-        // });
+        $this->slideOver(true);
 
-        // $this->slideOver(true);
+        $this->mountUsing(function (HasProductVariants $livewire, ComponentContainer $form) {
+            if ( ! $activeProductVariantStatePath = $livewire->getActiveProductVariantItemStatePath()) {
+                return;
+            }
 
-        // $this->mountUsing(function (HasProductVariants $livewire, ComponentContainer $form) {
-        //     if ( ! $activeProductVariantStatePath = $livewire->getActiveProductVariantItemStatePath()) {
-        //         return;
-        //     }
+            $state = data_get($livewire, $activeProductVariantStatePath) ?? [];
+            $form->fill($state);
+        });
 
-        //     $state = data_get($livewire, $activeProductVariantStatePath) ?? [];
+        $this->form(fn (HasProductVariants $livewire) => $livewire->getProductVariantFormSchema());
 
-        //     $form->fill($state);
-        // });
+        $this->action(function (HasProductVariants $livewire, array $data) {
+            if ( ! $activeProductVariantStatePath = $livewire->getActiveProductVariantItemStatePath()) {
+                return;
+            }
 
-        // $this->form(fn (HasProductVariants $livewire) => $livewire->getProductVariantFormSchema());
-
-        // $this->action(function (HasProductVariants $livewire, array $data) {
-        //     if ( ! $activeProductVariantStatePath = $livewire->getActiveProductVariantItemStatePath()) {
-        //         return;
-        //     }
-
-        //     $oldData = data_get($livewire, $activeProductVariantStatePath) ?? [];
-        //     data_set($livewire, $activeProductVariantStatePath, array_merge($oldData, $data));
-        //     $livewire->unmountProductVariantItem();
-        // });
+            $oldData = data_get($livewire, $activeProductVariantStatePath) ?? [];
+            data_set($livewire, $activeProductVariantStatePath, array_merge($oldData, $data));
+            $livewire->unmountProductVariantItem();
+        });
     }
 }

@@ -6,6 +6,9 @@ namespace Domain\Product\Actions;
 
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
+use Domain\Product\Models\ProductOption;
+use Domain\Product\Models\ProductOptionValue;
+use Domain\Product\Models\ProductVariant;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 use Illuminate\Http\UploadedFile;
@@ -35,6 +38,36 @@ class CreateProductAction
             }
         }
 
+        if (count($productData->product_options)) {
+            foreach ($productData->product_options[0] as $productOption) {
+                $productOptionModel = ProductOption::findOrNew($productOption['id']);
+                $productOptionModel->name = $productOption['name'];
+                $productOptionModel->save();
+
+                foreach ($productOption['productOptionValues'] as $productOptionValue) {
+                    $optionValueModel = ProductOptionValue::findOrNew($productOptionValue['id']);
+                    $optionValueModel->name = $productOptionValue['name'];
+                    $optionValueModel->product_option_id = $productOptionValue['product_option_id'];
+                    $optionValueModel->save();
+                }
+            }
+        }
+
+        if (count($productData->product_variants)) {
+            foreach ($productData->product_variants as $productVariant) {
+                $productVariantModel = ProductVariant::findOrNew($productVariant['id']);
+
+                $productVariantModel->product_id = $product['id'];
+                $productVariantModel->sku = $productVariant['sku'];
+                $productVariantModel->combination = $productVariant['combination'];
+                $productVariantModel->retail_price = $productVariant['retail_price'];
+                $productVariantModel->selling_price = $productVariant['selling_price'];
+                $productVariantModel->stock = $productVariant['stock'];
+                $productVariantModel->status = $productVariant['status'];
+                $productVariantModel->save();
+            }
+        }
+
         if ($productData->images === null) {
             $product->clearMediaCollection('image');
         }
@@ -57,6 +90,7 @@ class CreateProductAction
                 'weight' => $productData->weight,
                 'status' => $productData->status,
                 'stock' => $productData->stock,
+                'minimum_order_quantity' => $productData->minimum_order_quantity,
                 'is_digital_product' => $productData->is_digital_product,
                 'is_featured' => $productData->is_featured,
                 'is_special_offer' => $productData->is_special_offer,

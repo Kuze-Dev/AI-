@@ -30,10 +30,7 @@ trait HasProductVariants
     {
         $this->activeProductVariant = $productVariant;
         $this->activeProductVariantItemStatePath = $itemStatePath;
-        // dd($this);
 
-        // $this->mountedActionData = $record->toArray
-        // \Log::info('MOUNT PRODUCT VARIANT ITEM TO');
         $this->mountAction('product-variant-form');
     }
 

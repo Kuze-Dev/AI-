@@ -38,69 +38,79 @@ class CustomerRegisterRequest extends FormRequest
             'password' => ['required', 'confirmed', Password::default()],
 
             // shipping address
-            'shipping_country_id' => [
+            'shipping.country_id' => [
                 'required',
                 Rule::exists(Country::class, (new Country())->getRouteKeyName()),
             ],
-            'shipping_state_id' => [
+            'shipping.state_id' => [
                 'required',
                 Rule::exists(State::class, (new State())->getRouteKeyName())
                     ->where(function (Builder $query) {
 
                         $country = app(Country::class)
-                            ->resolveRouteBinding($this->input('shipping_country_id'));
+                            ->resolveRouteBinding($this->input('shipping.country_id'));
 
                         return $query->where('country_id', $country?->getKey());
                     }),
             ],
-            'shipping_address_line_1' => 'required|string|max:255',
-            'shipping_zip_code' => 'required|string|max:255',
-            'shipping_city' => 'required|string|max:255',
-            'shipping_label_as' => ['required', Rule::enum(AddressLabelAs::class)],
+            'shipping.address_line_1' => 'required|string|max:255',
+            'shipping.zip_code' => 'required|string|max:255',
+            'shipping.city' => 'required|string|max:255',
+            'shipping.label_as' => ['required', Rule::enum(AddressLabelAs::class)],
 
             // billing address
-            'billing_same_as_shipping' => 'required|bool',
-            'billing_country_id' => [
-                'required_if:billing_same_as_shipping,0',
+            'billing.same_as_shipping' => 'required|bool',
+            'billing.country_id' => [
+                'required_if:billing.same_as_shipping,0',
                 Rule::exists(Country::class, (new Country())->getRouteKeyName()),
             ],
-            'billing_state_id' => [
-                'required_if:billing_same_as_shipping,0',
+            'billing.state_id' => [
+                'required_if:billing.same_as_shipping,0',
                 Rule::exists(State::class, (new State())->getRouteKeyName())
                     ->where(function (Builder $query) {
 
                         $country = app(Country::class)
-                            ->resolveRouteBinding($this->input('billing_country_id'));
+                            ->resolveRouteBinding($this->input('billing.country_id'));
 
                         return $query->where('country_id', $country?->getKey());
                     }),
             ],
-            'billing_address_line_1' => 'required_if:billing_same_as_shipping,0|string|max:255',
-            'billing_zip_code' => 'required_if:billing_same_as_shipping,0|string|max:255',
-            'billing_city' => 'required_if:billing_same_as_shipping,0|string|max:255',
-            'billing_label_as' => ['required_if:billing_same_as_shipping,0', Rule::enum(AddressLabelAs::class)],
+            'billing.address_line_1' => 'required_if:billing.same_as_shipping,0|string|max:255',
+            'billing.zip_code' => 'required_if:billing.same_as_shipping,0|string|max:255',
+            'billing.city' => 'required_if:billing.same_as_shipping,0|string|max:255',
+            'billing.label_as' => ['required_if:billing.same_as_shipping,0', Rule::enum(AddressLabelAs::class)],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'billing_country_id.required_if' => trans('validation.required'),
-            'billing_state_id.required_if' => trans('validation.required'),
-            'billing_address_line_1.required_if' => trans('validation.required'),
-            'billing_zip_code.required_if' => trans('validation.required'),
-            'billing_city.required_if' => trans('validation.required'),
-            'billing_label_as.required_if' => trans('validation.required'),
+            'billing.country_id.required_if' => trans('validation.required'),
+            'billing.state_id.required_if' => trans('validation.required'),
+            'billing.address_line_1.required_if' => trans('validation.required'),
+            'billing.zip_code.required_if' => trans('validation.required'),
+            'billing.city.required_if' => trans('validation.required'),
+            'billing.label_as.required_if' => trans('validation.required'),
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'shipping_country_id' => 'shipping country',
-            'shipping_state_id' => 'shipping state',
-            'billing_country_id' => 'billing country',
-            'billing_state_id' => 'billing state',
+            'shipping.country_id' => 'shipping country',
+            'shipping.state_id' => 'shipping state',
+            'shipping.address_line_1' => 'shipping address_line_1',
+            'shipping.zip_code' => 'shipping zip_code',
+            'shipping.city' => 'shipping city',
+            'shipping.label_as' => 'shipping label_as',
+
+            'billing.same_as_shipping' => 'billing same_as_shipping',
+            'billing.country_id' => 'billing country',
+            'billing.state_id' => 'billing state',
+            'billing.address_line_1' => 'shipping address_line_1',
+            'billing.zip_code' => 'shipping zip_code',
+            'billing.city' => 'shipping city',
+            'billing.label_as' => 'shipping label_as',
         ];
     }
 
@@ -120,14 +130,14 @@ class CustomerRegisterRequest extends FormRequest
             password: $validated['password']
         );
 
-        $same = $this->boolean('billing_same_as_shipping');
+        $same = $this->boolean('billing.same_as_shipping');
 
         $shippingAddress = new AddressData(
-            label_as: $validated['shipping_label_as'],
-            address_line_1: $validated['shipping_address_line_1'],
-            state_id: (int) $validated['shipping_state_id'],
-            zip_code: $validated['shipping_zip_code'],
-            city: $validated['shipping_city'],
+            label_as: $validated['shipping']['label_as'],
+            address_line_1: $validated['shipping']['address_line_1'],
+            state_id: (int) $validated['shipping']['state_id'],
+            zip_code: $validated['shipping']['zip_code'],
+            city: $validated['shipping']['city'],
             is_default_shipping: true,
             is_default_billing: $same,
         );
@@ -135,11 +145,11 @@ class CustomerRegisterRequest extends FormRequest
         $billingAddress = null;
         if ( ! $same) {
             $billingAddress = new AddressData(
-                label_as: $validated['billing_label_as'],
-                address_line_1: $validated['billing_address_line_1'],
-                state_id: (int) $validated['billing_state_id'],
-                zip_code: $validated['billing_zip_code'],
-                city:$validated['billing_city'],
+                label_as: $validated['billing']['label_as'],
+                address_line_1: $validated['billing']['address_line_1'],
+                state_id: (int) $validated['billing']['state_id'],
+                zip_code: $validated['billing']['zip_code'],
+                city:$validated['billing']['city'],
                 is_default_shipping: false,
                 is_default_billing: true,
             );
