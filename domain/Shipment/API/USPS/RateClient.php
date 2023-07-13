@@ -21,28 +21,13 @@ class RateClient
 
     public function getV4(RateV4RequestData $requestData): RateV4ResponseData
     {
-        // $xml = <<<XML
-        //       <RateV4Request USERID="{$this->client->username}">
-        //         <Revision>1</Revision>
-        //         <Package ID="1">
-        //             <Service>PRIORITY</Service>
-        //             <ZipOrigination>94107</ZipOrigination>
-        //             <ZipDestination>26301</ZipDestination>
-        //             <Pounds>8</Pounds>
-        //             <Ounces>2</Ounces>
-        //             <Container></Container>
-        //             <Machinable>TRUE</Machinable>
-        //         </Package>
-
-        //     </RateV4Request>
-        //     XML;
-        // dump($xml);
+        ray($requestData->toArray());
 
         $array = [
             'Revision' => '1',
             'Package' => array_merge([
                 '_attributes' => ['ID' => '1'],
-            ], get_object_vars($requestData)),
+            ], $requestData->toArray()),
         ];
 
         $result = ArrayToXml::convert($array, [

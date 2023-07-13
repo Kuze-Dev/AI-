@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\Drivers;
 
+use Domain\Shipment\API\USPS\Enums\Container;
+use Domain\Shipment\API\USPS\Enums\ServiceType;
 use Domain\Shipment\API\USPS\RateClient;
 use Domain\Shipment\DataTransferObjects\RateV4RequestData;
 
@@ -24,15 +26,15 @@ class UspsDriver
     public function getRate(): float
     {
         return $this->rateClient->getV4(
-            RateV4RequestData::fromArray([
-                'service' => 'PRIORITY',
-                'zipOrigination' => '94107',
-                'zipDestination' => '26301',
-                'pounds' => '8',
-                'ounces' => '2',
-                'container' => '',
-                'machinable' => true,
-            ])
+            new RateV4RequestData(
+                Service: ServiceType::PRIORITY,
+                ZipOrigination:'94107',
+                ZipDestination:'26301',
+                Pounds:'8',
+                Ounces:'2',
+                Container:Container::NONE,
+                Machinable:true,
+            )
         )->rate;
     }
 }
