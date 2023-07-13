@@ -18,9 +18,10 @@ final class CreateDiscountLimitAction
         $discount = Discount::whereCode($discountCode)
             ->whereStatus(DiscountStatus::ACTIVE)
             ->where(function ($query) {
-                $query->where('max_uses', '>', 0);
+                $query->where('max_uses', '>', 0)
+                    ->orWhereNull('max_uses');
             })
-            ->first();
+            ->firstOrFail();
 
         $count = DiscountLimit::whereDiscountId($discount->id)->count();
 
@@ -32,7 +33,6 @@ final class CreateDiscountLimitAction
             'customer_type' => Customer::class,
             'order_id' => $order->id,
             'order_type' => Order::class,
-            'times_used' => $count + 1,
             'code' => $discount->code,
         ]);
     }

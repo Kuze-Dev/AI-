@@ -77,8 +77,6 @@ return new class () extends Migration {
             $table->morphs('order');
 
             $table->string('code')->index();
-            $table->bigInteger('times_used')
-                ->nullable();
 
             $table->timestamps();
         });

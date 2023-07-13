@@ -16,14 +16,13 @@ class CreateOrderAction
     {
         $referenceNumber = Str::upper(Str::random(12));
 
-        // dd($deductable_subtotal_amount);
         $subTotal = $preparedOrderData->cartLine->reduce(function ($carry, $cartLine) {
             $purchasable = $cartLine->purchasable;
 
             return $carry + ($purchasable->selling_price * $cartLine->quantity);
         }, 0);
 
-        $deductable_subtotal_amount = (new DiscountHelperFunctions())->deductOrderSubtotalByFixedValue($preparedOrderData->discountCode)
+        $deductable_subtotal_amount = (new DiscountHelperFunctions())->deductOrderSubtotalByFixedValue($preparedOrderData->discountCode, $subTotal)
                     ?: (new DiscountHelperFunctions())->deductOrderSubtotalByPercentageValue($preparedOrderData->discountCode, $subTotal);
 
         $total = $subTotal - ($deductable_subtotal_amount !== null ? $deductable_subtotal_amount : 0);

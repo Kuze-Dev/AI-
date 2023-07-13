@@ -35,6 +35,10 @@ class DiscountController extends Controller
         return DiscountResource::make(
             QueryBuilder::for(Discount::whereCode($code)
                 ->whereStatus(DiscountStatus::ACTIVE))
+                ->where(function ($query) {
+                    $query->where('max_uses', '>', 0)
+                        ->orWhereNull('max_uses');
+                })
                 ->allowedIncludes(['discountCondition', 'discountRequirement'])
                 ->firstOrFail()
         );
