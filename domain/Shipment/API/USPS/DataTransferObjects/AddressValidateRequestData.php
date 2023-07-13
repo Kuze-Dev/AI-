@@ -23,6 +23,6 @@ class AddressValidateRequestData
 
     public function toArray(): array
     {
-        return ['xxx' => 'xxx'];
+        return get_object_vars($this);
     }
 }

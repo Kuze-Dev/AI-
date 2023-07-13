@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\Drivers;
 
+use Domain\Customer\Models\Customer;
 use Domain\Shipment\API\USPS\Clients\AddressClient;
 use Domain\Shipment\API\USPS\Clients\RateClient;
 use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\API\USPS\DataTransferObjects\RateV4RequestData;
 use Domain\Shipment\API\USPS\Enums\ServiceType;
-use Domain\Shipment\Models\CustomerVerifiedAddress;
 
 class UspsDriver
 {
@@ -17,30 +17,47 @@ class UspsDriver
 
     protected RateClient $rateClient;
 
-    public function __construct(private readonly AddressValidateRequestData $addressValidateRequestData)
+    public function __construct()
     {
         $this->rateClient = app(RateClient::class);
     }
 
-    public function getRate(): float
+    public function getRate(array $parcelData, AddressValidateRequestData $addressValidateRequestData): float
     {
 
         // First or create
 
-        $verifiedAddress = CustomerVerifiedAddress::firstOrCreate(
-            ['address' => $this->addressValidateRequestData->toArray()],
-            ['customer_id' => 1]
-        );
+        $customer = Customer::with('verifiedAddress')->where('id', 1)->first();
 
-        if ($verifiedAddress->wasRecentlyCreated) {
-            $address = app(AddressClient::class)->verify($this->addressValidateRequestData);
-            $zipDestination = $address->zip5;
+        if ($customer->verifiedAddress) {
 
-            $verifiedAddress->update([
+            $verifiedAddress = $customer->verifiedAddress;
+
+            #check if customer shipping was Change
+
+            if ($verifiedAddress->address != $addressValidateRequestData->toArray()) {
+
+                $updatedVerifiedAddress = app(AddressClient::class)->verify($addressValidateRequestData);
+
+                $verifiedAddress->update([
+                    'address' => $addressValidateRequestData->toArray(),
+                    'verified_address' => $updatedVerifiedAddress->toArray(),
+                ]);
+
+            }
+
+            $zipDestination = $verifiedAddress->verified_address['zip5'];
+
+        } else {
+
+            $address = app(AddressClient::class)->verify($addressValidateRequestData);
+
+            $customer->verifiedAddress()->create([
+                'address' => $addressValidateRequestData->toArray(),
                 'verified_address' => $address->toArray(),
             ]);
-        } else {
-            $zipDestination = $verifiedAddress->verified_address['zip5'];
+
+            $zipDestination = $address->zip5;
         }
 
         return $this->rateClient->getV4(
@@ -48,8 +65,8 @@ class UspsDriver
                 Service: ServiceType::PRIORITY,
                 ZipOrigination:'94107',
                 ZipDestination:$zipDestination,
-                Pounds:'8',
-                Ounces:'2',
+                Pounds: $parcelData['pounds'],
+                Ounces:$parcelData['ounces'],
             )
         )->rate;
     }

@@ -9,8 +9,6 @@ use App\HttpTenantApi\Resources\PageResource;
 use Carbon\Carbon;
 use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Page\Models\Page;
-use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
-use Domain\Shipment\Drivers\UspsDriver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\URL;
@@ -28,18 +26,6 @@ class PageController
 {
     public function index(): JsonApiResourceCollection
     {
-
-        $usps = new UspsDriver(AddressValidateRequestData::fromArray([
-            'Address1' => '',
-            'Address2' => 'STE K 185 Berry Street',
-            'City' => 'San Francisco',
-            'State' => 'CA',
-            'Zip5' => '5656',
-            'Zip4' => '2342',
-        ]));
-
-        dd($usps->getRate());
-
         return PageResource::collection(
             QueryBuilder::for(
                 Page::with('activeRouteUrl')

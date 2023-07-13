@@ -30,6 +30,6 @@ class AddressValidateResponseData
 
     public function toArray(): array
     {
-        return ['yyyy' => 'yyyy'];
+        return get_object_vars($this);
     }
 }

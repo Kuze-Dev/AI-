@@ -8,11 +8,13 @@ use Domain\Address\Models\Address;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Customer\Enums\Status;
+use Domain\Shipment\Models\CustomerVerifiedAddress;
 use Domain\Tier\Models\Tier;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -150,5 +152,11 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new VerifyEmail());
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Shipment\Models\CustomerVerifiedAddress> */
+    public function verifiedAddress(): HasOne
+    {
+        return $this->hasOne(CustomerVerifiedAddress::class);
     }
 }
