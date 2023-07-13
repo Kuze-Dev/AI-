@@ -32,7 +32,7 @@ it('can send link', function () {
     Notification::fake();
     Queue::fake();
 
-    postJson('api/password/email', ['email' => $customer->email])
+    postJson('api/account/password/email', ['email' => $customer->email])
         ->assertValid()
         ->assertOk()
         ->assertJson(['message' => 'We have emailed your password reset link!']);
@@ -52,7 +52,7 @@ it('can reset password', function () {
     Notification::fake();
     Queue::fake();
 
-    postJson('api/password/reset', [
+    postJson('api/account/password/reset', [
         'token' => PasswordBroker::broker('customer')->createToken($customer),
         'email' => $customer->email,
         'password' => 'new-password',
@@ -79,7 +79,7 @@ it('can not update password', function () {
 
     Sanctum::actingAs($customer);
 
-    putJson('api/password', [
+    putJson('api/account/password', [
         'current_password' => 'invalid-password',
         'password' => 'new-password',
         'password_confirmation' => 'new-password',
@@ -100,7 +100,7 @@ it('can update password', function () {
 
     Sanctum::actingAs($customer);
 
-    putJson('api/password', [
+    putJson('api/account/password', [
         'current_password' => 'old-password',
         'password' => 'new-password',
         'password_confirmation' => 'new-password',

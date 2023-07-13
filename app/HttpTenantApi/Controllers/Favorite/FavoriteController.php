@@ -11,16 +11,19 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
+use Spatie\RouteAttributes\Attributes\Middleware;
 
 #[
     Resource('favorites', apiResource: true, except: ['index', 'update']),
+    Middleware(['auth:sanctum'])
 ]
 class FavoriteController
 {
-    public function show(string $favorite): JsonApiResourceCollection
+    public function show(): JsonApiResourceCollection
     {
+        $customer = auth()->user();
         return FavoriteResource::collection(
-            QueryBuilder::for(Favorite::whereCustomerId($favorite))
+            QueryBuilder::for(Favorite::whereCustomerId($customer->id))
                 ->allowedIncludes([
                     'product',
                     'customer',
@@ -32,9 +35,10 @@ class FavoriteController
     public function store(FavoriteStoreRequest $request, Favorite $favorite): JsonResponse
     {
 
+        $customer = auth()->user();
         $validatedData = $request->validated();
         $favorite->product_id = $validatedData['product_id'];
-        $favorite->customer_id = $validatedData['customer_id'];
+        $favorite->customer_id = $customer->id;
 
         $favorite->save();
 
