@@ -7,6 +7,7 @@ namespace App\Console;
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Laravel\Sanctum\Console\Commands\PruneExpired as SanctumPruneExpired;
 use Support\Excel\Commands\PruneExcelCommand;
 
 class Kernel extends ConsoleKernel
@@ -19,6 +20,9 @@ class Kernel extends ConsoleKernel
 
         $schedule->command(ClearResetsCommand::class, ['name' => 'customer'])
             ->everyFifteenMinutes();
+
+        $schedule->command(SanctumPruneExpired::class, ['--hours' => 24])
+            ->daily();
     }
 
     /** Register the commands for the application. */
