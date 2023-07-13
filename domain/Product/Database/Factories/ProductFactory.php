@@ -74,7 +74,7 @@ class ProductFactory extends Factory
     {
         $taxonomyTermIds = TaxonomyTerm::whereIn('slug', ['brand-one', 'clothing'])->pluck('id');
 
-        collect($products)->each(function ($productData) use ($taxonomyTermIds, $productOptions, $variantCombinations) {
+        collect($products)->each(function ($productData) use ($taxonomyTermIds, $productOptions) {
             $productImageUrl = $productData['image_url'];
             unset($productData['image_url']);
             $product = Product::create($productData);
@@ -91,20 +91,44 @@ class ProductFactory extends Factory
             $product->taxonomyTerms()->attach($taxonomyTermIds);
 
             $this->seedProductOptions($product, $productOptions);
-            $this->seedProductVariants($product, $variantCombinations);
         });
     }
 
     private function seedProductOptions(Product $product, array $productOptions): void
     {
-
-        foreach ($productOptions as $productOption) {
+        $combination = [];
+        foreach ($productOptions as $key => $productOption) {
             $productOptionModel = ProductOption::create(['product_id' => $product->id, 'name' => $productOption['name']]);
 
+            $optionValues = [];
             foreach ($productOption['values'] as $productOptionValue) {
-                ProductOptionValue::create(['product_option_id' => $productOptionModel->id, 'name' => $productOptionValue]);
+                $optionValueModel = ProductOptionValue::create(['product_option_id' => $productOptionModel->id, 'name' => $productOptionValue]);
+
+                array_push(
+                    $optionValues,
+                    [
+                        'option_id' => $productOptionModel->id,
+                        'option' => $productOptionModel->name,
+                        'option_value_id' => $optionValueModel->id,
+                        'option_value' => $optionValueModel->name,
+                    ]
+                );
             }
+            array_push($combination, $optionValues);
         }
+
+        $variantCombinations = [
+            [
+                $combination[0][0],
+                $combination[1][0],
+            ],
+            [
+                $combination[0][0],
+                $combination[1][1],
+            ],
+        ];
+
+        $this->seedProductVariants($product, $variantCombinations);
     }
 
     private function seedProductVariants(Product $product, array $variantCombinations): void

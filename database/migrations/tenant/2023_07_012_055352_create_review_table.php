@@ -7,14 +7,20 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Domain\Product\Models\Product;
 use Domain\Customer\Models\Customer;
+use Domain\Order\Models\Order;
 
 return new class () extends Migration {
     public function up(): void
     {
-        Schema::create('favorites', function (Blueprint $table) {
+        Schema::create('reviews', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Product::class)->index();
-            $table->foreignIdFor(Customer::class)->index();
+            $table->foreignIdFor(Order::class)->index();
+            $table->foreignIdFor(Customer::class)->nullable()->index();
+
+            $table->string('title')->index();
+            $table->smallInteger('rating');
+            $table->string('comment')->nullable();
 
             $table->timestamps();
         });
@@ -22,6 +28,6 @@ return new class () extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('favorites');
+        Schema::dropIfExists('reviews');
     }
 };

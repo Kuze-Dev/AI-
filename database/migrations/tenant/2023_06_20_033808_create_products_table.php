@@ -29,6 +29,7 @@ return new class () extends Migration {
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_special_offer')->default(false);
             $table->boolean('allow_customer_remarks')->default(false);
+            $table->unsignedInteger('minimum_order_quantity')->default(1);
             $table->timestamps();
         });
 
