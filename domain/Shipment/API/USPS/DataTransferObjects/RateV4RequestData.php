@@ -26,6 +26,7 @@ class RateV4RequestData
 
         $array['Service'] = $array['Service']->value;
         $array['Container'] = $array['Container']->value;
+        $array['Machinable'] = $array['Machinable'] ? 'TRUE' : 'FALSE';
 
         return $array;
     }

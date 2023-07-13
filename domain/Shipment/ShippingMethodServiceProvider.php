@@ -22,7 +22,7 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
             fn ($app) => $app->make(ShippingManager::class)
         );
 
-        $this->app->singleton(
+        $this->app->bind(
             Client::class,
             function () {
                 $setting = app(ShippingSettings::class);

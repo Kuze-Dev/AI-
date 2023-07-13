@@ -21,13 +21,6 @@ class UspsDriver
         $this->rateClient = app(RateClient::class);
     }
 
-    public function withAddress(): self
-    {
-
-
-        return $this;
-    }
-
     public function getRate(): float
     {
 
@@ -35,7 +28,6 @@ class UspsDriver
 
         // if none then request, else reused
         $address = app(AddressClient::class)->verify($this->addressValidateRequestData);
-
 
         return $this->rateClient->getV4(
             new RateV4RequestData(
