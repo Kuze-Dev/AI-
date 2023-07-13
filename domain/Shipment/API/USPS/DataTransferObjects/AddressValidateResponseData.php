@@ -27,4 +27,9 @@ class AddressValidateResponseData
             address2: $data['Address2'] ?? null,
         );
     }
+
+    public function toArray(): array
+    {
+        return ['yyyy' => 'yyyy'];
+    }
 }

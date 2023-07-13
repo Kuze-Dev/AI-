@@ -20,4 +20,9 @@ class AddressValidateRequestData
     {
         return new self(...$data);
     }
+
+    public function toArray(): array
+    {
+        return ['xxx' => 'xxx'];
+    }
 }

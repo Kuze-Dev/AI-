@@ -15,8 +15,8 @@ return new class () extends Migration {
 
             $table->foreignIdFor(Customer::class)->index();
 
-            $table->longText('address');
-            $table->longText('verified_address');
+            $table->json('address');
+            $table->json('verified_address')->nullable();
 
             $table->timestamps();
 
