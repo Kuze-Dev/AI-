@@ -18,7 +18,7 @@ class ReviewResource extends JsonApiResource
             'title' => $this->title,
             'rating' => $this->rating,
             'comment' => $this->comment,
-            'product_review_images' => $this->getMedia('product_review_images')->toArray(),
+            'media' => $this->getMedia('media')->toArray(),
         ];
     }
 
@@ -29,6 +29,7 @@ class ReviewResource extends JsonApiResource
             'customer' => fn () => new CustomerResource($this->customer),
             'product' => fn () => new ProductResource($this->product),
             'order' => fn () => new OrderResource($this->product),
+            'order_line' => fn () => new OrderLineResource($this->order_line),
         ];
     }
 }
