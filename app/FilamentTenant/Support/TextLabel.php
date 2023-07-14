@@ -34,7 +34,7 @@ class TextLabel extends Field
         return new static($name);
     }
 
-    public function readOnly(bool | Closure $condition = false): static
+    public function readOnly(bool|Closure $condition = false): static
     {
         $this->hasState = $condition;
 

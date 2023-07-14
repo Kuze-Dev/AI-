@@ -18,9 +18,9 @@ class PrepareOrderAction
     {
         $customer = auth()->user();
 
-        $shippingAddress = Address::with("state.country")->find($placeOrderData->addresses->shipping);
+        $shippingAddress = Address::with('state.country')->find($placeOrderData->addresses->shipping);
 
-        $billingAddress = Address::with("state.country")->find($placeOrderData->addresses->billing);
+        $billingAddress = Address::with('state.country')->find($placeOrderData->addresses->billing);
 
         $currency = Currency::where('default', true)->first();
 
@@ -28,11 +28,13 @@ class PrepareOrderAction
             $query->morphWith([
                 ProductVariant::class => ['product'],
             ]);
-        },])
+        }, ])
             ->whereCheckoutReference($placeOrderData->cart_reference)
             ->get();
 
         $notes = $placeOrderData->notes;
+
+        $discountCode = $placeOrderData->discountCode;
 
         $orderData = [
             'customer' => $customer,
@@ -41,6 +43,7 @@ class PrepareOrderAction
             'currency' => $currency,
             'cartLine' => $cartLines,
             'notes' => $notes,
+            'discountCode' => $discountCode,
         ];
 
         return PreparedOrderData::fromArray($orderData);

@@ -17,6 +17,7 @@ class PreparedOrderData
         public readonly Currency $currency,
         public readonly mixed $cartLine,
         public readonly ?string $notes,
+        public readonly ?string $discountCode,
     ) {
     }
 
@@ -28,7 +29,8 @@ class PreparedOrderData
             billingAddress: $data['billingAddress'],
             currency: $data['currency'],
             cartLine: $data['cartLine'],
-            notes: $data['notes'] ?? null
+            notes: $data['notes'] ?? null,
+            discountCode: $data['discountCode'] ?? null,
         );
     }
 }

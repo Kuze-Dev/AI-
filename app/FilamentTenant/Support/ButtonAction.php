@@ -16,9 +16,9 @@ class ButtonAction extends Field
     use Concerns\HasSize;
 
     /** @var array<Action|Closure> */
-    protected array $actions          = [];
+    protected array $actions = [];
     private array   $evaluatedActions = [];
-    protected string | Closure | null $width = null;
+    protected string|Closure|null $width = null;
 
     protected string $view = 'filament.forms.components.button-action';
 
@@ -39,7 +39,7 @@ class ButtonAction extends Field
     /** @return array<Action|Closure> */
     public function getExecutableActions(bool $reevaluate = false): array
     {
-        if ((!$reevaluate) && $this->evaluatedActions) {
+        if (( ! $reevaluate) && $this->evaluatedActions) {
             return $this->evaluatedActions;
         }
 
@@ -65,9 +65,10 @@ class ButtonAction extends Field
         return array_merge(parent::getActions(), $actions);
     }
 
-    public function fullWidth(bool | Closure $condition = true): static
+    public function fullWidth(bool|Closure $condition = true): static
     {
         $this->width = $condition ? 'w-full' : null;
+
         return $this;
     }
 

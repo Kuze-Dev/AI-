@@ -73,7 +73,7 @@ class CartLinesController extends Controller
         $result = app(DestroyCartLineAction::class)
             ->execute($cartline);
 
-        if (!$result) {
+        if ( ! $result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

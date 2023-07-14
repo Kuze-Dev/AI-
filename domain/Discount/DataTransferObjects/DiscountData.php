@@ -18,7 +18,7 @@ final class DiscountData
         public readonly ?string $description = null,
         public readonly string $code,
         public readonly DiscountStatus $status,
-        public readonly int $max_uses,
+        public readonly ?int $max_uses = null,
         public readonly Carbon $valid_start_at,
         public readonly ?Carbon $valid_end_at = null,
         public readonly DiscountConditionData $discountConditionData,
@@ -34,7 +34,7 @@ final class DiscountData
             description: $data['description'] ?? null,
             code: $data['code'],
             status: DiscountStatus::from($data['status']),
-            max_uses: (int) $data['max_uses'],
+            max_uses: !empty($data['max_uses']) ? (int)$data['max_uses'] : null,
             valid_start_at: Carbon::parse($data['valid_start_at']),
             valid_end_at: isset($data['valid_end_at']) ? Carbon::parse($data['valid_end_at']) : null,
             discountConditionData: new DiscountConditionData(

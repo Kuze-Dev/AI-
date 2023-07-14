@@ -15,6 +15,7 @@ use Domain\Discount\Actions\RestoreDiscountAction;
 use Domain\Discount\Actions\SoftDeleteDiscountAction;
 use Domain\Discount\Enums\DiscountAmountType;
 use Domain\Discount\Models\Discount;
+use Domain\Discount\Models\DiscountLimit;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\DateTimePicker;
@@ -80,12 +81,28 @@ class DiscountResource extends Resource
                                 ->tooltip(trans('auto generate code')),
                         )->unique(ignoreRecord: true)
                         ->required(),
+
                     TextInput::make('max_uses')
                         ->numeric()
+                        ->rules([
+                            function ($record) {
+
+                                return function (string $attribute, mixed $value, Closure $fail) use ($record) {
+                                    if ($value < $record?->max_uses) {
+                                        $fail('The maximum usage must be less than current.');
+                                    }
+                                };
+                            },
+                        ])
+
                         ->label(trans('Maximum Usage'))
                         ->helperText(new HtmlString(<<<HTML
                                 Leave this blank if no maximum usage.
                             HTML)),
+                    TextInput::make('times_used')
+                        ->disabled()
+                        ->formatStateUsing(fn ($record) => $record = DiscountLimit::whereCode($record->code)->count()),
+
                 ])
                     ->columnSpan(['lg' => 2]),
                 Group::make([
