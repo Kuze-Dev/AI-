@@ -6,6 +6,7 @@ namespace Domain\Review\Models;
 
 use Domain\Customer\Models\Customer;
 use Domain\Order\Models\Order;
+use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\Product;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -57,7 +58,7 @@ class Review extends Model implements HasMedia
             $this->addMediaConversion('preview');
         };
 
-        $this->addMediaCollection('product_review_images')
+        $this->addMediaCollection('media')
             ->registerMediaConversions($registerMediaConversions);
     }
 
@@ -74,5 +75,10 @@ class Review extends Model implements HasMedia
     public function order()
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function order_line()
+    {
+        return $this->belongsTo(OrderLine::class);
     }
 }
