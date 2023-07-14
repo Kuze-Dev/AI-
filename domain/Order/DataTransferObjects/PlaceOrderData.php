@@ -28,7 +28,7 @@ class PlaceOrderData
                 state_id: $data['taxations']['state_id'] ?? null
             ),
             notes: $data['notes'] ?? null,
-            discountCode: $data['discount_code'],
+            discountCode: $data['discount_code'] ?? null,
         );
     }
 }

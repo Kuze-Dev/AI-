@@ -412,9 +412,12 @@ class OrderResource extends Resource
                                     ->color('secondary')
                                     ->label($get('discount_code'))
                                     ->size('sm')
-                                    ->url(DiscountResource::getUrl('edit', ['record' => $get('discount_id')]));
+                                    ->url(DiscountResource::getUrl('edit', ['record' => $get('discount_id') ?? null]));
                             })->disableLabel()->columnSpan(1)->alignRight()->size('sm'),
-                    ]),
+                    ])
+                    ->hidden(function (Order $record) {
+                        return is_null($record->discount_code) ? true : false;
+                    }),
                 Forms\Components\Grid::make(2)
                     ->schema([
                         Support\TextLabel::make('')->label('Grand Total')->alignLeft()->size('md')->color('primary')->inline()->readOnly(),
