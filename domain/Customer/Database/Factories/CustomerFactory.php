@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Customer\Database\Factories;
 
+use Carbon\Carbon;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
@@ -39,6 +40,16 @@ class CustomerFactory extends Factory
     public function deleted(): self
     {
         return $this->state(['deleted_at' => now()]);
+    }
+
+    public function verified(?Carbon $datetime = null): self
+    {
+        return $this->state(['email_verified_at' => $datetime ?? now()]);
+    }
+
+    public function unverified(): self
+    {
+        return $this->state(['email_verified_at' => null]);
     }
 
     public function active(): self

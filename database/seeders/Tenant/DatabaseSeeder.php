@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             Auth\AdminSeeder::class,
             Page\PageSeeder::class,
             Tier\TierSeeder::class,
+            Customer\CustomerSeeder::class,
         ]);
     }
 }
