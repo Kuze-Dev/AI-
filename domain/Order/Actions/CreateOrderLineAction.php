@@ -32,15 +32,8 @@ class CreateOrderLineAction
             $taxPercentage = (float) $preparedOrderData->taxZone->percentage;
             $taxTotal = round($subTotal * $taxPercentage / 100, 2);
 
-            $grandTotal = 0;
-
-            if ($taxDisplay == PriceDisplay::INCLUSIVE) {
-                $subTotal += $taxTotal;
-                //for now, but the shipping fee and discount will be added
-                $grandTotal = $subTotal;
-            } else {
-                $grandTotal = $subTotal + $taxTotal;
-            }
+            //for now, but the shipping fee and discount will be added
+            $grandTotal = $subTotal + $taxTotal;
 
             $orderLine = OrderLine::create([
                 'order_id' => $order->id,
@@ -52,6 +45,7 @@ class CreateOrderLineAction
                 'quantity' => $cartLine->quantity,
                 'tax_total' => $taxTotal,
                 'tax_display' => $taxDisplay,
+                'tax_percentage' => $taxPercentage,
                 'sub_total' => $subTotal,
                 'discount_total' => 0,
                 'total' => $grandTotal,
