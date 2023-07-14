@@ -7,6 +7,7 @@ namespace Domain\Order\DataTransferObjects;
 use Domain\Address\Models\Address;
 use Domain\Currency\Models\Currency;
 use Domain\Customer\Models\Customer;
+use Domain\Discount\Models\Discount;
 use Domain\Taxation\Models\TaxZone;
 
 class PreparedOrderData
@@ -19,7 +20,7 @@ class PreparedOrderData
         public readonly TaxZone $taxZone,
         public readonly mixed $cartLine,
         public readonly ?string $notes,
-        public readonly ?string $discountCode,
+        public readonly ?Discount $discount,
     ) {
     }
 
@@ -33,7 +34,7 @@ class PreparedOrderData
             taxZone: $data['taxZone'],
             cartLine: $data['cartLine'],
             notes: $data['notes'] ?? null,
-            discountCode: $data['discountCode'] ?? null,
+            discount: $data['discount'] ?? null,
         );
     }
 }

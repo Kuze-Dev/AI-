@@ -22,7 +22,7 @@ class CreateCartData
             purchasable_id: (int) $data['purchasable_id'],
             purchasable_type: $data['purchasable_type'],
             quantity: (int) $data['quantity'],
-            variant_id: (int) $data['variant_id'] ?? null,
+            variant_id: $data['variant_id'] ?? null,
             medias: $data['media'] ?? null,
             remarks: $data['remarks'] ?? null,
         );

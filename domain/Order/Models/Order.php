@@ -107,6 +107,8 @@ class Order extends Model implements HasMedia
         'tax_display',
         'sub_total',
         'discount_total',
+        'discount_id',
+        'discount_code',
         'shipping_total',
         'total',
         'notes',

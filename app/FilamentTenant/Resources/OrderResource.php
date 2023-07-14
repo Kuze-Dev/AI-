@@ -386,18 +386,32 @@ class OrderResource extends Resource
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Shipping Fee")->alignLeft()->size("md")->inline()->readOnly(),
+                        Support\TextLabel::make("")->label("Total Shipping Fee")->alignLeft()->size("md")->inline()->readOnly(),
                         Support\TextLabel::make("shipping_total")->alignRight()->size("md")->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Tax total")->alignLeft()->size("md")->inline()->readOnly(),
+                        Support\TextLabel::make("")->label("Total Tax")->alignLeft()->size("md")->inline()->readOnly(),
                         Support\TextLabel::make("tax_total")->alignRight()->size("md")->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Discount")->alignLeft()->size("md")->inline()->readOnly(),
+                        Support\TextLabel::make("")->label("Total Discount")
+                            ->alignLeft()->size("md")->inline()->readOnly(),
                         Support\TextLabel::make("discount_total")->alignRight()->size("md")->inline(),
+                    ]),
+                Forms\Components\Grid::make(2)
+                    ->schema([
+                        Support\TextLabel::make("")->label("Discount Code")
+                            ->alignLeft()->size("md")->inline()->readOnly(),
+                        Support\ButtonAction::make('discount_code')
+                            ->execute(function (Closure $get, Closure $set) {
+                                return Forms\Components\Actions\Action::make('btn_discount_code')
+                                    ->color('secondary')
+                                    ->label($get('discount_code'))
+                                    ->size('sm')
+                                    ->url(DiscountResource::getUrl('edit', ['record' => $get('discount_id')]));
+                            })->disableLabel()->columnSpan(1)->alignRight()->size('sm'),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([

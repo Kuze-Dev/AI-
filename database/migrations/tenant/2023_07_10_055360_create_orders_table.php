@@ -8,7 +8,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class() extends Migration
+{
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
@@ -27,6 +28,8 @@ return new class () extends Migration {
             $table->string('tax_display');
             $table->decimal('sub_total');
             $table->decimal('discount_total');
+            $table->integer('discount_id')->nullable();
+            $table->string('discount_code')->nullable();
             $table->decimal('shipping_total');
             $table->decimal('total')->index();
             $table->longText('notes')->nullable();
@@ -75,6 +78,8 @@ return new class () extends Migration {
             $table->string('tax_display');
             $table->decimal('sub_total');
             $table->decimal('discount_total');
+            $table->integer('discount_id')->nullable();
+            $table->string('discount_code')->nullable();
             $table->decimal('total')->index();
 
             $table->json('remarks_data')->nullable();

@@ -7,6 +7,8 @@ namespace Domain\Order\Actions;
 use Domain\Address\Models\Address;
 use Domain\Cart\Models\CartLine;
 use Domain\Currency\Models\Currency;
+use Domain\Discount\Enums\DiscountStatus;
+use Domain\Discount\Models\Discount;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Product\Models\ProductVariant;
@@ -37,7 +39,13 @@ class PrepareOrderAction
 
         $notes = $placeOrderData->notes;
 
-        $discountCode = $placeOrderData->discountCode;
+        $discount = Discount::whereCode($placeOrderData->discountCode)
+            ->whereStatus(DiscountStatus::ACTIVE)
+            ->where(function ($query) {
+                $query->where('max_uses', '>', 0)
+                    ->orWhereNull('max_uses');
+            })
+            ->firstOrFail();
 
         $orderData = [
             'customer' => $customer,
@@ -47,7 +55,7 @@ class PrepareOrderAction
             'cartLine' => $cartLines,
             'notes' => $notes,
             'taxZone' => $taxZone,
-            'discountCode' => $discountCode,
+            'discount' => $discount,
         ];
 
         return PreparedOrderData::fromArray($orderData);

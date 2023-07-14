@@ -74,6 +74,8 @@ class OrderLine extends Model implements HasMedia
         'tax_display',
         'sub_total',
         'discount_total',
+        'discount_id',
+        'discount_code',
         'total',
         'remarks_data',
         'purchasable_data',

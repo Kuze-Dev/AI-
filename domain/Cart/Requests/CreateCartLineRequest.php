@@ -39,13 +39,13 @@ class CreateCartLineRequest extends FormRequest
                 'min:1',
                 function ($attribute, $value, $fail) {
                     $purchasableId = $this->input('purchasable_id');
-                    $variantId = $this->input('variant_id');
+                    $variantId = $this->input('variant_id') ?? null;
 
-                    if ( ! $purchasableId) {
+                    if (!$purchasableId) {
                         $fail('Invalid product.');
                     }
 
-                    if (!$variantId) {
+                    if (is_null($variantId)) {
                         $product = Product::find($purchasableId);
 
                         if (!$product) {
@@ -84,7 +84,7 @@ class CreateCartLineRequest extends FormRequest
 
                     $product = Product::find($purchasableId);
 
-                    if ( ! $product) {
+                    if (!$product) {
                         $fail('Invalid product.');
 
                         return;
