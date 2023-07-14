@@ -18,7 +18,6 @@ use Carbon\Carbon;
 use Closure;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Taxation\Enums\PriceDisplay;
-use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
@@ -248,12 +247,13 @@ class OrderResource extends Resource
                                             $status = $data['status_options'];
                                             $updateData = ['status' => $status];
 
-                                            if ($status == "Cancelled") {
+                                            if ($status == 'Cancelled') {
                                                 if ($order->status == OrderStatuses::PACKED) {
                                                     Notification::make()
                                                         ->title("You can't cancel this order, its already packed.")
                                                         ->warning()
                                                         ->send();
+
                                                     return;
                                                 }
                                                 $updateData['cancelled_at'] = now(Auth::user()?->timezone);
@@ -274,8 +274,8 @@ class OrderResource extends Resource
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Order Date")->alignLeft()->size("md")->inline()->readOnly(),
-                        Support\TextLabel::make("created_at")->alignRight()->size("md")->inline()
+                        Support\TextLabel::make('')->label('Order Date')->alignLeft()->size('md')->inline()->readOnly(),
+                        Support\TextLabel::make('created_at')->alignRight()->size('md')->inline()
                             ->formatStateUsing(function ($state) {
                                 $format ??= config('tables.date_format');
                                 $formattedState = Carbon::parse($state)
@@ -307,7 +307,7 @@ class OrderResource extends Resource
                             ->action(function () use ($get, $set) {
                                 $order = Order::find($get('id'));
 
-                                $isPaid = !$order->is_paid;
+                                $isPaid = ! $order->is_paid;
 
                                 $result = $order->update([
                                     'is_paid' => $isPaid,
@@ -376,36 +376,37 @@ class OrderResource extends Resource
                 Support\Divider::make(''),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label(function (Order $record) {
+                        Support\TextLabel::make('')->label(function (Order $record) {
                             if ($record->tax_display == PriceDisplay::INCLUSIVE) {
-                                return "Subtotal " . " (Tax Included)";
+                                return 'Subtotal ' . ' (Tax Included)';
                             }
-                            return "Subtotal";
-                        })->alignLeft()->size("md")->inline()->readOnly(),
-                        Support\TextLabel::make("sub_total")->alignRight()->size("md")->inline(),
+
+                            return 'Subtotal';
+                        })->alignLeft()->size('md')->inline()->readOnly(),
+                        Support\TextLabel::make('sub_total')->alignRight()->size('md')->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Total Shipping Fee")->alignLeft()->size("md")->inline()->readOnly(),
-                        Support\TextLabel::make("shipping_total")->alignRight()->size("md")->inline(),
+                        Support\TextLabel::make('')->label('Total Shipping Fee')->alignLeft()->size('md')->inline()->readOnly(),
+                        Support\TextLabel::make('shipping_total')->alignRight()->size('md')->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label(function (Order $record) {
+                        Support\TextLabel::make('')->label(function (Order $record) {
                             return "Tax Total ( $record->tax_percentage% )";
-                        })->alignLeft()->size("md")->inline()->readOnly(),
-                        Support\TextLabel::make("tax_total")->alignRight()->size("md")->inline(),
+                        })->alignLeft()->size('md')->inline()->readOnly(),
+                        Support\TextLabel::make('tax_total')->alignRight()->size('md')->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Total Discount")
-                            ->alignLeft()->size("md")->inline()->readOnly(),
-                        Support\TextLabel::make("discount_total")->alignRight()->size("md")->inline(),
+                        Support\TextLabel::make('')->label('Total Discount')
+                            ->alignLeft()->size('md')->inline()->readOnly(),
+                        Support\TextLabel::make('discount_total')->alignRight()->size('md')->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Discount Code")
-                            ->alignLeft()->size("md")->inline()->readOnly(),
+                        Support\TextLabel::make('')->label('Discount Code')
+                            ->alignLeft()->size('md')->inline()->readOnly(),
                         Support\ButtonAction::make('discount_code')
                             ->execute(function (Closure $get, Closure $set) {
                                 return Forms\Components\Actions\Action::make('btn_discount_code')

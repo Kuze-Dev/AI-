@@ -5,18 +5,11 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\Http\Controllers\Controller;
-use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
-use Domain\Customer\Models\Customer;
-use Domain\Taxation\Enums\PriceDisplay;
 use Domain\Taxation\Facades\Taxation;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
-use Spatie\RouteAttributes\Attributes\Prefix;
 
 #[
     Middleware(['auth:sanctum'])
@@ -56,8 +49,7 @@ class CartSummaryController extends Controller
             ->whereIn('id', $cartLineIds)
             ->get();
 
-
-        $subTotal =  $cartLines->reduce(function ($carry, $cartLine) {
+        $subTotal = $cartLines->reduce(function ($carry, $cartLine) {
             $purchasable = $cartLine->purchasable;
 
             return $carry + ($purchasable->selling_price * $cartLine->quantity);
@@ -77,7 +69,7 @@ class CartSummaryController extends Controller
             'tax_display' => $taxDisplay,
             'tax_percentage' => $taxPercentage,
             'tax_total' => $taxTotal,
-            'grand_total' => $grandTotal
+            'grand_total' => $grandTotal,
         ], 200);
     }
 }

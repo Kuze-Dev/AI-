@@ -8,7 +8,6 @@ use Domain\Discount\Actions\CreateDiscountLimitAction;
 use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Models\Order;
-use Domain\Taxation\Enums\PriceDisplay;
 use Illuminate\Support\Str;
 
 class CreateOrderAction
@@ -30,15 +29,13 @@ class CreateOrderAction
         //for now, but the shipping fee and discount will be added
         $grandTotal = $subTotal + $taxTotal;
 
-
         $deductable_subtotal_amount = null;
-        if (!is_null($preparedOrderData->discount)) {
+        if ( ! is_null($preparedOrderData->discount)) {
             $discountCode = $preparedOrderData->discount->code;
 
             $deductable_subtotal_amount = (new DiscountHelperFunctions())->deductOrderSubtotalByFixedValue($discountCode, $subTotal)
                 ?: (new DiscountHelperFunctions())->deductOrderSubtotalByPercentageValue($discountCode, $subTotal);
         }
-
 
         // $total = $subTotal - ($deductable_subtotal_amount !== null ? $deductable_subtotal_amount : 0);
         $grandTotal -= ($deductable_subtotal_amount !== null ? $deductable_subtotal_amount : 0);
@@ -79,7 +76,7 @@ class CreateOrderAction
             'is_paid' => false,
         ]);
 
-        if (!is_null($preparedOrderData->discount)) {
+        if ( ! is_null($preparedOrderData->discount)) {
             app(CreateDiscountLimitAction::class)->execute($discountCode, $order, $preparedOrderData->customer);
         }
 
