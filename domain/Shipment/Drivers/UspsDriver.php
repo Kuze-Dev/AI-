@@ -70,4 +70,9 @@ class UspsDriver
             )
         )->rate;
     }
+
+    public function getInternationalRate()
+    {
+        return $this->rateClient->getInternationalVersion2();
+    }
 }
