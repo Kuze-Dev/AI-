@@ -15,23 +15,11 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 use Exception;
 
 #[
-    Resource('reviews', apiResource: true, except: ['index', 'update']),
+    Resource('reviews', apiResource: true, only: ['destroy', 'store']),
     Middleware(['auth:sanctum'])
 ]
 class ReviewController
 {
-    public function show(string $review): JsonApiResourceCollection
-    {
-        return ReviewResource::collection(
-            QueryBuilder::for(Review::whereProductId($review))
-                ->allowedIncludes([
-                    'product',
-                    'customer',
-                ])
-                ->get()
-        );
-    }
-
     public function store(ReviewStoreRequest $request, Review $review): JsonResponse
     {
 
@@ -41,17 +29,18 @@ class ReviewController
         $review->comment = $validatedData['comment'];
         $review->product_id = $validatedData['product_id'];
         $review->order_id = $validatedData['order_id'];
+        $review->order_line_id = $validatedData['order_line_id'];    
 
         $customer = auth()->user();
         if(!$validatedData['anonymous']){
             $review->customer_id = $customer->id;
         }
  
-        if ($validatedData['product_review_images'] !== null) {
-            foreach ($validatedData['product_review_images'] as $imageUrl) {
+        if ($validatedData['media'] !== null) {
+            foreach ($validatedData['media'] as $imageUrl) {
                 try {
                     $review->addMediaFromUrl($imageUrl)
-                        ->toMediaCollection('product_review_images');
+                        ->toMediaCollection('media');
                 } catch (Exception $e) {
                     dd($e);
                 }
