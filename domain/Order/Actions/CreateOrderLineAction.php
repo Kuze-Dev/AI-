@@ -42,7 +42,6 @@ class CreateOrderLineAction
                 $grandTotal = $subTotal + $taxTotal;
             }
 
-
             $orderLine = OrderLine::create([
                 'order_id' => $order->id,
                 'purchasable_id' => $cartLine->purchasable_id,

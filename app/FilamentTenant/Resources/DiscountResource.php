@@ -20,6 +20,7 @@ use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
@@ -89,7 +90,7 @@ class DiscountResource extends Resource
 
                                 return function (string $attribute, mixed $value, Closure $fail) use ($record) {
                                     if ($value < $record?->max_uses) {
-                                        $fail('The maximum usage must be less than current.');
+                                        $fail('The maximum usage must not be less than current. Current is: '.$record?->max_uses);
                                     }
                                 };
                             },
@@ -99,9 +100,9 @@ class DiscountResource extends Resource
                         ->helperText(new HtmlString(<<<HTML
                                 Leave this blank if no maximum usage.
                             HTML)),
-                    TextInput::make('times_used')
+                    Placeholder::make('times_used')
                         ->disabled()
-                        ->formatStateUsing(fn ($record) => $record = DiscountLimit::whereCode($record->code)->count()),
+                        ->content(fn ($record) => $record = DiscountLimit::whereCode($record?->code)->count()),
 
                 ])
                     ->columnSpan(['lg' => 2]),
@@ -166,16 +167,19 @@ class DiscountResource extends Resource
                 Group::make([
                     Section::make(trans('Requirements'))
                         ->schema([
-                            Select::make('discountRequirement.requirement_type')
-                                ->options([
-                                    'minimum_order_amount' => 'Minimum Purchase Amount',
-                                ])
-                                ->formatStateUsing(fn ($record) => $record?->discountRequirement->requirement_type),
+                            // Select::make('discountRequirement.requirement_type')
+                            //     ->options([
+                            //         'minimum_order_amount' => 'Minimum Purchase Amount',
+                            //     ])
+                            //     // ->reactive()
+                            //     ->formatStateUsing(fn ($record) => $record?->discountRequirement?->requirement_type),
 
                             TextInput::make('discountRequirement.minimum_amount')
                                 ->label(trans('Minimum purchase amount'))
+                                // ->required(fn (Closure $get) => $get('discountRequirement.requirement_type') != null)
+                                // ->disabled(fn (Closure $get) => $get('discountRequirement.requirement_type') == null)
                                 ->numeric()
-                                ->formatStateUsing(fn ($record) => $record?->discountRequirement->minimum_amount)
+                                ->formatStateUsing(fn ($record) => $record?->discountRequirement?->minimum_amount)
                                 ->helperText(new HtmlString(<<<HTML
                                         Leave this blank if no minimum purchase amount.
                                     HTML))

@@ -22,6 +22,7 @@ class FavoriteController
     public function index(): JsonApiResourceCollection
     {
         $customer = auth()->user();
+
         return FavoriteResource::collection(
             QueryBuilder::for(Favorite::whereCustomerId($customer->id))
                 ->allowedIncludes([

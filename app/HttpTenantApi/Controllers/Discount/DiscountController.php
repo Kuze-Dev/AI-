@@ -33,7 +33,8 @@ class DiscountController extends Controller
     public function show(string $code): DiscountResource
     {
         return DiscountResource::make(
-            QueryBuilder::for(Discount::whereCode($code)
+            QueryBuilder::for(Discount::whereValidEndAt()
+                ->whereCode($code)
                 ->whereStatus(DiscountStatus::ACTIVE))
                 ->where(function ($query) {
                     $query->where('max_uses', '>', 0)

@@ -45,34 +45,34 @@ class UpdateCartLineRequest extends FormRequest
                     $purchasable = $cartLine->purchasable;
 
                     if ($purchasable instanceof Product) {
-                        if ($value && !$purchasable->allow_customer_remarks) {
+                        if ($value && ! $purchasable->allow_customer_remarks) {
                             $fail('You cant add remarks into this product.');
                         }
-                    } else if ($purchasable instanceof ProductVariant) {
+                    } elseif ($purchasable instanceof ProductVariant) {
                         $productVariant = ProductVariant::with('product')
-                            ->where("id", $cartLine->purchasable_id)->first();
+                            ->where('id', $cartLine->purchasable_id)->first();
 
-                        if ($value && !$productVariant->product->allow_customer_remarks) {
+                        if ($value && ! $productVariant->product->allow_customer_remarks) {
                             $fail('You cant add remarks into this product.');
                         }
                     }
                 },
             ],
             'media' => [
-                "nullable",
-                "array",
+                'nullable',
+                'array',
                 function ($attribute, $value, $fail) use ($cartLine) {
                     $purchasable = $cartLine->purchasable;
 
                     if ($purchasable instanceof Product) {
-                        if ($value && !$purchasable->allow_customer_remarks) {
+                        if ($value && ! $purchasable->allow_customer_remarks) {
                             $fail('You cant add media remarks into this product.');
                         }
-                    } else if ($purchasable instanceof ProductVariant) {
+                    } elseif ($purchasable instanceof ProductVariant) {
                         $productVariant = ProductVariant::with('product')
-                            ->where("id", $cartLine->purchasable_id)->first();
+                            ->where('id', $cartLine->purchasable_id)->first();
 
-                        if ($value && !$productVariant->product->allow_customer_remarks) {
+                        if ($value && ! $productVariant->product->allow_customer_remarks) {
                             $fail('You cant add media remarks into this product.');
                         }
                     }

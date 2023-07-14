@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Review;
 
-use App\HttpTenantApi\Resources\ReviewResource;
 use Domain\Review\Models\Review;
 use Domain\Review\Requests\ReviewStoreRequest;
 use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Spatie\QueryBuilder\QueryBuilder;
-use TiMacDonald\JsonApi\JsonApiResourceCollection;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Exception;
 
@@ -29,13 +26,13 @@ class ReviewController
         $review->comment = $validatedData['comment'];
         $review->product_id = $validatedData['product_id'];
         $review->order_id = $validatedData['order_id'];
-        $review->order_line_id = $validatedData['order_line_id'];    
+        $review->order_line_id = $validatedData['order_line_id'];
 
         $customer = auth()->user();
-        if(!$validatedData['anonymous']){
+        if( ! $validatedData['anonymous']) {
             $review->customer_id = $customer->id;
         }
- 
+
         if ($validatedData['media'] !== null) {
             foreach ($validatedData['media'] as $imageUrl) {
                 try {

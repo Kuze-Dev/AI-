@@ -75,7 +75,7 @@ class PlaceOrderRequest extends FormRequest
 
                     $customer = Customer::query()
                         ->whereHas('addresses', function ($query) use ($value) {
-                            $query->whereHas("state", function ($subQuery) use ($value) {
+                            $query->whereHas('state', function ($subQuery) use ($value) {
                                 $subQuery->where('country_id', $value);
                             });
                         })

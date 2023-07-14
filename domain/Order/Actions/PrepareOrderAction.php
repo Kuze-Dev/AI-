@@ -14,6 +14,7 @@ use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Domain\Taxation\Facades\Taxation;
+use Exception;
 
 class PrepareOrderAction
 {
@@ -31,7 +32,7 @@ class PrepareOrderAction
             $query->morphWith([
                 ProductVariant::class => ['product'],
             ]);
-        },])
+        }, ])
             ->whereCheckoutReference($placeOrderData->cart_reference)
             ->get();
 
@@ -39,13 +40,21 @@ class PrepareOrderAction
 
         $notes = $placeOrderData->notes;
 
-        $discount = Discount::whereCode($placeOrderData->discountCode)
-            ->whereStatus(DiscountStatus::ACTIVE)
-            ->where(function ($query) {
-                $query->where('max_uses', '>', 0)
-                    ->orWhereNull('max_uses');
-            })
-            ->firstOrFail();
+        try {
+            $discount = Discount::whereCode($placeOrderData->discountCode)
+                ->whereStatus(DiscountStatus::ACTIVE)
+                ->where(function ($query) {
+                    $query->where('max_uses', '>', 0)
+                        ->orWhereNull('max_uses');
+                })
+                ->where(function ($query) {
+                    $query->where('valid_end_at', '>=', now())
+                        ->orWhereNull('valid_end_at');
+                })
+                ->firstOrFail();
+        } catch (Exception $e) {
+            $discount = null;
+        }
 
         $orderData = [
             'customer' => $customer,

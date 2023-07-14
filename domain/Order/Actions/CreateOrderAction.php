@@ -36,11 +36,10 @@ class CreateOrderAction
         } else {
             $grandTotal = $subTotal + $taxTotal;
         }
-
-        $discountCode = $preparedOrderData->discount->code;
-
-        $deductable_subtotal_amount = (new DiscountHelperFunctions())->deductOrderSubtotalByFixedValue($discountCode, $subTotal)
-            ?: (new DiscountHelperFunctions())->deductOrderSubtotalByPercentageValue($discountCode, $subTotal);
+        $deductable_subtotal_amount = 0;
+        if($preparedOrderData->discount) {
+            $deductable_subtotal_amount = (new DiscountHelperFunctions())->deductOrderSubtotal($preparedOrderData->discount, $subTotal);
+        }
 
         // $total = $subTotal - ($deductable_subtotal_amount !== null ? $deductable_subtotal_amount : 0);
         $grandTotal -= ($deductable_subtotal_amount !== null ? $deductable_subtotal_amount : 0);
@@ -65,8 +64,8 @@ class CreateOrderAction
             'sub_total' => $subTotal,
 
             'discount_total' => $deductable_subtotal_amount ?? 0,
-            'discount_id' => $preparedOrderData->discount->id,
-            'discount_code' => $preparedOrderData->discount->code,
+            'discount_id' => $preparedOrderData->discount->id ?? 0,
+            'discount_code' => $preparedOrderData->discount->code ?? '',
 
             'shipping_total' => 0,
             'total' => $grandTotal,
@@ -79,7 +78,9 @@ class CreateOrderAction
             'is_paid' => false,
         ]);
 
-        app(CreateDiscountLimitAction::class)->execute($discountCode, $order, $preparedOrderData->customer);
+        if($preparedOrderData->discount) {
+            app(CreateDiscountLimitAction::class)->execute($preparedOrderData->discount, $order, $preparedOrderData->customer);
+        }
 
         return $order;
     }

@@ -26,6 +26,7 @@ class PreparedOrderData
 
     public static function fromArray(array $data): self
     {
+
         return new self(
             customer: $data['customer'],
             shippingAddress: $data['shippingAddress'],
