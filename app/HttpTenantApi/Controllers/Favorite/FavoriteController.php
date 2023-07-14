@@ -15,7 +15,7 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 
 #[
     Resource('favorites', apiResource: true, except: ['index', 'update']),
-    Middleware(['auth:sanctum', 'feature.tenant:' . ECommerceBase::class])
+    Middleware(['auth:sanctum'])
 ]
 class FavoriteController
 {
@@ -36,7 +36,6 @@ class FavoriteController
     {
 
         $customer = auth()->user();
-        
         $validatedData = $request->validated();
         $favorite->product_id = $validatedData['product_id'];
         $favorite->customer_id = $customer->id;

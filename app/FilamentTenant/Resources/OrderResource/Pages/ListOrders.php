@@ -19,7 +19,7 @@ class ListOrders extends ListRecords implements ContractsHasTabHeader
     public function getTabOptions(): array
     {
         return [
-            "All", "Pending", "Packed", "Shipped", "Fulfilled", "For Cancellation", "Cancelled", "Refunded"
+            'All', 'Pending', 'Packed', 'Shipped', 'Fulfilled', 'For Cancellation', 'Cancelled', 'Refunded',
         ];
     }
 
@@ -29,7 +29,7 @@ class ListOrders extends ListRecords implements ContractsHasTabHeader
 
         $option = $this->activeOption;
 
-        if ($option != "All") {
+        if ($option != 'All') {
             $query->where('status', $option);
         }
 

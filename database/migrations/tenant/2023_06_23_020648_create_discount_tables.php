@@ -73,12 +73,10 @@ return new class () extends Migration {
             $table->foreignIdFor(Discount::class)
                 ->index()
                 ->nullable();
-            $table->foreignIdFor(Customer::class);
-            // $table->foreignIdFor(Order::class);
+            $table->morphs('customer');
+            $table->morphs('order');
 
             $table->string('code')->index();
-            $table->bigInteger('times_used')
-                ->nullable();
 
             $table->timestamps();
         });

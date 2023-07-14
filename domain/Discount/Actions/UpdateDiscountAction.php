@@ -18,7 +18,7 @@ final class UpdateDiscountAction
             'description' => $discountData->description,
             'code' => $discountData->code,
             'status' => $discountData->status,
-            'max_uses' => $discountData->max_uses,
+            'max_uses' => $discountData->max_uses ?? null,
             'valid_start_at' => $discountData->valid_start_at,
             'valid_end_at' => $discountData->valid_end_at,
         ]);

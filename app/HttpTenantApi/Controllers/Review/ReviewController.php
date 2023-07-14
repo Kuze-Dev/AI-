@@ -16,7 +16,7 @@ use Exception;
 
 #[
     Resource('reviews', apiResource: true, except: ['index', 'update']),
-    Middleware(['auth:sanctum', 'feature.tenant:' . ECommerceBase::class])
+    Middleware(['auth:sanctum'])
 ]
 class ReviewController
 {

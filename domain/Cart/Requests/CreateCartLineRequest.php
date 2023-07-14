@@ -39,10 +39,67 @@ class CreateCartLineRequest extends FormRequest
                 'min:1',
                 function ($attribute, $value, $fail) {
                     $purchasableId = $this->input('purchasable_id');
+                    $variantId = $this->input('variant_id');
 
-                    if (!$purchasableId) {
+                    if ( ! $purchasableId) {
                         $fail('Invalid product.');
                     }
+
+                    if (!$variantId) {
+                        $product = Product::find($purchasableId);
+
+                        if (!$product) {
+                            $fail('Invalid product.');
+
+                            return;
+                        }
+
+                        if ($value > $product->stock) {
+                            $fail('The quantity exceeds the available quantity of the product.');
+
+                            return;
+                        }
+                    } else {
+                        $productVariant = ProductVariant::find($variantId);
+
+                        if (!$productVariant) {
+                            $fail('Invalid productVariant.');
+
+                            return;
+                        }
+
+                        if ($value > $productVariant->stock) {
+                            $fail('The quantity exceeds the available quantity of the product.');
+
+                            return;
+                        }
+                    }
+                },
+            ],
+            'remarks' => [
+                'nullable',
+                'array',
+                function ($attribute, $value, $fail) {
+                    $purchasableId = $this->input('purchasable_id');
+
+                    $product = Product::find($purchasableId);
+
+                    if ( ! $product) {
+                        $fail('Invalid product.');
+
+                        return;
+                    }
+
+                    if ($value && !$product->allow_customer_remarks) {
+                        $fail('You cant add remarks into this product.');
+                    }
+                },
+            ],
+            'media' => [
+                "nullable",
+                "array",
+                function ($attribute, $value, $fail) {
+                    $purchasableId = $this->input('purchasable_id');
 
                     $product = Product::find($purchasableId);
 
@@ -52,18 +109,11 @@ class CreateCartLineRequest extends FormRequest
                         return;
                     }
 
-                    if ($value > $product->stock) {
-                        $fail('The quantity exceeds the available quantity of the product.');
-
-                        return;
+                    if ($value && !$product->allow_customer_remarks) {
+                        $fail('You cant add media remarks into this product.');
                     }
                 },
             ],
-            'remarks' => [
-                'nullable',
-                'array',
-            ],
-            'media' => 'nullable|array',
             'media.*' => 'url',
         ];
     }

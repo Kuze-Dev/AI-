@@ -30,7 +30,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property-read \Domain\Cart\Models\Cart|null $cart
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
- * @property-read Model|\Eloquent $purchasable
+ * @property-read Model|Eloquent $purchasable
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine query()

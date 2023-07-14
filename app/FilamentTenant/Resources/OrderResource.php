@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use Closure;
 use Domain\Order\Enums\OrderStatuses;
-use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
@@ -56,9 +55,9 @@ class OrderResource extends Resource
                                     ->schema([
                                         Forms\Components\Placeholder::make('email')->label('Email')
                                             ->content(fn (Order $record): ?string => $record->customer_email),
-                                        Forms\Components\Placeholder::make('contact_number')->label("Contact Number")
+                                        Forms\Components\Placeholder::make('contact_number')->label('Contact Number')
                                             ->content(fn (Order $record): ?string => $record->customer_mobile),
-                                    ])
+                                    ]),
                             ])->collapsible(),
                         Forms\Components\Section::make('Shipping Address')
                             ->schema([
@@ -109,7 +108,7 @@ class OrderResource extends Resource
                                     ]),
                             ])->collapsible(),
                     ])->columnSpan(2),
-                self::summaryCard()
+                self::summaryCard(),
             ])->columns(3);
     }
 
@@ -117,22 +116,22 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('reference')->label("Order ID")->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('customer_name')->label("Customer")
+                Tables\Columns\TextColumn::make('reference')->label('Order ID')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('customer_name')->label('Customer')
                     ->sortable()
                     ->formatStateUsing(function ($record) {
-                        return $record->customer_first_name . " " . $record->customer_last_name;
+                        return $record->customer_first_name . ' ' . $record->customer_last_name;
                     }),
-                Tables\Columns\TextColumn::make('tax_total')->label("Tax Total")->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('tax_total')->label('Tax Total')->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('total')->sortable(),
-                Tables\Columns\TextColumn::make('shipping_method')->label("Shipping Method")->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('payment_method')->label("Payment Method")->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\IconColumn::make('is_paid')->label("isPaid")
+                Tables\Columns\TextColumn::make('shipping_method')->label('Shipping Method')->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('payment_method')->label('Payment Method')->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\IconColumn::make('is_paid')->label('isPaid')
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()
-                    ->label("Order Date")
+                    ->label('Order Date')
                     ->dateTime(timezone: Auth::user()?->timezone),
                 Tables\Columns\BadgeColumn::make('status')
                     ->sortable(),
@@ -179,7 +178,7 @@ class OrderResource extends Resource
                 //     ->icon('heroicon-o-check')
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->color("primary"),
+                Tables\Actions\ViewAction::make()->color('primary'),
             ])
             ->defaultSort('id', 'DESC');
     }
@@ -232,7 +231,7 @@ class OrderResource extends Resource
                                                 'Packed' => 'Packed',
                                                 'Shipped' => 'Shipped',
                                                 'Delivered' => 'Delivered',
-                                                'Fulfilled' => 'Fulfilled'
+                                                'Fulfilled' => 'Fulfilled',
                                             ])
                                             ->disablePlaceholderSelection()
                                             ->formatStateUsing(function () use ($get) {
@@ -262,17 +261,18 @@ class OrderResource extends Resource
                                             }
                                         }
                                     );
-                            })->disableLabel()->columnSpan(1)->alignRight()->size("sm"),
+                            })->disableLabel()->columnSpan(1)->alignRight()->size('sm'),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Order Date")->alignLeft()->size("sm")->inline()->readOnly(),
-                        Support\TextLabel::make("created_at")->alignRight()->size("sm")->inline()
+                        Support\TextLabel::make('')->label('Order Date')->alignLeft()->size('sm')->inline()->readOnly(),
+                        Support\TextLabel::make('created_at')->alignRight()->size('sm')->inline()
                             ->formatStateUsing(function ($state) {
                                 $format ??= config('tables.date_format');
                                 $formattedState = Carbon::parse($state)
                                     ->setTimezone(Auth::user()?->timezone)
                                     ->translatedFormat($format);
+
                                 return $formattedState;
                             }),
                     ]),
@@ -284,22 +284,24 @@ class OrderResource extends Resource
                                 if ($get('is_paid')) {
                                     return 'secondary';
                                 }
+
                                 return 'primary';
                             })
                             ->label(function () use ($get) {
                                 if ($get('is_paid')) {
                                     return 'Unmark as paid';
                                 }
+
                                 return 'Mark as paid';
                             })
                             ->size('sm')
                             ->action(function () use ($get, $set) {
                                 $order = Order::find($get('id'));
 
-                                $isPaid = !$order->is_paid;
+                                $isPaid = ! $order->is_paid;
 
                                 $result = $order->update([
-                                    'is_paid' => $isPaid
+                                    'is_paid' => $isPaid,
                                 ]);
 
                                 if ($result) {
@@ -311,7 +313,7 @@ class OrderResource extends Resource
                                 }
                             })
                             ->requiresConfirmation();
-                    })->fullWidth()->size("md"),
+                    })->fullWidth()->size('md'),
                 Support\ButtonAction::make('proof_of_payment')
                     ->disableLabel()
                     ->execute(function (Closure $get, Closure $set) {
@@ -319,22 +321,19 @@ class OrderResource extends Resource
                             ->color('secondary')
                             ->label('View Proof of payment')
                             ->size('sm')
-                            ->action(function () use ($get, $set) {
+                            ->action(function () {
                             })
                             ->modalHeading('Proof of Payment')
                             ->modalWidth('lg')
                             ->form([
-                                Forms\Components\FileUpload::make('bank_proof_image')->label("Customer Upload")
+                                Forms\Components\FileUpload::make('bank_proof_image')->label('Customer Upload')
                                     ->formatStateUsing(function (Order $record) {
                                         return $record?->getMedia('bank_proof_images')
                                             ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
                                             ->toArray() ?? [];
                                     })
                                     ->hidden(function (Order $record) {
-                                        if (empty($record?->getFirstMediaUrl('bank_proof_images'))) {
-                                            return true;
-                                        }
-                                        return false;
+                                        return (bool) (empty($record?->getFirstMediaUrl('bank_proof_images')));
                                     })
                                     ->multiple()
                                     ->image()
@@ -350,6 +349,7 @@ class OrderResource extends Resource
                                             } catch (Throwable $exception) {
                                             }
                                         }
+
                                         return $media?->getUrl();
                                     })->disabled(),
 
@@ -357,33 +357,33 @@ class OrderResource extends Resource
                                     ->label('')
                                     ->options([
                                         'Approved' => 'Approved',
-                                        'Declined' => 'Declined'
+                                        'Declined' => 'Declined',
                                     ]),
-                                Forms\Components\Textarea::make('Message')
+                                Forms\Components\Textarea::make('Message'),
                             ])
                             ->slideOver()
                             ->icon('heroicon-s-eye');
-                    })->fullWidth()->size("md"),
+                    })->fullWidth()->size('md'),
                 Support\Divider::make(''),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Subtotal")->alignLeft()->size("sm")->inline()->readOnly(),
-                        Support\TextLabel::make("sub_total")->alignRight()->size("sm")->inline(),
+                        Support\TextLabel::make('')->label('Subtotal')->alignLeft()->size('sm')->inline()->readOnly(),
+                        Support\TextLabel::make('sub_total')->alignRight()->size('sm')->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Shipping Fee")->alignLeft()->size("sm")->inline()->readOnly(),
-                        Support\TextLabel::make("shipping_total")->alignRight()->size("sm")->inline(),
+                        Support\TextLabel::make('')->label('Shipping Fee')->alignLeft()->size('sm')->inline()->readOnly(),
+                        Support\TextLabel::make('shipping_total')->alignRight()->size('sm')->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Discount")->alignLeft()->size("sm")->inline()->readOnly(),
-                        Support\TextLabel::make("discount_total")->alignRight()->size("sm")->inline(),
+                        Support\TextLabel::make('')->label('Discount')->alignLeft()->size('sm')->inline()->readOnly(),
+                        Support\TextLabel::make('discount_total')->alignRight()->size('sm')->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Grand Total")->alignLeft()->size("md")->color("primary")->inline()->readOnly(),
-                        Support\TextLabel::make("total")->alignRight()->size("md")->color("primary")->inline(),
+                        Support\TextLabel::make('')->label('Grand Total')->alignLeft()->size('md')->color('primary')->inline()->readOnly(),
+                        Support\TextLabel::make('total')->alignRight()->size('md')->color('primary')->inline(),
                     ]),
             ])->columnSpan(1);
     }
