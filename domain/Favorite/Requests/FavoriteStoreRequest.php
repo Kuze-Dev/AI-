@@ -34,8 +34,8 @@ class FavoriteStoreRequest extends FormRequest
                 Rule::exists('products', 'id'),
                 Rule::unique('favorites', 'product_id')
                     ->where(function ($query) {
-                        $customerId = $this->input('customer_id');
-                        $query->where('customer_id', $customerId);
+                        $customer = auth()->user();
+                        $query->where('customer_id', $customer->id);
                     }),
 
             ],

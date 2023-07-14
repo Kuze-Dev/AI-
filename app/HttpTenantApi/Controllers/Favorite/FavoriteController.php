@@ -14,12 +14,12 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 use Spatie\RouteAttributes\Attributes\Middleware;
 
 #[
-    Resource('favorites', apiResource: true, except: ['index', 'update']),
+    Resource('favorites', apiResource: true, except: ['update', 'show']),
     Middleware(['auth:sanctum'])
 ]
 class FavoriteController
 {
-    public function show(): JsonApiResourceCollection
+    public function index(): JsonApiResourceCollection
     {
         $customer = auth()->user();
         return FavoriteResource::collection(
