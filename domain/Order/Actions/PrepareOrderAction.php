@@ -46,13 +46,16 @@ class PrepareOrderAction
 
         $notes = $placeOrderData->notes;
 
-        $discount = Discount::whereCode($placeOrderData->discountCode)
-            ->whereStatus(DiscountStatus::ACTIVE)
-            ->where(function ($query) {
-                $query->where('max_uses', '>', 0)
-                    ->orWhereNull('max_uses');
-            })
-            ->firstOrFail();
+        $discount = null;
+        if ($placeOrderData->discountCode) {
+            $discount = Discount::whereCode($placeOrderData->discountCode)
+                ->whereStatus(DiscountStatus::ACTIVE)
+                ->where(function ($query) {
+                    $query->where('max_uses', '>', 0)
+                        ->orWhereNull('max_uses');
+                })
+                ->firstOrFail();
+        }
 
         $orderData = [
             'customer' => $customer,
