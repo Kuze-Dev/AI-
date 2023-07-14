@@ -11,9 +11,11 @@ use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
+use Domain\Order\Enums\OrderResult;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Domain\Taxation\Facades\Taxation;
+use Domain\Taxation\Models\TaxZone;
 
 class PrepareOrderAction
 {
@@ -36,6 +38,11 @@ class PrepareOrderAction
             ->get();
 
         $taxZone = Taxation::getTaxZone($placeOrderData->taxation_data->country_id, $placeOrderData->taxation_data->state_id);
+
+        if (!$taxZone instanceof TaxZone) {
+            \Log::info("No tax zone found");
+            return OrderResult::FAILED;
+        }
 
         $notes = $placeOrderData->notes;
 
