@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Resources\PageResource\Pages;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\PageResource;
 use App\Settings\CMSSettings;
+use App\Settings\SiteSettings;
 use Domain\Page\Actions\UpdatePageAction;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
@@ -41,20 +42,17 @@ class EditPage extends EditRecord
             Action::make('preview')
                 ->color('secondary')
                 ->label(__('Preview Page'))
-                ->action(function (CMSSettings $cmsSettings) {
-                    $pageUrl = $cmsSettings->front_end_preview_page_url ?? null;
+                ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
+                    $domain = $siteSettings->front_end_domain ?? $cmsSettings->front_end_domain;
 
-                    if (
-                        ! blank($pageUrl) && is_string($pageUrl)
-                        && str_contains($pageUrl, '{slug}')
-                    ) {
-                        $previewPageUrl = str_replace('{slug}', $this->record->slug, $pageUrl);
-
-                        $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$this->record->slug], false), '?');
-
-                        $this->redirect($previewPageUrl . '?' . $queryString);
+                    if ( ! $domain) {
+                        return null;
                     }
-                }),
+
+                    $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$this->record->slug], false), '?');
+
+                    return "https://{$domain}/preview?slug={$this->record->slug}&{$queryString}";
+                }, true),
             Action::make('clone-page')
                 ->label(__('Clone Page'))
                 ->color('secondary')
