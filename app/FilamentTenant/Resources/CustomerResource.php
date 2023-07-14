@@ -161,7 +161,12 @@ class CustomerResource extends Resource
                     ->wrap(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->translateLabel()
-                    ->sortable(),
+                    ->sortable()
+                    ->colors([
+                        'success' => Status::ACTIVE->value,
+                        'warning' => Status::INACTIVE->value,
+                        'danger' => Status::BANNED->value,
+                    ]),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->translateLabel()
                     ->dateTime(timezone: Filament::auth()->user()?->timezone)

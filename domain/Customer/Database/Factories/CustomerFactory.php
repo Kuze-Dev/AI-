@@ -54,11 +54,21 @@ class CustomerFactory extends Factory
 
     public function active(): self
     {
-        return $this->state(['status' => Status::ACTIVE]);
+        return $this->status(Status::ACTIVE);
     }
 
     public function inactive(): self
     {
-        return $this->state(['status' => Status::INACTIVE]);
+        return $this->status(Status::INACTIVE);
+    }
+
+    public function banned(): self
+    {
+        return $this->status(Status::BANNED);
+    }
+
+    public function status(Status $status): self
+    {
+        return $this->state(['status' => $status]);
     }
 }
