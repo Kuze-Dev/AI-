@@ -391,7 +391,9 @@ class OrderResource extends Resource
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
-                        Support\TextLabel::make("")->label("Total Tax")->alignLeft()->size("md")->inline()->readOnly(),
+                        Support\TextLabel::make("")->label(function (Order $record) {
+                            return "Tax Total ( $record->tax_percentage% )";
+                        })->alignLeft()->size("md")->inline()->readOnly(),
                         Support\TextLabel::make("tax_total")->alignRight()->size("md")->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
