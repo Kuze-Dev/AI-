@@ -43,6 +43,21 @@ class ProductVariant extends Field
                     $livewire->mountProductVariantItem($this->getName(), $statePath);
                 },
             ],
+            'productVariant::toggleItem' => [
+                function (self $component, string $statePath): void {
+                    if ( ! Str::startsWith($statePath, $component->getStatePath())) {
+                        return;
+                    }
+
+                    $itemContainerPath = Str::beforeLast($statePath, '.');
+                    $itemKey = Str::afterLast($statePath, '.');
+                    $livewire = $component->getLivewire();
+
+                    $items = data_get($livewire, $itemContainerPath);
+                    $items[$itemKey]['status'] = ! $items[$itemKey]['status'];
+                    data_set($livewire, $itemContainerPath, $items);
+                },
+            ],
         ]);
 
         $this->mutateDehydratedStateUsing(static function (?array $state): array {
