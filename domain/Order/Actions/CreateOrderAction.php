@@ -27,8 +27,15 @@ class CreateOrderAction
         $taxPercentage = (float) $preparedOrderData->taxZone->percentage;
         $taxTotal = round($subTotal * $taxPercentage / 100, 2);
 
-        //for now, but the shipping fee and discount will be added
-        $grandTotal = $subTotal + $taxTotal;
+        $grandTotal = 0;
+
+        if ($taxDisplay == PriceDisplay::INCLUSIVE) {
+            $subTotal += $taxTotal;
+            //for now, but the shipping fee and discount will be added
+            $grandTotal = $subTotal;
+        } else {
+            $grandTotal = $subTotal + $taxTotal;
+        }
 
         $discountCode = $preparedOrderData->discount->code;
 
@@ -55,8 +62,6 @@ class CreateOrderAction
 
             'tax_total' => $taxTotal,
             'tax_display' => $taxDisplay,
-            'tax_percentage' => $taxPercentage,
-
             'sub_total' => $subTotal,
 
             'discount_total' => $deductable_subtotal_amount ?? 0,
