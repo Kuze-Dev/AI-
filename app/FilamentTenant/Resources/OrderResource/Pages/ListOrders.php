@@ -29,7 +29,7 @@ class ListOrders extends ListRecords implements ContractsHasTabHeader
 
         $option = $this->activeOption;
 
-        if ($option != "All") {
+        if ($option != 'All') {
             $query->where('status', $option);
         }
 

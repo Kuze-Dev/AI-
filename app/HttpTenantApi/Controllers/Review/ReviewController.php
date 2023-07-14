@@ -16,7 +16,7 @@ use Exception;
 
 #[
     Resource('reviews', apiResource: true, except: ['index', 'update']),
-    Middleware(['auth:sanctum', 'feature.tenant:' . ECommerceBase::class])
+    Middleware(['auth:sanctum'])
 ]
 class ReviewController
 {
@@ -41,10 +41,13 @@ class ReviewController
         $review->comment = $validatedData['comment'];
         $review->product_id = $validatedData['product_id'];
         $review->order_id = $validatedData['order_id'];
-        $review->customer_id = $validatedData['customer_id'];
 
+        $customer = auth()->user();
+        if(!$validatedData['anonymous']){
+            $review->customer_id = $customer->id;
+        }
+ 
         if ($validatedData['product_review_images'] !== null) {
-
             foreach ($validatedData['product_review_images'] as $imageUrl) {
                 try {
                     $review->addMediaFromUrl($imageUrl)

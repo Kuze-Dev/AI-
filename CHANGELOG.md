@@ -2,10 +2,6 @@
 
 ## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.4)
 
-### Added
-
-- Added `*.front_end_domain` on tenant settings.
-
 ## [0.2.4](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/0.2.4%0Dv0.2.3)
 
 ### Added

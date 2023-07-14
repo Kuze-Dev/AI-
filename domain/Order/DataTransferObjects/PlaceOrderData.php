@@ -11,6 +11,7 @@ class PlaceOrderData
         public readonly string $cart_reference,
         public readonly OrderTaxationData $taxation_data,
         public readonly ?string $notes,
+        public readonly ?string $discountCode,
     ) {
     }
 
@@ -18,15 +19,16 @@ class PlaceOrderData
     {
         return new self(
             addresses: new OrderAddressData(
-                shipping: $data['addresses']['shipping'],
-                billing: $data['addresses']['billing']
+                shipping: (int) $data['addresses']['shipping'],
+                billing: (int) $data['addresses']['billing']
             ),
             cart_reference: $data['cart_reference'],
             taxation_data: new OrderTaxationData(
                 country_id: $data['taxations']['country_id'],
                 state_id: $data['taxations']['state_id'] ?? null
             ),
-            notes: $data['notes'] ?? null
+            notes: $data['notes'] ?? null,
+            discountCode: $data['discount_code'],
         );
     }
 }

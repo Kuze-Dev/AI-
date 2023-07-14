@@ -19,6 +19,7 @@ class PreparedOrderData
         public readonly TaxZone $taxZone,
         public readonly mixed $cartLine,
         public readonly ?string $notes,
+        public readonly ?string $discountCode,
     ) {
     }
 
@@ -31,7 +32,8 @@ class PreparedOrderData
             currency: $data['currency'],
             taxZone: $data['taxZone'],
             cartLine: $data['cartLine'],
-            notes: $data['notes'] ?? null
+            notes: $data['notes'] ?? null,
+            discountCode: $data['discountCode'] ?? null,
         );
     }
 }

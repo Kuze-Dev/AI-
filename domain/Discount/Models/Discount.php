@@ -7,6 +7,7 @@ namespace Domain\Discount\Models;
 use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Enums\DiscountConditionType;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -88,5 +89,10 @@ class Discount extends Model
     public function discountRequirement(): HasOne
     {
         return $this->hasOne(DiscountRequirement::class);
+    }
+
+    public function discountLimits(): HasMany
+    {
+        return $this->hasMany(DiscountLimit::class, 'discountable');
     }
 }

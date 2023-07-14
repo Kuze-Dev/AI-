@@ -24,8 +24,8 @@ class CreateCartLineAction
 
             match ($cartLineData->purchasable_type) {
                 'Product' => $purchasableType = Product::class,
-                    // 'Service' => $purchasableType = Service::class,
-                    // 'Booking' => $purchasableType = Booking::class,
+                // 'Service' => $purchasableType = Service::class,
+                // 'Booking' => $purchasableType = Booking::class,
                 default => null
             };
 
@@ -49,9 +49,8 @@ class CreateCartLineAction
                 ]
             );
 
-            $cartLine->clearMediaCollection('cart_line_notes');
-
             if ($cartLineData->medias !== null) {
+                $cartLine->clearMediaCollection('cart_line_notes');
                 foreach ($cartLineData->medias as $imageUrl) {
                     try {
                         $cartLine->addMediaFromUrl($imageUrl)

@@ -12,15 +12,14 @@ use Filament\Forms;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
 use App\FilamentTenant\Support;
-use Closure;
 
 class ViewOrderDetails extends ViewRecord
 {
     protected static string $resource = OrderResource::class;
 
-    protected function getHeading(): string | Htmlable
+    protected function getHeading(): string|Htmlable
     {
-        return "Order Details #" . $this->record->reference;
+        return 'Order Details #' . $this->record->reference;
     }
 
     protected function getRelationManagers(): array
@@ -35,7 +34,7 @@ class ViewOrderDetails extends ViewRecord
                 ->schema([
                     Forms\Components\Group::make()
                         ->schema($this->getSections())->columnSpan(2),
-                    OrderResource::summaryCard()
+                    OrderResource::summaryCard(),
                 ])->columns(3),
         ];
     }
@@ -60,10 +59,7 @@ class ViewOrderDetails extends ViewRecord
                                         })
                                         ->disableLabel()
                                         ->hidden(function () use ($orderLine) {
-                                            if (empty($orderLine->getFirstMediaUrl('order_line_images'))) {
-                                                return true;
-                                            }
-                                            return false;
+                                            return (bool) (empty($orderLine->getFirstMediaUrl('order_line_images')));
                                         })
                                         ->image()
                                         ->imagePreviewHeight('120')
@@ -97,10 +93,11 @@ class ViewOrderDetails extends ViewRecord
                                                             if ($orderLine->purchasable_type == ProductVariant::class) {
                                                                 $variant = array_values($orderLine->purchasable_data['combination']);
                                                                 $variantString = implode(' / ', array_map('ucfirst', $variant));
+
                                                                 return $variantString;
                                                             }
 
-                                                            return "N/A";
+                                                            return 'N/A';
                                                         }),
                                                 ]),
                                             Forms\Components\Grid::make(2)
@@ -109,7 +106,7 @@ class ViewOrderDetails extends ViewRecord
                                                         ->content($orderLine->quantity),
                                                     Forms\Components\Placeholder::make('amount_' . $sectionIndex)->label('Amount')
                                                         ->content($orderLine->sub_total),
-                                                ])
+                                                ]),
                                         ]),
                                 ])->columnSpan(2),
                         ])->columns(3),
@@ -129,18 +126,15 @@ class ViewOrderDetails extends ViewRecord
                                 ->form([
                                     Forms\Components\Placeholder::make('remarks_' . $sectionIndex)->label('Remarks')
                                         ->hidden(is_null($orderLine->remarks_data) ? true : false)
-                                        ->content($orderLine->remarks_data['notes'] ?? ""),
-                                    Forms\Components\FileUpload::make('customer_upload_' . $sectionIndex)->label("Customer Upload")
+                                        ->content($orderLine->remarks_data['notes'] ?? ''),
+                                    Forms\Components\FileUpload::make('customer_upload_' . $sectionIndex)->label('Customer Upload')
                                         ->formatStateUsing(function ($record) use ($orderLine) {
                                             return $orderLine?->getMedia('order_line_notes')
                                                 ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
                                                 ->toArray() ?? [];
                                         })
                                         ->hidden(function () use ($orderLine) {
-                                            if (empty($orderLine->getFirstMediaUrl('order_line_notes'))) {
-                                                return true;
-                                            }
-                                            return false;
+                                            return (bool) (empty($orderLine->getFirstMediaUrl('order_line_notes')));
                                         })
                                         ->multiple()
                                         ->image()
@@ -156,8 +150,9 @@ class ViewOrderDetails extends ViewRecord
                                                 } catch (Throwable $exception) {
                                                 }
                                             }
+
                                             return $media?->getUrl();
-                                        })->disabled()
+                                        })->disabled(),
                                 ])
                                 ->slideOver()
                                 ->icon('heroicon-o-document');
