@@ -36,14 +36,13 @@ class PaymentCallbackController
 
             $data = array_merge($request->all(), ['status' => $status]);
 
-            // dump(
             app(PaymentManagerInterface::class)
                 ->driver($paymentMethod->gateway)
                 ->capture($paymentModel, $data);
-            // );
 
             #redirect to FE order summary or order page.
             return redirect()->away('/');
+
         } catch (Throwable $th) {
             throw $th;
         }
@@ -64,30 +63,29 @@ class PaymentCallbackController
     //                 'amount' => AmountData::fromArray([
     //                     'currency' => 'PHP',
     //                     'total' => '1000.00',
-    //                     'details' => PaymentDetailsData::fromArray(
-    //                         [
-    //                             'subtotal' => '950.00',
-    //                             'shipping' => '50.00',
-    //                         ]
-    //                     ),
+    //                     // 'details' => PaymentDetailsData::fromArray(
+    //                     //     [
+    //                     //         'subtotal' => '950.00',
+    //                     //         'shipping' => '50.00',
+    //                     //     ]
+    //                     // ),
     //                 ]),
-    //                 'item_list' => [
-    //                     [
-    //                         'sku' => 'SKU-4958',
-    //                         'name' => 'Product One',
-    //                         'description' => 'Sample Product',
-    //                         'quantity' => '1',
-    //                         'price' => '950',
-    //                         'currency' => 'PHP',
-    //                         'tax' => '0',
-    //                         'category' => 'Product',
-    //                     ],
-    //                 ],
+    //                 // 'item_list' => [
+    //                 //     [
+    //                 //         'sku' => 'SKU-4958',
+    //                 //         'name' => 'Product One',
+    //                 //         'description' => 'Sample Product',a
+    //                 //         'quantity' => '1',
+    //                 //         'price' => '950',
+    //                 //         'currency' => 'PHP',
+    //                 //         'tax' => '0',
+    //                 //         'category' => 'Product',
+    //                 //     ],
+    //                 // ],
     //                 'description' => 'payment request',
     //             ]
-    //             ),
-    //             payment_driver: 'paypal'
-
+    //         ),
+    //         payment_driver: 'paypal'
     //     );
 
     //     dump(
