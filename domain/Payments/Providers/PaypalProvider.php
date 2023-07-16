@@ -12,18 +12,8 @@ use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentRefund;
 use Domain\Payments\Events\PaymentProcessEvent;
 use Domain\Payments\Models\Payment as ModelsPayment;
 use Domain\Payments\Providers\Concerns\HandlesRedirection as ConcernsHandlesRedirection;
-use PayPal\Api\Amount;
-use PayPal\Api\Details;
-use PayPal\Api\Item;
-use PayPal\Api\ItemList;
-use PayPal\Api\Payer;
-use PayPal\Api\Payment;
-use PayPal\Api\PaymentExecution;
-use PayPal\Api\RedirectUrls;
-use PayPal\Api\Transaction;
-use PayPal\Auth\OAuthTokenCredential;
-use PayPal\Rest\ApiContext;
 use Throwable;
+use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
 class PaypalProvider extends Provider
 {
@@ -31,31 +21,36 @@ class PaypalProvider extends Provider
 
     protected string $name = 'paypal';
 
-    /** @var \PayPal\Rest\ApiContext */
-    private $paypalApiContext;
+    private PayPalClient $payPalclient;
 
     public function __construct()
     {
         /** @var array */
         $paypalCredentials = app(PaymentSettings::class)->paypal_credentials;
 
-        $this->paypalApiContext = new ApiContext(
-            new OAuthTokenCredential(
-                clientId: $paypalCredentials['paypal_secret_id'],
-                clientSecret: $paypalCredentials['paypal_secret_key']
-            )
-        );
+        $config = [
+            'mode' => app(PaymentSettings::class)->paypal_mode ? 'live' : 'sandbox',
+            'live' => [
+                'client_id' => $paypalCredentials['paypal_secret_id'],
+                'client_secret' => $paypalCredentials['paypal_secret_key'],
+                'app_id' => '',
+            ],
+            'sandbox' => [
+                'client_id' => $paypalCredentials['paypal_secret_id'],
+                'client_secret' => $paypalCredentials['paypal_secret_key'],
+                'app_id' => '',
+            ],
+            'payment_action' => 'Sale',
+            'currency' => 'USD',
+            'notify_url' => '', //?
+            'locale' => 'en_US',
+            'validate_ssl' => true,
+        ];
 
-        $this->setConfig(
-            array_merge(
-                config('payment-gateway.paypal'),
-                [
-                    'mode' => app(PaymentSettings::class)->paypal_mode ? 'live' : 'sandbox',
-                ]
-            )
-        );
+        $this->payPalclient = new PaypalClient($config);
 
-        $this->paypalApiContext->setConfig($this->config);
+        $this->payPalclient->getAccessToken();
+
     }
 
     public function authorize(): PaymentAuthorize
@@ -65,66 +60,57 @@ class PaypalProvider extends Provider
 
             $providerData = $this->data;
 
-            $payer = app(Payer::class)->setPaymentMethod($this->name);
-            // (['payment_method' => $this->name]);
-
-            // $totalItems = $providerData->transactionData->item_list ?
-            //         count($providerData->transactionData->item_list) :
-            //         0;
-            // if ($totalItems > 0) {
-
-            //     $itemList = new ItemList();
-
-            //     foreach ($providerData->transactionData->item_list as $item) {
-            //         $itemList->addItem(new Item([
-            //             'name' => $item->name,
-            //             'quantity' => $item->quantity,
-            //             'currency' => $item->currency,
-            //             'price' => $item->price,
-            //         ]));
-            //     }
-            // }
-
             $paymentData = $providerData->paymentModel;
 
-            /** @phpstan-ignore-next-line */
-            $amount = new Amount([
-                'currency' => $paymentData->currency,
-                'total' => $paymentData->amount,
-                /** @phpstan-ignore-next-line */
-                'details' => new Details($paymentData->payment_details),
+            $request = [
+                'intent' => 'CAPTURE',
+                'application_context' => [
+                    'return_url' => route(
+                        'tenant.api.payment-callback',
+                        [
+                            'paymentmethod' => $providerData->payment_method_id,
+                            'transactionId' => $providerData->paymentModel->id,
+                            'status' => 'success',  ]
+                    ),
+                    'cancel_url' => route(
+                        'tenant.api.payment-callback',
+                        [
+                            'paymentmethod' => $providerData->payment_method_id,
+                            'transactionId' => $providerData->paymentModel->id,
+                            'status' => 'cancel',  ]
+                    ),
+
+                ],
+                'purchase_units' => [
+                    0 => [
+                        'amount' => [
+                            'currency_code' => $paymentData->currency,
+                            'value' => $paymentData->amount,
+                        ],
+                    ],
+
+                ],
+
+            ];
+
+            /** @var array */
+            $order = $this->payPalclient->createOrder($request);
+
+            $paymentData->update([
+                'payment_id' => $order['id'],
             ]);
 
-            $transaction = app(Transaction::class)
-                ->setAmount($amount);
-            // ->setItemList($itemList ?? [])
-            // ->setDescription((string) $providerData->transactionData->description);
+            $redirectUrl = array_reduce($order['links'], function ($result, $link) {
+                if ($link['rel'] === 'approve') {
+                    return $link;
+                }
 
-            $redirectUrls = app(RedirectUrls::class)
-                ->setReturnUrl(
-                    route('tenant.api.payment-callback', [
-                        'paymentmethod' => $providerData->payment_method_id,
-                        'transactionId' => $providerData->paymentModel->id,
-                        'status' => 'success',
-                    ])
-                )->setCancelUrl(
-                    route('tenant.api.payment-callback', [
-                        'paymentmethod' => $providerData->payment_method_id,
-                        'transactionId' => $providerData->paymentModel->id,
-                        'status' => 'cancel',
-                    ])
-                );
-
-            $payment = app(Payment::class)->setIntent('sale')
-                ->setPayer($payer)
-                ->addTransaction($transaction)
-                ->setRedirectUrls($redirectUrls);
-
-            $payment->create($this->paypalApiContext);
+                return $result;
+            }, [])['href'];
 
             return PaymentAuthorize::fromArray([
                 'success' => true,
-                'url' => $payment->getApprovalLink(),
+                'url' => $redirectUrl,
             ]);
 
         } catch (Throwable $th) {
@@ -141,31 +127,41 @@ class PaypalProvider extends Provider
     {
         return match ($data['status']) {
             'success' => $this->processTransaction($paymentModel, $data),
+            'cancel' => $this->cancelTransaction($paymentModel, $data),
             default => throw new InvalidArgument(),
         };
     }
 
     protected function processTransaction(ModelsPayment $paymentModel, array $data): PaymentCapture
     {
-        /** @var Payment */
-        $payment = Payment::get($data['paymentId'], $this->paypalApiContext);
 
-        $execution = app(PaymentExecution::class)->setPayerId($data['PayerID']);
-
-        $payment->execute($execution, $this->paypalApiContext);
-
-        /** @phpstan-ignore-next-line */
-        $transaction = $payment->transactions['0'];
+        $this->payPalclient->capturePaymentOrder($data['token']);
 
         $paymentModel->update([
             'status' => 'paid',
             'payment_id' => $data['paymentId'],
-            'transaction_id' => $transaction->getRelatedResources()['0']->getSale()->getId(),
         ]);
 
         event(new PaymentProcessEvent($paymentModel));
 
         return new PaymentCapture(success: true);
+
+    }
+
+    protected function cancelTransaction(ModelsPayment $paymentModel, array $data): PaymentCapture
+    {
+
+        $paymentModel->update([
+            'status' => 'cancel',
+            'payment_id' => $data['paymentId'],
+        ]);
+
+        event(new PaymentProcessEvent($paymentModel));
+
+        return new PaymentCapture(
+            success: false,
+            message: 'The request for payment has been canceled.'
+        );
 
     }
 
