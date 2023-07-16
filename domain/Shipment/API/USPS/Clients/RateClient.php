@@ -64,24 +64,24 @@ class RateClient
     public function getInternationalVersion2(): RateInternationalV2ResponseData
     {
 
-        $xml = <<<XML
-                    <IntlRateV2Request USERID="7CADCOA340677" PASSWORD="XM892016HO9892O">
-                        <Revision>2</Revision>
-                        <Package ID="1">
-                            <Pounds>15.12345678</Pounds>
-                            <Ounces>0</Ounces>
-                            <MailType>Package</MailType>
-                            <ValueOfContents>200</ValueOfContents>
-                            <Country>Philippines</Country>
-                            <Width>10</Width>
-                            <Length>15</Length>
-                            <Height>10</Height>
-                            <OriginZip>18701</OriginZip>
-                            <AcceptanceDateTime>2023-07-14T13:15:00-06:00</AcceptanceDateTime>
-                            <DestinationPostalCode>1603</DestinationPostalCode>
-                        </Package>
-                    </IntlRateV2Request>
-                XML;
+        // $xml = <<<XML
+        //             <IntlRateV2Request USERID="7CADCOA340677" PASSWORD="XM892016HO9892O">
+        //                 <Revision>2</Revision>
+        //                 <Package ID="1">
+        //                     <Pounds>15.12345678</Pounds>
+        //                     <Ounces>0</Ounces>
+        //                     <MailType>Package</MailType>
+        //                     <ValueOfContents>200</ValueOfContents>
+        //                     <Country>Philippines</Country>
+        //                     <Width>10</Width>
+        //                     <Length>15</Length>
+        //                     <Height>10</Height>
+        //                     <OriginZip>18701</OriginZip>
+        //                     <AcceptanceDateTime>2023-07-14T13:15:00-06:00</AcceptanceDateTime>
+        //                     <DestinationPostalCode>1603</DestinationPostalCode>
+        //                 </Package>
+        //             </IntlRateV2Request>
+        //         XML;
 
         $array = [
             'Revision' => '2',
@@ -101,30 +101,25 @@ class RateClient
             ],
         ];
 
-        // $xml = ArrayToXml::convert($array, [
-        //     'rootElementName' => 'IntlRateV2Request',
-        //     '_attributes' => [
-        //         'USERID' => $this->client->username,
-        //         'PASSWORD' => $this->client->password,
-        //     ],
-        // ], true, 'UTF-8');
-
-      dump($xml);
+        $xml = ArrayToXml::convert($array, [
+            'rootElementName' => 'IntlRateV2Request',
+            '_attributes' => [
+                'USERID' => $this->client->username,
+                'PASSWORD' => $this->client->password,
+            ],
+        ], true, 'UTF-8');
       
         $body = $this->client->getClient()
-            // ->withHeaders(['Content-Type' => 'text/xml; charset=utf-8'])
             ->withQueryParameters([
                 'API' => 'IntlRateV2',
                 'XML' => $xml,
             ])
-            ->get(self::URI);
-            // ->body();
-        dd($body);
-        $array = XmlToArray::convert($body);
-        dd($array);
-        self::throwError($array);
+            ->get(self::URI)
+            ->body();
 
-        dump($array);
+        $array = XmlToArray::convert($body);
+
+        self::throwError($array);
 
         return new RateInternationalV2ResponseData();
     }
