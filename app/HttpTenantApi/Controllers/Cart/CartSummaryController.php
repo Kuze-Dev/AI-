@@ -9,6 +9,8 @@ use Domain\Cart\Helpers\CartLineHelper;
 use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
+use Domain\Discount\Enums\DiscountStatus;
+use Domain\Discount\Models\Discount;
 use Domain\Taxation\Facades\Taxation;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -42,6 +44,18 @@ class CartSummaryController extends Controller
         $stateId = (int) $validated['state_id'] ?? null;
         $countryId = (int) $validated['country_id'];
 
+        $discount = Discount::whereCode($validated['discount_code'])
+            ->whereStatus(DiscountStatus::ACTIVE)
+            ->where(function ($query) {
+                $query->where('max_uses', '>', 0)
+                    ->orWhereNull('max_uses');
+            })
+            ->where(function ($query) {
+                $query->where('valid_end_at', '>=', now())
+                    ->orWhereNull('valid_end_at');
+            })->first();
+
+
         $cartLines = CartLine::query()
             ->with('purchasable')
             ->whereHas('cart', function ($query) {
@@ -53,7 +67,7 @@ class CartSummaryController extends Controller
 
 
         $summaryData = app(CartLineHelper::class)
-            ->summary($cartLines, $countryId, $stateId);
+            ->summary($cartLines, $countryId, $stateId, $discount);
 
         return response()->json([
             'tax_inclusive_sub_total' => $summaryData->subTotal + $summaryData->taxTotal,
@@ -61,7 +75,9 @@ class CartSummaryController extends Controller
             'tax_display' => $summaryData->taxDisplay,
             'tax_percentage' => $summaryData->taxPercentage,
             'tax_total' => $summaryData->taxTotal,
-            'grand_total' => $summaryData->grandTotal
+            'grand_total' => $summaryData->grandTotal,
+            'discount_total' => $summaryData->discountTotal,
+            'discount_message' => $summaryData->discountMessage,
         ], 200);
     }
 }

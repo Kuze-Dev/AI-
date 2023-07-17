@@ -8,13 +8,14 @@ use Domain\Cart\Models\CartLine;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Enums\OrderResult;
+use Domain\Order\Models\Order;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
 class SplitOrderAction
 {
-    public function execute(PreparedOrderData $preparedOrderData, PlaceOrderData $placeOrderData): OrderResult|Exception
+    public function execute(PreparedOrderData $preparedOrderData, PlaceOrderData $placeOrderData): Order|Exception
     {
         return DB::transaction(function () use ($preparedOrderData, $placeOrderData) {
             try {
@@ -34,7 +35,7 @@ class SplitOrderAction
 
                 DB::commit();
 
-                return OrderResult::SUCCESS;
+                return  $order;
             } catch (Exception $e) {
                 DB::rollBack();
                 Log::info('Error on SplitOrderAction->execute() ' . $e);
