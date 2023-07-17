@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Customer\Actions;
 
 use Domain\Address\Actions\CreateAddressAction;
+use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Models\Customer;
 use Illuminate\Auth\Events\Registered;
@@ -38,12 +39,22 @@ class CreateCustomerAction
 
         if ($customerData->shipping_address_data !== null) {
             $this->createAddress
-                ->execute($customerData->shipping_address_data);
+                ->execute(
+                    AddressData::fromAddressAddCustomer(
+                        $customer,
+                        $customerData->shipping_address_data
+                    )
+                );
         }
 
         if ($customerData->billing_address_data !== null) {
             $this->createAddress
-                ->execute($customer, $customerData->billing_address_data);
+                ->execute(
+                    AddressData::fromAddressAddCustomer(
+                        $customer,
+                        $customerData->billing_address_data
+                    )
+                );
         }
 
         if ($customerData->image !== null) {
