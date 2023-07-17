@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class StateFactory extends Factory
 {
     protected $model = State::class;
-    private static mixed $country_id = null;
 
     public function definition(): array
     {
