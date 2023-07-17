@@ -18,15 +18,22 @@ class StateFactory extends Factory
 
     public function definition(): array
     {
-        if (self::$country_id === null) {
-            // Philippines
-            self::$country_id = Country::whereName('Philippines')
-                ->value('id')
-                ?? CountryFactory::new();
-        }
-
         return [
-            'country_id' => self::$country_id,
+            'country_id' => function (array $attributes) {
+
+                if ( ! isset($attributes['country_id'])) {
+
+                    if(self::$country_id === null) {
+                        self::$country_id = Country::whereName('Philippines')
+                            ->value('id')
+                            ?? CountryFactory::new();
+                    }
+
+                    return self::$country_id;
+                }
+
+                return $attributes;
+            },
             'name' => $this->faker->name(),
         ];
     }
