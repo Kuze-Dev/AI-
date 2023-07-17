@@ -23,8 +23,6 @@ class FormSettings extends TenantBaseSettings
             Forms\Components\Section::make(trans('Captcha'))
                 ->schema([
                     Forms\Components\TextInput::make('sender_email')
-                        ->label('Sender Email')
-                        ->placeholder('Email')
                         ->required(),
                     Forms\Components\Select::make('provider')
                         ->options([
