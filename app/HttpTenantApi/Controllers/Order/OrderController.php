@@ -43,7 +43,7 @@ class OrderController extends Controller
         $result = app(PlaceOrderAction::class)
             ->execute(PlaceOrderData::fromArray($validatedData));
 
-        if (OrderResult::SUCCESS != $result) {
+        if (!$result instanceof Order) {
             return response()->json([
                 'message' => 'Order failed to be created',
             ], 400);
@@ -52,6 +52,7 @@ class OrderController extends Controller
         return response()
             ->json([
                 'message' => 'Order placed successfully',
+                'data' =>  $result
             ]);
     }
 

@@ -16,6 +16,8 @@ class SummaryData
         public readonly float $taxPercentage,
         public readonly float $taxTotal,
         public readonly float $grandTotal,
+        public readonly float|null $discountTotal,
+        public readonly string|null $discountMessage,
     ) {
     }
 
@@ -28,6 +30,8 @@ class SummaryData
             taxPercentage: $data['taxPercentage'] ?? null,
             taxTotal: $data['taxTotal'] ?? null,
             grandTotal: $data['grandTotal'] ?? null,
+            discountTotal: $data['discountTotal'] ?? null,
+            discountMessage: $data['discountMessage'] ?? null,
         );
     }
 }
