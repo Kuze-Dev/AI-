@@ -8,6 +8,8 @@ use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\getJson;
 
+uses()->group('customer');
+
 beforeEach(function () {
     testInTenantContext();
 });

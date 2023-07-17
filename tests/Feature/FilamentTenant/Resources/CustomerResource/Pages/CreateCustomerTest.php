@@ -15,6 +15,8 @@ use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\travelTo;
 use function Pest\Livewire\livewire;
 
+uses()->group('customer');
+
 beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');

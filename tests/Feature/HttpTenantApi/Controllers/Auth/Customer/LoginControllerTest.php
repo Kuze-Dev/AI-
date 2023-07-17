@@ -10,6 +10,8 @@ use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 use function PHPUnit\Framework\assertCount;
 
+uses()->group('customer');
+
 beforeEach(function () {
     testInTenantContext();
 });

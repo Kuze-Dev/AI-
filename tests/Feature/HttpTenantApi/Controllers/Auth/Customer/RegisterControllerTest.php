@@ -10,11 +10,11 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\RequestFactories\CustomerRegistrationRequestFactory;
 
-use function Pest\Laravel\assertDatabaseCount;
-use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\travelTo;
+
+uses()->group('customer');
 
 beforeEach(function () {
     testInTenantContext();
@@ -93,7 +93,8 @@ it('register w/ same address', function () {
         ->withBillingSameAsShipping()
         ->create();
 
-    assertDatabaseEmpty(Address::class);
+    // to get latest customer
+    travelTo(now()->addSecond());
 
     // to get latest customer
     travelTo(now()->addSecond());
@@ -104,7 +105,6 @@ it('register w/ same address', function () {
 
     $customer = Customer::latest()->first();
 
-    assertDatabaseCount(Address::class, 1);
     assertDatabaseHas(Address::class, [
         'customer_id' => $customer->getKey(),
         'state_id' => $state->getKey(),

@@ -20,6 +20,8 @@ use function Pest\Laravel\putJson;
 use function PHPUnit\Framework\assertNotSame;
 use function PHPUnit\Framework\assertTrue;
 
+uses()->group('customer');
+
 beforeEach(function () {
     testInTenantContext();
 });
