@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Tenant;
 
+use Database\Seeders\Tenant\Address\CountrySeeder;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
 
