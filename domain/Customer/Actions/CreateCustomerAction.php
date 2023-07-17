@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Customer\Actions;
 
-use Domain\Address\Actions\CreateCustomerAddressAction;
+use Domain\Address\Actions\CreateAddressAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Models\Customer;
 use Illuminate\Auth\Events\Registered;
@@ -17,7 +17,7 @@ class CreateCustomerAction
 {
     public function __construct(
         private readonly SyncMediaCollectionAction $syncMediaCollection,
-        private readonly CreateCustomerAddressAction $createCustomerAddress,
+        private readonly CreateAddressAction $createAddress,
     ) {
     }
 
@@ -37,12 +37,12 @@ class CreateCustomerAction
         ]);
 
         if ($customerData->shipping_address_data !== null) {
-            $this->createCustomerAddress
-                ->execute($customer, $customerData->shipping_address_data);
+            $this->createAddress
+                ->execute($customerData->shipping_address_data);
         }
 
         if ($customerData->billing_address_data !== null) {
-            $this->createCustomerAddress
+            $this->createAddress
                 ->execute($customer, $customerData->billing_address_data);
         }
 
