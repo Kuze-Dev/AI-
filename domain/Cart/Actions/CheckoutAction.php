@@ -10,7 +10,6 @@ use Domain\Cart\Models\CartLine;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 

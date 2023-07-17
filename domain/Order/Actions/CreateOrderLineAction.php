@@ -48,7 +48,6 @@ class CreateOrderLineAction
                 'purchasable_data' => $cartLine->purchasable,
             ]);
 
-
             if ($cartLine->purchasable instanceof Product) {
                 $purchasableMedias = $cartLine->purchasable->getMedia('image');
                 $this->copyMediaToOrderLine($orderLine, $purchasableMedias, 'order_line_images');

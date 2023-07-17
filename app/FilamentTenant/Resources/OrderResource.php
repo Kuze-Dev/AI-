@@ -321,7 +321,7 @@ class OrderResource extends Resource
                             ->action(function () use ($get, $set) {
                                 $order = Order::find($get('id'));
 
-                                $isPaid = !$order->is_paid;
+                                $isPaid = ! $order->is_paid;
 
                                 $result = $order->update([
                                     'is_paid' => $isPaid,

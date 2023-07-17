@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Domain\Cart\Requests;
 
 use Domain\Cart\Models\CartLine;
-use Domain\Customer\Models\Customer;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

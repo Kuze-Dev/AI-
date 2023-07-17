@@ -6,9 +6,7 @@ namespace Domain\Cart\Requests;
 
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
-use Domain\Discount\Models\Discount;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class CartSummaryRequest extends FormRequest
 {
