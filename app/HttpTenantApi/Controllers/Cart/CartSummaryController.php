@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\Http\Controllers\Controller;
+use Domain\Cart\Helpers\CartLineHelper;
 use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
@@ -44,8 +45,8 @@ class CartSummaryController extends Controller
         $cartLineIdArray = explode(',', $validated['cart_line_ids']);
         $cartLineIds = array_map('intval', $cartLineIdArray);
 
-        $stateId = $validated['state_id'] ?? null;
-        $countryId = $validated['country_id'];
+        $stateId = (int) $validated['state_id'] ?? null;
+        $countryId = (int) $validated['country_id'];
 
         $cartLines = CartLine::query()
             ->with('purchasable')
@@ -57,27 +58,16 @@ class CartSummaryController extends Controller
             ->get();
 
 
-        $subTotal =  $cartLines->reduce(function ($carry, $cartLine) {
-            $purchasable = $cartLine->purchasable;
-
-            return $carry + ($purchasable->selling_price * $cartLine->quantity);
-        }, 0);
-
-        $taxZone = Taxation::getTaxZone($countryId, $stateId);
-        $taxDisplay = $taxZone->price_display;
-        $taxPercentage = (float) $taxZone->percentage;
-        $taxTotal = round($subTotal * $taxPercentage / 100, 2);
-
-        //for now, but the shipping fee and discount will be added
-        $grandTotal = $subTotal + $taxTotal;
+        $summaryData = app(CartLineHelper::class)
+            ->calculate($cartLines, $countryId, $stateId);
 
         return response()->json([
-            'tax_inclusive_sub_total' => $subTotal + $taxTotal,
-            'sub_total' => $subTotal,
-            'tax_display' => $taxDisplay,
-            'tax_percentage' => $taxPercentage,
-            'tax_total' => $taxTotal,
-            'grand_total' => $grandTotal
+            'tax_inclusive_sub_total' => $summaryData->subTotal + $summaryData->taxTotal,
+            'sub_total' => $summaryData->subTotal,
+            'tax_display' => $summaryData->taxDisplay,
+            'tax_percentage' => $summaryData->taxPercentage,
+            'tax_total' => $summaryData->taxTotal,
+            'grand_total' => $summaryData->grandTotal
         ], 200);
     }
 }
