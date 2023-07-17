@@ -11,6 +11,7 @@ use App\HttpTenantApi\Resources\AddressResource;
 use Domain\Address\Actions\CreateAddressAction;
 use Domain\Address\Actions\DeleteAddressAction;
 use Domain\Address\Actions\UpdateAddressAction;
+use Domain\Address\Exceptions\CantDeleteDefaultAddressException;
 use Domain\Address\Models\Address;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Throwable;
 
 #[
@@ -71,10 +73,17 @@ class AddressController extends Controller
     {
         $this->authorize('delete', $address);
 
-        DB::transaction(
-            fn () => app(DeleteAddressAction::class)
-                ->execute($address)
-        );
+        try {
+            DB::transaction(
+                fn () => app(DeleteAddressAction::class)
+                    ->execute($address)
+            );
+        } catch (CantDeleteDefaultAddressException $e) {
+
+            abort(400,  trans('Deleting default address not allowed.'));
+        } catch (DeleteRestrictedException $e) {
+            abort(400,  trans('Failed to delete.'));
+        }
 
         return response()->noContent();
     }
