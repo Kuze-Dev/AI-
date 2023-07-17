@@ -8,7 +8,6 @@ use Domain\Address\Database\Factories\AddressFactory;
 use Domain\Address\Models\State;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Tier\Models\Tier;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Seeder;
 
 class CustomerSeeder extends Seeder
@@ -18,9 +17,10 @@ class CustomerSeeder extends Seeder
         /** @var \Domain\Tier\Models\Tier $tier */
         $tier = Tier::whereName(config('domain.tier.default'))->first();
 
-        $states = State::whereHas(
+        $states = State::whereRelation(
             'country',
-            fn (Builder $query) => $query->where('name', 'Philippines')
+            'name',
+            'Philippines'
         )
             ->get();
 
