@@ -146,7 +146,7 @@ class AddressesRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->translateLabel()
-                    ->using(function (array $data, self $livewire) {
+                    ->using(function (self $livewire, array $data) {
 
                         $data['customer_id'] = $livewire->getOwnerRecord()->getKey();
 
@@ -164,12 +164,16 @@ class AddressesRelationManager extends RelationManager
 
                         return $data;
                     })
-                    ->using(fn (Address $record, array $data) => DB::transaction(
-                        fn () => DB::transaction(
-                            fn () => app(UpdateAddressAction::class)
-                                ->execute($record, AddressData::fromArray($data))
-                        )
-                    )),
+                    ->using(function (self $livewire, Address $record, array $data) {
+                        $data['customer_id'] = $livewire->getOwnerRecord()->getKey();
+
+                        return DB::transaction(
+                            fn () => DB::transaction(
+                                fn () => app(UpdateAddressAction::class)
+                                    ->execute($record, AddressData::fromArray($data))
+                            )
+                        );
+                    }),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
                         ->translateLabel()
