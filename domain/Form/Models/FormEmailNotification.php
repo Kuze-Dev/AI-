@@ -18,7 +18,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property array|null $to
  * @property array|null|null $cc
  * @property array|null|null $bcc
- * @property string $sender
+ * @property string $sender_name
  * @property array|null|null $reply_to
  * @property string $subject
  * @property string $template

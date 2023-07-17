@@ -38,7 +38,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
             to: array_map($this->interpolateStringWithData(...), $this->formEmailNotification->to ?? []),
             cc: array_map($this->interpolateStringWithData(...), $this->formEmailNotification->cc ?? []),
             bcc: array_map($this->interpolateStringWithData(...), $this->formEmailNotification->bcc ?? []),
-            replyTo: array_map($this->interpolateStringWithData(...), $this->formEmailNotification->reply_to ?? [$this->formEmailNotification->sender]),
+            replyTo: array_map($this->interpolateStringWithData(...), $this->formEmailNotification->reply_to ?? [$this->formEmailNotification->sender_name]),
             subject: $this->interpolateStringWithData($this->formEmailNotification->subject),
         );
     }

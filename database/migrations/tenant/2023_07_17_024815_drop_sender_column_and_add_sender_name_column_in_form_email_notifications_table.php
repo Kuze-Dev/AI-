@@ -12,7 +12,7 @@ return new class () extends Migration {
     {
         Schema::table('form_email_notifications', function (Blueprint $table) {
             $table->dropColumn('sender');
-            $table->string('sender_name')->after('bcc');
+            $table->string('sender_name')->after('bcc')->nullable();
         });
     }
 

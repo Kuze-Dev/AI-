@@ -11,7 +11,7 @@ class FormSettings extends Settings
 {
     public ?CaptchaProvider $provider = null;
 
-    public ?string $sender_email = null;
+    public string $sender_email = '';
 
     public ?string $site_key = null;
 
