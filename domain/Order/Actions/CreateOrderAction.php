@@ -33,8 +33,7 @@ class CreateOrderAction
         if ( ! is_null($preparedOrderData->discount)) {
             $discountCode = $preparedOrderData->discount->code;
 
-            $deductable_subtotal_amount = (new DiscountHelperFunctions())->deductOrderSubtotalByFixedValue($discountCode, $subTotal)
-                ?: (new DiscountHelperFunctions())->deductOrderSubtotalByPercentageValue($discountCode, $subTotal);
+            $deductable_subtotal_amount = (new DiscountHelperFunctions())->deductOrderSubtotal($preparedOrderData->discount, $subTotal);
         }
 
         // $total = $subTotal - ($deductable_subtotal_amount !== null ? $deductable_subtotal_amount : 0);
@@ -77,7 +76,7 @@ class CreateOrderAction
         ]);
 
         if ( ! is_null($preparedOrderData->discount)) {
-            app(CreateDiscountLimitAction::class)->execute($discountCode, $order, $preparedOrderData->customer);
+            app(CreateDiscountLimitAction::class)->execute($preparedOrderData->discount, $order, $preparedOrderData->customer);
         }
 
         return $order;

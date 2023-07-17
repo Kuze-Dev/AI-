@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use Closure;
+use Domain\Discount\Models\Discount;
+use Domain\Discount\Models\DiscountLimit;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Taxation\Enums\PriceDisplay;
 use Filament\Notifications\Notification;
@@ -257,6 +259,16 @@ class OrderResource extends Resource
                                                     return;
                                                 }
                                                 $updateData['cancelled_at'] = now(Auth::user()?->timezone);
+
+                                                if($order->discount_code != null) {
+                                                    DiscountLimit::whereOrderId($order->id)->delete();
+                                                    $discount = Discount::whereCode($order->discount_code)->first();
+
+                                                    $discount->update([
+                                                        'max_uses' => $discount->max_uses + 1,
+                                                    ]);
+                                                }
+
                                             }
 
                                             $result = $order->update($updateData);
