@@ -16,6 +16,8 @@ use Domain\Product\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
+use Log;
+use Exception;
 
 class PrepareOrderAction
 {
@@ -33,28 +35,36 @@ class PrepareOrderAction
             $query->morphWith([
                 ProductVariant::class => ['product'],
             ]);
-        },])
+        }, ])
             ->whereCheckoutReference($placeOrderData->cart_reference)
             ->get();
 
         $taxZone = Taxation::getTaxZone($placeOrderData->taxation_data->country_id, $placeOrderData->taxation_data->state_id);
 
-        if (!$taxZone instanceof TaxZone) {
-            \Log::info("No tax zone found");
+        if ( ! $taxZone instanceof TaxZone) {
+            Log::info('No tax zone found');
+
             return OrderResult::FAILED;
         }
 
         $notes = $placeOrderData->notes;
 
         $discount = null;
-        if ($placeOrderData->discountCode) {
+
+        try {
             $discount = Discount::whereCode($placeOrderData->discountCode)
                 ->whereStatus(DiscountStatus::ACTIVE)
                 ->where(function ($query) {
                     $query->where('max_uses', '>', 0)
                         ->orWhereNull('max_uses');
                 })
+                ->where(function ($query) {
+                    $query->where('valid_end_at', '>=', now())
+                        ->orWhereNull('valid_end_at');
+                })
                 ->firstOrFail();
+        } catch (Exception $e) {
+            $discount = null;
         }
 
         $orderData = [

@@ -9,7 +9,6 @@ use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
-use Domain\Taxation\Enums\PriceDisplay;
 
 class CreateOrderLineAction
 {
