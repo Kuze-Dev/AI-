@@ -79,7 +79,6 @@ class AddressController extends Controller
                     ->execute($address)
             );
         } catch (CantDeleteDefaultAddressException $e) {
-
             abort(400,  trans('Deleting default address not allowed.'));
         } catch (DeleteRestrictedException $e) {
             abort(400,  trans('Failed to delete.'));
