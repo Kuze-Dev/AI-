@@ -8,7 +8,7 @@ use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Tests\RequestFactories\CustomerRequestFactory;
+use Tests\RequestFactories\CustomerRegistrationRequestFactory;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\postJson;
@@ -25,9 +25,9 @@ it('register', function () {
     Event::fake(Registered::class);
 
     $state = StateFactory::new()->createOne();
-    $data = CustomerRequestFactory::new()
-        ->shippingAddress($state)
-        ->billingAddress($state)
+    $data = CustomerRegistrationRequestFactory::new()
+        ->withShippingAddress($state)
+        ->withBillingAddress($state)
         ->create();
 
     // to get latest customer
@@ -88,10 +88,13 @@ it('register', function () {
 it('register w/ same address', function () {
 
     $state = StateFactory::new()->createOne();
-    $data = CustomerRequestFactory::new()
-        ->shippingAddress($state)
-        ->billingSameAsShipping()
+    $data = CustomerRegistrationRequestFactory::new()
+        ->withShippingAddress($state)
+        ->withBillingSameAsShipping()
         ->create();
+
+    // to get latest customer
+    travelTo(now()->addSecond());
 
     // to get latest customer
     travelTo(now()->addSecond());

@@ -4,16 +4,11 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Requests\Auth\Customer;
 
-use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
-use Domain\Customer\DataTransferObjects\CustomerData;
-use Domain\Customer\DataTransferObjects\CustomerRegisterData;
 use Domain\Customer\Enums\Gender;
-use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
-use Domain\Tier\Models\Tier;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -112,53 +107,5 @@ class CustomerRegisterRequest extends FormRequest
             'billing.city' => 'shipping city',
             'billing.label_as' => 'shipping label_as',
         ];
-    }
-
-    public function toDTO(Tier $tier): CustomerRegisterData
-    {
-        $validated = $this->validated();
-
-        $customerData = new CustomerData(
-            first_name: $validated['first_name'],
-            last_name: $validated['last_name'],
-            mobile: $validated['mobile'],
-            gender: Gender::from($validated['gender']),
-            birth_date: now()->parse($validated['birth_date']),
-            status: Status::ACTIVE,
-            tier_id: $tier->getKey(),
-            email: $validated['email'],
-            password: $validated['password']
-        );
-
-        $same = $this->boolean('billing.same_as_shipping');
-
-        $shippingAddress = new AddressData(
-            label_as: $validated['shipping']['label_as'],
-            address_line_1: $validated['shipping']['address_line_1'],
-            state_id: (int) $validated['shipping']['state_id'],
-            zip_code: $validated['shipping']['zip_code'],
-            city: $validated['shipping']['city'],
-            is_default_shipping: true,
-            is_default_billing: $same,
-        );
-
-        $billingAddress = null;
-        if ( ! $same) {
-            $billingAddress = new AddressData(
-                label_as: $validated['billing']['label_as'],
-                address_line_1: $validated['billing']['address_line_1'],
-                state_id: (int) $validated['billing']['state_id'],
-                zip_code: $validated['billing']['zip_code'],
-                city:$validated['billing']['city'],
-                is_default_shipping: false,
-                is_default_billing: true,
-            );
-        }
-
-        return new CustomerRegisterData(
-            customerData: $customerData,
-            shippingAddressData: $shippingAddress,
-            billingAddressData: $billingAddress
-        );
     }
 }

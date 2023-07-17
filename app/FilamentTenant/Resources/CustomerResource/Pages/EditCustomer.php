@@ -72,7 +72,7 @@ class EditCustomer extends EditRecord
     {
         return DB::transaction(
             fn () => app(EditCustomerAction::class)
-                ->execute($record, CustomerData::fromArray($data))
+                ->execute($record, CustomerData::fromArrayEditByAdmin($data))
         );
     }
 }
