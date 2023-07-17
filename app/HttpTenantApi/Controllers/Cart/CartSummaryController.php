@@ -44,17 +44,21 @@ class CartSummaryController extends Controller
         $stateId = (int) $validated['state_id'] ?? null;
         $countryId = (int) $validated['country_id'];
 
-        $discount = Discount::whereCode($validated['discount_code'])
-            ->whereStatus(DiscountStatus::ACTIVE)
-            ->where(function ($query) {
-                $query->where('max_uses', '>', 0)
-                    ->orWhereNull('max_uses');
-            })
-            ->where(function ($query) {
-                $query->where('valid_end_at', '>=', now())
-                    ->orWhereNull('valid_end_at');
-            })->first();
+        $discount = null;
+        $discountCode = $validated['discount_code'] ?? null;
 
+        if (!is_null($discountCode)) {
+            $discount = Discount::whereCode($discountCode)
+                ->whereStatus(DiscountStatus::ACTIVE)
+                ->where(function ($query) {
+                    $query->where('max_uses', '>', 0)
+                        ->orWhereNull('max_uses');
+                })
+                ->where(function ($query) {
+                    $query->where('valid_end_at', '>=', now())
+                        ->orWhereNull('valid_end_at');
+                })->first();
+        }
 
         $cartLines = CartLine::query()
             ->with('purchasable')
@@ -76,8 +80,8 @@ class CartSummaryController extends Controller
             'tax_percentage' => $summaryData->taxPercentage,
             'tax_total' => $summaryData->taxTotal,
             'grand_total' => $summaryData->grandTotal,
-            'discount_total' => $summaryData->discountTotal,
-            'discount_message' => $summaryData->discountMessage,
+            'discount_total' => $discountCode ? $summaryData->discountTotal : "",
+            'discount_message' => $discountCode ? $summaryData->discountMessage : "",
         ], 200);
     }
 }
