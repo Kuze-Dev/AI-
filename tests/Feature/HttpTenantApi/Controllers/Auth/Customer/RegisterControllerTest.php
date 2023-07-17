@@ -10,8 +10,6 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\RequestFactories\CustomerRequestFactory;
 
-use function Pest\Laravel\assertDatabaseCount;
-use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\travelTo;

@@ -40,12 +40,7 @@ class CustomerFactory extends Factory
 
     public function configure(): self
     {
-        return parent::configure()->hasAddress();
-    }
-
-    public function hasAddress(): self
-    {
-        return $this->has(
+        return parent::configure()->has(
             AddressFactory::new()
                 ->defaultShipping()
                 ->defaultBilling()
