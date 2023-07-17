@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             Auth\RoleSeeder::class,
             Auth\AdminSeeder::class,
             Page\PageSeeder::class,
+            Address\CountrySeeder::class,
             DiscountSeeder::class,
             Product\ProductSeeder::class,
             Address\CountrySeeder::class,
