@@ -140,7 +140,8 @@ class CustomerResource extends Resource
                                 ->translateLabel()
                                 ->required()
                                 ->string()
-                                ->maxLength(255),
+                                ->maxLength(255)
+                                ->columnSpanFull(),
                             Forms\Components\Select::make('shipping_country_id')
                                 ->label(trans('Shipping country'))
                                 ->required()
@@ -160,8 +161,7 @@ class CustomerResource extends Resource
                                     'name',
                                     fn (Builder $query, callable $get) => $query->where('country_id', $get('shipping_country_id'))
                                 )
-                                ->reactive()
-                                ->visible(fn (callable $get) => $get('shipping_country_id') !== null),
+                                ->reactive(),
                             Forms\Components\TextInput::make('shipping_zip_code')
                                 ->translateLabel()
                                 ->required()
@@ -183,18 +183,21 @@ class CustomerResource extends Resource
                                         ])
                                         ->toArray()
                                 )
-                                ->enum(AddressLabelAs::class),
+                                ->enum(AddressLabelAs::class)
+                                ->columnSpanFull(),
                             Forms\Components\Toggle::make('same_as_shipping')
                                 ->label(trans('set this as billing address as well'))
                                 ->translateLabel()
                                 ->reactive(),
-                        ]),
+                        ])
+                            ->columns(2),
                         Forms\Components\Card::make([
                             Forms\Components\TextInput::make('billing_address_line_1')
                                 ->translateLabel()
                                 ->required()
                                 ->string()
-                                ->maxLength(255),
+                                ->maxLength(255)
+                                ->columnSpanFull(),
                             Forms\Components\Select::make('billing_country_id')
                                 ->label(trans('Billing country'))
                                 ->required()
@@ -214,8 +217,7 @@ class CustomerResource extends Resource
                                     'name',
                                     fn (Builder $query, callable $get) => $query->where('country_id', $get('billing_country_id'))
                                 )
-                                ->reactive()
-                                ->visible(fn (callable $get) => $get('billing_country_id') !== null),
+                                ->reactive(),
                             Forms\Components\TextInput::make('billing_zip_code')
                                 ->translateLabel()
                                 ->required()
@@ -237,8 +239,10 @@ class CustomerResource extends Resource
                                         ])
                                         ->toArray()
                                 )
-                                ->enum(AddressLabelAs::class),
+                                ->enum(AddressLabelAs::class)
+                                ->columnSpanFull(),
                         ])
+                            ->columns(2)
                             ->hidden(fn (callable $get) => $get('same_as_shipping')),
                     ])
                     ->visibleOn('create'),
