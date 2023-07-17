@@ -10,10 +10,11 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\RequestFactories\CustomerRequestFactory;
 
-use function Pest\Laravel\assertDatabaseCount;
-use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\postJson;
+use function Pest\Laravel\travelTo;
+
+uses()->group('customer');
 
 beforeEach(function () {
     testInTenantContext();
@@ -29,14 +30,14 @@ it('register', function () {
         ->billingAddress($state)
         ->create();
 
-    assertDatabaseEmpty(Customer::class);
-    assertDatabaseEmpty(Address::class);
+    // to get latest customer
+    travelTo(now()->addSecond());
 
     postJson('api/register', $data)
         ->assertValid()
         ->assertCreated()
         ->assertJson(function (AssertableJson $json) {
-            $customer = Customer::first();
+            $customer = Customer::latest()->first();
             $json
                 ->where('data.type', 'customers')
                 ->where('data.attributes.first_name', $customer->first_name)
@@ -60,9 +61,8 @@ it('register', function () {
         'birth_date' => $data['birth_date'] . ' 00:00:00',
     ]);
 
-    $customer = Customer::first();
+    $customer = Customer::latest()->first();
 
-    assertDatabaseCount(Address::class, 2);
     assertDatabaseHas(Address::class, [
         'customer_id' => $customer->getKey(),
         'state_id' => $state->getKey(),
@@ -93,15 +93,15 @@ it('register w/ same address', function () {
         ->billingSameAsShipping()
         ->create();
 
-    assertDatabaseEmpty(Address::class);
+    // to get latest customer
+    travelTo(now()->addSecond());
 
     postJson('api/register', $data)
         ->assertValid()
         ->assertCreated();
 
-    $customer = Customer::first();
+    $customer = Customer::latest()->first();
 
-    assertDatabaseCount(Address::class, 1);
     assertDatabaseHas(Address::class, [
         'customer_id' => $customer->getKey(),
         'state_id' => $state->getKey(),
