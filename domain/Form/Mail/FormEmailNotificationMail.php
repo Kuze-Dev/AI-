@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Domain\Form\Mail;
 
+use App\Settings\FormSettings;
 use Domain\Form\Models\FormEmailNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Blade;
@@ -32,7 +34,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: $this->interpolateStringWithData($this->formEmailNotification->sender),
+            from: new Address(app(FormSettings::class)->sender_email, $this->formEmailNotification->sender_name),
             to: array_map($this->interpolateStringWithData(...), $this->formEmailNotification->to ?? []),
             cc: array_map($this->interpolateStringWithData(...), $this->formEmailNotification->cc ?? []),
             bcc: array_map($this->interpolateStringWithData(...), $this->formEmailNotification->bcc ?? []),

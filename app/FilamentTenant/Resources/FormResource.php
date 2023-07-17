@@ -116,7 +116,8 @@ class FormResource extends Resource
                                             : ($state ?? [])),
                                 ])
                                 ->columns(3),
-                            Forms\Components\TextInput::make('sender')
+                            Forms\Components\TextInput::make('sender_name')
+                                ->label('Sender Name')
                                 ->required(),
                             Forms\Components\TextInput::make('reply_to')
                                 ->helperText('Seperated by comma')
