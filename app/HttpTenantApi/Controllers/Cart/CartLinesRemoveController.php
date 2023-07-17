@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Cart;
 
 use Domain\Cart\Actions\BulkDestroyCartLineAction;
-use Domain\Cart\Models\CartLine;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Domain\Cart\Requests\BulkRemoveRequest;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 
@@ -17,32 +15,9 @@ use Spatie\RouteAttributes\Attributes\Post;
 class CartLinesRemoveController
 {
     #[Post('carts/cartlines/bulk-remove', name: 'carts.bulk-remove')]
-    public function __invoke(Request $request)
+    public function __invoke(BulkRemoveRequest $request)
     {
-        $validated = $request->validate([
-            'cart_line_ids' => [
-                'required',
-                'array',
-                function ($attribute, $value, $fail) {
-                    $cartLineIds = $value;
-
-                    $cartLines = CartLine::query()
-                        ->whereHas('cart', function ($query) {
-                            $query->whereBelongsTo(auth()->user());
-                        })
-                        ->whereIn('id', $cartLineIds)
-                        ->whereNull('checked_out_at');
-
-                    if (count($cartLineIds) !== $cartLines->count()) {
-                        $fail('Cart lines not found');
-                    }
-                },
-            ],
-            'cart_line_ids.*' => [
-                'required',
-                Rule::exists(CartLine::class, 'id'),
-            ],
-        ]);
+        $validated = $request->validated();
 
         $cartLineIds = $validated['cart_line_ids'];
 

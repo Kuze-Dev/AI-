@@ -18,7 +18,32 @@ class CheckoutAction
 {
     public function execute(CheckoutData $checkoutData): string|CartActionResult
     {
-        $cartLinesForCheckout = CartLine::with('purchasable')
+        $cartLinesForCheckout = $this->getCartLinesForCheckout($checkoutData);
+
+        if ($cartLinesForCheckout->count() !== count($checkoutData->cart_line_ids)) {
+            throw new BadRequestHttpException('Invalid request');
+        }
+
+        $cartLineIds = $cartLinesForCheckout->pluck('id');
+
+        $checkoutReference = Str::upper(Str::random(12));
+
+        $affectedRows = CartLine::whereIn('id', $cartLineIds)
+            ->update([
+                'checkout_reference' => $checkoutReference,
+                'checkout_expiration' => now()->addMinutes(20),
+            ]);
+
+        if ($affectedRows == $cartLineIds->count()) {
+            return $checkoutReference;
+        }
+
+        return CartActionResult::FAILED;
+    }
+
+    private function getCartLinesForCheckout(CheckoutData $checkoutData)
+    {
+        return CartLine::with('purchasable')
             ->whereHas('cart', function ($query) {
                 $query->whereBelongsTo(auth()->user());
             })
@@ -44,27 +69,5 @@ class CheckoutAction
                 });
             })
             ->get();
-
-        Log::info($cartLinesForCheckout->count());
-        Log::info(count($checkoutData->cart_line_ids));
-        if ($cartLinesForCheckout->count() !== count($checkoutData->cart_line_ids)) {
-            throw new BadRequestHttpException('Invalid request');
-        }
-
-        $cartLineIds = $cartLinesForCheckout->pluck('id');
-
-        $checkoutReference = Str::upper(Str::random(12));
-
-        $affectedRows = CartLine::whereIn('id', $cartLineIds)
-            ->update([
-                'checkout_reference' => $checkoutReference,
-                'checkout_expiration' => now()->addMinutes(20),
-            ]);
-
-        if ($affectedRows == $cartLineIds->count()) {
-            return $checkoutReference;
-        }
-
-        return CartActionResult::FAILED;
     }
 }
