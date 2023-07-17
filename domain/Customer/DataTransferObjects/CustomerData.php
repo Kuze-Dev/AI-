@@ -49,9 +49,9 @@ final class CustomerData
             email: $validated['email'],
             password: $validated['password'],
             shipping_address_data: new AddressData(
+                state_id: (int) $validated['shipping']['state_id'],
                 label_as: $validated['shipping']['label_as'],
                 address_line_1: $validated['shipping']['address_line_1'],
-                state_id: (int) $validated['shipping']['state_id'],
                 zip_code: $validated['shipping']['zip_code'],
                 city: $validated['shipping']['city'],
                 is_default_shipping: true,
@@ -60,11 +60,11 @@ final class CustomerData
             billing_address_data: $sameAsShipping
                 ? null
                 : new AddressData(
+                    state_id: (int) $validated['billing']['state_id'],
                     label_as: $validated['billing']['label_as'],
                     address_line_1: $validated['billing']['address_line_1'],
-                    state_id: (int) $validated['billing']['state_id'],
                     zip_code: $validated['billing']['zip_code'],
-                    city:$validated['billing']['city'],
+                    city: $validated['billing']['city'],
                     is_default_shipping: false,
                     is_default_billing: true,
                 ),
@@ -97,9 +97,9 @@ final class CustomerData
             password: $data['password'] ?? null,
             image: $data['image'],
             shipping_address_data: new AddressData(
+                state_id: (int) $data['shipping_state_id'],
                 label_as: $data['shipping_label_as'],
                 address_line_1: $data['shipping_address_line_1'],
-                state_id: (int) $data['shipping_state_id'],
                 zip_code: $data['shipping_zip_code'],
                 city: $data['shipping_city'],
                 is_default_shipping: true,
@@ -108,9 +108,9 @@ final class CustomerData
             billing_address_data: $data['same_as_shipping']
                 ? null
                 : new AddressData(
+                    state_id: (int) $data['billing_state_id'],
                     label_as: $data['billing_label_as'],
                     address_line_1: $data['billing_address_line_1'],
-                    state_id: (int) $data['billing_state_id'],
                     zip_code: $data['billing_zip_code'],
                     city: $data['billing_city'],
                     is_default_shipping: false,

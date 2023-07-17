@@ -14,8 +14,8 @@ class AddressData
         public readonly string $address_line_1,
         public readonly string $zip_code,
         public readonly string $city,
-        public readonly bool $is_default_shipping,
-        public readonly bool $is_default_billing,
+        public readonly ?bool $is_default_shipping = null,
+        public readonly ?bool $is_default_billing = null,
         public readonly ?int $customer_id = null,
     ) {
     }

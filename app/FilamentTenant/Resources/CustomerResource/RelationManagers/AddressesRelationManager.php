@@ -6,6 +6,8 @@ namespace App\FilamentTenant\Resources\CustomerResource\RelationManagers;
 
 use Domain\Address\Actions\CreateAddressAction;
 use Domain\Address\Actions\DeleteAddressAction;
+use Domain\Address\Actions\SetAddressAsDefaultBillingAction;
+use Domain\Address\Actions\SetAddressAsDefaultShippingAction;
 use Domain\Address\Actions\UpdateAddressAction;
 use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Address\Enums\AddressLabelAs;
@@ -84,10 +86,12 @@ class AddressesRelationManager extends RelationManager
                     )
                     ->enum(AddressLabelAs::class)
                     ->columnSpanFull(),
-                Forms\Components\Checkbox::make('is_default_billing')
-                    ->translateLabel(),
                 Forms\Components\Checkbox::make('is_default_shipping')
-                    ->translateLabel(),
+                    ->translateLabel()
+                    ->visibleOn('create'),
+                Forms\Components\Checkbox::make('is_default_billing')
+                    ->translateLabel()
+                    ->visibleOn('create'),
             ])->columns(2);
     }
 
@@ -124,19 +128,31 @@ class AddressesRelationManager extends RelationManager
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->wrap(),
-                Tables\Columns\IconColumn::make('is_default_billing')
+                Tables\Columns\ToggleColumn::make('is_default_shipping')
                     ->translateLabel()
-                    ->boolean()
-                    ->sortable(),
-                Tables\Columns\IconColumn::make('is_default_shipping')
+                    ->sortable()
+                    ->updateStateUsing(function (Address $record) {
+                        DB::transaction(function () use ($record) {
+                            app(SetAddressAsDefaultShippingAction::class)->execute($record);
+                            Filament::notify('success', trans('Address set to default shipping successfully!'));
+                        });
+                    })
+                    ->disabled(fn (Address $record) => $record->is_default_shipping),
+                Tables\Columns\ToggleColumn::make('is_default_billing')
                     ->translateLabel()
-                    ->boolean()
-                    ->sortable(),
+                    ->sortable()
+                    ->updateStateUsing(function (Address $record) {
+                        DB::transaction(function () use ($record) {
+                            app(SetAddressAsDefaultBillingAction::class)->execute($record);
+                            Filament::notify('success', trans('Address set to default billing successfully!'));
+                        });
+                    })
+                    ->disabled(fn (Address $record) => $record->is_default_billing),
             ])
             ->filters([
-                Tables\Filters\TernaryFilter::make('is_default_billing')
-                    ->translateLabel(),
                 Tables\Filters\TernaryFilter::make('is_default_shipping')
+                    ->translateLabel(),
+                Tables\Filters\TernaryFilter::make('is_default_billing')
                     ->translateLabel(),
             ])
             ->headerActions([
