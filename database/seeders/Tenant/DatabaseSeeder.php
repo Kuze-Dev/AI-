@@ -22,7 +22,6 @@ class DatabaseSeeder extends Seeder
             Address\CountrySeeder::class,
             DiscountSeeder::class,
             Product\ProductSeeder::class,
-            Address\CountrySeeder::class,
             Currency\CurrencySeeder::class,
             Tier\TierSeeder::class,
             Customer\CustomerSeeder::class,
