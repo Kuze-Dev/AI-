@@ -21,6 +21,8 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Customer\Models\Customer
@@ -74,6 +76,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @method static \Illuminate\Database\Eloquent\Builder|Customer withoutTrashed()
  * @mixin \Eloquent
  */
+#[OnDeleteCascade(['addresses'])]
 class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
 {
     use SoftDeletes;
@@ -81,6 +84,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
     use InteractsWithMedia;
     use Notifiable;
     use HasApiTokens;
+    use ConstraintsRelationships;
 
     protected $fillable = [
         'tier_id',

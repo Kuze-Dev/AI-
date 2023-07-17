@@ -13,6 +13,7 @@ use function Pest\Laravel\assertModelMissing;
 use function Pest\Laravel\assertNotSoftDeleted;
 use function Pest\Laravel\assertSoftDeleted;
 use function Pest\Livewire\livewire;
+use function PHPUnit\Framework\assertCount;
 
 beforeEach(function () {
     testInTenantContext();
@@ -63,9 +64,12 @@ it('can force delete customer', function () {
         ->deleted()
         ->createOne();
 
+    assertCount(1, $customer->addresses);
+
     livewire(ListCustomers::class)
         ->callTableAction(ForceDeleteAction::class, $customer)
         ->assertOk();
 
     assertModelMissing($customer);
+    assertModelMissing($customer->addresses->first());
 });
