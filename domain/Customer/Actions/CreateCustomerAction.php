@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Customer\Actions;
 
+use Domain\Address\Actions\CreateAddressAction;
+use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Models\Customer;
 use Illuminate\Auth\Events\Registered;
@@ -14,8 +16,10 @@ use Support\Common\DataTransferObjects\MediaData;
 
 class CreateCustomerAction
 {
-    public function __construct(private readonly SyncMediaCollectionAction $syncMediaCollection)
-    {
+    public function __construct(
+        private readonly SyncMediaCollectionAction $syncMediaCollection,
+        private readonly CreateAddressAction $createAddress,
+    ) {
     }
 
     public function execute(CustomerData $customerData): Customer
@@ -32,6 +36,26 @@ class CreateCustomerAction
             'birth_date' => $customerData->birth_date,
             'password' => $customerData->password,
         ]);
+
+        if ($customerData->shipping_address_data !== null) {
+            $this->createAddress
+                ->execute(
+                    AddressData::fromAddressAddCustomer(
+                        $customer,
+                        $customerData->shipping_address_data
+                    )
+                );
+        }
+
+        if ($customerData->billing_address_data !== null) {
+            $this->createAddress
+                ->execute(
+                    AddressData::fromAddressAddCustomer(
+                        $customer,
+                        $customerData->billing_address_data
+                    )
+                );
+        }
 
         if ($customerData->image !== null) {
             $this->syncMediaCollection->execute($customer, new MediaCollectionData(

@@ -3,15 +3,16 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\CustomerResource\Pages\CreateCustomer;
-use Domain\Customer\Enums\Gender;
-use Domain\Customer\Enums\Status;
+use Domain\Address\Database\Factories\StateFactory;
+use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
 use Filament\Facades\Filament;
 
-use Illuminate\Http\UploadedFile;
+use Tests\RequestFactories\CustomerRequestFactory;
 
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\travelTo;
 use function Pest\Livewire\livewire;
 
 uses()->group('customer');
@@ -28,31 +29,86 @@ it('can render page', function () {
         ->assertOk();
 });
 
-it('can create customer', function () {
+it('can create customer w/ same address', function () {
+
+    $data = CustomerRequestFactory::new()
+        ->withTier(Tier::first())
+        ->withShippingAddress(StateFactory::new()->createOne())
+        ->withBillingSameAsShipping()
+        ->create();
+
+    // to get latest customer
+    travelTo(now()->addSecond());
 
     livewire(CreateCustomer::class)
-        ->fillForm([
-            'tier_id' => Tier::first()->getKey(),
-            'image' => UploadedFile::fake()->image('test_image.jpg'),
-            'email' => 'email@test.com',
-            'first_name' => 'test first name',
-            'last_name' => 'test last name',
-            'mobile' => '09123456789',
-            'gender' => Gender::MALE->value,
-            'status' => Status::ACTIVE->value,
-            'birth_date' => now()->subDay()->format('Y-m-d'),
-        ])
+        ->fillForm($data)
         ->call('create')
         ->assertHasNoFormErrors()
         ->assertOk();
 
+    $customer = Customer::latest()->first();
+
     assertDatabaseHas(Customer::class, [
-        'email' => 'email@test.com',
-        'first_name' => 'test first name',
-        'last_name' => 'test last name',
-        'mobile' => '09123456789',
-        'gender' => Gender::MALE->value,
-        'status' => Status::ACTIVE->value,
-        'birth_date' => now()->subDay()->toDateString().' 00:00:00',
+        'id' => $customer->getKey(),
+        'email' => $data['email'],
+        'first_name' => $data['first_name'],
+        'last_name' => $data['last_name'],
+        'mobile' => $data['mobile'],
+        'gender' => $data['gender'],
+        'status' => $data['status'],
+        'birth_date' => $data['birth_date'].' 00:00:00',
+    ]);
+
+    assertDatabaseHas(Address::class, [
+        'customer_id' => $customer->getKey(),
+        'state_id' => $data['shipping_state_id'],
+        'label_as' => $data['shipping_label_as'],
+        'address_line_1' => $data['shipping_address_line_1'],
+        'zip_code' => $data['shipping_zip_code'],
+        'city' => $data['shipping_city'],
+        'is_default_shipping' => 1,
+        'is_default_billing' => 1,
+    ]);
+});
+
+it('can create customer w/ different address', function () {
+
+    $data = CustomerRequestFactory::new()
+        ->withTier(Tier::first())
+        ->withShippingAddress(StateFactory::new()->createOne())
+        ->withBillingAddress(StateFactory::new()->createOne())
+        ->create();
+
+    // to get latest customer
+    travelTo(now()->addSecond());
+
+    livewire(CreateCustomer::class)
+        ->fillForm($data)
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk();
+
+    $customer = Customer::latest()->first();
+
+    assertDatabaseHas(Address::class, [
+        'customer_id' => $customer->getKey(),
+        'state_id' => $data['shipping_state_id'],
+        'label_as' => $data['shipping_label_as'],
+        'address_line_1' => $data['shipping_address_line_1'],
+        'zip_code' => $data['shipping_zip_code'],
+        'city' => $data['shipping_city'],
+        'is_default_shipping' => 1,
+        'is_default_billing' => 0,
+    ]);
+
+    assertDatabaseHas(Address::class, [
+        'customer_id' => $customer->getKey(),
+        'state_id' => $data['billing_state_id'],
+        'label_as' => $data['billing_label_as'],
+        'address_line_1' => $data['billing_address_line_1'],
+        'zip_code' => $data['billing_zip_code'],
+        'city' => $data['billing_city'],
+        'is_default_shipping' => 0,
+        'is_default_billing' => 1,
     ]);
 });

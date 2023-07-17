@@ -55,14 +55,7 @@ class AccountController extends Controller
 
         $customer = DB::transaction(
             fn () => app(EditCustomerAction::class)
-                ->execute($customer, new CustomerData(
-                    first_name: $validated['first_name'],
-                    last_name: $validated['last_name'],
-                    mobile: $validated['mobile'],
-                    gender: Gender::from($validated['gender']),
-                    birth_date: now()->parse($validated['birth_date']),
-                    email: $validated['email'],
-                ))
+                ->execute($customer, CustomerData::formArrayCustomerEditAPI($validated))
         );
 
         return CustomerResource::make($customer);
