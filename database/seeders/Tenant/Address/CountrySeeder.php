@@ -15,23 +15,29 @@ class CountrySeeder extends Seeder
     {
         $countries = $this->getCountryData();
 
-        if ($countries) {
-            foreach ($countries as $countryData) {
-                $country = Country::create([
-                    'code' => $countryData['iso2'],
-                    'name' => $countryData['name'],
-                    'capital' => $countryData['capital'],
-                    'timezone' => $countryData['timezones'][0]['gmtOffsetName'],
-                    'active' => false,
-                ]);
+        $bar = $this->command->getOutput()->createProgressBar(count($countries));
 
-                foreach ($countryData['states'] as $stateData) {
-                    $country->states()->create([
-                        'name' => $stateData['name'],
-                    ]);
-                }
+        foreach ($countries as $countryData) {
+            $country = Country::create([
+                'code' => $countryData['iso2'],
+                'name' => $countryData['name'],
+                'capital' => $countryData['capital'],
+                'timezone' => $countryData['timezones'][0]['gmtOffsetName'],
+                'active' => false,
+            ]);
+
+            foreach ($countryData['states'] as $stateData) {
+                $country->states()->create([
+                    'name' => $stateData['name'],
+                ]);
             }
+
+            $bar->advance();
         }
+
+        $bar->finish();
+
+        $this->command->getOutput()->newLine();
     }
 
     /** @throws Exception */
