@@ -35,7 +35,7 @@ class ProductResource extends Resource
 
     protected static ?string $model = Product::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
 
     public static function form(Form $form): Form
     {
@@ -161,6 +161,19 @@ class ProductResource extends Resource
                             ->schema([
                                 Forms\Components\Group::make()
                                     ->schema([
+                                        Forms\Components\Group::make()
+                                            ->schema(function ($state) {
+                                                $schemaArray = [];
+                                                foreach ($state['combination'] as $key => $combination) {
+                                                    $schemaArray[$key] =
+                                                        Forms\Components\TextInput::make("combination[{$key}].option_value")
+                                                            ->formatStateUsing(fn () => ucfirst($combination['option_value']))
+                                                            ->label(ucfirst($combination['option']))
+                                                            ->disabled();
+                                                }
+
+                                                return $schemaArray;
+                                            })->columns(2),
                                         Forms\Components\Section::make('Inventory')
                                             ->schema([
                                                 Forms\Components\TextInput::make('sku')
@@ -287,26 +300,6 @@ class ProductResource extends Resource
                     MetaDataForm::make('Meta Data'),
                 ])->columnSpan(1),
             ]);
-    }
-
-    private function generateCombinations($options, $current = [], $index = 0, $result = [])
-    {
-        if ($index === count($options)) {
-            $result[] = [
-                'id' => uniqid(), // Add a unique ID
-                'data' => $current,
-            ];
-
-            return $result;
-        }
-
-        foreach ($options[$index]['productOptionValues'] as $value) {
-            $newCurrent = $current;
-            $newCurrent[$options[$index]['name']] = $value['name'];
-            $result = $this->generateCombinations($options, $newCurrent, $index + 1, $result);
-        }
-
-        return $result;
     }
 
     public static function table(Table $table): Table

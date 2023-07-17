@@ -24,8 +24,8 @@ class PlaceOrderData
             ),
             cart_reference: $data['cart_reference'],
             taxation_data: new OrderTaxationData(
-                country_id: $data['taxations']['country_id'],
-                state_id: $data['taxations']['state_id'] ?? null
+                country_id: (int) $data['taxations']['country_id'],
+                state_id: (int) $data['taxations']['state_id'] ?? null
             ),
             notes: $data['notes'] ?? null,
             discountCode: $data['discount_code'] ?? null,

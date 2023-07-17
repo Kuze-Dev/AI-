@@ -41,9 +41,12 @@ class CreatePage extends CreateRecord
                 ->with(['metaData.media', 'blockContents'])
                 ->firstOrFail();
 
-            $this->data['visibility'] = $page->visibility;
-            $this->data['published_at'] = $page->published_at ? true : false;
-            $this->data['block_contents'] = $page->blockContents->toArray();
+            $this->form->fill([
+                'visibility' => $page->visibility,
+                'published_at' => $page->published_at,
+                'block_contents' => $page->blockContents,
+            ]);
+
             $this->data['meta_data'] = [
                 'author' => $page->metaData?->author,
                 'description' => $page->metaData?->description,

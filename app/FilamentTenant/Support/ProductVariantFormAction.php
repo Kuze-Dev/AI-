@@ -29,20 +29,10 @@ class ProductVariantFormAction extends Action
             $state = data_get($livewire, $activeProductVariantStatePath);
 
             if ($state !== null) {
-                $combinationString = '';
-                $loopCounter = 0;
-                foreach ($state['combination'] as $key => $value) {
-                    $combinationString .= ucfirst($value['option']) . ': ' . ucfirst($value['option_value']);
-                    $loopCounter++;
-                    if (count($state['combination']) != $loopCounter) {
-                        $combinationString .= ' / ';
-                    }
-                }
-
-                return trans('Edit Product Variant (:combination)', ['combination' => $combinationString]);
+                return trans('Edit Variant');
             }
 
-            return trans('Manage Product Variant');
+            return trans('Manage Variant');
         });
 
         $this->slideOver(true);

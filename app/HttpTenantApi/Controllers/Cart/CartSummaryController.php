@@ -9,15 +9,9 @@ use Domain\Cart\Helpers\CartLineHelper;
 use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
-use Domain\Customer\Models\Customer;
-use Domain\Taxation\Enums\PriceDisplay;
 use Domain\Taxation\Facades\Taxation;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
-use Spatie\RouteAttributes\Attributes\Prefix;
 
 #[
     Middleware(['auth:sanctum'])

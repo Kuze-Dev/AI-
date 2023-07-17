@@ -56,8 +56,7 @@ class CartLineHelper
 
         $discountTotal = 0;
         if (!is_null($discount)) {
-            $discountTotal = (new DiscountHelperFunctions())->deductOrderSubtotalByFixedValue($discount->code, $subTotal)
-                ?: (new DiscountHelperFunctions())->deductOrderSubtotalByPercentageValue($discount->code, $subTotal);
+            $discountTotal = (new DiscountHelperFunctions())->deductOrderSubtotal($discount, $subTotal);
         }
 
         //for now, but the shipping fee and discount will be added

@@ -39,6 +39,10 @@ class DiscountController extends Controller
                     $query->where('max_uses', '>', 0)
                         ->orWhereNull('max_uses');
                 })
+                ->where(function ($query) {
+                    $query->where('valid_end_at', '>=', now())
+                        ->orWhereNull('valid_end_at');
+                })
                 ->allowedIncludes(['discountCondition', 'discountRequirement'])
                 ->firstOrFail()
         );

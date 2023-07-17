@@ -18,7 +18,7 @@ class UpdateOrderAction
         try {
             if ($updateOrderData->status) {
                 if ($updateOrderData->status == 'For Cancellation') {
-                    //cant cancel if order is 
+                    //cant cancel if order is
                     if ($order->status != OrderStatuses::PENDING) {
                         return OrderResult::FAILED;
                     }

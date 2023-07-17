@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Spatie\QueryBuilder\QueryBuilder;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 use App\HttpTenantApi\Resources\ReviewResource;
+
 #[
     Resource('reviews', apiResource: true, only: ['show']),
 ]
@@ -23,12 +24,11 @@ class ReviewShowController
                 ->allowedIncludes([
                     'product',
                     'customer',
-                    'order_line'
+                    'order_line',
                 ])
                 ->get()
         );
     }
-
 
     #[Get('reviews/ratings/{rating}')]
     public function showRating(string $rating): JsonResponse
@@ -37,5 +37,5 @@ class ReviewShowController
 
         return response()->json(['product_id' => $rating, 'average_ratings' => $averageRating]);
 
-    }   
+    }
 }

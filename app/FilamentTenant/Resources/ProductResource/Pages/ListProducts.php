@@ -15,6 +15,13 @@ class ListProducts extends ListRecords
     protected function getActions(): array
     {
         return [
+            Actions\Action::make('import-products')
+                ->icon('')
+                ->label(__('Import'))
+                ->color('secondary'),
+            Actions\Action::make('export-products')
+                ->label(__('Export'))
+                ->color('secondary'),
             Actions\CreateAction::make(),
         ];
     }
