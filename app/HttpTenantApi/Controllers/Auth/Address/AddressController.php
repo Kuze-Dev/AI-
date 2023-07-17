@@ -47,7 +47,7 @@ class AddressController extends Controller
 
         $address = DB::transaction(
             fn () => app(CreateAddressAction::class)
-                ->execute($request->toDTO($customer))
+                ->execute($request->toDTO(customer: $customer))
         );
 
         return AddressResource::make($address);
@@ -58,12 +58,9 @@ class AddressController extends Controller
     {
         $this->authorize('update', $address);
 
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = Auth::user();
-
         $address = DB::transaction(
             fn () => app(UpdateAddressAction::class)
-                ->execute($address, $request->toDTO($customer))
+                ->execute($address, $request->toDTO(address: $address))
         );
 
         return AddressResource::make($address);

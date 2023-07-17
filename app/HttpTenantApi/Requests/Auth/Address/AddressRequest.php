@@ -6,6 +6,7 @@ namespace App\HttpTenantApi\Requests\Auth\Address;
 
 use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Address\Enums\AddressLabelAs;
+use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Customer\Models\Customer;
@@ -40,7 +41,7 @@ class AddressRequest extends FormRequest
         ];
     }
 
-    public function toDTO(Customer $customer): AddressData
+    public function toDTO(?Customer $customer = null, ?Address $address = null): AddressData
     {
         $validated = $this->validated();
 
@@ -50,9 +51,9 @@ class AddressRequest extends FormRequest
             address_line_1: $validated['address_line_1'],
             zip_code: $validated['zip_code'],
             city: $validated['city'],
-            is_default_shipping: false,
-            is_default_billing: false,
-            customer_id: $customer->getKey(),
+            is_default_shipping: $address?->is_default_shipping ?? false,
+            is_default_billing: $address?->is_default_billing ?? false,
+            customer_id: $customer?->getKey() ?? $address?->customer->getKey(),
         );
     }
 }
