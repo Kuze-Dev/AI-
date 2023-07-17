@@ -5,36 +5,69 @@ declare(strict_types=1);
 namespace Domain\Cart\Helpers;
 
 use Domain\Cart\DataTransferObjects\SummaryData;
+use Domain\Cart\Models\CartLine;
+use Domain\Discount\Actions\DiscountHelperFunctions;
+use Domain\Discount\Models\Discount;
 use Domain\Taxation\Facades\Taxation;
+use Domain\Taxation\Models\TaxZone;
 use Illuminate\Database\Eloquent\Collection;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class CartLineHelper
 {
-    public function calculate(Collection $cartLines, int $countryId, ?int $stateId = null)
+    public function summary(Collection $collections, int $countryId, ?int $stateId = null)
     {
-        $subTotal = $cartLines->reduce(function ($carry, $cartLine) {
-            $purchasable = $cartLine->purchasable;
-
-            return $carry + ($purchasable->selling_price * $cartLine->quantity);
-        }, 0);
-
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
-        $taxDisplay = $taxZone->price_display;
         $taxPercentage = (float) $taxZone->percentage;
-        $taxTotal = round($subTotal * $taxPercentage / 100, 2);
+        $taxDisplay = $taxZone->price_display;
 
-        //for now, but the shipping fee and discount will be added
-        $grandTotal = $subTotal + $taxTotal;
+        if (!$taxZone instanceof TaxZone) {
+            throw new BadRequestHttpException('No tax zone found');
+        }
+
+        $summary = $this->calculate($collections, $taxPercentage);
 
         $summaryData = [
-            'subTotal' => $subTotal,
+            'subTotal' => $summary['subTotal'],
             'taxZone' => $taxZone,
             'taxDisplay' => $taxDisplay,
             'taxPercentage' => $taxPercentage,
-            'taxTotal' => $taxTotal,
-            'grandTotal' => $grandTotal,
+            'taxTotal' => $summary['taxTotal'],
+            'grandTotal' => $summary['grandTotal'],
         ];
 
         return SummaryData::fromArray($summaryData);
+    }
+
+    public function calculate(CartLine|Collection $collections, float $taxPercentage, ?Discount $discount = null)
+    {
+        $subTotal = 0;
+        if ($collections instanceof Collection) {
+            $subTotal = $collections->reduce(function ($carry, $collection) {
+                $purchasable = $collection->purchasable;
+
+                return $carry + ($purchasable->selling_price * $collection->quantity);
+            }, 0);
+        } else if ($collections instanceof CartLine) {
+            $subTotal = $collections->purchasable->selling_price * $collections->quantity;
+        }
+
+        $taxTotal = round($subTotal * $taxPercentage / 100, 2);
+
+        $discountTotal = 0;
+        if (!is_null($discount)) {
+            $discountTotal = (new DiscountHelperFunctions())->deductOrderSubtotalByFixedValue($discount->code, $subTotal)
+                ?: (new DiscountHelperFunctions())->deductOrderSubtotalByPercentageValue($discount->code, $subTotal);
+        }
+
+        //for now, but the shipping fee and discount will be added
+        $grandTotal = $subTotal + $taxTotal - $discountTotal;
+
+        return [
+            'subTotal' => $subTotal,
+            'taxTotal' => $taxTotal,
+            'discountTotal' => $discountTotal,
+            'grandTotal' => $grandTotal
+        ];
     }
 }

@@ -59,7 +59,7 @@ class CartSummaryController extends Controller
 
 
         $summaryData = app(CartLineHelper::class)
-            ->calculate($cartLines, $countryId, $stateId);
+            ->summary($cartLines, $countryId, $stateId);
 
         return response()->json([
             'tax_inclusive_sub_total' => $summaryData->subTotal + $summaryData->taxTotal,
