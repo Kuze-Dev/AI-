@@ -31,12 +31,6 @@ class CheckoutController
 
         $reference = $validated['reference'];
 
-        if ( ! $reference) {
-            return response()->json([
-                'message' => 'Invalid reference.',
-            ], 400);
-        }
-
         $cartLineQuery = CartLine::with(['purchasable' => function (MorphTo $query) {
             $query->morphWith([
                 ProductVariant::class => ['product.media'],

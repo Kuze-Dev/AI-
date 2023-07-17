@@ -111,7 +111,7 @@ class OrderLine extends Model implements HasMedia
             ->registerMediaConversions($registerMediaConversions);
 
         $this->addMediaCollection('order_line_notes')
-            ->onlyKeepLatest(3)
+            ->onlyKeepLatest(5)
             ->registerMediaConversions($registerMediaConversions);
     }
 

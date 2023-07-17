@@ -16,8 +16,7 @@ use Domain\Product\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
-use Log;
-use Exception;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class PrepareOrderAction
 {
@@ -25,52 +24,22 @@ class PrepareOrderAction
     {
         $customer = auth()->user();
 
-        $shippingAddress = Address::with('state.country')->find($placeOrderData->addresses->shipping);
+        $addresses = $this->prepareAddress($placeOrderData);
 
-        $billingAddress = Address::with('state.country')->find($placeOrderData->addresses->billing);
+        $currency = $this->prepareCurrency();
 
-        $currency = Currency::where('default', true)->first();
+        $cartLines = $this->prepareCartLines($placeOrderData);
 
-        $cartLines = CartLine::with(['purchasable' => function (MorphTo $query) {
-            $query->morphWith([
-                ProductVariant::class => ['product'],
-            ]);
-        }, ])
-            ->whereCheckoutReference($placeOrderData->cart_reference)
-            ->get();
+        $taxZone = $this->prepareTax($placeOrderData);
 
-        $taxZone = Taxation::getTaxZone($placeOrderData->taxation_data->country_id, $placeOrderData->taxation_data->state_id);
-
-        if ( ! $taxZone instanceof TaxZone) {
-            Log::info('No tax zone found');
-
-            return OrderResult::FAILED;
-        }
+        $discount = $this->prepareDiscount($placeOrderData);
 
         $notes = $placeOrderData->notes;
 
-        $discount = null;
-
-        try {
-            $discount = Discount::whereCode($placeOrderData->discountCode)
-                ->whereStatus(DiscountStatus::ACTIVE)
-                ->where(function ($query) {
-                    $query->where('max_uses', '>', 0)
-                        ->orWhereNull('max_uses');
-                })
-                ->where(function ($query) {
-                    $query->where('valid_end_at', '>=', now())
-                        ->orWhereNull('valid_end_at');
-                })
-                ->firstOrFail();
-        } catch (Exception $e) {
-            $discount = null;
-        }
-
         $orderData = [
             'customer' => $customer,
-            'shippingAddress' => $shippingAddress,
-            'billingAddress' => $billingAddress,
+            'shippingAddress' => $addresses['shippingAddress'],
+            'billingAddress' => $addresses['billingAddress'],
             'currency' => $currency,
             'cartLine' => $cartLines,
             'notes' => $notes,
@@ -79,5 +48,61 @@ class PrepareOrderAction
         ];
 
         return PreparedOrderData::fromArray($orderData);
+    }
+
+    private function prepareAddress(PlaceOrderData $placeOrderData)
+    {
+        $shippingAddress = Address::with('state.country')->find($placeOrderData->addresses->shipping);
+
+        $billingAddress = Address::with('state.country')->find($placeOrderData->addresses->billing);
+
+        return [
+            'shippingAddress' => $shippingAddress,
+            'billingAddress' => $billingAddress
+        ];
+    }
+
+    private function prepareCurrency()
+    {
+        return Currency::where('default', true)->first();
+    }
+
+    private function prepareCartLines(PlaceOrderData $placeOrderData)
+    {
+        return CartLine::with(['purchasable' => function (MorphTo $query) {
+            $query->morphWith([
+                ProductVariant::class => ['product'],
+            ]);
+        },])
+            ->whereCheckoutReference($placeOrderData->cart_reference)
+            ->get();
+    }
+
+    private function prepareTax(PlaceOrderData $placeOrderData)
+    {
+        $taxZone = Taxation::getTaxZone($placeOrderData->taxation_data->country_id, $placeOrderData->taxation_data->state_id);
+
+        if (!$taxZone instanceof TaxZone) {
+            \Log::info("No tax zone found");
+            throw new BadRequestHttpException('No tax zone found');
+            // return OrderResult::FAILED;
+        }
+
+        return $taxZone;
+    }
+
+    private function prepareDiscount(PlaceOrderData $placeOrderData)
+    {
+        if ($placeOrderData->discountCode) {
+            return Discount::whereCode($placeOrderData->discountCode)
+                ->whereStatus(DiscountStatus::ACTIVE)
+                ->where(function ($query) {
+                    $query->where('max_uses', '>', 0)
+                        ->orWhereNull('max_uses');
+                })
+                ->firstOrFail();
+        }
+
+        return null;
     }
 }
