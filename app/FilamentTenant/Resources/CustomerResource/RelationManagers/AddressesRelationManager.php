@@ -39,8 +39,8 @@ class AddressesRelationManager extends RelationManager
                     ->translateLabel()
                     ->required()
                     ->string()
-                    ->maxLength(255),
-
+                    ->maxLength(255)
+                    ->columnSpanFull(),
                 Forms\Components\Select::make('country_id')
                     ->label(trans('Country'))
                     ->required()
@@ -51,7 +51,6 @@ class AddressesRelationManager extends RelationManager
                         $set('state_id', null);
                     })
                     ->dehydrated(false),
-
                 Forms\Components\Select::make('state_id')
                     ->label(trans('State'))
                     ->required()
@@ -61,27 +60,18 @@ class AddressesRelationManager extends RelationManager
                         'name',
                         fn (Builder $query, callable $get) => $query->where('country_id', $get('country_id'))
                     )
-                    ->reactive()
-                    ->visible(fn (callable $get) => $get('country_id') !== null),
-
+                    ->reactive(),
                 Forms\Components\TextInput::make('zip_code')
                     ->translateLabel()
                     ->required()
                     ->string()
                     ->maxLength(255)
                     ->reactive(),
-
                 Forms\Components\TextInput::make('city')
                     ->translateLabel()
                     ->required()
                     ->string()
                     ->maxLength(255),
-
-                Forms\Components\Checkbox::make('is_default_billing')
-                    ->translateLabel(),
-                Forms\Components\Checkbox::make('is_default_shipping')
-                    ->translateLabel(),
-
                 Forms\Components\Select::make('label_as')
                     ->translateLabel()
                     ->required()
@@ -92,9 +82,13 @@ class AddressesRelationManager extends RelationManager
                             ])
                             ->toArray()
                     )
-                    ->enum(AddressLabelAs::class),
-
-            ])->columns(1);
+                    ->enum(AddressLabelAs::class)
+                    ->columnSpanFull(),
+                Forms\Components\Checkbox::make('is_default_billing')
+                    ->translateLabel(),
+                Forms\Components\Checkbox::make('is_default_shipping')
+                    ->translateLabel(),
+            ])->columns(2);
     }
 
     /** @throws Exception */
