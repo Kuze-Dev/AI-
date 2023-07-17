@@ -7,7 +7,8 @@ namespace App\HttpTenantApi\Controllers\Auth\Customer;
 use App\Features\ECommerce\ECommerceBase;
 use App\HttpTenantApi\Requests\Auth\Customer\CustomerRegisterRequest;
 use App\HttpTenantApi\Resources\CustomerResource;
-use Domain\Customer\Actions\CustomerRegisterAction;
+use Domain\Customer\Actions\CreateCustomerAction;
+use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Tier\Models\Tier;
 use Illuminate\Support\Facades\DB;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -25,8 +26,8 @@ class RegisterController
         $tier = Tier::whereName(config('domain.tier.default'))->first();
 
         $customer = DB::transaction(
-            fn () => app(CustomerRegisterAction::class)
-                ->execute($request->toDTO($tier))
+            fn () => app(CreateCustomerAction::class)
+                ->execute(CustomerData::fromRegistrationRequest($tier, $request))
         );
 
         return CustomerResource::make($customer);
