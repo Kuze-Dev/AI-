@@ -9,10 +9,12 @@ use Domain\Address\Actions\DeleteAddressAction;
 use Domain\Address\Actions\UpdateAddressAction;
 use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Address\Enums\AddressLabelAs;
+use Domain\Address\Exceptions\CantDeleteDefaultAddressException;
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Exception;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -37,8 +39,8 @@ class AddressesRelationManager extends RelationManager
                     ->translateLabel()
                     ->required()
                     ->string()
-                    ->maxLength(255),
-
+                    ->maxLength(255)
+                    ->columnSpanFull(),
                 Forms\Components\Select::make('country_id')
                     ->label(trans('Country'))
                     ->required()
@@ -49,7 +51,6 @@ class AddressesRelationManager extends RelationManager
                         $set('state_id', null);
                     })
                     ->dehydrated(false),
-
                 Forms\Components\Select::make('state_id')
                     ->label(trans('State'))
                     ->required()
@@ -59,27 +60,18 @@ class AddressesRelationManager extends RelationManager
                         'name',
                         fn (Builder $query, callable $get) => $query->where('country_id', $get('country_id'))
                     )
-                    ->reactive()
-                    ->visible(fn (callable $get) => $get('country_id') !== null),
-
+                    ->reactive(),
                 Forms\Components\TextInput::make('zip_code')
                     ->translateLabel()
                     ->required()
                     ->string()
                     ->maxLength(255)
                     ->reactive(),
-
                 Forms\Components\TextInput::make('city')
                     ->translateLabel()
                     ->required()
                     ->string()
                     ->maxLength(255),
-
-                Forms\Components\Checkbox::make('is_default_billing')
-                    ->translateLabel(),
-                Forms\Components\Checkbox::make('is_default_shipping')
-                    ->translateLabel(),
-
                 Forms\Components\Select::make('label_as')
                     ->translateLabel()
                     ->required()
@@ -90,9 +82,13 @@ class AddressesRelationManager extends RelationManager
                             ])
                             ->toArray()
                     )
-                    ->enum(AddressLabelAs::class),
-
-            ])->columns(1);
+                    ->enum(AddressLabelAs::class)
+                    ->columnSpanFull(),
+                Forms\Components\Checkbox::make('is_default_billing')
+                    ->translateLabel(),
+                Forms\Components\Checkbox::make('is_default_shipping')
+                    ->translateLabel(),
+            ])->columns(2);
     }
 
     /** @throws Exception */
@@ -146,7 +142,7 @@ class AddressesRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->translateLabel()
-                    ->using(function (array $data, self $livewire) {
+                    ->using(function (self $livewire, array $data) {
 
                         $data['customer_id'] = $livewire->getOwnerRecord()->getKey();
 
@@ -164,18 +160,26 @@ class AddressesRelationManager extends RelationManager
 
                         return $data;
                     })
-                    ->using(fn (Address $record, array $data) => DB::transaction(
-                        fn () => DB::transaction(
-                            fn () => app(UpdateAddressAction::class)
-                                ->execute($record, AddressData::fromArray($data))
-                        )
-                    )),
+                    ->using(function (self $livewire, Address $record, array $data) {
+                        $data['customer_id'] = $livewire->getOwnerRecord()->getKey();
+
+                        return DB::transaction(
+                            fn () => DB::transaction(
+                                fn () => app(UpdateAddressAction::class)
+                                    ->execute($record, AddressData::fromArray($data))
+                            )
+                        );
+                    }),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
                         ->translateLabel()
                         ->using(function (Address $record) {
                             try {
                                 return app(DeleteAddressAction::class)->execute($record);
+                            } catch (CantDeleteDefaultAddressException $e) {
+                                Filament::notify('danger', trans('Deleting default address not allowed.'));
+
+                                return false;
                             } catch (DeleteRestrictedException $e) {
                                 return false;
                             }

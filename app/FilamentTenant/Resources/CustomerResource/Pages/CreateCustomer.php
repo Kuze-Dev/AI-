@@ -42,7 +42,7 @@ class CreateCustomer extends CreateRecord
     {
         return DB::transaction(
             fn () => app(CreateCustomerAction::class)
-                ->execute(CustomerData::fromArray($data))
+                ->execute(CustomerData::fromArrayCreateByAdmin($data))
         );
     }
 }

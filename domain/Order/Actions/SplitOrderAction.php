@@ -7,7 +7,6 @@ namespace Domain\Order\Actions;
 use Domain\Cart\Models\CartLine;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
-use Domain\Order\Enums\OrderResult;
 use Domain\Order\Models\Order;
 use Illuminate\Support\Facades\DB;
 use Exception;

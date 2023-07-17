@@ -12,10 +12,11 @@ class CustomerSeeder extends Seeder
 {
     public function run(): void
     {
+        /** @var \Domain\Tier\Models\Tier $tier */
+        $tier = Tier::whereName(config('domain.tier.default'))->first();
+
         $customerFactory = CustomerFactory::new(['password' => 'secret'])
-            ->recycle(
-                Tier::whereName(config('domain.tier.default'))->first()
-            )
+            ->recycle($tier)
             ->count(2);
 
         $customerFactory

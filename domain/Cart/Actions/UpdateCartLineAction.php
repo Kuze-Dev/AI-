@@ -7,7 +7,6 @@ namespace Domain\Cart\Actions;
 use Domain\Cart\DataTransferObjects\UpdateCartLineData;
 use Domain\Cart\Models\CartLine;
 use Domain\Media\Actions\CreateMediaAction;
-use Exception;
 
 class UpdateCartLineAction
 {

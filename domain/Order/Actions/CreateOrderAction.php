@@ -6,7 +6,6 @@ namespace Domain\Order\Actions;
 
 use Domain\Cart\Helpers\CartLineHelper;
 use Domain\Discount\Actions\CreateDiscountLimitAction;
-use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Models\Order;
 use Illuminate\Support\Str;
@@ -58,7 +57,7 @@ class CreateOrderAction
             'is_paid' => false,
         ]);
 
-        if (!is_null($preparedOrderData->discount)) {
+        if ( ! is_null($preparedOrderData->discount)) {
             app(CreateDiscountLimitAction::class)->execute($preparedOrderData->discount, $order, $preparedOrderData->customer);
         }
 

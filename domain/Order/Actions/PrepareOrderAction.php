@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Log;
 
 class PrepareOrderAction
 {
@@ -61,7 +62,7 @@ class PrepareOrderAction
 
         return [
             'shippingAddress' => $shippingAddress,
-            'billingAddress' => $billingAddress
+            'billingAddress' => $billingAddress,
         ];
     }
 
@@ -76,7 +77,7 @@ class PrepareOrderAction
             $query->morphWith([
                 ProductVariant::class => ['product'],
             ]);
-        },])
+        }, ])
             ->whereCheckoutReference($placeOrderData->cart_reference)
             ->get();
     }
@@ -85,8 +86,9 @@ class PrepareOrderAction
     {
         $taxZone = Taxation::getTaxZone($placeOrderData->taxation_data->country_id, $placeOrderData->taxation_data->state_id);
 
-        if (!$taxZone instanceof TaxZone) {
-            \Log::info("No tax zone found");
+        if ( ! $taxZone instanceof TaxZone) {
+            Log::info('No tax zone found');
+
             throw new BadRequestHttpException('No tax zone found');
             // return OrderResult::FAILED;
         }
@@ -97,13 +99,19 @@ class PrepareOrderAction
     private function prepareDiscount(PlaceOrderData $placeOrderData)
     {
         if ($placeOrderData->discountCode) {
-            return Discount::whereCode($placeOrderData->discountCode)
+            $discount = Discount::whereCode($placeOrderData->discountCode)
                 ->whereStatus(DiscountStatus::ACTIVE)
                 ->where(function ($query) {
                     $query->where('max_uses', '>', 0)
                         ->orWhereNull('max_uses');
                 })
-                ->firstOrFail();
+                ->where(function ($query) {
+                    $query->where('valid_end_at', '>=', now())
+                        ->orWhereNull('valid_end_at');
+                })
+                ->first();
+
+            return $discount ?? null;
         }
 
         return null;

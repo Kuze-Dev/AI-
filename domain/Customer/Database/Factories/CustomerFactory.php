@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Customer\Database\Factories;
 
 use Carbon\Carbon;
+use Domain\Address\Database\Factories\AddressFactory;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
@@ -35,6 +36,15 @@ class CustomerFactory extends Factory
             'birth_date' => now()->subYears($this->faker->randomDigitNotNull()),
             'remember_token' => Str::random(10),
         ];
+    }
+
+    public function configure(): self
+    {
+        return parent::configure()->has(
+            AddressFactory::new()
+                ->defaultShipping()
+                ->defaultBilling()
+        );
     }
 
     public function deleted(): self

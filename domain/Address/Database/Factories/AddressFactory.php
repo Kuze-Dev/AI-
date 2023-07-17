@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Address\Database\Factories;
 
+use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\Address;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Arr;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Address\Models\Address>
@@ -25,6 +27,7 @@ class AddressFactory extends Factory
             'city' => $this->faker->city(),
             'is_default_shipping' => $this->faker->boolean(),
             'is_default_billing' => $this->faker->boolean(),
+            'label_as' => Arr::random(AddressLabelAs::cases())->value,
         ];
     }
 

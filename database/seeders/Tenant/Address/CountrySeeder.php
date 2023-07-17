@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Tenant\Address;
 
-use Domain\Address\Models\Country;
+use Domain\Address\Database\Factories\CountryFactory;
+use Domain\Address\Database\Factories\StateFactory;
 use Illuminate\Database\Seeder;
 use Exception;
 
@@ -15,9 +16,11 @@ class CountrySeeder extends Seeder
     {
         $countries = $this->getCountryData();
 
-        if ($countries) {
-            foreach ($countries as $countryData) {
-                $country = Country::create([
+        $bar = $this->command->getOutput()->createProgressBar(count($countries));
+
+        foreach ($countries as $countryData) {
+            $country = CountryFactory::new()
+                ->createOne([
                     'code' => $countryData['iso2'],
                     'name' => $countryData['name'],
                     'capital' => $countryData['capital'],
@@ -25,13 +28,20 @@ class CountrySeeder extends Seeder
                     'active' => false,
                 ]);
 
-                foreach ($countryData['states'] as $stateData) {
-                    $country->states()->create([
+            foreach ($countryData['states'] as $stateData) {
+                StateFactory::new()
+                    ->for($country)
+                    ->createOne([
                         'name' => $stateData['name'],
                     ]);
-                }
             }
+
+            $bar->advance();
         }
+
+        $bar->finish();
+
+        $this->command->getOutput()->newLine();
     }
 
     /** @throws Exception */

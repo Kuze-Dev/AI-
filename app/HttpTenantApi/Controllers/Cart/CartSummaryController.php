@@ -6,12 +6,10 @@ namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\Http\Controllers\Controller;
 use Domain\Cart\Helpers\CartLineHelper;
-use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
 use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
-use Domain\Taxation\Facades\Taxation;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
 
@@ -47,7 +45,7 @@ class CartSummaryController extends Controller
         $discount = null;
         $discountCode = $validated['discount_code'] ?? null;
 
-        if (!is_null($discountCode)) {
+        if ( ! is_null($discountCode)) {
             $discount = Discount::whereCode($discountCode)
                 ->whereStatus(DiscountStatus::ACTIVE)
                 ->where(function ($query) {
@@ -69,7 +67,6 @@ class CartSummaryController extends Controller
             ->whereIn('id', $cartLineIds)
             ->get();
 
-
         $summaryData = app(CartLineHelper::class)
             ->summary($cartLines, $countryId, $stateId, $discount);
 
@@ -80,8 +77,8 @@ class CartSummaryController extends Controller
             'tax_percentage' => $summaryData->taxPercentage,
             'tax_total' => $summaryData->taxTotal,
             'grand_total' => $summaryData->grandTotal,
-            'discount_total' => $discountCode ? $summaryData->discountTotal : "",
-            'discount_message' => $discountCode ? $summaryData->discountMessage : "",
+            'discount_total' => $discountCode ? $summaryData->discountTotal : '',
+            'discount_message' => $discountCode ? $summaryData->discountMessage : '',
         ], 200);
     }
 }

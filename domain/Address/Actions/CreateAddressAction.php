@@ -9,9 +9,15 @@ use Domain\Address\Models\Address;
 
 class CreateAddressAction
 {
+    public function __construct(
+        private readonly SetAddressAsDefaultShippingAction $setAddressAsDefaultShipping,
+        private readonly SetAddressAsDefaultBillingAction $setAddressAsDefaultBilling,
+    ) {
+    }
+
     public function execute(AddressData $addressData): Address
     {
-        return Address::create([
+        $address = Address::create([
             'customer_id' => $addressData->customer_id,
             'state_id' => $addressData->state_id,
             'label_as' => $addressData->label_as,
@@ -21,5 +27,15 @@ class CreateAddressAction
             'is_default_shipping' => $addressData->is_default_shipping,
             'is_default_billing' => $addressData->is_default_billing,
         ]);
+
+        if ($addressData->is_default_shipping) {
+            $this->setAddressAsDefaultShipping->execute($address);
+        }
+
+        if ($addressData->is_default_billing) {
+            $this->setAddressAsDefaultBilling->execute($address);
+        }
+
+        return $address;
     }
 }

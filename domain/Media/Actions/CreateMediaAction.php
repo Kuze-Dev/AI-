@@ -6,6 +6,7 @@ namespace Domain\Media\Actions;
 
 use Illuminate\Database\Eloquent\Model;
 use Exception;
+use Log;
 
 class CreateMediaAction
 {
@@ -17,7 +18,7 @@ class CreateMediaAction
                 $model->addMediaFromUrl($imageUrl)
                     ->toMediaCollection($collection);
             } catch (Exception $e) {
-                \Log::info($e);
+                Log::info($e);
             }
         }
     }

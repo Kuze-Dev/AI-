@@ -37,21 +37,25 @@ class ListCustomers extends ListRecords
                             'first_name' => $row['first_name'],
                             'last_name' => $row['last_name'],
                             'mobile' => $row['mobile'],
-                            'gender' => Gender::from($row['gender']),
-                            'status' => Status::from($row['status']),
-                            'birth_date' => now()->parse($row['birth_date']),
-                            'tier_id' => isset($row['tier']) ? (Tier::whereName($row['tier'])->first()?->getKey()) : null,
+                            'gender' => $row['gender'],
+                            'status' => $row['status'],
+                            'birth_date' => $row['birth_date'],
+                            'tier_id' => isset($row['tier'])
+                                ? (Tier::whereName($row['tier'])->first()?->getKey())
+                                : null,
                         ];
                         unset($row);
 
                         if ($customer = Customer::whereEmail($data['email'])->first()) {
                             unset($data['email']);
-                            $customer = app(EditCustomerAction::class)->execute($customer, new CustomerData(...$data));
-                        } else {
-                            $customer = app(CreateCustomerAction::class)->execute(new CustomerData(...$data));
+
+                            return app(EditCustomerAction::class)
+                                ->execute($customer, CustomerData::fromArrayImportByAdmin($data));
                         }
 
-                        return $customer;
+                        return app(CreateCustomerAction::class)
+                            ->execute(CustomerData::fromArrayImportByAdmin($data));
+
                     }
                 )
                 ->withValidation(

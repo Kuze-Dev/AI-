@@ -6,6 +6,8 @@ use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Tier\Database\Factories\TierFactory;
 use Illuminate\Auth\Events\PasswordReset;
 
+uses()->group('customer');
+
 it('log', function () {
     $customer = CustomerFactory::new()->make([
         'tier_id' => TierFactory::new()->make(),
