@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Address\Database\Factories;
 
-use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -19,21 +18,7 @@ class StateFactory extends Factory
     public function definition(): array
     {
         return [
-            'country_id' => function (array $attributes) {
-
-                if ( ! isset($attributes['country_id'])) {
-
-                    if(self::$country_id === null) {
-                        self::$country_id = Country::whereName('Philippines')
-                            ->value('id')
-                            ?? CountryFactory::new();
-                    }
-
-                    return self::$country_id;
-                }
-
-                return $attributes;
-            },
+            'country_id' => CountryFactory::new(),
             'name' => $this->faker->name(),
         ];
     }
