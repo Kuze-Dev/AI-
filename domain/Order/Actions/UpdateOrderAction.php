@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Domain\Order\Actions;
 
+use Domain\Media\Actions\CreateMediaAction;
 use Domain\Order\DataTransferObjects\UpdateOrderData;
 use Domain\Order\Enums\OrderResult;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
 use Exception;
-use Log;
 
 class UpdateOrderAction
 {
@@ -35,16 +35,9 @@ class UpdateOrderAction
                 }
             }
 
-            $order->clearMediaCollection('bank_proof_images');
             if ($updateOrderData->bank_proof_medias !== null) {
-                foreach ($updateOrderData->bank_proof_medias as $imageUrl) {
-                    try {
-                        $order->addMediaFromUrl($imageUrl)
-                            ->toMediaCollection('bank_proof_images');
-                    } catch (Exception $e) {
-                        Log::info($e);
-                    }
-                }
+                app(CreateMediaAction::class)
+                    ->execute($order, $updateOrderData->bank_proof_medias, 'bank_proof_images');
             }
 
             return OrderResult::SUCCESS;

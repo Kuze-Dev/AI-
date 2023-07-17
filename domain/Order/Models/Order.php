@@ -171,6 +171,7 @@ class Order extends Model implements HasMedia
         };
 
         $this->addMediaCollection('bank_proof_images')
+            ->onlyKeepLatest(5)
             ->registerMediaConversions($registerMediaConversions);
     }
 

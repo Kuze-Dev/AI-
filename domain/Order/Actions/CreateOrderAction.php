@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Order\Actions;
 
+use Domain\Cart\Helpers\CartLineHelper;
 use Domain\Discount\Actions\CreateDiscountLimitAction;
 use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
@@ -16,30 +17,11 @@ class CreateOrderAction
     {
         $referenceNumber = Str::upper(Str::random(12));
 
-        $subTotal = $preparedOrderData->cartLine->reduce(function ($carry, $cartLine) {
-            $purchasable = $cartLine->purchasable;
-
-            return $carry + ($purchasable->selling_price * $cartLine->quantity);
-        }, 0);
-
         $taxDisplay = $preparedOrderData->taxZone->price_display;
         $taxPercentage = (float) $preparedOrderData->taxZone->percentage;
-        $taxTotal = round($subTotal * $taxPercentage / 100, 2);
 
-        //for now, but the shipping fee and discount will be added
-        $grandTotal = $subTotal + $taxTotal;
-
-        $deductable_subtotal_amount = null;
-        if ( ! is_null($preparedOrderData->discount)) {
-            $discountCode = $preparedOrderData->discount->code;
-
-            $deductable_subtotal_amount = (new DiscountHelperFunctions())->deductOrderSubtotal($preparedOrderData->discount, $subTotal);
-        }
-
-        // $total = $subTotal - ($deductable_subtotal_amount !== null ? $deductable_subtotal_amount : 0);
-        $grandTotal -= ($deductable_subtotal_amount !== null ? $deductable_subtotal_amount : 0);
-        //add tax and minus discount here
-        // $total = $subTotal + $preparedOrderData->totals->shipping_total;
+        $summary = app(CartLineHelper::class)
+            ->calculate($preparedOrderData->cartLine, $taxPercentage, $preparedOrderData->discount);
 
         $order = Order::create([
             'customer_id' => $preparedOrderData->customer->id,
@@ -54,18 +36,18 @@ class CreateOrderAction
 
             'reference' => $referenceNumber,
 
-            'tax_total' => $taxTotal,
+            'tax_total' => $summary['taxTotal'],
             'tax_display' => $taxDisplay,
             'tax_percentage' => $taxPercentage,
 
-            'sub_total' => $subTotal,
+            'sub_total' => $summary['subTotal'],
 
-            'discount_total' => $deductable_subtotal_amount ?? 0,
+            'discount_total' => $summary['discountTotal'],
             'discount_id' => $preparedOrderData->discount ? $preparedOrderData->discount->id : null,
             'discount_code' => $preparedOrderData->discount ? $preparedOrderData->discount->code : null,
 
             'shipping_total' => 0,
-            'total' => $grandTotal,
+            'total' => $summary['grandTotal'],
 
             'notes' => $preparedOrderData->notes,
             'shipping_method' => 'test shipping_method',
@@ -75,7 +57,7 @@ class CreateOrderAction
             'is_paid' => false,
         ]);
 
-        if ( ! is_null($preparedOrderData->discount)) {
+        if (!is_null($preparedOrderData->discount)) {
             app(CreateDiscountLimitAction::class)->execute($preparedOrderData->discount, $order, $preparedOrderData->customer);
         }
 

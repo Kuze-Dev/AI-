@@ -6,6 +6,7 @@ namespace Domain\Cart\Actions;
 
 use Domain\Cart\DataTransferObjects\UpdateCartLineData;
 use Domain\Cart\Models\CartLine;
+use Domain\Media\Actions\CreateMediaAction;
 use Exception;
 
 class UpdateCartLineAction
@@ -24,17 +25,9 @@ class UpdateCartLineAction
             ]);
         }
 
-        $cartLine->clearMediaCollection('cart_line_notes');
-
         if ($cartLineData->medias !== null) {
-            foreach ($cartLineData->medias as $imageUrl) {
-                try {
-                    $cartLine->addMediaFromUrl($imageUrl)
-                        ->toMediaCollection('cart_line_notes');
-                } catch (Exception $e) {
-                    // Log::info($e);
-                }
-            }
+            app(CreateMediaAction::class)
+                ->execute($cartLine, $cartLineData->medias, 'cart_line_notes');
         }
 
         return $cartLine;
