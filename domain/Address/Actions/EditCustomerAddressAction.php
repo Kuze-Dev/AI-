@@ -9,6 +9,12 @@ use Domain\Address\Models\Address;
 
 class EditCustomerAddressAction
 {
+    public function __construct(
+        private readonly SetAddressAsDefaultShippingAction $setAddressAsDefaultShipping,
+        private readonly SetAddressAsDefaultBillingAction $setAddressAsDefaultBilling,
+    ) {
+    }
+
     public function execute(Address $address, AddressData $addressData): Address
     {
         $address->update([
@@ -18,6 +24,14 @@ class EditCustomerAddressAction
             'zip_code' => $addressData->zip_code,
             'city' => $addressData->city,
         ]);
+
+        if ($addressData->is_default_shipping) {
+            $this->setAddressAsDefaultShipping->execute($address);
+        }
+
+        if ($addressData->is_default_billing) {
+            $this->setAddressAsDefaultBilling->execute($address);
+        }
 
         return $address;
     }
