@@ -9,10 +9,12 @@ use Domain\Address\Actions\DeleteAddressAction;
 use Domain\Address\Actions\UpdateAddressAction;
 use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Address\Enums\AddressLabelAs;
+use Domain\Address\Exceptions\CantDeleteDefaultAddressException;
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Exception;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -180,6 +182,10 @@ class AddressesRelationManager extends RelationManager
                         ->using(function (Address $record) {
                             try {
                                 return app(DeleteAddressAction::class)->execute($record);
+                            } catch (CantDeleteDefaultAddressException $e) {
+                                Filament::notify('danger', trans('Deleting default address not allowed.'));
+
+                                return false;
                             } catch (DeleteRestrictedException $e) {
                                 return false;
                             }
