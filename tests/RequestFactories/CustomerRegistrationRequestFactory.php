@@ -7,19 +7,15 @@ namespace Tests\RequestFactories;
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\State;
 use Domain\Customer\Enums\Gender;
-use Domain\Customer\Enums\Status;
-use Domain\Tier\Models\Tier;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Worksome\RequestFactories\RequestFactory;
 
-class CustomerRequestFactory extends RequestFactory
+class CustomerRegistrationRequestFactory extends RequestFactory
 {
     public function definition(): array
     {
         return [
-            'image' => UploadedFile::fake()->image('test_image.jpg'),
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
             'email' => function (array $attributes) {
@@ -29,7 +25,6 @@ class CustomerRequestFactory extends RequestFactory
                 return "{$firstName}.{$lastName}@fake.com";
             },
             'gender' => Arr::random(Gender::cases())->value,
-            'status' => Arr::random(Status::cases())->value,
             'password' => 'secret',
             'password_confirmation' => 'secret',
             'mobile' => $this->faker->phoneNumber(),
@@ -37,42 +32,41 @@ class CustomerRequestFactory extends RequestFactory
         ];
     }
 
-    public function withTier(Tier $tier): self
-    {
-        return $this->state([
-            'tier_id' => $tier->getKey(),
-        ]);
-    }
-
     public function withShippingAddress(State $state): self
     {
         return $this->state([
-            'shipping_country_id' => $state->country->getKey(),
-            'shipping_state_id' => $state->getKey(),
-            'shipping_address_line_1' => $this->faker->address(),
-            'shipping_zip_code' => $this->faker->postcode(),
-            'shipping_city' => $this->faker->city(),
-            'shipping_label_as' => Arr::random(AddressLabelAs::cases())->value,
+            'shipping' => [
+                'country_id' => $state->country->getRouteKey(),
+                'state_id' => $state->getRouteKey(),
+                'address_line_1' => $this->faker->address(),
+                'zip_code' => $this->faker->postcode(),
+                'city' => $this->faker->city(),
+                'label_as' => Arr::random(AddressLabelAs::cases())->value,
+            ],
         ]);
     }
 
     public function withBillingSameAsShipping(): self
     {
         return $this->state([
-            'same_as_shipping' => true,
+            'billing' => [
+                'same_as_shipping' => true,
+            ],
         ]);
     }
 
     public function withBillingAddress(State $state): self
     {
         return $this->state([
-            'same_as_shipping' => false,
-            'billing_country_id' => $state->country->getKey(),
-            'billing_state_id' => $state->getKey(),
-            'billing_address_line_1' => $this->faker->address(),
-            'billing_zip_code' => $this->faker->postcode(),
-            'billing_city' => $this->faker->city(),
-            'billing_label_as' => Arr::random(AddressLabelAs::cases())->value,
+            'billing' => [
+                'same_as_shipping' => false,
+                'country_id' => $state->country->getRouteKey(),
+                'state_id' => $state->getRouteKey(),
+                'address_line_1' => $this->faker->address(),
+                'zip_code' => $this->faker->postcode(),
+                'city' => $this->faker->city(),
+                'label_as' => Arr::random(AddressLabelAs::cases())->value,
+            ],
         ]);
     }
 }

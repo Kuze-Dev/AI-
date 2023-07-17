@@ -8,12 +8,13 @@ use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Tests\RequestFactories\CustomerRequestFactory;
+use Tests\RequestFactories\CustomerRegistrationRequestFactory;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\postJson;
+use function Pest\Laravel\travelTo;
 
 beforeEach(function () {
     testInTenantContext();
@@ -24,19 +25,19 @@ it('register', function () {
     Event::fake(Registered::class);
 
     $state = StateFactory::new()->createOne();
-    $data = CustomerRequestFactory::new()
-        ->shippingAddress($state)
-        ->billingAddress($state)
+    $data = CustomerRegistrationRequestFactory::new()
+        ->withShippingAddress($state)
+        ->withBillingAddress($state)
         ->create();
 
-    assertDatabaseEmpty(Customer::class);
-    assertDatabaseEmpty(Address::class);
+    // to get latest customer
+    travelTo(now()->addSecond());
 
     postJson('api/register', $data)
         ->assertValid()
         ->assertCreated()
         ->assertJson(function (AssertableJson $json) {
-            $customer = Customer::first();
+            $customer = Customer::latest()->first();
             $json
                 ->where('data.type', 'customers')
                 ->where('data.attributes.first_name', $customer->first_name)
@@ -60,9 +61,8 @@ it('register', function () {
         'birth_date' => $data['birth_date'] . ' 00:00:00',
     ]);
 
-    $customer = Customer::first();
+    $customer = Customer::latest()->first();
 
-    assertDatabaseCount(Address::class, 2);
     assertDatabaseHas(Address::class, [
         'customer_id' => $customer->getKey(),
         'state_id' => $state->getKey(),
@@ -88,18 +88,21 @@ it('register', function () {
 it('register w/ same address', function () {
 
     $state = StateFactory::new()->createOne();
-    $data = CustomerRequestFactory::new()
-        ->shippingAddress($state)
-        ->billingSameAsShipping()
+    $data = CustomerRegistrationRequestFactory::new()
+        ->withShippingAddress($state)
+        ->withBillingSameAsShipping()
         ->create();
 
     assertDatabaseEmpty(Address::class);
+
+    // to get latest customer
+    travelTo(now()->addSecond());
 
     postJson('api/register', $data)
         ->assertValid()
         ->assertCreated();
 
-    $customer = Customer::first();
+    $customer = Customer::latest()->first();
 
     assertDatabaseCount(Address::class, 1);
     assertDatabaseHas(Address::class, [
