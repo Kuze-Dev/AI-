@@ -36,6 +36,8 @@ class PrepareOrderAction
 
         $notes = $placeOrderData->notes;
 
+        $paymentMethod = $placeOrderData->payment_method;
+
         $orderData = [
             'customer' => $customer,
             'shippingAddress' => $addresses['shippingAddress'],
@@ -45,6 +47,7 @@ class PrepareOrderAction
             'notes' => $notes,
             'taxZone' => $taxZone,
             'discount' => $discount,
+            'paymentMethod' => $paymentMethod,
         ];
 
         return PreparedOrderData::fromArray($orderData);

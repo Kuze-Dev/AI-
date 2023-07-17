@@ -10,6 +10,7 @@ class PlaceOrderData
         public readonly OrderAddressData $addresses,
         public readonly string $cart_reference,
         public readonly OrderTaxationData $taxation_data,
+        public readonly string $payment_method,
         public readonly ?string $notes,
         public readonly ?string $discountCode,
     ) {
@@ -27,6 +28,7 @@ class PlaceOrderData
                 country_id: (int) $data['taxations']['country_id'],
                 state_id: $data['taxations']['state_id'] ?? null
             ),
+            payment_method: $data['payment_method'],
             notes: $data['notes'] ?? null,
             discountCode: $data['discount_code'] ?? null,
         );
