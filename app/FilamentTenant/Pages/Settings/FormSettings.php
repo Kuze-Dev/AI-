@@ -33,17 +33,17 @@ class FormSettings extends TenantBaseSettings
                         ])
                         ->enum(CaptchaProvider::class)
                         ->dehydrateStateUsing(
-                            fn(CaptchaProvider|string|null $state) => is_string($state)
+                            fn (CaptchaProvider|string|null $state) => is_string($state)
                                 ? CaptchaProvider::tryFrom($state)
                                 : $state
                         )
                         ->lazy(),
                     Forms\Components\TextInput::make('site_key')
                         ->required()
-                        ->visible(fn(Closure $get) => filled($get('provider'))),
+                        ->visible(fn (Closure $get) => filled($get('provider'))),
                     Forms\Components\TextInput::make('secret_key')
                         ->required()
-                        ->visible(fn(Closure $get) => filled($get('provider'))),
+                        ->visible(fn (Closure $get) => filled($get('provider'))),
                 ]),
         ];
     }
