@@ -8,6 +8,7 @@ use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
+use Domain\Customer\Models\Customer;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -39,18 +40,19 @@ class AddressRequest extends FormRequest
         ];
     }
 
-    public function toDTO(): AddressData
+    public function toDTO(Customer $customer): AddressData
     {
         $validated = $this->validated();
 
         return new AddressData(
+            state_id: (int) $validated['state_id'],
             label_as: $validated['label_as'],
             address_line_1: $validated['address_line_1'],
-            state_id: (int) $validated['state_id'],
             zip_code: $validated['zip_code'],
             city: $validated['city'],
             is_default_shipping: false,
             is_default_billing: false,
+            customer_id: $customer->getKey(),
         );
     }
 }

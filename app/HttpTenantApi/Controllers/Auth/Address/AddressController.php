@@ -8,9 +8,9 @@ use App\Features\ECommerce\ECommerceBase;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Requests\Auth\Address\AddressRequest;
 use App\HttpTenantApi\Resources\AddressResource;
-use Domain\Address\Actions\CreateCustomerAddressAction;
+use Domain\Address\Actions\CreateAddressAction;
 use Domain\Address\Actions\DeleteAddressAction;
-use Domain\Address\Actions\EditCustomerAddressAction;
+use Domain\Address\Actions\UpdateAddressAction;
 use Domain\Address\Models\Address;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -46,8 +46,8 @@ class AddressController extends Controller
         $customer = Auth::user();
 
         $address = DB::transaction(
-            fn () => app(CreateCustomerAddressAction::class)
-                ->execute($customer, $request->toDTO())
+            fn () => app(CreateAddressAction::class)
+                ->execute($request->toDTO($customer))
         );
 
         return AddressResource::make($address);
@@ -58,9 +58,12 @@ class AddressController extends Controller
     {
         $this->authorize('update', $address);
 
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = Auth::user();
+
         $address = DB::transaction(
-            fn () => app(EditCustomerAddressAction::class)
-                ->execute($address, $request->toDTO())
+            fn () => app(UpdateAddressAction::class)
+                ->execute($address, $request->toDTO($customer))
         );
 
         return AddressResource::make($address);
