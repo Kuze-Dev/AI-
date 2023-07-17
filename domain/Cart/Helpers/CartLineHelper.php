@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class CartLineHelper
 {
-    public function summary(Collection $collections, int $countryId, ?int $stateId = null, ?Discount $discount = null)
+    public function summary(Collection $collections, int $countryId, ?int $stateId = null)
     {
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
         $taxPercentage = (float) $taxZone->percentage;
@@ -25,7 +25,7 @@ class CartLineHelper
             throw new BadRequestHttpException('No tax zone found');
         }
 
-        $summary = $this->calculate($collections, $taxPercentage, $discount);
+        $summary = $this->calculate($collections, $taxPercentage);
 
         $summaryData = [
             'subTotal' => $summary['subTotal'],
@@ -34,8 +34,6 @@ class CartLineHelper
             'taxPercentage' => $taxPercentage,
             'taxTotal' => $summary['taxTotal'],
             'grandTotal' => $summary['grandTotal'],
-            'discountTotal' => $summary['discountTotal'],
-            'discountMessage' => $summary['discountTotal'] == 0 ? "Sorry this discount code is not valid." : "Discount is valid"
         ];
 
         return SummaryData::fromArray($summaryData);
@@ -65,10 +63,10 @@ class CartLineHelper
         $grandTotal = $subTotal + $taxTotal - $discountTotal;
 
         return [
-            'subTotal' => round($subTotal, 2),
-            'taxTotal' => round($taxTotal, 2),
-            'discountTotal' => round($discountTotal, 2),
-            'grandTotal' => round($grandTotal, 2)
+            'subTotal' => $subTotal,
+            'taxTotal' => $taxTotal,
+            'discountTotal' => $discountTotal,
+            'grandTotal' => $grandTotal
         ];
     }
 }

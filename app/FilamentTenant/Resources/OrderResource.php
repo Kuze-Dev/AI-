@@ -260,7 +260,7 @@ class OrderResource extends Resource
                                                 }
                                                 $updateData['cancelled_at'] = now(Auth::user()?->timezone);
 
-                                                if ($order->discount_code != null) {
+                                                if($order->discount_code != null) {
                                                     DiscountLimit::whereOrderId($order->id)->delete();
                                                     $discount = Discount::whereCode($order->discount_code)->first();
 
@@ -268,6 +268,7 @@ class OrderResource extends Resource
                                                         'max_uses' => $discount->max_uses + 1,
                                                     ]);
                                                 }
+
                                             }
 
                                             $result = $order->update($updateData);
@@ -281,10 +282,7 @@ class OrderResource extends Resource
                                             }
                                         }
                                     );
-                            })->disableLabel()->columnSpan(1)->alignRight()->size('sm')
-                            ->hidden(function (Order $record) {
-                                return $record->status == OrderStatuses::CANCELLED;
-                            }),
+                            })->disableLabel()->columnSpan(1)->alignRight()->size('sm'),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
@@ -321,7 +319,7 @@ class OrderResource extends Resource
                             ->action(function () use ($get, $set) {
                                 $order = Order::find($get('id'));
 
-                                $isPaid = !$order->is_paid;
+                                $isPaid = ! $order->is_paid;
 
                                 $result = $order->update([
                                     'is_paid' => $isPaid,
@@ -336,10 +334,7 @@ class OrderResource extends Resource
                                 }
                             })
                             ->requiresConfirmation();
-                    })->fullWidth()->size('md')
-                    ->hidden(function (Order $record) {
-                        return $record->status == OrderStatuses::CANCELLED;
-                    }),
+                    })->fullWidth()->size('md'),
                 Support\ButtonAction::make('proof_of_payment')
                     ->disableLabel()
                     ->execute(function (Closure $get, Closure $set) {
@@ -405,29 +400,20 @@ class OrderResource extends Resource
                 Forms\Components\Grid::make(2)
                     ->schema([
                         Support\TextLabel::make('')->label('Total Shipping Fee')->alignLeft()->size('md')->inline()->readOnly(),
-                        Support\TextLabel::make('shipping_total')->alignRight()->size('md')->inline()
-                            ->formatStateUsing(function (Order $record) {
-                                return number_format($record->shipping_total, 2, '.', '');
-                            }),
+                        Support\TextLabel::make('shipping_total')->alignRight()->size('md')->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
                         Support\TextLabel::make('')->label(function (Order $record) {
                             return "Tax Total ( $record->tax_percentage% )";
                         })->alignLeft()->size('md')->inline()->readOnly(),
-                        Support\TextLabel::make('tax_total')->alignRight()->size('md')->inline()
-                            ->formatStateUsing(function (Order $record) {
-                                return number_format($record->tax_total, 2, '.', '');
-                            }),
+                        Support\TextLabel::make('tax_total')->alignRight()->size('md')->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
                         Support\TextLabel::make('')->label('Total Discount')
                             ->alignLeft()->size('md')->inline()->readOnly(),
-                        Support\TextLabel::make('discount_total')->alignRight()->size('md')->inline()
-                            ->formatStateUsing(function (Order $record) {
-                                return number_format($record->discount_total, 2, '.', '');
-                            }),
+                        Support\TextLabel::make('discount_total')->alignRight()->size('md')->inline(),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
@@ -448,10 +434,7 @@ class OrderResource extends Resource
                 Forms\Components\Grid::make(2)
                     ->schema([
                         Support\TextLabel::make('')->label('Grand Total')->alignLeft()->size('md')->color('primary')->inline()->readOnly(),
-                        Support\TextLabel::make('total')->alignRight()->size('md')->color('primary')->inline()
-                            ->formatStateUsing(function (Order $record) {
-                                return number_format($record->total, 2, '.', '');
-                            }),
+                        Support\TextLabel::make('total')->alignRight()->size('md')->color('primary')->inline(),
                     ]),
             ])->columnSpan(1);
     }
