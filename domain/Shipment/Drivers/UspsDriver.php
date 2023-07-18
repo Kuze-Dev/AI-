@@ -7,9 +7,11 @@ namespace Domain\Shipment\Drivers;
 use Domain\Customer\Models\Customer;
 use Domain\Shipment\API\USPS\Clients\AddressClient;
 use Domain\Shipment\API\USPS\Clients\RateClient;
+use Domain\Shipment\API\USPS\Contracts\RateResponse;
 use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\API\USPS\DataTransferObjects\RateV4RequestData;
 use Domain\Shipment\API\USPS\Enums\ServiceType;
+use Domain\Shipment\DataTransferObjects\ParcelData;
 
 class UspsDriver
 {
@@ -21,11 +23,11 @@ class UspsDriver
     ) {
     }
 
-    public function getRate(array $parcelData, AddressValidateRequestData $addressValidateRequestData): float
-    {
-        $customer = Customer::with('verifiedAddress')
-            ->where('id', 1)
-            ->first();
+    public function getRate(
+        Customer $customer,
+        ParcelData $parcelData,
+        AddressValidateRequestData $addressValidateRequestData
+    ): RateResponse {
 
         if ($customer->verifiedAddress) {
 
@@ -61,17 +63,16 @@ class UspsDriver
         return $this->rateClient->getV4(
             new RateV4RequestData(
                 Service: ServiceType::PRIORITY,
-                ZipOrigination:'94107',
+                ZipOrigination: '94107', // TODO: add real data here
                 ZipDestination:$zipDestination,
-                Pounds: $parcelData['pounds'],
-                Ounces:$parcelData['ounces'],
+                Pounds: $parcelData->pounds,
+                Ounces:$parcelData->ounces,
             )
-        )
-            ->rate;
+        );
     }
 
-    public function getInternationalRate(): float
+    public function getInternationalRate(): RateResponse
     {
-        return $this->rateClient->getInternationalVersion2()->rate;
+        return $this->rateClient->getInternationalVersion2();
     }
 }

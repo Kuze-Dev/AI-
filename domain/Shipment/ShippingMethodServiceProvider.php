@@ -5,17 +5,11 @@ declare(strict_types=1);
 namespace Domain\Shipment;
 
 use App\Settings\ShippingSettings;
-use Domain\Shipment\API\USPS\Clients\AddressClient;
 use Domain\Shipment\API\USPS\Clients\Client;
-use Domain\Shipment\API\USPS\Clients\RateClient;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
-use Domain\Shipment\Drivers\StorePickup;
-use Domain\Shipment\Drivers\UspsDriver;
-use Domain\ShippingMethod\Enums\Driver;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
-use InvalidArgumentException;
 
 class ShippingMethodServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -46,18 +40,14 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
     {
         if (tenancy()->initialized) {
 
-            $shippingMethods = ShippingMethod::whereStatus(true)->get();
+            $shippingMethods = ShippingMethod::whereStatus(true);
 
-            if ($shippingMethods->isNotEmpty()) {
-                foreach ($shippingMethods as $shippingMethod) {
+            if ($shippingMethods->count() > 0) {
+                foreach ($shippingMethods->get() as $shippingMethod) {
                     app(ShippingManagerInterface::class)
                         ->extend(
-                            $shippingMethod->slug,
-                            fn () => match ($shippingMethod->driver) {
-                                Driver::STORE_PICKUP => new StorePickup(),
-                                Driver::USPS => new UspsDriver(app(RateClient::class), app(AddressClient::class)),
-                                default => throw new InvalidArgumentException(),
-                            }
+                            $shippingMethod->driver->value,
+                            fn () => $shippingMethod->driver->getShipping()
                         );
                 }
             }

@@ -6,10 +6,11 @@ namespace Domain\Shipment\Actions;
 
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
-use Domain\Shipment\DataTransferObjects\ParcelData;
+use Domain\Customer\Models\Customer;
+use Domain\Shipment\API\USPS\Contracts\RateResponse;
 use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
-use Domain\Shipment\DataTransferObjects\ShippingRateActionReturn;
+use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 
 class GetShippingRateAction
@@ -19,26 +20,24 @@ class GetShippingRateAction
     }
 
     public function execute(
+        Customer $customer,
         ParcelData $parcelData,
         ShippingMethod $shippingMethod,
         Address $address
-    ): ShippingRateActionReturn {
+    ): RateResponse {
+
+        /** @var \Domain\Shipment\Drivers\UspsDriver $shippingDriver */
         $shippingDriver = $this->shippingManager->driver($shippingMethod->driver->value);
 
         if ($this->isDomesticInUnitedStates($address)) {
-            return new ShippingRateActionReturn(
-                rate: $shippingDriver->getRate(
-                    $parcelData->toArray(),
-                    AddressValidateRequestData::formAddress($address)
-                ),
-                isUnitedStateDomestic: true
+            return $shippingDriver->getRate(
+                $customer,
+                $parcelData,
+                AddressValidateRequestData::formAddress($address)
             );
         }
 
-        return new ShippingRateActionReturn(
-            rate: $shippingDriver->getInternationalRate(),
-            isUnitedStateDomestic: false
-        );
+        return $shippingDriver->getInternationalRate();
     }
 
     protected function isDomesticInUnitedStates(Address $address): bool

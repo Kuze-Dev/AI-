@@ -42,6 +42,7 @@ class CustomerVerifiedAddress extends Model
         'verified_address' => 'array',
     ];
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Shipment\Models\CustomerVerifiedAddress>*/
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);

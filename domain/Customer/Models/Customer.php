@@ -27,6 +27,9 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 /**
  * Domain\Customer\Models\Customer
  *
+ *
+ * @property \Domain\Shipment\Models\CustomerVerifiedAddress $verifiedAddress
+ *
  * @property int $id
  * @property int $tier_id
  * @property string $cuid customer unique ID

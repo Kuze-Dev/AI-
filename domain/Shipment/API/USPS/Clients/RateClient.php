@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\API\USPS\Clients;
 
-use Domain\Shipment\API\USPS\DataTransferObjects\RateInternationalV2ResponseData;
+use Domain\Shipment\API\USPS\DataTransferObjects\InternationalResponse\IntlRateV2ResponseData;
 use Domain\Shipment\API\USPS\DataTransferObjects\RateV4RequestData;
 use Domain\Shipment\API\USPS\DataTransferObjects\RateV4ResponseData;
 use Illuminate\Support\Facades\Log;
@@ -61,7 +61,7 @@ class RateClient
         }
     }
 
-    public function getInternationalVersion2(): RateInternationalV2ResponseData
+    public function getInternationalVersion2(): IntlRateV2ResponseData
     {
 
         $array = [
@@ -97,12 +97,10 @@ class RateClient
             ])
             ->get(self::URI)
             ->body();
-
         $array = XmlToArray::convert($body);
 
         self::throwError($array);
-        ray($array);
-        // TODO: get international rate
-        return new RateInternationalV2ResponseData(rate: 123.45);
+
+        return IntlRateV2ResponseData::fromArray($array);
     }
 }

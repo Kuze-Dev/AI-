@@ -4,10 +4,17 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\API\USPS\DataTransferObjects;
 
-class RateV4ResponseData
+use Domain\Shipment\API\USPS\Contracts\RateResponse;
+
+class RateV4ResponseData implements RateResponse
 {
     public function __construct(
         public readonly float $rate
     ) {
+    }
+
+    public function getRateResponseAPI(): array
+    {
+        return get_object_vars($this);
     }
 }
