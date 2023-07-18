@@ -51,10 +51,6 @@ class ReviewStoreRequest extends FormRequest
                     }
                 },
             ],
-            'title' => [
-                'required',
-
-            ],
             'rating' => [
                 'required',
                 'integer',
