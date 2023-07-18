@@ -16,7 +16,6 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 
 /**
  * Domain\Order\Models\Order
@@ -93,7 +92,6 @@ use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-#[OnDeleteCascade(['orderLines', 'shippingAddress', 'billingAddress'])]
 class Order extends Model implements HasMedia, PayableInterface
 {
     use LogsActivity;

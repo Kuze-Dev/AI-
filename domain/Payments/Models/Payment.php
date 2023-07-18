@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Payments\Models;
 
+use Domain\PaymentMethod\Models\PaymentMethod;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 // use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -86,6 +87,11 @@ class Payment extends Model implements HasMedia
     protected $casts = [
         'payment_details' => 'array',
     ];
+
+    public function paymentMethod()
+    {
+        return $this->belongsTo(PaymentMethod::class);
+    }
 
     /** @return MorphTo<Model, self> */
     public function payable(): MorphTo

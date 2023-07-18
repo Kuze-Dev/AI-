@@ -104,8 +104,35 @@ class OrderResource extends Resource
                             ->schema([
                                 Forms\Components\Grid::make(2)
                                     ->schema([
-                                        Forms\Components\Placeholder::make('card_image')->label('')
-                                            ->content(fn (Order $record): ?string => 'Test Image here'),
+                                        Forms\Components\Grid::make(2)
+                                            ->schema([
+                                                Forms\Components\FileUpload::make('payment_image')
+                                                    ->formatStateUsing(function (Order $record) {
+                                                        return $record->payments[0]->paymentMethod?->getMedia('logo')
+                                                            ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                                                            ->toArray() ?? [];
+                                                    })
+                                                    ->disableLabel()
+                                                    ->image()
+                                                    ->imagePreviewHeight('120')
+                                                    ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                                                        $mediaClass = config('media-library.media_model', Media::class);
+
+                                                        /** @var ?Media $media */
+                                                        $media = $mediaClass::findByUuid($file);
+
+                                                        if ($component->getVisibility() === 'private') {
+                                                            try {
+                                                                return $media?->getTemporaryUrl(now()->addMinutes(5));
+                                                            } catch (Throwable $exception) {
+                                                                // This driver does not support creating temporary URLs.
+                                                            }
+                                                        }
+
+                                                        return $media?->getUrl();
+                                                    }),
+                                            ])->columnSpan(1),
+
                                         Forms\Components\Placeholder::make('card_info')->label('Card Info')
                                             ->content(fn (Order $record): ?string => '*************Test'),
                                     ]),
@@ -128,7 +155,10 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('tax_total')->label('Tax Total')->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('total')->sortable(),
                 Tables\Columns\TextColumn::make('shipping_method')->label('Shipping Method')->toggleable(isToggledHiddenByDefault: true),
-                // Tables\Columns\TextColumn::make('payment_method')->label('Payment Method')->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('payment_method')->label('Payment Method')
+                    ->toggleable(isToggledHiddenByDefault: true)->formatStateUsing(function (Order $record) {
+                        return $record->payments[0]->paymentMethod->title;
+                    }),
                 Tables\Columns\IconColumn::make('is_paid')->label('isPaid')
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -389,7 +419,10 @@ class OrderResource extends Resource
                             ])
                             ->slideOver()
                             ->icon('heroicon-s-eye');
-                    })->fullWidth()->size('md'),
+                    })->fullWidth()->size('md')
+                    ->hidden(function (Order $record) {
+                        return $record->payments[0]->gateway != "bank-transfer";
+                    }),
                 Support\Divider::make(''),
                 Forms\Components\Grid::make(2)
                     ->schema([
