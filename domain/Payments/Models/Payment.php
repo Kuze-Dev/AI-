@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\Payments\Models;
 
+use Domain\PaymentMethod\Models\PaymentMethod;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-// use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Eloquent;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Domain\Payments\Models\Payment
@@ -57,7 +58,6 @@ use Eloquent;
 class Payment extends Model implements HasMedia
 {
     use InteractsWithMedia;
-    // use HasUuids;
 
     /**
      * Declare columns
@@ -86,6 +86,12 @@ class Payment extends Model implements HasMedia
     protected $casts = [
         'payment_details' => 'array',
     ];
+
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\PaymentMethod\Models\PaymentMethod, self> */
+    public function paymentMethod(): BelongsTo
+    {
+        return $this->belongsTo(PaymentMethod::class);
+    }
 
     /** @return MorphTo<Model, self> */
     public function payable(): MorphTo
