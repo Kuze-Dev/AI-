@@ -11,14 +11,11 @@ use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentCapture;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentRefund;
 use Domain\Payments\Events\PaymentProcessEvent;
 use Domain\Payments\Models\Payment as ModelsPayment;
-use Domain\Payments\Providers\Concerns\HandlesRedirection as ConcernsHandlesRedirection;
 use Throwable;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
 class PaypalProvider extends Provider
 {
-    // use ConcernsHandlesRedirection;
-
     protected string $name = 'paypal';
 
     private PayPalClient $payPalclient;
@@ -126,18 +123,19 @@ class PaypalProvider extends Provider
     {
         return match ($data['status']) {
             'success' => $this->processTransaction($paymentModel, $data),
-            'cancel' => $this->cancelTransaction($paymentModel, $data),
+            'cancel' => $this->cancelTransaction($paymentModel),
             default => throw new InvalidArgument(),
         };
     }
 
     protected function processTransaction(ModelsPayment $paymentModel, array $data): PaymentCapture
     {
-        $this->payPalclient->capturePaymentOrder($data['token']);
+        /** @var array */
+        $captured = $this->payPalclient->capturePaymentOrder($data['token']);
 
         $paymentModel->update([
             'status' => 'paid',
-            // 'payment_id' => $data['paymentId'],
+            'payment_id' => $captured['purchase_units']['0']['payments']['captures']['0']['id'],
         ]);
 
         event(new PaymentProcessEvent($paymentModel));
@@ -145,11 +143,10 @@ class PaypalProvider extends Provider
         return new PaymentCapture(success: true);
     }
 
-    protected function cancelTransaction(ModelsPayment $paymentModel, array $data): PaymentCapture
+    protected function cancelTransaction(ModelsPayment $paymentModel): PaymentCapture
     {
         $paymentModel->update([
             'status' => 'cancel',
-            // 'payment_id' => $data['paymentId'],
         ]);
 
         event(new PaymentProcessEvent($paymentModel));

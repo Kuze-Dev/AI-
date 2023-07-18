@@ -15,6 +15,7 @@ class SetAddressAsDefaultShippingAction
         ]);
 
         Address::whereKeyNot($address)
+            ->whereBelongsTo($address->customer)
             ->update([
                 'is_default_shipping' => false,
             ]);

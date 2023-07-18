@@ -24,7 +24,7 @@ return new class () extends Migration {
             $table->decimal('weight')->nullable();
             $table->unsignedInteger('stock');
             $table->mediumText('description')->nullable();
-            $table->string('status')->default(true);
+            $table->boolean('status')->default(true);
             $table->boolean('is_digital_product')->default(false);
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_special_offer')->default(false);

@@ -40,11 +40,16 @@ class CustomerFactory extends Factory
 
     public function configure(): self
     {
-        return parent::configure()->has(
-            AddressFactory::new()
-                ->defaultShipping()
-                ->defaultBilling()
-        );
+        return $this
+            ->afterCreating(function (Customer $customer) {
+                if ($customer->addresses->isEmpty()) {
+                    AddressFactory::new()
+                        ->for($customer)
+                        ->defaultShipping()
+                        ->defaultBilling()
+                        ->createOne();
+                }
+            });
     }
 
     public function deleted(): self
