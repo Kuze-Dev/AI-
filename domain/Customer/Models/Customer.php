@@ -27,9 +27,6 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 /**
  * Domain\Customer\Models\Customer
  *
- *
- * @property \Domain\Shipment\Models\CustomerVerifiedAddress $verifiedAddress
- *
  * @property int $id
  * @property int $tier_id
  * @property string $cuid customer unique ID
@@ -57,6 +54,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property-read Tier $tier
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
+ * @property-read CustomerVerifiedAddress $verifiedAddress
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer onlyTrashed()
