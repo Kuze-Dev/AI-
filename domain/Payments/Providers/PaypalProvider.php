@@ -136,7 +136,7 @@ class PaypalProvider extends Provider
 
         $paymentModel->update([
             'status' => 'paid',
-            'payment_id' => $captured['purchase_units']['0']['payments']['captures']['0']['id'],
+            'transaction_id' => $captured['purchase_units']['0']['payments']['captures']['0']['id'],
         ]);
 
         event(new PaymentProcessEvent($paymentModel));
