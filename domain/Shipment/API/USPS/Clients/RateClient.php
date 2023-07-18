@@ -101,7 +101,8 @@ class RateClient
         $array = XmlToArray::convert($body);
 
         self::throwError($array);
-
+        ray($array);
+        // TODO: get international rate
         return new RateInternationalV2ResponseData(rate: 123.45);
     }
 }

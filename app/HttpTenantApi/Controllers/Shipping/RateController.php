@@ -17,6 +17,8 @@ class RateController
     #[Get('/shipping/{driver}/rate/{address}')]
     public function __invoke(string $driver, Address $address): mixed
     {
+        // TODO gate policy
+
         // TODO: validate $driver
         $rateReturn = app(GetShippingRateAction::class)
             ->execute(
