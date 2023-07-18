@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Domain\PaymentMethod\Actions;
 
+use Support\Common\Actions\SyncMediaCollectionAction;
 use Domain\PaymentMethod\DataTransferObjects\PaymentMethodData;
+use Support\Common\DataTransferObjects\MediaCollectionData;
 use Domain\PaymentMethod\Models\PaymentMethod;
 
 class UpdatePaymentMethodAction
 {
-    /**
-     * Execute operations for updating
-     * collection and save collection query.
-     */
+    public function __construct(
+        protected SyncMediaCollectionAction $syncMediaCollectionAction
+    ) {
+    }
+
     public function execute(PaymentMethod $paymentMethod, PaymentMethodData $paymentMethodData): PaymentMethod
     {
         $paymentMethod->update([
@@ -23,6 +26,19 @@ class UpdatePaymentMethodAction
             'instruction' => $paymentMethodData->instruction,
             'status' => $paymentMethodData->status,
         ]);
+
+        $this->syncMediaCollectionAction->execute(
+            $paymentMethod,
+            MediaCollectionData::fromArray([
+                'collection' => 'logo',
+                'media' => $paymentMethodData->logo
+                    ? [
+                        'media' => $paymentMethodData->logo,
+                        'custom_properties' => ['alt_text' => $paymentMethod->title],
+                    ]
+                    : [],
+            ])
+        );
 
         return $paymentMethod;
     }
