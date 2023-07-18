@@ -7,7 +7,6 @@ namespace Domain\Payments\Models;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-// use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Eloquent;
