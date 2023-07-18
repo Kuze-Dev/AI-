@@ -46,7 +46,7 @@ class Cart extends Model
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Cart\Models\CartLine> */
     public function cartLines()
     {
-        return $this->hasMany(CartLine::class);
+        return $this->hasMany(CartLine::class)->whereNull('checked_out_at');
     }
 
     public function customer()

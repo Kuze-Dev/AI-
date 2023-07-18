@@ -51,8 +51,9 @@ class CreateOrderAction
             'notes' => $preparedOrderData->notes,
             'shipping_method' => 'test shipping_method',
             'shipping_details' => 'test shipping details',
-            'payment_method' => 'COD',
-            'payment_details' => 'test payment details',
+
+            'payment_method' => $preparedOrderData->paymentMethod,
+            'payment_details' => null,
             'is_paid' => false,
         ]);
 

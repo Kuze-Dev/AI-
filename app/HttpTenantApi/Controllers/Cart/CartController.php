@@ -33,9 +33,6 @@ class CartController extends Controller
                 },
                 'cartLines.media',
             ])
-                ->whereHas('cartLines', function (Builder $query) {
-                    $query->whereNull('checked_out_at');
-                })
                 ->whereBelongsTo(auth()->user())
         )->allowedIncludes(['cartLines', 'cartLines.purchasable'])
             ->first();
@@ -57,7 +54,7 @@ class CartController extends Controller
         $result = app(DestroyCartAction::class)
             ->execute($cart);
 
-        if ( ! $result) {
+        if (!$result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);
