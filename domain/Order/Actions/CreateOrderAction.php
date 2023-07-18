@@ -52,8 +52,6 @@ class CreateOrderAction
             'shipping_method' => 'test shipping_method',
             'shipping_details' => 'test shipping details',
 
-            'payment_method' => "test payment method",
-            'payment_details' => null,
             'is_paid' => false,
         ]);
 

@@ -128,7 +128,7 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('tax_total')->label('Tax Total')->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('total')->sortable(),
                 Tables\Columns\TextColumn::make('shipping_method')->label('Shipping Method')->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('payment_method')->label('Payment Method')->toggleable(isToggledHiddenByDefault: true),
+                // Tables\Columns\TextColumn::make('payment_method')->label('Payment Method')->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('is_paid')->label('isPaid')
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -379,12 +379,12 @@ class OrderResource extends Resource
                                         return $media?->getUrl();
                                     })->disabled(),
 
-                                Forms\Components\Select::make('payment_status')
-                                    ->label('')
-                                    ->options([
-                                        'Approved' => 'Approved',
-                                        'Declined' => 'Declined',
-                                    ]),
+                                // Forms\Components\Select::make('payment_status')
+                                //     ->label('')
+                                //     ->options([
+                                //         'Approved' => 'Approved',
+                                //         'Declined' => 'Declined',
+                                //     ]),
                                 Forms\Components\Textarea::make('Message'),
                             ])
                             ->slideOver()
