@@ -17,7 +17,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Facades\Auth;
 use Closure;
 
@@ -41,20 +40,16 @@ class GlobalsResource extends Resource
             Forms\Components\Card::make([
                 Forms\Components\TextInput::make('name')
                     ->unique(ignoreRecord: true)
-                    ->required(),
-                Forms\Components\Select::make('blueprint_id')
-                    ->options(
-                        fn () => Blueprint::orderBy('name')
-                            ->pluck('name', 'id')
-                            ->toArray()
-                    )
                     ->required()
-                    ->exists(Blueprint::class, 'id')
-                    ->searchable()
-                    ->reactive()
+                    ->string()
+                    ->maxLength(255),
+                Forms\Components\Select::make('blueprint_id')
+                    ->label(trans('Blueprint'))
+                    ->required()
                     ->preload()
-                    ->disabled(fn (?Globals $record) => $record !== null),
-
+                    ->optionsFromModel(Blueprint::class, 'name')
+                    ->disabled(fn (?Globals $record) => $record !== null)
+                    ->reactive(),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
                     ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
@@ -68,23 +63,11 @@ class GlobalsResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->sortable()
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('blueprint.name')
-                    ->sortable()
-                    ->searchable()
-                    ->url(fn (Globals $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
+                    ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable()
-                    ->toggleable()
-                    ->toggledHiddenByDefault(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('blueprint')
@@ -92,7 +75,7 @@ class GlobalsResource extends Resource
                     ->searchable()
                     ->optionsLimit(20),
             ])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([

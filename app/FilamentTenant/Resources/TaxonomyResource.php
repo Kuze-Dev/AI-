@@ -14,12 +14,14 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Domain\Blueprint\Models\Blueprint;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Domain\Taxonomy\Actions\DeleteTaxonomyAction;
+use Illuminate\Support\Facades\Auth;
 
 class TaxonomyResource extends Resource
 {
@@ -66,17 +68,14 @@ class TaxonomyResource extends Resource
                 Forms\Components\Card::make()->schema([
                     Forms\Components\TextInput::make('name')
                         ->required()
+                        ->string()
+                        ->maxLength(255)
                         ->unique(ignoreRecord: true),
                     Forms\Components\Select::make('blueprint_id')
+                        ->label(trans('Blueprint'))
                         ->required()
-                        ->options(
-                            fn () => Blueprint::orderBy('name')
-                                ->pluck('name', 'id')
-                                ->toArray()
-                        )
-                        ->exists(Blueprint::class, 'id')
-                        ->searchable()
                         ->preload()
+                        ->optionsFromModel(Blueprint::class, 'name')
                         ->disabled(fn (?Taxonomy $record) => $record !== null),
                 ]),
                 Forms\Components\Section::make(trans('Terms'))->schema([
@@ -106,21 +105,30 @@ class TaxonomyResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('slug')
+                Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->truncate('max-w-xs 2xl:max-w-xl', true),
                 Tables\Columns\BadgeColumn::make('taxonomy_terms_count')
                     ->counts('taxonomyTerms')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->sortable(),
             ])
             ->filters([])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Taxonomy $record) {
+                            try {
+                                return app(DeleteTaxonomyAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
                 ]),
             ])
             ->bulkActions([

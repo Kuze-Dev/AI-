@@ -14,9 +14,10 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
+use Domain\Content\Actions\DeleteContentAction;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -69,6 +70,8 @@ class ContentResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
+                        ->string()
+                        ->maxLength(255)
                         ->lazy()
                         ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
                             if ($get('prefix') === Str::slug($state) || blank($get('prefix'))) {
@@ -77,30 +80,22 @@ class ContentResource extends Resource
                         })
                         ->required(),
                     Forms\Components\Select::make('blueprint_id')
+                        ->label(trans('Blueprint'))
                         ->required()
-                        ->options(
-                            fn () => Blueprint::orderBy('name')
-                                ->pluck('name', 'id')
-                                ->toArray()
-                        )
-                        ->exists(Blueprint::class, 'id')
-                        ->searchable()
                         ->preload()
+                        ->optionsFromModel(Blueprint::class, 'name')
                         ->disabled(fn (?Content $record) => $record !== null),
                     Forms\Components\TextInput::make('prefix')
                         ->required()
                         ->string()
+                        ->maxLength(255)
                         ->alphaDash()
                         ->unique(ignoreRecord: true)
                         ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                     Forms\Components\Select::make('taxonomies')
                         ->multiple()
-                        ->options(
-                            fn () => Taxonomy::orderBy('name')
-                                ->pluck('name', 'id')
-                                ->toArray()
-                        )
-                        ->searchable()
+                        ->preload()
+                        ->optionsFromModel(Taxonomy::class, 'name')
                         ->afterStateHydrated(function (Forms\Components\Select $component, ?Content $record) {
                             $component->state($record ? $record->taxonomies->pluck('id')->toArray() : []);
                         }),
@@ -153,23 +148,11 @@ class ContentResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->sortable()
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('blueprint.name')
-                    ->sortable()
-                    ->searchable()
-                    ->url(fn (Content $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
+                    ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable()
-                    ->toggleable()
-                    ->toggledHiddenByDefault(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('blueprint')
@@ -177,7 +160,7 @@ class ContentResource extends Resource
                     ->searchable()
                     ->optionsLimit(20),
             ])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
@@ -185,7 +168,14 @@ class ContentResource extends Resource
                         ->icon('heroicon-s-eye')
                         ->color('secondary')
                         ->url(fn (Content $record) => ContentEntryResource::getUrl('index', [$record])),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Content $record) {
+                            try {
+                                return app(DeleteContentAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
                 ]),
             ])
             ->bulkActions([

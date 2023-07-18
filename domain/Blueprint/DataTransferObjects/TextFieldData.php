@@ -19,7 +19,8 @@ class TextFieldData extends FieldData
         public readonly ?int $max_length = null,
         public readonly ?int $min = null,
         public readonly ?int $max = null,
-        public readonly ?float $step = null
+        public readonly ?float $step = null,
+        public readonly ?string $helper_text = null,
     ) {
     }
 
@@ -38,7 +39,8 @@ class TextFieldData extends FieldData
             max_length: $data['max_length'] ?? null,
             min: $data['min'] ?? null,
             max: $data['max'] ?? null,
-            step: $data['step'] ?? null
+            step: $data['step'] ?? null,
+            helper_text: $data['helper_text'] ?? null,
         );
     }
 }

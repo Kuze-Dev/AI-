@@ -6,9 +6,9 @@ namespace Domain\Taxonomy\Models;
 
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Content\Models\Content;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -28,14 +28,14 @@ use Spatie\Sluggable\SlugOptions;
  * @property string $slug
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Blueprint $blueprint
- * @property-read \Illuminate\Database\Eloquent\Collection|Content[] $contents
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Content> $contents
  * @property-read int|null $contents_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Taxonomy\Models\TaxonomyTerm[] $parentTerms
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Taxonomy\Models\TaxonomyTerm> $parentTerms
  * @property-read int|null $parent_terms_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Taxonomy\Models\TaxonomyTerm[] $taxonomyTerms
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Taxonomy\Models\TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy newQuery()
@@ -78,11 +78,11 @@ class Taxonomy extends Model
         return $this->belongsTo(Blueprint::class);
     }
 
-     /** @return HasMany<TaxonomyTerm> */
-     public function parentTerms(): HasMany
-     {
-         return $this->taxonomyTerms()->whereNull('parent_id')->ordered();
-     }
+    /** @return HasMany<TaxonomyTerm> */
+    public function parentTerms(): HasMany
+    {
+        return $this->taxonomyTerms()->whereNull('parent_id')->ordered();
+    }
 
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Taxonomy\Models\TaxonomyTerm> */
     public function taxonomyTerms(): HasMany

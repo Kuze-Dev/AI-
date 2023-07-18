@@ -21,16 +21,17 @@ class TaxonomyTermResource extends JsonApiResource
         return  [
             'name' => $this->name,
             'data' => $this->transformSchemaPayload($this->data),
+            'order' => $this->order,
         ];
     }
 
-       /** @return array<string, callable> */
-       public function toRelationships(Request $request): array
-       {
-           return [
-               'children' => fn () => TaxonomyTermResource::collection($this->children),
-           ];
-       }
+    /** @return array<string, callable> */
+    public function toRelationships(Request $request): array
+    {
+        return [
+            'children' => fn () => TaxonomyTermResource::collection($this->children),
+        ];
+    }
 
     protected function getSchemaData(): SchemaData
     {

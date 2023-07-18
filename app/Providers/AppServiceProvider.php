@@ -17,16 +17,19 @@ use Domain\Form\Models\FormSubmission;
 use Domain\Globals\Models\Globals;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
-use Domain\Support\Captcha\CaptchaManager;
-use Domain\Support\MetaData\Models\MetaData;
+use Support\Captcha\CaptchaManager;
+use Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Internationalization\Models\Locale;
+use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Pennant\Feature;
 use Stancl\Tenancy\Database\Models\Tenant;
 use TiMacDonald\JsonApi\JsonApiResource;
 
@@ -45,6 +48,8 @@ class AppServiceProvider extends ServiceProvider
             if ($model instanceof Tenant && Str::startsWith($key, Tenant::internalPrefix())) {
                 return null;
             }
+
+            throw new MissingAttributeException($model, $key);
         });
 
         Relation::enforceMorphMap([
@@ -69,7 +74,7 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Password::defaults(
-            fn () => $this->app->environment('local', 'testing')
+            $this->app->environment('local', 'testing')
                 ? Password::min(4)
                 : Password::min(8)
                     ->mixedCase()
@@ -79,6 +84,13 @@ class AppServiceProvider extends ServiceProvider
                         $this->app->isProduction(),
                         fn (Password $password) => $password->uncompromised()
                     )
+        );
+
+        Rule::macro(
+            'email',
+            fn (): string => app()->environment('local', 'testing')
+                ? 'email'
+                : 'email:rfc,dns'
         );
 
         JsonApiResource::resolveIdUsing(fn (Model $resource): string => (string) $resource->getRouteKey());
@@ -94,5 +106,8 @@ class AppServiceProvider extends ServiceProvider
                 ? app(FormSettings::class)->getCredentials()
                 : config('catpcha.credentials')
         );
+
+        Feature::discover('App\\Features\\CMS', app_path('Features/CMS'));
+        Feature::discover('App\\Features\\ECommerce', app_path('Features/ECommerce'));
     }
 }

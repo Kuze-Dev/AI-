@@ -1,6 +1,54 @@
 # Release Notes
 
-## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.1)
+## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.4)
+
+## [0.2.4](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/0.2.4%0Dv0.2.3)
+
+### Added
+
+- Evaluatable parameters for `Select::optionsFromModel()` macro.
+- Added `wrap()` on table `TextColumns`.
+- Added ellipsis for long titles and breadcrumbs.
+- Added `Rule::email()` macro.
+- Added export and import actions.
+
+### Changed
+
+- Updated `sortable()` and `searchable()` implementation on Filament Table columns.
+
+## [v0.2.3](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.2.3%0Dv0.2.2)
+
+## Added
+
+- Add ability to update account of current logged-in admin.
+- Improved `LogsFormActivity` extensibility.
+- Add `Select::optionsFromModel()` macro.
+
+## Changed
+
+- `LogsFormActivity` will only log if the form was modified.
+- `PermissionSeeder` will now update or create permissions then delete everything else that wasn't defined in the `permissionsByGuard()` method.
+
+## [v0.2.2](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.2.2%0Dv0.2.1)
+
+## Added
+
+- Add general Properties `KeyValue` field for `ActivityResource` form.
+- Add Event column for `ActivityResource` table.
+- Add `Action::withActivityLog()` macro.
+- Added `assertActivityLogged()` testing helper.
+
+## Changed
+- Upgrade `spatie/laravel-settings` to `v3.1.0`.
+- Update `phpunit.xml` to match with `phpunit/phpunit` v10 specifications.
+
+### Fixed
+
+- Fix the description for activity logs on `CreateRecord` pages.
+- Should fail gracefully when trying to resolve a subject's url in `ActivityResource` table.
+- Remove bulk actions for `ActivityResource` table.
+- `AdminResource` email field must be unique.
+- Should not be able to impersonate a deleted `Admin`.
 
 ## [v0.2.1](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.2.1%0Dv0.2.0)
 

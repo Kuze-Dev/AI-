@@ -15,16 +15,17 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
 use Mockery\MockInterface;
+use Pest\Mock\Mock;
 use Tests\Fixtures\User;
 
 it('can check if two factor is required', function () {
     Event::fake();
-    $user = mock(new User())
+    $user = (new Mock(new User()))
         ->expect(
             hasEnabledTwoFactorAuthentication: fn () => true,
             getKey: fn () => 1,
         );
-    $userProvider = mock(EloquentUserProvider::class)
+    $userProvider = (new Mock(EloquentUserProvider::class))
         ->expect(
             retrieveByCredentials: fn () => $user,
             validateCredentials: fn () => true,
@@ -44,9 +45,9 @@ it('can check if two factor is required', function () {
 
 it('proceeds through pipeline when two factor is disabled for user', function () {
     Event::fake();
-    $user = mock(new User())
+    $user = (new Mock(new User()))
         ->expect(hasEnabledTwoFactorAuthentication: fn () => false);
-    $userProvider = mock(EloquentUserProvider::class)
+    $userProvider = (new Mock(EloquentUserProvider::class))
         ->expect(
             retrieveByCredentials: fn () => $user,
             validateCredentials: fn () => true,
@@ -66,9 +67,9 @@ it('proceeds through pipeline when two factor is disabled for user', function ()
 
 it('proceeds through pipeline when user is on safe device', function () {
     Event::fake();
-    $user = mock(new User())
+    $user = (new Mock(new User()))
         ->expect(hasEnabledTwoFactorAuthentication: fn () => true);
-    $userProvider = mock(EloquentUserProvider::class)
+    $userProvider = (new Mock(EloquentUserProvider::class))
         ->expect(
             retrieveByCredentials: fn () => $user,
             validateCredentials: fn () => true,
@@ -92,7 +93,7 @@ it('proceeds through pipeline when user is on safe device', function () {
 
 it('throws exception on invalid credentials', function () {
     Event::fake();
-    $userProvider = mock(EloquentUserProvider::class)
+    $userProvider = (new Mock(EloquentUserProvider::class))
         ->expect(
             retrieveByCredentials: fn () => new User(),
             validateCredentials: fn () => false,

@@ -1,0 +1,8 @@
+<?php
+
+namespace Stancl\Tenancy;
+
+/** @property \Domain\Tenant\Models\Tenant|null $tenant  */
+class Tenancy
+{
+}

@@ -4,23 +4,33 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Page;
 
+use App\Features\CMS\CMSBase;
 use App\HttpTenantApi\Resources\PageResource;
 use Carbon\Carbon;
 use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Page\Models\Page;
+use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\URL;
+use Spatie\RouteAttributes\Attributes\Middleware;
 
-#[ApiResource('pages', only: ['index', 'show'])]
+#[
+    ApiResource('pages', only: ['index', 'show']),
+    Middleware('feature.tenant:'. CMSBase::class)
+]
 class PageController
 {
     public function index(): JsonApiResourceCollection
     {
         return PageResource::collection(
-            QueryBuilder::for(Page::with('activeRouteUrl'))
+            QueryBuilder::for(
+                Page::with('activeRouteUrl')
+                    ->whereNotNull('published_at')
+            )
                 ->allowedFilters([
                     'name',
                     'slug',
@@ -54,16 +64,21 @@ class PageController
         );
     }
 
-    public function show(string $page): PageResource
+    public function show(Request $request, string $page): PageResource
     {
-        return PageResource::make(
-            QueryBuilder::for(Page::whereSlug($page))
-                ->allowedIncludes([
-                    'blockContents.block',
-                    'routeUrls',
-                    'metaData',
-                ])
-                ->firstOrFail()
-        );
+        /** @var Page $page */
+        $page = QueryBuilder::for(Page::whereSlug($page))
+            ->allowedIncludes([
+                'blockContents.block',
+                'routeUrls',
+                'metaData',
+            ])
+            ->firstOrFail();
+
+        $ignoreQuery = array_diff(array_keys($request->query->all()), ['signature', 'expires']);
+
+        abort_if($page->isPublished() && ! URL::hasValidSignature($request, false, $ignoreQuery), 412);
+
+        return PageResource::make($page);
     }
 }

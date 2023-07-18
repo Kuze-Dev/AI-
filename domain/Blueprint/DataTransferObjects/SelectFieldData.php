@@ -22,6 +22,7 @@ class SelectFieldData extends FieldData
         public readonly bool $multiple = false,
         public readonly ?int $min = null,
         public readonly ?int $max = null,
+        public readonly ?string $helper_text = null,
     ) {
     }
 
@@ -46,6 +47,7 @@ class SelectFieldData extends FieldData
             multiple: $data['multiple'] ?? false,
             min: $data['min'] ?? null,
             max: $data['max'] ?? null,
+            helper_text: $data['helper_text'] ?? null,
         );
     }
 }

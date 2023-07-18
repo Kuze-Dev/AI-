@@ -2,61 +2,69 @@
 
 declare(strict_types=1);
 
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Blueprint\Enums\FieldType;
 use Domain\Form\Database\Factories\FormFactory;
 
 use Domain\Form\Models\FormSubmission;
-use Domain\Support\Captcha\CaptchaProvider;
-use Domain\Support\Captcha\Facades\Captcha;
+use Support\Captcha\CaptchaProvider;
+use Support\Captcha\Facades\Captcha;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 
-use function Pest\Laravel\assertDatabaseCount;
-use function Pest\Laravel\assertDatabaseEmpty;
+use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\postJson;
 
 beforeEach(fn () => testInTenantContext());
 
 it('can submit form', function () {
     $form = FormFactory::new()
-        ->withDummyBlueprint()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Name', 'type' => FieldType::TEXT, 'rules' => ['required']])
+        )
         ->storeSubmission()
         ->createOne();
 
-    assertDatabaseEmpty(FormSubmission::class);
-
-    postJson(
-        'api/forms/' . $form->getRouteKey() . '/submissions',
-        [fake()->word() => fake()->sentence(3)]
-    )
+    postJson("api/forms/{$form->getRouteKey()}/submissions", ['main' => ['name' => 'foo']])
         ->assertCreated()
         ->assertValid();
 
-    assertDatabaseCount(FormSubmission::class, 1);
+    assertDatabaseHas(
+        FormSubmission::class,
+        ['data' => json_encode(['main' => ['name' => 'foo']])]
+    );
 });
 
 it('can submit form with captcha', function () {
     $form = FormFactory::new()
-        ->withDummyBlueprint()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Name', 'type' => FieldType::TEXT, 'rules' => ['required']])
+        )
         ->storeSubmission()
         ->usesCaptcha()
         ->createOne();
 
     resolve(SettingsMigrator::class)->update('form.provider', fn () => CaptchaProvider::GOOGLE_RECAPTCHA);
 
-    assertDatabaseEmpty(FormSubmission::class);
-
     Captcha::shouldReceive('verify')
         ->once()
         ->andReturn(true);
 
     postJson(
-        'api/forms/' . $form->getRouteKey() . '/submissions',
+        "api/forms/{$form->getRouteKey()}/submissions",
         [
-            fake()->word() => fake()->sentence(3),
+            'main' => ['name' => 'foo'],
             'captcha_token' => 'some-token',
         ]
     )
         ->assertCreated()
         ->assertValid();
 
-    assertDatabaseCount(FormSubmission::class, 1);
+    assertDatabaseHas(
+        FormSubmission::class,
+        ['data' => json_encode(['main' => ['name' => 'foo']])]
+    );
 });

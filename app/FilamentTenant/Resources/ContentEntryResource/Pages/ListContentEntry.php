@@ -35,6 +35,7 @@ class ListContentEntry extends ListRecords
         return [
             Actions\EditAction::make()
                 ->label(trans('Edit Content'))
+                ->visible(ContentResource::canEdit($this->ownerRecord))
                 ->url(ContentResource::getUrl('edit', [$this->ownerRecord])),
             Actions\CreateAction::make()
                 ->label(trans('Create entry'))

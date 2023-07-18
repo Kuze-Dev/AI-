@@ -6,8 +6,8 @@ namespace App\FilamentTenant\Pages\Settings;
 
 use App\Settings\FormSettings as SettingsFormSettings;
 use Closure;
-use Domain\Support\Captcha\CaptchaProvider;
 use Filament\Forms;
+use Support\Captcha\CaptchaProvider;
 
 class FormSettings extends TenantBaseSettings
 {
@@ -22,13 +22,19 @@ class FormSettings extends TenantBaseSettings
         return [
             Forms\Components\Section::make(trans('Captcha'))
                 ->schema([
+                    Forms\Components\TextInput::make('sender_email')
+                        ->required(),
                     Forms\Components\Select::make('provider')
                         ->options([
                             CaptchaProvider::GOOGLE_RECAPTCHA->value => 'Google reCAPTCHA',
                             CaptchaProvider::CLOUDFLARE_TURNSTILE->value => 'Cloudflare Turnstile',
                         ])
                         ->enum(CaptchaProvider::class)
-                        ->dehydrateStateUsing(fn (?string $state) => CaptchaProvider::tryFrom($state ?? ''))
+                        ->dehydrateStateUsing(
+                            fn (CaptchaProvider|string|null $state) => is_string($state)
+                                ? CaptchaProvider::tryFrom($state)
+                                : $state
+                        )
                         ->lazy(),
                     Forms\Components\TextInput::make('site_key')
                         ->required()

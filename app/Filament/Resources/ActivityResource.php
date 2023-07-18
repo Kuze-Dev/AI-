@@ -13,8 +13,9 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Routing\Exceptions\UrlGenerationException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\ActivitylogServiceProvider;
@@ -60,10 +61,19 @@ class ActivityResource extends Resource
                 Forms\Components\TextInput::make('subject_id')
                     ->translateLabel(),
                 Forms\Components\KeyValue::make('properties.old')
+                    ->visible(fn ($state) => filled($state))
                     ->translateLabel(),
                 Forms\Components\KeyValue::make('properties.attributes')
+                    ->visible(fn ($state) => filled($state))
                     ->label('New')
                     ->translateLabel(),
+                Forms\Components\KeyValue::make('data')
+                    ->formatStateUsing(
+                        fn (Activity $record) => Arr::except($record->properties?->toArray() ?? [], ['old', 'attributes'])
+                    )
+                    ->visible(fn ($state) => filled($state))
+                    ->label(trans('Properties'))
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -76,7 +86,11 @@ class ActivityResource extends Resource
                     ->label('Log')
                     ->translateLabel()
                     ->formatStateUsing(fn (string $state) => Str::headline($state)),
+                Tables\Columns\BadgeColumn::make('event')
+                    ->toggleable()
+                    ->toggledHiddenByDefault(),
                 Tables\Columns\TextColumn::make('description')
+                    ->wrap()
                     ->translateLabel()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('subject.name')
@@ -87,6 +101,7 @@ class ActivityResource extends Resource
                                 return;
                             }
 
+                            /** @var \Filament\Resources\Resource|null $resource */
                             $resource = self::findResourceForModel($record->subject::class);
 
                             return $resource
@@ -100,24 +115,28 @@ class ActivityResource extends Resource
                                 return;
                             }
 
+                            /** @var \Filament\Resources\Resource|null $resource */
                             $resource = self::findResourceForModel($record->subject::class);
 
                             if ( ! $resource) {
                                 return;
                             }
 
-                            if ($resource::hasPage('view')) {
-                                return $resource::getUrl('view', ['record' => $record->subject]);
-                            }
-
-                            if ($resource::hasPage('edit')) {
-                                return $resource::getUrl('edit', ['record' => $record->subject]);
+                            try {
+                                if ($resource::hasPage('view') && $resource::canView($record)) {
+                                    return $resource::getUrl('view', ['record' => $record->subject]);
+                                }
+                                if ($resource::hasPage('edit') && $resource::canEdit($record)) {
+                                    return $resource::getUrl('edit', ['record' => $record->subject]);
+                                }
+                            } catch (UrlGenerationException) {
                             }
                         },
                         shouldOpenInNewTab: true
                     ),
                 Tables\Columns\TextColumn::make('causer.full_name')
-                    ->translateLabel(),
+                    ->translateLabel()
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->translateLabel()
                     ->dateTime(timezone: Auth::user()?->timezone)
@@ -129,11 +148,11 @@ class ActivityResource extends Resource
                     ->options(self::getModel()::distinct()->pluck('log_name')->mapWithKeys(fn ($value) => [$value => Str::headline($value)]))
                     ->default('admin'),
             ])
-            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->translateLabel(),
             ])
+            ->bulkActions([])
             ->defaultSort('created_at', 'desc');
     }
 

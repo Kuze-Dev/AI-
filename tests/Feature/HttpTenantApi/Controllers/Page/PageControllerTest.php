@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
+use Support\RouteUrl\Database\Factories\RouteUrlFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\URL;
 
 use function Pest\Laravel\getJson;
 
@@ -15,6 +18,7 @@ beforeEach(function () {
 it('can list pages', function () {
     PageFactory::new()
         ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->published()
         ->count(10)
         ->create();
 
@@ -22,7 +26,7 @@ it('can list pages', function () {
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json
-                ->count('data', 10)
+                ->count('data', 11)
                 ->where('data.0.type', 'pages')
                 ->whereType('data.0.attributes.name', 'string')
                 ->etc();
@@ -32,6 +36,7 @@ it('can list pages', function () {
 it('can filter pages', function ($attribute) {
     $pages = PageFactory::new()
         ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->published()
         ->count(2)
         ->sequence(
             ['name' => 'Foo', 'visibility' => 'authenticated'],
@@ -57,6 +62,8 @@ it('can filter pages', function ($attribute) {
 it('can show a page with includes', function (string $include) {
     $page = PageFactory::new()
         ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->has(RouteUrlFactory::new())
+        ->published()
         ->createOne();
 
     $page->metaData()->create([
@@ -85,3 +92,27 @@ it('can show a page with includes', function (string $include) {
     'routeUrls',
     'metaData',
 ]);
+
+it('cant show an unpublished page', function () {
+    $page = PageFactory::new()
+        ->createOne();
+
+    getJson("api/pages/{$page->getRouteKey()}")
+        ->assertStatus(412);
+});
+
+it('can show an unpublished page with valid signature', function () {
+    $page = PageFactory::new()
+        ->createOne();
+
+    $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$page->getRouteKey()], false), '?');
+
+    getJson("api/pages/{$page->getRouteKey()}?{$queryString}")
+        ->assertStatus(200)
+        ->assertJson(function (AssertableJson $json) use ($page) {
+            $json
+                ->where('data.type', 'pages')
+                ->where('data.id', Str::slug($page->name))
+                ->etc();
+        });
+});

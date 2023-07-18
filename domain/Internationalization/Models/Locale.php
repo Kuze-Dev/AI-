@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Internationalization\Models;
 
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Globals\Models\Globals
@@ -30,7 +29,7 @@ use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
  * @method static \Illuminate\Database\Eloquent\Builder|Locale whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class Locale extends Model implements IsActivitySubject
+class Locale extends Model
 {
     use LogsActivity;
     use ConstraintsRelationships;

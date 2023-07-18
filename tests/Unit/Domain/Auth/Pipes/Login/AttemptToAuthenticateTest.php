@@ -10,6 +10,7 @@ use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Mockery\MockInterface;
+use Pest\Mock\Mock;
 
 it('can login a user', function () {
     mockAuthAttempt(true);
@@ -53,7 +54,7 @@ it('hits throttle with invalid credentials', function () {
 
 function mockAuthAttempt(bool $return): void
 {
-    $guard = mock(StatefulGuard::class)
+    $guard = (new Mock(StatefulGuard::class))
         ->expect(attempt: fn () => $return);
 
     Auth::shouldReceive('guard')

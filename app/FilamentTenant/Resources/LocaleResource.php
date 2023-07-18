@@ -11,6 +11,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Table;
 use Filament\Resources\Resource;
 use Filament\Tables\Filters\Layout;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Domain\Internationalization\Models\Locale;
@@ -32,9 +33,14 @@ class LocaleResource extends Resource
 
     protected static ?int $navigationSort = 9;
 
+    /**
+     * @throws FileNotFoundException
+     */
     public static function form(Form $form): Form
     {
-        $locales = collect(json_decode(File::get(public_path('locales.json')), true));
+        /** @var array<string, array> $locales_json */
+        $locales_json = json_decode(File::get(public_path('locales.json')), true);
+        $locales = collect($locales_json);
 
         $options = $locales->map(function ($locale) {
             $display = "{$locale['locale']} ({$locale['code']})";

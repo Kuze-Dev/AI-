@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Role\Models;
 
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -19,11 +19,11 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string $guard_name
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Permission\Models\Permission[] $permissions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
  * @property-read int|null $permissions_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Admin\Models\Admin[] $users
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Admin\Models\Admin> $users
  * @property-read int|null $users_count
  * @method static \Illuminate\Database\Eloquent\Builder|Role newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Role newQuery()

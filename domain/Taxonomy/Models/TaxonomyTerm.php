@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Domain\Taxonomy\Models;
 
 use Domain\Content\Models\ContentEntry;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -29,9 +29,9 @@ use Illuminate\Database\Eloquent\Builder;
  * @property int $order
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|TaxonomyTerm[] $children
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $children
  * @property-read int|null $children_count
- * @property-read \Illuminate\Database\Eloquent\Collection|ContentEntry[] $contentEntries
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ContentEntry> $contentEntries
  * @property-read int|null $content_entries_count
  * @property-read \Domain\Taxonomy\Models\Taxonomy $taxonomy
  * @method static Builder|TaxonomyTerm newModelQuery()

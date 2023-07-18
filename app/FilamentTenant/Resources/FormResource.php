@@ -17,7 +17,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 use Filament\Resources\RelationManagers\RelationGroup;
@@ -43,19 +42,16 @@ class FormResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
-                        ->required(),
-                    Forms\Components\Select::make('blueprint_id')
-                        ->options(
-                            fn () => Blueprint::orderBy('name')
-                                ->pluck('name', 'id')
-                                ->toArray()
-                        )
-                        ->disabled(fn (?FormModel $record) => $record !== null)
                         ->required()
-                        ->exists(Blueprint::class, 'id')
-                        ->searchable()
-                        ->reactive()
-                        ->preload(),
+                        ->string()
+                        ->maxLength(255),
+                    Forms\Components\Select::make('blueprint_id')
+                        ->label(trans('Blueprint'))
+                        ->required()
+                        ->preload()
+                        ->optionsFromModel(Blueprint::class, 'name')
+                        ->disabled(fn (?FormModel $record) => $record !== null)
+                        ->reactive(),
                     Forms\Components\Toggle::make('store_submission'),
                     Forms\Components\Toggle::make('uses_captcha')
                         ->disabled(fn (FormSettings $formSettings) => ! $formSettings->provider)
@@ -120,7 +116,7 @@ class FormResource extends Resource
                                             : ($state ?? [])),
                                 ])
                                 ->columns(3),
-                            Forms\Components\TextInput::make('sender')
+                            Forms\Components\TextInput::make('sender_name')
                                 ->required(),
                             Forms\Components\TextInput::make('reply_to')
                                 ->helperText('Seperated by comma')
@@ -177,15 +173,8 @@ class FormResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->sortable()
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('blueprint.name')
-                    ->sortable()
-                    ->searchable()
-                    ->url(fn (FormModel $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
+                    ->truncate('max-w-xs 2xl:max-w-xl', true),
                 Tables\Columns\BadgeColumn::make('form_submissions_count')
                     ->counts('formSubmissions')
                     ->formatStateUsing(fn (FormModel $record, ?int $state) => $record->store_submission ? $state : 'N/A')
@@ -194,14 +183,9 @@ class FormResource extends Resource
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable()
-                    ->toggleable()
-                    ->toggledHiddenByDefault(),
             ])
             ->filters([])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([

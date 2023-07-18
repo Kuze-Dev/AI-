@@ -14,7 +14,6 @@ use Filament\Resources\Table;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use App\FilamentTenant\Resources;
-use Filament\Tables\Filters\Layout;
 use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -102,7 +101,9 @@ class ContentEntryResource extends Resource
                                     ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
                                     ?->dispatchEvent('route_url::update');
                             })
-                            ->required(),
+                            ->required()
+                            ->string()
+                            ->maxLength(255),
                         RouteUrlFieldset::make()
                             ->generateModelForRouteUrlUsing(function ($livewire, ContentEntry|string $model) {
                                 return $model instanceof ContentEntry
@@ -166,19 +167,16 @@ class ContentEntryResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('activeRouteUrl.url')
                     ->label('URL')
                     ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->sortable()
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->searchable(),
+                    ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('locale')
-                ->searchable()
-                ->hidden(Locale::count() === 1),
+                    ->searchable()
+                    ->hidden(Locale::count() === 1),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable(['first_name', 'last_name'])
                     ->searchable(query: function (Builder $query, string $search): Builder {
@@ -198,11 +196,6 @@ class ContentEntryResource extends Resource
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable()
-                    ->toggleable()
-                    ->toggledHiddenByDefault(),
             ])
             ->filters([
                 Tables\Filters\Filter::make('taxonomies')
@@ -260,7 +253,7 @@ class ContentEntryResource extends Resource
                     ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
             ])
             ->reorderable('order')
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->url(fn ($livewire, ContentEntry $record) => self::getUrl('edit', [$livewire->ownerRecord, $record])),

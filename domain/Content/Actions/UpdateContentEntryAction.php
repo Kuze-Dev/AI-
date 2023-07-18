@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Domain\Content\Actions;
 
-use Domain\Content\Models\ContentEntry;
-use Domain\Internationalization\Models\Locale;
 use Domain\Content\DataTransferObjects\ContentEntryData;
-use Domain\Support\MetaData\Actions\CreateMetaDataAction;
-use Domain\Support\MetaData\Actions\UpdateMetaDataAction;
-use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
+use Domain\Content\Models\ContentEntry;
+use Support\MetaData\Actions\CreateMetaDataAction;
+use Support\MetaData\Actions\UpdateMetaDataAction;
+use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
+use Domain\Internationalization\Models\Locale;
 
 class UpdateContentEntryAction
 {

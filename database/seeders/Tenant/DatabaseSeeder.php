@@ -17,8 +17,8 @@ class DatabaseSeeder extends Seeder
             Auth\PermissionSeeder::class,
             Auth\RoleSeeder::class,
             Auth\AdminSeeder::class,
-            BlockSeeder::class,
             LocaleSeeder::class,
+            Page\PageSeeder::class,
         ]);
     }
 }

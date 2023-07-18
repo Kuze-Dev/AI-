@@ -11,6 +11,7 @@ class TenantData
         public readonly string $name,
         public readonly ?DatabaseData $database = null,
         public readonly array $domains = [],
+        public readonly array $features = [],
     ) {
     }
 
@@ -33,7 +34,18 @@ class TenantData
                     domain: $data['domain'],
                 ),
                 $data['domains']
-            )
+            ),
+            features: $data['features'] ?? []
+        );
+    }
+
+    public function getNormalizedFeatureNames(): array
+    {
+        return array_map(
+            fn (string $feature) => class_exists($feature) && (method_exists($feature, 'resolve') || method_exists($feature, '__invoke'))
+                ? app($feature)->name ?? $feature
+                : $feature,
+            $this->features,
         );
     }
 }

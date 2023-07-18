@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Tenant\Models;
 
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Laravel\Pennant\Concerns\HasFeatures;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -23,12 +24,12 @@ use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property array|null $data
- * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection|Domain[] $domains
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Domain> $domains
  * @property-read int|null $domains_count
- * @method static \Stancl\Tenancy\Database\TenantCollection|static[] all($columns = ['*'])
- * @method static \Stancl\Tenancy\Database\TenantCollection|static[] get($columns = ['*'])
+ * @method static \Stancl\Tenancy\Database\TenantCollection<int, static> all($columns = ['*'])
+ * @method static \Stancl\Tenancy\Database\TenantCollection<int, static> get($columns = ['*'])
  * @method static \Illuminate\Database\Eloquent\Builder|Tenant newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Tenant newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Tenant query()
@@ -46,6 +47,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     use HasDomains;
     use LogsActivity;
     use ConstraintsRelationships;
+    use HasFeatures;
 
     public function getActivitylogOptions(): LogOptions
     {
