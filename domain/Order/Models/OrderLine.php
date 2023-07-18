@@ -24,8 +24,12 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property float $unit_price
  * @property int $quantity
  * @property float $tax_total
+ * @property float $tax_percentage
+ * @property PriceDisplay $tax_display
  * @property float $sub_total
  * @property float $discount_total
+ * @property int|null $discount_id
+ * @property string|null $discount_code
  * @property float $total
  * @property array|null $remarks_data
  * @property array|null $purchasable_data
@@ -40,6 +44,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine query()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereDiscountCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereDiscountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereDiscountTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereName($value)
@@ -51,6 +57,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereQuantity($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereRemarksData($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereSubTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereTaxDisplay($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereTaxPercentage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereTaxTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereUnitPrice($value)

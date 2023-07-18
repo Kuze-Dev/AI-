@@ -32,17 +32,17 @@ use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
  * @property float $currency_exchange_rate
  * @property string $reference
  * @property float $tax_total
+ * @property float $tax_percentage
+ * @property PriceDisplay $tax_display
  * @property float $sub_total
  * @property float $discount_total
+ * @property int|null $discount_id
+ * @property string|null $discount_code
  * @property float $shipping_total
  * @property float $total
  * @property string|null $notes
  * @property string $shipping_method
  * @property string $shipping_details
- * @property string $payment_method
- * @property string $payment_details
- * @property string|null $payment_status
- * @property string|null $payment_message
  * @property bool $is_paid
  * @property OrderStatuses $status
  * @property string|null $cancelled_reason
@@ -57,6 +57,8 @@ use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
  * @property-read int|null $media_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Order\Models\OrderLine> $orderLines
  * @property-read int|null $order_lines_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Payments\Models\Payment> $payments
+ * @property-read int|null $payments_count
  * @property-read \Domain\Order\Models\OrderAddress|null $shippingAddress
  * @method static \Illuminate\Database\Eloquent\Builder|Order newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Order newQuery()
@@ -72,20 +74,20 @@ use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereCustomerId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereCustomerLastName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereCustomerMobile($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereDiscountCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereDiscountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereDiscountTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereIsPaid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereNotes($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order wherePaymentDetails($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order wherePaymentMessage($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order wherePaymentMethod($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order wherePaymentStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereReference($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereShippingDetails($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereShippingMethod($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereShippingTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereSubTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereTaxDisplay($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereTaxPercentage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereTaxTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereUpdatedAt($value)

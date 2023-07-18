@@ -28,6 +28,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property DiscountConditionType $type
  * @property-read \Domain\Discount\Models\DiscountCondition|null $discountCondition
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Discount\Models\DiscountLimit> $discountLimits
+ * @property-read int|null $discount_limits_count
  * @property-read \Domain\Discount\Models\DiscountRequirement|null $discountRequirement
  * @method static \Illuminate\Database\Eloquent\Builder|Discount newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Discount newQuery()

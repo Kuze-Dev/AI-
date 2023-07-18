@@ -21,6 +21,9 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property int|null $times_used
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read Model|\Eloquent $customer
+ * @property-read \Domain\Discount\Models\Discount|null $discount
+ * @property-read Model|\Eloquent $order
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountLimit newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountLimit newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountLimit query()
