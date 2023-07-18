@@ -170,6 +170,17 @@ class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, 
         return $this->hasMany(Favorite::class);
     }
 
+    public function isFavorite()
+    {
+        if ( ! auth()->check()) {
+            return false;
+        }
+
+        $customer = auth()->user();
+
+        return $this->favorites()->where('customer_id', $customer->id)->exists();
+    }
+
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
