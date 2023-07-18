@@ -7,6 +7,7 @@ namespace App\HttpTenantApi\Controllers\Product;
 use App\Features\ECommerce\ECommerceBase;
 use App\HttpTenantApi\Resources\ProductResource;
 use Domain\Product\Models\Product;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -22,28 +23,36 @@ class ProductController
     {
         return ProductResource::collection(
             QueryBuilder::for(Product::query())
+                ->allowedFilters([
+                    'name',
+                    'slug',
+                    'is_digital_product',
+                    'is_special_offer',
+                    'is_featured',
+                    'status'
+                ])
                 ->allowedIncludes([
                     'productOptions',
                     'productVariants',
                     'taxonomyTerms',
                     'media',
                 ])
-                ->allowedFilters(['name', 'slug', 'is_digital_product', 'is_special_offer', 'is_featured', 'status'])
                 ->jsonPaginate()
         );
     }
 
     public function show(string $product): ProductResource
     {
-        return ProductResource::make(
-            QueryBuilder::for(Product::whereSlug($product))
-                ->allowedIncludes([
-                    'productOptions',
-                    'productVariants',
-                    'taxonomyTerms',
-                    'media',
-                ])
-                ->firstOrFail()
-        );
+        /** @var Product $product */
+        $product = QueryBuilder::for(Product::whereSlug($product))
+            ->allowedIncludes([
+                'productOptions',
+                'productVariants',
+                'taxonomyTerms',
+                'media',
+            ])
+            ->firstOrFail();
+
+        return ProductResource::make($product);
     }
 }
