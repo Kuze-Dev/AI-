@@ -28,7 +28,7 @@ class CreateProductAction
 
         $this->createMetaTags->execute($product, $productData->meta_data);
 
-        if ($product->images) {
+        if ($productData->images) {
             foreach ($productData->images as $image) {
                 if ($image instanceof UploadedFile && $imageString = $image->get()) {
                     $product
