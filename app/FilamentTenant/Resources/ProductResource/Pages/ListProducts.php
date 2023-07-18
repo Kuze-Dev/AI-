@@ -14,11 +14,7 @@ use Filament\Resources\Pages\ListRecords;
 use Support\Excel\Actions\ExportAction;
 use Support\Excel\Actions\ImportAction;
 use Illuminate\Database\Eloquent\Builder;
-
-use Exception;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
-use Spatie\ValidationRules\Rules\Delimited;
+use Support\MetaData\DataTransferObjects\MetaDataData;
 
 class ListProducts extends ListRecords
 {
@@ -54,6 +50,7 @@ class ListProducts extends ListRecords
                         if ($product = Product::whereName($data['name'])->first()) {
                             $product = app(UpdateProductAction::class)->execute($product, new ProductData(...$data));
                         } else {
+                            $data['meta_data'] = new MetaDataData($data['name']);
                             $product = app(CreateProductAction::class)->execute(new ProductData(...$data));
                         }
 

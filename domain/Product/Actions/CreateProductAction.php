@@ -28,17 +28,19 @@ class CreateProductAction
 
         $this->createMetaTags->execute($product, $productData->meta_data);
 
-        foreach ($productData->images as $image) {
-            if ($image instanceof UploadedFile && $imageString = $image->get()) {
-                $product
-                    ->addMediaFromString($imageString)
-                    ->usingFileName($image->getClientOriginalName())
-                    ->usingName(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME))
-                    ->toMediaCollection('image');
+        if ($product->images) {
+            foreach ($productData->images as $image) {
+                if ($image instanceof UploadedFile && $imageString = $image->get()) {
+                    $product
+                        ->addMediaFromString($imageString)
+                        ->usingFileName($image->getClientOriginalName())
+                        ->usingName(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME))
+                        ->toMediaCollection('image');
+                }
             }
         }
 
-        if (count($productData->product_options)) {
+        if ($productData->product_options) {
             foreach ($productData->product_options[0] as $productOption) {
                 $productOptionModel = ProductOption::findOrNew($productOption['id']);
                 $productOptionModel->name = $productOption['name'];
@@ -53,7 +55,7 @@ class CreateProductAction
             }
         }
 
-        if (count($productData->product_variants)) {
+        if ($productData->product_variants) {
             foreach ($productData->product_variants as $productVariant) {
                 $productVariantModel = ProductVariant::findOrNew($productVariant['id']);
 
@@ -72,8 +74,10 @@ class CreateProductAction
             $product->clearMediaCollection('image');
         }
 
-        $product->taxonomyTerms()
-            ->attach($productData->taxonomy_terms);
+        if ($productData->taxonomy_terms) {
+            $product->taxonomyTerms()
+                ->attach($productData->taxonomy_terms);
+        }
 
         return $product;
     }
