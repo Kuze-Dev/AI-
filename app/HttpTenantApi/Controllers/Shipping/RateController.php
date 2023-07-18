@@ -5,29 +5,30 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Shipping;
 
 use App\Features\ECommerce\ECommerceBase;
+use App\Http\Controllers\Controller;
 use Domain\Address\Models\Address;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\Actions\GetShippingRateAction;
+use Domain\ShippingMethod\Models\ShippingMethod;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Get;
 
 #[Middleware(['feature.tenant:'. ECommerceBase::class, 'auth:sanctum'])]
-class RateController
+class RateController extends Controller
 {
-    #[Get('/shipping/{driver}/rate/{address}')]
-    public function __invoke(string $driver, Address $address): mixed
+    #[Get('shipping-methods/{shippingMethod}/rate/{address}')]
+    public function __invoke(ShippingMethod $shippingMethod, Address $address): mixed
     {
-        // TODO gate policy
+        $this->authorize('view', $address);
 
-        // TODO: validate $driver
         $rateReturn = app(GetShippingRateAction::class)
             ->execute(
                 parcelData: new ParcelData(
                     pounds: '10',
                     ounces: '0'
                 ),
-                address: $address,
-                driver: $driver
+                shippingMethod: $shippingMethod,
+                address: $address
             );
 
         return response([

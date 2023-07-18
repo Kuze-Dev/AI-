@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Resources\ShippingmethodResource\Pages;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Domain\ShippingMethod\Enums\Driver;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -13,6 +14,7 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
 
@@ -70,14 +72,12 @@ class ShippingmethodResource extends Resource
                         ->reactive(),
                     Forms\Components\Select::make('driver')
                         ->required()
-                        ->options(function () {
-
-                            return [
-                                'usps' => 'USPS',
-                                'store-pickup' => 'Store Pickup',
-                            ];
-
-                        })
+                        ->options(
+                            collect(Driver::cases())
+                                ->mapWithKeys(fn (Driver $target) => [$target->value => Str::of($target->value)->headline()->upper()])
+                                ->toArray()
+                        )
+                        ->enum(Driver::class)
                         ->reactive(),
                     Forms\Components\KeyValue::make('ship_from_address')
                         ->label('Ship From Address')

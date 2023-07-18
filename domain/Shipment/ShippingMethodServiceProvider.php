@@ -11,6 +11,7 @@ use Domain\Shipment\API\USPS\Clients\RateClient;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\Drivers\StorePickup;
 use Domain\Shipment\Drivers\UspsDriver;
+use Domain\ShippingMethod\Enums\Driver;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
@@ -53,8 +54,8 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
                         ->extend(
                             $shippingMethod->slug,
                             fn () => match ($shippingMethod->driver) {
-                                'store-pickup' => new StorePickup(),
-                                'usps' => new UspsDriver(app(RateClient::class), app(AddressClient::class)),
+                                Driver::STORE_PICKUP => new StorePickup(),
+                                Driver::USPS => new UspsDriver(app(RateClient::class), app(AddressClient::class)),
                                 default => throw new InvalidArgumentException(),
                             }
                         );

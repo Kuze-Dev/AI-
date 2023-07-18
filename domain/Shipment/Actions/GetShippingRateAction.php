@@ -10,6 +10,7 @@ use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\DataTransferObjects\ShippingRateActionReturn;
+use Domain\ShippingMethod\Models\ShippingMethod;
 
 class GetShippingRateAction
 {
@@ -17,9 +18,9 @@ class GetShippingRateAction
     {
     }
 
-    public function execute(ParcelData $parcelData, Address $address, string $driver): ShippingRateActionReturn
+    public function execute(ParcelData $parcelData, ShippingMethod $shippingMethod, Address $address): ShippingRateActionReturn
     {
-        $shipping = $this->shippingManager->driver($driver);
+        $shipping = $this->shippingManager->driver($shippingMethod->driver->value);
 
         if ($this->isDomesticInUnitedStates($address)) {
             return new ShippingRateActionReturn(

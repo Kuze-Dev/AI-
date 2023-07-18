@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\ShippingMethod\Models;
 
 use Domain\Shipment\Models\Shipment;
+use Domain\ShippingMethod\Enums\Driver;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -34,12 +35,12 @@ class ShippingMethod extends Model implements HasMedia
         'driver',
         'ship_from_address',
         'status',
-
     ];
 
     protected $casts = [
         'ship_from_address' => 'array',
         'status' => 'bool',
+        'driver' => Driver::class,
     ];
 
     /** @return LogOptions */
