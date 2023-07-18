@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Order\Models;
 
+use Domain\Review\Models\Review;
 use Domain\Taxation\Enums\PriceDisplay;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
@@ -108,6 +109,18 @@ class OrderLine extends Model implements HasMedia
         return $this->belongsTo(Order::class);
     }
 
+    public function review()
+    {
+        return $this->hasOne(Review::class);
+    }
+
+    public function reviewDetails()
+    {
+        $reviews = $this->review()->get();
+
+        return $reviews;
+    }
+    
     public function registerMediaCollections(): void
     {
         $registerMediaConversions = function (Media $media) {

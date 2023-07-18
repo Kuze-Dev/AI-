@@ -37,9 +37,9 @@ class ReviewController
             foreach ($validatedData['media'] as $imageUrl) {
                 try {
                     $review->addMediaFromUrl($imageUrl)
-                        ->toMediaCollection('media');
+                        ->toMediaCollection('review_product_media');
                 } catch (Exception $e) {
-                    dd($e);
+                    // dd($e);
                 }
             }
         }
