@@ -12,6 +12,7 @@ use Domain\Product\Models\ProductVariant;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
 
 class CreateProductAction
 {
@@ -28,45 +29,25 @@ class CreateProductAction
 
         $this->createMetaTags->execute($product, $productData->meta_data);
 
+
         if ($productData->images) {
-            foreach ($productData->images as $image) {
-                if ($image instanceof UploadedFile && $imageString = $image->get()) {
+            if (gettype($productData->images) === "string") {
+                $response = Http::get($productData->images);
+                if ($response->successful()) {
                     $product
-                        ->addMediaFromString($imageString)
-                        ->usingFileName($image->getClientOriginalName())
-                        ->usingName(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME))
+                        ->addMediaFromUrl($productData->images)
                         ->toMediaCollection('image');
                 }
-            }
-        }
-
-        if ($productData->product_options) {
-            foreach ($productData->product_options[0] as $productOption) {
-                $productOptionModel = ProductOption::findOrNew($productOption['id']);
-                $productOptionModel->name = $productOption['name'];
-                $productOptionModel->save();
-
-                foreach ($productOption['productOptionValues'] as $productOptionValue) {
-                    $optionValueModel = ProductOptionValue::findOrNew($productOptionValue['id']);
-                    $optionValueModel->name = $productOptionValue['name'];
-                    $optionValueModel->product_option_id = $productOptionValue['product_option_id'];
-                    $optionValueModel->save();
+            } else {
+                foreach ($productData->images as $image) {
+                    if ($image instanceof UploadedFile && $imageString = $image->get()) {
+                        $product
+                            ->addMediaFromString($imageString)
+                            ->usingFileName($image->getClientOriginalName())
+                            ->usingName(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME))
+                            ->toMediaCollection('image');
+                    }
                 }
-            }
-        }
-
-        if ($productData->product_variants) {
-            foreach ($productData->product_variants as $productVariant) {
-                $productVariantModel = ProductVariant::findOrNew($productVariant['id']);
-
-                $productVariantModel->product_id = $product['id'];
-                $productVariantModel->sku = $productVariant['sku'];
-                $productVariantModel->combination = $productVariant['combination'];
-                $productVariantModel->retail_price = $productVariant['retail_price'];
-                $productVariantModel->selling_price = $productVariant['selling_price'];
-                $productVariantModel->stock = $productVariant['stock'];
-                $productVariantModel->status = $productVariant['status'];
-                $productVariantModel->save();
             }
         }
 

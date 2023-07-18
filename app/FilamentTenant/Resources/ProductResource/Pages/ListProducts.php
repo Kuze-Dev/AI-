@@ -9,12 +9,16 @@ use Domain\Product\Actions\CreateProductAction;
 use Domain\Product\Actions\UpdateProductAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
+use Domain\Taxation\Models\TaxZone;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Support\Excel\Actions\ExportAction;
 use Support\Excel\Actions\ImportAction;
 use Illuminate\Database\Eloquent\Builder;
 use Support\MetaData\DataTransferObjects\MetaDataData;
+use Illuminate\Validation\Rule;
 
 class ListProducts extends ListRecords
 {
@@ -28,31 +32,56 @@ class ListProducts extends ListRecords
                 ->processRowsUsing(
                     function (array $row): Product {
                         $data = [
+                            'images' => $row['image_link'],
                             'name' => $row['name'],
+                            'categories' => $row['category'],
+                            'brand' => $row['brand'],
                             'sku' => $row['sku'],
-                            'description' => $row['description'],
+                            'stock' => $row['stock'],
                             'retail_price' => $row['retail_price'],
                             'selling_price' => $row['selling_price'],
-                            'stock' => $row['stock'],
-                            'status' => $row['status'],
-                            'is_digital_product' => $row['is_digital_product'],
-                            'is_featured' => $row['is_featured'],
-                            'is_special_offer' => $row['is_special_offer'],
-                            'allow_customer_remarks' => $row['allow_customer_remarks'],
+                            // 'status' => $row['status'],
+                            // 'is_digital_product' => $row['is_digital_product'],
+                            // 'is_featured' => $row['is_featured'],
+                            // 'is_special_offer' => $row['is_special_offer'],
+                            // 'allow_customer_remarks' => $row['allow_customer_remarks'],
                             'weight' => $row['weight'],
                             'length' => $row['length'],
                             'width' => $row['width'],
                             'height' => $row['height'],
-                            'minimum_order_quantity' => $row['minimum_order_quantity'],
+                            // 'minimum_order_quantity' => $row['minimum_order_quantity'],
                         ];
-                        unset($row);
 
-                        if ($product = Product::whereName($data['name'])->first()) {
-                            $product = app(UpdateProductAction::class)->execute($product, new ProductData(...$data));
-                        } else {
-                            $data['meta_data'] = new MetaDataData($data['name']);
-                            $product = app(CreateProductAction::class)->execute(new ProductData(...$data));
+                        // Taxonomies (Category & Product)
+                        $taxoTermIds = [];
+                        foreach (['categories' => $data['categories'], 'brand' => $data['brand']] as $key => $taxonomyTerm) {
+                            $taxonomy = Taxonomy::with('taxonomyTerms')
+                                ->whereSlug($key)
+                                ->whereHas('taxonomyTerms', function (Builder $query) use ($taxonomyTerm) {
+                                    $query->where('name', $taxonomyTerm);
+                                })->first();
+
+                            if (!$taxonomy) {
+                                $foundTaxo = Taxonomy::where('slug', $key)->first();
+                                // dd($key, $foundTaxo);
+                                if ($foundTaxo) {
+                                    $model = TaxonomyTerm::create(['taxonomy_id' => $foundTaxo->id, 'data' => [
+                                        'main' => [
+                                            'heading' => $taxonomyTerm,
+                                        ],
+                                    ], 'name' => $taxonomyTerm]);
+
+                                    array_push($taxoTermIds, $model->id);
+                                }
+                            }
                         }
+                        $data['taxonomy_terms'] = $taxoTermIds;
+
+                        unset($row);
+                        unset($data['categories']);
+                        unset($data['brand']);
+                        $data['meta_data'] = new MetaDataData($data['name']);
+                        $product = app(CreateProductAction::class)->execute(new ProductData(...$data));
 
                         return $product;
                     }

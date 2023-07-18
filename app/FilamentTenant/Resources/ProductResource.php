@@ -50,7 +50,7 @@ class ProductResource extends Resource
                             ->label('Product Name')
                             ->unique(ignoreRecord: true)
                             ->required(),
-                        Forms\Components\RichEditor::make('description')->required(),
+                        Forms\Components\RichEditor::make('description'),
                         Forms\Components\FileUpload::make('images')
                             ->label('Media')
                             ->mediaLibraryCollection('image')
