@@ -18,7 +18,7 @@ class IntlRateV2ResponseData implements RateResponse
         $data = $data['IntlRateV2Response']['Package'];
 
         $services = [];
-        foreach ($data['Service'] as $k => $service) {
+        foreach ($data['Service'] as $service) {
             $extraServices = [];
 
             foreach ($service['ExtraServices'] as $extraService) {
