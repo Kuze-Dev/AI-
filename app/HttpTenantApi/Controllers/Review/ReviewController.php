@@ -21,7 +21,6 @@ class ReviewController
     {
 
         $validatedData = $request->validated();
-        $review->title = $validatedData['title'];
         $review->rating = $validatedData['rating'];
         $review->comment = $validatedData['comment'];
         $review->product_id = $validatedData['product_id'];
