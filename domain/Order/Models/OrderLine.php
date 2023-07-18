@@ -116,7 +116,7 @@ class OrderLine extends Model implements HasMedia
 
     public function reviewDetails()
     {
-        $reviews = $this->review()->get();
+        $reviews = $this->review()->firstOrFail();
 
         return $reviews;
     }
