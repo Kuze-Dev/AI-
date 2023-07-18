@@ -18,13 +18,16 @@ class GetShippingRateAction
     {
     }
 
-    public function execute(ParcelData $parcelData, ShippingMethod $shippingMethod, Address $address): ShippingRateActionReturn
-    {
-        $shipping = $this->shippingManager->driver($shippingMethod->driver->value);
+    public function execute(
+        ParcelData $parcelData,
+        ShippingMethod $shippingMethod,
+        Address $address
+    ): ShippingRateActionReturn {
+        $shippingDriver = $this->shippingManager->driver($shippingMethod->driver->value);
 
         if ($this->isDomesticInUnitedStates($address)) {
             return new ShippingRateActionReturn(
-                rate: $shipping->getRate(
+                rate: $shippingDriver->getRate(
                     $parcelData->toArray(),
                     AddressValidateRequestData::formAddress($address)
                 ),
@@ -33,7 +36,7 @@ class GetShippingRateAction
         }
 
         return new ShippingRateActionReturn(
-            rate: $shipping->getInternationalRate(),
+            rate: $shippingDriver->getInternationalRate(),
             isUnitedStateDomestic: false
         );
     }

@@ -6,7 +6,7 @@ namespace Domain\Shipment\Drivers;
 
 class StorePickup
 {
-    protected string $name = 'store-pickup';
+    //    protected string $name = 'store-pickup';
 
     public function getRate(): float
     {
