@@ -7,6 +7,8 @@ namespace Domain\Order\Models;
 use Domain\Customer\Models\Customer;
 use Domain\Order\Enums\OrderAddressTypes;
 use Domain\Order\Enums\OrderStatuses;
+use Domain\Payments\Interfaces\PayableInterface;
+use Domain\Payments\Models\Traits\HasPayments;
 use Domain\Taxation\Enums\PriceDisplay;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
@@ -14,6 +16,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 
 /**
  * Domain\Order\Models\Order
@@ -88,10 +91,12 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class Order extends Model implements HasMedia
+#[OnDeleteCascade(['orderLines', 'shippingAddress', 'billingAddress'])]
+class Order extends Model implements HasMedia, PayableInterface
 {
     use LogsActivity;
     use InteractsWithMedia;
+    use HasPayments;
 
     protected $fillable = [
         'customer_id',

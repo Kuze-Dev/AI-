@@ -52,12 +52,12 @@ class CreateOrderAction
             'shipping_method' => 'test shipping_method',
             'shipping_details' => 'test shipping details',
 
-            'payment_method' => $preparedOrderData->paymentMethod,
+            'payment_method' => "test payment method",
             'payment_details' => null,
             'is_paid' => false,
         ]);
 
-        if ( ! is_null($preparedOrderData->discount)) {
+        if (!is_null($preparedOrderData->discount)) {
             app(CreateDiscountLimitAction::class)->execute($preparedOrderData->discount, $order, $preparedOrderData->customer);
         }
 
