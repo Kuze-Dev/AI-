@@ -6,8 +6,8 @@ namespace App\FilamentTenant\Pages\Settings;
 
 use App\Settings\FormSettings as SettingsFormSettings;
 use Closure;
-use Support\Captcha\CaptchaProvider;
 use Filament\Forms;
+use Support\Captcha\CaptchaProvider;
 
 class FormSettings extends TenantBaseSettings
 {
@@ -22,6 +22,8 @@ class FormSettings extends TenantBaseSettings
         return [
             Forms\Components\Section::make(trans('Captcha'))
                 ->schema([
+                    Forms\Components\TextInput::make('sender_email')
+                        ->required(),
                     Forms\Components\Select::make('provider')
                         ->options([
                             CaptchaProvider::GOOGLE_RECAPTCHA->value => 'Google reCAPTCHA',
