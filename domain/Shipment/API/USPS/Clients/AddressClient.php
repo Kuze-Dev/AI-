@@ -20,7 +20,6 @@ class AddressClient
 
     public function verify(AddressValidateRequestData $addressData): AddressValidateResponseData
     {
-
         $array = [
             'Revision' => '1',
             'Address' => get_object_vars($addressData),

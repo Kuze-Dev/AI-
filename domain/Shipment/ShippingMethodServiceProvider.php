@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Domain\Shipment;
 
 use App\Settings\ShippingSettings;
+use Domain\Shipment\API\USPS\Clients\AddressClient;
 use Domain\Shipment\API\USPS\Clients\Client;
+use Domain\Shipment\API\USPS\Clients\RateClient;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\Drivers\StorePickup;
 use Domain\Shipment\Drivers\UspsDriver;
@@ -29,31 +31,33 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
                 $setting = app(ShippingSettings::class);
 
                 return new Client(
-                    username: $setting->usps_credentials['username'],
-                    password: $setting->usps_credentials['password'],
+                    username: $setting->getUsername(),
+                    password: $setting->getPassword(),
                     isProduction: $setting->usps_mode,
                 );
             }
         );
 
-        $this->mergeConfigFrom(__DIR__ . '/config/shipping.php', 'shipping');
+        $this->mergeConfigFrom(__DIR__ . '/config/shipment.php', 'domain.shipment');
     }
 
     public function boot(): void
     {
         if (tenancy()->initialized) {
 
-            $paymentMethods = ShippingMethod::all();
+            $shippingMethods = ShippingMethod::whereStatus(true)->get();
 
-            if ($paymentMethods->count() > 0) {
-                foreach ($paymentMethods as $courier) {
-                    app(ShippingManagerInterface::class)->extend($courier->slug, function () use ($courier) {
-                        return match ($courier->driver) {
-                            'store-pickup' => new StorePickup(),
-                            'usps' => new UspsDriver(),
-                            default => throw new InvalidArgumentException(),
-                        };
-                    });
+            if ($shippingMethods->isNotEmpty()) {
+                foreach ($shippingMethods as $shippingMethod) {
+                    app(ShippingManagerInterface::class)
+                        ->extend(
+                            $shippingMethod->slug,
+                            fn () => match ($shippingMethod->driver) {
+                                'store-pickup' => new StorePickup(),
+                                'usps' => new UspsDriver(app(RateClient::class), app(AddressClient::class)),
+                                default => throw new InvalidArgumentException(),
+                            }
+                        );
                 }
             }
         }

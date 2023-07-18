@@ -16,4 +16,27 @@ class ShippingSettings extends Settings
     {
         return 'shipping';
     }
+
+    public function getUsername(): string
+    {
+        return $this->check('username');
+    }
+
+    public function getPassword(): string
+    {
+        return $this->check('password');
+    }
+
+    public function check(string $param): string
+    {
+        if ($this->usps_credentials === null) {
+            abort(400, 'Setting not set');
+        }
+
+        if ( ! isset($this->usps_credentials[$param])) {
+            abort(400, 'Setting not set');
+        }
+
+        return $this->usps_credentials[$param];
+    }
 }

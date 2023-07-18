@@ -64,7 +64,6 @@ class Shipment extends Model
         'destination_address' => 'array',
     ];
 
-    /** @return LogOptions */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

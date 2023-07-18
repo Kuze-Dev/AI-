@@ -15,25 +15,23 @@ class UspsDriver
 {
     protected string $name = 'usps';
 
-    protected RateClient $rateClient;
-
-    public function __construct()
-    {
-        $this->rateClient = app(RateClient::class);
+    public function __construct(
+        private readonly RateClient $rateClient,
+        private readonly AddressClient $addressClient
+    ) {
     }
 
     public function getRate(array $parcelData, AddressValidateRequestData $addressValidateRequestData): float
     {
-
-        // First or create
-
-        $customer = Customer::with('verifiedAddress')->where('id', 1)->first();
+        $customer = Customer::with('verifiedAddress')
+            ->where('id', 1)
+            ->first();
 
         if ($customer->verifiedAddress) {
 
             $verifiedAddress = $customer->verifiedAddress;
 
-            #check if customer shipping was Change
+            # check if customer shipping was Change
 
             if ($verifiedAddress->address != $addressValidateRequestData->toArray()) {
 
@@ -50,7 +48,7 @@ class UspsDriver
 
         } else {
 
-            $address = app(AddressClient::class)->verify($addressValidateRequestData);
+            $address = $this->addressClient->verify($addressValidateRequestData);
 
             $customer->verifiedAddress()->create([
                 'address' => $addressValidateRequestData->toArray(),
@@ -68,11 +66,12 @@ class UspsDriver
                 Pounds: $parcelData['pounds'],
                 Ounces:$parcelData['ounces'],
             )
-        )->rate;
+        )
+            ->rate;
     }
 
-    public function getInternationalRate()
+    public function getInternationalRate(): float
     {
-        return $this->rateClient->getInternationalVersion2();
+        return $this->rateClient->getInternationalVersion2()->rate;
     }
 }

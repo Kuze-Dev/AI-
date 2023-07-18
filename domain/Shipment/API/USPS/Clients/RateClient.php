@@ -7,7 +7,6 @@ namespace Domain\Shipment\API\USPS\Clients;
 use Domain\Shipment\API\USPS\DataTransferObjects\RateInternationalV2ResponseData;
 use Domain\Shipment\API\USPS\DataTransferObjects\RateV4RequestData;
 use Domain\Shipment\API\USPS\DataTransferObjects\RateV4ResponseData;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Spatie\ArrayToXml\ArrayToXml;
 use Vyuldashev\XmlToArray\XmlToArray;
@@ -65,35 +64,10 @@ class RateClient
     public function getInternationalVersion2(): RateInternationalV2ResponseData
     {
 
-        //     $xml = <<<XML
-        //     <IntlRateV2Request USERID="7CADCOA340677" PASSWORD="XM892016HO9892O">
-        //                     <Revision>2</Revision>
-        //                     <Package ID="1">
-        //                         <Pounds>15.12345678</Pounds>
-        //                         <Ounces>0</Ounces>
-        //                         <MailType>Package</MailType>
-        //                         <ValueOfContents>200</ValueOfContents>
-        //                         <Country>Philippines</Country>
-        //                         <Width>10</Width>
-        //                         <Length>15</Length>
-        //                         <Height>10</Height>
-        //                         <OriginZip>18701</OriginZip>
-        //                         <AcceptanceDateTime>2023-07-14T13:15:00-06:00</AcceptanceDateTime>
-        //                         <DestinationPostalCode>1603</DestinationPostalCode>
-        //                     </Package>
-        //                 </IntlRateV2Request>
-        // XML;
-
-        $test = '<?xml version="1.0" encoding="UTF-8"?><IntlRateV2Request USERID="7CADCOA340677" PASSWORD="XM892016HO9892O"><Revision>2</Revision><Package ID="0"><Pounds>15.12345678</Pounds><Ounces>0</Ounces><MailType>Package</MailType><ValueOfContents>200</ValueOfContents><Country>Philippines</Country><Container>VARIABLE</Container><Width>10</Width><Length>15</Length><Height>10</Height><OriginZip>18701</OriginZip><AcceptanceDateTime>2023-07-28T13:15:00-06:00</AcceptanceDateTime><DestinationPostalCode>1603</DestinationPostalCode></Package></IntlRateV2Request>';
-
-        $url = 'https://production.shippingapis.com/' . self::URI . '?API=IntlRateV2&XML='.$test;
-        dump($url);
-        dump(Http::get($url)->body());
-
         $array = [
             'Revision' => '2',
             'Package' => [
-                '_attributes' => ['ID' => '1'],
+                '_attributes' => ['ID' => '0'],
                 'Pounds' => 15.12345678,
                 'Ounces' => 0,
                 'MailType' => 'Package',
@@ -103,7 +77,7 @@ class RateClient
                 'Length' => 15,
                 'Height' => 10,
                 'OriginZip' => 18701,
-                'AcceptanceDateTime' => '2023-07-25T13:15:00-06:00',
+                'AcceptanceDateTime' => '2023-07-28T13:15:00-06:00',
                 'DestinationPostalCode' => 1603,
             ],
         ];
@@ -115,23 +89,19 @@ class RateClient
                 'PASSWORD' => $this->client->password,
             ],
         ], true, 'UTF-8');
-        dump($xml);
-
-        // dd($this->client->getClient()->baseUrl());
-        // Http::get($this->client->getClient()->baseUrl);
 
         $body = $this->client->getClient()
             ->withQueryParameters([
                 'API' => 'IntlRateV2',
-                'XML' => $test,
+                'XML' => $xml,
             ])
             ->get(self::URI)
             ->body();
 
         $array = XmlToArray::convert($body);
-        dd($array);
+
         self::throwError($array);
 
-        return new RateInternationalV2ResponseData();
+        return new RateInternationalV2ResponseData(rate: 123.45);
     }
 }

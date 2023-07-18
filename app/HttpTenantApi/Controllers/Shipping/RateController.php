@@ -4,42 +4,33 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Shipping;
 
-use App\Features\CMS\CMSBase;
+use App\Features\ECommerce\ECommerceBase;
 use Domain\Address\Models\Address;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\Actions\GetShippingRateAction;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Get;
-use Throwable;
 
-// use TiMacDonald\JsonApi\JsonApiResourceCollection;
-
-// #[Middleware('feature.tenant:'. CMSBase::class)]
+#[Middleware(['feature.tenant:'. ECommerceBase::class, 'auth:sanctum'])]
 class RateController
 {
-    #[Get('/shipping/{slug}/rate/{addressId}')]
-    public function __invoke(string $slug, string $addressId)
+    #[Get('/shipping/{driver}/rate/{address}')]
+    public function __invoke(string $driver, Address $address): mixed
     {
-
-        try {
-
-            $customerShippingAddress = Address::with('state')->where('customer_id', '1')
-                ->where('id', $addressId)->firstOrFail();
-
-            dump(
-                app(GetShippingRateAction::class)->execute(
-                    new ParcelData(
-                        pounds: '10',
-                        ounces: '0'
-                    ),
-                    $customerShippingAddress,
-                    $slug
-                )
+        // TODO: validate $driver
+        $rateReturn = app(GetShippingRateAction::class)
+            ->execute(
+                parcelData: new ParcelData(
+                    pounds: '10',
+                    ounces: '0'
+                ),
+                address: $address,
+                driver: $driver
             );
-        } catch (Throwable $th) {
 
-            throw $th;
-        }
-
+        return response([
+            'rate' => $rateReturn->rate,
+            'is_united_state_domestic' => $rateReturn->isUnitedStateDomestic,
+        ]);
     }
 }

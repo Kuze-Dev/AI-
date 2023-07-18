@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\Shipment;
 
+use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Illuminate\Support\Manager;
 
-class ShippingManager extends Manager
+class ShippingManager extends Manager implements ShippingManagerInterface
 {
     public function getDefaultDriver(): string
     {
-        return config('shipping.default');
+        return config('domain.shipment.default');
     }
 }
