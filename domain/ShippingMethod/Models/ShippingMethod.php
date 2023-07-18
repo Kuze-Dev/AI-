@@ -16,6 +16,42 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+/**
+ * Domain\ShippingMethod\Models\ShippingMethod
+ *
+ * @property int $id
+ * @property string $title
+ * @property string $slug
+ * @property string|null $subtitle
+ * @property string|null $description
+ * @property Driver $driver
+ * @property array $ship_from_address
+ * @property bool $status
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read int|null $media_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Shipment> $shipments
+ * @property-read int|null $shipments_count
+ * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereDriver($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereShipFromAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereSubtitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class ShippingMethod extends Model implements HasMedia
 {
     use LogsActivity;
