@@ -24,9 +24,9 @@ class OrderLineResource extends JsonApiResource
             'sub_total' => $this->sub_total,
             'discount_total' => $this->discount_total,
             'total' => $this->total,
-            'remarks_data' => $this->remarks_data,
+            'remarks' => $this->remarks_data,
             'purchasable_data' => $this->purchasable_data,
-            'remark_images' => $this->getMedia('order_line_notes')->toArray(),
+            'remarks_images' => $this->getMedia('order_line_notes')->toArray(),
             'purchasable_images' => $this->getMedia('order_line_images')->toArray(),
         ];
     }
