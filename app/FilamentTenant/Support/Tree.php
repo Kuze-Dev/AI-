@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Support;
 
-use App\FilamentTenant\Support\Contracts\HasTrees;
 use Closure;
 use Filament\Forms\Components\Concerns\CanLimitItemsLength;
 use Filament\Forms\Components\Field;
+use Filament\Resources\Pages\CreateRecord;
+use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Str;
-use InvalidArgumentException;
 
 class Tree extends Field
 {
@@ -32,13 +32,14 @@ class Tree extends Field
                         return;
                     }
 
+                    /** @var CreateRecord|EditRecord $livewire */
                     $livewire = $component->getLivewire();
 
-                    if ( ! $livewire instanceof HasTrees) {
-                        throw new InvalidArgumentException();
-                    }
-
-                    $livewire->mountTreeItem($this->getName(), "{$statePath}." . (string) Str::uuid());
+                    $livewire->mountFormComponentAction(
+                        $component->getStatePath(),
+                        'tree-form',
+                        ['activeTreeStatePath' => "{$statePath}." . (string) Str::uuid()]
+                    );
                 },
             ],
             'tree::editItem' => [
@@ -47,13 +48,14 @@ class Tree extends Field
                         return;
                     }
 
+                    /** @var CreateRecord|EditRecord $livewire */
                     $livewire = $component->getLivewire();
 
-                    if ( ! $livewire instanceof HasTrees) {
-                        throw new InvalidArgumentException();
-                    }
-
-                    $livewire->mountTreeItem($this->getName(), $statePath);
+                    $livewire->mountFormComponentAction(
+                        $component->getStatePath(),
+                        'tree-form',
+                        ['activeTreeStatePath' => $statePath]
+                    );
                 },
             ],
             'tree::deleteItem' => [
@@ -93,6 +95,8 @@ class Tree extends Field
         $this->mutateDehydratedStateUsing(static function (?array $state): array {
             return array_values($state ?? []);
         });
+
+        $this->registerActions([TreeFormAction::make()]);
     }
 
     public function getChildComponentContainers(bool $withHidden = false, string $statePath = null): array
