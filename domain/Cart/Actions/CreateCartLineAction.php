@@ -36,18 +36,27 @@ class CreateCartLineAction
                 $purchasableType = ProductVariant::class;
             }
 
-            $cartLine = CartLine::updateOrCreate(
-                [
+            $cartLine = CartLine::where([
+                'cart_id' => $cart->id,
+                'purchasable_id' => $purchasableId,
+                'purchasable_type' => $purchasableType,
+                'checked_out_at' => null,
+            ])->first();
+
+            if ($cartLine) {
+                $cartLine->update([
+                    'quantity' => $cartLine->quantity + $cartLineData->quantity,
+                    'remarks' => $cartLineData->remarks,
+                ]);
+            } else {
+                $cartLine = CartLine::create([
                     'cart_id' => $cart->id,
                     'purchasable_id' => $purchasableId,
                     'purchasable_type' => $purchasableType,
-                    'checked_out_at' => null,
-                ],
-                [
-                    'quantity' => DB::raw('quantity + ' . $cartLineData->quantity),
+                    'quantity' => $cartLineData->quantity,
                     'remarks' => $cartLineData->remarks,
-                ]
-            );
+                ]);
+            }
 
             if ($cartLineData->medias !== null) {
                 app(CreateMediaFromUrlAction::class)
@@ -59,7 +68,7 @@ class CreateCartLineAction
             return $cartLine;
         } catch (Exception $e) {
             DB::rollBack();
-            // Log::info($e);
+            \Log::info($e);
             return $e;
         }
     }

@@ -16,6 +16,8 @@ use Domain\Cart\Requests\CreateCartLineRequest;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
 use App\Http\Controllers\Controller;
+use Domain\Cart\Actions\CreateCartLineAction;
+use Domain\Cart\Models\Cart;
 
 #[
     Resource('carts/cartlines', apiResource: true, except: ['show', 'index']),
@@ -29,10 +31,18 @@ class CartLinesController extends Controller
 
         $customer = auth()->user();
 
-        $result = app(CreateCartAction::class)
-            ->execute($customer, CreateCartData::fromArray($validatedData));
+        $cart = app(CreateCartAction::class)->execute($customer);
 
-        if (CartActionResult::SUCCESS != $result) {
+        if (!$cart instanceof Cart) {
+            return response()->json([
+                'message' => 'Invalid action',
+            ], 400);
+        }
+
+        $cartline = app(CreateCartLineAction::class)
+            ->execute($cart, CreateCartData::fromArray($validatedData));
+
+        if (!$cartline instanceof CartLine) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);
@@ -73,7 +83,7 @@ class CartLinesController extends Controller
         $result = app(DestroyCartLineAction::class)
             ->execute($cartline);
 
-        if ( ! $result) {
+        if (!$result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);
