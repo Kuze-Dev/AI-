@@ -9,13 +9,11 @@ use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateResponseData;
 use Spatie\ArrayToXml\ArrayToXml;
 use Vyuldashev\XmlToArray\XmlToArray;
 
-class AddressClient
+class AddressClient extends BaseClient
 {
-    private const URI = 'ShippingAPI.dll';
-
-    public function __construct(
-        private readonly Client $client
-    ) {
+    public static function uri(): string
+    {
+        return'ShippingAPI.dll';
     }
 
     public function verify(AddressValidateRequestData $addressData): AddressValidateResponseData
@@ -37,11 +35,19 @@ class AddressClient
                 'API' => 'Verify',
                 'XML' => $result,
             ])
-            ->get(self::URI)
+            ->get(self::uri())
             ->body();
 
+        $array = XmlToArray::convert($body);
+
+        self::throwError($array);
+
+        if (isset($array['AddressValidateResponse']['Address']['Error'])) {
+            abort(422, $array['AddressValidateResponse']['Address']['Error']['Description']);
+        }
+
         return AddressValidateResponseData::fromArray(
-            XmlToArray::convert($body)['AddressValidateResponse']['Address']
+            $array['AddressValidateResponse']['Address']
         );
     }
 }

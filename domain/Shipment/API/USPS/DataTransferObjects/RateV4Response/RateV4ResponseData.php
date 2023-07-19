@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Shipment\API\USPS\DataTransferObjects;
+namespace Domain\Shipment\API\USPS\DataTransferObjects\RateV4Response;
 
 use Domain\Shipment\API\USPS\Contracts\RateResponse;
 

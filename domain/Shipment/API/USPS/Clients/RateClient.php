@@ -6,18 +6,15 @@ namespace Domain\Shipment\API\USPS\Clients;
 
 use Domain\Shipment\API\USPS\DataTransferObjects\InternationalResponse\IntlRateV2ResponseData;
 use Domain\Shipment\API\USPS\DataTransferObjects\RateV4RequestData;
-use Domain\Shipment\API\USPS\DataTransferObjects\RateV4ResponseData;
-use Illuminate\Support\Facades\Log;
+use Domain\Shipment\API\USPS\DataTransferObjects\RateV4Response\RateV4ResponseData;
 use Spatie\ArrayToXml\ArrayToXml;
 use Vyuldashev\XmlToArray\XmlToArray;
 
-class RateClient
+class RateClient extends BaseClient
 {
-    private const URI = 'ShippingAPI.dll';
-
-    public function __construct(
-        private readonly Client $client
-    ) {
+    public static function uri(): string
+    {
+        return'ShippingAPI.dll';
     }
 
     public function getV4(RateV4RequestData $requestData): RateV4ResponseData
@@ -41,24 +38,17 @@ class RateClient
                 'API' => 'RateV4',
                 'XML' => $result,
             ])
-            ->get(self::URI)
+            ->get(self::uri())
             ->body();
 
         $array = XmlToArray::convert($body);
 
         self::throwError($array);
+        ray($array);
 
         return new RateV4ResponseData(
             rate: (float) $array['RateV4Response']['Package']['Postage']['Rate']
         );
-    }
-
-    private static function throwError(array $array): void
-    {
-        if (isset($array['Error'])) {
-            Log::error('error', $array);
-            abort(422, 'Something wrong.');
-        }
     }
 
     public function getInternationalVersion2(): IntlRateV2ResponseData
@@ -95,7 +85,7 @@ class RateClient
                 'API' => 'IntlRateV2',
                 'XML' => $xml,
             ])
-            ->get(self::URI)
+            ->get(self::uri())
             ->body();
         $array = XmlToArray::convert($body);
 
