@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Order\Actions;
 
-use Domain\Media\Actions\CreateMediaAction;
+use Domain\Media\Actions\CreateMediaFromUrlAction;
 use Domain\Order\DataTransferObjects\UpdateOrderData;
 use Domain\Order\Enums\OrderResult;
 use Domain\Order\Enums\OrderStatuses;
