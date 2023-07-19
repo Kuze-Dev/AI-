@@ -20,7 +20,10 @@ class CartLineResource extends JsonApiResource
             'id' => $this->id,
             'cart_id' => $this->cart_id,
             'quantity' => $this->quantity,
-            'remarks' => $this->remarks,
+            'remarks' => [
+                'data' => $this->remarks,
+                'media' => $this->media->toArray(),
+            ],
             'purchasable' => function () {
                 if ($this->purchasable instanceof Product) {
                     return ProductResource::make($this->purchasable);
@@ -28,7 +31,6 @@ class CartLineResource extends JsonApiResource
                     return $this->purchasable;
                 }
             },
-            'remarks_images' => $this->media->toArray(),
         ];
     }
 }
