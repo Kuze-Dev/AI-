@@ -29,7 +29,7 @@ class UspsDriver
         AddressValidateRequestData $addressValidateRequestData
     ): RateResponse {
 
-        if ($customer->verifiedAddress->count() > 0) {
+        if ($customer->verifiedAddress !== null) {
 
             $verifiedAddress = $customer->verifiedAddress;
 
