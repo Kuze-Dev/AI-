@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Settings\FormSettings;
+use Domain\Address\Models\Address;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Customer\Models\Customer;
@@ -20,6 +21,7 @@ use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
 use Domain\Shipment\Models\Shipment;
 use Domain\ShippingMethod\Models\ShippingMethod;
+use Domain\Tier\Models\Tier;
 use Support\Captcha\CaptchaManager;
 use Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Models\Taxonomy;
@@ -74,6 +76,8 @@ class AppServiceProvider extends ServiceProvider
             MetaData::class,
             Shipment::class,
             ShippingMethod::class,
+            Address::class,
+            Tier::class,
             Customer::class,
         ]);
 
