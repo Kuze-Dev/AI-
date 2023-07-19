@@ -8,7 +8,7 @@ use Domain\Address\Models\Address;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Customer\Enums\Status;
-use Domain\Shipment\Models\CustomerVerifiedAddress;
+use Domain\Shipment\Models\VerifiedAddress;
 use Domain\Tier\Models\Tier;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -54,7 +54,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property-read Tier $tier
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
- * @property-read CustomerVerifiedAddress|null $verifiedAddress
+ * @property-read VerifiedAddress|null $verifiedAddress
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer onlyTrashed()
@@ -155,9 +155,9 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
         $this->notify(new VerifyEmail());
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Shipment\Models\CustomerVerifiedAddress> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Shipment\Models\VerifiedAddress> */
     public function verifiedAddress(): HasOne
     {
-        return $this->hasOne(CustomerVerifiedAddress::class);
+        return $this->hasOne(VerifiedAddress::class);
     }
 }

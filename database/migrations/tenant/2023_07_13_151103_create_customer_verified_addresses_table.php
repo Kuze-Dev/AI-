@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Schema;
 return new class () extends Migration {
     public function up(): void
     {
-        Schema::create('customer_verified_addresses', function (Blueprint $table) {
+        Schema::create('verified_addresses', function (Blueprint $table) {
             $table->id();
 
             $table->foreignIdFor(Customer::class)->index();
@@ -28,6 +28,6 @@ return new class () extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('customer_verified_addresses');
+        Schema::dropIfExists('verified_addresses');
     }
 };
