@@ -104,7 +104,9 @@ class OrderResource extends Resource
                             ->schema([
                                 Forms\Components\FileUpload::make('payment_image')
                                     ->formatStateUsing(function (Order $record) {
-                                        return $record->payments[0]->paymentMethod?->getMedia('logo')
+                                        $orderPayment = Order::with('payments.paymentMethod')->find($record->id);
+
+                                        return $orderPayment->payments->first()->paymentMethod?->getMedia('logo')
                                             ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
                                             ->toArray() ?? [];
                                     })
@@ -230,7 +232,7 @@ class OrderResource extends Resource
 
     public static function summaryCard()
     {
-        return  Forms\Components\Section::make('Summary')
+        return Forms\Components\Section::make('Summary')
             ->schema([
                 Forms\Components\Grid::make(2)
                     ->schema([
@@ -340,15 +342,25 @@ class OrderResource extends Resource
                             })
                             ->size('sm')
                             ->action(function () use ($get, $set) {
-                                $order = Order::find($get('id'));
+                                $order = Order::with('payments')->find($get('id'));
 
-                                $isPaid = ! $order->is_paid;
+                                $isPaid = !$order->is_paid;
 
                                 $result = $order->update([
                                     'is_paid' => $isPaid,
                                 ]);
 
                                 if ($result) {
+                                    if ($order->is_paid) {
+                                        $order->payments->first()->update([
+                                            'status' => 'paid'
+                                        ]);
+                                    } else {
+                                        $order->payments->first()->update([
+                                            'status' => 'pending'
+                                        ]);
+                                    }
+
                                     $set('is_paid', $isPaid);
                                     Notification::make()
                                         ->title('Order marked successfully')
@@ -375,14 +387,18 @@ class OrderResource extends Resource
                             ->form([
                                 Forms\Components\FileUpload::make('bank_proof_image')->label('Customer Upload')
                                     ->formatStateUsing(function (Order $record) {
-                                        return $record?->getMedia('bank_proof_images')
+                                        $orderPayment = Order::with('payments')->find($record->id);
+
+                                        return $orderPayment->payments->first()?->getMedia('image')
                                             ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
                                             ->toArray() ?? [];
                                     })
                                     ->hidden(function (Order $record) {
-                                        return (bool) (empty($record?->getFirstMediaUrl('bank_proof_images')));
+                                        $orderPayment = Order::with('payments')->find($record->id);
+
+                                        return (bool) (empty($orderPayment->payments->first()?->getFirstMediaUrl('image')));
                                     })
-                                    ->multiple()
+                                    // ->multiple()
                                     ->image()
                                     ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
                                         $mediaClass = config('media-library.media_model', Media::class);
@@ -399,20 +415,26 @@ class OrderResource extends Resource
 
                                         return $media?->getUrl();
                                     })->disabled(),
+                                Forms\Components\Select::make('payment_status')
+                                    ->label('')
+                                    ->options([
+                                        'Approved' => 'Approved',
+                                        'Declined' => 'Declined',
+                                    ]),
+                                Forms\Components\Textarea::make('Message')
+                                    ->formatStateUsing(function (Order $record) {
+                                        $orderPayment = Order::with('payments')->find($record->id);
 
-                                // Forms\Components\Select::make('payment_status')
-                                //     ->label('')
-                                //     ->options([
-                                //         'Approved' => 'Approved',
-                                //         'Declined' => 'Declined',
-                                //     ]),
-                                Forms\Components\Textarea::make('Message'),
+                                        return $orderPayment->payments->first()->message;
+                                    }),
                             ])
                             ->slideOver()
                             ->icon('heroicon-s-eye');
                     })->fullWidth()->size('md')
                     ->hidden(function (Order $record) {
-                        return $record->payments[0]->gateway != 'bank-transfer';
+                        $orderPayment = Order::with('payments')->find($record->id);
+
+                        return $orderPayment->payments->first()->gateway != 'bank-transfer';
                     }),
                 Support\Divider::make(''),
                 Forms\Components\Grid::make(2)
