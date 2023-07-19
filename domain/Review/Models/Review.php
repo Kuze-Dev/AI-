@@ -20,7 +20,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int $product_id
  * @property int $order_id
  * @property int|null $customer_id
- * @property string $title
  * @property int $rating
  * @property string|null $comment
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -50,7 +49,6 @@ class Review extends Model implements HasMedia
     use InteractsWithMedia;
 
     protected $fillable = [
-        'title',
         'ratings',
         'comment',
     ];
