@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Support\Excel\Commands\PruneExcelCommand;
 
 use function Pest\Laravel\artisan;
