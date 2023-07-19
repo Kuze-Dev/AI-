@@ -27,14 +27,14 @@ class ShippingSettings extends Settings
         return $this->check('password');
     }
 
-    public function check(string $param): string
+    private function check(string $param): string
     {
         if ($this->usps_credentials === null) {
-            abort(400, 'Setting not set');
+            abort(400, 'Setting ['.self::group().'] not set.');
         }
 
         if ( ! isset($this->usps_credentials[$param])) {
-            abort(400, 'Setting not set');
+            abort(400, 'Setting ['.self::group().'] not set.');
         }
 
         return $this->usps_credentials[$param];
