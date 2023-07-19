@@ -414,7 +414,7 @@ class FilamentServiceProvider extends ServiceProvider
                     : null;
             });
 
-            $this->formatStateUsing(function (string $state) use ($size): HtmlString {
+            $this->formatStateUsing(function (?string $state) use ($size): HtmlString {
                 $cssClass = match ($size) {
                     'xs' => 'max-w-xs',
                     'sm' => 'max-w-sm',
