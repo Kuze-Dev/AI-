@@ -54,7 +54,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property-read Tier $tier
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
- * @property-read CustomerVerifiedAddress $verifiedAddress
+ * @property-read CustomerVerifiedAddress|null $verifiedAddress
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer onlyTrashed()
