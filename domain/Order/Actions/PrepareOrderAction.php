@@ -12,6 +12,7 @@ use Domain\Discount\Models\Discount;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Enums\OrderResult;
+use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Domain\Taxation\Facades\Taxation;
@@ -35,9 +36,9 @@ class PrepareOrderAction
 
         $discount = $this->prepareDiscount($placeOrderData);
 
-        $notes = $placeOrderData->notes;
+        $paymentMethod = $this->preparePaymentMethod($placeOrderData);
 
-        $paymentMethod = $placeOrderData->payment_method;
+        $notes = $placeOrderData->notes;
 
         $orderData = [
             'customer' => $customer,
@@ -115,5 +116,10 @@ class PrepareOrderAction
         }
 
         return null;
+    }
+
+    private function preparePaymentMethod(PlaceOrderData $placeOrderData)
+    {
+        return PaymentMethod::whereSlug($placeOrderData->payment_method)->first();
     }
 }

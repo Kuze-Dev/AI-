@@ -15,10 +15,9 @@ class ReviewResource extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         return [
-            'title' => $this->title,
             'rating' => $this->rating,
             'comment' => $this->comment,
-            'media' => $this->getMedia('media')->toArray(),
+            'media' => $this->getMedia('review_product_media')->toArray(),
         ];
     }
 

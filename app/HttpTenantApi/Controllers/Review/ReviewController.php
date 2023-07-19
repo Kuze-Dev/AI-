@@ -21,7 +21,6 @@ class ReviewController
     {
 
         $validatedData = $request->validated();
-        $review->title = $validatedData['title'];
         $review->rating = $validatedData['rating'];
         $review->comment = $validatedData['comment'];
         $review->product_id = $validatedData['product_id'];
@@ -37,9 +36,9 @@ class ReviewController
             foreach ($validatedData['media'] as $imageUrl) {
                 try {
                     $review->addMediaFromUrl($imageUrl)
-                        ->toMediaCollection('media');
+                        ->toMediaCollection('review_product_media');
                 } catch (Exception $e) {
-                    dd($e);
+                    // dd($e);
                 }
             }
         }

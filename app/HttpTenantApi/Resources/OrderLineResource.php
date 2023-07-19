@@ -14,6 +14,8 @@ class OrderLineResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
+        $reviews = $this->reviewDetails();
+
         return  [
             'purchasable_id' => $this->purchasable_id,
             'purchasable_sku' => $this->purchasable_sku,
@@ -24,9 +26,12 @@ class OrderLineResource extends JsonApiResource
             'sub_total' => $this->sub_total,
             'discount_total' => $this->discount_total,
             'total' => $this->total,
-            'remarks' => $this->remarks_data,
             'purchasable_data' => $this->purchasable_data,
-            'remarks_images' => $this->getMedia('order_line_notes')->toArray(),
+            'review' => $reviews ? ReviewResource::make($reviews) : null,
+            'remarks' => [
+                'data' => $this->remarks_data,
+                'media' => $this->getMedia('order_line_notes')->toArray(),
+            ],
             'purchasable_images' => $this->getMedia('order_line_images')->toArray(),
         ];
     }

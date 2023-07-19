@@ -20,7 +20,6 @@ return new class () extends Migration {
             $table->foreignIdFor(OrderLine::class)->index();
             $table->foreignIdFor(Customer::class)->nullable()->index();
 
-            $table->string('title')->index();
             $table->smallInteger('rating');
             $table->string('comment')->nullable();
 

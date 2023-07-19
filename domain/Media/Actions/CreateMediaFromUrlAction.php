@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Exception;
 use Log;
 
-class CreateMediaAction
+class CreateMediaFromUrlAction
 {
     public function execute(Model $model, array $medias, string $collection)
     {

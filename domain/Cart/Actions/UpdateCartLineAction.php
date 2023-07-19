@@ -6,7 +6,7 @@ namespace Domain\Cart\Actions;
 
 use Domain\Cart\DataTransferObjects\UpdateCartLineData;
 use Domain\Cart\Models\CartLine;
-use Domain\Media\Actions\CreateMediaAction;
+use Domain\Media\Actions\CreateMediaFromUrlAction;
 
 class UpdateCartLineAction
 {
@@ -25,7 +25,7 @@ class UpdateCartLineAction
         }
 
         if ($cartLineData->medias !== null) {
-            app(CreateMediaAction::class)
+            app(CreateMediaFromUrlAction::class)
                 ->execute($cartLine, $cartLineData->medias, 'cart_line_notes');
         }
 

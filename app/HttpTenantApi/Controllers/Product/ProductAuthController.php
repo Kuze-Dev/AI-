@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Product;
 
-use App\Features\ECommerce\ECommerceBase;
 use App\HttpTenantApi\Resources\ProductResource;
 use Domain\Product\Models\Product;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -13,10 +12,10 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
-    ApiResource('products', only: ['index', 'show']),
-    Middleware('feature.tenant:' . ECommerceBase::class)
+    ApiResource('auth/products', only: ['index', 'show']),
+    Middleware(['auth:sanctum'])
 ]
-class ProductController
+class ProductAuthController
 {
     public function index(): JsonApiResourceCollection
     {

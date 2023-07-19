@@ -7,7 +7,7 @@ namespace Domain\Cart\Actions;
 use Domain\Cart\DataTransferObjects\CreateCartData;
 use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
-use Domain\Media\Actions\CreateMediaAction;
+use Domain\Media\Actions\CreateMediaFromUrlAction;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
@@ -25,8 +25,8 @@ class CreateCartLineAction
 
             match ($cartLineData->purchasable_type) {
                 'Product' => $purchasableType = Product::class,
-                // 'Service' => $purchasableType = Service::class,
-                // 'Booking' => $purchasableType = Booking::class,
+                    // 'Service' => $purchasableType = Service::class,
+                    // 'Booking' => $purchasableType = Booking::class,
                 default => null
             };
 
@@ -50,7 +50,7 @@ class CreateCartLineAction
             );
 
             if ($cartLineData->medias !== null) {
-                app(CreateMediaAction::class)
+                app(CreateMediaFromUrlAction::class)
                     ->execute($cartLine, $cartLineData->medias, 'cart_line_notes');
             }
 

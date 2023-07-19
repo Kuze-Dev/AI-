@@ -7,6 +7,7 @@ namespace Domain\Order\Requests;
 use Domain\Address\Models\Address;
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
+use Domain\PaymentMethod\Models\PaymentMethod;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -44,7 +45,7 @@ class PlaceOrderRequest extends FormRequest
                         ->whereNull('checked_out_at')
                         ->count();
 
-                    if (!$cartLines) {
+                    if ( ! $cartLines) {
                         $fail('No cart lines for checkout');
 
                         return;
@@ -101,7 +102,7 @@ class PlaceOrderRequest extends FormRequest
             ],
             'payment_method' => [
                 'required',
-                Rule::in(['COD', 'Bank Transfer', 'Paypal']),
+                Rule::exists(PaymentMethod::class, 'slug'),
             ],
 
         ];

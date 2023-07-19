@@ -16,6 +16,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property int $id
  * @property int $order_id
  * @property OrderAddressTypes $type
+ * @property string $country
  * @property string $state
  * @property AddressLabelAs $label_as
  * @property string $address_line_1
@@ -29,6 +30,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress query()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress whereAddressLine1($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress whereCity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress whereCountry($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress whereLabelAs($value)

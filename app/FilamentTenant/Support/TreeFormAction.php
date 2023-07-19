@@ -48,7 +48,8 @@ class TreeFormAction extends Action
 
     protected function getActiveTreeStatePath(): string
     {
-        return $this->getArguments()['activeTreeStatePath'];
+        /** @phpstan-ignore-next-line */
+        return $this->getLivewire()->mountedFormComponentActionArguments['activeTreeStatePath'];
     }
 
     protected function getActiveTreeState(): array
