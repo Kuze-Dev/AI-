@@ -136,6 +136,7 @@ class ViewOrderDetails extends ViewRecord
                                         ->hidden(function () use ($orderLine) {
                                             return (bool) (empty($orderLine->getFirstMediaUrl('order_line_notes')));
                                         })
+                                        ->disabled()
                                         ->multiple()
                                         ->image()
                                         ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
@@ -150,9 +151,8 @@ class ViewOrderDetails extends ViewRecord
                                                 } catch (Throwable $exception) {
                                                 }
                                             }
-
                                             return $media?->getUrl();
-                                        })->disabled(),
+                                        })
                                 ])
                                 ->slideOver()
                                 ->icon('heroicon-o-document');

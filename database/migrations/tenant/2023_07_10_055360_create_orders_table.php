@@ -8,7 +8,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class() extends Migration
+{
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
@@ -37,7 +38,7 @@ return new class () extends Migration {
             $table->string('shipping_details');
             $table->boolean('is_paid')->default(false);
             $table->enum('status', [
-                'Pending', 'Cancelled', 'For Cancellation', 'Refunded', 'Packed', 'Shipped', 'Delivered', 'Fulfilled',
+                'Pending', 'Cancelled', 'Refunded', 'Packed', 'Shipped', 'Delivered', 'Fulfilled',
             ])->default('Pending')->index();
             $table->string('cancelled_reason')->nullable();
 

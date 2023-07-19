@@ -20,7 +20,7 @@ class UpdateOrderAction
     {
         try {
             if ($updateOrderData->status) {
-                if ($updateOrderData->status == 'For Cancellation') {
+                if ($updateOrderData->status == 'Cancelled') {
                     //cant cancel if order is
                     if ($order->status != OrderStatuses::PENDING) {
                         return OrderResult::FAILED;
@@ -37,7 +37,6 @@ class UpdateOrderAction
                     ]);
                 }
             }
-
 
             if ($updateOrderData->proof_of_payment !== null) {
                 $orderPayment = Order::with('payments')->find($order->id);

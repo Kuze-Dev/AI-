@@ -18,7 +18,7 @@ class UpdateOrderRequest extends FormRequest
             ],
             'status' => [
                 'nullable',
-                Rule::in(['For Cancellation', 'Fulfilled']),
+                Rule::in(['Cancelled', 'Fulfilled']),
                 Rule::requiredIf(function () {
                     return $this->input('type') === 'status';
                 }),
