@@ -56,30 +56,28 @@ class SplitOrderAction
 
     private function proceedPayment(Order $order, PreparedOrderData $preparedOrderData)
     {
-        if ($preparedOrderData->paymentMethod->slug == "paypal") {
-            $providerData = new CreatepaymentData(
-                transactionData: TransactionData::fromArray(
-                    [
-                        'reference_id' => $order->reference,
-                        'amount' => AmountData::fromArray([
-                            'currency' => $preparedOrderData->currency->code,
-                            'total' => strval($order->total),
-                            'details' => PaymentDetailsData::fromArray(
-                                [
-                                    'subtotal' => strval($order->sub_total - $order->discount_total),
-                                    'tax' => strval($order->tax_total)
-                                ]
-                            ),
-                        ]),
-                    ]
-                ),
-                payment_driver: $preparedOrderData->paymentMethod->slug
-            );
+        $providerData = new CreatepaymentData(
+            transactionData: TransactionData::fromArray(
+                [
+                    'reference_id' => $order->reference,
+                    'amount' => AmountData::fromArray([
+                        'currency' => $preparedOrderData->currency->code,
+                        'total' => strval($order->total),
+                        'details' => PaymentDetailsData::fromArray(
+                            [
+                                'subtotal' => strval($order->sub_total - $order->discount_total),
+                                'tax' => strval($order->tax_total)
+                            ]
+                        ),
+                    ]),
+                ]
+            ),
+            payment_driver: $preparedOrderData->paymentMethod->slug
+        );
 
-            $result = app(CreatePaymentAction::class)
-                ->execute($order, $providerData);
+        $result = app(CreatePaymentAction::class)
+            ->execute($order, $providerData);
 
-            return $result;
-        }
+        return $result;
     }
 }

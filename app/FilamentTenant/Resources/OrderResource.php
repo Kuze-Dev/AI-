@@ -102,37 +102,35 @@ class OrderResource extends Resource
                             ])->collapsible(),
                         Forms\Components\Section::make('Payment Method')
                             ->schema([
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\FileUpload::make('payment_image')
-                                            ->formatStateUsing(function (Order $record) {
-                                                return $record->payments[0]->paymentMethod?->getMedia('logo')
-                                                    ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                                                    ->toArray() ?? [];
-                                            })
-                                            ->disableLabel()
-                                            ->image()
-                                            ->imagePreviewHeight('120')
-                                            ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
-                                                $mediaClass = config('media-library.media_model', Media::class);
+                                Forms\Components\FileUpload::make('payment_image')
+                                    ->formatStateUsing(function (Order $record) {
+                                        return $record->payments[0]->paymentMethod?->getMedia('logo')
+                                            ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                                            ->toArray() ?? [];
+                                    })
+                                    ->disabled()
+                                    ->disableLabel()
+                                    ->image()
+                                    ->imagePreviewHeight('150')
+                                    ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                                        $mediaClass = config('media-library.media_model', Media::class);
 
-                                                /** @var ?Media $media */
-                                                $media = $mediaClass::findByUuid($file);
+                                        /** @var ?Media $media */
+                                        $media = $mediaClass::findByUuid($file);
 
-                                                if ($component->getVisibility() === 'private') {
-                                                    try {
-                                                        return $media?->getTemporaryUrl(now()->addMinutes(5));
-                                                    } catch (Throwable $exception) {
-                                                        // This driver does not support creating temporary URLs.
-                                                    }
-                                                }
+                                        if ($component->getVisibility() === 'private') {
+                                            try {
+                                                return $media?->getTemporaryUrl(now()->addMinutes(5));
+                                            } catch (Throwable $exception) {
+                                                // This driver does not support creating temporary URLs.
+                                            }
+                                        }
 
-                                                return $media?->getUrl();
-                                            }),
+                                        return $media?->getUrl();
+                                    }),
 
-                                        Forms\Components\Placeholder::make('card_info')->label('Card Info')
-                                            ->content(fn (Order $record): ?string => '*************Test'),
-                                    ]),
+                                // Forms\Components\Placeholder::make('card_info')->label('Card Info')
+                                //     ->content(fn (Order $record): ?string => '*************Test'),
                             ])->collapsible(),
                     ])->columnSpan(2),
                 self::summaryCard(),

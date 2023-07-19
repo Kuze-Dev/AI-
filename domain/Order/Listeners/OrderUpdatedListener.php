@@ -18,7 +18,8 @@ class OrderUpdatedListener
 
             match ($status) {
                 "paid" => $this->onOrderPaid($order),
-                "cancel" => $this->onOrderCancelled($order),
+                    // "cancel" => $this->onOrderCancelled($order),
+                default => null
             };
         }
     }
@@ -30,9 +31,9 @@ class OrderUpdatedListener
         ]);
     }
 
-    private function onOrderCancelled(Order $order)
-    {
-        //add balik ng discount
-        app(DestroyOrderAction::class)->execute($order);
-    }
+    // private function onOrderCancelled(Order $order)
+    // {
+    //     //add balik ng discount
+    //     app(DestroyOrderAction::class)->execute($order);
+    // }
 }
