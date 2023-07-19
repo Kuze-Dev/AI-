@@ -20,7 +20,7 @@ class FormEmailNotificationFactory extends Factory
             'to' => $this->emails(),
             'cc' => $this->emails(),
             'bcc' => $this->emails(),
-            'sender' => $this->faker->safeEmail(),
+            'sender_name' => $this->faker->name(),
             'reply_to' => $this->faker->safeEmail(),
             'subject' => $this->faker->sentence(),
             'template' => $this->faker->word(),

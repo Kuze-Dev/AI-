@@ -404,7 +404,7 @@ class FilamentServiceProvider extends ServiceProvider
         Tables\Columns\TextColumn::macro('truncate', function (string $size = 'md', bool|Closure $tooltip = false): Tables\Columns\TextColumn {
             /** @var Tables\Columns\TextColumn $this */
 
-            $this->tooltip(function (Tables\Columns\TextColumn $column) use ($tooltip): string {
+            $this->tooltip(function (Tables\Columns\TextColumn $column) use ($tooltip): ?string {
                 if ($tooltip instanceof Closure) {
                     return $column->evaluate($tooltip);
                 }
