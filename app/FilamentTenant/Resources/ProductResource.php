@@ -79,31 +79,31 @@ class ProductResource extends Resource
                                 ->schema([
                                     Forms\Components\TextInput::make('length')
                                         ->numeric()
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['length']))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['length']))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Length'),
 
                                     Forms\Components\TextInput::make('width')
                                         ->numeric()
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['width']))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['width']))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Width'),
 
                                     Forms\Components\TextInput::make('height')
                                         ->numeric()
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['height']))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['height']))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Height'),
                                 ])->columns(3),
                         ]),
                     Forms\Components\Section::make(trans('Variant'))->schema([
-                        // For Manage Variant
+                        /** For Manage Variant */ 
                         ProductOptionSupport::make('product_options')
                             ->itemLabel(fn (array $state) => $state['name'] ?? null)
                             ->schema([
                                 Forms\Components\Repeater::make('options')
                                     ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, HasProductOptions $livewire) {
-                                        if ( ! $record) {
+                                        if (!$record) {
                                             return $state;
                                         }
 
@@ -145,7 +145,7 @@ class ProductResource extends Resource
                             ->itemLabel(fn (array $state) => $state['name'] ?? null)
                             ->formatStateUsing(
                                 function (?Product $record) {
-                                    if ( ! $record) {
+                                    if (!$record) {
                                         return [];
                                     }
 
@@ -167,9 +167,9 @@ class ProductResource extends Resource
                                                 foreach ($state['combination'] as $key => $combination) {
                                                     $schemaArray[$key] =
                                                         Forms\Components\TextInput::make("combination[{$key}].option_value")
-                                                            ->formatStateUsing(fn () => ucfirst($combination['option_value']))
-                                                            ->label(ucfirst($combination['option']))
-                                                            ->disabled();
+                                                        ->formatStateUsing(fn () => ucfirst($combination['option_value']))
+                                                        ->label(ucfirst($combination['option']))
+                                                        ->disabled();
                                                 }
 
                                                 return $schemaArray;
@@ -295,7 +295,7 @@ class ProductResource extends Resource
                                     Forms\Components\Hidden::make('taxonomy_terms')
                                         ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                                 ])
-                                ->when(fn () => ! empty($taxonomies->toArray())),
+                                ->when(fn () => !empty($taxonomies->toArray())),
                         ]),
                     MetaDataForm::make('Meta Data'),
                 ])->columnSpan(1),
@@ -352,8 +352,9 @@ class ProductResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->authorize('update'),
-                Tables\Actions\DeleteAction::make()
-                    ->authorize('delete'),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

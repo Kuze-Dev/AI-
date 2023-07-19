@@ -24,6 +24,62 @@ class ListProducts extends ListRecords
 {
     protected static string $resource = ProductResource::class;
 
+
+    protected static function generateCombinations($row, $inputArray): array
+    {
+        $outputArray = [];
+        foreach ($inputArray[0]['productOptionValues'] as $key => $optionValue1) {
+            if (isset($inputArray[1]['productOptionValues'])) {
+                foreach ($inputArray[1]['productOptionValues'] as $key2 => $optionValue2) {
+                    $combination = [
+                        [
+                            'option' => $inputArray[0]['name'],
+                            'option_id' => $optionValue1['product_option_id'],
+                            'option_value' => $optionValue1['name'],
+                            'option_value_id' => $optionValue1['id'],
+                        ],
+                        [
+
+                            'option' => $inputArray[1]['name'],
+                            'option_id' => $optionValue2['product_option_id'],
+                            'option_value' => $optionValue2['name'],
+                            'option_value_id' => $optionValue2['id'],
+                        ],
+                    ];
+
+                    $outputArray[] = [
+                        'combination' => $combination,
+                        'id' => uniqid(),
+                        'selling_price' => $row['selling_price'],
+                        'retail_price' => $row['retail_price'],
+                        'stock' => $row['stock'],
+                        'sku' => $row['sku'] . $key . $key2,
+                    ];
+                }
+            } else {
+                $combination = [
+                    [
+                        'option' => $inputArray[0]['name'],
+                        'option_id' => $optionValue1['product_option_id'],
+                        'option_value' => $optionValue1['name'],
+                        'option_value_id' => $optionValue1['id'],
+                    ],
+                ];
+
+                $outputArray[] = [
+                    'combination' => $combination,
+                    'id' => uniqid(),
+                    'selling_price' => $row['selling_price'],
+                    'retail_price' => $row['retail_price'],
+                    'stock' => $row['stock'],
+                    'sku' => $row['sku'] . $key,
+                ];
+            }
+        }
+
+        return $outputArray;
+    }
+
     protected function getActions(): array
     {
         return [
@@ -31,6 +87,35 @@ class ListProducts extends ListRecords
                 ->model(Product::class)
                 ->processRowsUsing(
                     function (array $row): Product {
+                        $productOptions = [];
+                        for ($i = 1; $i <= 2; $i++) {
+                            if (isset($row["product_option_{$i}_name"])) {
+                                /** Construct Option and Option Value */
+                                $productOption = [
+                                    'id' => uniqid(),
+                                    'name' => $row["product_option_{$i}_name"],
+                                    'slug' => $row["product_option_{$i}_name"],
+                                    'productOptionValues' => [],
+                                ];
+
+                                $j = 1;
+                                while (isset($row["product_option_{$i}_value_{$j}"])) {
+                                    array_push($productOption['productOptionValues'], [
+                                        'id' => uniqid(),
+                                        'name' => $row["product_option_{$i}_value_{$j}"],
+                                        'slug' => $row["product_option_{$i}_value_{$j}"],
+                                        'product_option_id' => $productOption['id'],
+                                    ]);
+
+                                    $j++;
+                                }
+                                array_push($productOptions, $productOption);
+                            }
+                        }
+
+                        /** Create product variants */
+                        $productVariants = self::generateCombinations($row, $productOptions);
+
                         $data = [
                             'images' => $row['image_link'],
                             'name' => $row['name'],
@@ -40,42 +125,41 @@ class ListProducts extends ListRecords
                             'stock' => $row['stock'],
                             'retail_price' => $row['retail_price'],
                             'selling_price' => $row['selling_price'],
-                            // 'status' => $row['status'],
-                            // 'is_digital_product' => $row['is_digital_product'],
-                            // 'is_featured' => $row['is_featured'],
-                            // 'is_special_offer' => $row['is_special_offer'],
-                            // 'allow_customer_remarks' => $row['allow_customer_remarks'],
                             'weight' => $row['weight'],
                             'length' => $row['length'],
                             'width' => $row['width'],
                             'height' => $row['height'],
-                            // 'minimum_order_quantity' => $row['minimum_order_quantity'],
+                            'product_options' => $productOptions,
+                            'product_variants' => $productVariants,
                         ];
 
-                        // Taxonomies (Category & Product)
-                        $taxoTermIds = [];
+                        /** Taxonomies (Category & Product) */
+                        $taxonomyTermIds = [];
                         foreach (['categories' => $data['categories'], 'brand' => $data['brand']] as $key => $taxonomyTerm) {
                             $taxonomy = Taxonomy::with('taxonomyTerms')
                                 ->whereSlug($key)
-                                ->whereHas('taxonomyTerms', function (Builder $query) use ($taxonomyTerm) {
-                                    $query->where('name', $taxonomyTerm);
-                                })->first();
+                                ->first();
 
-                            if (!$taxonomy) {
-                                $foundTaxo = Taxonomy::where('slug', $key)->first();
-                                // dd($key, $foundTaxo);
-                                if ($foundTaxo) {
-                                    $model = TaxonomyTerm::create(['taxonomy_id' => $foundTaxo->id, 'data' => [
-                                        'main' => [
-                                            'heading' => $taxonomyTerm,
-                                        ],
-                                    ], 'name' => $taxonomyTerm]);
+                            if ($taxonomy) {
+                                $termModel = TaxonomyTerm::whereName($taxonomyTerm)->first();
 
-                                    array_push($taxoTermIds, $model->id);
+                                if (!$termModel) {
+                                    $termModel = TaxonomyTerm::create(
+                                        [
+                                            'name' => $taxonomyTerm,
+                                            'taxonomy_id' => $taxonomy->id,
+                                            'data' => [
+                                                'main' => [
+                                                    'heading' => $taxonomyTerm,
+                                                ],
+                                            ],
+                                        ]
+                                    );
                                 }
+                                array_push($taxonomyTermIds, $termModel->id);
                             }
                         }
-                        $data['taxonomy_terms'] = $taxoTermIds;
+                        $data['taxonomy_terms'] = $taxonomyTermIds;
 
                         unset($row);
                         unset($data['categories']);
