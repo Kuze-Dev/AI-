@@ -59,10 +59,6 @@ class ShippingMethod extends Model implements HasMedia
     use ConstraintsRelationships;
     use InteractsWithMedia;
 
-    /**
-     * Declare columns
-     * that are mass assignable.
-     */
     protected $fillable = [
         'title',
         'slug',

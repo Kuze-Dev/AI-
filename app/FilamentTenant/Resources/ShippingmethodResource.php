@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
+use Exception;
 
 class ShippingmethodResource extends Resource
 {
@@ -102,6 +103,7 @@ class ShippingmethodResource extends Resource
             ]);
     }
 
+    /** @throws Exception */
     public static function table(Table $table): Table
     {
         return $table
@@ -127,7 +129,8 @@ class ShippingmethodResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])
+            ->defaultSort('updated_at', 'desc');
     }
 
     public static function getRelations(): array
