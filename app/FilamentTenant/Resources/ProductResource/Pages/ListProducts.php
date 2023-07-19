@@ -71,7 +71,7 @@ class ListProducts extends ListRecords
                         'Name', 'SKU', 'Description', 'Retail Price', 'Selling Price', 'Stock',
                         'Status', 'Is Digital Product', 'Is Featured', 'Is Special Offer',
                         'Allow Customer Remarks', 'Weight', 'Dimension', 'Minimum Order Quantity',
-                        'Created At'
+                        'Created At',
                     ],
                     fn (Product $product): array => [
                         $product->name,

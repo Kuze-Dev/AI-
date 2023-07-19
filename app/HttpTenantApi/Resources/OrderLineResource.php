@@ -6,7 +6,6 @@ namespace App\HttpTenantApi\Resources;
 
 use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
-use App\HttpTenantApi\Resources\ReviewResource;
 
 /**
  * @mixin \Domain\Order\Models\OrderLine
@@ -31,7 +30,7 @@ class OrderLineResource extends JsonApiResource
             'review' => $reviews ? ReviewResource::make($reviews) : null,
             'remarks' => [
                 'data' => $this->remarks_data,
-                'media' => $this->getMedia('order_line_notes')->toArray()
+                'media' => $this->getMedia('order_line_notes')->toArray(),
             ],
             'purchasable_images' => $this->getMedia('order_line_images')->toArray(),
         ];

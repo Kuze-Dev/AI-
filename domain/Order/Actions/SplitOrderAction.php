@@ -42,8 +42,8 @@ class SplitOrderAction
                 DB::commit();
 
                 return [
-                    "order" => $order,
-                    "payment" => $payment
+                    'order' => $order,
+                    'payment' => $payment,
                 ];
             } catch (Exception $e) {
                 DB::rollBack();
@@ -66,7 +66,7 @@ class SplitOrderAction
                         'details' => PaymentDetailsData::fromArray(
                             [
                                 'subtotal' => strval($order->sub_total - $order->discount_total),
-                                'tax' => strval($order->tax_total)
+                                'tax' => strval($order->tax_total),
                             ]
                         ),
                     ]),

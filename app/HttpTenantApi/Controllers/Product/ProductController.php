@@ -7,7 +7,6 @@ namespace App\HttpTenantApi\Controllers\Product;
 use App\Features\ECommerce\ECommerceBase;
 use App\HttpTenantApi\Resources\ProductResource;
 use Domain\Product\Models\Product;
-use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -29,7 +28,7 @@ class ProductController
                     'is_digital_product',
                     'is_special_offer',
                     'is_featured',
-                    'status'
+                    'status',
                 ])
                 ->allowedIncludes([
                     'productOptions',

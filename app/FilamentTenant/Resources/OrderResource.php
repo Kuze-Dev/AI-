@@ -342,7 +342,7 @@ class OrderResource extends Resource
                             ->action(function () use ($get, $set) {
                                 $order = Order::find($get('id'));
 
-                                $isPaid = !$order->is_paid;
+                                $isPaid = ! $order->is_paid;
 
                                 $result = $order->update([
                                     'is_paid' => $isPaid,
@@ -412,7 +412,7 @@ class OrderResource extends Resource
                             ->icon('heroicon-s-eye');
                     })->fullWidth()->size('md')
                     ->hidden(function (Order $record) {
-                        return $record->payments[0]->gateway != "bank-transfer";
+                        return $record->payments[0]->gateway != 'bank-transfer';
                     }),
                 Support\Divider::make(''),
                 Forms\Components\Grid::make(2)

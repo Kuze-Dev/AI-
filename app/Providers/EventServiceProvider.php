@@ -22,7 +22,7 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         PaymentProcessEvent::class => [
-            OrderUpdatedListener::class
+            OrderUpdatedListener::class,
         ],
     ];
 

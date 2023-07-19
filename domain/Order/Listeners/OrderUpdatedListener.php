@@ -17,8 +17,8 @@ class OrderUpdatedListener
             $order = $event->payment->payable;
 
             match ($status) {
-                "paid" => $this->onOrderPaid($order),
-                    // "cancel" => $this->onOrderCancelled($order),
+                'paid' => $this->onOrderPaid($order),
+                // "cancel" => $this->onOrderCancelled($order),
                 default => null
             };
         }
