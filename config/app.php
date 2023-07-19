@@ -182,6 +182,7 @@ return [
         Domain\Role\RoleServiceProvider::class,
         Domain\Blueprint\BlueprintServiceProvider::class,
         Domain\Shipment\ShippingMethodServiceProvider::class,
+        Domain\Tier\TierServiceProvider::class,
 
         /*
         * Support Service Providers...
