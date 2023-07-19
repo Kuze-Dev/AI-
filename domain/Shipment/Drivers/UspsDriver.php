@@ -15,8 +15,6 @@ use Domain\Shipment\DataTransferObjects\ParcelData;
 
 class UspsDriver
 {
-    //    protected string $name = 'usps';
-
     public function __construct(
         private readonly RateClient $rateClient,
         private readonly AddressClient $addressClient
@@ -29,15 +27,13 @@ class UspsDriver
         AddressValidateRequestData $addressValidateRequestData
     ): RateResponse {
 
-        if ($customer->verifiedAddress !== null) {
+        $verifiedAddress = $customer->verifiedAddress;
 
-            $verifiedAddress = $customer->verifiedAddress;
-
-            # check if customer shipping was Change
+        if ($verifiedAddress !== null) {
 
             if ($verifiedAddress->address != $addressValidateRequestData->toArray()) {
 
-                $updatedVerifiedAddress = app(AddressClient::class)->verify($addressValidateRequestData);
+                $updatedVerifiedAddress = $this->addressClient->verify($addressValidateRequestData);
 
                 $verifiedAddress->update([
                     'address' => $addressValidateRequestData->toArray(),

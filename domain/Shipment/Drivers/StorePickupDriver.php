@@ -6,10 +6,9 @@ namespace Domain\Shipment\Drivers;
 
 class StorePickupDriver
 {
-    //    protected string $name = 'store-pickup';
-
     public function getRate(): float
     {
+        // TODO: not yet implemented
         return 0.00;
     }
 }
