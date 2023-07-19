@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             Auth\AdminSeeder::class,
             Page\PageSeeder::class,
             Address\CountrySeeder::class,
+            ShippingMethod\ShippingMethodSeeder::class,
         ]);
     }
 }
