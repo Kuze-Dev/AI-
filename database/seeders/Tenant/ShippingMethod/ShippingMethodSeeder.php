@@ -23,7 +23,7 @@ class ShippingMethodSeeder extends Seeder
                 'title' => 'USPS',
                 'subtitle' => 'usps',
                 'description' => 'test',
-                'driver' => Driver::STORE_PICKUP,
+                'driver' => Driver::USPS,
                 'ship_from_address' => [
                     'address' => '185 BERRY ST',
                     'state' => 'CA',
