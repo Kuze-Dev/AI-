@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\Log;
 
 abstract class BaseClient
 {
-    private const URI = '';
-
     public function __construct(
         protected readonly Client $client
     ) {

@@ -18,6 +18,8 @@ class AddressValidateResponseData
 
     public static function fromArray(array $data): self
     {
+        $data = $data['AddressValidateResponse']['Address'];
+
         return new self(
             state: $data['State'],
             zip4: $data['Zip4'],

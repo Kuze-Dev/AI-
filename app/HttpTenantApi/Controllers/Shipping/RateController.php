@@ -21,13 +21,14 @@ class RateController extends Controller
     public function __invoke(ShippingMethod $shippingMethod, Address $address): mixed
     {
         $this->authorize('view', $address);
+
         /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = Auth::user()->load('verifiedAddress');
+        $customer = Auth::user();
 
         return response(
             app(GetShippingRateAction::class)
                 ->execute(
-                    customer: $customer,
+                    customer: $customer->load('verifiedAddress'),
                     parcelData: new ParcelData(
                         pounds: '10',
                         ounces: '0'

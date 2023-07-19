@@ -44,11 +44,8 @@ class RateClient extends BaseClient
         $array = XmlToArray::convert($body);
 
         self::throwError($array);
-        ray($array);
 
-        return new RateV4ResponseData(
-            rate: (float) $array['RateV4Response']['Package']['Postage']['Rate']
-        );
+        return RateV4ResponseData::fromArray($array);
     }
 
     public function getInternationalVersion2(): IntlRateV2ResponseData

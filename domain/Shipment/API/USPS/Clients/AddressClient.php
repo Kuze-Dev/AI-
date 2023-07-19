@@ -20,10 +20,10 @@ class AddressClient extends BaseClient
     {
         $array = [
             'Revision' => '1',
-            'Address' => get_object_vars($addressData),
+            'Address' => $addressData->toArray(),
         ];
 
-        $result = ArrayToXml::convert($array, [
+        $xml = ArrayToXml::convert($array, [
             'rootElementName' => 'AddressValidateRequest',
             '_attributes' => [
                 'USERID' => $this->client->username,
@@ -33,7 +33,7 @@ class AddressClient extends BaseClient
         $body = $this->client->getClient()
             ->withQueryParameters([
                 'API' => 'Verify',
-                'XML' => $result,
+                'XML' => $xml,
             ])
             ->get(self::uri())
             ->body();
@@ -46,8 +46,6 @@ class AddressClient extends BaseClient
             abort(422, $array['AddressValidateResponse']['Address']['Error']['Description']);
         }
 
-        return AddressValidateResponseData::fromArray(
-            $array['AddressValidateResponse']['Address']
-        );
+        return AddressValidateResponseData::fromArray($array);
     }
 }

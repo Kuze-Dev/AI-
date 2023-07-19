@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\Drivers;
 
-class StorePickup
+class StorePickupDriver
 {
     //    protected string $name = 'store-pickup';
 

@@ -9,8 +9,28 @@ use Domain\Shipment\API\USPS\Contracts\RateResponse;
 class RateV4ResponseData implements RateResponse
 {
     public function __construct(
-        public readonly float $rate
+        public readonly PackageData $package,
     ) {
+    }
+
+    public static function fromArray(array $data): self
+    {
+        $data = $data['RateV4Response']['Package'];
+
+        return new self(
+            package: new PackageData(
+                zip_origination: (int) $data['ZipOrigination'],
+                zip_destination: (int) $data['ZipDestination'],
+                pounds: (int) $data['Pounds'],
+                qunces: (int) $data['Ounces'],
+                container: $data['Container'],
+                zone: (int) $data['Zone'],
+                postage: new PostageData(
+                    mail_service: $data['Postage']['MailService'],
+                    rate: (float) $data['Postage']['Rate'],
+                ),
+            )
+        );
     }
 
     public function getRateResponseAPI(): array

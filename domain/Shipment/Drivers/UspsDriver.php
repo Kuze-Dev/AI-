@@ -29,7 +29,7 @@ class UspsDriver
         AddressValidateRequestData $addressValidateRequestData
     ): RateResponse {
 
-        if ($customer->verifiedAddress) {
+        if ($customer->verifiedAddress->count() > 0) {
 
             $verifiedAddress = $customer->verifiedAddress;
 
@@ -46,7 +46,7 @@ class UspsDriver
 
             }
 
-            $zipDestination = $verifiedAddress->verified_address['zip5'];
+            $zipDestination = $verifiedAddress->verified_address['zip5'] ?? null;
 
         } else {
 
