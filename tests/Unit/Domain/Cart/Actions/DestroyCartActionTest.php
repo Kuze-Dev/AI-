@@ -18,4 +18,9 @@ it('can delete cart', function () {
     Sanctum::actingAs($customer);
 
     $cart = CartFactory::new()->setCustomerId($customer->id)->createOne();
+
+    $result = app(DestroyCartAction::class)
+        ->execute($cart);
+
+    expect($result)->toBe(true);
 });

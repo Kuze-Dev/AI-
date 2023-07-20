@@ -15,6 +15,12 @@ use Exception;
 
 class CreateCartLineAction
 {
+    public function __construct(
+        private readonly CreateMediaFromUrlAction $createMediaFromUrlAction
+    ) {
+    }
+
+
     public function execute(Cart $cart, CreateCartData $cartLineData): CartLine|Exception
     {
         DB::beginTransaction();
@@ -59,8 +65,7 @@ class CreateCartLineAction
             }
 
             if ($cartLineData->medias !== null) {
-                app(CreateMediaFromUrlAction::class)
-                    ->execute($cartLine, $cartLineData->medias, 'cart_line_notes');
+                $this->createMediaFromUrlAction->execute($cartLine, $cartLineData->medias, 'cart_line_notes');
             }
 
             DB::commit();
@@ -68,7 +73,7 @@ class CreateCartLineAction
             return $cartLine;
         } catch (Exception $e) {
             DB::rollBack();
-            \Log::info($e);
+            \Log::info('Error on CreateCartLineAction->execute() ' . $e);
             return $e;
         }
     }
