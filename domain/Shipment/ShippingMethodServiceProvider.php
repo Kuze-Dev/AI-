@@ -7,6 +7,9 @@ namespace Domain\Shipment;
 use App\Settings\ShippingSettings;
 use Domain\Shipment\API\USPS\Clients\Client;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
+use Domain\Shipment\Drivers\StorePickupDriver;
+use Domain\Shipment\Drivers\UspsDriver;
+use Domain\ShippingMethod\Enums\Driver;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
@@ -47,7 +50,10 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
                     app(ShippingManagerInterface::class)
                         ->extend(
                             $shippingMethod->driver->value,
-                            fn () => $shippingMethod->driver->getShipping()
+                            fn () => match ($shippingMethod->driver) {
+                                Driver::STORE_PICKUP => new StorePickupDriver(),
+                                Driver::USPS => new UspsDriver(),
+                            }
                         );
                 }
             }

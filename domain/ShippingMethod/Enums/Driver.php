@@ -11,12 +11,4 @@ enum Driver: string
 {
     case USPS = 'usps';
     case STORE_PICKUP = 'store-pickup';
-
-    public function getShipping(): UspsDriver|StorePickupDriver
-    {
-        return match ($this) {
-            Driver::STORE_PICKUP => new StorePickupDriver(),
-            Driver::USPS => new UspsDriver(),
-        };
-    }
 }
