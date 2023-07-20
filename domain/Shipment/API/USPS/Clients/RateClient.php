@@ -43,7 +43,7 @@ class RateClient extends BaseClient
 
         $array = XmlToArray::convert($body);
 
-        self::throwError($array);
+        self::throwError($array, __METHOD__.':'.__LINE__);
 
         return RateV4ResponseData::fromArray($array);
     }
@@ -86,7 +86,7 @@ class RateClient extends BaseClient
             ->body();
         $array = XmlToArray::convert($body);
 
-        self::throwError($array);
+        self::throwError($array, __METHOD__.':'.__LINE__);
 
         return IntlRateV2ResponseData::fromArray($array);
     }

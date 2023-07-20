@@ -40,7 +40,7 @@ class AddressClient extends BaseClient
 
         $array = XmlToArray::convert($body);
 
-        self::throwError($array);
+        self::throwError($array, __METHOD__.':'.__LINE__);
 
         if (isset($array['AddressValidateResponse']['Address']['Error'])) {
             abort(422, $array['AddressValidateResponse']['Address']['Error']['Description']);

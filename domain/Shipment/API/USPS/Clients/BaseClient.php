@@ -16,14 +16,12 @@ abstract class BaseClient
 
     abstract public static function uri(): string;
 
-    protected static function throwError(array $array): void
+    protected static function throwError(array $array, string $methodCall): void
     {
         if (isset($array['Error'])) {
-            $debug = debug_backtrace()[0];
-            $fileLine = $debug['file'].':'.$debug['line'];
-            Log::error('Error on '.$fileLine, $array);
+            Log::error('Error on '.$methodCall, $array);
             if (app()->isLocal()) {
-                throw new Exception($fileLine.': '.json_encode($array));
+                throw new Exception($methodCall.': '.json_encode($array));
             } else {
                 abort(422, 'Something wrong.');
             }

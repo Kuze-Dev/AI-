@@ -6,19 +6,12 @@ namespace Domain\Shipment;
 
 use App\Settings\ShippingSettings;
 use Domain\Shipment\API\USPS\Clients\Client;
-use Domain\Shipment\Contracts\ShippingManagerInterface;
-use Domain\ShippingMethod\Models\ShippingMethod;
-use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 
-class ShippingMethodServiceProvider extends ServiceProvider implements DeferrableProvider
+class ShippingMethodServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(
-            ShippingManagerInterface::class,
-            fn ($app) => $app->make(ShippingManager::class)
-        );
 
         $this->app->bind(
             Client::class,
@@ -36,29 +29,7 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
         $this->mergeConfigFrom(__DIR__ . '/config/shipment.php', 'domain.shipment');
     }
 
-    public function boot(): void
-    {
-        if (tenancy()->initialized) {
-
-            $shippingMethods = ShippingMethod::whereStatus(true);
-
-            if ($shippingMethods->count() > 0) {
-                foreach ($shippingMethods->get() as $shippingMethod) {
-                    app(ShippingManagerInterface::class)
-                        ->extend(
-                            $shippingMethod->driver->value,
-                            fn () => $shippingMethod->driver->getShipping()
-                        );
-                }
-            }
-        }
-    }
-
-    public function provides(): array
-    {
-        return [
-            ShippingManagerInterface::class,
-            Client::class,
-        ];
-    }
+    //    public function boot(): void
+    //    {
+    //    }
 }
