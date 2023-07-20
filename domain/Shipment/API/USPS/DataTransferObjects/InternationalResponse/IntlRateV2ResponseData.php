@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Shipment\API\USPS\DataTransferObjects\InternationalResponse;
 
 use Domain\Shipment\API\USPS\Contracts\RateResponse;
+use InvalidArgumentException;
 
 class IntlRateV2ResponseData implements RateResponse
 {
@@ -68,5 +69,16 @@ class IntlRateV2ResponseData implements RateResponse
     public function getRateResponseAPI(): array
     {
         return ['is_united_state_domestic' => false] + get_object_vars($this);
+    }
+
+    public function getRate(int $serviceID = null): float
+    {
+        foreach ($this->package->services as $service) {
+            if($service->id === $serviceID) {
+                return $service->postage;
+            }
+        }
+
+        throw new InvalidArgumentException('Service Not Found');
     }
 }

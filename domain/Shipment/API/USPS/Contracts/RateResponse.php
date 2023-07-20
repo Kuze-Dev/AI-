@@ -7,4 +7,6 @@ namespace Domain\Shipment\API\USPS\Contracts;
 interface RateResponse
 {
     public function getRateResponseAPI(): array;
+
+    public function getRate(int $service = null): float;
 }

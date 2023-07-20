@@ -7,12 +7,8 @@ namespace Domain\Shipment\Actions\USPS;
 use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
 use Domain\Shipment\Actions\GetShippingRateAction;
-use Domain\Shipment\API\USPS\DataTransferObjects\InternationalResponse\ServiceData;
-use Domain\Shipment\API\USPS\DataTransferObjects\ShippingRateData;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\ShippingMethod\Models\ShippingMethod;
-use InvalidArgumentException;
-use Throwable;
 
 class GetUSPSRateAction
 {
@@ -26,34 +22,15 @@ class GetUSPSRateAction
         ParcelData $parcelData,
         ShippingMethod $shippingMethod,
         Address $address,
-        ?int $service_id = null
-    ): ShippingRateData {
+        ?int $serviceID = null
+    ): float {
 
-        try {
-            $data = $this->getShippingRateAction->execute(
-                $customer,
-                $parcelData,
-                $shippingMethod,
-                $address
-            )->getRateResponseAPI();
-
-            if ($data['is_united_state_domestic']) {
-
-                return new ShippingRateData($data['package']->postage->rate);
-            }
-
-            $services = $data['package']->services;
-
-            /** @var ServiceData $filteredServices */
-            $filteredServices = array_filter($services, function ($service) use ($service_id) {
-                return $service->id === $service_id;
-            })['0'];
-
-            return new ShippingRateData($filteredServices->postage);
-
-        } catch (Throwable) {
-            throw new InvalidArgumentException('Service Not Found');
-        }
-
+        return $this->getShippingRateAction->execute(
+            $customer,
+            $parcelData,
+            $shippingMethod,
+            $address
+        )
+            ->getRate($serviceID);
     }
 }

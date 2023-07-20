@@ -6,7 +6,7 @@ namespace Domain\Shipment\API\USPS\DataTransferObjects\InternationalResponse;
 
 class PackageData
 {
-    /** @param array<\Domain\Shipment\API\USPS\DataTransferObjects\InternationalResponse\ServiceData> $services */
+    /** @param \Domain\Shipment\API\USPS\DataTransferObjects\InternationalResponse\ServiceData[] $services */
     public function __construct(
         public readonly string $prohibition,
         public readonly string $restriction,
