@@ -31,7 +31,11 @@ class GetShippingRateAction
             );
         }
 
-        return $shippingDriver->getInternationalRate();
+        return $shippingDriver->getInternationalRate(
+            $customer,
+            $parcelData,
+            $address,
+        );
     }
 
     protected function isDomesticInUnitedStates(Address $address): bool

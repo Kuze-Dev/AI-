@@ -28,7 +28,7 @@ class ShippingMethodSeeder extends Seeder
                     'address' => '185 BERRY ST',
                     'state' => 'CA',
                     'city' => 'SAN FRANCISCO',
-                    'zip3' => '94107',
+                    'zip5' => '94107',
                     'zip4' => '1741',
                 ],
                 'status' => true,

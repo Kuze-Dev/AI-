@@ -67,6 +67,6 @@ class IntlRateV2ResponseData implements RateResponse
 
     public function getRateResponseAPI(): array
     {
-        return ['is_united_state_domestic' => true] + get_object_vars($this);
+        return ['is_united_state_domestic' => false] + get_object_vars($this);
     }
 }

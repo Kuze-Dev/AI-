@@ -9,6 +9,8 @@ class ParcelData
     public function __construct(
         public readonly string $pounds,
         public readonly string $ounces,
+        public readonly string $zip_origin,
+        public readonly ?string $parcel_value = null,
         public readonly ?string $height = null,
         public readonly ?string $width = null,
         public readonly ?string $length = null,
