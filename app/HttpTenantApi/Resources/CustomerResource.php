@@ -27,11 +27,11 @@ class CustomerResource extends JsonApiResource
         ];
     }
 
-    //    /** @return array<string, callable> */
-    //    public function toRelationships(Request $request): array
-    //    {
-    //        return [
-    //            'media' => fn () => MediaResource::collection($this->media),
-    //        ];
-    //    }
+    /** @return array<string, callable> */
+    public function toRelationships(Request $request): array
+    {
+        return [
+            'media' => fn () => MediaResource::collection($this->media),
+        ];
+    }
 }
