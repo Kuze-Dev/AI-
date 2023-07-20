@@ -59,7 +59,7 @@ class GetUSPSRateAction
         return $this->rateClient->getV4(
             new RateV4RequestData(
                 Service: ServiceType::PRIORITY,
-                ZipOrigination: '94107', // TODO: add real data here
+                ZipOrigination: $parcelData->zip_origin, // TODO: add real data here
                 ZipDestination:$zipDestination,
                 Pounds: $parcelData->pounds,
                 Ounces:$parcelData->ounces,

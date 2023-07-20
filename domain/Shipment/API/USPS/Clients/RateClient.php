@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Shipment\API\USPS\Clients;
 
 use Domain\Shipment\API\USPS\DataTransferObjects\InternationalResponse\IntlRateV2ResponseData;
+use Domain\Shipment\API\USPS\DataTransferObjects\Ratev2InternationalRequestData;
 use Domain\Shipment\API\USPS\DataTransferObjects\RateV4RequestData;
 use Domain\Shipment\API\USPS\DataTransferObjects\RateV4Response\RateV4ResponseData;
 use Spatie\ArrayToXml\ArrayToXml;
@@ -48,25 +49,32 @@ class RateClient extends BaseClient
         return RateV4ResponseData::fromArray($array);
     }
 
-    public function getInternationalVersion2(): IntlRateV2ResponseData
+    public function getInternationalVersion2(Ratev2InternationalRequestData $requestData): IntlRateV2ResponseData
     {
+
+        // $array = [
+        //     'Revision' => '2',
+        //     'Package' => [
+        //         '_attributes' => ['ID' => '0'],
+        //         'Pounds' => 15.12345678,
+        //         'Ounces' => 0,
+        //         'MailType' => 'Package',
+        //         'ValueOfContents' => 200,
+        //         'Country' => 'Philippines',
+        //         'Width' => 10,
+        //         'Length' => 15,
+        //         'Height' => 10,
+        //         'OriginZip' => 18701,
+        //         'AcceptanceDateTime' => '2023-07-28T13:15:00-06:00',
+        //         'DestinationPostalCode' => 1603,
+        //     ],
+        // ];
 
         $array = [
             'Revision' => '2',
-            'Package' => [
+            'Package' => array_merge([
                 '_attributes' => ['ID' => '0'],
-                'Pounds' => 15.12345678,
-                'Ounces' => 0,
-                'MailType' => 'Package',
-                'ValueOfContents' => 200,
-                'Country' => 'Philippines',
-                'Width' => 10,
-                'Length' => 15,
-                'Height' => 10,
-                'OriginZip' => 18701,
-                'AcceptanceDateTime' => '2023-07-28T13:15:00-06:00',
-                'DestinationPostalCode' => 1603,
-            ],
+            ], $requestData->toArray()),
         ];
 
         $xml = ArrayToXml::convert($array, [

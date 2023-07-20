@@ -14,6 +14,6 @@ enum MailType: string
     case FLAT = 'FLAT';
     case PARCEL = 'PARCEL';
     case POSTCARD = 'POSTCARD';
-    case PACKAGE = 'PACKAGE';
+    case PACKAGE = 'Package';
     case PACKAGE_SERVICE = 'PACKAGE SERVICE';
 }

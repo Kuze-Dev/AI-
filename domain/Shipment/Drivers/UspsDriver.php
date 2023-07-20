@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\Drivers;
 
+use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
 use Domain\Shipment\Actions\USPS\GetUSPSInternationalRateAction;
 use Domain\Shipment\Actions\USPS\GetUSPSRateAction;
@@ -21,8 +22,15 @@ class UspsDriver
         return app(GetUSPSRateAction::class)->execute(...func_get_args());
     }
 
-    public function getInternationalRate(): RateResponse
-    {
-        return app(GetUSPSInternationalRateAction::class)->execute();
+    public function getInternationalRate(
+        Customer $customer,
+        ParcelData $parcelData,
+        Address $address,
+    ): RateResponse {
+        return app(GetUSPSInternationalRateAction::class)->execute(
+            $customer,
+            $parcelData,
+            $address,
+        );
     }
 }

@@ -31,7 +31,12 @@ class RateController extends Controller
                     customer: $customer->load('verifiedAddress'),
                     parcelData: new ParcelData(
                         pounds: '10',
-                        ounces: '0'
+                        ounces: '0',
+                        width: '10',
+                        height: '10',
+                        length: '10',
+                        zip_origin: $shippingMethod->ship_from_address['zip5'],
+                        parcel_value: '200',
                     ),
                     shippingMethod: $shippingMethod,
                     address: $address
