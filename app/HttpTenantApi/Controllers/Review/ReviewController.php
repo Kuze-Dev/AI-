@@ -51,7 +51,9 @@ class ReviewController
 
     public function destroy(int $review): JsonResponse
     {
-        $review = Review::where('id', $review)
+        $customer = auth()->user();
+        
+        $review = Review::where('product_id', $review)->where('customer_id', $customer->id)
             ->firstOrFail();
 
         $review->delete();
