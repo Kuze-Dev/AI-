@@ -18,7 +18,6 @@ abstract class BaseClient
 
     protected static function throwError(array $array): void
     {
-        ray();
         if (isset($array['Error'])) {
             $debug = debug_backtrace()[0];
             $fileLine = $debug['file'].':'.$debug['line'];
