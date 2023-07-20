@@ -7,7 +7,9 @@ use Domain\Cart\Database\Factories\CartLineFactory;
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Product\Database\Factories\ProductFactory;
+use Domain\Product\Database\Factories\ProductVariantFactory;
 use Domain\Product\Models\Product;
+use Domain\Product\Models\ProductVariant;
 
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\patchJson;
@@ -17,7 +19,11 @@ use function Pest\Laravel\withHeader;
 beforeEach(function () {
     testInTenantContext();
 
-    ProductFactory::new()->createOne();
+    $product = ProductFactory::new()->createOne();
+
+    $product->update([
+        "allow_customer_remarks" => true,
+    ]);
 
     $customer = CustomerFactory::new()
         ->createOne();
@@ -27,14 +33,14 @@ beforeEach(function () {
     withHeader('Authorization', 'Bearer ' . $customer
         ->createToken('testing-auth')
         ->plainTextToken);
+
+    $this->product = $product;
+    return compact('product');
 });
 
-it('can add to cart', function () {
-    $product = ProductFactory::new()
-        ->createOne();
-
+it('can add to cart a purchasable product', function () {
     postJson('api/carts/cartlines', [
-        'purchasable_id' => $product->id,
+        'purchasable_id' => $this->product->id,
         'purchasable_type' => "Product",
         "quantity" => 1
     ])
@@ -42,13 +48,57 @@ it('can add to cart', function () {
         ->assertOk();
 });
 
-it('can update cart line quantity', function () {
+it('can add to cart a purchasable product with variant', function () {
+    $productVariant = ProductVariantFactory::new()->setProductId($this->product->id)
+        ->createOne();
 
+    postJson('api/carts/cartlines', [
+        'purchasable_id' => $this->product->id,
+        'variant_id' => $productVariant->id,
+        'purchasable_type' => "Product",
+        "quantity" => 1
+    ])
+        ->assertValid()
+        ->assertOk();
+});
+
+it('can add to cart a purchasable product with remarks', function () {
+    $productVariant = ProductVariantFactory::new()->setProductId($this->product->id)
+        ->createOne();
+
+    postJson('api/carts/cartlines', [
+        'purchasable_id' => $this->product->id,
+        'variant_id' => $productVariant->id,
+        'purchasable_type' => "Product",
+        "quantity" => 1,
+        "remarks" => [
+            "notes" => "test remarks"
+        ]
+    ])
+        ->assertValid()
+        ->assertOk();
+});
+
+it('can update cart line quantity', function () {
     $cartLine = CartLineFactory::new()->createOne();
 
     patchJson('api/carts/cartlines/' . $cartLine->id, [
         'type' => "quantity",
         "quantity" => 2
+    ])
+        ->assertValid()
+        ->assertOk();
+});
+
+it('can update cart line remarks', function () {
+
+    $cartLine = CartLineFactory::new()->createOne();
+
+    patchJson('api/carts/cartlines/' . $cartLine->id, [
+        'type' => "remarks",
+        "remarks" => [
+            "notes" => "test remarks"
+        ]
     ])
         ->assertValid()
         ->assertOk();

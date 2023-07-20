@@ -8,6 +8,7 @@ use Domain\Cart\DataTransferObjects\CreateCartData;
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Product\Database\Factories\ProductFactory;
+use Domain\Product\Database\Factories\ProductVariantFactory;
 use Domain\Product\Models\ProductVariant;
 use Laravel\Sanctum\Sanctum;
 
@@ -52,17 +53,8 @@ it('can create cart lines with product_variant as purchasable', function () {
     $product = ProductFactory::new()
         ->createOne();
 
-    $productVariant = ProductVariant::create([
-        'product_id' => $product->id,
-        'sku' => $product->sku . 1,
-        'combination' => [
-            "color" => "black",
-            "size" => "large"
-        ],
-        'retail_price' => $product->retail_price,
-        'selling_price' => $product->selling_price,
-        'stock' => $product->stock,
-    ]);
+    $productVariant = ProductVariantFactory::new()->setProductId($product->id)
+        ->createOne();
 
     $payload = [
         "purchasable_id" => $product->id,
