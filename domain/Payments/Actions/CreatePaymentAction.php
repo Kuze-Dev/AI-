@@ -5,16 +5,19 @@ declare(strict_types=1);
 namespace Domain\Payments\Actions;
 
 use Domain\PaymentMethod\Models\PaymentMethod;
-use Domain\Payments\Contracts\PaymentManagerInterface;
 use Domain\Payments\DataTransferObjects\CreatepaymentData;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
-use Domain\Payments\DataTransferObjects\ProviderData;
 use Domain\Payments\Interfaces\PayableInterface;
 use Throwable;
 use DB;
 
 class CreatePaymentAction
 {
+    public function __construct(
+        public readonly CreatePaymentLink $createPaymentlink
+    ) {
+    }
+
     /** Execute create collection query. */
     public function execute(PayableInterface $model, CreatepaymentData $paymentData): PaymentAuthorize
     {
@@ -33,20 +36,12 @@ class CreatePaymentAction
                 'status' => 'pending',
             ]);
 
-            $providerData = new ProviderData(
-                transactionData: $paymentData->transactionData,
-                paymentModel: $paymentTransaction,
-                payment_method_id: $paymentMethod->id,
-            );
-
-            $result = app(PaymentManagerInterface::class)
-                ->driver($paymentMethod->slug)
-                ->withData($providerData)
-                ->authorize();
-
             DB::commit();
 
-            return $result;
+            return $this->createPaymentlink->execute(
+                $paymentTransaction,
+                $paymentData
+            );
 
         } catch (Throwable $th) {
 
