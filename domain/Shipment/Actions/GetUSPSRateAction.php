@@ -43,15 +43,14 @@ class GetUSPSRateAction
 
             $services = $data['package']->services;
 
-            /** @var ServiceData */
+            /** @var ServiceData $filteredServices */
             $filteredServices = array_filter($services, function ($service) use ($service_id) {
                 return $service->id === $service_id;
             })['0'];
 
             return new ShippingRateData($filteredServices->postage);
 
-        } catch (Throwable $th) {
-
+        } catch (Throwable) {
             throw new InvalidArgumentException('Service Not Found');
         }
 
