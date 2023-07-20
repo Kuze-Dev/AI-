@@ -34,6 +34,8 @@ class ReviewController
         $customer = auth()->user();
         if ( ! $validatedData['anonymous']) {
             $review->customer_id = $customer->id;
+            $review->customer_name = $customer->first_name. ' ' .$customer->last_name;
+            $review->customer_email = $customer->email;
         }
 
         if ($validatedData['media'] !== null) {
@@ -67,7 +69,7 @@ class ReviewController
     {
         $customer = auth()->user();
 
-        $review = QueryBuilder::for(Review::whereCustomerId($customer->id)->whereOrderLineId($orderLineId))
+        $review = QueryBuilder::for(Review::whereOrderLineId($orderLineId))
             ->allowedIncludes([
                 'media',
             ])->first();
