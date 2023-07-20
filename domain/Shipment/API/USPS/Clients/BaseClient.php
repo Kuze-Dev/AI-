@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Shipment\API\USPS\Clients;
 
 use Illuminate\Support\Facades\Log;
+use Exception;
 
 abstract class BaseClient
 {
@@ -19,7 +20,11 @@ abstract class BaseClient
     {
         if (isset($array['Error'])) {
             Log::error('error', $array);
-            abort(422, 'Something wrong.');
+            if (app()->isLocal()) {
+                throw new Exception(json_encode($array));
+            } else {
+                abort(422, 'Something wrong.');
+            }
         }
     }
 }
