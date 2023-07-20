@@ -28,7 +28,7 @@ class OrderController extends Controller
     {
         return OrderResource::collection(
             QueryBuilder::for(
-                Order::with(['shippingAddress', 'billingAddress'])->whereBelongsTo(auth()->user())
+                Order::with(['shippingAddress', 'billingAddress', 'orderLines.media', 'orderLines.review'])->whereBelongsTo(auth()->user())
             )
                 ->allowedIncludes(['orderLines'])
                 ->allowedFilters(['status'])
