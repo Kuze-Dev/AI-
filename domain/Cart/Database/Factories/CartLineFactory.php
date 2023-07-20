@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Domain\Cart\Database\Factories;
+
+use Domain\Cart\Models\CartLine;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class CartLineFactory extends Factory
+{
+    protected $model = CartLine::class;
+
+    public function definition(): array
+    {
+        return [
+            'cart_id' => 1,
+            'purchasable_id' => 1,
+            'purchasable_type' => "Product",
+            'quantity' => 1,
+            'remarks' => "test remarks",
+        ];
+    }
+
+    public function setCartId(int $id): self
+    {
+        return $this->state(['cart_id' => $id]);
+    }
+
+    public function setPurchasableId(int $id): self
+    {
+        return $this->state(['purchasable_id' => $id]);
+    }
+
+    public function setPurchasableType(string $type): self
+    {
+        return $this->state(['purchasable_type' => $type]);
+    }
+}
