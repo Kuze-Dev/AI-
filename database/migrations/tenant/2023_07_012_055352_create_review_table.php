@@ -22,6 +22,7 @@ return new class () extends Migration {
 
             $table->smallInteger('rating');
             $table->string('comment')->nullable();
+            $table->json('data')->nullable();
 
             $table->timestamps();
         });
