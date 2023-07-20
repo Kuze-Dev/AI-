@@ -26,4 +26,12 @@ class CustomerResource extends JsonApiResource
             'is_verified' => $this->hasVerifiedEmail(),
         ];
     }
+
+    //    /** @return array<string, callable> */
+    //    public function toRelationships(Request $request): array
+    //    {
+    //        return [
+    //            'media' => fn () => MediaResource::collection($this->media),
+    //        ];
+    //    }
 }
