@@ -33,6 +33,7 @@ class IntlRateV2ResponseData implements RateResponse
             }
 
             $services[] = new ServiceData(
+                id: (int) $service['_attributes']['ID'],
                 pound: (float) $service['Pounds'],
                 qunces: (int) $service['Ounces'],
                 mail_type: $service['MailType'],

@@ -8,6 +8,7 @@ class ServiceData
 {
     /** @param array<\Domain\Shipment\API\USPS\DataTransferObjects\InternationalResponse\ExtraServiceData> $extra_services */
     public function __construct(
+        public readonly int $id,
         public readonly float $pound,
         public readonly int $qunces,
         public readonly string $mail_type,
