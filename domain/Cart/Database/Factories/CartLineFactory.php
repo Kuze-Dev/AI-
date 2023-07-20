@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Cart\Database\Factories;
 
 use Domain\Cart\Models\CartLine;
+use Domain\Product\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CartLineFactory extends Factory
@@ -16,7 +17,7 @@ class CartLineFactory extends Factory
         return [
             'cart_id' => 1,
             'purchasable_id' => 1,
-            'purchasable_type' => "Product",
+            'purchasable_type' => Product::class,
             'quantity' => 1,
             'remarks' => "test remarks",
         ];
