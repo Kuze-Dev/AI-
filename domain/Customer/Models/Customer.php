@@ -136,7 +136,8 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')
-            ->singleFile();
+            ->singleFile()
+            ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Tier\Models\Tier, \Domain\Customer\Models\Customer> */
