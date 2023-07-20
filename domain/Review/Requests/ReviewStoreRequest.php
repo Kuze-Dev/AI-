@@ -38,7 +38,6 @@ class ReviewStoreRequest extends FormRequest
             'product_id' => [
                 'required',
                 Rule::exists('products', 'id'),
-                Rule::exists('order_lines', 'purchasable_id'),
             ],
             'order_line_id' => [
                 'required',
