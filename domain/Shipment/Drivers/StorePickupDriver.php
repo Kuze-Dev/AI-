@@ -11,11 +11,11 @@ class StorePickupDriver
 {
     public function getRate(): RateResponse
     {
-        return app(StorePickupResponseData::class);
+        return new StorePickupResponseData();
     }
 
     public function getInternationalRate(): RateResponse
     {
-        return app(StorePickupResponseData::class);
+        return new StorePickupResponseData();
     }
 }
