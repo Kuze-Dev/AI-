@@ -14,8 +14,7 @@ class OrderLineResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
-        $reviews = $this->reviewDetails();
-
+        $reviews = $this->review;
         return  [
             'purchasable_id' => $this->purchasable_id,
             'purchasable_sku' => $this->purchasable_sku,

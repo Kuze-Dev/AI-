@@ -30,6 +30,7 @@ class OrderController extends Controller
             QueryBuilder::for(
                 Order::with(['shippingAddress', 'billingAddress',])->whereBelongsTo(auth()->user())
             )
+                ->allowedIncludes(['orderLines'])
                 ->allowedFilters(['status'])
                 ->allowedSorts(['reference', 'total', 'status', 'created_at'])
                 ->jsonPaginate()
@@ -62,7 +63,7 @@ class OrderController extends Controller
         // $this->authorize('view', $order);
 
         $model = QueryBuilder::for(
-            $order->whereBelongsTo(auth()->user())->whereReference($order->reference)
+            $order->with('orderLines.review')->whereBelongsTo(auth()->user())->whereReference($order->reference)
         )
             ->allowedIncludes(['orderLines'])->first();
 

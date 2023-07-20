@@ -41,6 +41,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @property-read \Domain\Order\Models\Order|null $order
+ * @property-read Review|null $review
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine query()
@@ -112,13 +113,6 @@ class OrderLine extends Model implements HasMedia
     public function review()
     {
         return $this->hasOne(Review::class);
-    }
-
-    public function reviewDetails()
-    {
-        $reviews = $this->review()->first();
-
-        return $reviews;
     }
 
     public function registerMediaCollections(): void

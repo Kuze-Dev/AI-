@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Product\Models;
 
 use Domain\Favorite\Models\Favorite;
+use Domain\Review\Models\Review;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\MetaData\HasMetaData;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -170,6 +171,11 @@ class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, 
         return $this->hasMany(Favorite::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
     public function isFavorite()
     {
         if ( ! auth()->check()) {
@@ -197,6 +203,7 @@ class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, 
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('image');
+        $this->addMediaCollection('image')
+            ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 }

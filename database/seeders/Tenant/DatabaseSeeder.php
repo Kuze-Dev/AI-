@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             Currency\CurrencySeeder::class,
             Tier\TierSeeder::class,
             Customer\CustomerSeeder::class,
+            ShippingMethod\ShippingMethodSeeder::class,
         ]);
     }
 }

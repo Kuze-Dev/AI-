@@ -38,6 +38,7 @@ class ProductResource extends JsonApiResource
     public function toRelationships(Request $request): array
     {
         return [
+            'media' => fn () => MediaResource::collection($this->media),
             'productOptions' => fn () => ProductOptionResource::collection($this->productOptions),
             'productVariants' => fn () => ProductVariantResource::collection($this->productVariants),
             'taxonomyTerms' => fn () => TaxonomyTermResource::collection($this->taxonomyTerms),

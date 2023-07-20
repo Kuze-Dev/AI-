@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Prefix;
@@ -29,7 +30,11 @@ class AccountController extends Controller
     #[Get('/', name: 'account')]
     public function show(): CustomerResource
     {
-        return CustomerResource::make(Auth::user());
+        return CustomerResource::make(
+            QueryBuilder::for(Customer::whereKey(Auth::user()))
+                ->allowedIncludes('media')
+                ->first()
+        );
     }
 
     /** @throws Throwable */

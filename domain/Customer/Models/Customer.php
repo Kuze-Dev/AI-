@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace Domain\Customer\Models;
 
+use App\Settings\SiteSettings;
 use Domain\Address\Models\Address;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Customer\Enums\Status;
 use Domain\Discount\Models\DiscountLimit;
 use Domain\Favorite\Models\Favorite;
+use Domain\Shipment\Models\VerifiedAddress;
 use Domain\Tier\Models\Tier;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -60,6 +63,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property-read Tier|null $tier
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
+ * @property-read VerifiedAddress|null $verifiedAddress
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer onlyTrashed()
@@ -143,7 +147,9 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')
-            ->singleFile();
+            ->singleFile()
+            ->useFallbackUrl(app(SiteSettings::class)->getLogoUrl())
+            ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Tier\Models\Tier, \Domain\Customer\Models\Customer> */
@@ -171,5 +177,11 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
     public function discountLimits(): HasMany
     {
         return $this->hasMany(DiscountLimit::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Shipment\Models\VerifiedAddress> */
+    public function verifiedAddress(): HasOne
+    {
+        return $this->hasOne(VerifiedAddress::class);
     }
 }

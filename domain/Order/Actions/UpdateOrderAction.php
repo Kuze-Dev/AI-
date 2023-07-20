@@ -20,22 +20,21 @@ class UpdateOrderAction
     {
         try {
             if ($updateOrderData->status) {
-                if ($updateOrderData->status == 'Cancelled') {
-                    //cant cancel if order is
-                    if ($order->status != OrderStatuses::PENDING) {
-                        return OrderResult::FAILED;
-                    }
-
-                    $order->update([
-                        'status' => $updateOrderData->status,
-                        'cancelled_reason' => $updateOrderData->notes,
-                    ]);
-                } else {
-                    $order->update([
-                        'status' => $updateOrderData->status,
-                        'cancelled_reason' => null,
-                    ]);
+                if ($updateOrderData->status == 'Cancelled' && $order->status !== OrderStatuses::PENDING) {
+                    return OrderResult::FAILED;
                 }
+
+                $orderData = [
+                    'status' => $updateOrderData->status,
+                ];
+
+                if ($updateOrderData->status == 'Cancelled') {
+                    $orderData['cancelled_reason'] = $updateOrderData->notes;
+                } else {
+                    $orderData['cancelled_reason'] = null;
+                }
+
+                $order->update($orderData);
             }
 
             if ($updateOrderData->proof_of_payment !== null) {

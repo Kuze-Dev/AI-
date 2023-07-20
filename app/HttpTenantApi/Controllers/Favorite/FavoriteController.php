@@ -48,7 +48,9 @@ class FavoriteController
 
     public function destroy(int $favorite): JsonResponse
     {
-        $favorite = Favorite::where('id', $favorite)
+        $customer = auth()->user();
+        
+        $favorite = Favorite::where('product_id', $favorite)->where('customer_id', $customer->id)
             ->firstOrFail();
 
         $favorite->delete();

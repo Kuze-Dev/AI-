@@ -62,6 +62,7 @@ class PermissionSeeder extends BasePermissionSeeder
                 ),
                 ...$this->generateFilamentResourcePermissions('addresses', ),
                 ...$this->generateFilamentResourcePermissions('paymentMethod', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('shippingMethod', except: ['deleteAny']),
             ],
         ];
     }
