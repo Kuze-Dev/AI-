@@ -197,6 +197,7 @@ class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, 
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('image');
+        $this->addMediaCollection('image')
+            ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 }
