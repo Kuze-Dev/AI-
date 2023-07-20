@@ -6,8 +6,8 @@ namespace Domain\Shipment\Drivers;
 
 use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
-use Domain\Shipment\Actions\USPS\GetUSPSInternationalRateAction;
-use Domain\Shipment\Actions\USPS\GetUSPSRateAction;
+use Domain\Shipment\Actions\USPS\GetUSPSInternationalRateDataAction;
+use Domain\Shipment\Actions\USPS\GetUSPSRateDataAction;
 use Domain\Shipment\API\USPS\Contracts\RateResponse;
 use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\DataTransferObjects\ParcelData;
@@ -19,7 +19,7 @@ class UspsDriver
         ParcelData $parcelData,
         AddressValidateRequestData $addressValidateRequestData
     ): RateResponse {
-        return app(GetUSPSRateAction::class)->execute(...func_get_args());
+        return app(GetUSPSRateDataAction::class)->execute(...func_get_args());
     }
 
     public function getInternationalRate(
@@ -27,7 +27,7 @@ class UspsDriver
         ParcelData $parcelData,
         Address $address,
     ): RateResponse {
-        return app(GetUSPSInternationalRateAction::class)->execute(
+        return app(GetUSPSInternationalRateDataAction::class)->execute(
             $customer,
             $parcelData,
             $address,

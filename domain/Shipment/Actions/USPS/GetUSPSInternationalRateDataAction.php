@@ -13,7 +13,7 @@ use Domain\Shipment\API\USPS\Enums\MailType;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Illuminate\Support\Carbon;
 
-class GetUSPSInternationalRateAction
+class GetUSPSInternationalRateDataAction
 {
     public function __construct(
         private readonly RateClient $rateClient,

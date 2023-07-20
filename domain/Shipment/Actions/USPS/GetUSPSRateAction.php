@@ -4,66 +4,56 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\Actions\USPS;
 
+use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
-use Domain\Shipment\API\USPS\Clients\AddressClient;
-use Domain\Shipment\API\USPS\Clients\RateClient;
-use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
-use Domain\Shipment\API\USPS\DataTransferObjects\RateV4RequestData;
-use Domain\Shipment\API\USPS\DataTransferObjects\RateV4Response\RateV4ResponseData;
-use Domain\Shipment\API\USPS\Enums\ServiceType;
+use Domain\Shipment\Actions\GetShippingRateAction;
+use Domain\Shipment\API\USPS\DataTransferObjects\InternationalResponse\ServiceData;
+use Domain\Shipment\API\USPS\DataTransferObjects\ShippingRateData;
 use Domain\Shipment\DataTransferObjects\ParcelData;
+use Domain\ShippingMethod\Models\ShippingMethod;
+use InvalidArgumentException;
+use Throwable;
 
 class GetUSPSRateAction
 {
     public function __construct(
-        private readonly RateClient $rateClient,
-        private readonly AddressClient $addressClient
+        private readonly GetShippingRateAction $getShippingRateAction,
     ) {
     }
 
     public function execute(
         Customer $customer,
         ParcelData $parcelData,
-        AddressValidateRequestData $addressValidateRequestData
-    ): RateV4ResponseData {
+        ShippingMethod $shippingMethod,
+        Address $address,
+        ?int $service_id = null
+    ): ShippingRateData {
 
-        $verifiedAddress = $customer->verifiedAddress;
+        try {
+            $data = $this->getShippingRateAction->execute(
+                $customer,
+                $parcelData,
+                $shippingMethod,
+                $address
+            )->getRateResponseAPI();
 
-        if ($verifiedAddress !== null) {
+            if ($data['is_united_state_domestic']) {
 
-            if ($verifiedAddress->address != $addressValidateRequestData->toArray()) {
-
-                $updatedVerifiedAddress = $this->addressClient->verify($addressValidateRequestData);
-
-                $verifiedAddress->update([
-                    'address' => $addressValidateRequestData->toArray(),
-                    'verified_address' => $updatedVerifiedAddress->toArray(),
-                ]);
-
+                return new ShippingRateData($data['package']->postage->rate);
             }
 
-            $zipDestination = $verifiedAddress->verified_address['zip5'] ?? null;
+            $services = $data['package']->services;
 
-        } else {
+            /** @var ServiceData $filteredServices */
+            $filteredServices = array_filter($services, function ($service) use ($service_id) {
+                return $service->id === $service_id;
+            })['0'];
 
-            $address = $this->addressClient->verify($addressValidateRequestData);
+            return new ShippingRateData($filteredServices->postage);
 
-            $customer->verifiedAddress()->create([
-                'address' => $addressValidateRequestData->toArray(),
-                'verified_address' => $address->toArray(),
-            ]);
-
-            $zipDestination = $address->zip5;
+        } catch (Throwable) {
+            throw new InvalidArgumentException('Service Not Found');
         }
 
-        return $this->rateClient->getV4(
-            new RateV4RequestData(
-                Service: ServiceType::PRIORITY,
-                ZipOrigination: $parcelData->zip_origin,
-                ZipDestination:$zipDestination,
-                Pounds: $parcelData->pounds,
-                Ounces:$parcelData->ounces,
-            )
-        );
     }
 }
