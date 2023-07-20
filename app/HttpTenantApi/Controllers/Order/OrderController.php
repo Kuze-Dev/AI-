@@ -30,6 +30,7 @@ class OrderController extends Controller
             QueryBuilder::for(
                 Order::with(['shippingAddress', 'billingAddress'])->whereBelongsTo(auth()->user())
             )
+                ->allowedIncludes(['orderLines'])
                 ->allowedFilters(['status'])
                 ->allowedSorts(['reference', 'total', 'status', 'created_at'])
                 ->jsonPaginate()
