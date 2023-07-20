@@ -28,7 +28,7 @@ class OrderController extends Controller
     {
         return OrderResource::collection(
             QueryBuilder::for(
-                Order::with(['shippingAddress', 'billingAddress', 'orderLines.media', 'orderLines.review'])->whereBelongsTo(auth()->user())
+                Order::with(['shippingAddress', 'billingAddress', 'orderLines.media',])->whereBelongsTo(auth()->user())
             )
                 ->allowedIncludes(['orderLines'])
                 ->allowedFilters(['status'])
@@ -63,7 +63,7 @@ class OrderController extends Controller
         // $this->authorize('view', $order);
 
         $model = QueryBuilder::for(
-            $order->with('orderLines.review')->whereBelongsTo(auth()->user())->whereReference($order->reference)
+            $order->whereBelongsTo(auth()->user())->whereReference($order->reference)
         )
             ->allowedIncludes(['orderLines'])->first();
 

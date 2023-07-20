@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Review;
 
+use App\HttpTenantApi\Resources\ReviewResource;
 use Domain\Review\Models\Review;
 use Domain\Review\Requests\ReviewStoreRequest;
+use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Spatie\RouteAttributes\Attributes\Middleware;
+use Spatie\RouteAttributes\Attributes\Get;
 use Exception;
 
 #[
@@ -29,7 +32,7 @@ class ReviewController
         $review->data = $validatedData['data'];
 
         $customer = auth()->user();
-        if( ! $validatedData['anonymous']) {
+        if ( ! $validatedData['anonymous']) {
             $review->customer_id = $customer->id;
         }
 
@@ -57,5 +60,18 @@ class ReviewController
         $review->delete();
 
         return response()->json(['message' => 'Review item deleted']);
+    }
+
+    #[Get('orderline-review/{orderLineId}')]
+    public function showCustomerReview(string $orderLineId)
+    {
+        $customer = auth()->user();
+
+        $review = QueryBuilder::for(Review::whereCustomerId($customer->id)->whereOrderLineId($orderLineId))
+            ->allowedIncludes([
+                'media',
+            ])->first();
+
+        return ReviewResource::make($review);
     }
 }

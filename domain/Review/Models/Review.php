@@ -54,13 +54,12 @@ class Review extends Model implements HasMedia
     protected $fillable = [
         'ratings',
         'comment',
-        'data'
+        'data',
     ];
 
     protected $casts = [
         'data' => 'array',
     ];
-
 
     public function registerMediaCollections(): void
     {
@@ -68,7 +67,7 @@ class Review extends Model implements HasMedia
             $this->addMediaConversion('preview');
         };
 
-        $this->addMediaCollection('media')
+        $this->addMediaCollection('review_product_media')
             ->registerMediaConversions($registerMediaConversions);
     }
 
