@@ -147,6 +147,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
     {
         $this->addMediaCollection('image')
             ->singleFile()
+            ->useFallbackUrl(asset('favicon.ico'))
             ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 
