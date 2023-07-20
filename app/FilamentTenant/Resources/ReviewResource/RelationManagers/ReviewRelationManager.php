@@ -10,13 +10,11 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
 
-
 class ReviewRelationManager extends RelationManager
 {
     protected static string $relationship = 'reviews';
 
     protected static ?string $recordTitleAttribute = 'comment';
-
 
     public static function form(Form $form): Form
     {
@@ -30,27 +28,27 @@ class ReviewRelationManager extends RelationManager
                 Forms\Components\TextInput::make('rating'),
             ])->columns(1);
     }
+
     public static function table(Table $table): Table
     {
         return $table
-        ->columns([
-            Tables\Columns\TextColumn::make('Customer.first_name')->default('Anonymous')
-            ->label('Name')
-            ->sortable(),
-            Tables\Columns\TextColumn::make('rating')
-            ->label('Rating')
-            ->sortable(),
-            Tables\Columns\TextColumn::make('comment')
-            ->label('Comment') 
-            ->sortable(),
-     
-        ])
-        ->actions([
-           Tables\Actions\ViewAction::make(),   
-           Tables\Actions\DeleteAction::make()
-        ])
-        ->bulkActions([])
-        ->defaultSort('id', 'asc');
-    }
+            ->columns([
+                Tables\Columns\TextColumn::make('Customer.first_name')->default('Anonymous')
+                    ->label('Name')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('rating')
+                    ->label('Rating')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('comment')
+                    ->label('Comment')
+                    ->sortable(),
 
+            ])
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([])
+            ->defaultSort('id', 'asc');
+    }
 }
