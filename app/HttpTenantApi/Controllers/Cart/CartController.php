@@ -38,8 +38,6 @@ class CartController extends Controller
         )->allowedIncludes(['cartLines', 'cartLines.purchasable'])
             ->first();
 
-        // return $model;
-
         if ($model) {
             return CartResource::make($model);
         }

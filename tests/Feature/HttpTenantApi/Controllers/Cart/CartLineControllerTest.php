@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 use Domain\Cart\Database\Factories\CartFactory;
 use Domain\Cart\Database\Factories\CartLineFactory;
-use Domain\Cart\Models\CartLine;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Product\Database\Factories\ProductFactory;
 use Domain\Product\Database\Factories\ProductVariantFactory;
-use Domain\Product\Models\Product;
-use Domain\Product\Models\ProductVariant;
 
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\patchJson;
