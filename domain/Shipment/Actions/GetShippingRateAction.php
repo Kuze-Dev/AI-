@@ -9,11 +9,16 @@ use Domain\Address\Models\Country;
 use Domain\Customer\Models\Customer;
 use Domain\Shipment\API\USPS\Contracts\RateResponse;
 use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
+use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 
 class GetShippingRateAction
 {
+    public function __construct(private readonly ShippingManagerInterface $shippingManager)
+    {
+    }
+
     public function execute(
         Customer $customer,
         ParcelData $parcelData,
@@ -21,7 +26,8 @@ class GetShippingRateAction
         Address $address
     ): RateResponse {
 
-        $shippingDriver = $shippingMethod->driver->getShipping();
+        /** @var \Domain\Shipment\Drivers\UspsDriver $shippingDriver */
+        $shippingDriver = $this->shippingManager->driver($shippingMethod->driver->value);
 
         if ($this->isDomesticInUnitedStates($address)) {
             return $shippingDriver->getRate(
