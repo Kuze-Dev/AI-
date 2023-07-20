@@ -51,25 +51,6 @@ class RateClient extends BaseClient
 
     public function getInternationalVersion2(Ratev2InternationalRequestData $requestData): IntlRateV2ResponseData
     {
-
-        // $array = [
-        //     'Revision' => '2',
-        //     'Package' => [
-        //         '_attributes' => ['ID' => '0'],
-        //         'Pounds' => 15.12345678,
-        //         'Ounces' => 0,
-        //         'MailType' => 'Package',
-        //         'ValueOfContents' => 200,
-        //         'Country' => 'Philippines',
-        //         'Width' => 10,
-        //         'Length' => 15,
-        //         'Height' => 10,
-        //         'OriginZip' => 18701,
-        //         'AcceptanceDateTime' => '2023-07-28T13:15:00-06:00',
-        //         'DestinationPostalCode' => 1603,
-        //     ],
-        // ];
-
         $array = [
             'Revision' => '2',
             'Package' => array_merge([

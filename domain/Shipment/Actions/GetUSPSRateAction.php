@@ -29,7 +29,6 @@ class GetUSPSRateAction
     ): ShippingRateData {
 
         try {
-            /** @var array */
             $data = $this->getShippingRateAction->execute(
                 $customer,
                 $parcelData,
@@ -42,7 +41,6 @@ class GetUSPSRateAction
                 return new ShippingRateData($data['package']->postage->rate);
             }
 
-            /** @var array */
             $services = $data['package']->services;
 
             /** @var ServiceData */
