@@ -38,7 +38,7 @@ class RateV4ResponseData implements RateResponse
         return ['is_united_state_domestic' => true] + get_object_vars($this);
     }
 
-    public function getRate(int $service = null): float
+    public function getRate(int $serviceID = null): float
     {
         return $this->package->postage->rate;
     }

@@ -17,4 +17,9 @@ class StorePickupResponseData implements RateResponse
     {
         return get_object_vars($this);
     }
+
+    public function getRate(int $serviceID = null): float
+    {
+        return $this->rate;
+    }
 }
