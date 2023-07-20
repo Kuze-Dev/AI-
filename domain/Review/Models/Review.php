@@ -19,6 +19,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int $id
  * @property int $product_id
  * @property int $order_id
+ * @property int $order_line_id
  * @property int|null $customer_id
  * @property int $rating
  * @property string|null $comment
@@ -38,9 +39,9 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereCustomerId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereOrderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Review whereOrderLineId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereRating($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Review whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereUpdatedAt($value)
  * @mixin \Eloquent
  */
