@@ -18,10 +18,13 @@ abstract class BaseClient
 
     protected static function throwError(array $array): void
     {
+        ray();
         if (isset($array['Error'])) {
-            Log::error('error', $array);
+            $debug = debug_backtrace()[0];
+            $fileLine = $debug['file'].':'.$debug['line'];
+            Log::error('Error on '.$fileLine, $array);
             if (app()->isLocal()) {
-                throw new Exception(json_encode($array));
+                throw new Exception($fileLine.': '.json_encode($array));
             } else {
                 abort(422, 'Something wrong.');
             }
