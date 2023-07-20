@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Customer\Models;
 
+use App\Settings\SiteSettings;
 use Domain\Address\Models\Address;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Notifications\VerifyEmail;
@@ -137,7 +138,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
     {
         $this->addMediaCollection('image')
             ->singleFile()
-            ->useFallbackUrl(asset('favicon.ico'))
+            ->useFallbackUrl(app(SiteSettings::class)->getLogoUrl())
             ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 
