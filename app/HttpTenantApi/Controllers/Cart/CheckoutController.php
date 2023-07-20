@@ -68,12 +68,6 @@ class CheckoutController
         $reference = app(CheckoutAction::class)
             ->execute(CheckoutData::fromArray($validatedData));
 
-        if (CartActionResult::FAILED == $reference) {
-            return response()->json([
-                'message' => 'Invalid action',
-            ], 400);
-        }
-
         return response()
             ->json([
                 'message' => 'Success',
