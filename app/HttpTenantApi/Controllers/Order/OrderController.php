@@ -28,7 +28,7 @@ class OrderController extends Controller
     {
         return OrderResource::collection(
             QueryBuilder::for(
-                Order::with(['shippingAddress', 'billingAddress'])->whereBelongsTo(auth()->user())
+                Order::with(['shippingAddress', 'billingAddress',])->whereBelongsTo(auth()->user())
             )
                 ->allowedFilters(['status'])
                 ->allowedSorts(['reference', 'total', 'status', 'created_at'])

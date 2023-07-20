@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartResource;
 use Domain\Cart\Actions\DestroyCartAction;
 use Domain\Cart\Models\Cart;
+use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -27,6 +28,7 @@ class CartController extends Controller
                 'cartLines',
                 'cartLines.purchasable' => function (MorphTo $query) {
                     $query->morphWith([
+                        Product::class => ['media'],
                         ProductVariant::class => ['product.media'],
                     ]);
                 },
@@ -35,6 +37,8 @@ class CartController extends Controller
                 ->whereBelongsTo(auth()->user())
         )->allowedIncludes(['cartLines', 'cartLines.purchasable'])
             ->first();
+
+        // return $model;
 
         if ($model) {
             return CartResource::make($model);

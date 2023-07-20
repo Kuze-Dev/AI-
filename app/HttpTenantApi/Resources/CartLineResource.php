@@ -22,7 +22,7 @@ class CartLineResource extends JsonApiResource
             'quantity' => $this->quantity,
             'remarks' => [
                 'data' => $this->remarks,
-                'media' => $this->media->toArray(),
+                'media' => MediaResource::collection($this->media),
             ],
             'purchasable' => function () {
                 if ($this->purchasable instanceof Product) {
@@ -31,6 +31,7 @@ class CartLineResource extends JsonApiResource
                     return $this->purchasable;
                 }
             },
+            "purchasable_media" => MediaResource::collection($this->purchasable->media)
         ];
     }
 }

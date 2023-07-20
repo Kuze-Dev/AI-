@@ -30,9 +30,15 @@ class OrderLineResource extends JsonApiResource
             'review' => $reviews ? ReviewResource::make($reviews) : null,
             'remarks' => [
                 'data' => $this->remarks_data,
-                'media' => $this->getMedia('order_line_notes')->toArray(),
+                'media' => MediaResource::collection($this->media->filter(
+                    fn ($media) =>
+                    $media->collection_name === 'order_line_notes'
+                )),
             ],
-            'purchasable_images' => $this->getMedia('order_line_images')->toArray(),
+            'purchasable_media' => MediaResource::collection($this->media->filter(
+                fn ($media) =>
+                $media->collection_name === 'order_line_images'
+            )),
         ];
     }
 }
