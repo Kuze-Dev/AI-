@@ -63,7 +63,7 @@ class OrderController extends Controller
         // $this->authorize('view', $order);
 
         $model = QueryBuilder::for(
-            $order->whereBelongsTo(auth()->user())->whereReference($order->reference)
+            $order->with('orderLines.review')->whereBelongsTo(auth()->user())->whereReference($order->reference)
         )
             ->allowedIncludes(['orderLines'])->first();
 
