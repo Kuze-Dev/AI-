@@ -68,5 +68,15 @@ class CustomerSeeder extends Seeder
             ->active()
             ->verified()
             ->create();
+
+        $customerFactory
+            ->has($randomAddress())
+            ->active()
+            ->verified()
+            ->createOne([
+                'email' => 'developer@gmail.com',
+                'first_name' => 'Halcyon',
+                'last_name' => 'Developer',
+            ]);
     }
 }
