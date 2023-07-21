@@ -22,7 +22,7 @@ class UpdateShippingMethodAction
             'title' => $shippingData->title,
             'subtitle' => $shippingData->subtitle,
             'driver' => $shippingData->driver,
-            'status' => $shippingData->status,
+            'active' => $shippingData->active,
             'description' => $shippingData->description,
             'ship_from_address' => $shippingData->ship_from_address,
         ]);

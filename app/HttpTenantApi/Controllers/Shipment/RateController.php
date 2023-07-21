@@ -20,7 +20,7 @@ class RateController extends Controller
     #[Get('shipping-methods/{shippingMethod}/rate/{address}')]
     public function __invoke(ShippingMethod $shippingMethod, Address $address): mixed
     {
-        if ( ! $shippingMethod->status) {
+        if ( ! $shippingMethod->active) {
             abort(404);
         }
 

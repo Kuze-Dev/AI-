@@ -20,7 +20,7 @@ class ShippingMethodController extends Controller
     public function __invoke(): JsonApiResourceCollection
     {
         return ShippingMethodResource::collection(
-            QueryBuilder::for(ShippingMethod::whereStatus(true))
+            QueryBuilder::for(ShippingMethod::whereActive(true))
                 ->allowedFilters(['name', 'slug'])
                 ->allowedIncludes([
                     'media',

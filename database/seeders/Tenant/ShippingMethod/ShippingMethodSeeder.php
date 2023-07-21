@@ -31,7 +31,7 @@ class ShippingMethodSeeder extends Seeder
                     'zip5' => '94107',
                     'zip4' => '1741',
                 ],
-                'status' => true,
+                'active' => true,
             ]);
 
         CustomerFactory::new()

@@ -43,7 +43,7 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
     {
         if (tenancy()->initialized) {
 
-            $shippingMethods = ShippingMethod::whereStatus(true);
+            $shippingMethods = ShippingMethod::whereActive(true);
 
             if ($shippingMethods->count() > 0) {
                 foreach ($shippingMethods->get() as $shippingMethod) {
