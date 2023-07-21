@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Shipping;
+namespace App\HttpTenantApi\Controllers\Shipment;
 
 use App\Features\ECommerce\ECommerceBase;
 use App\Http\Controllers\Controller;
