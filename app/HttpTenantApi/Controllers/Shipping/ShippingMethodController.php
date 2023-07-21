@@ -22,6 +22,9 @@ class ShippingMethodController extends Controller
         return ShippingMethodResource::collection(
             QueryBuilder::for(ShippingMethod::whereStatus(true))
                 ->allowedFilters(['name', 'slug'])
+                ->allowedIncludes([
+                    'media',
+                ])
                 ->jsonPaginate()
         );
     }

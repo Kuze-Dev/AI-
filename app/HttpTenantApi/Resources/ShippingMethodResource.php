@@ -29,7 +29,7 @@ class ShippingMethodResource extends JsonApiResource
     public function toRelationships(Request $request): array
     {
         return [
-
+            'media' => fn () => MediaResource::collection($this->media),
         ];
     }
 }
