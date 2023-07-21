@@ -12,6 +12,13 @@ class ShippingSettings extends Settings
 
     public bool $usps_mode;
 
+    public static function encrypted(): array
+    {
+        return [
+            'usps_credentials'
+        ];
+    }
+
     public static function group(): string
     {
         return 'shipping';
