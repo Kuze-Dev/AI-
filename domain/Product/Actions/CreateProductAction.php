@@ -41,10 +41,8 @@ class CreateProductAction
             $this->createMediaAction->execute($product, Arr::wrap($productData->images), 'image');
         }
 
-        if ($productData->taxonomy_terms) {
-            $product->taxonomyTerms()
-                ->attach($productData->taxonomy_terms);
-        }
+        $product->taxonomyTerms()
+            ->attach($productData->taxonomy_terms);
 
         return $product;
     }
