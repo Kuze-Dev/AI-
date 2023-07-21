@@ -20,6 +20,10 @@ class RateController extends Controller
     #[Get('shipping-methods/{shippingMethod}/rate/{address}')]
     public function __invoke(ShippingMethod $shippingMethod, Address $address): mixed
     {
+        if ( ! $shippingMethod->status) {
+            abort(404);
+        }
+
         $this->authorize('view', $address);
 
         /** @var \Domain\Customer\Models\Customer $customer */
