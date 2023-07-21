@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Domain\Shipment;
 
 use App\Settings\ShippingSettings;
-use Domain\Shipment\API\USPS\Clients\Client;
+use Domain\Shipment\API\USPS\Clients\Client as USPSClient;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\Drivers\StorePickupDriver;
 use Domain\Shipment\Drivers\UspsDriver;
@@ -24,11 +24,15 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
         );
 
         $this->app->bind(
-            Client::class,
+            USPSClient::class,
             function () {
                 $setting = app(ShippingSettings::class);
 
-                return new Client(
+                if ($setting->usps_username === null || $setting->usps_password === null) {
+                    abort(500, 'Setting USPS credential not setup yet.');
+                }
+
+                return new USPSClient(
                     username: $setting->usps_username,
                     password: $setting->usps_password,
                     isProduction: $setting->usps_production_mode,
@@ -64,7 +68,7 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
     {
         return [
             ShippingManagerInterface::class,
-            Client::class,
+            USPSClient::class,
         ];
     }
 }
