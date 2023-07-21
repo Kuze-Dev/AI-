@@ -17,6 +17,7 @@ class ReviewResource extends JsonApiResource
         return [
             'rating' => $this->rating,
             'comment' => $this->comment,
+            'data' => $this->data,
             'media' => $this->getMedia('review_product_media')->toArray(),
         ];
     }

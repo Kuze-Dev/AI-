@@ -19,9 +19,11 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int $id
  * @property int $product_id
  * @property int $order_id
+ * @property int $order_line_id
  * @property int|null $customer_id
  * @property int $rating
  * @property string|null $comment
+ * @property mixed|null $data
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Customer|null $customer
@@ -36,11 +38,12 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereComment($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereCustomerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Review whereData($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereOrderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Review whereOrderLineId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereRating($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Review whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereUpdatedAt($value)
  * @mixin \Eloquent
  */
@@ -51,7 +54,13 @@ class Review extends Model implements HasMedia
     protected $fillable = [
         'ratings',
         'comment',
+        'data'
     ];
+
+    protected $casts = [
+        'data' => 'array',
+    ];
+
 
     public function registerMediaCollections(): void
     {
