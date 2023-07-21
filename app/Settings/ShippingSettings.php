@@ -24,12 +24,12 @@ class ShippingSettings extends Settings
         return 'shipping';
     }
 
-    public function getUsername(): string
+    public function getUSPSUsername(): string
     {
         return $this->check('username');
     }
 
-    public function getPassword(): string
+    public function getUSPSPassword(): string
     {
         return $this->check('password');
     }
