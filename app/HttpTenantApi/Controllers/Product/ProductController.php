@@ -32,15 +32,6 @@ class ProductController
                     'is_special_offer',
                     'is_featured',
                     'status',
-                    // AllowedFilter::callback(
-                    //     'taxonomy_terms',
-                    //     function (ProductBuilder $query, array $value) {
-                    //         if (filled($value)) {
-                    //             $query->whereTaxonomyTerms([77]);
-                    //         }
-
-                    //     }
-                    // ),
                     AllowedFilter::callback(
                         'taxonomies',
                         function (ProductBuilder $query, array $value) {
