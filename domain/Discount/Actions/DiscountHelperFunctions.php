@@ -13,8 +13,10 @@ final class DiscountHelperFunctions
     public function deductOrderSubtotal(Discount $discount, float $subTotal): ?float
     {
 
-        if ($discount->discountCondition->discount_type === DiscountConditionType::ORDER_SUB_TOTAL
-            && $subTotal >= $discount->discountRequirement?->minimum_amount) {
+        if (
+            $discount->discountCondition->discount_type === DiscountConditionType::ORDER_SUB_TOTAL
+            && $subTotal >= $discount->discountRequirement?->minimum_amount
+        ) {
             if ($discount->discountCondition->amount_type === DiscountAmountType::FIXED_VALUE) {
                 return $discount->discountCondition->amount;
             } elseif ($discount->discountCondition->amount_type === DiscountAmountType::PERCENTAGE) {
@@ -23,8 +25,7 @@ final class DiscountHelperFunctions
                 return $deductable;
             }
         } else {
-            return null;
+            return 0;
         }
-
     }
 }

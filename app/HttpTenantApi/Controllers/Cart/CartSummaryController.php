@@ -40,12 +40,12 @@ class CartSummaryController extends Controller
         return response()->json(['cartCount' => $cartLinesCount], 200);
     }
 
-    #[Get('carts/summary/{country}/{shippingMethod}/{shippingAddress}/{stateId?}/{discountCode?}', name: 'carts.summary')]
+    #[Get('carts/summary/{country}/{shippingMethodId?}/{shippingAddressId?}/{stateId?}/{discountCode?}', name: 'carts.summary')]
     public function summary(
         CartSummaryRequest $request,
         Country $country,
-        ShippingMethod $shippingMethod,
-        Address $shippingAddress,
+        ?string $shippingMethodId,
+        ?string $shippingAddressId,
         ?string $stateId,
         ?string $discountCode
     ) {
@@ -55,11 +55,15 @@ class CartSummaryController extends Controller
         $cartLineIds = array_map('intval', $cartLineIdArray);
 
         $customer = auth()->user()->load('addresses.state.country');
-        $state = $stateId ? app(State::class)->resolveRouteBinding($stateId) : null;
 
-        $discount = $discountCode ? app(Discount::class)->resolveRouteBinding($discountCode) : null;
+        $state = $this->resolveSummaryRouteKey(State::class, $stateId);
 
-        $validationResponse = $this->validateAddress($customer, $country, $state);
+        $shippingMethod = $this->resolveSummaryRouteKey(ShippingMethod::class, $shippingMethodId);
+        $shippingAddress = $this->resolveSummaryRouteKey(Address::class, $shippingAddressId);
+
+        $discount = $this->resolveSummaryRouteKey(Discount::class, $discountCode);
+
+        $validationResponse = $this->validateAddress($customer, $country, $shippingAddress, $state);
 
         if ($validationResponse) {
             return $validationResponse;
@@ -74,43 +78,42 @@ class CartSummaryController extends Controller
             ->whereIn('id', $cartLineIds)
             ->get();
 
-        $summaryData = app(CartLineHelper::class)
-            ->summary($cartLines, $country->id, (int) $stateId, $discount);
+        $taxDetails = app(CartLineHelper::class)->getTax($country->id);
 
-        $parcelData =  new ParcelData(
-            pounds: '10',
-            ounces: '0',
-            width: '10',
-            height: '10',
-            length: '10',
-            zip_origin: $shippingMethod->ship_from_address['zip5'],
-            parcel_value: '200',
-        );
+        $discountDetails = app(CartLineHelper::class)->getDiscount($discount, 167.79);
 
-        try {
-            $shippingFee = app(GetUSPSRateAction::class)
-                ->execute($customer, $parcelData, $shippingMethod, $shippingAddress);
-        } catch (USPSServiceNotFoundException) {
-            return response()->json([
-                "service_id" => "Service id is required",
-            ], 404);
-        }
+        $subTotalDetails = app(CartLineHelper::class)->getSubTotal($cartLines);
 
-        return response()->json([
-            'tax_inclusive_sub_total' => $summaryData->subTotal + $summaryData->taxTotal,
-            'sub_total' => $summaryData->subTotal,
-            'tax_display' => $summaryData->taxDisplay,
-            'tax_percentage' => $summaryData->taxPercentage,
-            'tax_total' => $summaryData->taxTotal,
-            'grand_total' => $summaryData->grandTotal,
-            'discount_total' => $discountCode ? $summaryData->discountTotal : '',
-            'discount_message' => $discountCode ? $summaryData->discountMessage : '',
-            "shipping_fee" => $shippingFee
-        ], 200);
+        return $subTotalDetails;
+
+        //     $summaryData = app(CartLineHelper::class)
+        //     ->summary($cartLines, $country->id, (int) $stateId, $discount);
+
+
+        // return response()->json([
+        //     'tax_inclusive_sub_total' => $summaryData->subTotal + $summaryData->taxTotal,
+        //     'sub_total' => $summaryData->subTotal,
+        //     'tax_display' => $summaryData->taxDisplay,
+        //     'tax_percentage' => $summaryData->taxPercentage,
+        //     'tax_total' => $summaryData->taxTotal,
+        //     'grand_total' => $summaryData->grandTotal,
+        //     'discount_total' => $discountCode ? $summaryData->discountTotal : '',
+        //     'discount_message' => $discountCode ? $summaryData->discountMessage : '',
+        //     "shipping_fee" => $shippingFee
+        // ], 200);
     }
 
-    private function validateAddress(Customer $customer, Country $country, ?State $state = null)
+    private function resolveSummaryRouteKey(string $class, ?string $routeKey)
     {
+        return $routeKey ? app($class)->resolveRouteBinding($routeKey) : null;
+    }
+
+    private function validateAddress(
+        Customer $customer,
+        Country $country,
+        ?Address $shippingAddress,
+        ?State $state = null
+    ) {
         if (!$customer->addresses->pluck('state.country.id')->contains($country->id)) {
             return response()->json([
                 "country" => "Invalid country",
@@ -120,6 +123,12 @@ class CartSummaryController extends Controller
         if ($state && !$customer->addresses->pluck('state_id')->contains($state->id)) {
             return response()->json([
                 "state" => "Invalid state",
+            ], 404);
+        }
+
+        if ($shippingAddress && !$customer->addresses->contains('id', $shippingAddress->id)) {
+            return response()->json([
+                "shipping_address" => "Invalid shipping address",
             ], 404);
         }
     }
