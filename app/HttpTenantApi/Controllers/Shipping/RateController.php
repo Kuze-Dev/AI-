@@ -20,6 +20,10 @@ class RateController extends Controller
     #[Get('shipping-methods/{shippingMethod}/rate/{address}')]
     public function __invoke(ShippingMethod $shippingMethod, Address $address): mixed
     {
+        if ( ! $shippingMethod->status) {
+            abort(404);
+        }
+
         $this->authorize('view', $address);
 
         /** @var \Domain\Customer\Models\Customer $customer */
@@ -32,11 +36,11 @@ class RateController extends Controller
                     parcelData: new ParcelData(
                         pounds: '10',
                         ounces: '0',
-                        width: '10',
-                        height: '10',
-                        length: '10',
                         zip_origin: $shippingMethod->ship_from_address['zip5'],
                         parcel_value: '200',
+                        height: '10',
+                        width: '10',
+                        length: '10',
                     ),
                     shippingMethod: $shippingMethod,
                     address: $address
