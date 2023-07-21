@@ -21,7 +21,7 @@ class CartLineHelper
         $taxPercentage = (float) $taxZone->percentage;
         $taxDisplay = $taxZone->price_display;
 
-        if ( ! $taxZone instanceof TaxZone) {
+        if (!$taxZone instanceof TaxZone) {
             throw new BadRequestHttpException('No tax zone found');
         }
 
@@ -35,7 +35,7 @@ class CartLineHelper
             'taxTotal' => $summary['taxTotal'],
             'grandTotal' => $summary['grandTotal'],
             'discountTotal' => $summary['discountTotal'],
-            'discountMessage' => $summary['discountTotal'] == 0 ? 'Sorry this discount code is not valid.' : 'Discount is valid',
+            'discountMessage' => $summary['discountTotal'] == 0 ? 'Invalid discount' : 'Discount is valid',
         ];
 
         return SummaryData::fromArray($summaryData);
@@ -57,7 +57,7 @@ class CartLineHelper
         $taxTotal = round($subTotal * $taxPercentage / 100, 2);
 
         $discountTotal = 0;
-        if ( ! is_null($discount)) {
+        if (!is_null($discount)) {
             $discountTotal = (new DiscountHelperFunctions())->deductOrderSubtotal($discount, $subTotal);
         }
 
