@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b74da40fa6cfee0650b5df73482e524e",
+    "content-hash": "9ba1552a37954597dc529f2bbc759c7d",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -3777,6 +3777,85 @@
                 }
             ],
             "time": "2023-03-03T20:12:38+00:00"
+        },
+        {
+            "name": "lloricode/spatie-image-optimizer-health-check",
+            "version": "v1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lloricode/spatie-image-optimizer-health-check.git",
+                "reference": "60ed7b6fc93674942be993a70be6b5dbb539eed1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lloricode/spatie-image-optimizer-health-check/zipball/60ed7b6fc93674942be993a70be6b5dbb539eed1",
+                "reference": "60ed7b6fc93674942be993a70be6b5dbb539eed1",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^8.0|^9.0|^10.0",
+                "php": "^8.0",
+                "spatie/enum": "^3.13",
+                "spatie/laravel-health": "^1.19",
+                "spatie/laravel-package-tools": "^1.12.1"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^6.0",
+                "nunomaduro/larastan": "^2.0.1",
+                "orchestra/testbench": "^7.0",
+                "pestphp/pest": "^1.21",
+                "pestphp/pest-plugin-laravel": "^1.1",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^1.0",
+                "phpstan/phpstan-phpunit": "^1.0",
+                "phpunit/phpunit": "^9.5",
+                "spatie/laravel-ray": "^1.26"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": []
+            },
+            "autoload": {
+                "psr-4": {
+                    "Lloricode\\SpatieImageOptimizerHealthCheck\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lloric Mayuga Garcia",
+                    "email": "lloricode@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "These checks are where you can check if optimizer is installed on your server.",
+            "homepage": "https://github.com/lloricode/spatie-image-optimizer-health-check",
+            "keywords": [
+                "health check",
+                "image optimizer",
+                "laravel",
+                "lloricode",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/lloricode/spatie-image-optimizer-health-check/issues",
+                "source": "https://github.com/lloricode/spatie-image-optimizer-health-check/tree/v1.0.3"
+            },
+            "funding": [
+                {
+                    "url": "https://www.paypal.com/donate?hosted_button_id=V8PYXUNG6QP44",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://www.patreon.com/lloricode",
+                    "type": "patreon"
+                }
+            ],
+            "time": "2023-02-03T03:49:37+00:00"
         },
         {
             "name": "maatwebsite/excel",
