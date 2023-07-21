@@ -18,4 +18,12 @@ class StateResource extends JsonApiResource
             'name' => $this->name,
         ];
     }
+
+    /** @return array<string, callable> */
+    public function toRelationships(Request $request): array
+    {
+        return [
+            'country' => fn () => CountryResource::make($this->country),
+        ];
+    }
 }
