@@ -23,7 +23,7 @@ class ShippingSettings extends TenantBaseSettings
                     ->collapsible()
                     ->schema([
                         Forms\Components\KeyValue::make('usps_credentials')
-                            ->label('Usps Credentials')
+                            ->translateLabel()
                             ->disableAddingRows()
                             ->disableEditingKeys()
                             ->disableDeletingRows()
@@ -37,10 +37,15 @@ class ShippingSettings extends TenantBaseSettings
                                     'password' => '',
                                 ];
                             }),
-                        Forms\Components\Toggle::make('usps_mode')
+                        Forms\Components\Toggle::make('usps_production_mode')
                             ->inline(false)
-                            ->label(fn ($state) => $state ? 'Usps (Live)' : 'Usps (sandbox)')
-                            ->helperText('If the feature is activated, it is necessary to provide production keys. However, if the feature is deactivated, payment processing will occur in sandbox mode')
+                            ->label(fn ($state) => trans($state ? 'Usps (Live)' : 'Usps (sandbox)'))
+                            ->helperText(
+                                trans(
+                                    'If the feature is activated, it is necessary to provide production keys. '.
+                                    'However, if the feature is deactivated, payment processing will occur in sandbox mode'
+                                )
+                            )
                             ->reactive(),
                     ]),
 

@@ -8,14 +8,17 @@ use Spatie\LaravelSettings\Settings;
 
 class ShippingSettings extends Settings
 {
+    public bool $usps_production_mode;
     public ?array $usps_credentials = null;
 
-    public bool $usps_mode;
+    public bool $usp_production_mode;
+    public ?array $usp_credentials = null;
 
     public static function encrypted(): array
     {
         return [
             'usps_credentials',
+            'usp_credentials',
         ];
     }
 
