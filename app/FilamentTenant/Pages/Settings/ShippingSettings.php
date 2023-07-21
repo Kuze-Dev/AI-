@@ -22,24 +22,13 @@ class ShippingSettings extends TenantBaseSettings
                 Forms\Components\Section::make(trans('Usps Shipping'))
                     ->collapsible()
                     ->schema([
-                        Forms\Components\KeyValue::make('usps_credentials')
-                            ->translateLabel()
-                            ->disableAddingRows()
-                            ->disableEditingKeys()
-                            ->disableDeletingRows()
-                            ->formatStateUsing(function ($state) {
-                                if ($state != null) {
-                                    return $state;
-                                }
-
-                                return [
-                                    'username' => '',
-                                    'password' => '',
-                                ];
-                            }),
+                        Forms\Components\TextInput::make('usps_username')
+                            ->translateLabel(),
+                        Forms\Components\TextInput::make('usps_password')
+                            ->translateLabel(),
                         Forms\Components\Toggle::make('usps_production_mode')
                             ->inline(false)
-                            ->label(fn ($state) => trans($state ? 'Usps (Live)' : 'Usps (sandbox)'))
+                            ->label(fn ($state) => trans('Usps (:value)', ['value' => $state ? 'Live' : 'Sandbox']))
                             ->helperText(
                                 trans(
                                     'If the feature is activated, it is necessary to provide production keys. '.

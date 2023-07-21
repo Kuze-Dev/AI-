@@ -29,8 +29,8 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
                 $setting = app(ShippingSettings::class);
 
                 return new Client(
-                    username: $setting->getUSPSUsername(),
-                    password: $setting->getUSPSPassword(),
+                    username: $setting->usps_username,
+                    password: $setting->usps_password,
                     isProduction: $setting->usps_production_mode,
                 );
             }
