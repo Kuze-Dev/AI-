@@ -15,7 +15,7 @@ class ShippingSettings extends Settings
     public static function encrypted(): array
     {
         return [
-            'usps_credentials'
+            'usps_credentials',
         ];
     }
 
