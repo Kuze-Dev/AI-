@@ -11,7 +11,7 @@ class ShippingSettings extends TenantBaseSettings
 {
     protected static string $settings = SettingsShippingSettings::class;
 
-    protected static ?string $navigationIcon = 'heroicon-s-credit-card';
+    protected static ?string $navigationIcon = 'heroicon-s-truck';
 
     protected static ?string $title = 'Shipping Settings';
 
