@@ -22,7 +22,6 @@ use Throwable;
 
 class CreateProduct extends CreateRecord implements HasProductOptionsContracts, HasProductVariantsContracts
 {
-    use LogsFormActivity;
     use HasProductOptions;
     use HasProductVariants;
     use LogsFormActivity;

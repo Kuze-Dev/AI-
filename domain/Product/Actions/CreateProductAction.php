@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Product\Actions;
 
+use Domain\Media\Actions\CreateMediaAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductOption;
@@ -12,6 +13,7 @@ use Domain\Product\Models\ProductVariant;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 
 class CreateProductAction
@@ -19,87 +21,24 @@ class CreateProductAction
     public function __construct(
         protected CreateMetaDataAction $createMetaTags,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
+        protected CreateProductOptionAction $createProductOptionAction,
+        protected CreateProductVariantAction $createProductVariantAction,
+        protected CreateMediaAction $createMediaAction,
     ) {
     }
 
     public function execute(ProductData $productData): Product
     {
-        /** @var Product $product */
         $product = Product::create($this->getProductAttributes($productData));
 
         $this->createMetaTags->execute($product, $productData->meta_data);
 
-        if (count($productData->product_options)) {
-            foreach ($productData->product_options as $key => &$productOption) {
-                $newProductOptionModel = ProductOption::create([
-                    'product_id' => $product->id,
-                    'name' => $productOption['name'],
-                ]);
+        $this->createProductOptionAction->execute($product, $productData);
 
-                $productData->product_variants = $this->searchAndChangeValue(
-                    $productOption['id'],
-                    $productData->product_variants,
-                    $newProductOptionModel->id
-                );
-                $productData->product_options[$key]['id'] = $newProductOptionModel->id;
+        $this->createProductVariantAction->execute($product, $productData);
 
-                ////////
-                foreach ($productOption['productOptionValues'] as $key2 => $productOptionValue) {
-                    $newOptionValueModel = ProductOptionValue::create([
-                        'name' => $productOptionValue['name'],
-                        'product_option_id' => $productOption['id'],
-                    ]);
-
-                    $productOption['productOptionValues'][$key2]['id'] = $newOptionValueModel->id;
-                    $productData->product_variants = $this->searchAndChangeValue(
-                        $productOptionValue['id'],
-                        $productData->product_variants,
-                        $newOptionValueModel->id,
-                        'option_value_id'
-                    );
-                }
-            }
-        }
-
-        if (count($productData->product_variants)) {
-            foreach ($productData->product_variants as $productVariant) {
-                ProductVariant::create([
-                    'product_id' => $product['id'],
-                    'sku' => $productVariant['sku'],
-                    'combination' => $productVariant['combination'],
-                    'retail_price' => $productVariant['retail_price'],
-                    'selling_price' => $productVariant['selling_price'],
-                    'stock' => $productVariant['stock'],
-                    'status' => $productVariant['status'] ?? 1,
-                ]);
-            }
-        }
-
-        /** clears unexpected media even before upload */
-        $product->clearMediaCollection('image');
-        if ($productData->images) {
-            if (gettype($productData->images) === "string") {
-                $response = Http::get($productData->images);
-                if ($response->successful()) {
-                    $product
-                        ->addMediaFromUrl($productData->images)
-                        ->toMediaCollection('image');
-                }
-            } else {
-                foreach ($productData->images as $image) {
-                    if ($image instanceof UploadedFile && $imageString = $image->get()) {
-                        $product
-                            ->addMediaFromString($imageString)
-                            ->usingFileName($image->getClientOriginalName())
-                            ->usingName(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME))
-                            ->toMediaCollection('image');
-                    }
-                }
-            }
-        }
-
-        if ($productData->images === null) {
-            $product->clearMediaCollection('image');
+        if (filled($productData->images)) {
+            $this->createMediaAction->execute($product, Arr::wrap($productData->images), 'image');
         }
 
         if ($productData->taxonomy_terms) {
@@ -108,19 +47,6 @@ class CreateProductAction
         }
 
         return $product;
-    }
-
-    private function searchAndChangeValue($needle, &$haystack, $newValue, $field = 'option_id')
-    {
-        foreach ($haystack as $key => $variant) {
-            foreach ($variant['combination'] as $key2 => $combination) {
-                if ($combination[$field] == $needle) {
-                    $haystack[$key]['combination'][$key2][$field] = $newValue;
-                }
-            }
-        }
-
-        return $haystack;
     }
 
     protected function getProductAttributes(ProductData $productData): array
