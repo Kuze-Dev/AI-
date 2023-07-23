@@ -12,8 +12,8 @@ class CartSummaryShippingData
 {
     public function __construct(
         public readonly Customer $customer,
-        public readonly Address $shippingAddress,
-        public readonly ShippingMethod $shippingMethod,
+        public readonly ?Address $shippingAddress,
+        public readonly ?ShippingMethod $shippingMethod,
     ) {
     }
 
@@ -21,8 +21,8 @@ class CartSummaryShippingData
     {
         return new self(
             customer: $data['customer'],
-            shippingAddress: $data['shippingAddress'],
-            shippingMethod: $data['shippingMethod'],
+            shippingAddress: $data['shippingAddress'] ?? null,
+            shippingMethod: $data['shippingMethod'] ?? null,
         );
     }
 }
