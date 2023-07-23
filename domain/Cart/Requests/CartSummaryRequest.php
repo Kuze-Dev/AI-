@@ -19,7 +19,7 @@ class CartSummaryRequest extends FormRequest
 
                     $cartLineIds = explode(',', $value);
 
-                    $cartLines = CartLine::whereIn('uuid', $cartLineIds)
+                    $cartLines = CartLine::whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
                         ->whereHas('cart', function ($query) {
                             $query->whereBelongsTo(auth()->user());
                         })
