@@ -8,11 +8,13 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class() extends Migration
+{
     public function up(): void
     {
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
+            $table->uuid();
 
             $table->foreignIdFor(Customer::class)->index();
             $table->string('coupon_code')->nullable()->default(null)->index();
@@ -22,6 +24,7 @@ return new class () extends Migration {
 
         Schema::create('cart_lines', function (Blueprint $table) {
             $table->id();
+            $table->uuid();
             $table->foreignIdFor(Cart::class)->index();
 
             $table->unsignedInteger('purchasable_id')->index();

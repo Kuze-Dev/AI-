@@ -48,8 +48,7 @@ class CartSummaryController extends Controller
     ) {
         $validated = $request->validated();
 
-        $cartLineIdArray = explode(',', $validated['cart_line_ids']);
-        $cartLineIds = array_map('intval', $cartLineIdArray);
+        $cartLineIds = explode(',', $validated['cart_line_ids']);
 
         /** @var \Domain\Customer\Models\Customer $customer */
         $customer = auth()->user();
@@ -75,7 +74,7 @@ class CartSummaryController extends Controller
                 $query->whereBelongsTo(auth()->user());
             })
             ->whereNull('checked_out_at')
-            ->whereIn('id', $cartLineIds)
+            ->whereIn('uuid', $cartLineIds)
             ->get();
 
         $summary = app(CartLineHelper::class)->getSummary(

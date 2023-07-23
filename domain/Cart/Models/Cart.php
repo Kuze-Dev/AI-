@@ -39,9 +39,15 @@ class Cart extends Model
     use ConstraintsRelationships;
 
     protected $fillable = [
+        'uuid',
         'customer_id',
         'coupon_code',
     ];
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
 
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Cart\Models\CartLine> */
     public function cartLines()

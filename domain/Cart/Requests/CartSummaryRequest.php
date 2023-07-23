@@ -21,10 +21,9 @@ class CartSummaryRequest extends FormRequest
                 'string',
                 function ($attribute, $value, $fail) {
 
-                    $cartLineIdArray = explode(',', $value);
-                    $cartLineIds = array_map('intval', $cartLineIdArray);
+                    $cartLineIds = explode(',', $value);
 
-                    $cartLines = CartLine::whereIn('id', $cartLineIds)
+                    $cartLines = CartLine::whereIn('uuid', $cartLineIds)
                         ->whereHas('cart', function ($query) {
                             $query->whereBelongsTo(auth()->user());
                         })

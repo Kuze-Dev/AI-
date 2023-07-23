@@ -7,9 +7,9 @@ namespace App\HttpTenantApi\Controllers\Cart;
 use App\HttpTenantApi\Resources\CartLineResource;
 use Domain\Cart\Actions\CheckoutAction;
 use Domain\Cart\DataTransferObjects\CheckoutData;
-use Domain\Cart\Enums\CartActionResult;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CheckoutRequest;
+use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -33,6 +33,7 @@ class CheckoutController
 
         $cartLineQuery = CartLine::with(['purchasable' => function (MorphTo $query) {
             $query->morphWith([
+                Product::class => ['media'],
                 ProductVariant::class => ['product.media'],
             ]);
         }, 'media'])

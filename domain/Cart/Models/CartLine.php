@@ -53,6 +53,7 @@ class CartLine extends Model implements HasMedia
     use InteractsWithMedia;
 
     protected $fillable = [
+        'uuid',
         'cart_id',
         'purchasable_id',
         'purchasable_type',
@@ -67,6 +68,11 @@ class CartLine extends Model implements HasMedia
         'checkout_expiration' => 'datetime',
         'checked_out_at' => 'datetime',
     ];
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Cart\Models\Cart, \Domain\Cart\Models\CartLine> */
     public function cart(): BelongsTo

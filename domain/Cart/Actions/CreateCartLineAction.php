@@ -12,6 +12,8 @@ use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class CreateCartLineAction
 {
@@ -56,6 +58,7 @@ class CreateCartLineAction
                 ]);
             } else {
                 $cartLine = CartLine::create([
+                    'uuid' => (string) Str::uuid(),
                     'cart_id' => $cart->id,
                     'purchasable_id' => $purchasableId,
                     'purchasable_type' => $purchasableType,
@@ -73,7 +76,7 @@ class CreateCartLineAction
             return $cartLine;
         } catch (Exception $e) {
             DB::rollBack();
-            \Log::info('Error on CreateCartLineAction->execute() ' . $e);
+            Log::info('Error on CreateCartLineAction->execute() ' . $e);
             return $e;
         }
     }

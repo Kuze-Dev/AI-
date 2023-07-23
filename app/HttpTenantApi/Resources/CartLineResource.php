@@ -16,10 +16,10 @@ use TiMacDonald\JsonApi\JsonApiResource;
 class CartLineResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
-    {   
+    {
         return [
-            'id' => $this->id,
-            'cart_id' => $this->cart_id,
+            'id' => $this->uuid,
+            // 'cart_id' => $this->cart_id,
             'quantity' => $this->quantity,
             'remarks' => [
                 'data' => $this->remarks,
