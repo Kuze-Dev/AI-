@@ -82,7 +82,7 @@ class PrepareOrderAction
             $query->morphWith([
                 ProductVariant::class => ['product'],
             ]);
-        },])
+        }, ])
             ->whereCheckoutReference($placeOrderData->cart_reference)
             ->get();
     }
@@ -91,7 +91,7 @@ class PrepareOrderAction
     {
         $taxZone = Taxation::getTaxZone($placeOrderData->taxation_data->country_id, $placeOrderData->taxation_data->state_id);
 
-        if (!$taxZone instanceof TaxZone) {
+        if ( ! $taxZone instanceof TaxZone) {
             Log::info('No tax zone found');
 
             throw new BadRequestHttpException('No tax zone found');

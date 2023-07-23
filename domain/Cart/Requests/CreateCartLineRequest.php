@@ -41,14 +41,14 @@ class CreateCartLineRequest extends FormRequest
                     $purchasableId = $this->input('purchasable_id');
                     $variantId = $this->input('variant_id') ?? null;
 
-                    if (!$purchasableId) {
+                    if ( ! $purchasableId) {
                         $fail('Invalid product.');
                     }
 
                     if (is_null($variantId)) {
                         $product = Product::find($purchasableId);
 
-                        if (!$product) {
+                        if ( ! $product) {
                             $fail('Invalid product.');
 
                             return;
@@ -62,7 +62,7 @@ class CreateCartLineRequest extends FormRequest
                     } else {
                         $productVariant = ProductVariant::find($variantId);
 
-                        if (!$productVariant) {
+                        if ( ! $productVariant) {
                             $fail('Invalid productVariant.');
 
                             return;
@@ -84,13 +84,13 @@ class CreateCartLineRequest extends FormRequest
 
                     $product = Product::find($purchasableId);
 
-                    if (!$product) {
+                    if ( ! $product) {
                         $fail('Invalid product.');
 
                         return;
                     }
 
-                    if ($value && !$product->allow_customer_remarks) {
+                    if ($value && ! $product->allow_customer_remarks) {
                         $fail('You cant add remarks into this product.');
                     }
                 },
@@ -103,13 +103,13 @@ class CreateCartLineRequest extends FormRequest
 
                     $product = Product::find($purchasableId);
 
-                    if (!$product) {
+                    if ( ! $product) {
                         $fail('Invalid product.');
 
                         return;
                     }
 
-                    if ($value && !$product->allow_customer_remarks) {
+                    if ($value && ! $product->allow_customer_remarks) {
                         $fail('You cant add media remarks into this product.');
                     }
                 },

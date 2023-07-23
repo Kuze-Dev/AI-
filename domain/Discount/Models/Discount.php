@@ -81,7 +81,6 @@ class Discount extends Model
         return 'code';
     }
 
-
     // public function discountCodes(): HasMany
     // {
     //     return $this->hasMany(DiscountCode::class);

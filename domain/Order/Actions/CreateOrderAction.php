@@ -66,7 +66,7 @@ class CreateOrderAction
             'is_paid' => false,
         ]);
 
-        if (!is_null($preparedOrderData->discount)) {
+        if ( ! is_null($preparedOrderData->discount)) {
             app(CreateDiscountLimitAction::class)->execute($preparedOrderData->discount, $order, $preparedOrderData->customer);
         }
 
