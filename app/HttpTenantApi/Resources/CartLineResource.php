@@ -7,7 +7,6 @@ namespace App\HttpTenantApi\Resources;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
@@ -32,7 +31,7 @@ class CartLineResource extends JsonApiResource
                     return ProductResource::make($this->purchasable->product);
                 }
             },
-            "media" => function () {
+            'media' => function () {
                 if ($this->purchasable instanceof Product) {
                     return MediaResource::collection($this->purchasable->media);
                 } elseif ($this->purchasable instanceof ProductVariant) {

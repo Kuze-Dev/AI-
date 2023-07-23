@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Order\Actions;
 
-use Domain\Media\Actions\CreateMediaFromUrlAction;
 use Domain\Order\DataTransferObjects\UpdateOrderData;
 use Domain\Order\Enums\OrderResult;
 use Domain\Order\Enums\OrderStatuses;
@@ -13,6 +12,7 @@ use Domain\Payments\Actions\UploadProofofPaymentAction;
 use Domain\Payments\DataTransferObjects\ProofOfPaymentData;
 use Exception;
 use Illuminate\Http\UploadedFile;
+use Log;
 
 class UpdateOrderAction
 {
@@ -52,7 +52,8 @@ class UpdateOrderAction
 
             return OrderResult::SUCCESS;
         } catch (Exception $e) {
-            \Log::info($e);
+            Log::info($e);
+
             return $e;
         }
     }

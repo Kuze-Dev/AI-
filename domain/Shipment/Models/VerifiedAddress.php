@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property array|null $verified_address
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read Customer $customer
+ * @property-read Customer|null $customer
  * @method static \Illuminate\Database\Eloquent\Builder|VerifiedAddress newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|VerifiedAddress newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|VerifiedAddress query()

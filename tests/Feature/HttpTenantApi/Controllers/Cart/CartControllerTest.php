@@ -3,14 +3,10 @@
 declare(strict_types=1);
 
 use Domain\Cart\Database\Factories\CartFactory;
-use Domain\Cart\Database\Factories\CartLineFactory;
 use Domain\Customer\Database\Factories\CustomerFactory;
-use Domain\Product\Database\Factories\ProductFactory;
-use Domain\Product\Database\Factories\ProductVariantFactory;
 
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
-use function Pest\Laravel\postJson;
 use function Pest\Laravel\withHeader;
 
 beforeEach(function () {

@@ -19,7 +19,7 @@ beforeEach(function () {
     $product = ProductFactory::new()->createOne();
 
     $product->update([
-        "allow_customer_remarks" => true,
+        'allow_customer_remarks' => true,
     ]);
 
     $customer = CustomerFactory::new()
@@ -32,14 +32,15 @@ beforeEach(function () {
         ->plainTextToken);
 
     $this->product = $product;
+
     return compact('product');
 });
 
 it('can add to cart a purchasable product', function () {
     postJson('api/carts/cartlines', [
         'purchasable_id' => $this->product->id,
-        'purchasable_type' => "Product",
-        "quantity" => 1
+        'purchasable_type' => 'Product',
+        'quantity' => 1,
     ])
         ->assertValid()
         ->assertOk();
@@ -52,8 +53,8 @@ it('can add to cart a purchasable product with variant', function () {
     postJson('api/carts/cartlines', [
         'purchasable_id' => $this->product->id,
         'variant_id' => $productVariant->id,
-        'purchasable_type' => "Product",
-        "quantity" => 1
+        'purchasable_type' => 'Product',
+        'quantity' => 1,
     ])
         ->assertValid()
         ->assertOk();
@@ -66,11 +67,11 @@ it('can add to cart a purchasable product with remarks', function () {
     postJson('api/carts/cartlines', [
         'purchasable_id' => $this->product->id,
         'variant_id' => $productVariant->id,
-        'purchasable_type' => "Product",
-        "quantity" => 1,
-        "remarks" => [
-            "notes" => "test remarks"
-        ]
+        'purchasable_type' => 'Product',
+        'quantity' => 1,
+        'remarks' => [
+            'notes' => 'test remarks',
+        ],
     ])
         ->assertValid()
         ->assertOk();
@@ -80,8 +81,8 @@ it('can update cart line quantity', function () {
     $cartLine = CartLineFactory::new()->createOne();
 
     patchJson('api/carts/cartlines/' . $cartLine->id, [
-        'type' => "quantity",
-        "quantity" => 2
+        'type' => 'quantity',
+        'quantity' => 2,
     ])
         ->assertValid()
         ->assertOk();
@@ -92,10 +93,10 @@ it('can update cart line remarks', function () {
     $cartLine = CartLineFactory::new()->createOne();
 
     patchJson('api/carts/cartlines/' . $cartLine->id, [
-        'type' => "remarks",
-        "remarks" => [
-            "notes" => "test remarks"
-        ]
+        'type' => 'remarks',
+        'remarks' => [
+            'notes' => 'test remarks',
+        ],
     ])
         ->assertValid()
         ->assertOk();

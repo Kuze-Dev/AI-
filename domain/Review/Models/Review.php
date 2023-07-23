@@ -23,7 +23,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int|null $customer_id
  * @property int $rating
  * @property string|null $comment
- * @property mixed|null $data
+ * @property array|null $data
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Customer|null $customer
@@ -54,13 +54,12 @@ class Review extends Model implements HasMedia
     protected $fillable = [
         'ratings',
         'comment',
-        'data'
+        'data',
     ];
 
     protected $casts = [
         'data' => 'array',
     ];
-
 
     public function registerMediaCollections(): void
     {

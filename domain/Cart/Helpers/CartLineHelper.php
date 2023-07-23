@@ -82,9 +82,10 @@ class CartLineHelper
         ShippingMethod $shippingMethod,
     ): float {
         $shippingFeeTotal = 0;
+
         try {
             if ($shippingAddress) {
-                $parcelData =  new ParcelData(
+                $parcelData = new ParcelData(
                     pounds: '10',
                     ounces: '0',
                     width: '10',
@@ -99,7 +100,7 @@ class CartLineHelper
             }
         } catch (USPSServiceNotFoundException) {
             return response()->json([
-                "service_id" => "Service id is required",
+                'service_id' => 'Service id is required',
             ], 404);
         }
 
@@ -114,7 +115,7 @@ class CartLineHelper
         $taxPercentage = (float) $taxZone->percentage;
         $taxDisplay = $taxZone->price_display;
 
-        if (!$taxZone instanceof TaxZone) {
+        if ( ! $taxZone instanceof TaxZone) {
             throw new BadRequestHttpException('No tax zone found');
         }
 
@@ -129,7 +130,7 @@ class CartLineHelper
     {
         $discountTotal = 0;
 
-        if (!is_null($discount)) {
+        if ( ! is_null($discount)) {
             $discountTotal = (new DiscountHelperFunctions())->deductOrderSubtotal($discount, $subTotal);
         }
 

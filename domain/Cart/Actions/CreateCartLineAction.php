@@ -22,7 +22,6 @@ class CreateCartLineAction
     ) {
     }
 
-
     public function execute(Cart $cart, CreateCartData $cartLineData): CartLine|Exception
     {
         DB::beginTransaction();
@@ -33,8 +32,8 @@ class CreateCartLineAction
 
             match ($cartLineData->purchasable_type) {
                 'Product' => $purchasableType = Product::class,
-                    // 'Service' => $purchasableType = Service::class,
-                    // 'Booking' => $purchasableType = Booking::class,
+                // 'Service' => $purchasableType = Service::class,
+                // 'Booking' => $purchasableType = Booking::class,
                 default => null
             };
 
@@ -77,6 +76,7 @@ class CreateCartLineAction
         } catch (Exception $e) {
             DB::rollBack();
             Log::info('Error on CreateCartLineAction->execute() ' . $e);
+
             return $e;
         }
     }

@@ -18,8 +18,8 @@ it('can update cart line quantity', function () {
     $cartLine = CartLineFactory::new()->createOne();
 
     $payload = [
-        "type" => "quantity",
-        "quantity" => 3
+        'type' => 'quantity',
+        'quantity' => 3,
     ];
 
     $updatedCartLine = app(UpdateCartLineAction::class)
@@ -35,10 +35,10 @@ it('can update cart line remarks', function () {
     $cartLine = CartLineFactory::new()->createOne();
 
     $payload = [
-        "type" => "remarks",
-        "remarks" => [
-            "notes" => "test remarks"
-        ]
+        'type' => 'remarks',
+        'remarks' => [
+            'notes' => 'test remarks',
+        ],
     ];
 
     $updatedCartLine = app(UpdateCartLineAction::class)
@@ -47,7 +47,7 @@ it('can update cart line remarks', function () {
     assertInstanceOf(CartLine::class, $updatedCartLine);
     assertDatabaseHas(CartLine::class, [
         'remarks' => json_encode([
-            "notes" => "test remarks"
-        ])
+            'notes' => 'test remarks',
+        ]),
     ]);
 });

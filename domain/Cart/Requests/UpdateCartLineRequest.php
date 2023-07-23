@@ -45,14 +45,14 @@ class UpdateCartLineRequest extends FormRequest
                     $purchasable = $cartLine->purchasable;
 
                     if ($purchasable instanceof Product) {
-                        if ($value && !$purchasable->allow_customer_remarks) {
+                        if ($value && ! $purchasable->allow_customer_remarks) {
                             $fail('You cant add remarks into this product.');
                         }
                     } elseif ($purchasable instanceof ProductVariant) {
                         $productVariant = ProductVariant::with('product')
                             ->where('id', $cartLine->purchasable_id)->first();
 
-                        if ($value && !$productVariant->product->allow_customer_remarks) {
+                        if ($value && ! $productVariant->product->allow_customer_remarks) {
                             $fail('You cant add remarks into this product.');
                         }
                     }
@@ -65,14 +65,14 @@ class UpdateCartLineRequest extends FormRequest
                     $purchasable = $cartLine->purchasable;
 
                     if ($purchasable instanceof Product) {
-                        if ($value && !$purchasable->allow_customer_remarks) {
+                        if ($value && ! $purchasable->allow_customer_remarks) {
                             $fail('You cant add media remarks into this product.');
                         }
                     } elseif ($purchasable instanceof ProductVariant) {
                         $productVariant = ProductVariant::with('product')
                             ->where('id', $cartLine->purchasable_id)->first();
 
-                        if ($value && !$productVariant->product->allow_customer_remarks) {
+                        if ($value && ! $productVariant->product->allow_customer_remarks) {
                             $fail('You cant add media remarks into this product.');
                         }
                     }

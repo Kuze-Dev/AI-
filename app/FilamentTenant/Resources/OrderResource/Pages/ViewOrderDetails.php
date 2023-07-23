@@ -151,8 +151,9 @@ class ViewOrderDetails extends ViewRecord
                                                 } catch (Throwable $exception) {
                                                 }
                                             }
+
                                             return $media?->getUrl();
-                                        })
+                                        }),
                                 ])
                                 ->slideOver()
                                 ->icon('heroicon-o-document');

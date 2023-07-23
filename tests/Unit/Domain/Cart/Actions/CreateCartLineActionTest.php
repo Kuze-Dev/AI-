@@ -9,7 +9,6 @@ use Domain\Cart\Models\CartLine;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Product\Database\Factories\ProductFactory;
 use Domain\Product\Database\Factories\ProductVariantFactory;
-use Domain\Product\Models\ProductVariant;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -31,9 +30,9 @@ it('can create cart lines with product as purchasable', function () {
         ->createOne();
 
     $payload = [
-        "purchasable_id" => $product->id,
-        "purchasable_type" => "Product",
-        "quantity" => 1
+        'purchasable_id' => $product->id,
+        'purchasable_type' => 'Product',
+        'quantity' => 1,
     ];
 
     $cartline = app(CreateCartLineAction::class)
@@ -57,10 +56,10 @@ it('can create cart lines with product_variant as purchasable', function () {
         ->createOne();
 
     $payload = [
-        "purchasable_id" => $product->id,
-        "variant_id" => $productVariant->id,
-        "purchasable_type" => "Product",
-        "quantity" => 1
+        'purchasable_id' => $product->id,
+        'variant_id' => $productVariant->id,
+        'purchasable_type' => 'Product',
+        'quantity' => 1,
     ];
 
     $cartline = app(CreateCartLineAction::class)
@@ -81,12 +80,12 @@ it('can create cart lines with remarks', function () {
         ->createOne();
 
     $payload = [
-        "purchasable_id" => $product->id,
-        "purchasable_type" => "Product",
-        "quantity" => 1,
-        "remarks" => [
-            "notes" => "test notes"
-        ]
+        'purchasable_id' => $product->id,
+        'purchasable_type' => 'Product',
+        'quantity' => 1,
+        'remarks' => [
+            'notes' => 'test notes',
+        ],
     ];
 
     $cartline = app(CreateCartLineAction::class)
@@ -95,7 +94,7 @@ it('can create cart lines with remarks', function () {
     assertInstanceOf(CartLine::class, $cartline);
     assertDatabaseHas(CartLine::class, [
         'remarks' => json_encode([
-            "notes" => "test notes"
-        ])
+            'notes' => 'test notes',
+        ]),
     ]);
 });

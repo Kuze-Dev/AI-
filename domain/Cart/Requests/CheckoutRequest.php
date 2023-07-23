@@ -59,7 +59,6 @@ class CheckoutRequest extends FormRequest
                         })
                         ->get();
 
-
                     if ($cartLinesForCheckout->count() !== count($value)) {
                         $fail('Invalid stocks');
                     }

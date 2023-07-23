@@ -25,6 +25,4 @@ class CartSummaryShippingData
             shippingMethod: $data['shippingMethod'],
         );
     }
-
-    
 }

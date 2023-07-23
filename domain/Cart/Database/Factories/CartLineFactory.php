@@ -19,7 +19,7 @@ class CartLineFactory extends Factory
             'purchasable_id' => 1,
             'purchasable_type' => Product::class,
             'quantity' => 1,
-            'remarks' => "test remarks",
+            'remarks' => 'test remarks',
         ];
     }
 

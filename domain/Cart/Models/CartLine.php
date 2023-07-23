@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * Domain\Cart\Models\CartLine
  *
  * @property int $id
+ * @property string $uuid
  * @property int $cart_id
  * @property int $purchasable_id
  * @property string $purchasable_type
@@ -45,6 +46,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereQuantity($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereRemarks($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereUuid($value)
  * @mixin Eloquent
  */
 class CartLine extends Model implements HasMedia
