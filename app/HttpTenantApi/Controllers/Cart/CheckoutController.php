@@ -51,7 +51,7 @@ class CheckoutController
             if ($expiredCartLines->isNotEmpty()) {
                 return response()->json([
                     'message' => 'Key has been expired, checkout again',
-                ], 200);
+                ], 400);
             }
 
             return CartLineResource::collection($model);
