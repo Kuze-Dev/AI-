@@ -76,6 +76,12 @@ class Discount extends Model
         'valid_end_at' => 'datetime',
     ];
 
+    public function getRouteKeyName(): string
+    {
+        return 'code';
+    }
+
+
     // public function discountCodes(): HasMany
     // {
     //     return $this->hasMany(DiscountCode::class);

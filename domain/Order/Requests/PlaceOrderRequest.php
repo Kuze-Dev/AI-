@@ -8,6 +8,7 @@ use Domain\Address\Models\Address;
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
 use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -18,7 +19,7 @@ class PlaceOrderRequest extends FormRequest
         return [
             'addresses.shipping' => [
                 'required',
-                Rule::exists(Address::class, 'id')->where(function ($query) {
+                Rule::exists(Address::class, (new Address())->getRouteKeyName())->where(function ($query) {
                     $customerId = auth()->user()?->id;
 
                     $query->where('customer_id', $customerId);
@@ -26,7 +27,7 @@ class PlaceOrderRequest extends FormRequest
             ],
             'addresses.billing' => [
                 'required',
-                Rule::exists(Address::class, 'id')->where(function ($query) {
+                Rule::exists(Address::class, (new Address())->getRouteKeyName())->where(function ($query) {
                     $customerId = auth()->user()?->id;
 
                     $query->where('customer_id', $customerId);
@@ -45,7 +46,7 @@ class PlaceOrderRequest extends FormRequest
                         ->whereNull('checked_out_at')
                         ->count();
 
-                    if ( ! $cartLines) {
+                    if (!$cartLines) {
                         $fail('No cart lines for checkout');
 
                         return;
@@ -102,9 +103,12 @@ class PlaceOrderRequest extends FormRequest
             ],
             'payment_method' => [
                 'required',
-                Rule::exists(PaymentMethod::class, 'slug'),
+                Rule::exists(PaymentMethod::class, (new PaymentMethod())->getRouteKeyName()),
             ],
-
+            'shipping_method' => [
+                'required',
+                Rule::exists(ShippingMethod::class, (new ShippingMethod())->getRouteKeyName()),
+            ],
         ];
     }
 }

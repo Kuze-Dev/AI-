@@ -26,10 +26,10 @@ class SplitOrderAction
                 DB::beginTransaction();
 
                 $order = app(CreateOrderAction::class)
-                    ->execute($preparedOrderData);
+                    ->execute($placeOrderData, $preparedOrderData);
 
                 app(CreateOrderLineAction::class)
-                    ->execute($order, $preparedOrderData);
+                    ->execute($order, $placeOrderData, $preparedOrderData);
 
                 app(CreateOrderAddressAction::class)
                     ->execute($order, $preparedOrderData);
