@@ -8,17 +8,14 @@ use App\Http\Controllers\Controller;
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
+use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
+use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\Helpers\CartLineHelper;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
 use Domain\Customer\Models\Customer;
-use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
-use Domain\Shipment\Actions\USPS\GetUSPSRateAction;
-use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
-use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\ShippingMethod\Models\ShippingMethod;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
 
@@ -54,7 +51,10 @@ class CartSummaryController extends Controller
         $cartLineIdArray = explode(',', $validated['cart_line_ids']);
         $cartLineIds = array_map('intval', $cartLineIdArray);
 
-        $customer = auth()->user()->load('addresses.state.country');
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = auth()->user();
+
+        $customer->load('addresses.state.country');
 
         $state = $this->resolveSummaryRouteKey(State::class, $stateId);
 
@@ -78,29 +78,24 @@ class CartSummaryController extends Controller
             ->whereIn('id', $cartLineIds)
             ->get();
 
-        $taxDetails = app(CartLineHelper::class)->getTax($country->id);
+        $summary = app(CartLineHelper::class)->getSummary(
+            $cartLines,
+            new CartSummaryTaxData($country->id, $state->id ?? null),
+            new CartSummaryShippingData($customer, $shippingAddress, $shippingMethod),
+            $discount,
+        );
 
-        $discountDetails = app(CartLineHelper::class)->getDiscount($discount, 167.79);
-
-        $subTotalDetails = app(CartLineHelper::class)->getSubTotal($cartLines);
-
-        return $subTotalDetails;
-
-        //     $summaryData = app(CartLineHelper::class)
-        //     ->summary($cartLines, $country->id, (int) $stateId, $discount);
-
-
-        // return response()->json([
-        //     'tax_inclusive_sub_total' => $summaryData->subTotal + $summaryData->taxTotal,
-        //     'sub_total' => $summaryData->subTotal,
-        //     'tax_display' => $summaryData->taxDisplay,
-        //     'tax_percentage' => $summaryData->taxPercentage,
-        //     'tax_total' => $summaryData->taxTotal,
-        //     'grand_total' => $summaryData->grandTotal,
-        //     'discount_total' => $discountCode ? $summaryData->discountTotal : '',
-        //     'discount_message' => $discountCode ? $summaryData->discountMessage : '',
-        //     "shipping_fee" => $shippingFee
-        // ], 200);
+        return response()->json([
+            'tax_inclusive_sub_total' => $summary->subTotal + $summary->taxTotal,
+            'sub_total' => $summary->subTotal,
+            'tax_display' => $summary->taxDisplay,
+            'tax_percentage' => $summary->taxPercentage,
+            'tax_total' => $summary->taxTotal,
+            'grand_total' => $summary->grandTotal,
+            'discount_total' => $discountCode ? $summary->discountTotal : '',
+            // 'discount_message' => $discountCode ? $summary->discountMessage : '',
+            "shipping_fee" => $summary->shippingTotal
+        ], 200);
     }
 
     private function resolveSummaryRouteKey(string $class, ?string $routeKey)

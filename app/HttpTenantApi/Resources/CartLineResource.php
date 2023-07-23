@@ -7,6 +7,7 @@ namespace App\HttpTenantApi\Resources;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
@@ -15,7 +16,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
 class CartLineResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
-    {
+    {   
         return [
             'id' => $this->id,
             'cart_id' => $this->cart_id,
@@ -28,10 +29,16 @@ class CartLineResource extends JsonApiResource
                 if ($this->purchasable instanceof Product) {
                     return ProductResource::make($this->purchasable);
                 } elseif ($this->purchasable instanceof ProductVariant) {
-                    return $this->purchasable;
+                    return ProductResource::make($this->purchasable->product);
                 }
             },
-            "purchasable_media" => MediaResource::collection($this->purchasable->media)
+            "media" => function () {
+                if ($this->purchasable instanceof Product) {
+                    return MediaResource::collection($this->purchasable->media);
+                } elseif ($this->purchasable instanceof ProductVariant) {
+                    return MediaResource::collection(collect($this->purchasable->product->media));
+                }
+            },
         ];
     }
 }

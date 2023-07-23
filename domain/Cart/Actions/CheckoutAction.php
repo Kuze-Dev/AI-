@@ -12,7 +12,7 @@ class CheckoutAction
 {
     public function execute(CheckoutData $checkoutData): string
     {
-        $checkoutReference = Str::upper(Str::random(12));
+        $checkoutReference = (string) Str::uuid();
 
         CartLine::whereIn('id', $checkoutData->cart_line_ids)
             ->update([

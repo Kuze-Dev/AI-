@@ -35,7 +35,7 @@ class CartController extends Controller
                 'cartLines.media',
             ])
                 ->whereBelongsTo(auth()->user())
-        )->allowedIncludes(['cartLines', 'cartLines.purchasable'])
+        )->allowedIncludes(['cartLines'])
             ->first();
 
         if ($model) {
