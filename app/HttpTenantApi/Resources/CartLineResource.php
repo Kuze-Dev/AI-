@@ -17,18 +17,25 @@ class CartLineResource extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'cart_id' => $this->cart_id,
+            'id' => $this->uuid,
+            // 'cart_id' => $this->cart_id,
             'quantity' => $this->quantity,
             'remarks' => [
                 'data' => $this->remarks,
-                'media' => $this->media->toArray(),
+                'media' => MediaResource::collection($this->media),
             ],
             'purchasable' => function () {
                 if ($this->purchasable instanceof Product) {
                     return ProductResource::make($this->purchasable);
                 } elseif ($this->purchasable instanceof ProductVariant) {
-                    return $this->purchasable;
+                    return ProductResource::make($this->purchasable->product);
+                }
+            },
+            'media' => function () {
+                if ($this->purchasable instanceof Product) {
+                    return MediaResource::collection($this->purchasable->media);
+                } elseif ($this->purchasable instanceof ProductVariant) {
+                    return MediaResource::collection(collect($this->purchasable->product->media));
                 }
             },
         ];

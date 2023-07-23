@@ -4,27 +4,27 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Actions;
 
-use Domain\Cart\DataTransferObjects\CreateCartData;
-use Domain\Cart\Enums\CartActionResult;
 use Domain\Cart\Models\Cart;
-use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
-use Exception;
+use Illuminate\Support\Str;
 
 class CreateCartAction
 {
-    public function execute(Customer $customer, CreateCartData $cartData): CartActionResult|Exception
+    public function execute(Customer $customer): Cart
     {
-        $cart = Cart::firstOrCreate([
+        $cart = Cart::where([
+            'customer_id' => $customer->id,
+        ])->first();
+
+        if ($cart) {
+            return $cart;
+        }
+
+        $newCart = Cart::firstOrCreate([
+            'uuid' => (string) Str::uuid(),
             'customer_id' => $customer->id,
         ]);
 
-        $result = app(CreateCartLineAction::class)->execute($cart, $cartData);
-
-        if ($result instanceof CartLine) {
-            return CartActionResult::SUCCESS;
-        }
-
-        return CartActionResult::FAILED;
+        return $newCart;
     }
 }

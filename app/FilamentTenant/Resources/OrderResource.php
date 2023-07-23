@@ -344,7 +344,7 @@ class OrderResource extends Resource
                             ->action(function () use ($get, $set) {
                                 $order = Order::with('payments')->find($get('id'));
 
-                                $isPaid = !$order->is_paid;
+                                $isPaid = ! $order->is_paid;
 
                                 $result = $order->update([
                                     'is_paid' => $isPaid,
@@ -353,11 +353,11 @@ class OrderResource extends Resource
                                 if ($result) {
                                     if ($order->is_paid) {
                                         $order->payments->first()->update([
-                                            'status' => 'paid'
+                                            'status' => 'paid',
                                         ]);
                                     } else {
                                         $order->payments->first()->update([
-                                            'status' => 'pending'
+                                            'status' => 'pending',
                                         ]);
                                     }
 

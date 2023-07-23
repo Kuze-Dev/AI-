@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * Domain\Cart\Models\CartLine
  *
  * @property int $id
+ * @property string $uuid
  * @property int $cart_id
  * @property int $purchasable_id
  * @property string $purchasable_type
@@ -45,6 +46,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereQuantity($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereRemarks($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereUuid($value)
  * @mixin Eloquent
  */
 class CartLine extends Model implements HasMedia
@@ -53,6 +55,7 @@ class CartLine extends Model implements HasMedia
     use InteractsWithMedia;
 
     protected $fillable = [
+        'uuid',
         'cart_id',
         'purchasable_id',
         'purchasable_type',
@@ -67,6 +70,11 @@ class CartLine extends Model implements HasMedia
         'checkout_expiration' => 'datetime',
         'checked_out_at' => 'datetime',
     ];
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Cart\Models\Cart, \Domain\Cart\Models\CartLine> */
     public function cart(): BelongsTo

@@ -5,11 +5,17 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\Http\Controllers\Controller;
+use Domain\Address\Models\Address;
+use Domain\Address\Models\Country;
+use Domain\Address\Models\State;
+use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
+use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\Helpers\CartLineHelper;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
-use Domain\Discount\Enums\DiscountStatus;
+use Domain\Customer\Models\Customer;
 use Domain\Discount\Models\Discount;
+use Domain\ShippingMethod\Models\ShippingMethod;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
 
@@ -31,31 +37,35 @@ class CartSummaryController extends Controller
         return response()->json(['cartCount' => $cartLinesCount], 200);
     }
 
-    #[Get('carts/summary', name: 'carts.summary')]
-    public function summary(CartSummaryRequest $request)
-    {
+    #[Get('carts/summary/{country}/{shippingMethodId?}/{shippingAddressId?}/{stateId?}/{discountCode?}', name: 'carts.summary')]
+    public function summary(
+        CartSummaryRequest $request,
+        Country $country,
+        ?string $shippingMethodId,
+        ?string $shippingAddressId,
+        ?string $stateId,
+        ?string $discountCode
+    ) {
         $validated = $request->validated();
 
-        $cartLineIdArray = explode(',', $validated['cart_line_ids']);
-        $cartLineIds = array_map('intval', $cartLineIdArray);
+        $cartLineIds = explode(',', $validated['cart_line_ids']);
 
-        $stateId = (int) $validated['state_id'] ?? null;
-        $countryId = (int) $validated['country_id'];
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = auth()->user();
 
-        $discount = null;
-        $discountCode = $validated['discount_code'] ?? null;
+        $customer->load('addresses.state.country');
 
-        if ( ! is_null($discountCode)) {
-            $discount = Discount::whereCode($discountCode)
-                ->whereStatus(DiscountStatus::ACTIVE)
-                ->where(function ($query) {
-                    $query->where('max_uses', '>', 0)
-                        ->orWhereNull('max_uses');
-                })
-                ->where(function ($query) {
-                    $query->where('valid_end_at', '>=', now())
-                        ->orWhereNull('valid_end_at');
-                })->first();
+        $state = $this->resolveSummaryRouteKey(State::class, $stateId);
+
+        $shippingMethod = $this->resolveSummaryRouteKey(ShippingMethod::class, $shippingMethodId);
+        $shippingAddress = $this->resolveSummaryRouteKey(Address::class, $shippingAddressId);
+
+        $discount = $this->resolveSummaryRouteKey(Discount::class, $discountCode);
+
+        $validationResponse = $this->validateAddress($customer, $country, $shippingAddress, $state);
+
+        if ($validationResponse) {
+            return $validationResponse;
         }
 
         $cartLines = CartLine::query()
@@ -64,21 +74,56 @@ class CartSummaryController extends Controller
                 $query->whereBelongsTo(auth()->user());
             })
             ->whereNull('checked_out_at')
-            ->whereIn('id', $cartLineIds)
+            ->whereIn('uuid', $cartLineIds)
             ->get();
 
-        $summaryData = app(CartLineHelper::class)
-            ->summary($cartLines, $countryId, $stateId, $discount);
+        $summary = app(CartLineHelper::class)->getSummary(
+            $cartLines,
+            new CartSummaryTaxData($country->id, $state->id ?? null),
+            new CartSummaryShippingData($customer, $shippingAddress, $shippingMethod),
+            $discount,
+        );
 
         return response()->json([
-            'tax_inclusive_sub_total' => $summaryData->subTotal + $summaryData->taxTotal,
-            'sub_total' => $summaryData->subTotal,
-            'tax_display' => $summaryData->taxDisplay,
-            'tax_percentage' => $summaryData->taxPercentage,
-            'tax_total' => $summaryData->taxTotal,
-            'grand_total' => $summaryData->grandTotal,
-            'discount_total' => $discountCode ? $summaryData->discountTotal : '',
-            'discount_message' => $discountCode ? $summaryData->discountMessage : '',
+            'tax_inclusive_sub_total' => $summary->subTotal + $summary->taxTotal,
+            'sub_total' => $summary->subTotal,
+            'tax_display' => $summary->taxDisplay,
+            'tax_percentage' => $summary->taxPercentage,
+            'tax_total' => $summary->taxTotal,
+            'grand_total' => $summary->grandTotal,
+            'discount_total' => $discountCode ? $summary->discountTotal : '',
+            // 'discount_message' => $discountCode ? $summary->discountMessage : '',
+            'shipping_fee' => $summary->shippingTotal,
         ], 200);
+    }
+
+    private function resolveSummaryRouteKey(string $class, ?string $routeKey)
+    {
+        return $routeKey ? app($class)->resolveRouteBinding($routeKey) : null;
+    }
+
+    private function validateAddress(
+        Customer $customer,
+        Country $country,
+        ?Address $shippingAddress,
+        ?State $state = null
+    ) {
+        if ( ! $customer->addresses->pluck('state.country.id')->contains($country->id)) {
+            return response()->json([
+                'country' => 'Invalid country',
+            ], 404);
+        }
+
+        if ($state && ! $customer->addresses->pluck('state_id')->contains($state->id)) {
+            return response()->json([
+                'state' => 'Invalid state',
+            ], 404);
+        }
+
+        if ($shippingAddress && ! $customer->addresses->contains('id', $shippingAddress->id)) {
+            return response()->json([
+                'shipping_address' => 'Invalid shipping address',
+            ], 404);
+        }
     }
 }

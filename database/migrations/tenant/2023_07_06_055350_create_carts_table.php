@@ -13,6 +13,7 @@ return new class () extends Migration {
     {
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
+            $table->uuid();
 
             $table->foreignIdFor(Customer::class)->index();
             $table->string('coupon_code')->nullable()->default(null)->index();
@@ -22,6 +23,7 @@ return new class () extends Migration {
 
         Schema::create('cart_lines', function (Blueprint $table) {
             $table->id();
+            $table->uuid();
             $table->foreignIdFor(Cart::class)->index();
 
             $table->unsignedInteger('purchasable_id')->index();
