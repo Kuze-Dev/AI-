@@ -20,7 +20,8 @@ class CheckoutRequest extends FormRequest
                 'array',
                 function ($attribute, $value, $fail) {
 
-                    $cartLines = CartLine::with('purchasable')->whereIn('uuid', $value)
+                    $cartLines = CartLine::with('purchasable')
+                        ->whereIn((new CartLine())->getRouteKeyName(), $value)
                         ->whereHas('cart', function ($query) {
                             $query->whereBelongsTo(auth()->user());
                         })
@@ -37,7 +38,7 @@ class CheckoutRequest extends FormRequest
                             $query->whereBelongsTo(auth()->user());
                         })
                         ->whereNull('checked_out_at')
-                        ->whereIn('uuid', $value)
+                        ->whereIn((new CartLine())->getRouteKeyName(), $value)
                         ->where(function ($query) {
                             $query->where(function ($subQuery) {
                                 $subQuery->where('purchasable_type', Product::class)

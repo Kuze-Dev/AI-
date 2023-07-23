@@ -74,7 +74,7 @@ class CartSummaryController extends Controller
                 $query->whereBelongsTo(auth()->user());
             })
             ->whereNull('checked_out_at')
-            ->whereIn('uuid', $cartLineIds)
+            ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
             ->get();
 
         $summary = app(CartLineHelper::class)->getSummary(
