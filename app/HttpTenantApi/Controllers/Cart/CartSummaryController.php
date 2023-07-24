@@ -93,15 +93,15 @@ class CartSummaryController extends Controller
         }
 
         return response()->json([
-            'tax_inclusive_sub_total' => $summary->subTotal + $summary->taxTotal,
-            'sub_total' => $summary->subTotal,
+            'tax_inclusive_sub_total' => round($summary->subTotal + $summary->taxTotal, 2),
+            'sub_total' => round($summary->subTotal, 2),
             'tax_display' => $summary->taxDisplay,
-            'tax_percentage' => $summary->taxPercentage,
-            'tax_total' => $summary->taxTotal,
-            'grand_total' => $summary->grandTotal,
-            'discount_total' => $discountCode ? $summary->discountTotal : '',
+            'tax_percentage' => round($summary->taxPercentage, 2),
+            'tax_total' => round($summary->taxTotal, 2),
+            'grand_total' => round($summary->grandTotal, 2),
+            'discount_total' => $discountCode ? round($summary->discountTotal, 2) : '',
             // 'discount_message' => $discountCode ? $summary->discountMessage : '',
-            'shipping_fee' => $summary->shippingTotal,
+            'shipping_fee' => round($summary->shippingTotal, 2),
         ], 200);
     }
 
@@ -116,19 +116,19 @@ class CartSummaryController extends Controller
         ?Address $shippingAddress,
         ?State $state = null
     ) {
-        if (!$customer->addresses->pluck('state.country.id')->contains($country->id)) {
+        if ( ! $customer->addresses->pluck('state.country.id')->contains($country->id)) {
             return response()->json([
                 'country' => 'Invalid country',
             ], 404);
         }
 
-        if ($state && !$customer->addresses->pluck('state_id')->contains($state->id)) {
+        if ($state && ! $customer->addresses->pluck('state_id')->contains($state->id)) {
             return response()->json([
                 'state' => 'Invalid state',
             ], 404);
         }
 
-        if ($shippingAddress && !$customer->addresses->contains('id', $shippingAddress->id)) {
+        if ($shippingAddress && ! $customer->addresses->contains('id', $shippingAddress->id)) {
             return response()->json([
                 'shipping_address' => 'Invalid shipping address',
             ], 404);

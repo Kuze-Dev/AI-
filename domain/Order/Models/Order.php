@@ -10,6 +10,7 @@ use Domain\Order\Enums\OrderStatuses;
 use Domain\Payments\Interfaces\PayableInterface;
 use Domain\Payments\Models\Traits\HasPayments;
 use Domain\Taxation\Enums\PriceDisplay;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -182,5 +183,15 @@ class Order extends Model implements HasMedia, PayableInterface
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
+    }
+
+    public function scopeForPayment(Builder $query, $date): Builder
+    {
+        return $query->whereHas('payments', function ($subQuery) {
+            $subQuery->where(function ($query) {
+                $query->where('gateway', 'paypal')
+                    ->orWhere('gateway', 'bank-transfer');
+            })->where('status', 'pending');
+        })->where('is_paid', false);
     }
 }
