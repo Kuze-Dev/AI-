@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
-use Domain\Order\DataTransferObjects\OrderPaymentMethodData;
-use Domain\PaymentMethod\Models\PaymentMethod;
 use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 

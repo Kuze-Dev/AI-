@@ -14,7 +14,7 @@ use Domain\Order\Enums\OrderResult;
 use Domain\Order\Models\Order;
 use Domain\Order\Requests\PlaceOrderRequest;
 use Domain\Order\Requests\UpdateOrderRequest;
-use Domain\PaymentMethod\Models\PaymentMethod;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
@@ -33,7 +33,7 @@ class OrderController extends Controller
                 'orderLines.media',
             ])->whereBelongsTo(auth()->user()))
                 ->allowedIncludes(['orderLines'])
-                ->allowedFilters(['status', 'reference'])
+                ->allowedFilters(['status', 'reference', AllowedFilter::scope('for_payment')])
                 ->allowedSorts(['reference', 'total', 'status', 'created_at'])
                 ->jsonPaginate()
         );
@@ -46,7 +46,7 @@ class OrderController extends Controller
         $result = app(PlaceOrderAction::class)
             ->execute(PlaceOrderData::fromArray($validatedData));
 
-        if (!$result['order'] instanceof Order) {
+        if ( ! $result['order'] instanceof Order) {
             return response()->json([
                 'message' => 'Order failed to be created',
             ], 400);
@@ -64,15 +64,11 @@ class OrderController extends Controller
         // return $order;
         // $this->authorize('view', $order);
 
-        // $test = PaymentMethod::with('media')->first();
-
-        // return $test;
-
         $model = QueryBuilder::for(
             $order->with([
                 'shippingAddress', 'billingAddress',
                 'orderLines.media', 'orderLines.review.media',
-                'payments.paymentMethod.media'
+                'payments.paymentMethod.media',
             ])->whereBelongsTo(auth()->user())
                 ->whereReference($order->reference)
         )

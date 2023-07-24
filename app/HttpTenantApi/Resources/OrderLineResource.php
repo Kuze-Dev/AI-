@@ -6,8 +6,6 @@ namespace App\HttpTenantApi\Resources;
 
 use Domain\Order\DataTransferObjects\ProductOrderData;
 use Domain\Order\DataTransferObjects\ProductVariantOrderData;
-use Domain\Product\Models\Product;
-use Domain\Product\Models\ProductVariant;
 use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
@@ -29,9 +27,9 @@ class OrderLineResource extends JsonApiResource
             'discount_total' => $this->discount_total,
             'total' => $this->total,
             'purchasable' => function () {
-                // (WIP) DTO is my work around here becase the 
+                // (WIP) DTO is my work around here becase the
                 // purchable_data is an array coming from column
-                if (!isset($this->purchasable_data['product'])) {
+                if ( ! isset($this->purchasable_data['product'])) {
                     return ProductOrderData::fromArray($this->purchasable_data);
                 } elseif (isset($this->purchasable_data['product'])) {
                     return ProductVariantOrderData::fromArray($this->purchasable_data);
