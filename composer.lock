@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d24fb476f2a5b895cf8d80277cf9b466",
+    "content-hash": "a49060d53d64d7201b96a2dc3ad1703f",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -146,6 +146,83 @@
                 "source": "https://github.com/artificertech/filament-multi-context/tree/V2.1.2"
             },
             "time": "2023-05-15T00:09:34+00:00"
+        },
+        {
+            "name": "awcodes/drop-in-action",
+            "version": "v0.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/awcodes/drop-in-action.git",
+                "reference": "9681022b225f8c0152514d02a4e6b60bad9d49ba"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/awcodes/drop-in-action/zipball/9681022b225f8c0152514d02a4e6b60bad9d49ba",
+                "reference": "9681022b225f8c0152514d02a4e6b60bad9d49ba",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^2.0",
+                "illuminate/contracts": "^9.0|^10.0",
+                "php": "^8.0",
+                "spatie/laravel-package-tools": "^1.13.5"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^6.0|^7.0",
+                "orchestra/testbench": "^7.0|^8.0",
+                "pestphp/pest": "^1.21",
+                "pestphp/pest-plugin-laravel": "^1.1",
+                "pestphp/pest-plugin-livewire": "^1.0",
+                "pestphp/pest-plugin-parallel": "^0.3",
+                "phpunit/phpunit": "^9.5|^10.0",
+                "spatie/laravel-ray": "^1.26"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Awcodes\\DropInAction\\DropInActionServiceProvider"
+                    ],
+                    "aliases": {
+                        "DropInAction": "Awcodes\\DropInAction\\Facades\\DropInAction"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Awcodes\\DropInAction\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "awcodes",
+                    "email": "awcodes1@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A form component for Filamentphp allowing actions inside of forms.",
+            "homepage": "https://github.com/awcodes/drop-in-action",
+            "keywords": [
+                "awcodes",
+                "drop-in-action",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/awcodes/drop-in-action/issues",
+                "source": "https://github.com/awcodes/drop-in-action/tree/v0.2.2"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/awcodes",
+                    "type": "github"
+                }
+            ],
+            "time": "2023-05-12T12:50:37+00:00"
         },
         {
             "name": "aws/aws-crt-php",
@@ -3885,6 +3962,85 @@
             "time": "2023-03-03T20:12:38+00:00"
         },
         {
+            "name": "lloricode/spatie-image-optimizer-health-check",
+            "version": "v1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lloricode/spatie-image-optimizer-health-check.git",
+                "reference": "60ed7b6fc93674942be993a70be6b5dbb539eed1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lloricode/spatie-image-optimizer-health-check/zipball/60ed7b6fc93674942be993a70be6b5dbb539eed1",
+                "reference": "60ed7b6fc93674942be993a70be6b5dbb539eed1",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^8.0|^9.0|^10.0",
+                "php": "^8.0",
+                "spatie/enum": "^3.13",
+                "spatie/laravel-health": "^1.19",
+                "spatie/laravel-package-tools": "^1.12.1"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^6.0",
+                "nunomaduro/larastan": "^2.0.1",
+                "orchestra/testbench": "^7.0",
+                "pestphp/pest": "^1.21",
+                "pestphp/pest-plugin-laravel": "^1.1",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^1.0",
+                "phpstan/phpstan-phpunit": "^1.0",
+                "phpunit/phpunit": "^9.5",
+                "spatie/laravel-ray": "^1.26"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": []
+            },
+            "autoload": {
+                "psr-4": {
+                    "Lloricode\\SpatieImageOptimizerHealthCheck\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lloric Mayuga Garcia",
+                    "email": "lloricode@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "These checks are where you can check if optimizer is installed on your server.",
+            "homepage": "https://github.com/lloricode/spatie-image-optimizer-health-check",
+            "keywords": [
+                "health check",
+                "image optimizer",
+                "laravel",
+                "lloricode",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/lloricode/spatie-image-optimizer-health-check/issues",
+                "source": "https://github.com/lloricode/spatie-image-optimizer-health-check/tree/v1.0.3"
+            },
+            "funding": [
+                {
+                    "url": "https://www.paypal.com/donate?hosted_button_id=V8PYXUNG6QP44",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://www.patreon.com/lloricode",
+                    "type": "patreon"
+                }
+            ],
+            "time": "2023-02-03T03:49:37+00:00"
+        },
+        {
             "name": "maatwebsite/excel",
             "version": "3.1.48",
             "source": {
@@ -6898,6 +7054,69 @@
             "time": "2023-05-01T17:14:06+00:00"
         },
         {
+            "name": "spatie/array-to-xml",
+            "version": "3.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/array-to-xml.git",
+                "reference": "f9ab39c808500c347d5a8b6b13310bd5221e39e7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/array-to-xml/zipball/f9ab39c808500c347d5a8b6b13310bd5221e39e7",
+                "reference": "f9ab39c808500c347d5a8b6b13310bd5221e39e7",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.2",
+                "pestphp/pest": "^1.21",
+                "spatie/pest-plugin-snapshots": "^1.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\ArrayToXml\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://freek.dev",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Convert an array to xml",
+            "homepage": "https://github.com/spatie/array-to-xml",
+            "keywords": [
+                "array",
+                "convert",
+                "xml"
+            ],
+            "support": {
+                "source": "https://github.com/spatie/array-to-xml/tree/3.2.0"
+            },
+            "funding": [
+                {
+                    "url": "https://spatie.be/open-source/support-us",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2023-07-19T18:30:26+00:00"
+        },
+        {
             "name": "spatie/eloquent-sortable",
             "version": "4.0.2",
             "source": {
@@ -8424,6 +8643,71 @@
                 }
             ],
             "time": "2023-04-28T07:47:42+00:00"
+        },
+        {
+            "name": "srmklive/paypal",
+            "version": "3.0.21",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/srmklive/laravel-paypal.git",
+                "reference": "3a55d463f8d5935627c4eee15da702811a03c5ea"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/srmklive/laravel-paypal/zipball/3a55d463f8d5935627c4eee15da702811a03c5ea",
+                "reference": "3a55d463f8d5935627c4eee15da702811a03c5ea",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "guzzlehttp/guzzle": "~7.0",
+                "illuminate/support": "~6.0|~7.0|~8.0|~9.0|^10.0",
+                "nesbot/carbon": "~2.0",
+                "php": ">=7.2|^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.0|^9.0|^10.0",
+                "symfony/var-dumper": "~5.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Srmklive\\PayPal\\Providers\\PayPalServiceProvider"
+                    ],
+                    "aliases": {
+                        "PayPal": "Srmklive\\PayPal\\Facades\\PayPal"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Srmklive\\PayPal\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Raza Mehdi",
+                    "email": "srmk@outlook.com"
+                }
+            ],
+            "description": "Laravel plugin For Processing Payments Through Paypal Express Checkout. Can Be Used Independently With Other Applications.",
+            "keywords": [
+                "http",
+                "laravel paypal",
+                "paypal",
+                "rest",
+                "web service"
+            ],
+            "support": {
+                "issues": "https://github.com/srmklive/laravel-paypal/issues",
+                "source": "https://github.com/srmklive/laravel-paypal/tree/3.0.21"
+            },
+            "time": "2023-04-26T16:27:35+00:00"
         },
         {
             "name": "stancl/jobpipeline",
@@ -11590,6 +11874,51 @@
                 }
             ],
             "time": "2022-03-08T17:03:00+00:00"
+        },
+        {
+            "name": "vyuldashev/xml-to-array",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vyuldashev/xml-to-array.git",
+                "reference": "28542261014674a3e9615da335dba43c9dcf304b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vyuldashev/xml-to-array/zipball/28542261014674a3e9615da335dba43c9dcf304b",
+                "reference": "28542261014674a3e9615da335dba43c9dcf304b",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1|^8.0"
+            },
+            "require-dev": {
+                "larapack/dd": "^1.1",
+                "phpunit/phpunit": "^7.5|^9.5",
+                "spatie/array-to-xml": "^2.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Vyuldashev\\XmlToArray\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vladimir Yuldashev",
+                    "email": "misterio92@gmail.com"
+                }
+            ],
+            "description": "Convert xml to an array",
+            "support": {
+                "issues": "https://github.com/vyuldashev/xml-to-array/issues",
+                "source": "https://github.com/vyuldashev/xml-to-array/tree/v1.1.0"
+            },
+            "time": "2022-08-23T23:18:27+00:00"
         },
         {
             "name": "webmozart/assert",
