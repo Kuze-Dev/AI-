@@ -11,35 +11,86 @@ use Domain\Product\Models\ProductOptionValue;
 
 class CreateProductOptionAction
 {
-    public function execute(Product $product, ProductData $productData): void
+    public function execute(Product $product, ProductData $productData, bool $isCreate = true): void
     {
         if (filled($productData->product_options)) {
             foreach ($productData->product_options as $key => &$productOption) {
-                $newProductOptionModel = ProductOption::create([
-                    'product_id' => $product->id,
-                    'name' => $productOption['name'],
-                ]);
-
-                $productData->product_variants = $this->searchAndChangeValue(
-                    $productOption['id'],
-                    $productData->product_variants,
-                    $newProductOptionModel->id
-                );
-                $productData->product_options[$key]['id'] = $newProductOptionModel->id;
-
-                foreach ($productOption['productOptionValues'] as $key2 => $productOptionValue) {
-                    $newOptionValueModel = ProductOptionValue::create([
-                        'name' => $productOptionValue['name'],
-                        'product_option_id' => $productOption['id'],
+                if ($isCreate) {
+                    $newProductOptionModel = ProductOption::create([
+                        'product_id' => $product->id,
+                        'name' => $productOption['name'],
                     ]);
 
-                    $productOption['productOptionValues'][$key2]['id'] = $newOptionValueModel->id;
                     $productData->product_variants = $this->searchAndChangeValue(
-                        $productOptionValue['id'],
+                        $productOption['id'],
                         $productData->product_variants,
-                        $newOptionValueModel->id,
-                        'option_value_id'
+                        $newProductOptionModel->id
                     );
+                    $productData->product_options[$key]['id'] = $newProductOptionModel->id;
+
+                    foreach ($productOption['productOptionValues'] as $key2 => $productOptionValue) {
+                        $newOptionValueModel = ProductOptionValue::create([
+                            'name' => $productOptionValue['name'],
+                            'product_option_id' => $productOption['id'],
+                        ]);
+
+                        $productOption['productOptionValues'][$key2]['id'] = $newOptionValueModel->id;
+                        $productData->product_variants = $this->searchAndChangeValue(
+                            $productOptionValue['id'],
+                            $productData->product_variants,
+                            $newOptionValueModel->id,
+                            'option_value_id'
+                        );
+                    }
+                } else {
+                    $productOptionModel = ProductOption::find($productOption['id']);
+
+                    if ($productOptionModel) {
+                        $productOptionModel->product_id = $product->id;
+                        $productOptionModel->name = $productOption['name'];
+                        $productOptionModel->save();
+                    }
+
+                    foreach ($productOption['productOptionValues'] as $key2 => $productOptionValue) {
+                        $optionValueModel = ProductOptionValue::find($productOptionValue['id']);
+
+                        if ($optionValueModel) {
+                            $optionValueModel->name = $productOptionValue['name'];
+                            $optionValueModel->product_option_id = $productOption['id'];
+                            $optionValueModel->save();
+                        }
+                    }
+
+                    // Removal of Option Values
+                    $mappedOptionValueIds = array_map(function ($item) {
+                        return $item['id'];
+                    }, $productOption['productOptionValues']);
+                    if (count($mappedOptionValueIds)) {
+                        $toRemoveOptionValues = ProductOptionValue::where(
+                            'product_option_id',
+                            $productOption['id']
+                        )->whereNotIn('id', $mappedOptionValueIds)->get();
+                        foreach ($toRemoveOptionValues as $optionValue) {
+                            $optionValue->delete();
+                        }
+                    }
+                }
+            }
+
+            if (!$isCreate) {
+                // Removal of product options
+                $mappedOptionIds = array_map(function ($item) {
+                    return $item['id'];
+                }, $productData->product_options[0]);
+
+                if (count($mappedOptionIds)) {
+                    $toRemoveOptions = ProductOption::where(
+                        'product_id',
+                        $product->id
+                    )->whereNotIn('id', $mappedOptionIds)->get();
+                    foreach ($toRemoveOptions as $option) {
+                        $option->delete();
+                    }
                 }
             }
         }
