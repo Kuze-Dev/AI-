@@ -31,7 +31,7 @@ class OrderResource extends JsonApiResource
             'status' => $this->status,
             'shipping_address' => $this->shippingAddress,
             'billing_address' => $this->billingAddress,
-            'bank_proof_images' => $this->getMedia('bank_proof_images')->toArray(),
+            // 'bank_proof_images' => $this->getMedia('bank_proof_images')->toArray(),
         ];
     }
 
