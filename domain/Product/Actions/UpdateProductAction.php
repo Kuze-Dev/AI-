@@ -16,9 +16,9 @@ class UpdateProductAction
     public function __construct(
         protected CreateMetaDataAction $createMetaData,
         protected UpdateMetaDataAction $updateMetaData,
-        protected CreateProductOptionAction $createProductOptionAction,
-        protected CreateProductVariantAction $createProductVariantAction,
-        protected CreateMediaAction $createMediaAction,
+        protected UpdateProductOptionAction $updateProductOptionAction,
+        protected UpdateProductVariantAction $updateProductVariantAction,
+        protected CreateMediaAction $createMediaAction
     ) {
     }
 
@@ -30,9 +30,9 @@ class UpdateProductAction
             ? $this->updateMetaData->execute($product, $productData->meta_data)
             : $this->createMetaData->execute($product, $productData->meta_data);
 
-        $this->createProductOptionAction->execute($product, $productData, false);
-
-        $this->createProductVariantAction->execute($product, $productData, false);
+        $this->updateProductOptionAction->execute($product, $productData);
+        
+        $this->updateProductVariantAction->execute($product, $productData);
 
         if (filled($productData->images)) {
             $this->createMediaAction->execute($product, Arr::wrap($productData->images), 'image');

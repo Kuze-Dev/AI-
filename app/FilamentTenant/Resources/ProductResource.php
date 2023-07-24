@@ -56,8 +56,8 @@ class ProductResource extends Resource
                             ->label('Media')
                             ->mediaLibraryCollection('image')
                             ->image()
-                            ->multiple()
-                            ->required(),
+                            ->multiple(),
+                            // ->required(),
                     ]),
                     Forms\Components\Section::make('Customer Remarks')
                         ->schema([
