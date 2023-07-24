@@ -14,9 +14,7 @@ use Domain\Cart\Helpers\CartLineHelper;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
 use Domain\Customer\Models\Customer;
-use Domain\Discount\Models\Discount;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
-use Domain\ShippingMethod\Models\ShippingMethod;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
 
@@ -38,15 +36,9 @@ class CartSummaryController extends Controller
         return response()->json(['cartCount' => $cartLinesCount], 200);
     }
 
-    #[Get('carts/summary/{country}/{shippingMethodId?}/{shippingAddressId?}/{stateId?}/{discountCode?}', name: 'carts.summary')]
-    public function summary(
-        CartSummaryRequest $request,
-        Country $country,
-        ?string $shippingMethodId,
-        ?string $shippingAddressId,
-        ?string $stateId,
-        ?string $discountCode
-    ) {
+    #[Get('carts/summary', name: 'carts.summary')]
+    public function summary(CartSummaryRequest $request)
+    {
         $validated = $request->validated();
 
         $cartLineIds = explode(',', $validated['cart_line_ids']);
@@ -55,19 +47,6 @@ class CartSummaryController extends Controller
         $customer = auth()->user();
 
         $customer->load('addresses.state.country');
-
-        $state = $this->resolveSummaryRouteKey(State::class, $stateId);
-
-        $shippingMethod = $this->resolveSummaryRouteKey(ShippingMethod::class, $shippingMethodId);
-        $shippingAddress = $this->resolveSummaryRouteKey(Address::class, $shippingAddressId);
-
-        $discount = $this->resolveSummaryRouteKey(Discount::class, $discountCode);
-
-        $validationResponse = $this->validateAddress($customer, $country, $shippingAddress, $state);
-
-        if ($validationResponse) {
-            return $validationResponse;
-        }
 
         $cartLines = CartLine::query()
             ->with('purchasable')
@@ -78,12 +57,15 @@ class CartSummaryController extends Controller
             ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
             ->get();
 
-        try {
+        $country = $request->getCountry();
+        $state = $request->getState();
+        $discount = $request->getDiscount();
 
+        try {
             $summary = app(CartLineHelper::class)->getSummary(
                 $cartLines,
-                new CartSummaryTaxData($country->id, $state->id ?? null),
-                new CartSummaryShippingData($customer, $shippingAddress, $shippingMethod),
+                new CartSummaryTaxData($country?->id, $state?->id),
+                new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),
                 $discount,
             );
         } catch (USPSServiceNotFoundException) {
@@ -93,21 +75,21 @@ class CartSummaryController extends Controller
         }
 
         return response()->json([
-            'tax_inclusive_sub_total' => round($summary->subTotal + $summary->taxTotal, 2),
+            'tax' => [
+                'inclusive_sub_total' => round($summary->subTotal + $summary->taxTotal, 2),
+                'display' => $summary->taxDisplay,
+                'percentage' => round($summary->taxPercentage, 2),
+                'amount' => round($summary->taxTotal, 2),
+            ],
+            'discount' => [
+                'status' => round($summary->discountTotal, 2) ? 'valid' : 'invalid',
+                'amount' => $discount ? round($summary->discountTotal, 2) : 0,
+                // "message"
+            ],
             'sub_total' => round($summary->subTotal, 2),
-            'tax_display' => $summary->taxDisplay,
-            'tax_percentage' => round($summary->taxPercentage, 2),
-            'tax_total' => round($summary->taxTotal, 2),
-            'grand_total' => round($summary->grandTotal, 2),
-            'discount_total' => $discountCode ? round($summary->discountTotal, 2) : '',
-            // 'discount_message' => $discountCode ? $summary->discountMessage : '',
             'shipping_fee' => round($summary->shippingTotal, 2),
+            'total' => round($summary->grandTotal, 2),
         ], 200);
-    }
-
-    private function resolveSummaryRouteKey(string $class, ?string $routeKey)
-    {
-        return $routeKey ? app($class)->resolveRouteBinding($routeKey) : null;
     }
 
     private function validateAddress(

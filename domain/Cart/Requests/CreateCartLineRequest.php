@@ -109,7 +109,7 @@ class CreateCartLineRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $purchasableId = $this->input('purchasable_id');
 
-                    $product = ProductVariant::where((new ProductVariant())->getRouteKeyName(), $purchasableId)->first();
+                    $product = Product::where((new Product())->getRouteKeyName(), $purchasableId)->first();
 
                     if ( ! $product) {
                         $fail('Invalid product.');
