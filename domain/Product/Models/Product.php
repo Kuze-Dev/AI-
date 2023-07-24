@@ -38,11 +38,12 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string|null $weight
  * @property int $stock
  * @property string|null $description
- * @property string $status
+ * @property int $status
  * @property int $is_digital_product
  * @property int $is_featured
  * @property int $is_special_offer
  * @property int $allow_customer_remarks
+ * @property int $minimum_order_quantity
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
@@ -57,6 +58,8 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property-read int|null $product_options_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Product\Models\ProductVariant> $productVariants
  * @property-read int|null $product_variants_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Review> $reviews
+ * @property-read int|null $reviews_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Support\RouteUrl\Models\RouteUrl> $routeUrls
  * @property-read int|null $route_urls_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
@@ -72,6 +75,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsDigitalProduct($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsFeatured($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsSpecialOffer($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereMinimumOrderQuantity($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereRetailPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereSellingPrice($value)

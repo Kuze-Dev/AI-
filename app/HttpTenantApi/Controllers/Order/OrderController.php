@@ -14,6 +14,7 @@ use Domain\Order\Enums\OrderResult;
 use Domain\Order\Models\Order;
 use Domain\Order\Requests\PlaceOrderRequest;
 use Domain\Order\Requests\UpdateOrderRequest;
+use Domain\PaymentMethod\Models\PaymentMethod;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
@@ -27,11 +28,12 @@ class OrderController extends Controller
     public function index()
     {
         return OrderResource::collection(
-            QueryBuilder::for(
-                Order::with(['shippingAddress', 'billingAddress', 'orderLines.media', 'orderLines.review'])->whereBelongsTo(auth()->user())
-            )
+            QueryBuilder::for(Order::with([
+                'shippingAddress', 'billingAddress',
+                'orderLines.media',
+            ])->whereBelongsTo(auth()->user()))
                 ->allowedIncludes(['orderLines'])
-                ->allowedFilters(['status'])
+                ->allowedFilters(['status', 'reference'])
                 ->allowedSorts(['reference', 'total', 'status', 'created_at'])
                 ->jsonPaginate()
         );
@@ -62,10 +64,19 @@ class OrderController extends Controller
         // return $order;
         // $this->authorize('view', $order);
 
+        // $test = PaymentMethod::with('media')->first();
+
+        // return $test;
+
         $model = QueryBuilder::for(
-            $order->with('orderLines.review')->whereBelongsTo(auth()->user())->whereReference($order->reference)
+            $order->with([
+                'shippingAddress', 'billingAddress',
+                'orderLines.media', 'orderLines.review.media',
+                'payments.paymentMethod.media'
+            ])->whereBelongsTo(auth()->user())
+                ->whereReference($order->reference)
         )
-            ->allowedIncludes(['orderLines'])->first();
+            ->allowedIncludes(['orderLines', 'payments.paymentMethod.media'])->first();
 
         return OrderResource::make($model);
     }

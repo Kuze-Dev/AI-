@@ -40,6 +40,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string $first_name
  * @property string $last_name
  * @property string $mobile
+ * @property Gender $gender
  * @property Status $status
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon $birth_date
@@ -47,7 +48,6 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property Gender $gender
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Address> $addresses
@@ -75,6 +75,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereEmailVerifiedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereFirstName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Customer whereGender($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereLastName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereMobile($value)
