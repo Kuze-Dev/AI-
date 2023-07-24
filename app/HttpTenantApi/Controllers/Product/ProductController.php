@@ -57,18 +57,17 @@ class ProductController
 
     public function show(string $product): ProductResource
     {
-        /** @var Product $product */
-        $product = QueryBuilder::for(Product::whereSlug($product))
-            ->allowedIncludes([
-                'taxonomyTerms.taxonomy',
-                'productOptions',
-                'productVariants',
-                'media',
-                // 'routeUrls',
-                'metaData',
-            ])
-            ->firstOrFail();
-
-        return ProductResource::make($product);
+        return ProductResource::make(
+            QueryBuilder::for(Product::whereSlug($product))
+                ->allowedIncludes([
+                    'taxonomyTerms.taxonomy',
+                    'productOptions',
+                    'productVariants',
+                    'media',
+                    // 'routeUrls',
+                    'metaData',
+                ])
+                ->firstOrFail()
+        );
     }
 }
