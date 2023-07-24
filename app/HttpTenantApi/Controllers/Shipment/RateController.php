@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Shipping;
+namespace App\HttpTenantApi\Controllers\Shipment;
 
 use App\Features\ECommerce\ECommerceBase;
 use App\Http\Controllers\Controller;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Get;
 
-#[Middleware(['feature.tenant:' . ECommerceBase::class, 'auth:sanctum'])]
+#[Middleware(['feature.tenant:'. ECommerceBase::class, 'auth:sanctum'])]
 class RateController extends Controller
 {
     #[Get('shipping-methods/{shippingMethod}/rate/{address}')]

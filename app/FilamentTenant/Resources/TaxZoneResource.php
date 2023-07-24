@@ -80,6 +80,7 @@ class TaxZoneResource extends Resource
                                     ->bulkToggleable()
                                     ->searchable()
                                     ->disableLabel()
+                                    ->required()
                                     ->columns(3),
                             ])
                             ->columns(1),
@@ -92,7 +93,9 @@ class TaxZoneResource extends Resource
                             return $type === TaxZoneType::COUNTRY;
                         }),
                     Forms\Components\Group::make([
-                        Forms\Components\Select::make('country')
+                        Forms\Components\Select::make('countries')
+                            ->formatStateUsing(fn (?TaxZone $record) => $record?->countries->first()?->getKey() ?? null)
+                            ->afterStateUpdated(fn (Closure $set) => $set('states', []))
                             ->optionsFromModel(Country::class, 'name')
                             ->preload()
                             ->required()
@@ -101,7 +104,7 @@ class TaxZoneResource extends Resource
                             ->schema([
                                 Forms\Components\CheckboxList::make('states')
                                     ->options(
-                                        fn (Closure $get) => ($country = $get('country'))
+                                        fn (Closure $get) => ($country = $get('countries'))
                                             ? State::whereCountryId($country)->pluck('name', 'id')
                                             : []
                                     )
@@ -109,6 +112,7 @@ class TaxZoneResource extends Resource
                                     ->bulkToggleable()
                                     ->searchable()
                                     ->disableLabel()
+                                    ->required()
                                     ->columns(3),
                             ])
                             ->columns(1),

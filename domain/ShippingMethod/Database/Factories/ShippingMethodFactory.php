@@ -29,7 +29,7 @@ class ShippingMethodFactory extends Factory
                 'zip3' => '94107',
                 'zip4' => '1741',
             ],
-            'status' => $this->faker->boolean,
+            'active' => $this->faker->boolean,
         ];
     }
 }

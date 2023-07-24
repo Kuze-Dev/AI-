@@ -11,7 +11,7 @@ class ShippingSettings extends TenantBaseSettings
 {
     protected static string $settings = SettingsShippingSettings::class;
 
-    protected static ?string $navigationIcon = 'heroicon-s-credit-card';
+    protected static ?string $navigationIcon = 'heroicon-s-truck';
 
     protected static ?string $title = 'Shipping Settings';
 
@@ -22,25 +22,19 @@ class ShippingSettings extends TenantBaseSettings
                 Forms\Components\Section::make(trans('Usps Shipping'))
                     ->collapsible()
                     ->schema([
-                        Forms\Components\KeyValue::make('usps_credentials')
-                            ->label('Usps Credentials')
-                            ->disableAddingRows()
-                            ->disableEditingKeys()
-                            ->disableDeletingRows()
-                            ->formatStateUsing(function ($state) {
-                                if ($state != null) {
-                                    return $state;
-                                }
-
-                                return [
-                                    'username' => '',
-                                    'password' => '',
-                                ];
-                            }),
-                        Forms\Components\Toggle::make('usps_mode')
+                        Forms\Components\TextInput::make('usps_username')
+                            ->translateLabel(),
+                        Forms\Components\TextInput::make('usps_password')
+                            ->translateLabel(),
+                        Forms\Components\Toggle::make('usps_production_mode')
                             ->inline(false)
-                            ->label(fn ($state) => $state ? 'Usps (Live)' : 'Usps (sandbox)')
-                            ->helperText('If the feature is activated, it is necessary to provide production keys. However, if the feature is deactivated, payment processing will occur in sandbox mode')
+                            ->label(fn ($state) => trans('Usps (:value)', ['value' => $state ? 'Live' : 'Sandbox']))
+                            ->helperText(
+                                trans(
+                                    'If the feature is activated, it is necessary to provide production keys. '.
+                                    'However, if the feature is deactivated, payment processing will occur in sandbox mode'
+                                )
+                            )
                             ->reactive(),
                     ]),
 
