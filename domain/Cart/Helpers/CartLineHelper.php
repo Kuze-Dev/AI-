@@ -32,7 +32,8 @@ class CartLineHelper
         $subtotal = $this->getSubTotal($collections);
 
         $tax = $this->getTax($cartSummaryTaxData->countryId, $cartSummaryTaxData->stateId);
-        $taxTotal = round($subtotal * $tax['taxPercentage'] / 100, 2);
+
+        $taxTotal = $tax['taxPercentage'] ? round($subtotal * $tax['taxPercentage'] / 100, 2) : 0;
 
         $discountTotal = $this->getDiscount($discount, $subtotal);
 
@@ -101,14 +102,22 @@ class CartLineHelper
     }
 
     public function getTax(
-        int $countryId,
+        ?int $countryId,
         ?int $stateId = null
     ) {
+        if (is_null($countryId)) {
+            return [
+                'taxZone' => null,
+                'taxDisplay' => null,
+                'taxPercentage' => null,
+            ];
+        }
+
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
         $taxPercentage = (float) $taxZone->percentage;
         $taxDisplay = $taxZone->price_display;
 
-        if ( ! $taxZone instanceof TaxZone) {
+        if (!$taxZone instanceof TaxZone) {
             throw new BadRequestHttpException('No tax zone found');
         }
 
@@ -123,7 +132,7 @@ class CartLineHelper
     {
         $discountTotal = 0;
 
-        if ( ! is_null($discount)) {
+        if (!is_null($discount)) {
             $discountTotal = (new DiscountHelperFunctions())->deductOrderSubtotal($discount, $subTotal);
         }
 

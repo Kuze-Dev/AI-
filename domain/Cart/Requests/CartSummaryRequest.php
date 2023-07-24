@@ -38,8 +38,20 @@ class CartSummaryRequest extends FormRequest
                 },
             ],
             'country_id' => [
-                'required',
+                'nullable',
                 Rule::exists(Country::class, (new Country())->getRouteKeyName()),
+                function ($attribute, $value, $fail) {
+                    /** @var \Domain\Customer\Models\Customer $customer */
+                    $customer = auth()->user();
+
+                    $isBelongsToUser = $customer->whereHas('addresses.state.country', function ($query) use ($value) {
+                        $query->where((new Country())->getRouteKeyName(), $value);
+                    })->first();
+
+                    if (!$isBelongsToUser) {
+                        $fail('Invalid country');
+                    }
+                },
             ],
             'shipping_method_id' => [
                 'nullable',
@@ -47,11 +59,25 @@ class CartSummaryRequest extends FormRequest
             ],
             'address_id' => [
                 'nullable',
-                Rule::exists(Address::class, (new Address())->getRouteKeyName()),
+                Rule::exists(Address::class, (new Address())->getRouteKeyName())->where(function ($query) {
+                    $query->where('id', auth()->user()?->id);
+                }),
             ],
             'state_id' => [
                 'nullable',
                 Rule::exists(State::class, (new State())->getRouteKeyName()),
+                function ($attribute, $value, $fail) {
+                    /** @var \Domain\Customer\Models\Customer $customer */
+                    $customer = auth()->user();
+
+                    $isBelongsToUser = $customer->whereHas('addresses.state', function ($query) use ($value) {
+                        $query->where((new State())->getRouteKeyName(), $value);
+                    })->first();
+
+                    if (!$isBelongsToUser) {
+                        $fail('Invalid state');
+                    }
+                },
             ],
             'discount_code' => [
                 'nullable',
