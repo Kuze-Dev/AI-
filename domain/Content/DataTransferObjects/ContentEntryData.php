@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Domain\Content\DataTransferObjects;
 
 use Carbon\Carbon;
-use Domain\Support\MetaData\DataTransferObjects\MetaDataData;
-use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
+use Support\MetaData\DataTransferObjects\MetaDataData;
+use Support\RouteUrl\DataTransferObjects\RouteUrlData;
 
 class ContentEntryData
 {

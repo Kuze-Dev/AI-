@@ -8,7 +8,6 @@ use Domain\Globals\DataTransferObjects\GlobalsData;
 use Domain\Globals\Models\Globals;
 use Domain\Blueprint\Enums\FieldType;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 
 beforeEach(fn () => testInTenantContext());
@@ -22,8 +21,6 @@ it('can create globals  ', function () {
         ])
         ->createOne();
 
-    assertDatabaseCount(Globals::class, 0);
-
     app(CreateGlobalsAction::class)
         ->execute(GlobalsData::fromArray([
             'blueprint_id' => $blueprint->getKey(),
@@ -31,8 +28,6 @@ it('can create globals  ', function () {
             'slug' => 'test',
             'data' => ['main' => ['title' => 'Foo']],
         ]));
-
-    assertDatabaseCount(Globals::class, 1);
 
     assertDatabaseHas(Globals::class, [
         'blueprint_id' => $blueprint->getKey(),

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Page;
 
+use App\Features\CMS\CMSBase;
 use App\HttpTenantApi\Resources\PageResource;
 use Carbon\Carbon;
 use Domain\Page\Models\Builders\PageBuilder;
@@ -15,8 +16,12 @@ use Spatie\RouteAttributes\Attributes\ApiResource;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\URL;
+use Spatie\RouteAttributes\Attributes\Middleware;
 
-#[ApiResource('pages', only: ['index', 'show'])]
+#[
+    ApiResource('pages', only: ['index', 'show']),
+    Middleware('feature.tenant:'. CMSBase::class)
+]
 class PageController
 {
     public function index(): JsonApiResourceCollection

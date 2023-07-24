@@ -1,31 +1,25 @@
 {
-  "resources/css/web/app.css": {
-    "file": "assets/app-03a8b334.css",
-    "src": "resources/css/web/app.css",
-    "isEntry": true
-  },
   "resources/css/filament/app.css": {
-    "file": "assets/app-d1574934.css",
-    "src": "resources/css/filament/app.css",
-    "isEntry": true
-  },
-  "resources/js/web/app.js": {
-    "file": "assets/app-c203ce5a.js",
-    "src": "resources/js/web/app.js",
+    "file": "assets/app-68653725.css",
     "isEntry": true,
-    "imports": [
-      "_bootstrap-2e5bf673.js"
-    ]
+    "src": "resources/css/filament/app.css"
+  },
+  "resources/css/web/app.css": {
+    "file": "assets/app-ee470072.css",
+    "isEntry": true,
+    "src": "resources/css/web/app.css"
   },
   "resources/js/filament/app.js": {
-    "file": "assets/app-157f797a.js",
-    "src": "resources/js/filament/app.js",
+    "file": "assets/app-ffa2faf6.js",
     "isEntry": true,
-    "imports": [
-      "_bootstrap-2e5bf673.js"
-    ]
+    "src": "resources/js/filament/app.js"
   },
-  "_bootstrap-2e5bf673.js": {
-    "file": "assets/bootstrap-2e5bf673.js"
+  "resources/js/web/app.js": {
+    "file": "assets/app-1e6689a3.js",
+    "imports": [
+      "resources/js/filament/app.js"
+    ],
+    "isEntry": true,
+    "src": "resources/js/web/app.js"
   }
 }

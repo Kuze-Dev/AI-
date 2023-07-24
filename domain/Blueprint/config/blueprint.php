@@ -37,5 +37,16 @@ return [
         Domain\Page\Models\Page::class => [
             'title_column' => 'name'
         ],
+        Domain\Taxonomy\Models\Taxonomy::class => [
+            'title_column' => 'name'
+        ],
+        Domain\Taxonomy\Models\TaxonomyTerm::class => [
+            'title_column' => 'name',
+            'relation_scopes' => [
+                'taxonomy' => [
+                    'title_column' => 'name'
+                ],
+            ]
+        ],
     ]
 ];

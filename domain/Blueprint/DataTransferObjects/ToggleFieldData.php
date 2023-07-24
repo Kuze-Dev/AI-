@@ -14,7 +14,8 @@ class ToggleFieldData extends FieldData
         public readonly string $title,
         public readonly string $state_name,
         public readonly FieldType $type = FieldType::TOGGLE,
-        public readonly array $rules = []
+        public readonly array $rules = [],
+        public readonly ?string $helper_text = null,
     ) {
     }
 
@@ -29,6 +30,7 @@ class ToggleFieldData extends FieldData
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             type: $data['type'],
             rules: $data['rules'] ?? [],
+            helper_text: $data['helper_text'] ?? null,
         );
     }
 }

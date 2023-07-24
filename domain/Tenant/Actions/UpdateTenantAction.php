@@ -21,11 +21,19 @@ class UpdateTenantAction
     {
         $tenant->update(['name' => $tenantData->name]);
 
-        foreach ($tenant->domains->whereNotIn('id', Arr::pluck($tenantData->domains, 'id')) as $domain) {
+        $this->syncDomains($tenant, $tenantData->domains);
+        $this->syncFeatures($tenant, $tenantData->getNormalizedFeatureNames());
+
+        return $tenant;
+    }
+
+    protected function syncDomains(Tenant $tenant, array $domains): void
+    {
+        foreach ($tenant->domains->whereNotIn('id', Arr::pluck($domains, 'id')) as $domain) {
             $this->deleteDomain->execute($domain);
         }
 
-        foreach ($tenantData->domains as $domainData) {
+        foreach ($domains as $domainData) {
             if ($domain = $tenant->domains->firstWhere('id', $domainData->id)) {
                 $this->updateDomain->execute($domain, $domainData);
 
@@ -34,7 +42,19 @@ class UpdateTenantAction
 
             $this->createDomain->execute($tenant, $domainData);
         }
+    }
 
-        return $tenant;
+    protected function syncFeatures(Tenant $tenant, array $features): void
+    {
+        $activeFeatures = array_keys(array_filter($tenant->features()->all()));
+        $inactiveFeatures = array_diff($activeFeatures, $features);
+
+        foreach ($inactiveFeatures as $inactiveFeature) {
+            $tenant->features()->deactivate($inactiveFeature);
+        }
+
+        foreach ($features as $feature) {
+            $tenant->features()->activate($feature);
+        }
     }
 }

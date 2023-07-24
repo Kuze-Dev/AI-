@@ -15,9 +15,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Domain\Content\Enums\PublishBehavior;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
@@ -72,7 +72,6 @@ class Content extends Model
     protected $fillable = [
         'name',
         'blueprint_id',
-        'taxonomy_id',
         'slug',
         'prefix',
         'past_publish_date_behavior',

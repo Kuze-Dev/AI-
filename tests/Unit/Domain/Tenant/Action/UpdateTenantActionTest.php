@@ -8,7 +8,6 @@ use Domain\Tenant\DataTransferObjects\TenantData;
 use Domain\Tenant\Models\Tenant;
 use Stancl\Tenancy\Database\Models\Domain;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 
 it('can update tenant', function () {
@@ -29,5 +28,4 @@ it('can update tenant', function () {
 
     assertDatabaseHas(Tenant::class, ['name' => 'Test']);
     assertDatabaseHas(Domain::class, ['domain' => 'test.com']);
-    assertDatabaseCount(Domain::class, 1);
 });

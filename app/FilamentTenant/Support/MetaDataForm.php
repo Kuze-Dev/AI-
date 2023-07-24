@@ -20,10 +20,16 @@ class MetaDataForm extends Section
 
         $this->schema([
             Forms\Components\TextInput::make('title')
+                ->string()
+                ->maxLength(255)
                 ->formatStateUsing(fn ($record) => $record?->metaData?->title),
             Forms\Components\TextInput::make('keywords')
+                ->string()
+                ->maxLength(255)
                 ->formatStateUsing(fn ($record) => $record?->metaData?->keywords),
             Forms\Components\TextInput::make('author')
+                ->string()
+                ->maxLength(255)
                 ->formatStateUsing(fn ($record) => $record?->metaData?->author),
             Forms\Components\Textarea::make('description')
                 ->maxLength(fn (int $value = 160) => $value)

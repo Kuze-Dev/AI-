@@ -30,14 +30,16 @@ abstract class PermissionSeeder extends Seeder
     {
         collect($this->permissionsByGuard())
             ->map(fn (array $permissions) => collect($permissions))
-            ->each(
-                fn (Collection $permissions, string $guard) => $permissions->each(
-                    fn (string $permission) => Permission::create([
-                        'name' => $permission,
-                        'guard_name' => $guard,
-                    ])
-                )
-            );
+            ->each(function (Collection $permissions, string $guard) {
+                $permissions->each(fn (string $permission) => Permission::updateOrCreate([
+                    'name' => $permission,
+                    'guard_name' => $guard,
+                ]));
+
+                Permission::whereGuardName($guard)->whereNotIn('name', $permissions)->delete();
+            });
+
+        $this->command->callSilently('permission:cache-reset');
     }
 
     abstract protected function permissionsByGuard(): array;
