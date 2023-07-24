@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "be1e239988b5c99bf015f6bd8006cec1",
+    "content-hash": "9ba1552a37954597dc529f2bbc759c7d",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -3779,6 +3779,85 @@
             "time": "2023-03-03T20:12:38+00:00"
         },
         {
+            "name": "lloricode/spatie-image-optimizer-health-check",
+            "version": "v1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lloricode/spatie-image-optimizer-health-check.git",
+                "reference": "60ed7b6fc93674942be993a70be6b5dbb539eed1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lloricode/spatie-image-optimizer-health-check/zipball/60ed7b6fc93674942be993a70be6b5dbb539eed1",
+                "reference": "60ed7b6fc93674942be993a70be6b5dbb539eed1",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^8.0|^9.0|^10.0",
+                "php": "^8.0",
+                "spatie/enum": "^3.13",
+                "spatie/laravel-health": "^1.19",
+                "spatie/laravel-package-tools": "^1.12.1"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^6.0",
+                "nunomaduro/larastan": "^2.0.1",
+                "orchestra/testbench": "^7.0",
+                "pestphp/pest": "^1.21",
+                "pestphp/pest-plugin-laravel": "^1.1",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^1.0",
+                "phpstan/phpstan-phpunit": "^1.0",
+                "phpunit/phpunit": "^9.5",
+                "spatie/laravel-ray": "^1.26"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": []
+            },
+            "autoload": {
+                "psr-4": {
+                    "Lloricode\\SpatieImageOptimizerHealthCheck\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lloric Mayuga Garcia",
+                    "email": "lloricode@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "These checks are where you can check if optimizer is installed on your server.",
+            "homepage": "https://github.com/lloricode/spatie-image-optimizer-health-check",
+            "keywords": [
+                "health check",
+                "image optimizer",
+                "laravel",
+                "lloricode",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/lloricode/spatie-image-optimizer-health-check/issues",
+                "source": "https://github.com/lloricode/spatie-image-optimizer-health-check/tree/v1.0.3"
+            },
+            "funding": [
+                {
+                    "url": "https://www.paypal.com/donate?hosted_button_id=V8PYXUNG6QP44",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://www.patreon.com/lloricode",
+                    "type": "patreon"
+                }
+            ],
+            "time": "2023-02-03T03:49:37+00:00"
+        },
+        {
             "name": "maatwebsite/excel",
             "version": "3.1.48",
             "source": {
@@ -6153,6 +6232,69 @@
                 }
             ],
             "time": "2023-05-01T17:14:06+00:00"
+        },
+        {
+            "name": "spatie/array-to-xml",
+            "version": "3.1.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/array-to-xml.git",
+                "reference": "e210b98957987c755372465be105d32113f339a4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/array-to-xml/zipball/e210b98957987c755372465be105d32113f339a4",
+                "reference": "e210b98957987c755372465be105d32113f339a4",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.2",
+                "pestphp/pest": "^1.21",
+                "spatie/pest-plugin-snapshots": "^1.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\ArrayToXml\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://freek.dev",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Convert an array to xml",
+            "homepage": "https://github.com/spatie/array-to-xml",
+            "keywords": [
+                "array",
+                "convert",
+                "xml"
+            ],
+            "support": {
+                "source": "https://github.com/spatie/array-to-xml/tree/3.1.6"
+            },
+            "funding": [
+                {
+                    "url": "https://spatie.be/open-source/support-us",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2023-05-11T14:04:07+00:00"
         },
         {
             "name": "spatie/eloquent-sortable",
@@ -10675,6 +10817,51 @@
                 }
             ],
             "time": "2022-03-08T17:03:00+00:00"
+        },
+        {
+            "name": "vyuldashev/xml-to-array",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vyuldashev/xml-to-array.git",
+                "reference": "28542261014674a3e9615da335dba43c9dcf304b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vyuldashev/xml-to-array/zipball/28542261014674a3e9615da335dba43c9dcf304b",
+                "reference": "28542261014674a3e9615da335dba43c9dcf304b",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1|^8.0"
+            },
+            "require-dev": {
+                "larapack/dd": "^1.1",
+                "phpunit/phpunit": "^7.5|^9.5",
+                "spatie/array-to-xml": "^2.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Vyuldashev\\XmlToArray\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vladimir Yuldashev",
+                    "email": "misterio92@gmail.com"
+                }
+            ],
+            "description": "Convert xml to an array",
+            "support": {
+                "issues": "https://github.com/vyuldashev/xml-to-array/issues",
+                "source": "https://github.com/vyuldashev/xml-to-array/tree/v1.1.0"
+            },
+            "time": "2022-08-23T23:18:27+00:00"
         },
         {
             "name": "webmozart/assert",

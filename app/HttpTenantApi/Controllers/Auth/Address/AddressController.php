@@ -23,7 +23,7 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Throwable;
 
 #[
-    Resource('addresses', apiResource: true, except: 'show'),
+    Resource('addresses', apiResource: true),
     Middleware(['auth:sanctum', 'feature.tenant:' . ECommerceBase::class])
 ]
 class AddressController extends Controller
@@ -36,9 +36,17 @@ class AddressController extends Controller
         return AddressResource::collection(
             QueryBuilder::for(Address::whereBelongsTo($customer))
                 ->defaultSort('-updated_at')
-                ->allowedIncludes('state')
+                ->allowedIncludes('state.country')
                 ->jsonPaginate()
         );
+    }
+
+    /** @throws Throwable */
+    public function show(Address $address): AddressResource
+    {
+        $this->authorize('view', $address);
+
+        return AddressResource::make($address);
     }
 
     /** @throws Throwable */

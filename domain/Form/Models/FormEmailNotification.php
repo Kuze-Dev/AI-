@@ -18,7 +18,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property array|null $to
  * @property array|null|null $cc
  * @property array|null|null $bcc
- * @property string $sender_name
+ * @property string|null $sender_name
  * @property array|null|null $reply_to
  * @property string $subject
  * @property string $template
@@ -36,7 +36,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereFormId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereReplyTo($value)
- * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereSender($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereSenderName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereSubject($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereTemplate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereTo($value)

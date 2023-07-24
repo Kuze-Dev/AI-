@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Settings;
 
+use Illuminate\Support\Facades\Storage;
 use Spatie\LaravelSettings\Settings;
 
 class SiteSettings extends Settings
@@ -32,5 +33,11 @@ class SiteSettings extends Settings
         $scheme = parse_url(config('app.url'))['scheme'];
 
         return $scheme.'://'.$this->front_end_domain;
+    }
+
+    public function getLogoUrl(): string
+    {
+        return Storage::disk(config('filament.default_filesystem_disk'))
+            ->url($this->logo);
     }
 }

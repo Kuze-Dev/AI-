@@ -23,9 +23,8 @@ class ReviewShowController
             QueryBuilder::for(Review::whereProductId($review))
                 ->allowedIncludes([
                     'product',
-                    'customer',
-                    'customer.media',
                     'order_line',
+                    'media'
                 ])
                 ->get()
         );

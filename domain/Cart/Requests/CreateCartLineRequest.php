@@ -16,11 +16,11 @@ class CreateCartLineRequest extends FormRequest
         return [
             'purchasable_id' => [
                 'required',
-                Rule::exists(Product::class, 'id'),
+                Rule::exists(Product::class, (new Product())->getRouteKeyName()),
             ],
             'variant_id' => [
                 'nullable',
-                Rule::exists(ProductVariant::class, 'id')->where(function ($query) {
+                Rule::exists(ProductVariant::class, (new ProductVariant())->getRouteKeyName())->where(function ($query) {
                     $purchasableId = $this->input('purchasable_id');
                     $purchasableType = $this->input('purchasable_type');
 

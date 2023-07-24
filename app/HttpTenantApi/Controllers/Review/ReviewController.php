@@ -29,7 +29,6 @@ class ReviewController
         $review->product_id = $validatedData['product_id'];
         $review->order_id = $validatedData['order_id'];
         $review->order_line_id = $validatedData['order_line_id'];
-        $review->data = $validatedData['data'];
 
         $customer = auth()->user();
         if ( ! $validatedData['anonymous']) {

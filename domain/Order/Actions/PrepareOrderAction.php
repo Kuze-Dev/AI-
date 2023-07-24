@@ -14,6 +14,7 @@ use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Enums\OrderResult;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Product\Models\ProductVariant;
+use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
@@ -38,6 +39,8 @@ class PrepareOrderAction
 
         $paymentMethod = $this->preparePaymentMethod($placeOrderData);
 
+        $shippingMethod = $this->prepareShippingMethod($placeOrderData);
+
         $notes = $placeOrderData->notes;
 
         $orderData = [
@@ -49,6 +52,7 @@ class PrepareOrderAction
             'notes' => $notes,
             'taxZone' => $taxZone,
             'discount' => $discount,
+            'shippingMethod' => $shippingMethod,
             'paymentMethod' => $paymentMethod,
         ];
 
@@ -116,6 +120,11 @@ class PrepareOrderAction
         }
 
         return null;
+    }
+
+    private function prepareShippingMethod(PlaceOrderData $placeOrderData)
+    {
+        return ShippingMethod::where((new ShippingMethod())->getRouteKeyName(), $placeOrderData->shipping_method)->first();
     }
 
     private function preparePaymentMethod(PlaceOrderData $placeOrderData)

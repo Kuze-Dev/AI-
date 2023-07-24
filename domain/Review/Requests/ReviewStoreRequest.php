@@ -67,10 +67,6 @@ class ReviewStoreRequest extends FormRequest
                 'nullable',
                 'array',
             ],
-            'data' => [
-                'array',
-                'nullable',
-            ],
         ];
     }
 

@@ -29,7 +29,8 @@ class ProductResource extends JsonApiResource
             'is_favorite' => $this->isFavorite(),
             'is_special_offer' => $this->is_special_offer,
             'allow_customer_remarks' => $this->allow_customer_remarks,
-            'media' => $this->getMedia('image')->toArray(),
+            // 'media' => $this->media,
+            // 'media' => $this->getMedia('image')->toArray(),
         ];
     }
 

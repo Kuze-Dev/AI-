@@ -13,26 +13,29 @@ use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
+use Domain\Customer\Models\Customer;
+use Domain\Menu\Models\Menu;
+use Domain\Menu\Models\Node;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Domain\Discount\Models\Discount;
 use Domain\Discount\Models\DiscountCondition;
 use Domain\Discount\Models\DiscountRequirement;
-use Domain\Customer\Models\Customer;
 use Domain\Discount\Models\DiscountLimit;
 use Domain\Favorite\Models\Favorite;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
 use Domain\Globals\Models\Globals;
-use Domain\Menu\Models\Menu;
-use Domain\Menu\Models\Node;
 use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderLine;
 use Domain\Page\Models\Block;
 use Domain\Review\Models\Review;
 use Domain\Taxation\Models\TaxZone;
 use Domain\Page\Models\Page;
+use Domain\Shipment\Models\Shipment;
+use Domain\ShippingMethod\Models\ShippingMethod;
+use Domain\Tier\Models\Tier;
 use Support\Captcha\CaptchaManager;
 use Support\MetaData\Models\MetaData;
 use Domain\Product\Models\Product;
@@ -41,7 +44,6 @@ use Domain\Payments\Models\Payment;
 use Domain\Product\Models\ProductVariant;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
-use Domain\Tier\Models\Tier;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -111,6 +113,8 @@ class AppServiceProvider extends ServiceProvider
             OrderLine::class,
             Favorite::class,
             Review::class,
+            Shipment::class,
+            ShippingMethod::class,
         ]);
 
         Password::defaults(

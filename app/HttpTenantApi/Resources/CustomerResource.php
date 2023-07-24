@@ -32,6 +32,7 @@ class CustomerResource extends JsonApiResource
     {
         return [
             'media' => fn () => MediaResource::collection($this->media),
+            'addresses' => fn () => AddressResource::collection($this->addresses),
         ];
     }
 }
