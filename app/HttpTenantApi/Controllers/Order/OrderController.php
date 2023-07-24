@@ -30,10 +30,10 @@ class OrderController extends Controller
         return OrderResource::collection(
             QueryBuilder::for(Order::with([
                 'shippingAddress', 'billingAddress',
-                'orderLines.media', 'orderLines.review.media',
+                'orderLines.media',
             ])->whereBelongsTo(auth()->user()))
                 ->allowedIncludes(['orderLines'])
-                ->allowedFilters(['status'])
+                ->allowedFilters(['status', 'reference'])
                 ->allowedSorts(['reference', 'total', 'status', 'created_at'])
                 ->jsonPaginate()
         );
@@ -76,9 +76,8 @@ class OrderController extends Controller
             ])->whereBelongsTo(auth()->user())
                 ->whereReference($order->reference)
         )
-            ->allowedIncludes(['orderLines'])->first();
+            ->allowedIncludes(['orderLines', 'payments.paymentMethod.media'])->first();
 
-        // return $model->payments->first()->paymentMethod;
         return OrderResource::make($model);
     }
 

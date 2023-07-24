@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Resources;
 
 use Domain\Order\DataTransferObjects\OrderPaymentMethodData;
+use Domain\PaymentMethod\Models\PaymentMethod;
 use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
@@ -32,10 +33,6 @@ class OrderResource extends JsonApiResource
             'status' => $this->status,
             'shipping_address' => $this->shippingAddress,
             'billing_address' => $this->billingAddress,
-            'payment_method' => [
-                "data" => OrderPaymentMethodData::fromArray($this->payments->first()->paymentMethod->toArray()),
-                "media" => MediaResource::collection($this->payments->first()->paymentMethod->media)
-            ]
         ];
     }
 
@@ -43,6 +40,7 @@ class OrderResource extends JsonApiResource
     {
         return [
             'orderLines' => fn () => OrderLineResource::collection($this->orderLines),
+            'payments' => fn () => PaymentMethodOrderResource::make($this->payments->first()->paymentMethod),
         ];
     }
 }
