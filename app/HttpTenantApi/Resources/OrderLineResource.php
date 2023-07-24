@@ -29,13 +29,14 @@ class OrderLineResource extends JsonApiResource
             'discount_total' => $this->discount_total,
             'total' => $this->total,
             'purchasable' => function () {
+                // (WIP) DTO is my work around here becase the 
+                // purchable_data is an array coming from column
                 if (!isset($this->purchasable_data['product'])) {
                     return ProductOrderData::fromArray($this->purchasable_data);
                 } elseif (isset($this->purchasable_data['product'])) {
                     return ProductVariantOrderData::fromArray($this->purchasable_data);
                 }
             },
-            'review' => $this->review ? ReviewResource::make($this->review) : null,
             'remarks' => [
                 'data' => $this->remarks_data,
                 'media' => MediaResource::collection($this->media->filter(

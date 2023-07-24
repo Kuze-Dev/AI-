@@ -25,6 +25,7 @@
         "maatwebsite/excel": "^3.1.48",
         "pragmarx/google2fa": "^8.0",
         "saade/filament-laravel-log": "^1.2",
+        "sentry/sentry-laravel": "^3.6.1",
         "shuvroroy/filament-spatie-laravel-health": "^1.5",
         "spatie/array-to-xml": "^3.1",
         "spatie/eloquent-sortable": "^4.0",

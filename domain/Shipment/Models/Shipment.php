@@ -22,7 +22,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string|null $status
  * @property string $rate
  * @property array|null $shipping_details
- * @property mixed|null $destiantion_address
+ * @property mixed|null $destination_address
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities

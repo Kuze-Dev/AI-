@@ -33,8 +33,9 @@ class OrderLinesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('name')->label('Product Name')
                     ->description(function (OrderLine $record) {
                         if ($record->purchasable_type == ProductVariant::class) {
-                            $variant = array_values($record->purchasable_data['combination']);
-                            $variantString = implode(' / ', array_map('ucfirst', $variant));
+                            $combinations = array_values($record->purchasable_data['combination']);
+                            $optionValues = array_column($combinations, 'option_value');
+                            $variantString = implode(' / ', array_map('ucfirst', $optionValues));
 
                             return $variantString;
                         }
