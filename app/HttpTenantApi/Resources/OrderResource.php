@@ -15,7 +15,7 @@ class OrderResource extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         return [
-            'id' => $this->id,
+            // 'id' => $this->id,
             'reference' => $this->reference,
             'status' => $this->status,
             'created_at' => $this->created_at?->format('F d, Y H:i:s'),

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
+use Domain\Order\DataTransferObjects\ProductOrderData;
+use Domain\Order\DataTransferObjects\ProductVariantOrderData;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Http\Request;
@@ -26,14 +28,13 @@ class OrderLineResource extends JsonApiResource
             'sub_total' => $this->sub_total,
             'discount_total' => $this->discount_total,
             'total' => $this->total,
-            // 'purchasable' => function () {
-            //     if ($this->purchasable_data instanceof Product) {
-            //         return ProductResource::make($this->purchasable_data);
-            //     } elseif ($this->purchasable_data instanceof ProductVariant) {
-            //         return ProductVariantResource::make($this->purchasable_data);
-            //     }
-            // },
-            'purchasable' => $this->purchasable_data,
+            'purchasable' => function () {
+                if (!isset($this->purchasable_data['product'])) {
+                    return ProductOrderData::fromArray($this->purchasable_data);
+                } elseif (isset($this->purchasable_data['product'])) {
+                    return ProductVariantOrderData::fromArray($this->purchasable_data);
+                }
+            },
             'review' => $this->review ? ReviewResource::make($this->review) : null,
             'remarks' => [
                 'data' => $this->remarks_data,

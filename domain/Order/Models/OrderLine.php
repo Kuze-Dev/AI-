@@ -73,6 +73,7 @@ class OrderLine extends Model implements HasMedia
     use InteractsWithMedia;
 
     protected $fillable = [
+        'uuid',
         'order_id',
         'purchasable_id',
         'purchasable_type',

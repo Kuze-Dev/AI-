@@ -13,6 +13,7 @@ use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
+use Illuminate\Support\Str;
 
 class CreateOrderLineAction
 {
@@ -42,6 +43,7 @@ class CreateOrderLineAction
             }
 
             $orderLine = OrderLine::create([
+                'uuid' => (string) Str::uuid(),
                 'order_id' => $order->id,
                 'purchasable_id' => $cartLine->purchasable_id,
                 'purchasable_type' => $cartLine->purchasable_type,
