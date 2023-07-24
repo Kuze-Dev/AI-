@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Domain\Order\Requests;
 
 use Domain\Address\Models\Address;
+use Domain\Address\Models\Country;
+use Domain\Address\Models\State;
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
 use Domain\PaymentMethod\Models\PaymentMethod;
@@ -59,8 +61,8 @@ class PlaceOrderRequest extends FormRequest
                     $customerId = auth()->user()?->id;
 
                     $customer = Customer::query()
-                        ->whereHas('addresses', function ($query) use ($value) {
-                            $query->where('state_id', $value);
+                        ->whereHas('addresses.state', function ($query) use ($value) {
+                            $query->where((new State())->getRouteKeyName(), $value);
                         })
                         ->whereId($customerId)
                         ->count();
@@ -76,10 +78,8 @@ class PlaceOrderRequest extends FormRequest
                     $customerId = auth()->user()?->id;
 
                     $customer = Customer::query()
-                        ->whereHas('addresses', function ($query) use ($value) {
-                            $query->whereHas('state', function ($subQuery) use ($value) {
-                                $subQuery->where('country_id', $value);
-                            });
+                        ->whereHas('addresses.state.country', function ($query) use ($value) {
+                            $query->where((new Country())->getRouteKeyName(), $value);
                         })
                         ->whereId($customerId)
                         ->count();

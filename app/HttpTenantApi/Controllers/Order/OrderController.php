@@ -27,9 +27,10 @@ class OrderController extends Controller
     public function index()
     {
         return OrderResource::collection(
-            QueryBuilder::for(
-                Order::with(['shippingAddress', 'billingAddress', ])->whereBelongsTo(auth()->user())
-            )
+            QueryBuilder::for(Order::with([
+                'shippingAddress', 'billingAddress',
+                'orderLines.media', 'orderLines.review.media',
+            ])->whereBelongsTo(auth()->user()))
                 ->allowedIncludes(['orderLines'])
                 ->allowedFilters(['status'])
                 ->allowedSorts(['reference', 'total', 'status', 'created_at'])
@@ -44,7 +45,7 @@ class OrderController extends Controller
         $result = app(PlaceOrderAction::class)
             ->execute(PlaceOrderData::fromArray($validatedData));
 
-        if ( ! $result['order'] instanceof Order) {
+        if (!$result['order'] instanceof Order) {
             return response()->json([
                 'message' => 'Order failed to be created',
             ], 400);

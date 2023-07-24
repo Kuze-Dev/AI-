@@ -15,6 +15,7 @@ use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
 use Domain\Customer\Models\Customer;
 use Domain\Discount\Models\Discount;
+use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -77,12 +78,19 @@ class CartSummaryController extends Controller
             ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
             ->get();
 
-        $summary = app(CartLineHelper::class)->getSummary(
-            $cartLines,
-            new CartSummaryTaxData($country->id, $state->id ?? null),
-            new CartSummaryShippingData($customer, $shippingAddress, $shippingMethod),
-            $discount,
-        );
+        try {
+
+            $summary = app(CartLineHelper::class)->getSummary(
+                $cartLines,
+                new CartSummaryTaxData($country->id, $state->id ?? null),
+                new CartSummaryShippingData($customer, $shippingAddress, $shippingMethod),
+                $discount,
+            );
+        } catch (USPSServiceNotFoundException) {
+            return response()->json([
+                'service_id' => 'Shipping method service id is required',
+            ], 404);
+        }
 
         return response()->json([
             'tax_inclusive_sub_total' => $summary->subTotal + $summary->taxTotal,
@@ -108,19 +116,19 @@ class CartSummaryController extends Controller
         ?Address $shippingAddress,
         ?State $state = null
     ) {
-        if ( ! $customer->addresses->pluck('state.country.id')->contains($country->id)) {
+        if (!$customer->addresses->pluck('state.country.id')->contains($country->id)) {
             return response()->json([
                 'country' => 'Invalid country',
             ], 404);
         }
 
-        if ($state && ! $customer->addresses->pluck('state_id')->contains($state->id)) {
+        if ($state && !$customer->addresses->pluck('state_id')->contains($state->id)) {
             return response()->json([
                 'state' => 'Invalid state',
             ], 404);
         }
 
-        if ($shippingAddress && ! $customer->addresses->contains('id', $shippingAddress->id)) {
+        if ($shippingAddress && !$customer->addresses->contains('id', $shippingAddress->id)) {
             return response()->json([
                 'shipping_address' => 'Invalid shipping address',
             ], 404);
