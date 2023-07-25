@@ -168,7 +168,7 @@ class Order extends Model implements HasMedia, PayableInterface
 
     public function registerMediaCollections(): void
     {
-        $registerMediaConversions = function (Media $media) {
+        $registerMediaConversions = function () {
             $this->addMediaConversion('preview');
         };
 
@@ -185,13 +185,10 @@ class Order extends Model implements HasMedia, PayableInterface
             ->dontSubmitEmptyLogs();
     }
 
-    public function scopeForPayment(Builder $query, $date): Builder
+    public function scopeWhereHasForPayment(Builder $query): Builder
     {
-        return $query->whereHas('payments', function ($subQuery) {
-            $subQuery->where(function ($query) {
-                $query->where('gateway', 'paypal')
-                    ->orWhere('gateway', 'bank-transfer');
-            })->where('status', 'pending');
+        return $query->whereHas('payments', function (Builder $subQuery) {
+            $subQuery->where('status', 'pending');
         })->where('is_paid', false);
     }
 }

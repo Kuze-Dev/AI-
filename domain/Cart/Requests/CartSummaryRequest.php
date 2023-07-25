@@ -57,11 +57,12 @@ class CartSummaryRequest extends FormRequest
                 'nullable',
                 Rule::exists(ShippingMethod::class, (new ShippingMethod())->getRouteKeyName()),
             ],
-            'address_id' => [
+            'shipping_address_id' => [
                 'nullable',
-                Rule::exists(Address::class, (new Address())->getRouteKeyName())->where(function ($query) {
-                    $query->where('id', auth()->user()?->id);
-                }),
+                Rule::exists(Address::class, (new Address())->getRouteKeyName())
+                // ->where(function ($query) {
+                //     $query->where('id', auth()->user()?->id);
+                // }),
             ],
             'state_id' => [
                 'nullable',
@@ -106,7 +107,7 @@ class CartSummaryRequest extends FormRequest
 
     public function getShippingAddress(): ?Address
     {
-        if ($id = $this->validated('address_id')) {
+        if ($id = $this->validated('shipping_address_id')) {
             return app(Address::class)->resolveRouteBinding($id);
         }
 
