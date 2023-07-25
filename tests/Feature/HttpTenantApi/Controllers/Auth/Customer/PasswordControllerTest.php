@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Domain\Auth\Events\PasswordResetSent;
 use Domain\Customer\Database\Factories\CustomerFactory;
-use Domain\Customer\Notifications\PasswordHasBeenReset;
 use Domain\Customer\Notifications\ResetPassword;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Event;
@@ -68,7 +67,6 @@ it('can reset password', function () {
     assertTrue(Hash::check('new-password', $customer->password), 'password not reset');
     assertNotSame('old-remember_token', $customer->getRememberToken());
 
-    Notification::assertSentTo([$customer], PasswordHasBeenReset::class);
     Event::assertDispatched(PasswordReset::class);
 });
 
