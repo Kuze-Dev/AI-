@@ -15,7 +15,6 @@ class DiscountMessagesData
         public readonly ?DiscountAmountType $amount_type,
         public readonly ?float $amount,
         public readonly ?DiscountConditionType $discount_type,
-
     ) {
     }
 

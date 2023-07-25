@@ -10,7 +10,6 @@ use Domain\Discount\Enums\DiscountConditionType;
 use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
 use Domain\Discount\Models\DiscountCondition;
-use Domain\Discount\Models\DiscountLimit;
 use Domain\Discount\Models\DiscountRequirement;
 
 final class DiscountHelperFunctions
@@ -97,7 +96,7 @@ final class DiscountHelperFunctions
             'message' => 'Your discount code is valid',
             'amount_type' => $discountCondition->amount_type,
             'amount' => $discountCondition->amount,
-            'discount_type' => $discountCondition->discount_type
+            'discount_type' => $discountCondition->discount_type,
         ]);
     }
 }

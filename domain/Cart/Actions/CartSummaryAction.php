@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Cart\Helpers;
+namespace Domain\Cart\Actions;
 
 use Domain\Address\Models\Address;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
@@ -20,7 +20,7 @@ use Domain\Taxation\Models\TaxZone;
 use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class CartLineHelper
+class CartSummaryAction
 {
     public function getSummary(
         CartLine|Collection $collections,
@@ -53,8 +53,8 @@ class CartLineHelper
             'taxDisplay' => $tax['taxDisplay'],
             'taxPercentage' => $tax['taxPercentage'],
             'taxTotal' => $taxTotal,
-            'grandTotal' => $grandTotal - ($discountMessages->status == "valid" ? $discountTotal : 0),
-            'discountTotal' => $discountMessages->status == "valid" ? $discountTotal : 0,
+            'grandTotal' => $grandTotal - ($discountMessages->status == 'valid' ? $discountTotal : 0),
+            'discountTotal' => $discountMessages->status == 'valid' ? $discountTotal : 0,
             'discountMessages' => $discountMessages,
             'shippingTotal' => $shippingTotal,
         ];
@@ -120,7 +120,7 @@ class CartLineHelper
         $taxPercentage = (float) $taxZone->percentage;
         $taxDisplay = $taxZone->price_display;
 
-        if (!$taxZone instanceof TaxZone) {
+        if ( ! $taxZone instanceof TaxZone) {
             throw new BadRequestHttpException('No tax zone found');
         }
 
@@ -135,7 +135,7 @@ class CartLineHelper
     {
         $discountTotal = 0;
 
-        if (!is_null($discount)) {
+        if ( ! is_null($discount)) {
             $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal);
         }
 

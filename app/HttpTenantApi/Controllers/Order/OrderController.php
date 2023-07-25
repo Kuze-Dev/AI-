@@ -89,7 +89,7 @@ class OrderController extends Controller
         if (is_string($result)) {
             return response()->json([
                 'message' => 'Order failed to be updated',
-                'error' => $result
+                'error' => $result,
             ], 400);
         }
 

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Order\Actions;
 
+use Domain\Cart\Actions\CartSummaryAction;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
-use Domain\Cart\Helpers\CartLineHelper;
 use Domain\Discount\Actions\CreateDiscountLimitAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
@@ -19,7 +19,7 @@ class CreateOrderAction
     {
         $referenceNumber = Str::upper(Str::random(12));
 
-        $summary = app(CartLineHelper::class)->getSummary(
+        $summary = app(CartSummaryAction::class)->getSummary(
             $preparedOrderData->cartLine,
             new CartSummaryTaxData(
                 $placeOrderData->taxation_data->country_id,

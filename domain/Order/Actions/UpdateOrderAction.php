@@ -44,7 +44,7 @@ class UpdateOrderAction
                 $order->update($orderData);
             }
 
-            if ($updateOrderData->type == "bank-transfer") {
+            if ($updateOrderData->type == 'bank-transfer') {
                 if ($updateOrderData->proof_of_payment !== null) {
                     $orderPayment = Order::with('payments')->find($order->id);
 
@@ -58,12 +58,12 @@ class UpdateOrderAction
                     );
                 }
             } else {
-                if ($updateOrderData->type != "status") {
+                if ($updateOrderData->type != 'status') {
                     $payment = Payment::whereHas('payable', function (Builder $query) use ($order) {
                         $query->wherePayableId($order->id);
                     })->whereNot('status', 'paid')->first();
 
-                    if (!$payment) {
+                    if ( ! $payment) {
                         return 'Your order already paid';
                     }
 
@@ -99,7 +99,7 @@ class UpdateOrderAction
         } catch (Exception $e) {
             // Log::info($e);
 
-            return "Something went wrong";
+            return 'Something went wrong';
         }
     }
 
