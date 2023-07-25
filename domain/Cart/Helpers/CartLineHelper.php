@@ -37,8 +37,6 @@ class CartLineHelper
 
         $discountTotal = $this->getDiscount($discount, $subtotal);
 
-        $discountMessage = (new DiscountHelperFunctions())->validateDiscountCode($discount);
-
         $shippingTotal = $this->getShippingFee(
             $cartSummaryShippingData->customer,
             $cartSummaryShippingData->shippingAddress,
@@ -46,6 +44,8 @@ class CartLineHelper
         );
 
         $grandTotal = $subtotal + $taxTotal + $shippingTotal - $discountTotal;
+
+        $discountMessage = (new DiscountHelperFunctions())->validateDiscountCode($discount, $grandTotal);
 
         $summaryData = [
             'subTotal' => $subtotal,

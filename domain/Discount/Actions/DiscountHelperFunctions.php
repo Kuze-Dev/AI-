@@ -38,7 +38,7 @@ final class DiscountHelperFunctions
         }
     }
 
-    public function validateDiscountCode(?Discount $discount): string
+    public function validateDiscountCode(?Discount $discount, float $grandTotal): string
     {
         $uses = DiscountLimit::whereCode($discount->code)->count();
 
@@ -54,7 +54,10 @@ final class DiscountHelperFunctions
             return 'This discount code max usage limit has been reached.';
         }
 
-        return '';
-    }
+        if($grandTotal < $discount->discountRequirement->minimum_amount) {
+            return 'minimum amount required not reached for this discount.';
+        }
 
+        return 'Valid discount!';
+    }
 }
