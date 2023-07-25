@@ -13,7 +13,7 @@ class UpdateProductVariantAction
     public function execute(Product $product, ProductData $productData): void
     {
         if (filled($productData->product_variants)) {
-            /** Removal of Product Variants */ 
+            /** Removal of Product Variants */
             $mappedVariantIds = array_map(function ($item) {
                 return $item['id'];
             }, $productData->product_variants);

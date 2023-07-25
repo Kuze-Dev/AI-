@@ -48,7 +48,7 @@ class CartSummaryRequest extends FormRequest
                         $query->where((new Country())->getRouteKeyName(), $value);
                     })->first();
 
-                    if (!$isBelongsToUser) {
+                    if ( ! $isBelongsToUser) {
                         $fail('Invalid country');
                     }
                 },
@@ -59,7 +59,7 @@ class CartSummaryRequest extends FormRequest
             ],
             'shipping_address_id' => [
                 'nullable',
-                Rule::exists(Address::class, (new Address())->getRouteKeyName())
+                Rule::exists(Address::class, (new Address())->getRouteKeyName()),
                 // ->where(function ($query) {
                 //     $query->where('id', auth()->user()?->id);
                 // }),
@@ -75,7 +75,7 @@ class CartSummaryRequest extends FormRequest
                         $query->where((new State())->getRouteKeyName(), $value);
                     })->first();
 
-                    if (!$isBelongsToUser) {
+                    if ( ! $isBelongsToUser) {
                         $fail('Invalid state');
                     }
                 },

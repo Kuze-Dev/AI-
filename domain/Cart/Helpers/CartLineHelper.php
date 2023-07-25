@@ -117,7 +117,7 @@ class CartLineHelper
         $taxPercentage = (float) $taxZone->percentage;
         $taxDisplay = $taxZone->price_display;
 
-        if (!$taxZone instanceof TaxZone) {
+        if ( ! $taxZone instanceof TaxZone) {
             throw new BadRequestHttpException('No tax zone found');
         }
 
@@ -132,7 +132,7 @@ class CartLineHelper
     {
         $discountTotal = 0;
 
-        if (!is_null($discount)) {
+        if ( ! is_null($discount)) {
             $discountTotal = (new DiscountHelperFunctions())->deductOrderSubtotal($discount, $subTotal);
         }
 

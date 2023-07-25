@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Order\DataTransferObjects;
 
+use Domain\Product\Models\Product;
+
 class ProductOrderData
 {
     public function __construct(
@@ -39,6 +41,25 @@ class ProductOrderData
             is_featured: $data['is_featured'],
             is_special_offer: $data['is_special_offer'],
             allow_customer_remarks: $data['allow_customer_remarks'],
+        );
+    }
+
+    public static function fromProduct(Product $product): self
+    {
+        return new self(
+            id: $product->id,
+            name: $product->name,
+            slug: $product->slug,
+            sku: $product->sku,
+            description: $product->description,
+            retail_price: $product->retail_price,
+            selling_price: $product->selling_price,
+            stock: $product->stock,
+            status: $product->status,
+            is_digital_product: $product->is_digital_product,
+            is_featured: $product->is_featured,
+            is_special_offer: $product->is_special_offer,
+            allow_customer_remarks: $product->allow_customer_remarks,
         );
     }
 }

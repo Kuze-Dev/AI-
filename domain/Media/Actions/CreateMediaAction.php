@@ -40,7 +40,7 @@ class CreateMediaAction
             }
         }
 
-        if (!filled($medias)) {
+        if ( ! filled($medias)) {
             $model->clearMediaCollection($collection);
         }
     }

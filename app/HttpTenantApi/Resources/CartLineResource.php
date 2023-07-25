@@ -27,9 +27,9 @@ class CartLineResource extends JsonApiResource
             ],
             'purchasable' => function () {
                 if ($this->purchasable instanceof Product) {
-                    return ProductOrderData::fromArray($this->purchasable->toArray());
+                    return ProductOrderData::fromProduct($this->purchasable);
                 } elseif ($this->purchasable instanceof ProductVariant) {
-                    return ProductVariantOrderData::fromArray($this->purchasable->toArray());
+                    return ProductVariantOrderData::fromProductVariant($this->purchasable);
                 }
             },
             'media' => function () {

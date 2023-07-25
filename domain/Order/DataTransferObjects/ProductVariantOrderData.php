@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Order\DataTransferObjects;
 
+use Domain\Product\Models\ProductVariant;
+
 class ProductVariantOrderData
 {
     public function __construct(
@@ -37,14 +39,25 @@ class ProductVariantOrderData
             product: ProductOrderData::fromArray($data['product']),
         );
     }
-}
 
+    public static function fromProductVariant(ProductVariant $productVariant): self
+    {
+        $combinations = [];
+        foreach ($productVariant->combination as $combinationData) {
+            $combinations[] = new ProductVariantCombinationData(
+                option: $combinationData['option'],
+                option_value: $combinationData['option_value']
+            );
+        }
 
-class ProductVariantCombinationData
-{
-    public function __construct(
-        public readonly string $option,
-        public readonly string $option_value
-    ) {
+        return new self(
+            sku: $productVariant->sku,
+            combination: [],
+            retail_price: $productVariant->retail_price,
+            selling_price: $productVariant->selling_price,
+            stock: $productVariant->stock,
+            status: $productVariant->status,
+            product: ProductOrderData::fromProduct($productVariant->product),
+        );
     }
 }
