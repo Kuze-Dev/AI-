@@ -26,7 +26,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string|null $description
  * @property Driver $driver
  * @property array $ship_from_address
- * @property bool $status
+ * @property bool $active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $deleted_at
@@ -46,7 +46,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereShipFromAddress($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereSubtitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereUpdatedAt($value)
@@ -66,16 +66,15 @@ class ShippingMethod extends Model implements HasMedia
         'description',
         'driver',
         'ship_from_address',
-        'status',
+        'active',
     ];
 
     protected $casts = [
         'ship_from_address' => 'array',
-        'status' => 'bool',
+        'active' => 'bool',
         'driver' => Driver::class,
     ];
 
-    /** @return LogOptions */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -84,22 +83,17 @@ class ShippingMethod extends Model implements HasMedia
             ->dontSubmitEmptyLogs();
     }
 
-    /**
-     * Set the column reference
-     * for route keys.
-     */
     public function getRouteKeyName(): string
     {
         return 'slug';
     }
 
-    /** @return HasMany<Shipment> */
+    /** @return HasMany<\Domain\Shipment\Models\Shipment> */
     public function shipments(): HasMany
     {
         return $this->hasMany(Shipment::class);
     }
 
-    /** @return SlugOptions */
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()

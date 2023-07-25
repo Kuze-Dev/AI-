@@ -32,7 +32,7 @@ class PaymentMethodResource extends Resource
     protected static ?string $model = PaymentMethod::class;
 
     /** @var string|null */
-    protected static ?string $navigationGroup = 'eCommerce';
+    protected static ?string $navigationGroup = 'Shop Configuration';
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 

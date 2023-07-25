@@ -8,35 +8,20 @@ use Spatie\LaravelSettings\Settings;
 
 class ShippingSettings extends Settings
 {
-    public ?array $usps_credentials = null;
-
-    public bool $usps_mode;
+    public bool $usps_production_mode;
+    public ?string $usps_username = null;
+    public ?string $usps_password = null;
 
     public static function group(): string
     {
         return 'shipping';
     }
 
-    public function getUsername(): string
+    public static function encrypted(): array
     {
-        return $this->check('username');
-    }
-
-    public function getPassword(): string
-    {
-        return $this->check('password');
-    }
-
-    private function check(string $param): string
-    {
-        if ($this->usps_credentials === null) {
-            abort(400, 'Setting ['.self::group().'] not set.');
-        }
-
-        if ( ! isset($this->usps_credentials[$param])) {
-            abort(400, 'Setting ['.self::group().'] not set.');
-        }
-
-        return $this->usps_credentials[$param];
+        return [
+            'usps_username',
+            'usps_password',
+        ];
     }
 }

@@ -91,8 +91,9 @@ class ViewOrderDetails extends ViewRecord
                                                     Forms\Components\Placeholder::make('variant_'  . $sectionIndex)->label('Variant')
                                                         ->content(function () use ($orderLine) {
                                                             if ($orderLine->purchasable_type == ProductVariant::class) {
-                                                                $variant = array_values($orderLine->purchasable_data['combination']);
-                                                                $variantString = implode(' / ', array_map('ucfirst', $variant));
+                                                                $combinations = array_values($orderLine->purchasable_data['combination']);
+                                                                $optionValues = array_column($combinations, 'option_value');
+                                                                $variantString = implode(' / ', array_map('ucfirst', $optionValues));
 
                                                                 return $variantString;
                                                             }

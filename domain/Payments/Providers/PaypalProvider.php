@@ -22,19 +22,18 @@ class PaypalProvider extends Provider
 
     public function __construct()
     {
-        /** @var array */
-        $paypalCredentials = app(PaymentSettings::class)->paypal_credentials;
+        $paymentSettings = app(PaymentSettings::class);
 
         $config = [
-            'mode' => app(PaymentSettings::class)->paypal_mode ? 'live' : 'sandbox',
+            'mode' => app(PaymentSettings::class)->paypal_production_mode ? 'live' : 'sandbox',
             'live' => [
-                'client_id' => $paypalCredentials['paypal_secret_id'],
-                'client_secret' => $paypalCredentials['paypal_secret_key'],
+                'client_id' => $paymentSettings->paypal_secret_id,
+                'client_secret' => $paymentSettings->paypal_secret_key,
                 'app_id' => '',
             ],
             'sandbox' => [
-                'client_id' => $paypalCredentials['paypal_secret_id'],
-                'client_secret' => $paypalCredentials['paypal_secret_key'],
+                'client_id' => $paymentSettings->paypal_secret_id,
+                'client_secret' => $paymentSettings->paypal_secret_key,
                 'app_id' => '',
             ],
             'payment_action' => 'Sale',
