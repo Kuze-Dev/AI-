@@ -13,7 +13,7 @@ class CreateOrUpdateProductVariantAction
     public function execute(Product $product, ProductData $productData, bool $isCreate = true): void
     {
         if (filled($productData->product_variants)) {
-            if (!$isCreate) {
+            if ( ! $isCreate) {
                 $existingProductVariants = ProductVariant::where('product_id', $product->id)->get();
                 foreach ($existingProductVariants as $productVariant) {
                     $productVariant->delete();
