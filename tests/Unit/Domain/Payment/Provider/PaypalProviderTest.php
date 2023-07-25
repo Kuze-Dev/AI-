@@ -31,10 +31,10 @@ it('Paypal payment Gateway must be instance of PaypalProvider  ', function () {
 
     livewire(PaymentSettings::class)
         ->fillForm([
-            'paypal_credentials' => [
-                'paypal_secret_id' => 'test_paypal_secret_id',
-                'paypal_secret_key' => 'test_paypal_secret_d',
-            ],
+
+            'paypal_secret_id' => 'test_paypal_secret_id',
+            'paypal_secret_key' => 'test_paypal_secret_d',
+
         ])
         ->call('save')
         ->assertHasNoFormErrors();
@@ -48,10 +48,10 @@ it('can generate payment authorization dto ', function () {
 
     livewire(PaymentSettings::class)
         ->fillForm([
-            'paypal_credentials' => [
-                'paypal_secret_id' => 'test_paypal_secret_id',
-                'paypal_secret_key' => 'test_paypal_secret_d',
-            ],
+
+            'paypal_secret_id' => 'test_paypal_secret_id',
+            'paypal_secret_key' => 'test_paypal_secret_d',
+
         ])
         ->call('save')
         ->assertHasNoFormErrors();

@@ -10,6 +10,7 @@ use Domain\Order\Enums\OrderStatuses;
 use Domain\Payments\Interfaces\PayableInterface;
 use Domain\Payments\Models\Traits\HasPayments;
 use Domain\Taxation\Enums\PriceDisplay;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -167,7 +168,7 @@ class Order extends Model implements HasMedia, PayableInterface
 
     public function registerMediaCollections(): void
     {
-        $registerMediaConversions = function (Media $media) {
+        $registerMediaConversions = function () {
             $this->addMediaConversion('preview');
         };
 
@@ -182,5 +183,19 @@ class Order extends Model implements HasMedia, PayableInterface
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
+    }
+
+    public function scopeWhereHasForPayment(Builder $query): Builder
+    {
+        return $query->whereHas('payments', function (Builder $subQuery) {
+            $subQuery->where(function (Builder $query) {
+                $query->whereIn('gateway', ['paypal', 'bank-transfer']);
+            })->where('status', 'pending');
+        })->where('is_paid', false);
+    }
+
+    public function getReferenceNumber(): string
+    {
+        return $this->reference;
     }
 }

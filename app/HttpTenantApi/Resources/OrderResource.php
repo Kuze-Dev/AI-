@@ -15,7 +15,7 @@ class OrderResource extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         return [
-            'id' => $this->id,
+            // 'id' => $this->id,
             'reference' => $this->reference,
             'status' => $this->status,
             'created_at' => $this->created_at?->format('F d, Y H:i:s'),
@@ -31,7 +31,6 @@ class OrderResource extends JsonApiResource
             'status' => $this->status,
             'shipping_address' => $this->shippingAddress,
             'billing_address' => $this->billingAddress,
-            'bank_proof_images' => $this->getMedia('bank_proof_images')->toArray(),
         ];
     }
 
@@ -39,6 +38,7 @@ class OrderResource extends JsonApiResource
     {
         return [
             'orderLines' => fn () => OrderLineResource::collection($this->orderLines),
+            'payments' => fn () => PaymentMethodOrderResource::make($this->payments->first()->paymentMethod),
         ];
     }
 }

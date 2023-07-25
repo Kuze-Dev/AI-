@@ -9,6 +9,7 @@ use Doctrine\Common\Cache\Psr6\InvalidArgument;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentCapture;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentRefund;
+use Domain\Payments\Enums\PaymentStatus;
 use Domain\Payments\Events\PaymentProcessEvent;
 use Domain\Payments\Models\Payment as ModelsPayment;
 use Throwable;
@@ -22,19 +23,18 @@ class PaypalProvider extends Provider
 
     public function __construct()
     {
-        /** @var array */
-        $paypalCredentials = app(PaymentSettings::class)->paypal_credentials;
+        $paymentSettings = app(PaymentSettings::class);
 
         $config = [
-            'mode' => app(PaymentSettings::class)->paypal_mode ? 'live' : 'sandbox',
+            'mode' => app(PaymentSettings::class)->paypal_production_mode ? 'live' : 'sandbox',
             'live' => [
-                'client_id' => $paypalCredentials['paypal_secret_id'],
-                'client_secret' => $paypalCredentials['paypal_secret_key'],
+                'client_id' => $paymentSettings->paypal_secret_id,
+                'client_secret' => $paymentSettings->paypal_secret_key,
                 'app_id' => '',
             ],
             'sandbox' => [
-                'client_id' => $paypalCredentials['paypal_secret_id'],
-                'client_secret' => $paypalCredentials['paypal_secret_key'],
+                'client_id' => $paymentSettings->paypal_secret_id,
+                'client_secret' => $paymentSettings->paypal_secret_key,
                 'app_id' => '',
             ],
             'payment_action' => 'Sale',
@@ -134,7 +134,7 @@ class PaypalProvider extends Provider
         $captured = $this->payPalclient->capturePaymentOrder($data['token']);
 
         $paymentModel->update([
-            'status' => 'paid',
+            'status' => PaymentStatus::PAID->value,
             'transaction_id' => $captured['purchase_units']['0']['payments']['captures']['0']['id'],
         ]);
 
@@ -146,7 +146,7 @@ class PaypalProvider extends Provider
     protected function cancelTransaction(ModelsPayment $paymentModel): PaymentCapture
     {
         $paymentModel->update([
-            'status' => 'cancel',
+            'status' => PaymentStatus::CANCEL->value,
         ]);
 
         event(new PaymentProcessEvent($paymentModel));

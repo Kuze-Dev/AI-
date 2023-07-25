@@ -20,6 +20,7 @@ class ReviewResource extends JsonApiResource
             'data' => $this->data,
             'customer_name' => $this->customer_name,
             'customer_email' => $this->customer_email,
+            'media' => $this->media,
         ];
     }
 

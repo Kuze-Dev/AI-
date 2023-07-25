@@ -62,6 +62,7 @@ return new class () extends Migration {
 
         Schema::create('order_lines', function (Blueprint $table) {
             $table->id();
+            $table->uuid();
 
             $table->foreignIdFor(Order::class);
             $table->unsignedInteger('purchasable_id');

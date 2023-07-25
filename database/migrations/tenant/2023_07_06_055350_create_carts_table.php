@@ -13,27 +13,27 @@ return new class () extends Migration {
     {
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
-            $table->uuid();
 
             $table->foreignIdFor(Customer::class)->index();
-            $table->string('coupon_code')->nullable()->default(null)->index();
+            $table->uuid();
+            $table->string('coupon_code')->index()->nullable();
 
             $table->timestamps();
         });
 
         Schema::create('cart_lines', function (Blueprint $table) {
             $table->id();
-            $table->uuid();
+
             $table->foreignIdFor(Cart::class)->index();
+            $table->morphs('purchasable');
 
-            $table->unsignedInteger('purchasable_id')->index();
-            $table->string('purchasable_type')->index();
+            $table->uuid();
             $table->integer('quantity');
-            $table->json('remarks')->nullable()->default(null);
-            $table->string('checkout_reference')->nullable()->default(null);
+            $table->json('remarks')->nullable();
+            $table->string('checkout_reference')->nullable();
 
-            $table->dateTime('checkout_expiration')->nullable()->default(null);
-            $table->dateTime('checked_out_at')->nullable()->default(null);
+            $table->dateTime('checkout_expiration')->nullable();
+            $table->dateTime('checked_out_at')->nullable();
             $table->timestamps();
         });
     }

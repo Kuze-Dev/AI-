@@ -36,10 +36,10 @@ use Domain\Page\Models\Page;
 use Domain\Shipment\Models\Shipment;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Tier\Models\Tier;
+use Domain\PaymentMethod\Models\PaymentMethod;
 use Support\Captcha\CaptchaManager;
 use Support\MetaData\Models\MetaData;
 use Domain\Product\Models\Product;
-use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Models\Payment;
 use Domain\Product\Models\ProductVariant;
 use Domain\Taxonomy\Models\Taxonomy;
@@ -51,6 +51,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
+use Sentry\Laravel\Integration;
 use Laravel\Pennant\Feature;
 use Stancl\Tenancy\Database\Models\Tenant;
 use TiMacDonald\JsonApi\JsonApiResource;
@@ -65,6 +66,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::shouldBeStrict( ! $this->app->isProduction());
+
+        Model::handleLazyLoadingViolationUsing(Integration::lazyLoadingViolationReporter());
 
         Model::handleMissingAttributeViolationUsing(function (Model $model, string $key) {
             if ($model instanceof Tenant && Str::startsWith($key, Tenant::internalPrefix())) {
@@ -99,6 +102,11 @@ class AppServiceProvider extends ServiceProvider
             DiscountCondition::class,
             DiscountLimit::class,
             TaxZone::class,
+            PaymentMethod::class,
+            Payment::class,
+            Tier::class,
+            Customer::class,
+            Address::class,
             Country::class,
             State::class,
             Currency::class,

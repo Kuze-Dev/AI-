@@ -13,7 +13,6 @@ use Domain\Customer\Models\Customer;
 use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Discount\Models\Discount;
 use Domain\Shipment\Actions\USPS\GetUSPSRateAction;
-use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Taxation\Facades\Taxation;
@@ -33,7 +32,8 @@ class CartLineHelper
         $subtotal = $this->getSubTotal($collections);
 
         $tax = $this->getTax($cartSummaryTaxData->countryId, $cartSummaryTaxData->stateId);
-        $taxTotal = round($subtotal * $tax['taxPercentage'] / 100, 2);
+
+        $taxTotal = $tax['taxPercentage'] ? round($subtotal * $tax['taxPercentage'] / 100, 2) : 0;
 
         $discountTotal = $this->getDiscount($discount, $subtotal);
 
@@ -45,6 +45,8 @@ class CartLineHelper
 
         $grandTotal = $subtotal + $taxTotal + $shippingTotal - $discountTotal;
 
+        $discountMessage = (new DiscountHelperFunctions())->validateDiscountCode($discount, $grandTotal);
+
         $summaryData = [
             'subTotal' => $subtotal,
             'taxZone' => $tax['taxZone'],
@@ -53,7 +55,9 @@ class CartLineHelper
             'taxTotal' => $taxTotal,
             'grandTotal' => $grandTotal,
             'discountTotal' => $discountTotal,
+            'discountMessage' => $discountMessage,
             'shippingTotal' => $shippingTotal,
+
         ];
 
         return SummaryData::fromArray($summaryData);
@@ -83,34 +87,36 @@ class CartLineHelper
     ): float {
         $shippingFeeTotal = 0;
 
-        try {
-            if ($shippingAddress) {
-                $parcelData = new ParcelData(
-                    pounds: '10',
-                    ounces: '0',
-                    width: '10',
-                    height: '10',
-                    length: '10',
-                    zip_origin: $shippingMethod->ship_from_address['zip5'],
-                    parcel_value: '200',
-                );
+        if ($shippingAddress) {
+            $parcelData = new ParcelData(
+                pounds: '10',
+                ounces: '0',
+                width: '10',
+                height: '10',
+                length: '10',
+                zip_origin: $shippingMethod->ship_from_address['zip5'],
+                parcel_value: '200',
+            );
 
-                $shippingFeeTotal = app(GetUSPSRateAction::class)
-                    ->execute($customer, $parcelData, $shippingMethod, $shippingAddress);
-            }
-        } catch (USPSServiceNotFoundException) {
-            return response()->json([
-                'service_id' => 'Service id is required',
-            ], 404);
+            $shippingFeeTotal = app(GetUSPSRateAction::class)
+                ->execute($customer, $parcelData, $shippingMethod, $shippingAddress);
         }
 
         return $shippingFeeTotal;
     }
 
     public function getTax(
-        int $countryId,
+        ?int $countryId,
         ?int $stateId = null
     ) {
+        if (is_null($countryId)) {
+            return [
+                'taxZone' => null,
+                'taxDisplay' => null,
+                'taxPercentage' => null,
+            ];
+        }
+
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
         $taxPercentage = (float) $taxZone->percentage;
         $taxDisplay = $taxZone->price_display;

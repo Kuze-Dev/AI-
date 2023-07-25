@@ -32,6 +32,5 @@ class GetUSPSRateAction
             $address
         )
             ->getRate($serviceID);
-
     }
 }
