@@ -10,4 +10,6 @@ interface PayableInterface
 {
     /** @return MorphMany<\Domain\Payments\Models\Payment> */
     public function payments(): MorphMany;
+
+    public function getReferenceNumber(): string;
 }

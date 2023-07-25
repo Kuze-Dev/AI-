@@ -36,10 +36,10 @@ use Domain\Page\Models\Page;
 use Domain\Shipment\Models\Shipment;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Tier\Models\Tier;
+use Domain\PaymentMethod\Models\PaymentMethod;
 use Support\Captcha\CaptchaManager;
 use Support\MetaData\Models\MetaData;
 use Domain\Product\Models\Product;
-use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Models\Payment;
 use Domain\Product\Models\ProductVariant;
 use Domain\Taxonomy\Models\Taxonomy;
@@ -102,6 +102,11 @@ class AppServiceProvider extends ServiceProvider
             DiscountCondition::class,
             DiscountLimit::class,
             TaxZone::class,
+            PaymentMethod::class,
+            Payment::class,
+            Tier::class,
+            Customer::class,
+            Address::class,
             Country::class,
             State::class,
             Currency::class,

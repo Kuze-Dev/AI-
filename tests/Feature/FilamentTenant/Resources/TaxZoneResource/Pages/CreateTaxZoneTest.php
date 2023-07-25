@@ -131,4 +131,3 @@ it('can create and override old default', function () {
     ]);
     expect($initialDefaultTaxZone->refresh())->is_default->toBeFalse();
 });
-

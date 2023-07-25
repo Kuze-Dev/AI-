@@ -58,7 +58,7 @@ class UpdateProductOptionAction
                     }
                 }
 
-                /** Removal of Option Values */ 
+                /** Removal of Option Values */
                 $mappedOptionValueIds = array_map(function ($item) {
                     return $item['id'];
                 }, $productOption['productOptionValues']);
@@ -73,7 +73,7 @@ class UpdateProductOptionAction
                 }
             }
 
-            /** Removal of product options */ 
+            /** Removal of product options */
             $mappedOptionIds = array_map(function ($item) {
                 return $item['id'];
             }, $productData->product_options[0]);

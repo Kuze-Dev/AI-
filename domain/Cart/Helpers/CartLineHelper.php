@@ -13,7 +13,6 @@ use Domain\Customer\Models\Customer;
 use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Discount\Models\Discount;
 use Domain\Shipment\Actions\USPS\GetUSPSRateAction;
-use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Taxation\Facades\Taxation;
@@ -33,7 +32,8 @@ class CartLineHelper
         $subtotal = $this->getSubTotal($collections);
 
         $tax = $this->getTax($cartSummaryTaxData->countryId, $cartSummaryTaxData->stateId);
-        $taxTotal = round($subtotal * $tax['taxPercentage'] / 100, 2);
+
+        $taxTotal = $tax['taxPercentage'] ? round($subtotal * $tax['taxPercentage'] / 100, 2) : 0;
 
         $discountTotal = $this->getDiscount($discount, $subtotal);
 
@@ -45,6 +45,8 @@ class CartLineHelper
 
         $grandTotal = $subtotal + $taxTotal + $shippingTotal - $discountTotal;
 
+        $discountMessage = (new DiscountHelperFunctions())->validateDiscountCode($discount, $grandTotal);
+
         $summaryData = [
             'subTotal' => $subtotal,
             'taxZone' => $tax['taxZone'],
@@ -53,7 +55,9 @@ class CartLineHelper
             'taxTotal' => $taxTotal,
             'grandTotal' => $grandTotal,
             'discountTotal' => $discountTotal,
+            'discountMessage' => $discountMessage,
             'shippingTotal' => $shippingTotal,
+
         ];
 
         return SummaryData::fromArray($summaryData);
@@ -102,14 +106,22 @@ class CartLineHelper
     }
 
     public function getTax(
-        int $countryId,
+        ?int $countryId,
         ?int $stateId = null
     ) {
+        if (is_null($countryId)) {
+            return [
+                'taxZone' => null,
+                'taxDisplay' => null,
+                'taxPercentage' => null,
+            ];
+        }
+
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
         $taxPercentage = (float) $taxZone->percentage;
         $taxDisplay = $taxZone->price_display;
 
-        if (!$taxZone instanceof TaxZone) {
+        if ( ! $taxZone instanceof TaxZone) {
             throw new BadRequestHttpException('No tax zone found');
         }
 
@@ -124,7 +136,7 @@ class CartLineHelper
     {
         $discountTotal = 0;
 
-        if (!is_null($discount)) {
+        if ( ! is_null($discount)) {
             $discountTotal = (new DiscountHelperFunctions())->deductOrderSubtotal($discount, $subTotal);
         }
 

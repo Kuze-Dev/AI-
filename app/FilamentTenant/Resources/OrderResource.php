@@ -20,7 +20,6 @@ use Domain\Discount\Models\Discount;
 use Domain\Discount\Models\DiscountLimit;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Taxation\Enums\PriceDisplay;
-use Exception;
 use Filament\Notifications\Notification;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
@@ -205,7 +204,7 @@ class OrderResource extends Resource
                 //     ->icon('heroicon-o-check')
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->color('primary')
+                Tables\Actions\ViewAction::make()->color('primary'),
             ])
             ->defaultSort('id', 'DESC');
     }
@@ -345,7 +344,7 @@ class OrderResource extends Resource
                             ->action(function () use ($get, $set) {
                                 $order = Order::with('payments')->find($get('id'));
 
-                                $isPaid = !$order->is_paid;
+                                $isPaid = ! $order->is_paid;
 
                                 $result = $order->update([
                                     'is_paid' => $isPaid,

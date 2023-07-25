@@ -6,10 +6,8 @@ namespace App\FilamentTenant\Resources\ProductResource\Pages;
 
 use App\FilamentTenant\Resources\ProductResource;
 use Domain\Product\Actions\CreateProductAction;
-use Domain\Product\Actions\UpdateProductAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
-use Domain\Taxation\Models\TaxZone;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Pages\Actions;
@@ -18,12 +16,10 @@ use Support\Excel\Actions\ExportAction;
 use Support\Excel\Actions\ImportAction;
 use Illuminate\Database\Eloquent\Builder;
 use Support\MetaData\DataTransferObjects\MetaDataData;
-use Illuminate\Validation\Rule;
 
 class ListProducts extends ListRecords
 {
     protected static string $resource = ProductResource::class;
-
 
     protected static function generateCombinations($row, $inputArray): array
     {
@@ -143,7 +139,7 @@ class ListProducts extends ListRecords
                             if ($taxonomy) {
                                 $termModel = TaxonomyTerm::whereName($taxonomyTerm)->first();
 
-                                if (!$termModel) {
+                                if ( ! $termModel) {
                                     $termModel = TaxonomyTerm::create(
                                         [
                                             'name' => $taxonomyTerm,
@@ -161,9 +157,8 @@ class ListProducts extends ListRecords
                         }
                         $data['taxonomy_terms'] = $taxonomyTermIds;
 
-                        unset($row);
-                        unset($data['categories']);
-                        unset($data['brand']);
+                        unset($row, $data['categories'], $data['brand']);
+
                         $data['meta_data'] = new MetaDataData($data['name']);
                         $product = app(CreateProductAction::class)->execute(new ProductData(...$data));
 
