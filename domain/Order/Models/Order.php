@@ -188,7 +188,9 @@ class Order extends Model implements HasMedia, PayableInterface
     public function scopeWhereHasForPayment(Builder $query): Builder
     {
         return $query->whereHas('payments', function (Builder $subQuery) {
-            $subQuery->where('status', 'pending');
+            $subQuery->where(function (Builder $query) {
+                $query->whereIn('gateway', ['paypal', 'bank-transfer']);
+            })->where('status', 'pending');
         })->where('is_paid', false);
     }
 }
