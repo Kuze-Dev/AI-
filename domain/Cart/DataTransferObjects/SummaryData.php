@@ -18,7 +18,7 @@ class SummaryData
         public readonly float $grandTotal,
         public readonly float $shippingTotal,
         public readonly float|null $discountTotal,
-        public readonly string|null $discountMessage,
+        public readonly ?DiscountMessagesData $discountMessages,
     ) {
     }
 
@@ -33,7 +33,7 @@ class SummaryData
             grandTotal: $data['grandTotal'],
             shippingTotal: $data['shippingTotal'],
             discountTotal: $data['discountTotal'] ?? null,
-            discountMessage: $data['discountMessage'] ?? null,
+            discountMessages: $data['discountMessages'] ?? null,
         );
     }
 }

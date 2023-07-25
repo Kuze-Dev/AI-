@@ -27,7 +27,7 @@ class CartLineHelper
         CartSummaryTaxData $cartSummaryTaxData,
         CartSummaryShippingData $cartSummaryShippingData,
         ?Discount $discount
-    ) {
+    ): SummaryData {
 
         $subtotal = $this->getSubTotal($collections);
 
@@ -35,15 +35,17 @@ class CartLineHelper
 
         $taxTotal = $tax['taxPercentage'] ? round($subtotal * $tax['taxPercentage'] / 100, 2) : 0;
 
-        $discountTotal = $this->getDiscount($discount, $subtotal);
-
         $shippingTotal = $this->getShippingFee(
             $cartSummaryShippingData->customer,
             $cartSummaryShippingData->shippingAddress,
             $cartSummaryShippingData->shippingMethod
         );
 
-        $grandTotal = $subtotal + $taxTotal + $shippingTotal - $discountTotal;
+        $discountTotal = $this->getDiscount($discount, $subtotal, $shippingTotal);
+
+        $grandTotal = $subtotal + $taxTotal + $shippingTotal;
+
+        $discountMessages = (new DiscountHelperFunctions())->validateDiscountCode($discount, $grandTotal);
 
         $summaryData = [
             'subTotal' => $subtotal,
@@ -51,8 +53,9 @@ class CartLineHelper
             'taxDisplay' => $tax['taxDisplay'],
             'taxPercentage' => $tax['taxPercentage'],
             'taxTotal' => $taxTotal,
-            'grandTotal' => $grandTotal,
-            'discountTotal' => $discountTotal,
+            'grandTotal' => $grandTotal - ($discountMessages->status == "valid" ? $discountTotal : 0),
+            'discountTotal' => $discountMessages->status == "valid" ? $discountTotal : 0,
+            'discountMessages' => $discountMessages,
             'shippingTotal' => $shippingTotal,
         ];
 
@@ -104,7 +107,7 @@ class CartLineHelper
     public function getTax(
         ?int $countryId,
         ?int $stateId = null
-    ) {
+    ): array {
         if (is_null($countryId)) {
             return [
                 'taxZone' => null,
@@ -117,7 +120,7 @@ class CartLineHelper
         $taxPercentage = (float) $taxZone->percentage;
         $taxDisplay = $taxZone->price_display;
 
-        if ( ! $taxZone instanceof TaxZone) {
+        if (!$taxZone instanceof TaxZone) {
             throw new BadRequestHttpException('No tax zone found');
         }
 
@@ -128,12 +131,12 @@ class CartLineHelper
         ];
     }
 
-    public function getDiscount(?Discount $discount, float $subTotal)
+    public function getDiscount(?Discount $discount, float $subTotal, float $shippingTotal): float
     {
         $discountTotal = 0;
 
-        if ( ! is_null($discount)) {
-            $discountTotal = (new DiscountHelperFunctions())->deductOrderSubtotal($discount, $subTotal);
+        if (!is_null($discount)) {
+            $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal);
         }
 
         return $discountTotal;

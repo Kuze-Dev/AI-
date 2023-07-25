@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Domain\Customer\Listeners;
+namespace Domain\Auth\Listeners;
 
-use Domain\Customer\Events\PasswordResetSent;
+use Domain\Auth\Events\PasswordResetSent;
 use Spatie\Activitylog\ActivityLogger;
 
 class LogPasswordResetSent

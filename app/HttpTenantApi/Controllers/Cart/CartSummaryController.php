@@ -10,6 +10,8 @@ use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\Helpers\CartLineHelper;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
+use Domain\Discount\Enums\DiscountAmountType;
+use Domain\Discount\Enums\DiscountConditionType;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -76,9 +78,12 @@ class CartSummaryController extends Controller
                 'amount' => $summary->taxTotal ? round($summary->taxTotal, 2) : 0,
             ],
             'discount' => [
-                'status' => round($summary->discountTotal, 2) ? 'valid' : 'invalid',
-                'amount' => $discount ? round($summary->discountTotal, 2) : 0,
-                // "message"
+                'status' => $summary->discountMessages->status,
+                'message' => $summary->discountMessages->message,
+                'type' => $summary->discountMessages->amount_type,
+                'amount' => $summary->discountMessages->amount,
+                'discount_type' => $summary->discountMessages->discount_type,
+                'total_savings' => $discount ? round($summary->discountTotal, 2) : 0,
             ],
             'sub_total' => round($summary->subTotal, 2),
             'shipping_fee' => round($summary->shippingTotal, 2),

@@ -46,7 +46,7 @@ class OrderController extends Controller
         $result = app(PlaceOrderAction::class)
             ->execute(PlaceOrderData::fromArray($validatedData));
 
-        if (!$result['order'] instanceof Order) {
+        if ( ! $result['order'] instanceof Order) {
             return response()->json([
                 'message' => 'Order failed to be created',
             ], 400);
