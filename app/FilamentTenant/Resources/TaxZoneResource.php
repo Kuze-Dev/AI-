@@ -94,7 +94,7 @@ class TaxZoneResource extends Resource
                         }),
                     Forms\Components\Group::make([
                         Forms\Components\Select::make('countries')
-                            ->formatStateUsing(fn (?TaxZone $record) => $record?->countries->first()?->getKey() ?? null)
+                            ->label(trans('Country'))
                             ->afterStateUpdated(fn (Closure $set) => $set('states', []))
                             ->optionsFromModel(Country::class, 'name')
                             ->preload()
