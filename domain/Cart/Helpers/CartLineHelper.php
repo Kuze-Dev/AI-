@@ -35,13 +35,12 @@ class CartLineHelper
 
         $taxTotal = $tax['taxPercentage'] ? round($subtotal * $tax['taxPercentage'] / 100, 2) : 0;
 
-        $discountTotal = $this->getDiscount($discount, $subtotal);
-
         $shippingTotal = $this->getShippingFee(
             $cartSummaryShippingData->customer,
             $cartSummaryShippingData->shippingAddress,
             $cartSummaryShippingData->shippingMethod
         );
+        $discountTotal = $this->getDiscount($discount, $subtotal, $shippingTotal);
 
         $grandTotal = $subtotal + $taxTotal + $shippingTotal - $discountTotal;
 
@@ -132,12 +131,12 @@ class CartLineHelper
         ];
     }
 
-    public function getDiscount(?Discount $discount, float $subTotal)
+    public function getDiscount(?Discount $discount, float $subTotal, float $shippingTotal)
     {
         $discountTotal = 0;
 
         if ( ! is_null($discount)) {
-            $discountTotal = (new DiscountHelperFunctions())->deductOrderSubtotal($discount, $subTotal);
+            $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal);
         }
 
         return $discountTotal;

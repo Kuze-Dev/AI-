@@ -183,7 +183,6 @@ return [
         Domain\Blueprint\BlueprintServiceProvider::class,
         Domain\Shipment\ShippingMethodServiceProvider::class,
         Domain\Tier\TierServiceProvider::class,
-        Domain\Customer\CustomerServiceProvider::class,
         Domain\Tier\TierServiceProvider::class,
         Domain\Taxation\TaxationServiceProvider::class,
 
