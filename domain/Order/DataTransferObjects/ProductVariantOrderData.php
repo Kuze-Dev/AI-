@@ -19,14 +19,32 @@ class ProductVariantOrderData
 
     public static function fromArray(array $data): self
     {
+        $combinations = [];
+        foreach ($data['combination'] as $combinationData) {
+            $combinations[] = new ProductVariantCombinationData(
+                option: $combinationData['option'],
+                option_value: $combinationData['option_value']
+            );
+        }
+
         return new self(
             sku: $data['sku'],
-            combination: $data['combination'],
+            combination: $combinations,
             retail_price: $data['retail_price'],
             selling_price: $data['selling_price'],
             stock: $data['stock'],
             status: $data['status'],
             product: ProductOrderData::fromArray($data['product']),
         );
+    }
+}
+
+
+class ProductVariantCombinationData
+{
+    public function __construct(
+        public readonly string $option,
+        public readonly string $option_value
+    ) {
     }
 }
