@@ -40,6 +40,25 @@ class PermissionSeeder extends BasePermissionSeeder
                 ...$this->generateFilamentResourcePermissions('contentEntry', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('globals', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('paymentMethod', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions(
+                    'customers',
+                    except: [
+                        'deleteAny',
+                        'restoreAny',
+                        'forceDeleteAny',
+                    ],
+                    hasSoftDeletes: true
+                ),
+                ...$this->generateFilamentResourcePermissions(
+                    'tiers',
+                    except: [
+                        'deleteAny',
+                        'restoreAny',
+                        'forceDeleteAny',
+                    ],
+                    hasSoftDeletes: true
+                ),
+                ...$this->generateFilamentResourcePermissions('addresses', ),
             ],
         ];
     }

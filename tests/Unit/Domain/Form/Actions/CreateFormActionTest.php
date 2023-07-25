@@ -25,7 +25,7 @@ it('store', function () {
             'form_email_notifications' => [
                 [
                     'to' => ['test@user'],
-                    'sender' => 'test@user',
+                    'sender_name' => 'test user',
                     'subject' => 'Foo Subject',
                     'template' => 'Foo Template',
                 ],
@@ -39,7 +39,7 @@ it('store', function () {
     ]);
     assertDatabaseHas(FormEmailNotification::class, [
         'to' => 'test@user',
-        'sender' => 'test@user',
+        'sender_name' => 'test user',
         'subject' => 'Foo Subject',
         'template' => 'Foo Template',
     ]);
