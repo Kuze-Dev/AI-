@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Customer\Events;
+namespace Domain\Auth\Events;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
