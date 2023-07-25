@@ -7,6 +7,7 @@ namespace Domain\Order\Requests;
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
+use Domain\Cart\Actions\PurchasableCheckerAction;
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
 use Domain\PaymentMethod\Models\PaymentMethod;
@@ -52,6 +53,22 @@ class PlaceOrderRequest extends FormRequest
                         $fail('No cart lines for checkout');
 
                         return;
+                    }
+
+                    $cartLines = CartLine::whereCheckoutReference($reference)->get();
+
+                    $cartLineIds = array_values($cartLines->pluck('uuid')->toArray());
+
+                    //auth check
+                    $checkAuth = app(PurchasableCheckerAction::class)->checkAuth($cartLineIds);
+                    if ($checkAuth !== count($cartLineIds)) {
+                        $fail('Invalid cart line IDs.');
+                    }
+
+                    //stock check
+                    $checkStocks = app(PurchasableCheckerAction::class)->checkStock($cartLineIds);
+                    if ($checkStocks !== count($cartLineIds)) {
+                        $fail('Invalid stocks');
                     }
                 },
             ],

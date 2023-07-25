@@ -82,7 +82,7 @@ class CartSummaryRequest extends FormRequest
             ],
             'discount_code' => [
                 'nullable',
-                Rule::exists(Discount::class, (new Discount())->getRouteKeyName()),
+                // Rule::exists(Discount::class, (new Discount())->getRouteKeyName()),
 
             ],
         ];

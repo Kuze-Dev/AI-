@@ -59,6 +59,14 @@ final class DiscountHelperFunctions
 
     public function validateDiscountCode(?Discount $discount, float $grandTotal): DiscountMessagesData
     {
+
+        if (is_null($discount)) {
+            return DiscountMessagesData::fromArray([
+                'status' => 'invalid',
+                'message' => 'This discount code is invalid.',
+            ]);
+        }
+
         $discountAmount = DiscountRequirement::whereBelongsTo($discount)->first();
         $discountCondition = DiscountCondition::whereBelongsTo($discount)->first();
 
