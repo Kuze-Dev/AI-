@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Product\Models;
 
 use Domain\Favorite\Models\Favorite;
+use Domain\Product\Models\Builders\ProductBuilder;
 use Domain\Review\Models\Review;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\MetaData\HasMetaData;
@@ -132,6 +133,12 @@ class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, 
         return [
             'title' => $this->name,
         ];
+    }
+
+    /** @return ProductBuilder<self> */
+    public function newEloquentBuilder($query): ProductBuilder
+    {
+        return new ProductBuilder($query);
     }
 
     public function getActivitylogOptions(): LogOptions

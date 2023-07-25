@@ -16,7 +16,7 @@ class DiscountSeeder extends Seeder
         DiscountFactory::new()
             ->has(DiscountConditionFactory::new())
             ->has(DiscountRequirementFactory::new())
-            ->count(10)
+            ->count(1)
             ->create();
     }
 }

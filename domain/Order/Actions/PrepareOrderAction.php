@@ -124,7 +124,7 @@ class PrepareOrderAction
 
     private function prepareShippingMethod(PlaceOrderData $placeOrderData)
     {
-        return ShippingMethod::where((new ShippingMethod())->getRouteKeyName(), $placeOrderData->shipping_method)->first();
+        return ShippingMethod::where((new ShippingMethod())->getRouteKeyName(), $placeOrderData->shipping_method)->first() ?? null;
     }
 
     private function preparePaymentMethod(PlaceOrderData $placeOrderData)

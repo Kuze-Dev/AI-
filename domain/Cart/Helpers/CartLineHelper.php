@@ -13,7 +13,6 @@ use Domain\Customer\Models\Customer;
 use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Discount\Models\Discount;
 use Domain\Shipment\Actions\USPS\GetUSPSRateAction;
-use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Taxation\Facades\Taxation;
@@ -33,7 +32,8 @@ class CartLineHelper
         $subtotal = $this->getSubTotal($collections);
 
         $tax = $this->getTax($cartSummaryTaxData->countryId, $cartSummaryTaxData->stateId);
-        $taxTotal = round($subtotal * $tax['taxPercentage'] / 100, 2);
+
+        $taxTotal = $tax['taxPercentage'] ? round($subtotal * $tax['taxPercentage'] / 100, 2) : 0;
 
         $discountTotal = $this->getDiscount($discount, $subtotal);
 
@@ -102,9 +102,17 @@ class CartLineHelper
     }
 
     public function getTax(
-        int $countryId,
+        ?int $countryId,
         ?int $stateId = null
     ) {
+        if (is_null($countryId)) {
+            return [
+                'taxZone' => null,
+                'taxDisplay' => null,
+                'taxPercentage' => null,
+            ];
+        }
+
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
         $taxPercentage = (float) $taxZone->percentage;
         $taxDisplay = $taxZone->price_display;
