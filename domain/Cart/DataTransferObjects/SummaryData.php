@@ -11,9 +11,9 @@ class SummaryData
 {
     public function __construct(
         public readonly float $subTotal,
-        public readonly TaxZone $taxZone,
-        public readonly PriceDisplay $taxDisplay,
-        public readonly float $taxPercentage,
+        public readonly ?TaxZone $taxZone,
+        public readonly ?PriceDisplay $taxDisplay,
+        public readonly ?float $taxPercentage,
         public readonly float $taxTotal,
         public readonly float $grandTotal,
         public readonly float $shippingTotal,
@@ -26,9 +26,9 @@ class SummaryData
     {
         return new self(
             subTotal: $data['subTotal'],
-            taxZone: $data['taxZone'],
-            taxDisplay: $data['taxDisplay'],
-            taxPercentage: $data['taxPercentage'],
+            taxZone: $data['taxZone'] ?? null,
+            taxDisplay: $data['taxDisplay'] ?? null,
+            taxPercentage: $data['taxPercentage'] ?? null,
             taxTotal: $data['taxTotal'],
             grandTotal: $data['grandTotal'],
             shippingTotal: $data['shippingTotal'],

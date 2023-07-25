@@ -25,17 +25,15 @@ class CartController extends Controller
     {
         $model = QueryBuilder::for(
             Cart::with([
-                'cartLines',
                 'cartLines.purchasable' => function (MorphTo $query) {
                     $query->morphWith([
                         Product::class => ['media'],
                         ProductVariant::class => ['product.media'],
                     ]);
                 },
-                'cartLines.media',
             ])
                 ->whereBelongsTo(auth()->user())
-        )->allowedIncludes(['cartLines'])
+        )->allowedIncludes(['cartLines.media'])
             ->first();
 
         if ($model) {
@@ -55,7 +53,7 @@ class CartController extends Controller
         $result = app(DestroyCartAction::class)
             ->execute($cart);
 
-        if ( ! $result) {
+        if (!$result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

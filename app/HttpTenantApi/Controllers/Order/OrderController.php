@@ -33,7 +33,7 @@ class OrderController extends Controller
                 'orderLines.media',
             ])->whereBelongsTo(auth()->user()))
                 ->allowedIncludes(['orderLines'])
-                ->allowedFilters(['status', 'reference', AllowedFilter::scope('for_payment')])
+                ->allowedFilters(['status', 'reference', AllowedFilter::scope('for_payment', 'whereHasForPayment')])
                 ->allowedSorts(['reference', 'total', 'status', 'created_at'])
                 ->jsonPaginate()
         );
@@ -46,7 +46,7 @@ class OrderController extends Controller
         $result = app(PlaceOrderAction::class)
             ->execute(PlaceOrderData::fromArray($validatedData));
 
-        if ( ! $result['order'] instanceof Order) {
+        if (!$result['order'] instanceof Order) {
             return response()->json([
                 'message' => 'Order failed to be created',
             ], 400);
