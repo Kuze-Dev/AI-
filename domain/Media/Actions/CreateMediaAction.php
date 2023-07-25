@@ -12,10 +12,12 @@ use Illuminate\Support\Facades\Http;
 
 class CreateMediaAction
 {
-    public function execute(Model $model, array $medias, string $collection): void
+    public function execute(Model $model, array $medias, string $collection, bool $isCreate = true): void
     {
-        /** Clears unexpected media even before upload */
-        $model->clearMediaCollection($collection);
+        if ($isCreate) {
+            /** Clears unexpected media even before upload */
+            $model->clearMediaCollection($collection);
+        }
 
         foreach ($medias as $image) {
             try {
