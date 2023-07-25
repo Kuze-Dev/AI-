@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Order\Requests;
 
+use Domain\PaymentMethod\Models\PaymentMethod;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -11,10 +12,15 @@ class UpdateOrderRequest extends FormRequest
 {
     public function rules()
     {
+        $paymentMethods = PaymentMethod::whereNotIn('gateway', ['manual', 'bank-transfer'])->get();
+
+        $slugs = $paymentMethods->pluck('slug')->toArray();
+        $slugsStrings = implode(', ', $slugs);
+
         return [
             'type' => [
                 'required',
-                Rule::in(['status', 'bank_proof']),
+                Rule::in(['status', 'bank-transfer', $slugsStrings]),
             ],
             'status' => [
                 'nullable',

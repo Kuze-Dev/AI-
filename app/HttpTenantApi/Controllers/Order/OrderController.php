@@ -10,10 +10,10 @@ use Domain\Order\Actions\PlaceOrderAction;
 use Domain\Order\Actions\UpdateOrderAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\UpdateOrderData;
-use Domain\Order\Enums\OrderResult;
 use Domain\Order\Models\Order;
 use Domain\Order\Requests\PlaceOrderRequest;
 use Domain\Order\Requests\UpdateOrderRequest;
+use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -46,7 +46,7 @@ class OrderController extends Controller
         $result = app(PlaceOrderAction::class)
             ->execute(PlaceOrderData::fromArray($validatedData));
 
-        if ( ! $result['order'] instanceof Order) {
+        if (!$result['order'] instanceof Order) {
             return response()->json([
                 'message' => 'Order failed to be created',
             ], 400);
@@ -86,10 +86,15 @@ class OrderController extends Controller
         $result = app(UpdateOrderAction::class)
             ->execute($order, UpdateOrderData::fromArray($validatedData));
 
-        if (OrderResult::SUCCESS != $result) {
+        if (is_string($result)) {
             return response()->json([
                 'message' => 'Order failed to be updated',
+                'error' => $result
             ], 400);
+        }
+
+        if ($result instanceof PaymentAuthorize) {
+            return response()->json($result);
         }
 
         return response()

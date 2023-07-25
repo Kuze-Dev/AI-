@@ -5,23 +5,30 @@ declare(strict_types=1);
 namespace Domain\Order\Actions;
 
 use Domain\Order\DataTransferObjects\UpdateOrderData;
-use Domain\Order\Enums\OrderResult;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
+use Domain\Payments\Actions\CreatePaymentLink;
 use Domain\Payments\Actions\UploadProofofPaymentAction;
+use Domain\Payments\DataTransferObjects\AmountData;
+use Domain\Payments\DataTransferObjects\CreatepaymentData;
+use Domain\Payments\DataTransferObjects\PaymentDetailsData;
+use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\ProofOfPaymentData;
+use Domain\Payments\DataTransferObjects\TransactionData;
+use Domain\Payments\Models\Payment;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
 use Log;
 
 class UpdateOrderAction
 {
-    public function execute(Order $order, UpdateOrderData $updateOrderData): OrderResult|Exception
+    public function execute(Order $order, UpdateOrderData $updateOrderData): Order|string|PaymentAuthorize
     {
         try {
             if ($updateOrderData->status) {
                 if ($updateOrderData->status == 'Cancelled' && $order->status !== OrderStatuses::PENDING) {
-                    return OrderResult::FAILED;
+                    return "You can't cancelled this order";
                 }
 
                 $orderData = [
@@ -37,24 +44,62 @@ class UpdateOrderAction
                 $order->update($orderData);
             }
 
-            if ($updateOrderData->proof_of_payment !== null) {
-                $orderPayment = Order::with('payments')->find($order->id);
+            if ($updateOrderData->type == "bank-transfer") {
+                if ($updateOrderData->proof_of_payment !== null) {
+                    $orderPayment = Order::with('payments')->find($order->id);
 
-                $test = $this->convertUrlToUploadedFile($updateOrderData->proof_of_payment);
+                    $test = $this->convertUrlToUploadedFile($updateOrderData->proof_of_payment);
 
-                app(UploadProofofPaymentAction::class)->execute(
-                    $orderPayment->payments->first(),
-                    new ProofOfPaymentData(
-                        $test
-                    )
-                );
+                    app(UploadProofofPaymentAction::class)->execute(
+                        $orderPayment->payments->first(),
+                        new ProofOfPaymentData(
+                            $test
+                        )
+                    );
+                }
+            } else {
+                if ($updateOrderData->type != "status") {
+                    $payment = Payment::whereHas('payable', function (Builder $query) use ($order) {
+                        $query->wherePayableId($order->id);
+                    })->whereNot('status', 'paid')->first();
+
+                    if (!$payment) {
+                        return 'Your order already paid';
+                    }
+
+                    $providerData = new CreatepaymentData(
+                        transactionData: TransactionData::fromArray(
+                            [
+                                'reference_id' => $order->reference,
+                                'amount' => AmountData::fromArray([
+                                    'currency' => $order->currency_code,
+                                    'total' => strval($order->total),
+                                    'details' => PaymentDetailsData::fromArray(
+                                        [
+                                            'subtotal' => strval($order->sub_total - $order->discount_total),
+                                            'tax' => strval($order->tax_total),
+                                        ]
+                                    ),
+                                ]),
+                            ]
+                        ),
+                        payment_driver: $updateOrderData->type
+                    );
+
+                    $result = app(CreatePaymentLink::class)->execute(
+                        $payment,
+                        $providerData
+                    );
+
+                    return $result;
+                }
             }
 
-            return OrderResult::SUCCESS;
+            return $order;
         } catch (Exception $e) {
-            Log::info($e);
+            // Log::info($e);
 
-            return $e;
+            return "Something went wrong";
         }
     }
 

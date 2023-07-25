@@ -344,7 +344,7 @@ class OrderResource extends Resource
                             ->action(function () use ($get, $set) {
                                 $order = Order::with('payments')->find($get('id'));
 
-                                $isPaid = ! $order->is_paid;
+                                $isPaid = !$order->is_paid;
 
                                 $result = $order->update([
                                     'is_paid' => $isPaid,
@@ -375,7 +375,7 @@ class OrderResource extends Resource
                     }),
                 Support\ButtonAction::make('proof_of_payment')
                     ->disableLabel()
-                    ->execute(function (Closure $get, Closure $set) {
+                    ->execute(function () {
                         return Forms\Components\Actions\Action::make('proof_of_payment')
                             ->color('secondary')
                             ->label('View Proof of payment')
