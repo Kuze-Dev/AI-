@@ -8,11 +8,18 @@ use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 
-class CreateProductVariantAction
+class CreateOrUpdateProductVariantAction
 {
-    public function execute(Product $product, ProductData $productData): void
+    public function execute(Product $product, ProductData $productData, bool $isCreate = true): void
     {
         if (filled($productData->product_variants)) {
+            if (!$isCreate) {
+                $existingProductVariants = ProductVariant::where('product_id', $product->id)->get();
+                foreach ($existingProductVariants as $productVariant) {
+                    $productVariant->delete();
+                }
+            }
+
             foreach ($productData->product_variants as $productVariant) {
                 ProductVariant::create([
                     'product_id' => $product->id,
@@ -25,6 +32,5 @@ class CreateProductVariantAction
                 ]);
             }
         }
-
     }
 }

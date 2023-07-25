@@ -7,14 +7,9 @@ namespace Domain\Product\Actions;
 use Domain\Media\Actions\CreateMediaAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
-use Domain\Product\Models\ProductOption;
-use Domain\Product\Models\ProductOptionValue;
-use Domain\Product\Models\ProductVariant;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Http;
 
 class CreateProductAction
 {
@@ -22,7 +17,7 @@ class CreateProductAction
         protected CreateMetaDataAction $createMetaTags,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
         protected CreateProductOptionAction $createProductOptionAction,
-        protected CreateProductVariantAction $createProductVariantAction,
+        protected CreateOrUpdateProductVariantAction $createOrUpdateProductVariantAction,
         protected CreateMediaAction $createMediaAction,
     ) {
     }
@@ -35,7 +30,7 @@ class CreateProductAction
 
         $this->createProductOptionAction->execute($product, $productData);
 
-        $this->createProductVariantAction->execute($product, $productData);
+        $this->createOrUpdateProductVariantAction->execute($product, $productData);
 
         if (filled($productData->images)) {
             $this->createMediaAction->execute($product, Arr::wrap($productData->images), 'image');
