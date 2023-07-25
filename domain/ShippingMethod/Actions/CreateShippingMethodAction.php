@@ -22,6 +22,7 @@ class CreateShippingMethodAction
             'title' => $shippingData->title,
             'subtitle' => $shippingData->subtitle,
             'driver' => $shippingData->driver,
+            'active' => $shippingData->active,
             'description' => $shippingData->description,
             'ship_from_address' => $shippingData->ship_from_address,
         ]);

@@ -26,14 +26,15 @@ class GetShippingRateAction
         Address $address
     ): RateResponse {
 
-        /** @var \Domain\Shipment\Drivers\UspsDriver $shippingDriver */
+        // /** @var \Domain\Shipment\Drivers\UspsDriver $shippingDriver */
         $shippingDriver = $this->shippingManager->driver($shippingMethod->driver->value);
 
         if ($this->isDomesticInUnitedStates($address)) {
             return $shippingDriver->getRate(
                 $customer,
                 $parcelData,
-                AddressValidateRequestData::formAddress($address)
+                AddressValidateRequestData::formAddress($address),
+                $shippingMethod,
             );
         }
 
