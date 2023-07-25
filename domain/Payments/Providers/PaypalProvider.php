@@ -9,6 +9,7 @@ use Doctrine\Common\Cache\Psr6\InvalidArgument;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentCapture;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentRefund;
+use Domain\Payments\Enums\PaymentStatus;
 use Domain\Payments\Events\PaymentProcessEvent;
 use Domain\Payments\Models\Payment as ModelsPayment;
 use Throwable;
@@ -133,7 +134,7 @@ class PaypalProvider extends Provider
         $captured = $this->payPalclient->capturePaymentOrder($data['token']);
 
         $paymentModel->update([
-            'status' => 'paid',
+            'status' => PaymentStatus::PAID->value,
             'transaction_id' => $captured['purchase_units']['0']['payments']['captures']['0']['id'],
         ]);
 
@@ -145,7 +146,7 @@ class PaypalProvider extends Provider
     protected function cancelTransaction(ModelsPayment $paymentModel): PaymentCapture
     {
         $paymentModel->update([
-            'status' => 'cancel',
+            'status' => PaymentStatus::CANCEL->value,
         ]);
 
         event(new PaymentProcessEvent($paymentModel));
