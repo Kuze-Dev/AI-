@@ -86,9 +86,9 @@ class AddressController extends Controller
                 fn () => app(DeleteAddressAction::class)
                     ->execute($address)
             );
-        } catch (CantDeleteDefaultAddressException $e) {
+        } catch (CantDeleteDefaultAddressException) {
             abort(400,  trans('Deleting default address not allowed.'));
-        } catch (DeleteRestrictedException $e) {
+        } catch (DeleteRestrictedException) {
             abort(400,  trans('Failed to delete.'));
         }
 

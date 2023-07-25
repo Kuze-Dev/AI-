@@ -193,4 +193,9 @@ class Order extends Model implements HasMedia, PayableInterface
             })->where('status', 'pending');
         })->where('is_paid', false);
     }
+
+    public function getReferenceNumber(): string
+    {
+        return $this->reference;
+    }
 }

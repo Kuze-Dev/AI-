@@ -10,6 +10,7 @@ use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\Interfaces\PayableInterface;
 use Throwable;
 use DB;
+use Domain\Payments\Enums\PaymentStatus;
 
 class CreatePaymentAction
 {
@@ -33,7 +34,7 @@ class CreatePaymentAction
                 'currency' => $paymentData->transactionData->getCurrency(),
                 'amount' => $paymentData->transactionData->getTotal(),
                 'payment_details' => $paymentData->transactionData->getPaymentDetails(),
-                'status' => 'pending',
+                'status' => PaymentStatus::PENDING->value,
             ]);
 
             DB::commit();
