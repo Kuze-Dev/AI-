@@ -7,14 +7,9 @@ namespace Domain\Product\Actions;
 use Domain\Media\Actions\CreateMediaAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
-use Domain\Product\Models\ProductOption;
-use Domain\Product\Models\ProductOptionValue;
-use Domain\Product\Models\ProductVariant;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Http;
 
 class CreateProductAction
 {

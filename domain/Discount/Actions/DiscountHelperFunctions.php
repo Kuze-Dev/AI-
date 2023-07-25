@@ -6,7 +6,9 @@ namespace Domain\Discount\Actions;
 
 use Domain\Discount\Enums\DiscountAmountType;
 use Domain\Discount\Enums\DiscountConditionType;
+use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
+use Domain\Discount\Models\DiscountLimit;
 use Exception;
 
 final class DiscountHelperFunctions
@@ -35,4 +37,24 @@ final class DiscountHelperFunctions
             return 0;
         }
     }
+
+    public function validateDiscountCode(?Discount $discount): string
+    {
+        $uses = DiscountLimit::whereCode($discount->code)->count();
+
+        if ($discount->status === DiscountStatus::INACTIVE) {
+            return 'This discount code is inactive.';
+        }
+
+        if ($discount->valid_end_at && $discount->valid_end_at < now()) {
+            return 'This discount code has expired.';
+        }
+
+        if ($uses >= $discount->max_uses) {
+            return 'This discount code max usage limit has been reached.';
+        }
+
+        return '';
+    }
+
 }

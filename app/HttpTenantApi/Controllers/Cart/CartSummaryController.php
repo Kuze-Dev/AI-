@@ -5,15 +5,11 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\Http\Controllers\Controller;
-use Domain\Address\Models\Address;
-use Domain\Address\Models\Country;
-use Domain\Address\Models\State;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\Helpers\CartLineHelper;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
-use Domain\Customer\Models\Customer;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -82,7 +78,7 @@ class CartSummaryController extends Controller
             'discount' => [
                 'status' => round($summary->discountTotal, 2) ? 'valid' : 'invalid',
                 'amount' => $discount ? round($summary->discountTotal, 2) : 0,
-                // "message"
+                'message' => $summary->discountMessage,
             ],
             'sub_total' => round($summary->subTotal, 2),
             'shipping_fee' => round($summary->shippingTotal, 2),
