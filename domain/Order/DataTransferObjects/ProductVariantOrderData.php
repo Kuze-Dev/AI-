@@ -39,7 +39,6 @@ class ProductVariantOrderData
     }
 }
 
-
 class ProductVariantCombinationData
 {
     public function __construct(

@@ -37,6 +37,8 @@ class CartLineHelper
 
         $discountTotal = $this->getDiscount($discount, $subtotal);
 
+        $discountMessage = (new DiscountHelperFunctions())->validateDiscountCode($discount);
+
         $shippingTotal = $this->getShippingFee(
             $cartSummaryShippingData->customer,
             $cartSummaryShippingData->shippingAddress,
@@ -53,7 +55,9 @@ class CartLineHelper
             'taxTotal' => $taxTotal,
             'grandTotal' => $grandTotal,
             'discountTotal' => $discountTotal,
+            'discountMessage' => $discountMessage,
             'shippingTotal' => $shippingTotal,
+
         ];
 
         return SummaryData::fromArray($summaryData);
@@ -117,7 +121,7 @@ class CartLineHelper
         $taxPercentage = (float) $taxZone->percentage;
         $taxDisplay = $taxZone->price_display;
 
-        if (!$taxZone instanceof TaxZone) {
+        if ( ! $taxZone instanceof TaxZone) {
             throw new BadRequestHttpException('No tax zone found');
         }
 
@@ -132,7 +136,7 @@ class CartLineHelper
     {
         $discountTotal = 0;
 
-        if (!is_null($discount)) {
+        if ( ! is_null($discount)) {
             $discountTotal = (new DiscountHelperFunctions())->deductOrderSubtotal($discount, $subTotal);
         }
 

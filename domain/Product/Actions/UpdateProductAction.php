@@ -31,7 +31,7 @@ class UpdateProductAction
             : $this->createMetaData->execute($product, $productData->meta_data);
 
         $this->updateProductOptionAction->execute($product, $productData);
-        
+
         $this->updateProductVariantAction->execute($product, $productData);
 
         if (filled($productData->images)) {
