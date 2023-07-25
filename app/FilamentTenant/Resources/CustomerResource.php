@@ -262,12 +262,12 @@ class CustomerResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('full_name')
                     ->translateLabel()
-                    ->searchable(['first_name', 'last_name'])
+                    ->searchable(['first_name', 'last_name'], isIndividual: true)
                     ->sortable(['first_name', 'last_name'])
                     ->wrap(),
                 Tables\Columns\TextColumn::make('email')
                     ->translateLabel()
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\IconColumn::make('email_verified_at')
                     ->label(trans('Verified'))
