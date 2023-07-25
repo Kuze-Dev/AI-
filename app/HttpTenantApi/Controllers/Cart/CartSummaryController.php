@@ -10,6 +10,8 @@ use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\Helpers\CartLineHelper;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
+use Domain\Discount\Enums\DiscountAmountType;
+use Domain\Discount\Enums\DiscountConditionType;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -77,6 +79,23 @@ class CartSummaryController extends Controller
             ],
             'discount' => [
                 'status' => round($summary->discountTotal, 2) ? 'valid' : 'invalid',
+                'amount_type' => (
+                    ($discount->discountCondition->amount_type === DiscountAmountType::FIXED_VALUE)
+                    ? 'fixed price'
+                    : (
+                        ($discount->discountCondition->amount_type === DiscountAmountType::PERCENTAGE)
+                        ? 'percentage'
+                        : ''
+                    )
+                ),
+                'price' => $discount->discountCondition->amount,
+                'type' => ($discount->discountCondition->discount_type === DiscountConditionType::ORDER_SUB_TOTAL)
+                        ? 'order subtotal discount'
+                        : (
+                            ($discount->discountCondition->discount_type === DiscountConditionType::DELIVERY_FEE)
+                            ? 'shipping fee discount'
+                            : ''
+                        ),
                 'amount' => $discount ? round($summary->discountTotal, 2) : 0,
                 'message' => $summary->discountMessage,
             ],
