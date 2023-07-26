@@ -126,6 +126,7 @@ class ShippingMethod extends Model implements HasMedia
         $this->addMediaCollection('logo')
             ->singleFile();
     }
+
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\Country, \Domain\ShippingMethod\Models\ShippingMethod> */
     public function country(): BelongsTo
     {

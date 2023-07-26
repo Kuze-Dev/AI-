@@ -52,7 +52,7 @@ class GetUPSRateDataAction
         }
         /** @var \Domain\Shipment\Models\VerifiedAddress */
         $verifiedCustomerAddress = $customer->verifiedAddress;
-        
+
         return $this->rateClient->getRate(
             customer: $customer,
             parcelData: $parcelData,

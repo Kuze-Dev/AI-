@@ -221,7 +221,7 @@ class UPSRateClient
                 ],
             ],
         ];
-        
+
         /** @var string */
         $jsonString = json_encode($data);
 
