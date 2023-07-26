@@ -18,8 +18,9 @@ class ReviewResource extends JsonApiResource
             'rating' => $this->rating,
             'comment' => $this->comment,
             'data' => $this->data,
-            'customer_name' => $this->customer_name,
-            'customer_email' => $this->customer_email,
+            'customer_name' => $this->is_anonymous ? '*' : $this->customer_name,
+            'customer_email' => $this->is_anonymous ? '*' : $this->customer_email,
+            'is_anonymous' => $this->is_anonymous,
         ];
     }
 
