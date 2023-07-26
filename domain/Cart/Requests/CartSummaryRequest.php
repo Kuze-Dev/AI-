@@ -64,6 +64,9 @@ class CartSummaryRequest extends FormRequest
                 //     $query->where('id', auth()->user()?->id);
                 // }),
             ],
+            'service_id' => [
+                'nullable',
+            ],
             'state_id' => [
                 'nullable',
                 Rule::exists(State::class, (new State())->getRouteKeyName()),
