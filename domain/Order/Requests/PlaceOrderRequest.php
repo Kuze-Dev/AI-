@@ -126,6 +126,10 @@ class PlaceOrderRequest extends FormRequest
                 'required',
                 Rule::exists(ShippingMethod::class, (new ShippingMethod())->getRouteKeyName()),
             ],
+            'service_id' => [
+                'nullable',
+                'int',
+            ],
         ];
     }
 }

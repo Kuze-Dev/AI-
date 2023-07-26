@@ -14,6 +14,7 @@ use Domain\Order\Models\Order;
 use Domain\Order\Requests\PlaceOrderRequest;
 use Domain\Order\Requests\UpdateOrderRequest;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
+use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -45,6 +46,12 @@ class OrderController extends Controller
 
         $result = app(PlaceOrderAction::class)
             ->execute(PlaceOrderData::fromArray($validatedData));
+
+        if ($result instanceof USPSServiceNotFoundException) {
+            return response()->json([
+                'service_id' => 'Shipping method service id is required',
+            ], 404);
+        }
 
         if ( ! $result['order'] instanceof Order) {
             return response()->json([

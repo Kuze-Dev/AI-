@@ -11,6 +11,7 @@ use Domain\Discount\Actions\CreateDiscountLimitAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Models\Order;
+use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Illuminate\Support\Str;
 
 class CreateOrderAction
@@ -19,20 +20,24 @@ class CreateOrderAction
     {
         $referenceNumber = Str::upper(Str::random(12));
 
-        $summary = app(CartSummaryAction::class)->getSummary(
-            $preparedOrderData->cartLine,
-            new CartSummaryTaxData(
-                $placeOrderData->taxation_data->country_id,
-                $placeOrderData->taxation_data->state_id
-            ),
-            new CartSummaryShippingData(
-                $preparedOrderData->customer,
-                $preparedOrderData->shippingAddress,
-                $preparedOrderData->shippingMethod
-            ),
-            $preparedOrderData->discount,
-            null
-        );
+        try {
+            $summary = app(CartSummaryAction::class)->getSummary(
+                $preparedOrderData->cartLine,
+                new CartSummaryTaxData(
+                    $placeOrderData->taxation_data->country_id,
+                    $placeOrderData->taxation_data->state_id
+                ),
+                new CartSummaryShippingData(
+                    $preparedOrderData->customer,
+                    $preparedOrderData->shippingAddress,
+                    $preparedOrderData->shippingMethod
+                ),
+                $preparedOrderData->discount,
+                $placeOrderData->serviceId
+            );
+        } catch (USPSServiceNotFoundException) {
+            throw new USPSServiceNotFoundException();
+        }
 
         $order = Order::create([
             'customer_id' => $preparedOrderData->customer->id,

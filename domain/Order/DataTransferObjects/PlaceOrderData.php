@@ -14,6 +14,7 @@ class PlaceOrderData
         public readonly string $payment_method,
         public readonly ?string $notes,
         public readonly ?string $discountCode,
+        public readonly ?int $serviceId,
     ) {
     }
 
@@ -33,6 +34,7 @@ class PlaceOrderData
             payment_method: $data['payment_method'],
             notes: $data['notes'] ?? null,
             discountCode: $data['discount_code'] ?? null,
+            serviceId: $data['service_id'] ?? null,
         );
     }
 }

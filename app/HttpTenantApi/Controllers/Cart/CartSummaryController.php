@@ -62,7 +62,7 @@ class CartSummaryController extends Controller
                 new CartSummaryTaxData($country?->id, $state?->id),
                 new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),
                 $discount,
-                $serviceId
+                $serviceId ? (int) $serviceId : null
             );
         } catch (USPSServiceNotFoundException) {
             return response()->json([
