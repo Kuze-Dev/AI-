@@ -7,6 +7,7 @@ namespace Domain\Shipment\DataTransferObjects;
 class ParcelData
 {
     public function __construct(
+        public readonly ShipFromAddressData $ship_from_address,
         public readonly string $pounds,
         public readonly string $ounces,
         public readonly string $zip_origin,
@@ -14,7 +15,6 @@ class ParcelData
         public readonly ?string $height = null,
         public readonly ?string $width = null,
         public readonly ?string $length = null,
-        public readonly ?ShipFromAddressData $ship_from_address = null,
     ) {
     }
 

@@ -7,6 +7,7 @@ namespace Domain\Shipment\Actions\UPS;
 use Domain\Customer\Models\Customer;
 use Domain\Shipment\API\USPS\Clients\AddressClient;
 use Domain\Shipment\API\UPS\Clients\UPSRateClient;
+use Domain\Shipment\API\UPS\DataTransferObjects\UpsResponse;
 use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 
@@ -22,7 +23,7 @@ class GetUPSRateDataAction
         Customer $customer,
         ParcelData $parcelData,
         AddressValidateRequestData $addressValidateRequestData,
-    ) {
+    ): UpsResponse {
 
         $verifiedAddress = $customer->verifiedAddress;
 
@@ -49,11 +50,13 @@ class GetUPSRateDataAction
             ]);
 
         }
-
+        /** @var \Domain\Shipment\Models\VerifiedAddress */
+        $verifiedCustomerAddress = $customer->verifiedAddress;
+        
         return $this->rateClient->getRate(
             customer: $customer,
             parcelData: $parcelData,
-            verifiedAddress: $customer->verifiedAddress,
+            verifiedAddress: $verifiedCustomerAddress,
         );
     }
 }

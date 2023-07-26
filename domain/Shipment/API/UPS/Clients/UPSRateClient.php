@@ -43,6 +43,8 @@ class UPSRateClient
         VerifiedAddress $verifiedAddress
     ): UpsResponse {
 
+        $shipper = $parcelData->ship_from_address;
+        /** @var array */
         $address = $verifiedAddress->verified_address;
         // Create the associative array representing the JSON structure
         $data = [
@@ -61,11 +63,11 @@ class UPSRateClient
                         'Name' => config('app.name'),
                         'ShipperNumber' => '',
                         'Address' => [
-                            'AddressLine' => $parcelData->ship_from_address['Address'],
-                            'City' => $parcelData->ship_from_address['City'],
-                            'StateProvinceCode' => $parcelData->ship_from_address['State'],
-                            'PostalCode' => $parcelData->ship_from_address['zip5'],
-                            'CountryCode' => 'US',
+                            'AddressLine' => $shipper->address,
+                            'City' => $shipper->city,
+                            // 'StateProvinceCode' => $shipper->state,
+                            'PostalCode' => $shipper->zipcode,
+                            'CountryCode' => $shipper->code,
                         ],
                     ],
                     'ShipTo' => [
@@ -81,11 +83,11 @@ class UPSRateClient
                     'ShipFrom' => [
                         'Name' => config('app.name'),
                         'Address' => [
-                            'AddressLine' => $parcelData->ship_from_address['Address'],
-                            'City' => $parcelData->ship_from_address['City'],
-                            'StateProvinceCode' => $parcelData->ship_from_address['State'],
-                            'PostalCode' => $parcelData->ship_from_address['zip5'],
-                            'CountryCode' => 'US',
+                            'AddressLine' => $shipper->address,
+                            'City' => $shipper->city,
+                            // 'StateProvinceCode' => $shipper->state,
+                            'PostalCode' => $shipper->zipcode,
+                            'CountryCode' => $shipper->code,
                         ],
                     ],
                     'Service' => [
@@ -123,6 +125,7 @@ class UPSRateClient
             ],
         ];
 
+        /** @var string */
         $jsonString = json_encode($data);
 
         $response = $this->client->getClient()
@@ -139,7 +142,8 @@ class UPSRateClient
         Address $address,
     ): UpsResponse {
 
-        dd($parcelData->ship_from_address);
+        $shipper = $parcelData->ship_from_address;
+
         $data = [
             'RateRequest' => [
                 'Request' => [
@@ -156,11 +160,11 @@ class UPSRateClient
                         'Name' => config('app.name'),
                         'ShipperNumber' => '',
                         'Address' => [
-                            'AddressLine' => $parcelData->ship_from_address['Address'],
-                            'City' => $parcelData->ship_from_address['City'],
-                            'StateProvinceCode' => $parcelData->ship_from_address['State'],
-                            'PostalCode' => $parcelData->ship_from_address['zip5'],
-                            'CountryCode' => 'US',
+                            'AddressLine' => $shipper->address,
+                            'City' => $shipper->city,
+                            // 'StateProvinceCode' => 'CA',
+                            'PostalCode' => $shipper->zipcode,
+                            'CountryCode' => $shipper->code,
                         ],
                     ],
                     'ShipTo' => [
@@ -176,11 +180,11 @@ class UPSRateClient
                     'ShipFrom' => [
                         'Name' => config('app.name'),
                         'Address' => [
-                            'AddressLine' => $parcelData->ship_from_address['Address'],
-                            'City' => $parcelData->ship_from_address['City'],
-                            'StateProvinceCode' => $parcelData->ship_from_address['State'],
-                            'PostalCode' => $parcelData->ship_from_address['zip5'],
-                            'CountryCode' => 'US',
+                            'AddressLine' => $shipper->address,
+                            'City' => $shipper->city,
+                            // 'StateProvinceCode' => 'CA',
+                            'PostalCode' => $shipper->zipcode,
+                            'CountryCode' => $shipper->code,
                         ],
                     ],
                     'Service' => [
@@ -217,7 +221,8 @@ class UPSRateClient
                 ],
             ],
         ];
-
+        
+        /** @var string */
         $jsonString = json_encode($data);
 
         $response = $this->client->getClient()

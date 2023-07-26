@@ -37,12 +37,19 @@ class RateController extends Controller
                     parcelData: new ParcelData(
                         pounds: '10',
                         ounces: '0',
-                        zip_origin: $shippingMethod->ship_from_address['zip5'],
+                        zip_origin: $shippingMethod->shipper_zipcode,
                         parcel_value: '200',
                         height: '10',
                         width: '10',
                         length: '10',
-                        ship_from_address: ShipFromAddressData::fromArray($shippingMethod->ship_from_address),
+                        ship_from_address: new ShipFromAddressData(
+                            address: $shippingMethod->shipper_address,
+                            city: $shippingMethod->shipper_city,
+                            state: $shippingMethod->state,
+                            zipcode: $shippingMethod->shipper_zipcode,
+                            country: $shippingMethod->country,
+                            code: $shippingMethod->country->code,
+                        ),
                     ),
                     shippingMethod: $shippingMethod,
                     address: $address

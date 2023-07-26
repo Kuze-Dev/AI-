@@ -20,7 +20,6 @@ class ShippingMethodData
         public readonly bool $active,
         public readonly ?string $description = null,
         public readonly UploadedFile|string|null $logo = null,
-        // public readonly array $ship_from_address = [],
     ) {
     }
 
@@ -39,7 +38,6 @@ class ShippingMethodData
             active: $data['status'] ?? null,
             description: $data['description'] ?? null,
             logo: $data['logo'] ?? null,
-            // ship_from_address: $data['ship_from_address'] ?? [],
         );
     }
 }

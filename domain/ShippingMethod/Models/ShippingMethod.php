@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Domain\ShippingMethod\Models;
 
+use Domain\Address\Models\Country;
+use Domain\Address\Models\State;
 use Domain\Shipment\Models\Shipment;
 use Domain\ShippingMethod\Enums\Driver;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
@@ -109,5 +112,16 @@ class ShippingMethod extends Model implements HasMedia
     {
         $this->addMediaCollection('logo')
             ->singleFile();
+    }
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\Country, \Domain\ShippingMethod\Models\ShippingMethod> */
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class, 'shipper_country_id');
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\State, \Domain\ShippingMethod\Models\ShippingMethod> */
+    public function state(): BelongsTo
+    {
+        return $this->belongsTo(State::class, 'shipper_state_id');
     }
 }
