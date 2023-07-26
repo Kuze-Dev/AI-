@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\FilamentTenant\Resources\ProductResource\Pages\ListProducts;
 use Filament\Facades\Filament;
+
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
