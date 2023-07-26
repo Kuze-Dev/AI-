@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Cart\DataTransferObjects;
+namespace Domain\Discount\DataTransferObjects;
 
 use Domain\Discount\Enums\DiscountAmountType;
 use Domain\Discount\Enums\DiscountConditionType;
