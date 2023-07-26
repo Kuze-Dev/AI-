@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Review;
 
 use App\HttpTenantApi\Resources\ReviewResource;
+use Domain\Order\Models\OrderLine;
+use Domain\Product\Models\Product;
 use Domain\Review\Models\Review;
 use Domain\Review\Requests\ReviewStoreRequest;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -26,18 +28,27 @@ class ReviewController
         $validatedData = $request->validated();
         $review->rating = $validatedData['rating'];
         $review->comment = $validatedData['comment'];
-        $review->product_id = $validatedData['product_id'];
-        $review->order_id = $validatedData['order_id'];
         $review->order_line_id = $validatedData['order_line_id'];
 
+        $orderLine = OrderLine::find($validatedData['order_line_id']);
+
+        $review->order_id = $orderLine->order_id;
+
+        if(isset($orderLine->purchasable_data['product']))
+        {
+            $review->product_id = $orderLine->purchasable_data['product']['id'];
+        }else{
+            $review->product_id = $orderLine->purchasable_data['id'];
+        }
+        
         $customer = auth()->user();
-        if ( ! $validatedData['anonymous']) {
+        if (!$validatedData['anonymous']) {
             $review->customer_id = $customer->id;
-            $review->customer_name = $customer->first_name. ' ' .$customer->last_name;
+            $review->customer_name = $customer->first_name . ' ' . $customer->last_name;
             $review->customer_email = $customer->email;
         }
 
-        if ($validatedData['media'] !== null) {
+        if (isset($validatedData['media'])) {
             foreach ($validatedData['media'] as $imageUrl) {
                 try {
                     $review->addMediaFromUrl($imageUrl)

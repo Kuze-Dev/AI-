@@ -20,7 +20,6 @@ class ReviewResource extends JsonApiResource
             'data' => $this->data,
             'customer_name' => $this->customer_name,
             'customer_email' => $this->customer_email,
-            'media' => $this->media,
         ];
     }
 
@@ -28,6 +27,7 @@ class ReviewResource extends JsonApiResource
     public function toRelationships(Request $request): array
     {
         return [
+            'customer' => fn () => new CustomerResource($this->customer),
             'product' => fn () => new ProductResource($this->product),
             'order' => fn () => new OrderResource($this->product),
             'order_line' => fn () => new OrderLineResource($this->order_line),

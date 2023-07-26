@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Review;
 
 use Domain\Review\Models\Review;
+use Illuminate\Support\Facades\DB;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,23 +20,34 @@ class ReviewShowController
 {
     public function show(string $review): JsonApiResourceCollection
     {
+
         return ReviewResource::collection(
             QueryBuilder::for(Review::whereProductId($review))
                 ->allowedIncludes([
                     'product',
                     'order_line',
-                    'media'
+                    'customer.media',
                 ])
                 ->get()
         );
     }
 
     #[Get('reviews/ratings/{rating}')]
-    public function showRating(string $rating): JsonResponse
+    public function showSummary(string $product_id): JsonResponse
     {
-        $averageRating = Review::where('product_id', $rating)->avg('rating');
+        $review = Review::where('product_id', $product_id);
+    
+        $averageRating = $review->avg('rating');
 
-        return response()->json(['product_id' => $rating, 'average_ratings' => $averageRating]);
-
+        $ratingCounts = $review
+        ->select('rating', DB::raw('COUNT(rating) as rating_count'))
+        ->groupBy('rating')->get()->toArray();
+        
+        return response()->json([
+            'product_id' => $product_id,
+            'average_rating' => $averageRating,
+            'rating_counts' => $ratingCounts,
+        ]);
     }
+    
 }
