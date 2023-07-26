@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Cart\DataTransferObjects;
 
+use Domain\Discount\DataTransferObjects\DiscountMessagesData;
 use Domain\Taxation\Enums\PriceDisplay;
 use Domain\Taxation\Models\TaxZone;
 

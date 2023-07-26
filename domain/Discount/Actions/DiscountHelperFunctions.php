@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Discount\Actions;
 
-use Domain\Cart\DataTransferObjects\DiscountMessagesData;
+use Domain\Discount\DataTransferObjects\DiscountMessagesData;
 use Domain\Discount\Enums\DiscountAmountType;
 use Domain\Discount\Enums\DiscountConditionType;
 use Domain\Discount\Enums\DiscountStatus;

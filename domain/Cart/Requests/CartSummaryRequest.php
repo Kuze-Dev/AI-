@@ -130,8 +130,19 @@ class CartSummaryRequest extends FormRequest
 
     public function getDiscount(): ?Discount
     {
-        if ($id = $this->validated('discount_code')) {
-            return app(Discount::class)->resolveRouteBinding($id);
+        $id = $this->validated('discount_code');
+
+        if ($id) {
+            $discount = app(Discount::class)
+                ->with([
+                    'discountCondition',
+                    'discountRequirement',
+                    'discountLimits',
+                ])
+                ->where('code', $id)
+                ->first();
+
+            return $discount;
         }
 
         return null;
