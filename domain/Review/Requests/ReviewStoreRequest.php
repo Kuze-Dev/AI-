@@ -47,7 +47,7 @@ class ReviewStoreRequest extends FormRequest
                 'min:1',
                 'max:5',
             ],
-            'anonymous' => [
+            'is_anonymous' => [
                 'required',
                 'bool',
             ],

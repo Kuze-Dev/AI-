@@ -6,7 +6,6 @@ namespace App\HttpTenantApi\Controllers\Review;
 
 use App\HttpTenantApi\Resources\ReviewResource;
 use Domain\Order\Models\OrderLine;
-use Domain\Product\Models\Product;
 use Domain\Review\Models\Review;
 use Domain\Review\Requests\ReviewStoreRequest;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -26,26 +25,25 @@ class ReviewController
     {
 
         $validatedData = $request->validated();
+        $customer = auth()->user();
+
+        $review->customer_id = $customer->id;
+        $review->customer_name = $customer->first_name . ' ' . $customer->last_name;
+        $review->customer_email = $customer->email;
+
         $review->rating = $validatedData['rating'];
         $review->comment = $validatedData['comment'];
         $review->order_line_id = $validatedData['order_line_id'];
+        $review->is_anonymous = $validatedData['is_anonymous'];
 
         $orderLine = OrderLine::find($validatedData['order_line_id']);
 
         $review->order_id = $orderLine->order_id;
 
-        if(isset($orderLine->purchasable_data['product']))
-        {
+        if(isset($orderLine->purchasable_data['product'])) {
             $review->product_id = $orderLine->purchasable_data['product']['id'];
-        }else{
+        } else {
             $review->product_id = $orderLine->purchasable_data['id'];
-        }
-        
-        $customer = auth()->user();
-        if (!$validatedData['anonymous']) {
-            $review->customer_id = $customer->id;
-            $review->customer_name = $customer->first_name . ' ' . $customer->last_name;
-            $review->customer_email = $customer->email;
         }
 
         if (isset($validatedData['media'])) {
@@ -77,8 +75,6 @@ class ReviewController
     #[Get('orderline-review/{orderLineId}')]
     public function showCustomerReview(string $orderLineId)
     {
-        $customer = auth()->user();
-
         $review = QueryBuilder::for(Review::whereOrderLineId($orderLineId))
             ->allowedIncludes([
                 'media',
