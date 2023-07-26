@@ -37,7 +37,7 @@ class ReviewController
         $review->is_anonymous = $validatedData['is_anonymous'];
 
         $orderLine = OrderLine::find($validatedData['order_line_id']);
-
+        $orderLine->reviewed_at = now();
         $review->order_id = $orderLine->order_id;
 
         if(isset($orderLine->purchasable_data['product'])) {
@@ -57,6 +57,7 @@ class ReviewController
             }
         }
 
+        $orderLine->save();
         $review->save();
 
         return response()->json(['message' => 'Review item created successfully'], 201);

@@ -36,6 +36,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property array|null $purchasable_data
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $reviewed_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
@@ -91,6 +92,7 @@ class OrderLine extends Model implements HasMedia
         'total',
         'remarks_data',
         'purchasable_data',
+        'reviewed_at'
     ];
 
     protected $casts = [
@@ -104,6 +106,7 @@ class OrderLine extends Model implements HasMedia
         'total' => 'float',
         'remarks_data' => 'array',
         'purchasable_data' => 'array',
+        'reviewed_at' => 'datetime'
     ];
 
     public function order()

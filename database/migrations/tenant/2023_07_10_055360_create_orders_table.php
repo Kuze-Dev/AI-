@@ -83,6 +83,7 @@ return new class () extends Migration {
             $table->json('remarks_data')->nullable();
             $table->json('purchasable_data')->nullable();
 
+            $table->dateTime('reviewed_at')->nullable();
             $table->timestamps();
         });
     }
