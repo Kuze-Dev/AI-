@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Order\Notifications;
 
+use Domain\Order\Enums\OrderNotifications;
+use Domain\Order\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -14,12 +16,16 @@ class OrderUpdatedInvoice extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    private Order $order;
+    private OrderNotifications $type;
+
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct(Order $order, OrderNotifications $type)
     {
-        //
+        $this->order = $order;
+        $this->type = $type;
     }
 
     /**
@@ -37,16 +43,20 @@ class OrderUpdatedInvoice extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->from('tenantone@example.com')
-            ->view("filament.emails.order.updated");
-        //     ->subject('Order Being Processed')
-        //     ->greeting("Order Being Processed #XWEF24VA")
-        //     ->line('Hi <User>, your item(s) in order <OrderNumber> has been forwarded 
-        // to our delivery partner and on its way to <ShippingAddress>. Track your order below or key 
-        // in the tracking number below on your designated courier website ')
-        //     ->line('Please note that it may take up to 24 - 48 hours for tracking 
-        // information to be available/updated');
+
+        if ($this->type === OrderNotifications::CREATED) {
+            return (new MailMessage)
+                ->subject("Order Being Placed")
+                ->from('tenantone@example.com')
+                ->view("filament.emails.order.created", [
+                    'order' => $this->order,
+                    'customer' => $notifiable
+                ]);
+        } else {
+            return (new MailMessage)
+                ->from('tenantone@example.com')
+                ->view("filament.emails.order.updated", ['order' => $this->order]);
+        }
     }
 
     /**

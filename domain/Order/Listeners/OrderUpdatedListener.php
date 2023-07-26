@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Order\Listeners;
 
-use Domain\Order\Actions\DestroyOrderAction;
 use Domain\Order\Models\Order;
 use Domain\Payments\Events\PaymentProcessEvent;
 
@@ -24,7 +23,7 @@ class OrderUpdatedListener
 
             match ($status) {
                 'paid' => $this->onOrderPaid($order),
-                // "cancel" => $this->onOrderCancelled($order),
+                    // "cancel" => $this->onOrderCancelled($order),
                 default => null
             };
         }

@@ -56,7 +56,7 @@
         </p>
 
         <p style="line-height: 1.5em">
-            Hi User, your item(s) in order OrderNumber has been forwarded to our
+            Hi {{ $customer->first_name }}, your item(s) in order OrderNumber has been forwarded to our
             delivery partner and on its way to ShippingAddress. Track your order
             below or key in the tracking number below on your designated courier
             website.

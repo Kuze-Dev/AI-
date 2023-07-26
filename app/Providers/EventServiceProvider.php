@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use Domain\Order\Events\OrderPlacedEvent;
+use Domain\Order\Listeners\OrderPlacedListener;
 use Domain\Order\Listeners\OrderUpdatedListener;
 use Domain\Payments\Events\PaymentProcessEvent;
 use Illuminate\Auth\Events\Registered;
@@ -24,6 +26,9 @@ class EventServiceProvider extends ServiceProvider
         PaymentProcessEvent::class => [
             OrderUpdatedListener::class,
         ],
+        OrderPlacedEvent::class => [
+            OrderPlacedListener::class
+        ]
     ];
 
     /** Register any events for your application. */

@@ -10,6 +10,7 @@ use Domain\Order\Actions\PlaceOrderAction;
 use Domain\Order\Actions\UpdateOrderAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\UpdateOrderData;
+use Domain\Order\Events\OrderPlacedEvent;
 use Domain\Order\Models\Order;
 use Domain\Order\Notifications\OrderUpdatedInvoice;
 use Domain\Order\Requests\PlaceOrderRequest;
@@ -46,31 +47,35 @@ class OrderController extends Controller
         // PlaceOrderRequest $request
         // $validatedData = $request->validated();
 
+        $order = Order::find(1);
+
         /** @var \Domain\Customer\Models\Customer $customer */
         $customer = auth()->user();
 
-        $customer->notify(new OrderUpdatedInvoice());
+        event(new OrderPlacedEvent($customer, $order));
 
-        // $result = app(PlaceOrderAction::class)
-        //     ->execute(PlaceOrderData::fromArray($validatedData));
+        dd($order);
 
-        // if ($result instanceof USPSServiceNotFoundException) {
-        //     return response()->json([
-        //         'service_id' => 'Shipping method service id is required',
-        //     ], 404);
-        // }
+        $result = app(PlaceOrderAction::class)
+            ->execute(PlaceOrderData::fromArray($validatedData));
 
-        // if (!$result['order'] instanceof Order) {
-        //     return response()->json([
-        //         'message' => 'Order failed to be created',
-        //     ], 400);
-        // }
+        if ($result instanceof USPSServiceNotFoundException) {
+            return response()->json([
+                'service_id' => 'Shipping method service id is required',
+            ], 404);
+        }
 
-        // return response()
-        //     ->json([
-        //         'message' => 'Order placed successfully',
-        //         'data' => $result,
-        //     ]);
+        if (!$result['order'] instanceof Order) {
+            return response()->json([
+                'message' => 'Order failed to be created',
+            ], 400);
+        }
+
+        return response()
+            ->json([
+                'message' => 'Order placed successfully',
+                'data' => $result,
+            ]);
     }
 
     public function show(Order $order)
