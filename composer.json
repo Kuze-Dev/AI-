@@ -15,6 +15,7 @@
         "filament/spatie-laravel-media-library-plugin": "^2.17",
         "filament/spatie-laravel-settings-plugin": "^2.0",
         "guzzlehttp/guzzle": "^7.2",
+        "ibrahimbougaoua/filament-menu-scroll-fix": "^1.0",
         "laravel/framework": "^10.15",
         "laravel/pennant": "^1.3",
         "laravel/sanctum": "^3.2",
