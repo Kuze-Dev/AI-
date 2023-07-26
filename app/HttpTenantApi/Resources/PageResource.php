@@ -21,6 +21,7 @@ class PageResource extends JsonApiResource
             'route_url' => $this->activeRouteUrl?->url,
             'visibility' => $this->visibility,
             'published_at' => $this->published_at,
+            'locale' => $this->locale,
         ];
     }
 

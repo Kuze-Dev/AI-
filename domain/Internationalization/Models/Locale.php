@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Internationalization\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -52,6 +53,8 @@ class Locale extends Model
             if ($locale->is_default) {
                 static::where('is_default', true)->where('id', '!=', $locale->id)->update(['is_default' => false]);
             }
+
+            Cache::forget('locale');
         });
     }
 
