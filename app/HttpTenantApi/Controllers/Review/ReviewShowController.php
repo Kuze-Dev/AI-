@@ -41,9 +41,9 @@ class ReviewShowController
         $averageRating = $review->avg('rating');
 
         $ratingCounts = $review
-        ->select('rating', DB::raw('COUNT(rating) as rating_count'))
-        ->groupBy('rating')->get()->toArray();
-        
+            ->select('rating', DB::raw('COUNT(rating) as rating_count'))
+            ->groupBy('rating')->get()->toArray();
+
         return response()->json([
             'product_id' => $product_id,
             'raviewcount' => $reviewCount,
@@ -51,5 +51,4 @@ class ReviewShowController
             'rating_counts' => $ratingCounts,
         ]);
     }
-    
 }

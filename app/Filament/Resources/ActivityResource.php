@@ -92,7 +92,8 @@ class ActivityResource extends Resource
                 Tables\Columns\TextColumn::make('description')
                     ->wrap()
                     ->translateLabel()
-                    ->searchable(),
+                    ->searchable()
+                    ->truncate('max-w-xs 2xl:max-w-2xl', true),
                 Tables\Columns\TextColumn::make('subject.name')
                     ->hidden(fn ($livewire) => $livewire instanceof ActivitiesRelationManager)
                     ->getStateUsing(

@@ -14,6 +14,7 @@ use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Discount\Models\Discount;
 use Domain\Shipment\Actions\USPS\GetUSPSRateAction;
 use Domain\Shipment\DataTransferObjects\ParcelData;
+use Domain\Shipment\DataTransferObjects\ShipFromAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
@@ -93,12 +94,20 @@ class CartSummaryAction
 
         if ($shippingAddress) {
             $parcelData = new ParcelData(
+                ship_from_address: new ShipFromAddressData(
+                    address: $shippingMethod->shipper_address,
+                    city: $shippingMethod->shipper_city,
+                    state: $shippingMethod->state,
+                    zipcode: $shippingMethod->shipper_zipcode,
+                    country: $shippingMethod->country,
+                    code: $shippingMethod->country->code,
+                ),
                 pounds: '10',
                 ounces: '0',
                 width: '10',
                 height: '10',
                 length: '10',
-                zip_origin: $shippingMethod->ship_from_address['zip5'],
+                zip_origin: $shippingMethod->shipper_zipcode,
                 parcel_value: '200',
             );
 

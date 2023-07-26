@@ -94,7 +94,7 @@ class OrderLine extends Model implements HasMedia
         'total',
         'remarks_data',
         'purchasable_data',
-        'reviewed_at'
+        'reviewed_at',
     ];
 
     protected $casts = [
@@ -108,7 +108,7 @@ class OrderLine extends Model implements HasMedia
         'total' => 'float',
         'remarks_data' => 'array',
         'purchasable_data' => 'array',
-        'reviewed_at' => 'datetime'
+        'reviewed_at' => 'datetime',
     ];
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\Order, \Domain\Order\Models\OrderLine> */
