@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Review;
 
+use App\HttpTenantApi\Resources\ReviewResource;
+use Domain\Order\Models\OrderLine;
 use Domain\Review\Models\Review;
 use Domain\Review\Requests\ReviewStoreRequest;
+use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Spatie\RouteAttributes\Attributes\Middleware;
+use Spatie\RouteAttributes\Attributes\Get;
 use Exception;
 
 #[
@@ -21,19 +25,28 @@ class ReviewController
     {
 
         $validatedData = $request->validated();
+        $customer = auth()->user();
+
+        $review->customer_id = $customer->id;
+        $review->customer_name = $customer->first_name . ' ' . $customer->last_name;
+        $review->customer_email = $customer->email;
+
         $review->rating = $validatedData['rating'];
         $review->comment = $validatedData['comment'];
-        $review->product_id = $validatedData['product_id'];
-        $review->order_id = $validatedData['order_id'];
         $review->order_line_id = $validatedData['order_line_id'];
-        $review->data = $validatedData['data'];
+        $review->is_anonymous = $validatedData['is_anonymous'];
 
-        $customer = auth()->user();
-        if( ! $validatedData['anonymous']) {
-            $review->customer_id = $customer->id;
+        $orderLine = OrderLine::find($validatedData['order_line_id']);
+
+        $review->order_id = $orderLine->order_id;
+
+        if(isset($orderLine->purchasable_data['product'])) {
+            $review->product_id = $orderLine->purchasable_data['product']['id'];
+        } else {
+            $review->product_id = $orderLine->purchasable_data['id'];
         }
 
-        if ($validatedData['media'] !== null) {
+        if (isset($validatedData['media'])) {
             foreach ($validatedData['media'] as $imageUrl) {
                 try {
                     $review->addMediaFromUrl($imageUrl)
@@ -57,5 +70,16 @@ class ReviewController
         $review->delete();
 
         return response()->json(['message' => 'Review item deleted']);
+    }
+
+    #[Get('orderline-review/{orderLineId}')]
+    public function showCustomerReview(string $orderLineId)
+    {
+        $review = QueryBuilder::for(Review::whereOrderLineId($orderLineId))
+            ->allowedIncludes([
+                'media',
+            ])->first();
+
+        return ReviewResource::make($review);
     }
 }

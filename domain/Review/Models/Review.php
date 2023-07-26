@@ -20,10 +20,13 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int $product_id
  * @property int $order_id
  * @property int $order_line_id
+ * @property string|null $customer_name
+ * @property string|null $customer_email
  * @property int|null $customer_id
  * @property int $rating
  * @property string|null $comment
  * @property array|null $data
+ * @property bool $is_anonymous
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Customer|null $customer
@@ -37,7 +40,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|Review query()
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereComment($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Review whereCustomerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Review whereCustomerDetails($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereData($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereOrderId($value)
@@ -55,10 +58,12 @@ class Review extends Model implements HasMedia
         'ratings',
         'comment',
         'data',
+        'customer_name',
+        'customer_email',
     ];
 
     protected $casts = [
-        'data' => 'array',
+        'is_anonymous' => 'bool',
     ];
 
     public function registerMediaCollections(): void
@@ -67,7 +72,7 @@ class Review extends Model implements HasMedia
             $this->addMediaConversion('preview');
         };
 
-        $this->addMediaCollection('media')
+        $this->addMediaCollection('review_product_media')
             ->registerMediaConversions($registerMediaConversions);
     }
 
