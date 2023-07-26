@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use Domain\Address\Models\Address;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\Actions\GetShippingRateAction;
+use Domain\Shipment\DataTransferObjects\ShipFromAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Support\Facades\Auth;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -41,7 +42,7 @@ class RateController extends Controller
                         height: '10',
                         width: '10',
                         length: '10',
-                        ship_from_address: $shippingMethod->ship_from_address,
+                        ship_from_address: ShipFromAddressData::fromArray($shippingMethod->ship_from_address),
                     ),
                     shippingMethod: $shippingMethod,
                     address: $address

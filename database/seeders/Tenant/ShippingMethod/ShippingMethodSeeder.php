@@ -18,21 +18,22 @@ class ShippingMethodSeeder extends Seeder
 {
     public function run(): void
     {
-        ShippingMethodFactory::new()
-            ->createOne([
-                'title' => 'USPS',
-                'subtitle' => 'usps',
-                'description' => 'test',
-                'driver' => Driver::USPS,
-                'ship_from_address' => [
-                    'address' => '185 BERRY ST',
-                    'state' => 'CA',
-                    'city' => 'SAN FRANCISCO',
-                    'zip5' => '94107',
-                    'zip4' => '1741',
-                ],
-                'active' => true,
-            ]);
+
+        $countryID = Country::whereName('United States')->first()->id;
+
+        // ShippingMethodFactory::new()
+        //     ->createOne([
+        //         'title' => 'USPS',
+        //         'subtitle' => 'usps',
+        //         'description' => 'test',
+        //         'driver' => Driver::USPS,
+        //         'shipper_country_id' => $countryID,
+        //         'shipper_state_id' => State::where('country_id',$countryID)->whereName('California')->first()->id,
+        //         'shipper_address' => '185 BERRY ST',
+        //         'shipper_city' => 'SAN FRANCISCO',
+        //         'shipper_zipcode' => '94107',
+        //         'active' => true,
+        //     ]);
 
         CustomerFactory::new()
             /** @phpstan-ignore-next-line  */

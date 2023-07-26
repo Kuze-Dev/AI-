@@ -41,6 +41,7 @@ class RateController extends Controller
                         height: '10',
                         width: '10',
                         length: '10',
+                        ship_from_address: $$shippingMethod->ship_from_address,
                     ),
                     shippingMethod: $shippingMethod,
                     address: $address

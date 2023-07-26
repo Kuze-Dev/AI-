@@ -6,8 +6,11 @@ namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Resources\ShippingmethodResource\Pages;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Domain\Address\Models\Country;
+use Domain\Address\Models\State;
 use Domain\ShippingMethod\Enums\Driver;
 use Domain\ShippingMethod\Models\ShippingMethod;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -80,24 +83,48 @@ class ShippingmethodResource extends Resource
                         )
                         ->enum(Driver::class)
                         ->reactive(),
-                    Forms\Components\KeyValue::make('ship_from_address')
-                        ->label('Ship From Address')
-                        ->disableAddingRows()
-                        ->disableEditingKeys()
-                        ->disableDeletingRows()
-                        ->formatStateUsing(function ($state) {
-                            if ($state != null) {
-                                return $state;
-                            }
 
-                            return [
-                                'Address' => '',
-                                'City' => '',
-                                'State' => '',
-                                'zip4' => '',
-                                'zip5' => '',
-                            ];
-                        }),
+                    Forms\Components\Fieldset::make(trans('Ship From Address'))
+                        ->schema([
+                            Forms\Components\Select::make('shipper_country_id')
+                                ->label(trans('Shipper country'))
+                                ->required()
+                                ->preload()
+                                ->optionsFromModel(Country::class, 'name')
+                                ->reactive()
+                                ->afterStateUpdated(function (callable $set) {
+                                    $set('shipper_state_id', null);
+                                }),
+                            Forms\Components\Select::make('shipper_state_id')
+                                ->label(trans('Shipper state'))
+                                ->required()
+                                ->preload()
+                                ->optionsFromModel(
+                                    State::class,
+                                    'name',
+                                    fn (Builder $query, callable $get) => $query->where('country_id', $get('shipper_country_id'))
+                                )
+                                ->reactive(),
+                            Forms\Components\TextInput::make('shipper_address')
+                                ->translateLabel()
+                                ->required()
+                                ->string()
+                                ->maxLength(255)
+                                ->columnSpanFull(),
+                            Forms\Components\TextInput::make('shipper_city')
+                                ->translateLabel()
+                                ->required()
+                                ->string()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('shipper_zipcode')
+                                ->translateLabel()
+                                ->helperText('Please Provide 5 digit zipcode when using US address')
+                                ->required()
+                                ->string()
+                                ->minLength(4)
+                                ->maxLength(255),
+
+                        ]),
 
                 ]),
             ]);

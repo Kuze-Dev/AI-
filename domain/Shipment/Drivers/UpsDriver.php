@@ -6,8 +6,8 @@ namespace Domain\Shipment\Drivers;
 
 use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
+use Domain\Shipment\Actions\UPS\GetUPSInternationalRateDataAction;
 use Domain\Shipment\Actions\UPS\GetUPSRateDataAction;
-use Domain\Shipment\Actions\USPS\GetUSPSInternationalRateDataAction;
 use Domain\Shipment\API\USPS\Contracts\RateResponse;
 use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\DataTransferObjects\ParcelData;
@@ -35,7 +35,7 @@ class UpsDriver
         ParcelData $parcelData,
         Address $address,
     ): RateResponse {
-        return app(GetUSPSInternationalRateDataAction::class)->execute(
+        return app(GetUPSInternationalRateDataAction::class)->execute(
             $customer,
             $parcelData,
             $address,

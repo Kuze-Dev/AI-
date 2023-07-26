@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Http;
 final class UPSClient
 {
     public const PRODUCTION_URL = 'https://onlinetools.ups.com';
-    public const SANDBOX_URL = 'https://onlinetools.ups.com';
+    public const SANDBOX_URL = 'https://wwwcie.ups.com';
     private PendingRequest $client;
 
     public function __construct(

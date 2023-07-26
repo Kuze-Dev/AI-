@@ -25,7 +25,6 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string|null $subtitle
  * @property string|null $description
  * @property Driver $driver
- * @property array $ship_from_address
  * @property bool $active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -65,12 +64,15 @@ class ShippingMethod extends Model implements HasMedia
         'subtitle',
         'description',
         'driver',
-        'ship_from_address',
+        'shipper_country_id',
+        'shipper_state_id',
+        'shipper_address',
+        'shipper_city',
+        'shipper_zipcode',
         'active',
     ];
 
     protected $casts = [
-        'ship_from_address' => 'array',
         'active' => 'bool',
         'driver' => Driver::class,
     ];

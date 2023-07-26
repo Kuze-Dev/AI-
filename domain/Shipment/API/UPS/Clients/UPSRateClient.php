@@ -4,12 +4,34 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\API\UPS\Clients;
 
+use App\Settings\ShippingSettings;
+use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
 use Domain\Shipment\API\UPS\DataTransferObjects\UpsResponse;
 use Domain\Shipment\DataTransferObjects\ParcelData;
+use Domain\Shipment\Models\VerifiedAddress;
 
-class UPSRateClient extends BaseClient
+class UPSRateClient
 {
+    protected UPSClient $client;
+
+    public function __construct(
+    ) {
+
+        $setting = app(ShippingSettings::class);
+
+        if ($setting->ups_username === null || $setting->ups_password === null || $setting->access_license_number === null) {
+            abort(500, 'Setting UPS credential not setup yet.');
+        }
+
+        $this->client = new UPSClient(
+            accessLicenseNumber: (string) $setting->access_license_number,
+            username: $setting->ups_username,
+            password: $setting->ups_password,
+            isProduction: true,
+        );
+    }
+
     public static function uri(): string
     {
         return'ship/v1/rating/Rate';
@@ -18,9 +40,10 @@ class UPSRateClient extends BaseClient
     public function getRate(
         Customer $customer,
         ParcelData $parcelData,
-        // AddressValidateRequestData $addressValidateRequestData
+        VerifiedAddress $verifiedAddress
     ): UpsResponse {
 
+        $address = $verifiedAddress->verified_address;
         // Create the associative array representing the JSON structure
         $data = [
             'RateRequest' => [
@@ -48,10 +71,10 @@ class UPSRateClient extends BaseClient
                     'ShipTo' => [
                         'Name' => $customer->first_name. ' '. $customer->last_name,
                         'Address' => [
-                            'AddressLine' => '355 West San Fernando Street',
-                            'City' => 'San Jose',
-                            'StateProvinceCode' => 'CA',
-                            'PostalCode' => '95113',
+                            'AddressLine' => $address['address2'],
+                            'City' => $address['city'],
+                            'StateProvinceCode' => $address['state'],
+                            'PostalCode' => $address['zip5'],
                             'CountryCode' => 'US',
                         ],
                     ],
@@ -93,27 +116,30 @@ class UPSRateClient extends BaseClient
                             'UnitOfMeasurement' => [
                                 'Code' => 'LBS',
                             ],
-                            'Weight' => '10',
+                            'Weight' => $parcelData->pounds,
                         ],
                     ],
                 ],
             ],
         ];
 
-        // Convert the array to a JSON string
         $jsonString = json_encode($data);
 
-        // dd($jsonString);
+        $response = $this->client->getClient()
+            ->withBody($jsonString, 'application/json')
+            ->post(self::uri())
+            ->body();
 
-        $response = $this->client->getClient()->withBody($jsonString)->post(self::uri())->body();
-        // dd(UpsResponse::fromArray(json_decode($response,true))->getRate());
         return UpsResponse::fromArray(json_decode($response, true));
     }
 
-    public function getInternationalRates(): UpsResponse
-    {
+    public function getInternationalRates(
+        Customer $customer,
+        ParcelData $parcelData,
+        Address $address,
+    ): UpsResponse {
 
-        // Create the associative array representing the JSON structure
+        dd($parcelData->ship_from_address);
         $data = [
             'RateRequest' => [
                 'Request' => [
@@ -127,33 +153,33 @@ class UPSRateClient extends BaseClient
                         'UserLevelDiscountIndicator' => 'TRUE',
                     ],
                     'Shipper' => [
-                        'Name' => 'Billy Blanks',
+                        'Name' => config('app.name'),
                         'ShipperNumber' => '',
                         'Address' => [
-                            'AddressLine' => '366 Robin LN SE',
-                            'City' => 'Marietta',
-                            'StateProvinceCode' => 'GA',
-                            'PostalCode' => '30067',
+                            'AddressLine' => $parcelData->ship_from_address['Address'],
+                            'City' => $parcelData->ship_from_address['City'],
+                            'StateProvinceCode' => $parcelData->ship_from_address['State'],
+                            'PostalCode' => $parcelData->ship_from_address['zip5'],
                             'CountryCode' => 'US',
                         ],
                     ],
                     'ShipTo' => [
-                        'Name' => 'Sarita Lynn',
+                        'Name' => $customer->first_name. ' '. $customer->last_name,
                         'Address' => [
-                            'AddressLine' => '12 Kapitolyo Pasig',
-                            'City' => 'Pasig',
-                            'StateProvinceCode' => 'Manila',
-                            'PostalCode' => '1603',
-                            'CountryCode' => 'PH',
+                            'AddressLine' => $address->address_line_1,
+                            'City' => $address->city,
+                            'StateProvinceCode' => $address->state->name,
+                            'PostalCode' => $address->zip_code,
+                            'CountryCode' => $address->state->country->code,
                         ],
                     ],
                     'ShipFrom' => [
-                        'Name' => 'Billy Blanks',
+                        'Name' => config('app.name'),
                         'Address' => [
-                            'AddressLine' => '366 Robin LN SE',
-                            'City' => 'Marietta',
-                            'StateProvinceCode' => 'GA',
-                            'PostalCode' => '30067',
+                            'AddressLine' => $parcelData->ship_from_address['Address'],
+                            'City' => $parcelData->ship_from_address['City'],
+                            'StateProvinceCode' => $parcelData->ship_from_address['State'],
+                            'PostalCode' => $parcelData->ship_from_address['zip5'],
                             'CountryCode' => 'US',
                         ],
                     ],
@@ -166,7 +192,7 @@ class UPSRateClient extends BaseClient
                             'Code' => 'LBS',
                             'Description' => 'Pounds',
                         ],
-                        'Weight' => '16',
+                        'Weight' => $parcelData->pounds,
                     ],
                     'Package' => [
                         'PackagingType' => [
@@ -177,15 +203,15 @@ class UPSRateClient extends BaseClient
                             'UnitOfMeasurement' => [
                                 'Code' => 'IN',
                             ],
-                            'Length' => '10',
-                            'Width' => '10',
-                            'Height' => '10',
+                            'Length' => $parcelData->length,
+                            'Width' => $parcelData->width,
+                            'Height' => $parcelData->height,
                         ],
                         'PackageWeight' => [
                             'UnitOfMeasurement' => [
                                 'Code' => 'LBS',
                             ],
-                            'Weight' => '10',
+                            'Weight' => $parcelData->pounds,
                         ],
                     ],
                 ],
@@ -194,10 +220,11 @@ class UPSRateClient extends BaseClient
 
         $jsonString = json_encode($data);
 
-        // dd($jsonString);
+        $response = $this->client->getClient()
+            ->withBody($jsonString, 'application/json')
+            ->post(self::uri())
+            ->body();
 
-        $response = $this->client->getClient()->withBody($jsonString)->post(self::uri())->body();
-        // dd(UpsResponse::fromArray(json_decode($response,true))->getRate());
         return UpsResponse::fromArray(json_decode($response, true));
     }
 }

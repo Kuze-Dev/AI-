@@ -47,8 +47,8 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
             function () {
                 $setting = app(ShippingSettings::class);
 
-                if ($setting->ups_username === null || $setting->ups_password === null) {
-                    abort(500, 'Setting USPS credential not setup yet.');
+                if ($setting->ups_username === null || $setting->ups_password === null || $setting->access_license_number === null) {
+                    abort(500, 'Setting UPS credential not setup yet.');
                 }
 
                 return new UPSClient(

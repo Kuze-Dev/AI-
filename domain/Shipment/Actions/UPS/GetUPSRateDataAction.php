@@ -39,8 +39,6 @@ class GetUPSRateDataAction
 
             }
 
-            $zipDestination = $verifiedAddress->verified_address['zip5'] ?? null;
-
         } else {
 
             $address = $this->addressClient->verify($addressValidateRequestData);
@@ -50,12 +48,12 @@ class GetUPSRateDataAction
                 'verified_address' => $address->toArray(),
             ]);
 
-            $zipDestination = $address->zip5;
         }
 
         return $this->rateClient->getRate(
             customer: $customer,
             parcelData: $parcelData,
+            verifiedAddress: $customer->verifiedAddress,
         );
     }
 }
