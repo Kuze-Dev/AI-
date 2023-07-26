@@ -10,8 +10,6 @@ use Domain\Review\Models\Review;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\MetaData\HasMetaData;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
-use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
-use Support\RouteUrl\HasRouteUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
@@ -89,11 +87,10 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['metaData'])]
-class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, HasMedia
+class Product extends Model implements HasMetaDataContract, HasMedia
 {
     use LogsActivity;
     use HasSlug;
-    use HasRouteUrl;
     use HasMetaData;
     use ConstraintsRelationships;
     use InteractsWithMedia;
