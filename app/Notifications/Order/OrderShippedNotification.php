@@ -40,7 +40,7 @@ class OrderShippedNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            "content" => "order_shipped",
+            "type" => "order_shipped",
             "data" => $this->order,
         ];
     }
