@@ -31,6 +31,7 @@ class CreateOrderAction
                 $preparedOrderData->shippingMethod
             ),
             $preparedOrderData->discount,
+            null
         );
 
         $order = Order::create([

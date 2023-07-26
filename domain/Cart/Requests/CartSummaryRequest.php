@@ -15,7 +15,7 @@ use Illuminate\Validation\Rule;
 
 class CartSummaryRequest extends FormRequest
 {
-    public function rules()
+    public function rules(): array
     {
         return [
             'cart_line_ids' => [
@@ -63,6 +63,10 @@ class CartSummaryRequest extends FormRequest
                 // ->where(function ($query) {
                 //     $query->where('id', auth()->user()?->id);
                 // }),
+            ],
+            'service_id' => [
+                'nullable',
+                'int',
             ],
             'state_id' => [
                 'nullable',

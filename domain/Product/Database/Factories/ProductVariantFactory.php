@@ -7,6 +7,9 @@ namespace Domain\Product\Database\Factories;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Product\Models\ProductVariant>
+ */
 class ProductVariantFactory extends Factory
 {
     protected $model = ProductVariant::class;

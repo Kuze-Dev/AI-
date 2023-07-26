@@ -26,7 +26,8 @@ class CartSummaryAction
         CartLine|Collection $collections,
         CartSummaryTaxData $cartSummaryTaxData,
         CartSummaryShippingData $cartSummaryShippingData,
-        ?Discount $discount
+        ?Discount $discount,
+        ?int $serviceId
     ): SummaryData {
 
         $subtotal = $this->getSubTotal($collections);
@@ -36,9 +37,11 @@ class CartSummaryAction
         $taxTotal = $tax['taxPercentage'] ? round($subtotal * $tax['taxPercentage'] / 100, 2) : 0;
 
         $shippingTotal = $this->getShippingFee(
+            $collections,
             $cartSummaryShippingData->customer,
             $cartSummaryShippingData->shippingAddress,
-            $cartSummaryShippingData->shippingMethod
+            $cartSummaryShippingData->shippingMethod,
+            $serviceId
         );
 
         $discountTotal = $this->getDiscount($discount, $subtotal, $shippingTotal);
@@ -80,9 +83,11 @@ class CartSummaryAction
     }
 
     public function getShippingFee(
+        CartLine|Collection $collections,
         Customer $customer,
         ?Address $shippingAddress,
         ?ShippingMethod $shippingMethod,
+        ?int $serviceId
     ): float {
         $shippingFeeTotal = 0;
 
@@ -98,7 +103,7 @@ class CartSummaryAction
             );
 
             $shippingFeeTotal = app(GetUSPSRateAction::class)
-                ->execute($customer, $parcelData, $shippingMethod, $shippingAddress);
+                ->execute($customer, $parcelData, $shippingMethod, $shippingAddress, $serviceId);
         }
 
         return $shippingFeeTotal;

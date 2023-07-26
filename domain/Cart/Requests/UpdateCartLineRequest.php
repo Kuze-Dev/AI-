@@ -11,7 +11,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateCartLineRequest extends FormRequest
 {
-    public function rules()
+    public function rules(): array
     {
         $cartLine = $this->route('cartline');
 

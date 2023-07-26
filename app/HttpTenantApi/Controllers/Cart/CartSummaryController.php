@@ -54,6 +54,7 @@ class CartSummaryController extends Controller
         $country = $request->getCountry();
         $state = $request->getState();
         $discount = $request->getDiscount();
+        $serviceId = $validated['service_id'] ?? null;
 
         try {
             $summary = app(CartSummaryAction::class)->getSummary(
@@ -61,6 +62,7 @@ class CartSummaryController extends Controller
                 new CartSummaryTaxData($country?->id, $state?->id),
                 new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),
                 $discount,
+                $serviceId
             );
         } catch (USPSServiceNotFoundException) {
             return response()->json([
