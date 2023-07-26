@@ -100,6 +100,6 @@ class Discount extends Model
 
     public function discountLimits(): HasMany
     {
-        return $this->hasMany(DiscountLimit::class, 'discountable');
+        return $this->hasMany(DiscountLimit::class);
     }
 }
