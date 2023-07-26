@@ -22,7 +22,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string|null $status
  * @property string $rate
  * @property array|null $shipping_details
- * @property mixed|null $destination_address
+ * @property array|null $destination_address
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
@@ -32,7 +32,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @method static \Illuminate\Database\Eloquent\Builder|Shipment newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Shipment query()
  * @method static \Illuminate\Database\Eloquent\Builder|Shipment whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Shipment whereDestiantionAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Shipment whereDestinationAddress($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shipment whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shipment whereModelId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shipment whereModelType($value)

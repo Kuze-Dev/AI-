@@ -17,10 +17,10 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * Domain\Cart\Models\CartLine
  *
  * @property int $id
- * @property string $uuid
  * @property int $cart_id
- * @property int $purchasable_id
  * @property string $purchasable_type
+ * @property int $purchasable_id
+ * @property string $uuid
  * @property int $quantity
  * @property array|null $remarks
  * @property string|null $checkout_reference

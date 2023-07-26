@@ -17,6 +17,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * Domain\Order\Models\OrderLine
  *
  * @property int $id
+ * @property string $uuid
  * @property int $order_id
  * @property int $purchasable_id
  * @property string $purchasable_type
@@ -65,6 +66,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereUnitPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereUuid($value)
  * @mixin \Eloquent
  */
 class OrderLine extends Model implements HasMedia
@@ -106,11 +108,13 @@ class OrderLine extends Model implements HasMedia
         'purchasable_data' => 'array',
     ];
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\Order, \Domain\Order\Models\OrderLine> */
     public function order()
     {
         return $this->belongsTo(Order::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Review\Models\Review> */
     public function review()
     {
         return $this->hasOne(Review::class);

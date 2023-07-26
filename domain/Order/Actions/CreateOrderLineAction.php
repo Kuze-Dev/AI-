@@ -33,6 +33,7 @@ class CreateOrderLineAction
                     $preparedOrderData->shippingMethod
                 ),
                 $preparedOrderData->discount,
+                null
             );
 
             $name = null;

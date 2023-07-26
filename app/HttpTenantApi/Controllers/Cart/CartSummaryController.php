@@ -54,7 +54,7 @@ class CartSummaryController extends Controller
         $country = $request->getCountry();
         $state = $request->getState();
         $discount = $request->getDiscount();
-        $serviceId = $validated['service_id'] ? (int) $validated['service_id'] : null;
+        $serviceId = $validated['service_id'] ?? null;
 
         try {
             $summary = app(CartSummaryAction::class)->getSummary(

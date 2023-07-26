@@ -12,6 +12,7 @@ use Domain\Payments\Actions\CreatePaymentAction;
 use Domain\Payments\DataTransferObjects\AmountData;
 use Domain\Payments\DataTransferObjects\CreatepaymentData;
 use Domain\Payments\DataTransferObjects\PaymentDetailsData;
+use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\TransactionData;
 use Illuminate\Support\Facades\DB;
 use Exception;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\Log;
 
 class SplitOrderAction
 {
-    public function execute(PreparedOrderData $preparedOrderData, PlaceOrderData $placeOrderData)
+    public function execute(PreparedOrderData $preparedOrderData, PlaceOrderData $placeOrderData): array|Exception
     {
         return DB::transaction(function () use ($preparedOrderData, $placeOrderData) {
             try {
@@ -37,7 +38,7 @@ class SplitOrderAction
                 CartLine::whereCheckoutReference($placeOrderData->cart_reference)
                     ->update(['checked_out_at' => now()]);
 
-                $payment = $this->proceedPayment($order, $preparedOrderData) ?? null;
+                $payment = $this->proceedPayment($order, $preparedOrderData);
 
                 DB::commit();
 
@@ -54,7 +55,7 @@ class SplitOrderAction
         });
     }
 
-    private function proceedPayment(Order $order, PreparedOrderData $preparedOrderData)
+    private function proceedPayment(Order $order, PreparedOrderData $preparedOrderData): PaymentAuthorize
     {
         $providerData = new CreatepaymentData(
             transactionData: TransactionData::fromArray(

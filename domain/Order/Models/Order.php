@@ -12,6 +12,9 @@ use Domain\Payments\Models\Traits\HasPayments;
 use Domain\Taxation\Enums\PriceDisplay;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
@@ -60,37 +63,38 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Payments\Models\Payment> $payments
  * @property-read int|null $payments_count
  * @property-read \Domain\Order\Models\OrderAddress|null $shippingAddress
- * @method static \Illuminate\Database\Eloquent\Builder|Order newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Order newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Order query()
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereCancelledAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereCancelledReason($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereCurrencyCode($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereCurrencyExchangeRate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereCurrencyName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereCustomerEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereCustomerFirstName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereCustomerId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereCustomerLastName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereCustomerMobile($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereDiscountCode($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereDiscountId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereDiscountTotal($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereIsPaid($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereNotes($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereReference($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereShippingDetails($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereShippingMethod($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereShippingTotal($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereSubTotal($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereTaxDisplay($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereTaxPercentage($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereTaxTotal($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereTotal($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereUpdatedAt($value)
+ * @method static Builder|Order newModelQuery()
+ * @method static Builder|Order newQuery()
+ * @method static Builder|Order query()
+ * @method static Builder|Order whereCancelledAt($value)
+ * @method static Builder|Order whereCancelledReason($value)
+ * @method static Builder|Order whereCreatedAt($value)
+ * @method static Builder|Order whereCurrencyCode($value)
+ * @method static Builder|Order whereCurrencyExchangeRate($value)
+ * @method static Builder|Order whereCurrencyName($value)
+ * @method static Builder|Order whereCustomerEmail($value)
+ * @method static Builder|Order whereCustomerFirstName($value)
+ * @method static Builder|Order whereCustomerId($value)
+ * @method static Builder|Order whereCustomerLastName($value)
+ * @method static Builder|Order whereCustomerMobile($value)
+ * @method static Builder|Order whereDiscountCode($value)
+ * @method static Builder|Order whereDiscountId($value)
+ * @method static Builder|Order whereDiscountTotal($value)
+ * @method static Builder|Order whereHasForPayment()
+ * @method static Builder|Order whereId($value)
+ * @method static Builder|Order whereIsPaid($value)
+ * @method static Builder|Order whereNotes($value)
+ * @method static Builder|Order whereReference($value)
+ * @method static Builder|Order whereShippingDetails($value)
+ * @method static Builder|Order whereShippingMethod($value)
+ * @method static Builder|Order whereShippingTotal($value)
+ * @method static Builder|Order whereStatus($value)
+ * @method static Builder|Order whereSubTotal($value)
+ * @method static Builder|Order whereTaxDisplay($value)
+ * @method static Builder|Order whereTaxPercentage($value)
+ * @method static Builder|Order whereTaxTotal($value)
+ * @method static Builder|Order whereTotal($value)
+ * @method static Builder|Order whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class Order extends Model implements HasMedia, PayableInterface
@@ -146,22 +150,26 @@ class Order extends Model implements HasMedia, PayableInterface
         return 'reference';
     }
 
-    public function customer()
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Order\Models\Order> */
+    public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
 
-    public function orderLines()
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Order\Models\OrderLine>*/
+    public function orderLines(): HasMany
     {
         return $this->hasMany(OrderLine::class);
     }
 
-    public function shippingAddress()
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Order\Models\OrderAddress> */
+    public function shippingAddress(): HasOne
     {
         return $this->hasOne(OrderAddress::class)->where('type', OrderAddressTypes::SHIPPING);
     }
 
-    public function billingAddress()
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Order\Models\OrderAddress> */
+    public function billingAddress(): HasOne
     {
         return $this->hasOne(OrderAddress::class)->where('type', OrderAddressTypes::BILLING);
     }
@@ -185,6 +193,7 @@ class Order extends Model implements HasMedia, PayableInterface
             ->dontSubmitEmptyLogs();
     }
 
+    /** @return \Illuminate\Database\Eloquent\Builder<\Domain\Order\Models\Order> */
     public function scopeWhereHasForPayment(Builder $query): Builder
     {
         return $query->whereHas('payments', function (Builder $subQuery) {

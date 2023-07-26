@@ -11,19 +11,19 @@ use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
-use Domain\Order\Enums\OrderResult;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Product\Models\ProductVariant;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
+use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Log;
 
 class PrepareOrderAction
 {
-    public function execute(PlaceOrderData $placeOrderData)
+    public function execute(PlaceOrderData $placeOrderData): PreparedOrderData
     {
         $customer = auth()->user();
 
@@ -59,7 +59,7 @@ class PrepareOrderAction
         return PreparedOrderData::fromArray($orderData);
     }
 
-    private function prepareAddress(PlaceOrderData $placeOrderData)
+    private function prepareAddress(PlaceOrderData $placeOrderData): array
     {
         $shippingAddress = Address::with('state.country')->find($placeOrderData->addresses->shipping);
 
@@ -71,12 +71,23 @@ class PrepareOrderAction
         ];
     }
 
-    private function prepareCurrency()
+    private function prepareCurrency(): Currency
     {
-        return Currency::where('default', true)->first();
+        $currency = Currency::where('default', true)->first();
+
+        if ( ! $currency instanceof Currency) {
+
+            throw new BadRequestHttpException('No currency found');
+        }
+
+        return $currency;
     }
 
-    private function prepareCartLines(PlaceOrderData $placeOrderData)
+    /**
+     * @param PlaceOrderData $placeOrderData
+     * @return Collection<int, CartLine>
+     */
+    private function prepareCartLines(PlaceOrderData $placeOrderData): Collection
     {
         return CartLine::with(['purchasable' => function (MorphTo $query) {
             $query->morphWith([
@@ -87,7 +98,7 @@ class PrepareOrderAction
             ->get();
     }
 
-    private function prepareTax(PlaceOrderData $placeOrderData)
+    private function prepareTax(PlaceOrderData $placeOrderData): TaxZone
     {
         $taxZone = Taxation::getTaxZone($placeOrderData->taxation_data->country_id, $placeOrderData->taxation_data->state_id);
 
@@ -95,13 +106,12 @@ class PrepareOrderAction
             Log::info('No tax zone found');
 
             throw new BadRequestHttpException('No tax zone found');
-            // return OrderResult::FAILED;
         }
 
         return $taxZone;
     }
 
-    private function prepareDiscount(PlaceOrderData $placeOrderData)
+    private function prepareDiscount(PlaceOrderData $placeOrderData): ?Discount
     {
         if ($placeOrderData->discountCode) {
             $discount = Discount::whereCode($placeOrderData->discountCode)
@@ -122,13 +132,20 @@ class PrepareOrderAction
         return null;
     }
 
-    private function prepareShippingMethod(PlaceOrderData $placeOrderData)
+    private function prepareShippingMethod(PlaceOrderData $placeOrderData): ?ShippingMethod
     {
         return ShippingMethod::where((new ShippingMethod())->getRouteKeyName(), $placeOrderData->shipping_method)->first() ?? null;
     }
 
-    private function preparePaymentMethod(PlaceOrderData $placeOrderData)
+    private function preparePaymentMethod(PlaceOrderData $placeOrderData): PaymentMethod
     {
-        return PaymentMethod::whereSlug($placeOrderData->payment_method)->first();
+        $paymentMethod = PaymentMethod::whereSlug($placeOrderData->payment_method)->first();
+
+        if ( ! $paymentMethod instanceof PaymentMethod) {
+
+            throw new BadRequestHttpException('No paymentMethod found');
+        }
+
+        return $paymentMethod;
     }
 }

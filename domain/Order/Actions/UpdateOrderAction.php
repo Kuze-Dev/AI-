@@ -48,19 +48,25 @@ class UpdateOrderAction
                 if ($updateOrderData->proof_of_payment !== null) {
                     $orderPayment = Order::with('payments')->find($order->id);
 
-                    $test = $this->convertUrlToUploadedFile($updateOrderData->proof_of_payment);
+                    $image = $this->convertUrlToUploadedFile($updateOrderData->proof_of_payment);
 
-                    app(UploadProofofPaymentAction::class)->execute(
-                        $orderPayment->payments->first(),
-                        new ProofOfPaymentData(
-                            $test
-                        )
-                    );
+                    if ($image instanceof UploadedFile) {
+                        if ( ! empty($orderPayment->payments) && ! empty($orderPayment->payments->first())) {
+                            app(UploadProofofPaymentAction::class)->execute(
+                                $orderPayment->payments->first(),
+                                new ProofOfPaymentData(
+                                    $image
+                                )
+                            );
+                        }
+                    } else {
+                        return 'Invalid media';
+                    }
                 }
             } else {
                 if ($updateOrderData->type != 'status') {
                     $payment = Payment::whereHas('payable', function (Builder $query) use ($order) {
-                        $query->wherePayableId($order->id);
+                        $query->where('payable_id', $order->id);
                     })->whereNot('status', 'paid')->first();
 
                     if ( ! $payment) {
@@ -103,27 +109,28 @@ class UpdateOrderAction
         }
     }
 
-    private function convertUrlToUploadedFile($url)
+    private function convertUrlToUploadedFile(string $url): UploadedFile|string
     {
-        // Get the content of the file from the URL
         $fileContent = file_get_contents($url);
 
-        // Create a temporary file path
         $tempFilePath = tempnam(sys_get_temp_dir(), 'upload');
 
-        // Write the file content to the temporary file
-        file_put_contents($tempFilePath, $fileContent);
+        if ($tempFilePath) {
 
-        // Create an instance of UploadedFile using the temporary file
-        $uploadedFile = new UploadedFile(
-            $tempFilePath,
-            basename($url),
-            mime_content_type($tempFilePath),
-            null,
-            true
-        );
+            file_put_contents($tempFilePath, $fileContent);
 
-        // Return the UploadedFile instance
-        return $uploadedFile;
+            // Create an instance of UploadedFile using the temporary file
+            $uploadedFile = new UploadedFile(
+                $tempFilePath,
+                basename($url),
+                mime_content_type($tempFilePath),
+                null,
+                true
+            );
+
+            return $uploadedFile;
+        }
+
+        return '';
     }
 }

@@ -10,6 +10,12 @@ use Domain\Payments\Events\PaymentProcessEvent;
 
 class OrderUpdatedListener
 {
+    /**
+     * Handle the event.
+     *
+     * @param  \Domain\Payments\Events\PaymentProcessEvent  $event
+     * @return void
+     */
     public function handle(PaymentProcessEvent $event)
     {
         if ($event->payment->payable instanceof Order) {
@@ -24,7 +30,7 @@ class OrderUpdatedListener
         }
     }
 
-    private function onOrderPaid(Order $order)
+    private function onOrderPaid(Order $order): void
     {
         $order->update([
             'is_paid' => true,
