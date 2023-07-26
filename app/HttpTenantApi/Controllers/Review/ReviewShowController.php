@@ -37,6 +37,7 @@ class ReviewShowController
     {
         $review = Review::where('product_id', $product_id);
     
+        $reviewCount = $review->count();
         $averageRating = $review->avg('rating');
 
         $ratingCounts = $review
@@ -45,6 +46,7 @@ class ReviewShowController
         
         return response()->json([
             'product_id' => $product_id,
+            'raviewcount' => $reviewCount,
             'average_rating' => $averageRating,
             'rating_counts' => $ratingCounts,
         ]);
