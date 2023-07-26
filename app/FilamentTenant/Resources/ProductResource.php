@@ -76,7 +76,7 @@ class ProductResource extends Resource
                                 ->dehydrateStateUsing(fn ($state) => (float) $state),
 
                             Forms\Components\Fieldset::make('dimension')
-                                ->label('Dimension')
+                                ->label('Dimension (cm)')
                                 ->schema([
                                     Forms\Components\TextInput::make('length')
                                         ->numeric()

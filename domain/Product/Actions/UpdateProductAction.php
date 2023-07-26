@@ -17,7 +17,7 @@ class UpdateProductAction
         protected CreateMetaDataAction $createMetaData,
         protected UpdateMetaDataAction $updateMetaData,
         protected UpdateProductOptionAction $updateProductOptionAction,
-        protected UpdateProductVariantAction $updateProductVariantAction,
+        protected CreateOrUpdateProductVariantAction $createOrUpdateProductVariantAction,
         protected CreateMediaAction $createMediaAction
     ) {
     }
@@ -32,7 +32,7 @@ class UpdateProductAction
 
         $this->updateProductOptionAction->execute($product, $productData);
 
-        $this->updateProductVariantAction->execute($product, $productData);
+        $this->createOrUpdateProductVariantAction->execute($product, $productData, false);
 
         if (filled($productData->images)) {
             $this->createMediaAction->execute($product, Arr::wrap($productData->images), 'image', false);
