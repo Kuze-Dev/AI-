@@ -10,7 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateOrderRequest extends FormRequest
 {
-    public function rules()
+    public function rules(): array
     {
         $paymentMethods = PaymentMethod::whereNotIn('gateway', ['manual', 'bank-transfer'])->get();
 

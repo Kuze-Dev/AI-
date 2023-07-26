@@ -14,8 +14,8 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * Domain\Cart\Models\Cart
  *
  * @property int $id
- * @property string $uuid
  * @property int $customer_id
+ * @property string $uuid
  * @property string|null $coupon_code
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at

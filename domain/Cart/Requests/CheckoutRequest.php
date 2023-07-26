@@ -9,7 +9,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class CheckoutRequest extends FormRequest
 {
-    public function rules()
+    public function rules(): array
     {
         return [
             'cart_line_ids' => [

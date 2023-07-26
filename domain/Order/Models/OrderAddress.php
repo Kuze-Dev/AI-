@@ -7,6 +7,7 @@ namespace Domain\Order\Models;
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\Order\Enums\OrderAddressTypes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -60,8 +61,8 @@ class OrderAddress extends Model
         'type' => OrderAddressTypes::class,
     ];
 
-    // Define the relationship with the Order model
-    public function order()
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\Order, \Domain\Order\Models\OrderAddress> */
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
