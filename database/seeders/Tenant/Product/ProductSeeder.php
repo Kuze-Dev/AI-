@@ -4,25 +4,85 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Tenant\Product;
 
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Blueprint\Models\Blueprint;
 use Domain\Product\Database\Factories\ProductFactory;
+use Domain\Product\Database\Factories\ProductOptionFactory;
+use Domain\Product\Database\Factories\ProductOptionValueFactory;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductOption;
 use Domain\Product\Models\ProductOptionValue;
 use Domain\Product\Models\ProductVariant;
+use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
+use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class ProductSeeder extends Seeder
 {
-    public function run(): void
+    public function seedBrandAndCategories(): void
+    {
+        $taxonomies = $this->data()['taxonomies'];
+        BlueprintFactory::new($this->data()['blueprint_for_taxonomy']);
+        $blueprint = Blueprint::whereName($this->data()['blueprint_for_taxonomy']['name'])->first();
+
+        // Seed Brand and Category in Taxonomy
+        foreach ($taxonomies as $taxonomyData) {
+            if ($foundTaxonomy = Taxonomy::whereName($taxonomyData['name'])->first()) {
+                $foundTaxonomy->delete();
+            }
+            TaxonomyFactory::new([
+                'name' => $taxonomyData['name'],
+            ])
+                ->setBlueprintId($blueprint->id)
+                ->has(
+                    TaxonomyTermFactory::new($taxonomyData['term'])
+                )->create();
+        }
+    }
+
+    public function truncateDatabases()
     {
         ProductOptionValue::truncate();
         ProductOption::truncate();
         ProductVariant::truncate();
         DB::table('product_taxonomy_term')->truncate();
         Product::truncate();
+    }
 
-        (new ProductFactory())->seedData();
+    public function run(): void
+    {
+        $this->truncateDatabases();
+        // (new ProductFactory())->seedData();
+
+        $this->seedBrandAndCategories();
+
+        $taxonomyTermIds = TaxonomyTerm::whereIn('slug', ['brand-one', 'clothing'])->pluck('id');
+        foreach ($this->data()['products'] as $product) {
+            $productImageUrl = $product['image_url'];
+            unset($product['image_url']);
+
+            $product = ProductFactory::new($product)
+                ->has(
+                    ProductOptionFactory::new(['name' => 'size'])
+                        ->has(ProductOptionValueFactory::new(['name' => 'large'], ['name' => 'small']))
+                )
+                ->create();
+
+            $product->clearMediaCollection('image');
+
+            $response = Http::get($productImageUrl);
+            if ($response->successful()) {
+                $product
+                    ->addMediaFromUrl($productImageUrl)
+                    ->toMediaCollection('image');
+            }
+
+            $product->taxonomyTerms()->attach($taxonomyTermIds);
+        }
     }
 
     public function data(): array
@@ -184,20 +244,20 @@ class ProductSeeder extends Seeder
                 ],
             ],
             'product_options' => [
-                [
-                    'name' => 'size',
-                    'values' => [
-                        'large',
-                    ],
+                // [
+                'name' => 'size',
+                'values' => [
+                    'name' => 'large',
                 ],
-                [
-                    'name' => 'color',
-                    'values' => [
-                        'white',
-                        'black',
+                // ]
+                // [
+                //     'name' => 'color',
+                //     'values' => [
+                //         'white',
+                //         'black',
 
-                    ],
-                ],
+                //     ],
+                // ],
             ],
             'variant_combinations' => [
                 [
@@ -213,16 +273,23 @@ class ProductSeeder extends Seeder
                 [
                     'name' => 'Brand',
                     'term' => [
-                        ['name' => 'Brand One'],
-                        ['name' => 'The Next Brand'],
+                        'data' => [
+                            'main' => [
+                                'heading' => 'Brand One',
+                            ],
+                        ],
+                        'name' => 'Brand One',
                     ],
                 ],
                 [
                     'name' => 'Categories',
                     'term' => [
-                        ['name' => 'Clothing'],
-                        ['name' => 'Food & Beverages'],
-                        ['name' => 'Electronics'],
+                        'data' => [
+                            'main' => [
+                                'heading' => 'Clothing',
+                            ],
+                        ],
+                        'name' => 'Clothing',
                     ],
                 ],
             ],
