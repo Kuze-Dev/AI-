@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\Order;
 
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\Models\Order;
@@ -41,7 +41,7 @@ class OrderPlacedNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            "content" => "Your order has been placed, ",
+            "type" => "order_placed",
             "data" => $this->order,
         ];
     }

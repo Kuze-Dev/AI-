@@ -67,8 +67,8 @@ class OrderController extends Controller
         }
 
         // dd($result);
-
-        Notification::send($result['order'], new OrderPlacedNotification($result['order']));
+        $customer = auth()->user();
+        Notification::send($customer, new OrderPlacedNotification($result['order']));
 
         return response()
             ->json([
@@ -117,19 +117,24 @@ class OrderController extends Controller
             return response()->json($result);
         }
         
-        dd($result->customer_id);
-
-        if ($validatedData['status'] == 'Delivered') {
-            Notification::send($result, new OrderDeliveredNotification($result));
-        } else if ($validatedData['status'] == 'Cancelled') {
-            Notification::send($result, new OrderCancelledNotification($result));
+        $customer = auth()->user();
+        $status = $validatedData['status'];
+        
+        switch ($status) {
+            case 'Delivered':
+                Notification::send($customer, new OrderDeliveredNotification($result));
+                break;
+            case 'Cancelled':
+                Notification::send($customer, new OrderCancelledNotification($result));
+                break;
+            case 'Shipped':
+                Notification::send($customer, new OrderShippedNotification($result));
+                break;
+            case 'Fulfilled':
+                Notification::send($customer, new OrderFulfilledNotification($order));
+                break;
         }
-        else if ($validatedData['status'] == 'Shipped') {
-            Notification::send($result, new OrderShippedNotification($result));
-        }
-        else if ($validatedData['status'] == 'Fulfilled') {
-            Notification::send($result, new OrderFulfilledNotification($result));
-        }
+        
         
 
         return response()

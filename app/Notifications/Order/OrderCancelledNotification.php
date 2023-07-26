@@ -41,7 +41,7 @@ class OrderCancelledNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            "content" => "Your order has been cancelled, ",
+            "type" => "cancelled",
             "data" => $this->order,
         ];
     }
