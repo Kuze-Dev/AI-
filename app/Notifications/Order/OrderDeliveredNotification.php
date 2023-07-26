@@ -40,7 +40,7 @@ class OrderDeliveredNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            "content" => "order_delivered",
+            "type" => "order_delivered",
             "data" => $this->order,
         ];
     }

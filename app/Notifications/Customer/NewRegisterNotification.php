@@ -40,7 +40,7 @@ class NewRegisterNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            "content" => "Welcome, ",
+            "type" => "new_user",
             "data" => $this->customer,
         ];
     }
