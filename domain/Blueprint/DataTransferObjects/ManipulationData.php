@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Domain\Blueprint\DataTransferObjects;
+
+use Domain\Blueprint\Enums\ManipulationType;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Str;
+
+/**
+ * @implements Arrayable<string, mixed>
+ */
+class ManipulationData implements Arrayable
+{
+    private function __construct(
+        public readonly ManipulationType $type,
+        public readonly array $params = [],
+    ) {
+    }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            type: $data['type'],
+            params: $data['params'] ?? [],
+        );
+    }
+
+    /** @return array<string, mixed> */
+    public function toArray()
+    {
+        return (array) $this;
+    }
+}
