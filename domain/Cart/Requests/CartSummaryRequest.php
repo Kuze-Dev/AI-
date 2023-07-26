@@ -66,6 +66,7 @@ class CartSummaryRequest extends FormRequest
             ],
             'service_id' => [
                 'nullable',
+                'int',
             ],
             'state_id' => [
                 'nullable',
