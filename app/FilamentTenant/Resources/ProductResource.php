@@ -72,6 +72,7 @@ class ProductResource extends Resource
                     Forms\Components\Section::make('Shipping')
                         ->schema([
                             Forms\Components\TextInput::make('weight')
+                                ->label('Weight (lbs)')
                                 ->numeric()
                                 ->dehydrateStateUsing(fn ($state) => (float) $state),
 
