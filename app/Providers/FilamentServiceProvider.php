@@ -431,10 +431,10 @@ class FilamentServiceProvider extends ServiceProvider
 
                 return new HtmlString(
                     <<<html
-                            <div class="truncate {$cssClass}">
-                                {$state}
-                            </div>
-                        html
+                        <div class="truncate {$cssClass}">
+                            {$state}
+                        </div>
+                    html
                 );
             });
 
