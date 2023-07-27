@@ -20,7 +20,7 @@ class CustomerRegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email_verification_type' => ['required', Rule::enum(EmailVerificationType::class)],
+            'email_verification_type' => ['nullable', Rule::enum(EmailVerificationType::class)],
 
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
