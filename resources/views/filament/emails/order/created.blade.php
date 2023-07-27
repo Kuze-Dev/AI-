@@ -78,9 +78,9 @@
 </style>
 
 <div style="width: 100%; font-family: Arial, Helvetica, sans-serif">
-    <div style="width: 100%; max-height: 120px">
+    <div style="width: 100%; max-height: 150px">
         <img src="https://img.freepik.com/free-vector/stylish-glowing-digital-red-lines-banner_1017-23964.jpg"
-            alt="" style="width: 100%; height: 120px; object-fit: cover" />
+            alt="" style="width: 100%; height: 150px; object-fit: cover" />
     </div>
 
     <div class="main-container">

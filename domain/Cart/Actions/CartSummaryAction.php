@@ -122,12 +122,13 @@ class CartSummaryAction
         }
 
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
-        $taxPercentage = (float) $taxZone->percentage;
-        $taxDisplay = $taxZone->price_display;
 
-        if ( ! $taxZone instanceof TaxZone) {
+        if (!$taxZone instanceof TaxZone) {
             throw new BadRequestHttpException('No tax zone found');
         }
+
+        $taxPercentage = (float) $taxZone->percentage;
+        $taxDisplay = $taxZone->price_display;
 
         return [
             'taxZone' => $taxZone,
@@ -140,7 +141,7 @@ class CartSummaryAction
     {
         $discountTotal = 0;
 
-        if ( ! is_null($discount)) {
+        if (!is_null($discount)) {
             $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal);
         }
 
