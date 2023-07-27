@@ -6,7 +6,6 @@ namespace Domain\Customer\Models;
 
 use App\Settings\SiteSettings;
 use Domain\Address\Models\Address;
-use Domain\Customer\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Customer\Enums\Status;
@@ -40,7 +39,6 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string $mobile
  * @property \Domain\Customer\Enums\Gender $gender
  * @property Status $status
- * @property \Domain\Customer\Enums\EmailVerificationType $email_verification_type
  * @property \Illuminate\Support\Carbon $birth_date
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -100,7 +98,6 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
         'gender',
         'status',
         'birth_date',
-        'email_verification_type',
     ];
 
     protected $hidden = [
@@ -112,7 +109,6 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
         'birth_date' => 'date',
         'status' => Status::class,
         'gender' => Gender::class,
-        'email_verification_type' => EmailVerificationType::class,
         'email_verified_at' => 'datetime',
     ];
 
