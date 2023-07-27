@@ -20,6 +20,9 @@ class CreateOrderLineAction
 {
     public function execute(Order $order,  PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData)
     {
+
+        $orderLines = [];
+
         foreach ($preparedOrderData->cartLine as $cartLine) {
 
             try {
@@ -66,6 +69,8 @@ class CreateOrderLineAction
                 'remarks_data' => $cartLine->remarks,
                 'purchasable_data' => $cartLine->purchasable,
             ]);
+
+
 
             if ($cartLine->purchasable instanceof Product) {
                 $purchasableMedias = $cartLine->purchasable->getMedia('image');

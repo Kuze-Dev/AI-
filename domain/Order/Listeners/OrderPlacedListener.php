@@ -21,7 +21,8 @@ class OrderPlacedListener
         $customer = $event->customer;
         $order = $event->order;
         $shippingAddress = $event->shippingAddress;
+        $shippingMethod = $event->shippingMethod;
 
-        $customer->notify(new OrderPlacedMail($order, $shippingAddress, OrderMailStatus::CREATED));
+        $customer->notify(new OrderPlacedMail($order, $shippingAddress, $shippingMethod));
     }
 }

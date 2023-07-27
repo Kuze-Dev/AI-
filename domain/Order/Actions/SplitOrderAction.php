@@ -43,7 +43,12 @@ class SplitOrderAction
 
                 DB::commit();
 
-                event(new OrderPlacedEvent($preparedOrderData->customer,  $order, $preparedOrderData->shippingAddress));
+                event(new OrderPlacedEvent(
+                    $preparedOrderData->customer,
+                    $order,
+                    $preparedOrderData->shippingAddress,
+                    $preparedOrderData->shippingMethod
+                ));
 
                 return [
                     'order' => $order,

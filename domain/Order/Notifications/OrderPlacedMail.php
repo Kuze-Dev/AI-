@@ -8,6 +8,7 @@ use Domain\Address\Models\Address;
 use Domain\Admin\Models\Admin;
 use Domain\Order\Enums\OrderMailStatus;
 use Domain\Order\Models\Order;
+use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -22,16 +23,16 @@ class OrderPlacedMail extends Notification implements ShouldQueue
 
     private Order $order;
     private Address $shippingAddress;
-    private OrderMailStatus $type;
+    private ShippingMethod $shippingMethod;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(Order $order, Address $shippingAddress, OrderMailStatus $type)
+    public function __construct(Order $order, Address $shippingAddress, ShippingMethod $shippingMethod)
     {
         $this->order = $order;
-        $this->type = $type;
         $this->shippingAddress = $shippingAddress;
+        $this->shippingMethod = $shippingMethod;
     }
 
     /**
@@ -62,22 +63,17 @@ class OrderPlacedMail extends Notification implements ShouldQueue
             ', '
         );
 
-        if ($this->type === OrderMailStatus::CREATED) {
-            return (new MailMessage)
-                ->subject("Order Being Placed")
-                ->from('tenantone@example.com')
-                ->view("filament.emails.order.created", [
-                    'timezone' => $admin?->timezone,
-                    'order' => $this->order,
-                    'customer' => $notifiable,
-                    'address' => $address,
-                    'paymentMethod' => $this->order->payments->first()->paymentMethod
-                ]);
-        } else {
-            return (new MailMessage)
-                ->from('tenantone@example.com')
-                ->view("filament.emails.order.updated", ['order' => $this->order]);
-        }
+        return (new MailMessage)
+            ->subject("Order Being Placed")
+            ->from('tenantone@example.com')
+            ->view("filament.emails.order.created", [
+                'timezone' => $admin?->timezone,
+                'order' => $this->order,
+                'customer' => $notifiable,
+                'address' => $address,
+                'paymentMethod' => $this->order->payments->first()->paymentMethod,
+                'shippingMethod' => $this->shippingMethod
+            ]);
     }
 
     /**

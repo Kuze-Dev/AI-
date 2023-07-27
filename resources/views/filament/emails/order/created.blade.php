@@ -19,6 +19,20 @@
         border-radius: 0.8em;
     }
 
+    .summary-list {
+        display: flex;
+        justify-content: space-between;
+        height: 30px;
+    }
+
+    .remarks-container .col-1 {
+        width: 80%;
+    }
+
+    .remarks-container .col-2 {
+        width: 20%;
+    }
+
     @media (max-width: 1024px) and (min-width: 769px) {
         .main-container {
             padding-left: 8em;
@@ -30,6 +44,14 @@
         .main-container {
             padding-left: 1.5em;
             padding-right: 1.5em;
+        }
+
+        .remarks-container .col-1 {
+            width: 70%;
+        }
+
+        .remarks-container .col-2 {
+            width: 30%;
         }
     }
 
@@ -43,6 +65,15 @@
         .remarks-container {
             padding: 0.8em;
         }
+
+        .remarks-container .col-1 {
+            width: 50%;
+        }
+
+        .remarks-container .col-2 {
+            width: 50%;
+        }
+
     }
 </style>
 
@@ -86,24 +117,26 @@
 
         <div class="remarks-container">
             <p style="margin-bottom: 0.5em; font-weight: bold">Order Details:</p>
-            <div
-                style="
-            display: flex;
-            justify-content: flex-start;
-            width: 100%;
-            align-items: center;
-            gap: 2em;
-          ">
-                <div>
-                    <img src="https://i.pinimg.com/originals/67/25/e4/6725e4716ab971ff4b033d47184b27a8.png"
-                        alt="" style="width: 60px; height: 60px; object-fit: cover" />
+            @foreach ($order->orderLines as $orderLine)
+                <div
+                    style="
+                        display: flex;
+                        justify-content: flex-start;
+                        width: 100%;
+                        align-items: center;
+                        gap: 2em;
+                    ">
+                    <div>
+                        <img src="{{ $orderLine->getFirstMediaUrl('order_line_images') }}" alt=""
+                            style="width: 70px; height: 70px; object-fit: cover" />
+                    </div>
+                    <div>
+                        <p>{{ $orderLine->name }}</p>
+                        <p>{{ $order->currency_code }} {{ number_format($orderLine->sub_total, 2, '.', '') }}</p>
+                        <p>Quantity: <span>{{ $orderLine->quantity }}</span></p>
+                    </div>
                 </div>
-                <div>
-                    <p>Programmers mug</p>
-                    <p>P 99.00</p>
-                    <p>Quantity: <span>1</span></p>
-                </div>
-            </div>
+            @endforeach
         </div>
 
         <div class="remarks-container">
@@ -117,19 +150,54 @@
             gap: 2em;
             border-bottom: 1.3px solid #9ca3af;
           ">
-                <div style="width: 100%">
+                <div class="col-1">
                     <p>Subtotal:</p>
                     <p>Tax fee:</p>
                     <p>Shipping fee:</p>
                     <p>Total Saving:</p>
                     <p>Grand Total:</p>
                 </div>
-                <div style="width: 100%; text-align: right">
-                    <p>P 99.00</p>
-                    <p>P 99.00</p>
-                    <p>P 99.00</p>
-                    <p>P 99.00</p>
-                    <p>P 99.00</p>
+                <div class="col-2">
+                    <div class="summary-list">
+                        <div style="width: 100%; text-align: right">
+                            <p>{{ $order->currency_code }}</p>
+                        </div>
+                        <div style="width: 100%; text-align: right">
+                            <p>{{ number_format($order->sub_total, 2, '.', '') }}</p>
+                        </div>
+                    </div>
+                    <div class="summary-list">
+                        <div style="width: 100%; text-align: right">
+                            <p>{{ $order->currency_code }}</p>
+                        </div>
+                        <div style="width: 100%; text-align: right">
+                            <p>{{ number_format($order->tax_total, 2, '.', '') }}</p>
+                        </div>
+                    </div>
+                    <div class="summary-list">
+                        <div style="width: 100%; text-align: right">
+                            <p>{{ $order->currency_code }}</p>
+                        </div>
+                        <div style="width: 100%; text-align: right">
+                            <p>{{ number_format($order->shipping_total, 2, '.', '') }}</p>
+                        </div>
+                    </div>
+                    <div class="summary-list">
+                        <div style="width: 100%; text-align: right">
+                            <p>{{ $order->currency_code }}</p>
+                        </div>
+                        <div style="width: 100%; text-align: right">
+                            <p>{{ number_format($order->discount_total, 2, '.', '') }}</p>
+                        </div>
+                    </div>
+                    <div class="summary-list">
+                        <div style="width: 100%; text-align: right">
+                            <p>{{ $order->currency_code }}</p>
+                        </div>
+                        <div style="width: 100%; text-align: right">
+                            <p>{{ number_format($order->total, 2, '.', '') }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div
@@ -145,8 +213,8 @@
                     <p>Paid by:</p>
                 </div>
                 <div style="width: 100%; text-align: right">
-                    <p>USPS</p>
-                    <p>Cash on Delivery</p>
+                    <p>{{ $shippingMethod->title }}</p>
+                    <p>{{ $paymentMethod->title }}</p>
                 </div>
             </div>
         </div>
