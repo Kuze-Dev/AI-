@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Order\Notifications;
 
+use App\Settings\SiteSettings;
 use Domain\Address\Models\Address;
 use Domain\Admin\Models\Admin;
 use Domain\Order\Models\Order;
@@ -21,6 +22,9 @@ class OrderPlacedMail extends Notification implements ShouldQueue
     private Order $order;
     private Address $shippingAddress;
     private ShippingMethod $shippingMethod;
+    private string $logo;
+    private string $title;
+    private string $description;
 
     /**
      * Create a new notification instance.
@@ -30,6 +34,10 @@ class OrderPlacedMail extends Notification implements ShouldQueue
         $this->order = $order;
         $this->shippingAddress = $shippingAddress;
         $this->shippingMethod = $shippingMethod;
+
+        $this->logo = app(SiteSettings::class)->getLogoUrl();
+        $this->title = app(SiteSettings::class)->name;
+        $this->description = app(SiteSettings::class)->description;
     }
 
     /**
@@ -64,6 +72,9 @@ class OrderPlacedMail extends Notification implements ShouldQueue
             ->subject("Order Being Placed")
             ->from('tenantone@example.com')
             ->view("filament.emails.order.created", [
+                'logo' => $this->logo,
+                'title' => $this->title,
+                'description' => $this->description,
                 'timezone' => $admin?->timezone,
                 'order' => $this->order,
                 'customer' => $notifiable,

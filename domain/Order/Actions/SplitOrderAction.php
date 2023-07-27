@@ -36,12 +36,10 @@ class SplitOrderAction
                 app(CreateOrderAddressAction::class)
                     ->execute($order, $preparedOrderData);
 
-                CartLine::whereCheckoutReference($placeOrderData->cart_reference)
-                    ->update(['checked_out_at' => now()]);
+                // CartLine::whereCheckoutReference($placeOrderData->cart_reference)
+                //     ->update(['checked_out_at' => now()]);
 
                 $payment = $this->proceedPayment($order, $preparedOrderData);
-
-                DB::commit();
 
                 event(new OrderPlacedEvent(
                     $preparedOrderData->customer,
@@ -49,6 +47,8 @@ class SplitOrderAction
                     $preparedOrderData->shippingAddress,
                     $preparedOrderData->shippingMethod
                 ));
+
+                DB::commit();
 
                 return [
                     'order' => $order,

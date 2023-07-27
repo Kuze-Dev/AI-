@@ -1,6 +1,5 @@
 <style>
     .main-container {
-        /* text-align: center; */
         padding-top: 2em;
         padding-bottom: 2em;
         padding-left: 16em;
@@ -8,8 +7,42 @@
         font-size: medium;
     }
 
-    .remarks-container {
-        border: 1.5px solid #9ca3af;
+    .header {
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1.3px solid #e5e7eb;
+        padding-bottom: 1em;
+    }
+
+    .header img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover
+    }
+
+    .header .col-2 {
+        padding-left: 1em;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+
+    }
+
+    .title {
+        font-size: xx-large;
+        font-weight: bold;
+    }
+
+    .subtitle {
+        color: #3f3f3f;
+        padding-left: 4px;
+    }
+
+    .card {
+        border: 1.5px solid #E5E7EB;
         margin-top: 1.5em;
         padding-top: 0.5em;
         padding-bottom: 1.5em;
@@ -19,18 +52,36 @@
         border-radius: 0.8em;
     }
 
+    .card-title {
+        border-bottom: 1.3px solid #E5E7EB;
+        margin-bottom: 0.3em;
+    }
+
+    .card-title p {
+        font-weight: bold
+    }
+
     .summary-list {
         display: flex;
-        justify-content: space-between;
-        height: 30px;
+        justify-content: space-between
     }
 
-    .remarks-container .col-1 {
-        width: 80%;
+    .horizontal-line {
+        border-bottom: 1.3px solid #E5E7EB
     }
 
-    .remarks-container .col-2 {
-        width: 20%;
+    .order-details {
+        display: flex;
+        justify-content: flex-start;
+        border-bottom: 1.3px solid #E5E7EB;
+        padding-bottom: 0.5em;
+        align-items: flex-start;
+    }
+
+    .order-details img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover
     }
 
     @media (max-width: 1024px) and (min-width: 769px) {
@@ -46,11 +97,11 @@
             padding-right: 1.5em;
         }
 
-        .remarks-container .col-1 {
+        .summary-list .col-1 {
             width: 70%;
         }
 
-        .remarks-container .col-2 {
+        .summary-list .col-2 {
             width: 30%;
         }
     }
@@ -62,25 +113,53 @@
             font-size: small;
         }
 
-        .remarks-container {
+        .summary-list {
             padding: 0.8em;
         }
 
-        .remarks-container .col-1 {
+        .summary-list .col-1 {
             width: 50%;
         }
 
-        .remarks-container .col-2 {
+        .summary-list .col-2 {
             width: 50%;
         }
 
+        .order-details img {
+            width: 80px;
+            height: 80px
+        }
+
+        .title {
+            font-size: medium;
+        }
+
+        .subtitle {
+            font-size: small;
+        }
+
+        .header img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover
+        }
     }
 </style>
 
-<div style="width: 100%; font-family: Arial, Helvetica, sans-serif">
-    <div style="width: 100%; max-height: 150px">
-        <img src="https://img.freepik.com/free-vector/stylish-glowing-digital-red-lines-banner_1017-23964.jpg"
-            alt="" style="width: 100%; height: 150px; object-fit: cover" />
+<div style="width: 100%; font-family: Arial, Helvetica, Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif">
+
+    <div class="header">
+        @if ($logo)
+            <div>
+                <img src={{ $logo }} alt="" />
+            </div>
+        @endif
+        <div class="col-2">
+            <div>
+                <span class="title">{{ $title }}</span>
+            </div>
+            <div><span class="subtitle">{{ $description }}</span></div>
+        </div>
     </div>
 
     <div class="main-container">
@@ -101,10 +180,11 @@
             to serving you again soon.
         </p>
 
-        <div class="remarks-container">
-            <p style="margin-bottom: 0.5em; font-weight: bold">
-                Delivery Details:
-            </p>
+        <div class="card">
+            <div class="card-title">
+                <p class=>Delivery Details:</p>
+            </div>
+
             <p style="line-height: 1.5em">
                 Name: <span> {{ $customer->first_name . $customer->last_name }}</span>
             </p>
@@ -115,111 +195,98 @@
             </p>
         </div>
 
-        <div class="remarks-container">
-            <p style="margin-bottom: 0.5em; font-weight: bold">Order Details:</p>
+        <div class="card">
+            <div class="card-title" style="margin-bottom: 1em">
+                <p class=>Order Details:</p>
+            </div>
+
             @foreach ($order->orderLines as $orderLine)
-                <div
-                    style="
-                        display: flex;
-                        justify-content: flex-start;
-                        width: 100%;
-                        align-items: center;
-                        gap: 2em;
-                    ">
-                    <div>
-                        <img src="{{ $orderLine->getFirstMediaUrl('order_line_images') }}" alt=""
-                            style="width: 120px; height: 120px; object-fit: cover" />
-                    </div>
-                    <div>
-                        <p>{{ $orderLine->name }}</p>
-                        <p>{{ $order->currency_code }}
-                            {{ number_format($orderLine->sub_total, 2, '.', '') }}</p>
-                        <p>Quantity:
-                            <span>{{ $orderLine->quantity }}</span>
-                        </p>
-                        <p style="font-size: smaller">Color: White / Size: Large
-                        </p>
+                <div style="margin-bottom:1.5em">
+                    <div class="order-details">
+                        <div>
+                            <img src="{{ $orderLine->getFirstMediaUrl('order_line_images') }}" alt="" />
+                        </div>
+                        <div
+                            style="
+                            display: flex;
+                            align-items: flex-start;
+                            justify-content: flex-end;
+                            flex-direction: column;
+                            gap: 0.7em;
+                            padding-left: 1em;
+                            font-size: 1em;
+                        ">
+                            <div>{{ $orderLine->name }}</div>
+                            <div>
+                                {{ $order->currency_code }} {{ number_format($orderLine->sub_total, 2, '.', '') }}
+                            </div>
+                            @if (isset($orderLine->purchasable_data['combination']))
+                                @php
+                                    $combinations = array_values($orderLine->purchasable_data['combination']);
+                                    $optionValues = array_column($combinations, 'option_value');
+                                    $variantString = implode(' / ', array_map('ucfirst', $optionValues));
+                                @endphp
+
+                                <div style="height: 20px;">
+                                    <div><span style="color:#3f3f3f;">{{ $variantString }}</span> </div>
+                                </div>
+                            @endif
+
+                            <div style="height: 20px;">
+                                <span style="color:#3f3f3f">Quantity:</span>
+                                <span>{{ $orderLine->quantity }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             @endforeach
         </div>
 
-        <div class="remarks-container">
-            <p style="margin-bottom: 0.5em; font-weight: bold">Order Summary:</p>
-            <div
-                style="
-            display: flex;
-            justify-content: flex-start;
-            width: 100%;
-            align-items: center;
-            gap: 2em;
-            border-bottom: 1.3px solid #9ca3af;
-          ">
-                <div class="col-1">
+        <div class="card">
+            <div class="card-title">
+                <p class=>Order Summary:</p>
+            </div>
+            <div class="summary-list horizontal-line">
+                <div>
+                    <p>Shipping Method:</p>
+                    <p>Payment Method:</p>
+                </div>
+                <div style="text-align: right">
+                    <p>{{ $shippingMethod->title }}</p>
+                    <p>{{ $paymentMethod->title }}</p>
+                </div>
+            </div>
+
+            <div class="summary-list horizontal-line">
+                <div>
                     <p>Subtotal:</p>
                     <p>Tax fee:</p>
                     <p>Shipping fee:</p>
                     <p>Total Saving:</p>
-                    <p>Grand Total:</p>
                 </div>
-                <div class="col-2">
-                    <div class="summary-list">
-                        <div style="width: 100%; text-align: right">
-                            <p>{{ $order->currency_code }}</p>
-                        </div>
-                        <div style="width: 100%; text-align: right">
-                            <p>{{ number_format($order->sub_total, 2, '.', '') }}</p>
-                        </div>
-                    </div>
-                    <div class="summary-list">
-                        <div style="width: 100%; text-align: right">
-                            <p>{{ $order->currency_code }}</p>
-                        </div>
-                        <div style="width: 100%; text-align: right">
-                            <p>{{ number_format($order->tax_total, 2, '.', '') }}</p>
-                        </div>
-                    </div>
-                    <div class="summary-list">
-                        <div style="width: 100%; text-align: right">
-                            <p>{{ $order->currency_code }}</p>
-                        </div>
-                        <div style="width: 100%; text-align: right">
-                            <p>{{ number_format($order->shipping_total, 2, '.', '') }}</p>
-                        </div>
-                    </div>
-                    <div class="summary-list">
-                        <div style="width: 100%; text-align: right">
-                            <p>{{ $order->currency_code }}</p>
-                        </div>
-                        <div style="width: 100%; text-align: right">
-                            <p>{{ number_format($order->discount_total, 2, '.', '') }}</p>
-                        </div>
-                    </div>
-                    <div class="summary-list">
-                        <div style="width: 100%; text-align: right">
-                            <p>{{ $order->currency_code }}</p>
-                        </div>
-                        <div style="width: 100%; text-align: right">
-                            <p>{{ number_format($order->total, 2, '.', '') }}</p>
-                        </div>
-                    </div>
+                <div style="text-align: right">
+                    <p>{{ $order->currency_code }}
+                        {{ number_format($order->sub_total, 2, '.', '') }}
+                    </p>
+                    <p>{{ $order->currency_code }}
+                        {{ number_format($order->tax_total, 2, '.', '') }}
+                    </p>
+                    <p>{{ $order->currency_code }}
+                        {{ number_format($order->shipping_total, 2, '.', '') }}
+                    </p>
+                    <p>{{ $order->currency_code }}
+                        {{ number_format($order->discount_total, 2, '.', '') }}
+                    </p>
                 </div>
             </div>
-            <div
-                style="
-            display: flex;
-            justify-content: flex-start;
-            width: 100%;
-            align-items: center;
-            gap: 2em;
-          ">
-                <div style="width: 100%">
-                    <p>Shipping Option:</p>
-                    <p>Paid by:</p>
+            <div class="summary-list ">
+                <div>
+                    <p>Grand Total:</p>
                 </div>
-                <div style="width: 100%; text-align: right">
-                    <p>{{ $shippingMethod->title }}</p>
-                    <p>{{ $paymentMethod->title }}</p>
+                <div style="text-align: right">
+                    <p>{{ $order->currency_code }}
+                        {{ number_format($order->total, 2, '.', '') }}
+                    </p>
                 </div>
             </div>
         </div>
