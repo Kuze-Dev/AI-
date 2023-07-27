@@ -14,22 +14,22 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
 
-class OrderPlacedMail extends Notification implements ShouldQueue
+class OrderStatusUpdatedMail extends Notification implements ShouldQueue
 {
     use Queueable;
 
     private Order $order;
-    private Address $shippingAddress;
-    private ShippingMethod $shippingMethod;
+    private string $status;
+    private ?string $remarks;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(Order $order, Address $shippingAddress, ShippingMethod $shippingMethod)
+    public function __construct(Order $order, string $status, ?string $remarks)
     {
         $this->order = $order;
-        $this->shippingAddress = $shippingAddress;
-        $this->shippingMethod = $shippingMethod;
+        $this->status = $status;
+        $this->remarks = $remarks;
     }
 
     /**
@@ -47,29 +47,15 @@ class OrderPlacedMail extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $admin = Admin::first();
-
-        $address = Arr::join(
-            array_filter([
-                $this->shippingAddress->address_line_1,
-                $this->shippingAddress->state->country->name,
-                $this->shippingAddress->state->name,
-                $this->shippingAddress->zip_code,
-                $this->shippingAddress->city,
-            ]),
-            ', '
-        );
 
         return (new MailMessage)
-            ->subject("Order Being Placed")
+            ->subject("Order " .  $this->order->reference . " has been " . $this->status)
             ->from('tenantone@example.com')
-            ->view("filament.emails.order.created", [
-                'timezone' => $admin?->timezone,
+            ->view("filament.emails.order.updated", [
+                'status' => $this->status,
+                'remarks' => $this->remarks,
                 'order' => $this->order,
                 'customer' => $notifiable,
-                'address' => $address,
-                'paymentMethod' => $this->order->payments->first()->paymentMethod,
-                'shippingMethod' => $this->shippingMethod
             ]);
     }
 

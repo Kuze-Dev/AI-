@@ -5,6 +5,7 @@
         padding-bottom: 2em;
         padding-left: 16em;
         padding-right: 16em;
+        font-size: medium;
     }
 
     .remarks-container {
@@ -36,6 +37,7 @@
         .main-container {
             padding-left: 2px;
             padding-right: 2px;
+            font-size: small;
         }
 
         .remarks-container {
@@ -51,30 +53,21 @@
     </div>
 
     <div class="main-container">
-        <p style="margin-bottom: 1em; font-weight: bold">
-            Your order has been shipped
-        </p>
 
         <p style="line-height: 1.5em">
-            Hi {{ $customer->first_name }}, your item(s) in order OrderNumber has been forwarded to our
-            delivery partner and on its way to ShippingAddress. Track your order
-            below or key in the tracking number below on your designated courier
-            website.
+            Hi {{ $customer->first_name . $customer->last_name }}, we just want to inform you that your item(s) in order
+            #{{ $order->reference }} has
+            been {{ $status }}.
         </p>
 
-        <p style="line-height: 1.5em">
-            Please note that it may take up to 24 - 48 hours for tracking
-            information to be available/updated.
-        </p>
+        @if ($remarks)
+            <div class="remarks-container">
+                <p style="margin-bottom: 0.5em; font-weight: bold">Remarks:</p>
+                <p style="line-height: 1.5em">
+                    {{ $remarks }}
+                </p>
+            </div>
+        @endif
 
-        <div class="remarks-container">
-            <p style="margin-bottom: 0.5em; font-weight: bold">Remarks:</p>
-            <p style="line-height: 1.5em">
-                This remarks came from the admin This remarks came from the admin
-                This remarks came from the admin This remarks came from the admin
-                This remarks came from the admin This remarks came from the admin
-                This remarks came from the admin This remarks came from the admin
-            </p>
-        </div>
     </div>
 </div>

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Order\Listeners;
 
-use Domain\Order\Enums\OrderMailStatus;
 use Domain\Order\Events\OrderPlacedEvent;
 use Domain\Order\Notifications\OrderPlacedMail;
 
