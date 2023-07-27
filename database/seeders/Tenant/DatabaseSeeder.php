@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             Tier\TierSeeder::class,
             Customer\CustomerSeeder::class,
             ShippingMethod\ShippingMethodSeeder::class,
+            ShippingMethod\ShippingBoxSeeder::class,
         ]);
     }
 }
