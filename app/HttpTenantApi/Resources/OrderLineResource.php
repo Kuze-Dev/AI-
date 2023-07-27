@@ -26,6 +26,7 @@ class OrderLineResource extends JsonApiResource
             'sub_total' => $this->sub_total,
             'discount_total' => $this->discount_total,
             'total' => $this->total,
+            'reviewed_at' => $this->reviewed_at,
             'purchasable' => function () {
                 // (WIP) DTO is my work around here becase the
                 // purchable_data is an array coming from column

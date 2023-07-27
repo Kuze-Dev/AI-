@@ -30,15 +30,6 @@ class ReviewStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'order_id' => [
-                'required',
-                Rule::exists('orders', 'id')->where('status', 'Fulfilled'),
-                Rule::exists('order_lines', 'order_id')->where('id', $this->input('order_line_id')),
-            ],
-            'product_id' => [
-                'required',
-                Rule::exists('products', 'id'),
-            ],
             'order_line_id' => [
                 'required',
                 Rule::exists('order_lines', 'id'),
@@ -56,7 +47,7 @@ class ReviewStoreRequest extends FormRequest
                 'min:1',
                 'max:5',
             ],
-            'anonymous' => [
+            'is_anonymous' => [
                 'required',
                 'bool',
             ],

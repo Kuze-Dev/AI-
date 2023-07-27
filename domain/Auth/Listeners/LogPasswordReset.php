@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Customer\Listeners;
+namespace Domain\Auth\Listeners;
 
 use Illuminate\Auth\Events\PasswordReset;
 use Spatie\Activitylog\ActivityLogger;

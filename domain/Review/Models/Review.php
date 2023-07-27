@@ -26,6 +26,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int $rating
  * @property string|null $comment
  * @property array|null $data
+ * @property bool $is_anonymous
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Customer|null $customer
@@ -62,7 +63,7 @@ class Review extends Model implements HasMedia
     ];
 
     protected $casts = [
-        'data' => 'array',
+        'is_anonymous' => 'bool',
     ];
 
     public function registerMediaCollections(): void
