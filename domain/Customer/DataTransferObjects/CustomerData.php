@@ -28,7 +28,7 @@ final class CustomerData
         public readonly UploadedFile|string|null $image = null,
         public readonly ?AddressData $shipping_address_data = null,
         public readonly ?AddressData $billing_address_data = null,
-        public readonly ?EmailVerificationType $email_verification_type = null,
+        public readonly EmailVerificationType $email_verification_type = EmailVerificationType::LINK,
     ) {
     }
 
