@@ -40,7 +40,7 @@ class OrderController extends Controller
                 'billingAddress',
                 'orderLines.media',
             ])->whereBelongsTo(auth()->user()))
-                ->allowedIncludes(['orderLines'])
+                ->allowedIncludes(['orderLines', 'orderLines.review.media'])
                 ->allowedFilters(['status', 'reference', AllowedFilter::scope('for_payment', 'whereHasForPayment')])
                 ->allowedSorts(['reference', 'total', 'status', 'created_at'])
                 ->jsonPaginate()

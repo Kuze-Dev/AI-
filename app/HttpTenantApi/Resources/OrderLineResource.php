@@ -42,9 +42,17 @@ class OrderLineResource extends JsonApiResource
                     fn ($media) => $media->collection_name === 'order_line_notes'
                 )),
             ],
+            'reviews' => $this->review,
             'media' => MediaResource::collection($this->media->filter(
                 fn ($media) => $media->collection_name === 'order_line_images'
             )),
+        ];
+    }
+
+    public function toRelationships(Request $request): array
+    {
+        return [
+            'review' => fn () => new ReviewResource($this->review),
         ];
     }
 }
