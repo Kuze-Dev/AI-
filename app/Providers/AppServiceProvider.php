@@ -20,6 +20,7 @@ use Domain\Globals\Models\Globals;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
 use Domain\Shipment\Models\Shipment;
+use Domain\Shipment\Models\ShippingBox;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Tier\Models\Tier;
 use Support\Captcha\CaptchaManager;
@@ -79,6 +80,7 @@ class AppServiceProvider extends ServiceProvider
             Address::class,
             Tier::class,
             Customer::class,
+            ShippingBox::class,
         ]);
 
         Password::defaults(
