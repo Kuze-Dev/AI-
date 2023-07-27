@@ -29,7 +29,7 @@ class GetShippingfeeAction
             $parcelData,
             $shippingMethod,
             $address
-        )->getRate();
+        )->getRate($serviceID);
 
     }
 }
