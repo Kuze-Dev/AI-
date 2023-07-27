@@ -6,6 +6,7 @@ namespace Domain\Customer\Database\Factories;
 
 use Carbon\Carbon;
 use Domain\Address\Database\Factories\AddressFactory;
+use Domain\Customer\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
@@ -35,6 +36,7 @@ class CustomerFactory extends Factory
             'status' => Arr::random(Status::cases()),
             'birth_date' => now()->subYears($this->faker->randomDigitNotNull()),
             'remember_token' => Str::random(10),
+            'email_verification_type' => EmailVerificationType::LINK,
         ];
     }
 
