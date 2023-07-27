@@ -35,6 +35,7 @@ class CreateCustomerAction
             'gender' => $customerData->gender,
             'birth_date' => $customerData->birth_date,
             'password' => $customerData->password,
+            'email_verification_type' => $customerData->email_verification_type,
         ]);
 
         if ($customerData->shipping_address_data !== null) {

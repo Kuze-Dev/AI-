@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Domain\Auth;
+
+use Domain\Auth\Actions\GenerateOTPForEmailVerificationAction;
+use Domain\Auth\Enums\EmailVerificationType;
+use Domain\Auth\Model\EmailVerificationOneTimePassword;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+
+trait EmailVerificationOTP
+{
+    public function emailVerificationOneTimePassword(): MorphOne
+    {
+        return $this->morphOne(EmailVerificationOneTimePassword::class, 'authenticatable');
+    }
+
+    public function getEmailVerificationColumn(): EmailVerificationType
+    {
+        return $this->email_verification_type;
+    }
+
+    public function isEmailVerificationUseOTP(): bool
+    {
+        return $this->getEmailVerificationColumn() === EmailVerificationType::OTP;
+    }
+
+    public function generateEmailVerificationOTP(): string
+    {
+        return app(GenerateOTPForEmailVerificationAction::class)->execute($this);
+    }
+}
