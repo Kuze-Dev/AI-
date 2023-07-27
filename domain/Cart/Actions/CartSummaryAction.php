@@ -12,7 +12,8 @@ use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
 use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Discount\Models\Discount;
-use Domain\Shipment\Actions\USPS\GetUSPSRateAction;
+use Domain\Shipment\Actions\GetBoxAction;
+use Domain\Shipment\Actions\GetShippingfeeAction;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ShipFromAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
@@ -20,6 +21,7 @@ use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
 use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 
 class CartSummaryAction
 {
@@ -92,6 +94,29 @@ class CartSummaryAction
     ): float {
         $shippingFeeTotal = 0;
 
+        $productlist = [];
+
+        foreach ($collections as $collection) {
+            $purchasableId = $collection->purchasable->id;
+            $length = $collection->purchasable->dimension['length'];
+            $width = $collection->purchasable->dimension['width'];
+            $height = $collection->purchasable->dimension['height'];
+            $weight = $collection->purchasable->weight;
+
+            $productlist[] = [
+                'product_id' => (string) $purchasableId,
+                'length' => $length,
+                'width' => $width,
+                'height' => $height,
+                'weight' => (float) $weight,
+            ];
+        }
+
+        $boxData = app(GetBoxAction::class)->execute(
+            $shippingMethod,
+            BoxData::fromArray($productlist)
+        );
+
         if ($shippingAddress) {
             $parcelData = new ParcelData(
                 ship_from_address: new ShipFromAddressData(
@@ -102,16 +127,16 @@ class CartSummaryAction
                     country: $shippingMethod->country,
                     code: $shippingMethod->country->code,
                 ),
-                pounds: '10',
+                pounds: (string) $boxData->weight,
                 ounces: '0',
-                width: '10',
-                height: '10',
-                length: '10',
+                width: (string) $boxData->width,
+                height: (string) $boxData->height,
+                length: (string) $boxData->length,
                 zip_origin: $shippingMethod->shipper_zipcode,
                 parcel_value: '200',
             );
 
-            $shippingFeeTotal = app(GetUSPSRateAction::class)
+            $shippingFeeTotal = app(GetShippingfeeAction::class)
                 ->execute($customer, $parcelData, $shippingMethod, $shippingAddress, $serviceId);
         }
 
@@ -131,12 +156,13 @@ class CartSummaryAction
         }
 
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
-        $taxPercentage = (float) $taxZone->percentage;
-        $taxDisplay = $taxZone->price_display;
 
         if ( ! $taxZone instanceof TaxZone) {
             throw new BadRequestHttpException('No tax zone found');
         }
+
+        $taxPercentage = (float) $taxZone->percentage;
+        $taxDisplay = $taxZone->price_display;
 
         return [
             'taxZone' => $taxZone,

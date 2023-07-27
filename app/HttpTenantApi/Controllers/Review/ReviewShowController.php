@@ -36,7 +36,7 @@ class ReviewShowController
     public function showSummary(string $product_id): JsonResponse
     {
         $review = Review::where('product_id', $product_id);
-    
+
         $reviewCount = $review->count();
         $averageRating = $review->avg('rating');
 

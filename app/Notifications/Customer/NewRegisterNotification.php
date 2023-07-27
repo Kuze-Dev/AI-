@@ -1,11 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications\Customer;
 
 use Domain\Customer\Models\Customer;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class NewRegisterNotification extends Notification
@@ -13,12 +13,10 @@ class NewRegisterNotification extends Notification
     use Queueable;
     private $customer;
 
-    /**
-     * Create a new notification instance.
-     */
+    /** Create a new notification instance. */
     public function __construct(Customer $customer)
     {
-        //
+
         $this->customer = $customer;
     }
 
@@ -40,10 +38,10 @@ class NewRegisterNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            "type" => "new_user",
-            "message" => "Welcome to our platform {$this->customer->first_name} {$this->customer->last_name}!",
-            "button" => "View your profile",
-            "referrence" => $this->customer->email
+            'type' => 'new_user',
+            'message' => "Welcome to our platform {$this->customer->first_name} {$this->customer->last_name}!",
+            'button' => 'View your profile',
+            'referrence' => $this->customer->email,
         ];
     }
 }
