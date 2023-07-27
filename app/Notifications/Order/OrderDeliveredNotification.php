@@ -41,7 +41,9 @@ class OrderDeliveredNotification extends Notification
     {
         return [
             "type" => "order_delivered",
-            "data" => $this->order,
+            'message' => "Your order #{$this->order->reference} has been delivered",
+            "button" => "View Order Details",
+            'reference' => $this->order->reference
         ];
     }
 }
