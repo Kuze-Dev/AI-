@@ -10,9 +10,7 @@ use Domain\Order\Actions\PlaceOrderAction;
 use Domain\Order\Actions\UpdateOrderAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\UpdateOrderData;
-use Domain\Order\Events\OrderPlacedEvent;
 use Domain\Order\Models\Order;
-use Domain\Order\Notifications\OrderPlacedMail;
 use Domain\Order\Requests\PlaceOrderRequest;
 use Domain\Order\Requests\UpdateOrderRequest;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
@@ -45,14 +43,6 @@ class OrderController extends Controller
     public function store(PlaceOrderRequest $request)
     {
         $validatedData = $request->validated();
-
-        // $order = Order::find(1);
-
-        // /** @var \Domain\Customer\Models\Customer $customer */
-        // $customer = auth()->user();
-
-        // event(new OrderPlacedEvent($customer, $order));
-
 
         $result = app(PlaceOrderAction::class)
             ->execute(PlaceOrderData::fromArray($validatedData));

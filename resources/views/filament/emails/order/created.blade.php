@@ -128,12 +128,17 @@
                     ">
                     <div>
                         <img src="{{ $orderLine->getFirstMediaUrl('order_line_images') }}" alt=""
-                            style="width: 70px; height: 70px; object-fit: cover" />
+                            style="width: 120px; height: 120px; object-fit: cover" />
                     </div>
                     <div>
                         <p>{{ $orderLine->name }}</p>
-                        <p>{{ $order->currency_code }} {{ number_format($orderLine->sub_total, 2, '.', '') }}</p>
-                        <p>Quantity: <span>{{ $orderLine->quantity }}</span></p>
+                        <p>{{ $order->currency_code }}
+                            {{ number_format($orderLine->sub_total, 2, '.', '') }}</p>
+                        <p>Quantity:
+                            <span>{{ $orderLine->quantity }}</span>
+                        </p>
+                        <p style="font-size: smaller">Color: White / Size: Large
+                        </p>
                     </div>
                 </div>
             @endforeach
