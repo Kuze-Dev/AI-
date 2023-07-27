@@ -37,6 +37,7 @@ return new class () extends Migration {
 
             $table->rememberToken();
             $table->date('birth_date');
+            $table->string('email_verified_type');
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
