@@ -41,7 +41,9 @@ class OrderFulfilledNotification extends Notification
     {
         return [
             "type" => "order_fulfilled",
-            "data" => $this->order,
+            'message' => "Your order #{$this->order->reference} has been fulfilled",
+            "button" => "Add a review",
+            'reference' => $this->order->reference
         ];
     }
 }

@@ -41,7 +41,9 @@ class OrderShippedNotification extends Notification
     {
         return [
             "type" => "order_shipped",
-            "data" => $this->order,
+            'message' => "Your order #{$this->order->reference} is on its way",
+            "button" => "View Order Details",
+            'reference' => $this->order->reference
         ];
     }
 }
