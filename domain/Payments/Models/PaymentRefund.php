@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Payments\Models;
 
-use Domain\PaymentMethod\Models\PaymentMethod;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Eloquent;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Domain\Payments\Models\Payment
@@ -56,7 +53,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereUpdatedAt($value)
  * @mixin Eloquent
  */
-class Payment extends Model implements HasMedia
+class PaymentRefund extends Model implements HasMedia
 {
     use InteractsWithMedia;
 
@@ -66,18 +63,14 @@ class Payment extends Model implements HasMedia
      */
     protected $fillable = [
         'id',
-        'payable_type',
-        'payable_id',
-        'payment_method_id',
-        'gateway',
-        'currency',
+        'payment_id',
+        'refund_id',
         'amount',
+        'transaction_id',
         'status',
         'remarks',
         'message',
-        'payment_id',
-        'transaction_id',
-        'payment_details',
+        'refund_details',
     ];
 
     protected $with = [
@@ -85,25 +78,13 @@ class Payment extends Model implements HasMedia
     ];
 
     protected $casts = [
-        'payment_details' => 'array',
+        'refund_details' => 'array',
     ];
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\PaymentMethod\Models\PaymentMethod, self> */
-    public function paymentMethod(): BelongsTo
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Payments\Models\Payment, self> */
+    public function payment(): BelongsTo
     {
-        return $this->belongsTo(PaymentMethod::class);
-    }
-
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Payments\Models\PaymentRefund>*/
-    public function refunds(): HasMany
-    {
-        return $this->hasMany(PaymentRefund::class);
-    }
-
-    /** @return MorphTo<Model, self> */
-    public function payable(): MorphTo
-    {
-        return $this->morphTo();
+        return $this->belongsTo(Payment::class);
     }
 
     public function registerMediaCollections(): void

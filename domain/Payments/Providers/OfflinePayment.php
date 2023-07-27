@@ -22,7 +22,7 @@ class OfflinePayment extends Provider
         return new PaymentAuthorize(true);
     }
 
-    public function refund(): PaymentRefund
+    public function refund(Payment $paymentModel, int $amount): PaymentRefund
     {
         return new PaymentRefund(success: false);
     }

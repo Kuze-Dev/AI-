@@ -25,6 +25,7 @@ use Domain\Page\Models\Page;
 use Support\Captcha\CaptchaManager;
 use Support\MetaData\Models\MetaData;
 use Domain\Payments\Models\Payment;
+use Domain\Payments\Models\PaymentRefund;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tier\Models\Tier;
@@ -86,6 +87,7 @@ class AppServiceProvider extends ServiceProvider
             Tier::class,
             Customer::class,
             Address::class,
+            PaymentRefund::class,
         ]);
 
         Password::defaults(

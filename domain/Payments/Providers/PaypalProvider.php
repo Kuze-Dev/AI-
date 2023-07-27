@@ -161,7 +161,7 @@ class PaypalProvider extends Provider
 
     }
 
-    public function refund(): PaymentRefund
+    public function refund(ModelsPayment $paymentModel, int $amount): PaymentRefund
     {
         return new PaymentRefund(success: false);
     }
