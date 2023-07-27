@@ -48,11 +48,4 @@ class OrderLineResource extends JsonApiResource
             )),
         ];
     }
-
-    public function toRelationships(Request $request): array
-    {
-        return [
-            'review' => fn () => new ReviewResource($this->review),
-        ];
-    }
 }
