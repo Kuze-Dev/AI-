@@ -6,6 +6,11 @@ namespace App\HttpTenantApi\Controllers\Order;
 
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\OrderResource;
+use App\Notifications\Order\OrderCancelledNotification;
+use App\Notifications\Order\OrderDeliveredNotification;
+use App\Notifications\Order\OrderFulfilledNotification;
+use App\Notifications\Order\OrderPlacedNotification;
+use App\Notifications\Order\OrderShippedNotification;
 use Domain\Order\Actions\PlaceOrderAction;
 use Domain\Order\Actions\UpdateOrderAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
@@ -15,6 +20,7 @@ use Domain\Order\Requests\PlaceOrderRequest;
 use Domain\Order\Requests\UpdateOrderRequest;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
+use Illuminate\Support\Facades\Notification;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -30,10 +36,11 @@ class OrderController extends Controller
     {
         return OrderResource::collection(
             QueryBuilder::for(Order::with([
-                'shippingAddress', 'billingAddress',
+                'shippingAddress',
+                'billingAddress',
                 'orderLines.media',
             ])->whereBelongsTo(auth()->user()))
-                ->allowedIncludes(['orderLines'])
+                ->allowedIncludes(['orderLines', 'orderLines.review.media'])
                 ->allowedFilters(['status', 'reference', AllowedFilter::scope('for_payment', 'whereHasForPayment')])
                 ->allowedSorts(['reference', 'total', 'status', 'created_at'])
                 ->jsonPaginate()
@@ -59,6 +66,10 @@ class OrderController extends Controller
             ], 400);
         }
 
+        // dd($result);
+        $customer = auth()->user();
+        Notification::send($customer, new OrderPlacedNotification($result['order']));
+
         return response()
             ->json([
                 'message' => 'Order placed successfully',
@@ -73,8 +84,10 @@ class OrderController extends Controller
 
         $model = QueryBuilder::for(
             $order->with([
-                'shippingAddress', 'billingAddress',
-                'orderLines.media', 'orderLines.review.media',
+                'shippingAddress',
+                'billingAddress',
+                'orderLines.media',
+                'orderLines.review.media',
                 'payments.paymentMethod.media',
             ])->whereBelongsTo(auth()->user())
                 ->whereReference($order->reference)
@@ -103,6 +116,26 @@ class OrderController extends Controller
         if ($result instanceof PaymentAuthorize) {
             return response()->json($result);
         }
+        
+        $customer = auth()->user();
+        $status = $validatedData['status'];
+        
+        switch ($status) {
+            case 'Delivered':
+                Notification::send($customer, new OrderDeliveredNotification($result));
+                break;
+            case 'Cancelled':
+                Notification::send($customer, new OrderCancelledNotification($result));
+                break;
+            case 'Shipped':
+                Notification::send($customer, new OrderShippedNotification($result));
+                break;
+            case 'Fulfilled':
+                Notification::send($customer, new OrderFulfilledNotification($order));
+                break;
+        }
+        
+        
 
         return response()
             ->json([

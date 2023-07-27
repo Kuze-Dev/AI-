@@ -18,19 +18,38 @@ class ShippingMethodSeeder extends Seeder
 {
     public function run(): void
     {
+        $state = StateFactory::new(['name' => 'cali'])
+            ->for(
+                /** @phpstan-ignore-next-line  */
+                Country::whereName('United States')
+                    ->first()
+            )->createOne();
+
         ShippingMethodFactory::new()
             ->createOne([
                 'title' => 'USPS',
                 'subtitle' => 'usps',
                 'description' => 'test',
                 'driver' => Driver::USPS,
-                'ship_from_address' => [
-                    'address' => '185 BERRY ST',
-                    'state' => 'CA',
-                    'city' => 'SAN FRANCISCO',
-                    'zip5' => '94107',
-                    'zip4' => '1741',
-                ],
+                'shipper_country_id' => $state->country_id,
+                'shipper_state_id' => $state->id,
+                'shipper_address' => '185 BERRY ST',
+                'shipper_city' => 'SAN FRANCISCO',
+                'shipper_zipcode' => '94107',
+                'active' => true,
+            ]);
+
+        ShippingMethodFactory::new()
+            ->createOne([
+                'title' => 'UPS',
+                'subtitle' => 'ups',
+                'description' => 'test',
+                'driver' => Driver::UPS,
+                'shipper_country_id' => $state->country_id,
+                'shipper_state_id' => $state->id,
+                'shipper_address' => '185 BERRY ST',
+                'shipper_city' => 'SAN FRANCISCO',
+                'shipper_zipcode' => '94107',
                 'active' => true,
             ]);
 

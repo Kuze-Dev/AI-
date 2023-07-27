@@ -69,14 +69,15 @@ class ProductResource extends Resource
                             Forms\Components\Toggle::make('is_special_offer'),
                             Forms\Components\Toggle::make('is_featured'),
                         ])->columns(2),
-                    Forms\Components\Section::make('Shipping')
+                    Forms\Components\Section::make('Shipping Size')
                         ->schema([
                             Forms\Components\TextInput::make('weight')
+                                ->label('Weight (lbs)')
                                 ->numeric()
                                 ->dehydrateStateUsing(fn ($state) => (float) $state),
 
                             Forms\Components\Fieldset::make('dimension')
-                                ->label('Dimension')
+                                ->label('Dimension (cm)')
                                 ->schema([
                                     Forms\Components\TextInput::make('length')
                                         ->numeric()

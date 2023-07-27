@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Domain\Shipment;
 
 use App\Settings\ShippingSettings;
+use Domain\Shipment\API\UPS\Clients\UPSClient;
 use Domain\Shipment\API\USPS\Clients\Client as USPSClient;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\Drivers\StorePickupDriver;
+use Domain\Shipment\Drivers\UpsDriver;
 use Domain\Shipment\Drivers\UspsDriver;
 use Domain\ShippingMethod\Enums\Driver;
 use Domain\ShippingMethod\Models\ShippingMethod;
@@ -40,6 +42,24 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
             }
         );
 
+        $this->app->bind(
+            UPSClient::class,
+            function () {
+                $setting = app(ShippingSettings::class);
+
+                if ($setting->ups_username === null || $setting->ups_password === null || $setting->access_license_number === null) {
+                    abort(500, 'Setting UPS credential not setup yet.');
+                }
+
+                return new UPSClient(
+                    accessLicenseNumber: $setting->access_license_number,
+                    username: $setting->ups_username,
+                    password: $setting->ups_password,
+                    isProduction: $setting->ups_production_mode,
+                );
+            }
+        );
+
         $this->mergeConfigFrom(__DIR__ . '/config/shipment.php', 'domain.shipment');
     }
 
@@ -57,6 +77,7 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
                             fn () => match ($shippingMethod->driver) {
                                 Driver::STORE_PICKUP => new StorePickupDriver(),
                                 Driver::USPS => new UspsDriver(),
+                                Driver::UPS => new UpsDriver(),
                             }
                         );
                 }
@@ -69,6 +90,7 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
         return [
             ShippingManagerInterface::class,
             USPSClient::class,
+            UPSClient::class,
         ];
     }
 }

@@ -11,7 +11,6 @@ class ProductData
 {
     public function __construct(
         public readonly string $name,
-        // public readonly RouteUrlData $route_url_data,
         public readonly MetaDataData $meta_data,
         public readonly string $sku,
         public readonly float $retail_price,
@@ -39,7 +38,6 @@ class ProductData
     {
         return new self(
             name: $data['name'],
-            // route_url_data: RouteUrlData::fromArray($data['route_url'] ?? []),
             meta_data: MetaDataData::fromArray($data['meta_data']),
             taxonomy_terms: $data['taxonomy_terms'] ?? [],
             sku: $data['sku'],

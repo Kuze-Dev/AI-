@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use Domain\Address\Models\Address;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\Actions\GetShippingRateAction;
+use Domain\Shipment\DataTransferObjects\ShipFromAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Support\Facades\Auth;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -36,11 +37,19 @@ class RateController extends Controller
                     parcelData: new ParcelData(
                         pounds: '10',
                         ounces: '0',
-                        zip_origin: $shippingMethod->ship_from_address['zip5'],
+                        zip_origin: $shippingMethod->shipper_zipcode,
                         parcel_value: '200',
                         height: '10',
                         width: '10',
                         length: '10',
+                        ship_from_address: new ShipFromAddressData(
+                            address: $shippingMethod->shipper_address,
+                            city: $shippingMethod->shipper_city,
+                            state: $shippingMethod->state,
+                            zipcode: $shippingMethod->shipper_zipcode,
+                            country: $shippingMethod->country,
+                            code: $shippingMethod->country->code,
+                        ),
                     ),
                     shippingMethod: $shippingMethod,
                     address: $address
