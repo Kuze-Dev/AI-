@@ -19,7 +19,7 @@ class ListOrders extends ListRecords implements ContractsHasTabHeader
     public function getTabOptions(): array
     {
         return [
-            'All', 'Pending', 'Delivered', 'Packed', 'Shipped', 'Fulfilled',  'Cancelled', 'Refunded', 'For Cancellation', 'For Payment',
+            'All', 'Pending', 'Packed', 'Shipped', 'Delivered', 'Fulfilled',  'Cancelled', 'Refunded', 'For Payment',
         ];
     }
 
@@ -29,8 +29,17 @@ class ListOrders extends ListRecords implements ContractsHasTabHeader
 
         $option = $this->activeOption;
 
-        if ($option != 'All') {
+        if ($option != 'All' && $option != 'For Payment') {
             $query->where('status', $option);
+        }
+
+        if ($option == 'For Payment') {
+            $query->whereHas('payments', function ($subQuery) {
+                $subQuery->where(function ($query) {
+                    $query->where('gateway', 'paypal')
+                        ->orWhere('gateway', 'bank-transfer');
+                })->where('status', 'pending');
+            })->where('is_paid', false);
         }
 
         return $query;

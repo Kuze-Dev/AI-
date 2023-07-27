@@ -24,6 +24,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
@@ -254,14 +255,19 @@ class CustomerResource extends Resource
     {
         return $table
             ->columns([
+                SpatieMediaLibraryImageColumn::make('image')
+                    ->collection('image')
+                    ->conversion('original')
+                    ->circular()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('full_name')
                     ->translateLabel()
-                    ->searchable(['first_name', 'last_name'])
+                    ->searchable(['first_name', 'last_name'], isIndividual: true)
                     ->sortable(['first_name', 'last_name'])
                     ->wrap(),
                 Tables\Columns\TextColumn::make('email')
                     ->translateLabel()
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\IconColumn::make('email_verified_at')
                     ->label(trans('Verified'))

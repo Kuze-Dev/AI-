@@ -46,6 +46,11 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Cart\Models\Cart::class => \App\Policies\CartPolicy::class,
         \Domain\Cart\Models\CartLine::class => \App\Policies\CartLinePolicy::class,
         \Domain\Order\Models\Order::class => \App\Policies\OrderPolicy::class,
+        \Domain\ShippingMethod\Models\ShippingMethod::class => \App\Policies\ShippingMethodPolicy::class,
+        \Domain\PaymentMethod\Models\PaymentMethod::class => \App\Policies\PaymentMethodPolicy::class,
+        \Domain\Customer\Models\Customer::class => \App\Policies\CustomerPolicy::class,
+        \Domain\Tier\Models\Tier::class => \App\Policies\TierPolicy::class,
+        \Domain\Address\Models\Address::class => \App\Policies\AddressPolicy::class,
     ];
 
     /** Register any authentication / authorization services. */

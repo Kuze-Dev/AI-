@@ -102,13 +102,37 @@ class OrderResource extends Resource
                             ])->collapsible(),
                         Forms\Components\Section::make('Payment Method')
                             ->schema([
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\Placeholder::make('card_image')->label('')
-                                            ->content(fn (Order $record): ?string => 'Test Image here'),
-                                        Forms\Components\Placeholder::make('card_info')->label('Card Info')
-                                            ->content(fn (Order $record): ?string => '*************Test'),
-                                    ]),
+                                Forms\Components\FileUpload::make('payment_image')
+                                    ->formatStateUsing(function (Order $record) {
+                                        $orderPayment = Order::with('payments.paymentMethod')->find($record->id);
+
+                                        return $orderPayment->payments->first()->paymentMethod?->getMedia('logo')
+                                            ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                                            ->toArray() ?? [];
+                                    })
+                                    ->disabled()
+                                    ->disableLabel()
+                                    ->image()
+                                    ->imagePreviewHeight('150')
+                                    ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                                        $mediaClass = config('media-library.media_model', Media::class);
+
+                                        /** @var ?Media $media */
+                                        $media = $mediaClass::findByUuid($file);
+
+                                        if ($component->getVisibility() === 'private') {
+                                            try {
+                                                return $media?->getTemporaryUrl(now()->addMinutes(5));
+                                            } catch (Throwable $exception) {
+                                                // This driver does not support creating temporary URLs.
+                                            }
+                                        }
+
+                                        return $media?->getUrl();
+                                    }),
+
+                                // Forms\Components\Placeholder::make('card_info')->label('Card Info')
+                                //     ->content(fn (Order $record): ?string => '*************Test'),
                             ])->collapsible(),
                     ])->columnSpan(2),
                 self::summaryCard(),
@@ -128,7 +152,6 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('tax_total')->label('Tax Total')->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('total')->sortable(),
                 Tables\Columns\TextColumn::make('shipping_method')->label('Shipping Method')->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('payment_method')->label('Payment Method')->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('is_paid')->label('isPaid')
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -209,7 +232,7 @@ class OrderResource extends Resource
 
     public static function summaryCard()
     {
-        return  Forms\Components\Section::make('Summary')
+        return Forms\Components\Section::make('Summary')
             ->schema([
                 Forms\Components\Grid::make(2)
                     ->schema([
@@ -319,7 +342,7 @@ class OrderResource extends Resource
                             })
                             ->size('sm')
                             ->action(function () use ($get, $set) {
-                                $order = Order::find($get('id'));
+                                $order = Order::with('payments')->find($get('id'));
 
                                 $isPaid = ! $order->is_paid;
 
@@ -328,6 +351,16 @@ class OrderResource extends Resource
                                 ]);
 
                                 if ($result) {
+                                    if ($order->is_paid) {
+                                        $order->payments->first()->update([
+                                            'status' => 'paid',
+                                        ]);
+                                    } else {
+                                        $order->payments->first()->update([
+                                            'status' => 'pending',
+                                        ]);
+                                    }
+
                                     $set('is_paid', $isPaid);
                                     Notification::make()
                                         ->title('Order marked successfully')
@@ -342,7 +375,7 @@ class OrderResource extends Resource
                     }),
                 Support\ButtonAction::make('proof_of_payment')
                     ->disableLabel()
-                    ->execute(function (Closure $get, Closure $set) {
+                    ->execute(function () {
                         return Forms\Components\Actions\Action::make('proof_of_payment')
                             ->color('secondary')
                             ->label('View Proof of payment')
@@ -354,14 +387,18 @@ class OrderResource extends Resource
                             ->form([
                                 Forms\Components\FileUpload::make('bank_proof_image')->label('Customer Upload')
                                     ->formatStateUsing(function (Order $record) {
-                                        return $record?->getMedia('bank_proof_images')
+                                        $orderPayment = Order::with('payments')->find($record->id);
+
+                                        return $orderPayment->payments->first()?->getMedia('image')
                                             ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
                                             ->toArray() ?? [];
                                     })
                                     ->hidden(function (Order $record) {
-                                        return (bool) (empty($record?->getFirstMediaUrl('bank_proof_images')));
+                                        $orderPayment = Order::with('payments')->find($record->id);
+
+                                        return (bool) (empty($orderPayment->payments->first()?->getFirstMediaUrl('image')));
                                     })
-                                    ->multiple()
+                                    // ->multiple()
                                     ->image()
                                     ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
                                         $mediaClass = config('media-library.media_model', Media::class);
@@ -378,18 +415,27 @@ class OrderResource extends Resource
 
                                         return $media?->getUrl();
                                     })->disabled(),
-
                                 Forms\Components\Select::make('payment_status')
                                     ->label('')
                                     ->options([
                                         'Approved' => 'Approved',
                                         'Declined' => 'Declined',
                                     ]),
-                                Forms\Components\Textarea::make('Message'),
+                                Forms\Components\Textarea::make('Message')
+                                    ->formatStateUsing(function (Order $record) {
+                                        $orderPayment = Order::with('payments')->find($record->id);
+
+                                        return $orderPayment->payments->first()->message;
+                                    }),
                             ])
                             ->slideOver()
                             ->icon('heroicon-s-eye');
-                    })->fullWidth()->size('md'),
+                    })->fullWidth()->size('md')
+                    ->hidden(function (Order $record) {
+                        $orderPayment = Order::with('payments')->find($record->id);
+
+                        return $orderPayment->payments->first()->gateway != 'bank-transfer';
+                    }),
                 Support\Divider::make(''),
                 Forms\Components\Grid::make(2)
                     ->schema([

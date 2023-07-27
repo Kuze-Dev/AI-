@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Cart\DataTransferObjects;
 
+use Domain\Discount\DataTransferObjects\DiscountMessagesData;
 use Domain\Taxation\Enums\PriceDisplay;
 use Domain\Taxation\Models\TaxZone;
 
@@ -11,13 +12,14 @@ class SummaryData
 {
     public function __construct(
         public readonly float $subTotal,
-        public readonly TaxZone $taxZone,
-        public readonly PriceDisplay $taxDisplay,
-        public readonly float $taxPercentage,
+        public readonly ?TaxZone $taxZone,
+        public readonly ?PriceDisplay $taxDisplay,
+        public readonly ?float $taxPercentage,
         public readonly float $taxTotal,
         public readonly float $grandTotal,
+        public readonly float $shippingTotal,
         public readonly float|null $discountTotal,
-        public readonly string|null $discountMessage,
+        public readonly ?DiscountMessagesData $discountMessages,
     ) {
     }
 
@@ -25,13 +27,14 @@ class SummaryData
     {
         return new self(
             subTotal: $data['subTotal'],
-            taxZone: $data['taxZone'],
-            taxDisplay: $data['taxDisplay'],
+            taxZone: $data['taxZone'] ?? null,
+            taxDisplay: $data['taxDisplay'] ?? null,
             taxPercentage: $data['taxPercentage'] ?? null,
-            taxTotal: $data['taxTotal'] ?? null,
-            grandTotal: $data['grandTotal'] ?? null,
+            taxTotal: $data['taxTotal'],
+            grandTotal: $data['grandTotal'],
+            shippingTotal: $data['shippingTotal'],
             discountTotal: $data['discountTotal'] ?? null,
-            discountMessage: $data['discountMessage'] ?? null,
+            discountMessages: $data['discountMessages'] ?? null,
         );
     }
 }

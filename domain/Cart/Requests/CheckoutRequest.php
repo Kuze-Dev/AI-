@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Requests;
 
-use Domain\Cart\Models\CartLine;
+use Domain\Cart\Actions\PurchasableCheckerAction;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CheckoutRequest extends FormRequest
 {
-    public function rules()
+    public function rules(): array
     {
         return [
             'cart_line_ids' => [
@@ -17,15 +17,16 @@ class CheckoutRequest extends FormRequest
                 'array',
                 function ($attribute, $value, $fail) {
 
-                    $cartLines = CartLine::with('purchasable')->whereIn('id', $value)
-                        ->whereHas('cart', function ($query) {
-                            $query->whereBelongsTo(auth()->user());
-                        })
-                        ->whereNull('checked_out_at')
-                        ->get();
-
-                    if (count($value) !== $cartLines->count()) {
+                    //auth check
+                    $checkAuth = app(PurchasableCheckerAction::class)->checkAuth($value);
+                    if ($checkAuth !== count($value)) {
                         $fail('Invalid cart line IDs.');
+                    }
+
+                    //stock check
+                    $checkStocks = app(PurchasableCheckerAction::class)->checkStock($value);
+                    if ($checkStocks !== count($value)) {
+                        $fail('Invalid stocks');
                     }
                 },
             ],

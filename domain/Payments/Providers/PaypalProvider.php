@@ -9,35 +9,32 @@ use Doctrine\Common\Cache\Psr6\InvalidArgument;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentCapture;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentRefund;
+use Domain\Payments\Enums\PaymentStatus;
 use Domain\Payments\Events\PaymentProcessEvent;
 use Domain\Payments\Models\Payment as ModelsPayment;
-use Domain\Payments\Providers\Concerns\HandlesRedirection as ConcernsHandlesRedirection;
 use Throwable;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
 class PaypalProvider extends Provider
 {
-    // use ConcernsHandlesRedirection;
-
     protected string $name = 'paypal';
 
     private PayPalClient $payPalclient;
 
     public function __construct()
     {
-        /** @var array */
-        $paypalCredentials = app(PaymentSettings::class)->paypal_credentials;
+        $paymentSettings = app(PaymentSettings::class);
 
         $config = [
-            'mode' => app(PaymentSettings::class)->paypal_mode ? 'live' : 'sandbox',
+            'mode' => app(PaymentSettings::class)->paypal_production_mode ? 'live' : 'sandbox',
             'live' => [
-                'client_id' => $paypalCredentials['paypal_secret_id'],
-                'client_secret' => $paypalCredentials['paypal_secret_key'],
+                'client_id' => $paymentSettings->paypal_secret_id,
+                'client_secret' => $paymentSettings->paypal_secret_key,
                 'app_id' => '',
             ],
             'sandbox' => [
-                'client_id' => $paypalCredentials['paypal_secret_id'],
-                'client_secret' => $paypalCredentials['paypal_secret_key'],
+                'client_id' => $paymentSettings->paypal_secret_id,
+                'client_secret' => $paymentSettings->paypal_secret_key,
                 'app_id' => '',
             ],
             'payment_action' => 'Sale',
@@ -50,7 +47,6 @@ class PaypalProvider extends Provider
         $this->payPalclient = new PaypalClient($config);
 
         $this->payPalclient->getAccessToken();
-
     }
 
     public function authorize(): PaymentAuthorize
@@ -70,14 +66,16 @@ class PaypalProvider extends Provider
                         [
                             'paymentmethod' => $providerData->payment_method_id,
                             'transactionId' => $providerData->paymentModel->id,
-                            'status' => 'success',  ]
+                            'status' => 'success',
+                        ]
                     ),
                     'cancel_url' => route(
                         'tenant.api.payment-callback',
                         [
                             'paymentmethod' => $providerData->payment_method_id,
                             'transactionId' => $providerData->paymentModel->id,
-                            'status' => 'cancel',  ]
+                            'status' => 'cancel',
+                        ]
                     ),
 
                 ],
@@ -112,7 +110,6 @@ class PaypalProvider extends Provider
                 'success' => true,
                 'url' => $redirectUrl,
             ]);
-
         } catch (Throwable $th) {
 
             return PaymentAuthorize::fromArray([
@@ -120,40 +117,36 @@ class PaypalProvider extends Provider
                 'message' => $th->getMessage(),
             ]);
         }
-
     }
 
     public function capture(ModelsPayment $paymentModel, array $data): PaymentCapture
     {
         return match ($data['status']) {
             'success' => $this->processTransaction($paymentModel, $data),
-            'cancel' => $this->cancelTransaction($paymentModel, $data),
+            'cancel' => $this->cancelTransaction($paymentModel),
             default => throw new InvalidArgument(),
         };
     }
 
     protected function processTransaction(ModelsPayment $paymentModel, array $data): PaymentCapture
     {
-
-        $this->payPalclient->capturePaymentOrder($data['token']);
+        /** @var array */
+        $captured = $this->payPalclient->capturePaymentOrder($data['token']);
 
         $paymentModel->update([
-            'status' => 'paid',
-            'payment_id' => $data['paymentId'],
+            'status' => PaymentStatus::PAID->value,
+            'transaction_id' => $captured['purchase_units']['0']['payments']['captures']['0']['id'],
         ]);
 
         event(new PaymentProcessEvent($paymentModel));
 
         return new PaymentCapture(success: true);
-
     }
 
-    protected function cancelTransaction(ModelsPayment $paymentModel, array $data): PaymentCapture
+    protected function cancelTransaction(ModelsPayment $paymentModel): PaymentCapture
     {
-
         $paymentModel->update([
-            'status' => 'cancel',
-            'payment_id' => $data['paymentId'],
+            'status' => PaymentStatus::CANCEL->value,
         ]);
 
         event(new PaymentProcessEvent($paymentModel));
@@ -162,7 +155,6 @@ class PaypalProvider extends Provider
             success: false,
             message: 'The request for payment has been canceled.'
         );
-
     }
 
     public function refund(): PaymentRefund

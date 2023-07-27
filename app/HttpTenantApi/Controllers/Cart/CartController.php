@@ -8,10 +8,10 @@ use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartResource;
 use Domain\Cart\Actions\DestroyCartAction;
 use Domain\Cart\Models\Cart;
+use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\RouteAttributes\Attributes\Resource;
 
@@ -25,19 +25,15 @@ class CartController extends Controller
     {
         $model = QueryBuilder::for(
             Cart::with([
-                'cartLines',
                 'cartLines.purchasable' => function (MorphTo $query) {
                     $query->morphWith([
+                        Product::class => ['media'],
                         ProductVariant::class => ['product.media'],
                     ]);
                 },
-                'cartLines.media',
             ])
-                ->whereHas('cartLines', function (Builder $query) {
-                    $query->whereNull('checked_out_at');
-                })
                 ->whereBelongsTo(auth()->user())
-        )->allowedIncludes(['cartLines', 'cartLines.purchasable'])
+        )->allowedIncludes(['cartLines.media'])
             ->first();
 
         if ($model) {

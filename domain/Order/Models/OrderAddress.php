@@ -7,6 +7,7 @@ namespace Domain\Order\Models;
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\Order\Enums\OrderAddressTypes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -16,6 +17,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property int $id
  * @property int $order_id
  * @property OrderAddressTypes $type
+ * @property string $country
  * @property string $state
  * @property AddressLabelAs $label_as
  * @property string $address_line_1
@@ -29,6 +31,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress query()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress whereAddressLine1($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress whereCity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress whereCountry($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress whereLabelAs($value)
@@ -58,8 +61,8 @@ class OrderAddress extends Model
         'type' => OrderAddressTypes::class,
     ];
 
-    // Define the relationship with the Order model
-    public function order()
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\Order, \Domain\Order\Models\OrderAddress> */
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }

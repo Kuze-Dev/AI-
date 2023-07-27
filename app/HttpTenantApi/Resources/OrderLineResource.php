@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
+use Domain\Order\DataTransferObjects\ProductOrderData;
+use Domain\Order\DataTransferObjects\ProductVariantOrderData;
 use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
@@ -24,10 +26,25 @@ class OrderLineResource extends JsonApiResource
             'sub_total' => $this->sub_total,
             'discount_total' => $this->discount_total,
             'total' => $this->total,
-            'remarks_data' => $this->remarks_data,
-            'purchasable_data' => $this->purchasable_data,
-            'remark_images' => $this->getMedia('order_line_notes')->toArray(),
-            'purchasable_images' => $this->getMedia('order_line_images')->toArray(),
+            'reviewed_at' => $this->reviewed_at,
+            'purchasable' => function () {
+                // (WIP) DTO is my work around here becase the
+                // purchable_data is an array coming from column
+                if ( ! isset($this->purchasable_data['product'])) {
+                    return ProductOrderData::fromArray($this->purchasable_data);
+                } elseif (isset($this->purchasable_data['product'])) {
+                    return ProductVariantOrderData::fromArray($this->purchasable_data);
+                }
+            },
+            'remarks' => [
+                'data' => $this->remarks_data,
+                'media' => MediaResource::collection($this->media->filter(
+                    fn ($media) => $media->collection_name === 'order_line_notes'
+                )),
+            ],
+            'media' => MediaResource::collection($this->media->filter(
+                fn ($media) => $media->collection_name === 'order_line_images'
+            )),
         ];
     }
 }

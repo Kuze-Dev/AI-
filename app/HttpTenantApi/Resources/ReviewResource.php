@@ -15,10 +15,11 @@ class ReviewResource extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         return [
-            'title' => $this->title,
             'rating' => $this->rating,
             'comment' => $this->comment,
-            'media' => $this->getMedia('media')->toArray(),
+            'customer_name' => $this->is_anonymous ? '*' : $this->customer_name,
+            'customer_email' => $this->is_anonymous ? '*' : $this->customer_email,
+            'is_anonymous' => $this->is_anonymous,
         ];
     }
 
@@ -26,10 +27,11 @@ class ReviewResource extends JsonApiResource
     public function toRelationships(Request $request): array
     {
         return [
-            'customer' => fn () => new CustomerResource($this->customer),
+            $this->is_anonymous ? '' : 'customer' => fn () => new CustomerResource($this->customer),
             'product' => fn () => new ProductResource($this->product),
             'order' => fn () => new OrderResource($this->product),
             'order_line' => fn () => new OrderLineResource($this->order_line),
+            'media' => fn () => MediaResource::collection($this->media),
         ];
     }
 }

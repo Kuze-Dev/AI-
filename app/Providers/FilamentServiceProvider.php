@@ -404,7 +404,7 @@ class FilamentServiceProvider extends ServiceProvider
         Tables\Columns\TextColumn::macro('truncate', function (string $size = 'md', bool|Closure $tooltip = false): Tables\Columns\TextColumn {
             /** @var Tables\Columns\TextColumn $this */
 
-            $this->tooltip(function (Tables\Columns\TextColumn $column) use ($tooltip): string {
+            $this->tooltip(function (Tables\Columns\TextColumn $column) use ($tooltip): ?string {
                 if ($tooltip instanceof Closure) {
                     return $column->evaluate($tooltip);
                 }
@@ -414,7 +414,7 @@ class FilamentServiceProvider extends ServiceProvider
                     : null;
             });
 
-            $this->formatStateUsing(function (string $state) use ($size): HtmlString {
+            $this->formatStateUsing(function (?string $state) use ($size): HtmlString {
                 $cssClass = match ($size) {
                     'xs' => 'max-w-xs',
                     'sm' => 'max-w-sm',
@@ -431,10 +431,10 @@ class FilamentServiceProvider extends ServiceProvider
 
                 return new HtmlString(
                     <<<html
-                            <div class="truncate {$cssClass}">
-                                {$state}
-                            </div>
-                        html
+                        <div class="truncate {$cssClass}">
+                            {$state}
+                        </div>
+                    html
                 );
             });
 

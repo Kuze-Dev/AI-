@@ -19,26 +19,34 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int $id
  * @property int $product_id
  * @property int $order_id
+ * @property int $order_line_id
+ * @property string|null $customer_name
+ * @property string|null $customer_email
  * @property int|null $customer_id
- * @property string $title
  * @property int $rating
  * @property string|null $comment
+ * @property array|null $data
+ * @property bool $is_anonymous
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Customer|null $customer
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
+ * @property-read int|null $media_count
  * @property-read Order|null $order
+ * @property-read OrderLine|null $order_line
  * @property-read Product|null $product
  * @method static \Illuminate\Database\Eloquent\Builder|Review newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Review newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Review query()
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereComment($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Review whereCustomerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Review whereCustomerDetails($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Review whereData($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereOrderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Review whereOrderLineId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereRating($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Review whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereUpdatedAt($value)
  * @mixin \Eloquent
  */
@@ -47,9 +55,15 @@ class Review extends Model implements HasMedia
     use InteractsWithMedia;
 
     protected $fillable = [
-        'title',
         'ratings',
         'comment',
+        'data',
+        'customer_name',
+        'customer_email',
+    ];
+
+    protected $casts = [
+        'is_anonymous' => 'bool',
     ];
 
     public function registerMediaCollections(): void
@@ -58,7 +72,7 @@ class Review extends Model implements HasMedia
             $this->addMediaConversion('preview');
         };
 
-        $this->addMediaCollection('media')
+        $this->addMediaCollection('review_product_media')
             ->registerMediaConversions($registerMediaConversions);
     }
 

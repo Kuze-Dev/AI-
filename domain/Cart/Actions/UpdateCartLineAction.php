@@ -6,10 +6,15 @@ namespace Domain\Cart\Actions;
 
 use Domain\Cart\DataTransferObjects\UpdateCartLineData;
 use Domain\Cart\Models\CartLine;
-use Domain\Media\Actions\CreateMediaAction;
+use Domain\Media\Actions\CreateMediaFromUrlAction;
 
 class UpdateCartLineAction
 {
+    public function __construct(
+        private readonly CreateMediaFromUrlAction $createMediaFromUrlAction
+    ) {
+    }
+
     public function execute(CartLine $cartLine, UpdateCartLineData $cartLineData): CartLine
     {
         if ($cartLineData->quantity) {
@@ -25,8 +30,7 @@ class UpdateCartLineAction
         }
 
         if ($cartLineData->medias !== null) {
-            app(CreateMediaAction::class)
-                ->execute($cartLine, $cartLineData->medias, 'cart_line_notes');
+            $this->createMediaFromUrlAction->execute($cartLine, $cartLineData->medias, 'cart_line_notes');
         }
 
         return $cartLine;

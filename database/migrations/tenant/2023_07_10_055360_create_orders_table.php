@@ -35,13 +35,9 @@ return new class () extends Migration {
             $table->longText('notes')->nullable();
             $table->string('shipping_method')->index();
             $table->string('shipping_details');
-            $table->string('payment_method')->index();
-            $table->string('payment_details');
-            $table->enum('payment_status', ['Approved', 'Declined'])->nullable();
-            $table->text('payment_message')->nullable();
             $table->boolean('is_paid')->default(false);
             $table->enum('status', [
-                'Pending', 'Cancelled', 'For Cancellation', 'Refunded', 'Packed', 'Shipped', 'Delivered', 'Fulfilled',
+                'Pending', 'Cancelled', 'Refunded', 'Packed', 'Shipped', 'Delivered', 'Fulfilled',
             ])->default('Pending')->index();
             $table->string('cancelled_reason')->nullable();
 
@@ -66,6 +62,7 @@ return new class () extends Migration {
 
         Schema::create('order_lines', function (Blueprint $table) {
             $table->id();
+            $table->uuid();
 
             $table->foreignIdFor(Order::class);
             $table->unsignedInteger('purchasable_id');
@@ -86,6 +83,7 @@ return new class () extends Migration {
             $table->json('remarks_data')->nullable();
             $table->json('purchasable_data')->nullable();
 
+            $table->dateTime('reviewed_at')->nullable();
             $table->timestamps();
         });
     }

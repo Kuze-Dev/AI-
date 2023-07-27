@@ -4,72 +4,36 @@ declare(strict_types=1);
 
 namespace Domain\Product\Actions;
 
+use Domain\Media\Actions\CreateMediaAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
-use Domain\Product\Models\ProductOption;
-use Domain\Product\Models\ProductOptionValue;
-use Domain\Product\Models\ProductVariant;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
-use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 
 class CreateProductAction
 {
     public function __construct(
         protected CreateMetaDataAction $createMetaTags,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
+        protected CreateProductOptionAction $createProductOptionAction,
+        protected CreateOrUpdateProductVariantAction $createOrUpdateProductVariantAction,
+        protected CreateMediaAction $createMediaAction,
     ) {
     }
 
     public function execute(ProductData $productData): Product
     {
-        /** @var Product $product */
         $product = Product::create($this->getProductAttributes($productData));
 
         $this->createMetaTags->execute($product, $productData->meta_data);
 
-        foreach ($productData->images as $image) {
-            if ($image instanceof UploadedFile && $imageString = $image->get()) {
-                $product
-                    ->addMediaFromString($imageString)
-                    ->usingFileName($image->getClientOriginalName())
-                    ->usingName(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME))
-                    ->toMediaCollection('image');
-            }
-        }
+        $this->createProductOptionAction->execute($product, $productData);
 
-        if (count($productData->product_options)) {
-            foreach ($productData->product_options[0] as $productOption) {
-                $productOptionModel = ProductOption::findOrNew($productOption['id']);
-                $productOptionModel->name = $productOption['name'];
-                $productOptionModel->save();
+        $this->createOrUpdateProductVariantAction->execute($product, $productData);
 
-                foreach ($productOption['productOptionValues'] as $productOptionValue) {
-                    $optionValueModel = ProductOptionValue::findOrNew($productOptionValue['id']);
-                    $optionValueModel->name = $productOptionValue['name'];
-                    $optionValueModel->product_option_id = $productOptionValue['product_option_id'];
-                    $optionValueModel->save();
-                }
-            }
-        }
-
-        if (count($productData->product_variants)) {
-            foreach ($productData->product_variants as $productVariant) {
-                $productVariantModel = ProductVariant::findOrNew($productVariant['id']);
-
-                $productVariantModel->product_id = $product['id'];
-                $productVariantModel->sku = $productVariant['sku'];
-                $productVariantModel->combination = $productVariant['combination'];
-                $productVariantModel->retail_price = $productVariant['retail_price'];
-                $productVariantModel->selling_price = $productVariant['selling_price'];
-                $productVariantModel->stock = $productVariant['stock'];
-                $productVariantModel->status = $productVariant['status'];
-                $productVariantModel->save();
-            }
-        }
-
-        if ($productData->images === null) {
-            $product->clearMediaCollection('image');
+        if (filled($productData->images)) {
+            $this->createMediaAction->execute($product, Arr::wrap($productData->images), 'image');
         }
 
         $product->taxonomyTerms()

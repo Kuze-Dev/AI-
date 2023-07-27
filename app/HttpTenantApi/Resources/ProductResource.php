@@ -23,12 +23,13 @@ class ProductResource extends JsonApiResource
             'retail_price' => $this->retail_price,
             'selling_price' => $this->selling_price,
             'stock' => $this->stock,
-            'status' => $this->status,
+            'status' => $this->status, // TODO: use enum, to clarify what is available as valid
             'is_digital_product' => $this->is_digital_product,
             'is_featured' => $this->is_featured,
+            'is_favorite' => $this->isFavorite(), // TODO: do not make resource as getter
             'is_special_offer' => $this->is_special_offer,
             'allow_customer_remarks' => $this->allow_customer_remarks,
-            'media' => $this->getMedia('image'),
+            'media' => $this->getMedia('image')->toArray(), // TODO: do not make resource as getter
         ];
     }
 
@@ -36,6 +37,7 @@ class ProductResource extends JsonApiResource
     public function toRelationships(Request $request): array
     {
         return [
+            'media' => fn () => MediaResource::collection($this->media),
             'productOptions' => fn () => ProductOptionResource::collection($this->productOptions),
             'productVariants' => fn () => ProductVariantResource::collection($this->productVariants),
             'taxonomyTerms' => fn () => TaxonomyTermResource::collection($this->taxonomyTerms),

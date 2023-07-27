@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\Http\Controllers\Controller;
-use Domain\Cart\Helpers\CartLineHelper;
+use Domain\Cart\Actions\CartSummaryAction;
+use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
+use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
-use Domain\Discount\Enums\DiscountStatus;
-use Domain\Discount\Models\Discount;
+use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
 
@@ -36,27 +37,10 @@ class CartSummaryController extends Controller
     {
         $validated = $request->validated();
 
-        $cartLineIdArray = explode(',', $validated['cart_line_ids']);
-        $cartLineIds = array_map('intval', $cartLineIdArray);
+        $cartLineIds = explode(',', $validated['cart_line_ids']);
 
-        $stateId = (int) $validated['state_id'] ?? null;
-        $countryId = (int) $validated['country_id'];
-
-        $discount = null;
-        $discountCode = $validated['discount_code'] ?? null;
-
-        if ( ! is_null($discountCode)) {
-            $discount = Discount::whereCode($discountCode)
-                ->whereStatus(DiscountStatus::ACTIVE)
-                ->where(function ($query) {
-                    $query->where('max_uses', '>', 0)
-                        ->orWhereNull('max_uses');
-                })
-                ->where(function ($query) {
-                    $query->where('valid_end_at', '>=', now())
-                        ->orWhereNull('valid_end_at');
-                })->first();
-        }
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = auth()->user();
 
         $cartLines = CartLine::query()
             ->with('purchasable')
@@ -64,21 +48,46 @@ class CartSummaryController extends Controller
                 $query->whereBelongsTo(auth()->user());
             })
             ->whereNull('checked_out_at')
-            ->whereIn('id', $cartLineIds)
+            ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
             ->get();
 
-        $summaryData = app(CartLineHelper::class)
-            ->summary($cartLines, $countryId, $stateId, $discount);
+        $country = $request->getCountry();
+        $state = $request->getState();
+        $discount = $request->getDiscount();
+        $serviceId = $validated['service_id'] ?? null;
+
+        try {
+            $summary = app(CartSummaryAction::class)->getSummary(
+                $cartLines,
+                new CartSummaryTaxData($country?->id, $state?->id),
+                new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),
+                $discount,
+                $serviceId ? (int) $serviceId : null
+            );
+        } catch (USPSServiceNotFoundException) {
+            return response()->json([
+                'service_id' => 'Shipping method service id is required',
+            ], 404);
+        }
 
         return response()->json([
-            'tax_inclusive_sub_total' => $summaryData->subTotal + $summaryData->taxTotal,
-            'sub_total' => $summaryData->subTotal,
-            'tax_display' => $summaryData->taxDisplay,
-            'tax_percentage' => $summaryData->taxPercentage,
-            'tax_total' => $summaryData->taxTotal,
-            'grand_total' => $summaryData->grandTotal,
-            'discount_total' => $discountCode ? $summaryData->discountTotal : '',
-            'discount_message' => $discountCode ? $summaryData->discountMessage : '',
+            'tax' => [
+                'inclusive_sub_total' => $summary->taxTotal ? round($summary->subTotal + $summary->taxTotal, 2) : null,
+                'display' => $summary->taxTotal ? $summary->taxDisplay : null,
+                'percentage' => $summary->taxPercentage ? round($summary->taxPercentage, 2) : 0,
+                'amount' => $summary->taxTotal ? round($summary->taxTotal, 2) : 0,
+            ],
+            'discount' => [
+                'status' => $summary->discountMessages->status,
+                'message' => $summary->discountMessages->message,
+                'type' => $summary->discountMessages->amount_type,
+                'amount' => $summary->discountMessages->amount,
+                'discount_type' => $summary->discountMessages->discount_type,
+                'total_savings' => $discount ? round($summary->discountTotal, 2) : 0,
+            ],
+            'sub_total' => round($summary->subTotal, 2),
+            'shipping_fee' => round($summary->shippingTotal, 2),
+            'total' => round($summary->grandTotal, 2),
         ], 200);
     }
 }

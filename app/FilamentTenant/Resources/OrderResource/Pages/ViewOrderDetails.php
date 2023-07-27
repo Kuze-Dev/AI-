@@ -91,8 +91,9 @@ class ViewOrderDetails extends ViewRecord
                                                     Forms\Components\Placeholder::make('variant_'  . $sectionIndex)->label('Variant')
                                                         ->content(function () use ($orderLine) {
                                                             if ($orderLine->purchasable_type == ProductVariant::class) {
-                                                                $variant = array_values($orderLine->purchasable_data['combination']);
-                                                                $variantString = implode(' / ', array_map('ucfirst', $variant));
+                                                                $combinations = array_values($orderLine->purchasable_data['combination']);
+                                                                $optionValues = array_column($combinations, 'option_value');
+                                                                $variantString = implode(' / ', array_map('ucfirst', $optionValues));
 
                                                                 return $variantString;
                                                             }
@@ -136,6 +137,7 @@ class ViewOrderDetails extends ViewRecord
                                         ->hidden(function () use ($orderLine) {
                                             return (bool) (empty($orderLine->getFirstMediaUrl('order_line_notes')));
                                         })
+                                        ->disabled()
                                         ->multiple()
                                         ->image()
                                         ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
@@ -152,7 +154,7 @@ class ViewOrderDetails extends ViewRecord
                                             }
 
                                             return $media?->getUrl();
-                                        })->disabled(),
+                                        }),
                                 ])
                                 ->slideOver()
                                 ->icon('heroicon-o-document');

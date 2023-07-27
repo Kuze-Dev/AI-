@@ -8,7 +8,6 @@ enum OrderStatuses: string
 {
     case PENDING = 'Pending';
     case CANCELLED = 'Cancelled';
-    case FOR_CANCELLATION = 'For Cancellation';
     case REFUNDED = 'Refunded';
     case PACKED = 'Packed';
     case SHIPPED = 'Shipped';

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Order\Models;
 
+use Domain\Review\Models\Review;
 use Domain\Taxation\Enums\PriceDisplay;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
@@ -16,6 +17,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * Domain\Order\Models\OrderLine
  *
  * @property int $id
+ * @property string $uuid
  * @property int $order_id
  * @property int $purchasable_id
  * @property string $purchasable_type
@@ -24,22 +26,30 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property float $unit_price
  * @property int $quantity
  * @property float $tax_total
+ * @property float $tax_percentage
+ * @property PriceDisplay $tax_display
  * @property float $sub_total
  * @property float $discount_total
+ * @property int|null $discount_id
+ * @property string|null $discount_code
  * @property float $total
  * @property array|null $remarks_data
  * @property array|null $purchasable_data
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $reviewed_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @property-read \Domain\Order\Models\Order|null $order
+ * @property-read Review|null $review
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine query()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereDiscountCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereDiscountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereDiscountTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereName($value)
@@ -51,10 +61,13 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereQuantity($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereRemarksData($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereSubTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereTaxDisplay($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereTaxPercentage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereTaxTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereUnitPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereUuid($value)
  * @mixin \Eloquent
  */
 class OrderLine extends Model implements HasMedia
@@ -63,6 +76,7 @@ class OrderLine extends Model implements HasMedia
     use InteractsWithMedia;
 
     protected $fillable = [
+        'uuid',
         'order_id',
         'purchasable_id',
         'purchasable_type',
@@ -80,6 +94,7 @@ class OrderLine extends Model implements HasMedia
         'total',
         'remarks_data',
         'purchasable_data',
+        'reviewed_at',
     ];
 
     protected $casts = [
@@ -93,11 +108,19 @@ class OrderLine extends Model implements HasMedia
         'total' => 'float',
         'remarks_data' => 'array',
         'purchasable_data' => 'array',
+        'reviewed_at' => 'datetime',
     ];
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\Order, \Domain\Order\Models\OrderLine> */
     public function order()
     {
         return $this->belongsTo(Order::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Review\Models\Review> */
+    public function review()
+    {
+        return $this->hasOne(Review::class);
     }
 
     public function registerMediaCollections(): void

@@ -7,9 +7,9 @@ namespace App\HttpTenantApi\Controllers\Cart;
 use App\HttpTenantApi\Resources\CartLineResource;
 use Domain\Cart\Actions\CheckoutAction;
 use Domain\Cart\DataTransferObjects\CheckoutData;
-use Domain\Cart\Enums\CartActionResult;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CheckoutRequest;
+use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -33,6 +33,7 @@ class CheckoutController
 
         $cartLineQuery = CartLine::with(['purchasable' => function (MorphTo $query) {
             $query->morphWith([
+                Product::class => ['media'],
                 ProductVariant::class => ['product.media'],
             ]);
         }, 'media'])
@@ -50,7 +51,7 @@ class CheckoutController
             if ($expiredCartLines->isNotEmpty()) {
                 return response()->json([
                     'message' => 'Key has been expired, checkout again',
-                ], 200);
+                ], 400);
             }
 
             return CartLineResource::collection($model);
@@ -67,12 +68,6 @@ class CheckoutController
 
         $reference = app(CheckoutAction::class)
             ->execute(CheckoutData::fromArray($validatedData));
-
-        if (CartActionResult::FAILED == $reference) {
-            return response()->json([
-                'message' => 'Invalid action',
-            ], 400);
-        }
 
         return response()
             ->json([

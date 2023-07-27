@@ -88,10 +88,10 @@ class AddressesRelationManager extends RelationManager
                     ->columnSpanFull(),
                 Forms\Components\Checkbox::make('is_default_shipping')
                     ->translateLabel()
-                    ->visibleOn('create'),
+                    ->disabledOn('edit'),
                 Forms\Components\Checkbox::make('is_default_billing')
                     ->translateLabel()
-                    ->visibleOn('create'),
+                    ->disabledOn('edit'),
             ])->columns(2);
     }
 
