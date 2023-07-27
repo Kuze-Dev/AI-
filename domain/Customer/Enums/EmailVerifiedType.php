@@ -2,7 +2,7 @@
 
 namespace Domain\Customer\Enums;
 
-enum EmailVerificationType: string
+enum EmailVerifiedType: string
 {
     case LINK = 'link';
     case OTP = 'otp';
