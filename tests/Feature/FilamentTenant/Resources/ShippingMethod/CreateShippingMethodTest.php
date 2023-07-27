@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\ShippingmethodResource\Pages\CreateShippingmethod;
+use Domain\Address\Database\Factories\StateFactory;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Filament\Facades\Filament;
 
@@ -23,19 +24,20 @@ it('can render shipping method', function () {
 
 it('can create shipping method', function () {
 
+    StateFactory::new();
+
     livewire(CreateShippingmethod::class)
         ->fillForm([
             'title' => 'Store Pickup',
             'subtitle' => 'InStore Pickup',
             'description' => 'test',
             'driver' => 'store-pickup',
-            'ship_from_address' => [
-                'address' => '185 BERRY ST',
-                'state' => 'CA',
-                'city' => 'SAN FRANCISCO',
-                'zip3' => '94107',
-                'zip4' => '1741',
-            ],
+            'shipper_country_id' => '1',
+            'shipper_state_id' => '1',
+            'shipper_address' => '123 Test',
+            'shipper_city' => 'Test City',
+            'shipper_zipcode' => '62423',
+
         ])->call('create')
         ->assertHasNoFormErrors()
         ->assertOk()

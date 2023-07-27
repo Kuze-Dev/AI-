@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
@@ -102,6 +103,7 @@ class Order extends Model implements HasMedia, PayableInterface
     use LogsActivity;
     use InteractsWithMedia;
     use HasPayments;
+    use Notifiable;
 
     protected $fillable = [
         'customer_id',

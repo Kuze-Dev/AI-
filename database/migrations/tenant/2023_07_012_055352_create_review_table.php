@@ -21,8 +21,10 @@ return new class () extends Migration {
             $table->foreignIdFor(Customer::class)->nullable()->index();
 
             $table->smallInteger('rating');
+            $table->string('customer_name')->nullable();
+            $table->string('customer_email')->nullable();
             $table->string('comment')->nullable();
-            $table->json('data')->nullable();
+            $table->boolean('is_anonymous')->default(false);
 
             $table->timestamps();
         });

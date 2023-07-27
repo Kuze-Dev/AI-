@@ -34,6 +34,7 @@ use Domain\Review\Models\Review;
 use Domain\Taxation\Models\TaxZone;
 use Domain\Page\Models\Page;
 use Domain\Shipment\Models\Shipment;
+use Domain\Shipment\Models\ShippingBox;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Tier\Models\Tier;
 use Domain\PaymentMethod\Models\PaymentMethod;
@@ -123,6 +124,7 @@ class AppServiceProvider extends ServiceProvider
             Review::class,
             Shipment::class,
             ShippingMethod::class,
+            ShippingBox::class,
         ]);
 
         Password::defaults(

@@ -22,13 +22,11 @@ class ShippingMethodFactory extends Factory
             'subtitle' => 'Store Pickup',
             'description' => 'test shipping',
             'driver' => Driver::STORE_PICKUP,
-            'ship_from_address' => [
-                'address' => '185 BERRY ST',
-                'state' => 'CA',
-                'city' => 'SAN FRANCISCO',
-                'zip3' => '94107',
-                'zip4' => '1741',
-            ],
+            'shipper_country_id' => '236',
+            'shipper_state_id' => '4839',
+            'shipper_address' => '185 BERRY ST',
+            'shipper_city' => 'SAN FRANCISCO',
+            'shipper_zipcode' => '94107',
             'active' => $this->faker->boolean,
         ];
     }

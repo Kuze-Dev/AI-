@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Domain\Address\Models\Country;
+use Domain\Address\Models\State;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -20,8 +22,14 @@ return new class () extends Migration {
             $table->string('subtitle')->nullable();
             $table->string('description')->nullable();
 
+            $table->foreignIdFor(Country::class, 'shipper_country_id')->index();
+            $table->foreignIdFor(State::class, 'shipper_state_id')->index();
+
+            $table->string('shipper_address');
+            $table->string('shipper_city');
+            $table->string('shipper_zipcode');
+
             $table->string('driver');
-            $table->json('ship_from_address');
 
             $table->boolean('active');
 
