@@ -25,6 +25,8 @@ use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\Contracts\HasProductOptions;
+use Domain\Product\Actions\DeleteProductAction;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class ProductResource extends Resource
 {
@@ -236,7 +238,14 @@ class ProductResource extends Resource
                 Tables\Actions\EditAction::make()
                     ->authorize('update'),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Product $record) {
+                            try {
+                                return app(DeleteProductAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
                 ]),
             ])
             ->bulkActions([

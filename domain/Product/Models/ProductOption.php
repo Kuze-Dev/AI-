@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 
 /**
  * Domain\Product\Models\ProductOption
@@ -34,6 +35,7 @@ use Spatie\Sluggable\SlugOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOption whereUpdatedAt($value)
  * @mixin \Eloquent
  */
+#[OnDeleteCascade(['productOptionValues'])]
 class ProductOption extends Model
 {
     use HasSlug;
