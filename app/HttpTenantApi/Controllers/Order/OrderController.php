@@ -66,10 +66,6 @@ class OrderController extends Controller
             ], 400);
         }
 
-        // dd($result);
-        $customer = auth()->user();
-        Notification::send($customer, new OrderPlacedNotification($result['order']));
-
         return response()
             ->json([
                 'message' => 'Order placed successfully',
@@ -116,26 +112,6 @@ class OrderController extends Controller
         if ($result instanceof PaymentAuthorize) {
             return response()->json($result);
         }
-        
-        $customer = auth()->user();
-        $status = $validatedData['status'];
-        
-        switch ($status) {
-            case 'Delivered':
-                Notification::send($customer, new OrderDeliveredNotification($result));
-                break;
-            case 'Cancelled':
-                Notification::send($customer, new OrderCancelledNotification($result));
-                break;
-            case 'Shipped':
-                Notification::send($customer, new OrderShippedNotification($result));
-                break;
-            case 'Fulfilled':
-                Notification::send($customer, new OrderFulfilledNotification($order));
-                break;
-        }
-        
-        
 
         return response()
             ->json([
