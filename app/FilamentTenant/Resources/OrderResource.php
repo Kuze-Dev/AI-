@@ -268,7 +268,7 @@ class OrderResource extends Resource
                                         Forms\Components\Toggle::make('send_email')
                                             ->label('Send email notification')->default(false)
                                             ->reactive(),
-                                        Forms\Components\Textarea::make('email_remarks')->label("Remarks")
+                                        Forms\Components\Textarea::make('email_remarks')->label('Remarks')
                                             ->visible(fn (Closure $get) => $get('send_email') == true)
                                             ->dehydrateStateUsing(function (string|null $state) use ($get) {
                                                 if (filled($state) && $get('send_email') == true) {
@@ -321,7 +321,7 @@ class OrderResource extends Resource
                                             $emailRemarks = $livewire->mountedFormComponentActionData['email_remarks'];
 
                                             if ($shouldSendEmail) {
-                                                $customer = Customer::where("id", $order->customer_id)->first();
+                                                $customer = Customer::where('id', $order->customer_id)->first();
 
                                                 if ($customer) {
                                                     event(new OrderStatusUpdatedEvent(
@@ -374,7 +374,7 @@ class OrderResource extends Resource
                             ->action(function () use ($get, $set) {
                                 $order = Order::with('payments')->find($get('id'));
 
-                                $isPaid = !$order->is_paid;
+                                $isPaid = ! $order->is_paid;
 
                                 $result = $order->update([
                                     'is_paid' => $isPaid,

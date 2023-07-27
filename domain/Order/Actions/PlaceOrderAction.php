@@ -22,7 +22,7 @@ class PlaceOrderAction
 
             $customer = auth()->user();
             Notification::send($customer, new OrderPlacedNotification($result['order']));
-            
+
             return $result;
         }
     }

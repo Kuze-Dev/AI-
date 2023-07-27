@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 use Spatie\RouteAttributes\Attributes\Resource;
@@ -27,6 +26,7 @@ class NotificationController
         if ( ! $user = Auth::user()) {
             throw new AuthenticationException();
         }
+
         return NotificationResource::collection(
             QueryBuilder::for(
                 $user->notifications()

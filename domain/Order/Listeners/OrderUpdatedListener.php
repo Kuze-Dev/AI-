@@ -23,7 +23,7 @@ class OrderUpdatedListener
 
             match ($status) {
                 'paid' => $this->onOrderPaid($order),
-                    // "cancel" => $this->onOrderCancelled($order),
+                // "cancel" => $this->onOrderCancelled($order),
                 default => null
             };
         }

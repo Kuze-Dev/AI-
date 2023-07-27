@@ -26,9 +26,7 @@ class OrderPlacedMail extends Notification implements ShouldQueue
     private string $title;
     private string $description;
 
-    /**
-     * Create a new notification instance.
-     */
+    /** Create a new notification instance. */
     public function __construct(Order $order, Address $shippingAddress, ShippingMethod $shippingMethod)
     {
         $this->order = $order;
@@ -50,9 +48,7 @@ class OrderPlacedMail extends Notification implements ShouldQueue
         return ['mail'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
+    /** Get the mail representation of the notification. */
     public function toMail(object $notifiable): MailMessage
     {
         $admin = Admin::first();
@@ -68,10 +64,10 @@ class OrderPlacedMail extends Notification implements ShouldQueue
             ', '
         );
 
-        return (new MailMessage)
-            ->subject("Order Being Placed")
+        return (new MailMessage())
+            ->subject('Order Being Placed')
             ->from('tenantone@example.com')
-            ->view("filament.emails.order.created", [
+            ->view('filament.emails.order.created', [
                 'logo' => $this->logo,
                 'title' => $this->title,
                 'description' => $this->description,
@@ -80,7 +76,7 @@ class OrderPlacedMail extends Notification implements ShouldQueue
                 'customer' => $notifiable,
                 'address' => $address,
                 'paymentMethod' => $this->order->payments->first()->paymentMethod,
-                'shippingMethod' => $this->shippingMethod
+                'shippingMethod' => $this->shippingMethod,
             ]);
     }
 
@@ -92,7 +88,7 @@ class OrderPlacedMail extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            //
+
         ];
     }
 }

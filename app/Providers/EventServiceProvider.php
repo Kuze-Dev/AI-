@@ -29,10 +29,10 @@ class EventServiceProvider extends ServiceProvider
             OrderUpdatedListener::class,
         ],
         OrderPlacedEvent::class => [
-            OrderPlacedListener::class
+            OrderPlacedListener::class,
         ],
         OrderStatusUpdatedEvent::class => [
-            OrderStatusUpdatedListener::class
+            OrderStatusUpdatedListener::class,
         ],
     ];
 
