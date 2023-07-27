@@ -40,10 +40,11 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string $first_name
  * @property string $last_name
  * @property string $mobile
- * @property \Domain\Customer\Enums\Gender $gender
- * @property \Domain\Auth\Enums\EmailVerificationType $email_verification_type
+ * @property Gender $gender
  * @property Status $status
+ * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon $birth_date
+ * @property EmailVerificationType $email_verification_type
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -52,6 +53,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Address> $addresses
  * @property-read int|null $addresses_count
+ * @property-read \Domain\Auth\Model\EmailVerificationOneTimePassword|null $emailVerificationOneTimePassword
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
@@ -68,12 +70,15 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereCuid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Customer whereEmailVerificationType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereEmailVerifiedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereFirstName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Customer whereGender($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereLastName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereMobile($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Customer whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereTierId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereUpdatedAt($value)

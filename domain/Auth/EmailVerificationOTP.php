@@ -9,8 +9,12 @@ use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Auth\Model\EmailVerificationOneTimePassword;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
+/**
+ * @property-read \Domain\Auth\Model\EmailVerificationOneTimePassword|null $emailVerificationOneTimePassword
+ */
 trait EmailVerificationOTP
 {
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Domain\Auth\Model\EmailVerificationOneTimePassword> */
     public function emailVerificationOneTimePassword(): MorphOne
     {
         return $this->morphOne(EmailVerificationOneTimePassword::class, 'authenticatable');

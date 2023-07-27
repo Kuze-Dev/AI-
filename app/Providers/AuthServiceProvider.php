@@ -16,7 +16,6 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\URL;
 
 class AuthServiceProvider extends ServiceProvider
@@ -57,23 +56,23 @@ class AuthServiceProvider extends ServiceProvider
 
     protected function configureNotificationUrls(): void
     {
-        VerifyEmailNotification::toMailUsing(function (mixed $notifiable, ?string $url): MailMessage {
+        VerifyEmailNotification::toMailUsing(function (mixed $notifiable, $url): MailMessage {
 
             if ($notifiable instanceof HasEmailVerificationOTP && $notifiable->isEmailVerificationUseOTP()) {
                 return (new MailMessage())
-                    ->subject(Lang::get('Verify Email Address'))
-                    ->line(Lang::get('Please copy OTP below to verify your email address.'))
+                    ->subject(trans('Verify Email Address'))
+                    ->line(trans('Please copy OTP below to verify your email address.'))
                     ->line('OTP: '.$notifiable->generateEmailVerificationOTP())
-                    ->line(Lang::get('If you did not create an account, no further action is required.'));
+                    ->line(trans('If you did not create an account, no further action is required.'));
             }
 
             // copied from \Illuminate\Auth\Notifications\VerifyEmail::buildMailMessage($url)
             // https://github.com/laravel/framework/blob/v10.16.1/src/Illuminate/Auth/Notifications/VerifyEmail.php#L62
             return (new MailMessage())
-                ->subject(Lang::get('Verify Email Address'))
-                ->line(Lang::get('Please click the button below to verify your email address.'))
-                ->action(Lang::get('Verify Email Address'), $url)
-                ->line(Lang::get('If you did not create an account, no further action is required.'));
+                ->subject(trans('Verify Email Address'))
+                ->line(trans('Please click the button below to verify your email address.'))
+                ->action(trans('Verify Email Address'), $url)
+                ->line(trans('If you did not create an account, no further action is required.'));
 
         });
 

@@ -56,7 +56,10 @@ class VerifyEmailController extends Controller
             'otp' => 'required|string',
         ])['otp'];
 
-        if(app(VerifyEmailViaOTPAction::class)->execute(auth()->user(), $otp)) {
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = auth()->user();
+
+        if (app(VerifyEmailViaOTPAction::class)->execute($customer, $otp)) {
             return response(['message' => trans('Email verified!')]);
         }
 
