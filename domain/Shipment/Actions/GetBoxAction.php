@@ -9,6 +9,7 @@ use Domain\Shipment\API\Box\DataTransferObjects\BoxResponseData;
 use Domain\Shipment\Enums\UnitEnum;
 use Domain\Shipment\Exceptions\ShippingException;
 use Domain\Shipment\Models\ShippingBox;
+use Domain\ShippingMethod\Enums\Driver;
 use Domain\ShippingMethod\Models\ShippingMethod;
 
 class GetBoxAction
@@ -17,6 +18,20 @@ class GetBoxAction
         ShippingMethod $shippingMethod,
         BoxData $boxData
     ): BoxResponseData {
+
+        /** Store Pickup */
+
+        if ($shippingMethod->driver === Driver::STORE_PICKUP) {
+
+            return new BoxResponseData(
+                dimension_units: UnitEnum::INCH->value,
+                length: 0,
+                width: 0,
+                height: 0,
+                weight: 0,
+                volume: 0,
+            );
+        }
 
         /**
          * Notes:
