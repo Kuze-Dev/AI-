@@ -70,7 +70,9 @@ final class CustomerData
                     is_default_shipping: false,
                     is_default_billing: true,
                 ),
-            email_verification_type: EmailVerificationType::from($validated['email_verification_type']),
+            email_verification_type: isset($validated['email_verification_type'])
+                ? EmailVerificationType::from($validated['email_verification_type'])
+                : EmailVerificationType::LINK,
         );
     }
 
