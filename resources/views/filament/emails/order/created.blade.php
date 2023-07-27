@@ -57,20 +57,17 @@
             Your Order has been Placed.
         </h3>
 
-        <p style="line-height: 1.5em">Hi John Benedict Regore,</p>
+        <p style="line-height: 1.5em">Hi {{ $customer->first_name . $customer->last_name }},</p>
 
         <p style="line-height: 1.5em">
             Thank you for placing an order with us! Your order number is
-            #SADAAS233, and we received it on 15th July 2023 at 12:06. You have
-            chosen Cash on Delivery as your payment method. Our team is currently
+            #{{ $order->reference }}, and we received it on
+            {{ \Carbon\Carbon::parse($order->created_at)->timezone($timezone)->format('jS F Y \a\t h:i A') }}. You
+            have
+            chosen {{ $paymentMethod->title }} as your payment method. Our team is currently
             preparing your order, and we'll notify you once it's on the way. We
             hope you have a pleasant shopping experience with us and look forward
             to serving you again soon.
-        </p>
-
-        <p style="line-height: 1.5em">
-            Please note that it may take up to 24 - 48 hours for tracking
-            information to be available/updated.
         </p>
 
         <div class="remarks-container">
@@ -78,12 +75,12 @@
                 Delivery Details:
             </p>
             <p style="line-height: 1.5em">
-                Name: <span> John Benedict Regore</span>
+                Name: <span> {{ $customer->first_name . $customer->last_name }}</span>
             </p>
-            <p style="line-height: 1.5em">Address: <span> Pampanga</span></p>
-            <p style="line-height: 1.5em">Phone: <span> 09123456789 </span></p>
+            <p style="line-height: 1.5em">Address: <span> {{ $address }}</span></p>
+            <p style="line-height: 1.5em">Phone: <span> {{ $customer->mobile }} </span></p>
             <p style="line-height: 1.5em">
-                Email: <span> benedict.halcyondigital@gmail.com </span>
+                Email: <span> {{ $customer->email }}</span>
             </p>
         </div>
 

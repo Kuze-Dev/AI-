@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Order\Listeners;
 
-use Domain\Order\Enums\OrderNotifications;
+use Domain\Order\Enums\OrderMailStatus;
 use Domain\Order\Events\OrderPlacedEvent;
-use Domain\Order\Notifications\OrderUpdatedInvoice;
+use Domain\Order\Notifications\OrderPlacedMail;
 
 class OrderPlacedListener
 {
@@ -20,7 +20,8 @@ class OrderPlacedListener
     {
         $customer = $event->customer;
         $order = $event->order;
+        $shippingAddress = $event->shippingAddress;
 
-        $customer->notify(new OrderUpdatedInvoice($order, OrderNotifications::CREATED));
+        $customer->notify(new OrderPlacedMail($order, $shippingAddress, OrderMailStatus::CREATED));
     }
 }

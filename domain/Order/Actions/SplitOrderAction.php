@@ -7,6 +7,7 @@ namespace Domain\Order\Actions;
 use Domain\Cart\Models\CartLine;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
+use Domain\Order\Events\OrderPlacedEvent;
 use Domain\Order\Models\Order;
 use Domain\Payments\Actions\CreatePaymentAction;
 use Domain\Payments\DataTransferObjects\AmountData;
@@ -35,12 +36,14 @@ class SplitOrderAction
                 app(CreateOrderAddressAction::class)
                     ->execute($order, $preparedOrderData);
 
-                CartLine::whereCheckoutReference($placeOrderData->cart_reference)
-                    ->update(['checked_out_at' => now()]);
+                // CartLine::whereCheckoutReference($placeOrderData->cart_reference)
+                //     ->update(['checked_out_at' => now()]);
 
                 $payment = $this->proceedPayment($order, $preparedOrderData);
 
                 DB::commit();
+
+                event(new OrderPlacedEvent($preparedOrderData->customer,  $order, $preparedOrderData->shippingAddress));
 
                 return [
                     'order' => $order,
