@@ -43,6 +43,7 @@ use Support\MetaData\Models\MetaData;
 use Domain\Product\Models\Product;
 use Domain\Payments\Models\Payment;
 use Domain\Product\Models\ProductVariant;
+use Domain\Payments\Models\PaymentRefund;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\MissingAttributeException;
@@ -125,6 +126,7 @@ class AppServiceProvider extends ServiceProvider
             Shipment::class,
             ShippingMethod::class,
             ShippingBox::class,
+            PaymentRefund::class,
         ]);
 
         Password::defaults(

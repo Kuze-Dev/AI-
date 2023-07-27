@@ -8,6 +8,7 @@ use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Contracts\PaymentManagerInterface;
 use Domain\Payments\Providers\OfflinePayment;
 use Domain\Payments\Providers\PaypalProvider;
+use Domain\Payments\Providers\StripeProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use InvalidArgumentException;
@@ -36,6 +37,7 @@ class PaymentServiceProvider extends ServiceProvider implements DeferrableProvid
                         return match ($paymentType->gateway) {
                             'paypal' => new PaypalProvider(),
                             'manual' => new OfflinePayment(),
+                            'stripe' => new StripeProvider(),
                             'bank-transfer' => new OfflinePayment(),
                             default => throw new InvalidArgumentException(),
                         };
