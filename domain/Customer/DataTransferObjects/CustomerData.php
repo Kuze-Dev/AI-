@@ -7,6 +7,7 @@ namespace Domain\Customer\DataTransferObjects;
 use App\HttpTenantApi\Requests\Auth\Customer\CustomerRegisterRequest;
 use Carbon\Carbon;
 use Domain\Address\DataTransferObjects\AddressData;
+use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\Status;
 use Domain\Tier\Models\Tier;
@@ -27,6 +28,7 @@ final class CustomerData
         public readonly UploadedFile|string|null $image = null,
         public readonly ?AddressData $shipping_address_data = null,
         public readonly ?AddressData $billing_address_data = null,
+        public readonly EmailVerificationType $email_verification_type = EmailVerificationType::LINK,
     ) {
     }
 
@@ -68,6 +70,9 @@ final class CustomerData
                     is_default_shipping: false,
                     is_default_billing: true,
                 ),
+            email_verification_type: isset($validated['email_verification_type'])
+                ? EmailVerificationType::from($validated['email_verification_type'])
+                : EmailVerificationType::LINK,
         );
     }
 

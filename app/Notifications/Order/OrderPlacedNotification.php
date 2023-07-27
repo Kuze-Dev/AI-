@@ -42,7 +42,9 @@ class OrderPlacedNotification extends Notification
     {
         return [
             "type" => "order_placed",
-            "data" => $this->order,
+            'message' => "Your order #{$this->order->reference} has been placed",
+            "button" => "View Order Details",
+            'reference' => $this->order->reference
         ];
     }
 }

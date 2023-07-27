@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Status;
 use Domain\Tier\Models\Tier;
 use Illuminate\Database\Migrations\Migration;
@@ -37,6 +38,7 @@ return new class () extends Migration {
 
             $table->rememberToken();
             $table->date('birth_date');
+            $table->string('email_verification_type', 100)->default(EmailVerificationType::LINK->value);
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamps();
             $table->softDeletes();

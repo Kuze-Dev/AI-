@@ -41,7 +41,9 @@ class NewRegisterNotification extends Notification
     {
         return [
             "type" => "new_user",
-            "data" => $this->customer,
+            "message" => "Welcome to our platform {$this->customer->first_name} {$this->customer->last_name}!",
+            "button" => "View your profile",
+            "referrence" => $this->customer->email
         ];
     }
 }

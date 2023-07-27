@@ -6,6 +6,9 @@ namespace Domain\Customer\Models;
 
 use App\Settings\SiteSettings;
 use Domain\Address\Models\Address;
+use Domain\Auth\Contracts\HasEmailVerificationOTP;
+use Domain\Auth\EmailVerificationOTP;
+use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Customer\Enums\Status;
@@ -44,6 +47,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property Status $status
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon $birth_date
+ * @property EmailVerificationType $email_verification_type
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -56,6 +60,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property-read int|null $discount_limits_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Favorite> $favorites
  * @property-read int|null $favorites_count
+ * @property-read \Domain\Auth\Model\EmailVerificationOneTimePassword|null $emailVerificationOneTimePassword
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
@@ -73,6 +78,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereCuid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Customer whereEmailVerificationType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereEmailVerifiedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereFirstName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereGender($value)
@@ -89,7 +95,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['addresses'])]
-class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
+class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, HasEmailVerificationOTP
 {
     use SoftDeletes;
     use LogsActivity;
@@ -97,6 +103,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
     use Notifiable;
     use HasApiTokens;
     use ConstraintsRelationships;
+    use EmailVerificationOTP;
 
     protected $fillable = [
         'tier_id',
@@ -109,6 +116,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
         'gender',
         'status',
         'birth_date',
+        'email_verification_type',
     ];
 
     protected $hidden = [
@@ -120,6 +128,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
         'birth_date' => 'date',
         'status' => Status::class,
         'gender' => Gender::class,
+        'email_verification_type' => EmailVerificationType::class,
         'email_verified_at' => 'datetime',
     ];
 
