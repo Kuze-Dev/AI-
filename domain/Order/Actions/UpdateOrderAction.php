@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Order\Actions;
 
-use App\Notifications\Order\OrderCancelledNotification;
-use App\Notifications\Order\OrderDeliveredNotification;
-use App\Notifications\Order\OrderFulfilledNotification;
-use App\Notifications\Order\OrderShippedNotification;
 use Domain\Order\DataTransferObjects\UpdateOrderData;
 use Domain\Order\Enums\OrderStatuses;
+use Domain\Order\Events\OrderStatusUpdatedEvent;
 use Domain\Order\Models\Order;
 use Domain\Payments\Actions\CreatePaymentLink;
 use Domain\Payments\Actions\UploadProofofPaymentAction;
@@ -23,7 +20,6 @@ use Domain\Payments\Models\Payment;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Notification;
 use Log;
 
 class UpdateOrderAction
@@ -50,24 +46,11 @@ class UpdateOrderAction
 
                 $customer = auth()->user();
 
-                switch ($updateOrderData->status) {
-                    case 'Delivered':
-                        Notification::send($customer, new OrderDeliveredNotification($order));
-
-                        break;
-                    case 'Cancelled':
-                        Notification::send($customer, new OrderCancelledNotification($order));
-
-                        break;
-                    case 'Shipped':
-                        Notification::send($customer, new OrderShippedNotification($order));
-
-                        break;
-                    case 'Fulfilled':
-                        Notification::send($customer, new OrderFulfilledNotification($order));
-
-                        break;
-                }
+                event(new OrderStatusUpdatedEvent(
+                    $customer,
+                    $order,
+                    $updateOrderData->status
+                ));
             }
 
             if ($updateOrderData->type == 'bank-transfer') {

@@ -87,8 +87,6 @@ class OrderPlacedMail extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
-        return [
-
-        ];
+        return [];
     }
 }

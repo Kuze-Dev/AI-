@@ -8,6 +8,40 @@
         font-size: medium;
     }
 
+    .header {
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1.3px solid #e5e7eb;
+        padding-bottom: 1em;
+    }
+
+    .header img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover
+    }
+
+    .header .col-2 {
+        padding-left: 1em;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+
+    }
+
+    .title {
+        font-size: xx-large;
+        font-weight: bold;
+    }
+
+    .subtitle {
+        color: #3f3f3f;
+        padding-left: 4px;
+    }
+
     .remarks-container {
         border: 1.5px solid #9ca3af;
         margin-top: 2em;
@@ -43,17 +77,39 @@
         .remarks-container {
             padding: 0.8em;
         }
+
+        .title {
+            font-size: medium;
+        }
+
+        .subtitle {
+            font-size: small;
+        }
+
+        .header img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover
+        }
     }
 </style>
 
-<div style="width: 100%; font-family: Arial, Helvetica, sans-serif">
-    <div style="width: 100%; max-height: 150px">
-        <img src="https://img.freepik.com/free-vector/stylish-glowing-digital-red-lines-banner_1017-23964.jpg"
-            alt="" style="width: 100%; height: 150px; object-fit: cover" />
+<div style="width: 100%; font-family: Arial, Helvetica, Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif">
+    <div class="header">
+        @if ($logo)
+            <div>
+                <img src={{ $logo }} alt="" />
+            </div>
+        @endif
+        <div class="col-2">
+            <div>
+                <span class="title">{{ $title }}</span>
+            </div>
+            <div><span class="subtitle">{{ $description }}</span></div>
+        </div>
     </div>
 
     <div class="main-container">
-
         <p style="line-height: 1.5em">
             Hi {{ $customer->first_name . $customer->last_name }}, we just want to inform you that your item(s) in order
             #{{ $order->reference }} has
