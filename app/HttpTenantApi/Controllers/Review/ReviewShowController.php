@@ -27,6 +27,7 @@ class ReviewShowController
                     'product',
                     'order_line',
                     'customer.media',
+                    'media'
                 ])
                 ->get()
         );
