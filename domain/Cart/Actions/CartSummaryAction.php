@@ -94,23 +94,29 @@ class CartSummaryAction
     ): float {
         $shippingFeeTotal = 0;
 
-        $productlist = [];
+        // $productlist = [];
 
-        foreach ($collections as $collection) {
-            $purchasableId = $collection->purchasable->id;
-            $length = $collection->purchasable->dimension['length'];
-            $width = $collection->purchasable->dimension['width'];
-            $height = $collection->purchasable->dimension['height'];
-            $weight = $collection->purchasable->weight;
+        // foreach ($collections as $collection) {
+        //     $purchasableId = $collection->purchasable->id;
+        //     $length = $collection->purchasable->dimension['length'];
+        //     $width = $collection->purchasable->dimension['width'];
+        //     $height = $collection->purchasable->dimension['height'];
+        //     $weight = $collection->purchasable->weight;
 
-            $productlist[] = [
-                'product_id' => (string) $purchasableId,
-                'length' => $length,
-                'width' => $width,
-                'height' => $height,
-                'weight' => (float) $weight,
-            ];
-        }
+        //     $productlist[] = [
+        //         'product_id' => (string) $purchasableId,
+        //         'length' => $length,
+        //         'width' => $width,
+        //         'height' => $height,
+        //         'weight' => (float) $weight,
+        //     ];
+        // }
+
+        $productlist = [
+            ['product_id' => '1', 'length' => 10, 'width' => 5, 'height' => 0.3, 'weight' => 0.18],
+            ['product_id' => '1', 'length' => 10, 'width' => 5, 'height' => 0.3, 'weight' => 0.18],
+            ['product_id' => '1', 'length' => 10, 'width' => 5, 'height' => 0.3, 'weight' => 0.18],
+        ];
 
         $boxData = app(GetBoxAction::class)->execute(
             $shippingMethod,
@@ -157,7 +163,7 @@ class CartSummaryAction
 
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
 
-        if ( ! $taxZone instanceof TaxZone) {
+        if (!$taxZone instanceof TaxZone) {
             throw new BadRequestHttpException('No tax zone found');
         }
 
@@ -175,7 +181,7 @@ class CartSummaryAction
     {
         $discountTotal = 0;
 
-        if ( ! is_null($discount)) {
+        if (!is_null($discount)) {
             $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal);
         }
 

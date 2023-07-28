@@ -71,7 +71,7 @@ class SplitOrderAction
                     'reference_id' => $order->reference,
                     'amount' => AmountData::fromArray([
                         'currency' => $preparedOrderData->currency->code,
-                        'total' => strval($order->total),
+                        'total' => (int) $order->total,
                         'details' => PaymentDetailsData::fromArray(
                             [
                                 'subtotal' => strval($order->sub_total - $order->discount_total),
