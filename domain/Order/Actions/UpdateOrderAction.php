@@ -53,15 +53,19 @@ class UpdateOrderAction
                 switch ($updateOrderData->status) {
                     case 'Delivered':
                         Notification::send($customer, new OrderDeliveredNotification($order));
+
                         break;
                     case 'Cancelled':
                         Notification::send($customer, new OrderCancelledNotification($order));
+
                         break;
                     case 'Shipped':
                         Notification::send($customer, new OrderShippedNotification($order));
+
                         break;
                     case 'Fulfilled':
                         Notification::send($customer, new OrderFulfilledNotification($order));
+
                         break;
                 }
             }
@@ -73,7 +77,7 @@ class UpdateOrderAction
                     $image = $this->convertUrlToUploadedFile($updateOrderData->proof_of_payment);
 
                     if ($image instanceof UploadedFile) {
-                        if (!empty($orderPayment->payments) && !empty($orderPayment->payments->first())) {
+                        if ( ! empty($orderPayment->payments) && ! empty($orderPayment->payments->first())) {
                             app(UploadProofofPaymentAction::class)->execute(
                                 $orderPayment->payments->first(),
                                 new ProofOfPaymentData(
@@ -91,7 +95,7 @@ class UpdateOrderAction
                         $query->where('payable_id', $order->id);
                     })->whereNot('status', 'paid')->first();
 
-                    if (!$payment) {
+                    if ( ! $payment) {
                         return 'Your order already paid';
                     }
 

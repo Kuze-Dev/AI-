@@ -31,9 +31,9 @@ class RegisterController
             fn () => app(CreateCustomerAction::class)
                 ->execute(CustomerData::fromRegistrationRequest($tier, $request))
         );
-        
 
         Notification::send($customer, new NewRegisterNotification($customer));
+
         return CustomerResource::make($customer);
     }
 }

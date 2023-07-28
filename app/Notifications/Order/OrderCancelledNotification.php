@@ -1,12 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications\Order;
 
-use Domain\Order\DataTransferObjects\UpdateOrderData;
 use Domain\Order\Models\Order;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class OrderCancelledNotification extends Notification
@@ -14,12 +13,10 @@ class OrderCancelledNotification extends Notification
     use Queueable;
     private $order;
 
-    /**
-     * Create a new notification instance.
-     */
+    /** Create a new notification instance. */
     public function __construct(Order $order)
     {
-        //
+
         $this->order = $order;
     }
 
@@ -41,10 +38,10 @@ class OrderCancelledNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            "type" => "order_cancelled",
+            'type' => 'order_cancelled',
             'message' => "Your order #{$this->order->reference} has been cancelled",
-            "button" => "View Order Details",
-            'reference' => $this->order->reference
+            'button' => 'View Order Details',
+            'reference' => $this->order->reference,
         ];
     }
 }
