@@ -24,14 +24,18 @@ class ProductFactory extends Factory
             'selling_price' => $this->faker->randomFloat(2, 0, 100),
             'retail_price' => $this->faker->randomFloat(2, 0, 100),
             'stock' => $this->faker->numberBetween(0, 100),
-            // 'status',
-            // 'is_digital_product',
-            // 'is_featured',
-            // 'is_special_offer',
-            // 'allow_customer_remarks',
-            // 'weight',
-            // 'dimension',
-            // 'minimum_order_quantity',
+            'status' => $this->faker->boolean(),
+            'is_digital_product' => $this->faker->boolean(),
+            'is_featured' => $this->faker->boolean(),
+            'is_special_offer' => $this->faker->boolean(),
+            'allow_customer_remarks' => $this->faker->boolean(),
+            'weight' => $this->faker->numberBetween(0, 100),
+            'dimension' => [
+                'length' => $this->faker->numberBetween(0, 100),
+                'width' => $this->faker->numberBetween(0, 100),
+                'height' => $this->faker->numberBetween(0, 100),
+            ],
+            'minimum_order_quantity' => $this->faker->numberBetween(0, 10),
         ];
     }
 }

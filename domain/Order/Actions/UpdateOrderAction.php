@@ -77,7 +77,7 @@ class UpdateOrderAction
                     $image = $this->convertUrlToUploadedFile($updateOrderData->proof_of_payment);
 
                     if ($image instanceof UploadedFile) {
-                        if (!empty($orderPayment->payments) && !empty($orderPayment->payments->first())) {
+                        if ( ! empty($orderPayment->payments) && ! empty($orderPayment->payments->first())) {
                             app(UploadProofofPaymentAction::class)->execute(
                                 $orderPayment->payments->first(),
                                 new ProofOfPaymentData(
@@ -95,7 +95,7 @@ class UpdateOrderAction
                         $query->where('payable_id', $order->id);
                     })->whereNot('status', 'paid')->first();
 
-                    if (!$payment) {
+                    if ( ! $payment) {
                         return 'Your order already paid';
                     }
 
@@ -105,7 +105,7 @@ class UpdateOrderAction
                                 'reference_id' => $order->reference,
                                 'amount' => AmountData::fromArray([
                                     'currency' => $order->currency_code,
-                                    'total' =>  (int) $order->total,
+                                    'total' => (int) $order->total,
                                     'details' => PaymentDetailsData::fromArray(
                                         [
                                             'subtotal' => strval($order->sub_total - $order->discount_total),
