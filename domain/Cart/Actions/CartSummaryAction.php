@@ -96,7 +96,12 @@ class CartSummaryAction
     ): float {
         $shippingFeeTotal = 0;
 
-        $productlist = $this->getProducts($collections);
+        // $productlist = $this->getProducts($collections);
+        $productlist = [
+            ['product_id' => '1', 'length' => 10, 'width' => 5, 'height' => 0.3, 'weight' => 0.18],
+            ['product_id' => '1', 'length' => 10, 'width' => 5, 'height' => 0.3, 'weight' => 0.18],
+            ['product_id' => '1', 'length' => 10, 'width' => 5, 'height' => 0.3, 'weight' => 0.18],
+        ];
 
         $boxData = app(GetBoxAction::class)->execute(
             $shippingMethod,
@@ -129,40 +134,40 @@ class CartSummaryAction
         return $shippingFeeTotal;
     }
 
-    private function getProducts(CartLine|Collection $collections): array
-    {
-        $productlist = [];
+    // private function getProducts(CartLine|Collection $collections): array
+    // {
+    //     $productlist = [];
 
-        foreach ($collections as $collection) {
-            if ($collection->purchasable instanceof Product) {
-                $product = $collection->purchasable;
+    //     foreach ($collections as $collection) {
+    //         if ($collection->purchasable instanceof Product) {
+    //             $product = $collection->purchasable;
 
-                $purchasableId = $product->id;
-                $length = $product->dimension['length'];
-                $width = $product->dimension['width'];
-                $height = $product->dimension['height'];
-                $weight = $product->weight;
-            } elseif ($collection->purchasable instanceof ProductVariant) {
-                $product = $collection->purchasable->product;
+    //             $purchasableId = $product->id;
+    //             $length = $product->dimension['length'];
+    //             $width = $product->dimension['width'];
+    //             $height = $product->dimension['height'];
+    //             $weight = $product->weight;
+    //         } elseif ($collection->purchasable instanceof ProductVariant) {
+    //             $product = $collection->purchasable->product;
 
-                $purchasableId = $collection->purchasable->id;
-                $length = $product->dimension['length'];
-                $width = $product->dimension['width'];
-                $height = $product->dimension['height'];
-                $weight = $product->weight;
-            }
+    //             $purchasableId = $collection->purchasable->id;
+    //             $length = $product->dimension['length'];
+    //             $width = $product->dimension['width'];
+    //             $height = $product->dimension['height'];
+    //             $weight = $product->weight;
+    //         }
 
-            $productlist[] = [
-                'product_id' => (string) $purchasableId,
-                'length' => $length,
-                'width' => $width,
-                'height' => $height,
-                'weight' => (float) $weight,
-            ];
-        }
+    //         $productlist[] = [
+    //             'product_id' => (string) $purchasableId,
+    //             'length' => $length,
+    //             'width' => $width,
+    //             'height' => $height,
+    //             'weight' => (float) $weight,
+    //         ];
+    //     }
 
-        return $productlist;
-    }
+    //     return $productlist;
+    // }
 
     public function getTax(
         ?int $countryId,
