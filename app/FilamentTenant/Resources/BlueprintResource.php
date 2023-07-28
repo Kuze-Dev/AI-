@@ -448,8 +448,43 @@ class BlueprintResource extends Resource
                 self::getFieldsSchema()
                     ->columnSpanFull(),
             ],
-            FieldType::MEDIA => [
+            FieldType::MEDIA => [Forms\Components\Toggle::make('multiple')
+                ->reactive(),
+                Forms\Components\Toggle::make('reorder'),
+                Forms\Components\TextInput::make('accept')
+                    ->afterStateHydrated(function (Closure $set, ?array $state): void {
+                        $set('accept', implode(',', $state ?? []));
+                    })
+                    ->dehydrateStateUsing(function (string|null $state): array {
+                        if ($state === null) {
+                            return [];
+                        }
 
+                        return Str::contains($state, ',')
+                            ? Str::of($state)->split('/\,/')
+                                ->map(fn (string $rule) => trim($rule))
+                                ->toArray()
+                            : [$state];
+                    })
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('min_size')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('max_size')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('min_files')
+                    ->numeric()
+                    ->integer()
+                    ->when(fn (Closure $get) => $get('multiple') === true)
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('max_files')
+                    ->numeric()
+                    ->integer()
+                    ->when(fn (Closure $get) => $get('multiple') === true)
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
             ],
             default => [],
         };
