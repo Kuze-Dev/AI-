@@ -6,7 +6,6 @@ namespace Domain\Blueprint\DataTransferObjects;
 
 use Domain\Blueprint\Enums\ManipulationType;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Str;
 
 /**
  * @implements Arrayable<string, mixed>

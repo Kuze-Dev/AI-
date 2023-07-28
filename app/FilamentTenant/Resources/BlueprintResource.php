@@ -448,6 +448,9 @@ class BlueprintResource extends Resource
                 self::getFieldsSchema()
                     ->columnSpanFull(),
             ],
+            FieldType::MEDIA => [
+
+            ],
             default => [],
         };
     }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Domain\Blueprint\DataTransferObjects;
 
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Str;
 
 /**
  * @implements Arrayable<string, mixed>
@@ -20,7 +19,7 @@ class ConversionData implements Arrayable
 
     public static function fromArray(array $data): self
     {
-        if (!empty($data['manipulations'] ?? [])) {
+        if ( ! empty($data['manipulations'] ?? [])) {
             $data['manipulations'] = array_map(
                 fn (array $manipulation) => ManipulationData::fromArray($manipulation),
                 $data['manipulations']
