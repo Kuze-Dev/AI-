@@ -71,7 +71,7 @@ class ProductSeeder extends Seeder
     public function seedBrandAndCategories(): void
     {
         $taxonomies = $this->data()['taxonomies'];
-        BlueprintFactory::new($this->data()['blueprint_for_taxonomy']);
+        BlueprintFactory::new($this->data()['blueprint_for_taxonomy'])->create();
         $blueprint = Blueprint::whereName($this->data()['blueprint_for_taxonomy']['name'])->first();
 
         // Seed Brand and Category in Taxonomy
