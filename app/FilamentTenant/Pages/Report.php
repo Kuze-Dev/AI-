@@ -23,8 +23,8 @@ class Report extends Page
     protected function getWidgets(): array
     {
         return [
-            Widgets\ConversionRate::class,
             Widgets\TotalSales::class,
+            Widgets\ConversionRate::class,
         ];
     }
 
@@ -32,8 +32,8 @@ class Report extends Page
     protected function getFooterWidgets(): array
     {
         return [
-            Widgets\ConversionRate::class,
-            Widgets\TotalSales::class,
+            Widgets\MostSoldProduct::class,
+            Widgets\AverageOrderValue::class,
             Widgets\ConversionRate::class,
             Widgets\TotalSales::class,
             Widgets\ConversionRate::class,

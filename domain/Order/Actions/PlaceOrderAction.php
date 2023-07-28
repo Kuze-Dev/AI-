@@ -21,7 +21,8 @@ class PlaceOrderAction
             $result = app(SplitOrderAction::class)->execute($payload, $placeOrderData);
 
             $customer = auth()->user();
-            Notification::send($customer, new OrderPlacedNotification($result['order']));
+            // dd($result);
+            // Notification::send($customer, new OrderPlacedNotification($result['order']));
 
             return $result;
         }

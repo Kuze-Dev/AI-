@@ -7,14 +7,14 @@ use Filament\Widgets\BarChartWidget;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
 
-class TotalSales extends BarChartWidget
+class AverageOrderValue extends BarChartWidget
 {
-    protected static ?string $heading = 'Total sales';
+    protected static ?string $heading = 'Average Order Value';
 
 
     protected function getData(): array
     {
-        $salesData = Trend::query(Order::whereStatus('Fulfilled'))
+        $salesData = Trend::model(Order::class)
         ->between(
             start: now()->startOfYear(),
             end: now()->endOfYear(),
@@ -25,7 +25,7 @@ class TotalSales extends BarChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => "Total sales",
+                    'label' => "Average Order Value",
                     'data' => $salesData->map(fn (TrendValue $value) => $value->aggregate),
                 ],
 
