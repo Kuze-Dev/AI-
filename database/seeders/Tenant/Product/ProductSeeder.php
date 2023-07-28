@@ -9,6 +9,7 @@ use Domain\Blueprint\Models\Blueprint;
 use Domain\Product\Database\Factories\ProductFactory;
 use Domain\Product\Database\Factories\ProductOptionFactory;
 use Domain\Product\Database\Factories\ProductOptionValueFactory;
+use Domain\Product\Database\Factories\ProductVariantFactory;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductOption;
 use Domain\Product\Models\ProductOptionValue;
@@ -20,9 +21,53 @@ use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Support\MetaData\Database\Factories\MetaDataFactory;
 
 class ProductSeeder extends Seeder
 {
+    public function run(): void
+    {
+        $this->truncateDatabases();
+        $this->seedBrandAndCategories();
+
+        $taxonomyTermIds = TaxonomyTerm::whereIn('slug', ['brand-one', 'clothing'])->pluck('id');
+        foreach ($this->data()['products'] as $product) {
+            $productImageUrl = $product['image_url'];
+            unset($product['image_url']);
+
+            $product = ProductFactory::new($product)
+                ->has(
+                    ProductOptionFactory::new(['name' => 'size'])
+                        ->has(ProductOptionValueFactory::new(['name' => 'large']))
+                )
+                ->has(MetaDataFactory::new())
+                ->create();
+
+            $product->clearMediaCollection('image');
+
+            $response = Http::get($productImageUrl);
+            if ($response->successful()) {
+                $product
+                    ->addMediaFromUrl($productImageUrl)
+                    ->toMediaCollection('image');
+            }
+
+            $product->taxonomyTerms()->attach($taxonomyTermIds);
+            $productOptions = $product->productOptions;
+
+            ProductVariantFactory::new([
+                'combination' => [
+                    [
+                        'option_id' => $productOptions[0]->id,
+                        'option' => $productOptions[0]->name,
+                        'option_value_id' => $productOptions[0]->productOptionValues[0]->id,
+                        'option_value' => $productOptions[0]->productOptionValues[0]->name,
+                    ],
+                ],
+            ])->for($product)->create();
+        }
+    }
+
     public function seedBrandAndCategories(): void
     {
         $taxonomies = $this->data()['taxonomies'];
@@ -41,47 +86,6 @@ class ProductSeeder extends Seeder
                 ->has(
                     TaxonomyTermFactory::new($taxonomyData['term'])
                 )->create();
-        }
-    }
-
-    public function truncateDatabases()
-    {
-        ProductOptionValue::truncate();
-        ProductOption::truncate();
-        ProductVariant::truncate();
-        DB::table('product_taxonomy_term')->truncate();
-        Product::truncate();
-    }
-
-    public function run(): void
-    {
-        $this->truncateDatabases();
-        // (new ProductFactory())->seedData();
-
-        $this->seedBrandAndCategories();
-
-        $taxonomyTermIds = TaxonomyTerm::whereIn('slug', ['brand-one', 'clothing'])->pluck('id');
-        foreach ($this->data()['products'] as $product) {
-            $productImageUrl = $product['image_url'];
-            unset($product['image_url']);
-
-            $product = ProductFactory::new($product)
-                ->has(
-                    ProductOptionFactory::new(['name' => 'size'])
-                        ->has(ProductOptionValueFactory::new(['name' => 'large'], ['name' => 'small']))
-                )
-                ->create();
-
-            $product->clearMediaCollection('image');
-
-            $response = Http::get($productImageUrl);
-            if ($response->successful()) {
-                $product
-                    ->addMediaFromUrl($productImageUrl)
-                    ->toMediaCollection('image');
-            }
-
-            $product->taxonomyTerms()->attach($taxonomyTermIds);
         }
     }
 
@@ -243,32 +247,6 @@ class ProductSeeder extends Seeder
                     'weight' => 1.40,
                 ],
             ],
-            'product_options' => [
-                // [
-                'name' => 'size',
-                'values' => [
-                    'name' => 'large',
-                ],
-                // ]
-                // [
-                //     'name' => 'color',
-                //     'values' => [
-                //         'white',
-                //         'black',
-
-                //     ],
-                // ],
-            ],
-            'variant_combinations' => [
-                [
-                    'size' => 'large',
-                    'color' => 'white',
-                ],
-                [
-                    'size' => 'large',
-                    'color' => 'black',
-                ],
-            ],
             'taxonomies' => [
                 [
                     'name' => 'Brand',
@@ -338,5 +316,14 @@ class ProductSeeder extends Seeder
                 ],
             ],
         ];
+    }
+
+    protected function truncateDatabases()
+    {
+        ProductOptionValue::truncate();
+        ProductOption::truncate();
+        ProductVariant::truncate();
+        DB::table('product_taxonomy_term')->truncate();
+        Product::truncate();
     }
 }
