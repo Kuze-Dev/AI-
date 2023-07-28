@@ -50,7 +50,7 @@ class CheckoutController
             // Check if there are expired cart lines
             if ($expiredCartLines->isNotEmpty()) {
                 return response()->json([
-                    'message' => 'Key has been expired, checkout again',
+                    'message' => 'Key has been expired, checkout again to revalidate your cart',
                 ], 400);
             }
 
