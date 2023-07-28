@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Order\Actions;
 
-use App\Notifications\Order\OrderCancelledNotification;
-use App\Notifications\Order\OrderDeliveredNotification;
-use App\Notifications\Order\OrderFulfilledNotification;
-use App\Notifications\Order\OrderShippedNotification;
 use Domain\Order\DataTransferObjects\UpdateOrderData;
 use Domain\Order\Enums\OrderStatuses;
+use Domain\Order\Events\OrderStatusUpdatedEvent;
 use Domain\Order\Models\Order;
 use Domain\Payments\Actions\CreatePaymentLink;
 use Domain\Payments\Actions\UploadProofofPaymentAction;
@@ -23,7 +20,6 @@ use Domain\Payments\Models\Payment;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Notification;
 use Log;
 
 class UpdateOrderAction
@@ -50,24 +46,11 @@ class UpdateOrderAction
 
                 $customer = auth()->user();
 
-                switch ($updateOrderData->status) {
-                    case 'Delivered':
-                        Notification::send($customer, new OrderDeliveredNotification($order));
-
-                        break;
-                    case 'Cancelled':
-                        Notification::send($customer, new OrderCancelledNotification($order));
-
-                        break;
-                    case 'Shipped':
-                        Notification::send($customer, new OrderShippedNotification($order));
-
-                        break;
-                    case 'Fulfilled':
-                        Notification::send($customer, new OrderFulfilledNotification($order));
-
-                        break;
-                }
+                event(new OrderStatusUpdatedEvent(
+                    $customer,
+                    $order,
+                    $updateOrderData->status
+                ));
             }
 
             if ($updateOrderData->type == 'bank-transfer') {
@@ -77,7 +60,7 @@ class UpdateOrderAction
                     $image = $this->convertUrlToUploadedFile($updateOrderData->proof_of_payment);
 
                     if ($image instanceof UploadedFile) {
-                        if (!empty($orderPayment->payments) && !empty($orderPayment->payments->first())) {
+                        if ( ! empty($orderPayment->payments) && ! empty($orderPayment->payments->first())) {
                             app(UploadProofofPaymentAction::class)->execute(
                                 $orderPayment->payments->first(),
                                 new ProofOfPaymentData(
@@ -95,7 +78,7 @@ class UpdateOrderAction
                         $query->where('payable_id', $order->id);
                     })->whereNot('status', 'paid')->first();
 
-                    if (!$payment) {
+                    if ( ! $payment) {
                         return 'Your order already paid';
                     }
 
@@ -105,7 +88,7 @@ class UpdateOrderAction
                                 'reference_id' => $order->reference,
                                 'amount' => AmountData::fromArray([
                                     'currency' => $order->currency_code,
-                                    'total' =>  (int) $order->total,
+                                    'total' => (int) $order->total,
                                     'details' => PaymentDetailsData::fromArray(
                                         [
                                             'subtotal' => strval($order->sub_total - $order->discount_total),

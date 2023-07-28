@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Order\Listeners;
 
+use App\Notifications\Order\OrderCancelledNotification;
+use App\Notifications\Order\OrderFulfilledNotification;
 use Domain\Order\Events\OrderStatusUpdatedEvent;
-use Domain\Order\Notifications\OrderStatusUpdatedMail;
+use Illuminate\Support\Facades\Notification;
 
 class OrderStatusUpdatedListener
 {
@@ -15,11 +17,21 @@ class OrderStatusUpdatedListener
      * @param  \Domain\Order\Events\OrderStatusUpdatedEvent  $event
      * @return void
      */
-    public function handle(OrderStatusUpdatedEvent $event)
+    public function handle(OrderStatusUpdatedEvent $event): void
     {
         $customer = $event->customer;
         $order = $event->order;
+        $status = $event->status;
 
-        $customer->notify(new OrderStatusUpdatedMail($order, $event->status, $event->emailRemarks));
+        switch ($status) {
+            case 'Cancelled':
+                Notification::send($customer, new OrderCancelledNotification($order));
+
+                break;
+            case 'Fulfilled':
+                Notification::send($customer, new OrderFulfilledNotification($order));
+
+                break;
+        }
     }
 }

@@ -10,7 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class OrderStatusUpdatedMail extends Notification implements ShouldQueue
+class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -58,8 +58,6 @@ class OrderStatusUpdatedMail extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
-        return [
-
-        ];
+        return [];
     }
 }
