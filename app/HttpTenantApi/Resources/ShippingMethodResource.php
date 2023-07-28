@@ -20,7 +20,6 @@ class ShippingMethodResource extends JsonApiResource
             'subtitle' => $this->subtitle,
             'description' => $this->description,
             'driver' => $this->driver,
-            'ship_from_address' => $this->ship_from_address,
             'status' => $this->active,
 
         ];

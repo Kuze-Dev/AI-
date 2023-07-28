@@ -68,14 +68,14 @@ class PaymentCallbackController
     //     $providerData = new CreatepaymentData(
     //         transactionData: TransactionData::fromArray(
     //             [
-    //                 'reference_id' => '123',
+    //                 'reference_id' => 'KDFJKSDJFKSDJI',
     //                 'amount' => AmountData::fromArray([
     //                     'currency' => 'PHP',
-    //                     'total' => '1000.00',
+    //                     'total' => '100',
     //                     'details' => PaymentDetailsData::fromArray(
     //                         [
-    //                             'subtotal' => '950.00',
-    //                             'shipping' => '50.00',
+    //                             'subtotal' => '950',
+    //                             'shipping' => '50',
     //                         ]
     //                     ),
     //                 ]),
@@ -94,7 +94,7 @@ class PaymentCallbackController
     //                 'description' => 'payment request',
     //             ],
     //         ),
-    //         payment_driver: 'paypal'
+    //         payment_driver: 'stripe'
     //     );
 
     //     dump(

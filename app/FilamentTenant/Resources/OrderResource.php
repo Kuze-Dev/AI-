@@ -16,9 +16,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use Closure;
+use Domain\Customer\Models\Customer;
 use Domain\Discount\Models\Discount;
 use Domain\Discount\Models\DiscountLimit;
 use Domain\Order\Enums\OrderStatuses;
+use Domain\Order\Events\OrderStatusUpdatedEvent;
 use Domain\Taxation\Enums\PriceDisplay;
 use Filament\Notifications\Notification;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -246,7 +248,7 @@ class OrderResource extends Resource
                                     ->label('Edit')
                                     ->size('sm')
                                     ->modalHeading('Edit Status')
-                                    ->modalWidth('md')
+                                    ->modalWidth('xl')
                                     ->form([
                                         Forms\Components\Select::make('status_options')
                                             ->label('')
@@ -263,10 +265,22 @@ class OrderResource extends Resource
                                             ->formatStateUsing(function () use ($get) {
                                                 return $get('status');
                                             }),
-                                        Forms\Components\Toggle::make('send_email')->label('Send email notification')->default(false),
+                                        Forms\Components\Toggle::make('send_email')
+                                            ->label('Send email notification')->default(false)
+                                            ->reactive(),
+                                        Forms\Components\Textarea::make('email_remarks')->label('Remarks')
+                                            ->visible(fn (Closure $get) => $get('send_email') == true)
+                                            ->dehydrateStateUsing(function (string|null $state) use ($get) {
+                                                if (filled($state) && $get('send_email') == true) {
+                                                    return $state;
+                                                }
+
+                                                return null;
+                                            }),
                                     ])
                                     ->action(
-                                        function (array $data) use ($get, $set) {
+                                        function (array $data, $livewire) use ($get, $set) {
+
                                             $order = Order::find($get('id'));
 
                                             $status = $data['status_options'];
@@ -301,6 +315,22 @@ class OrderResource extends Resource
                                                     ->title('Order updated successfully')
                                                     ->success()
                                                     ->send();
+                                            }
+
+                                            $shouldSendEmail = $livewire->mountedFormComponentActionData['send_email'];
+                                            $emailRemarks = $livewire->mountedFormComponentActionData['email_remarks'];
+
+                                            if ($shouldSendEmail) {
+                                                $customer = Customer::where('id', $order->customer_id)->first();
+
+                                                if ($customer) {
+                                                    event(new OrderStatusUpdatedEvent(
+                                                        $customer,
+                                                        $order,
+                                                        $data['status_options'],
+                                                        $emailRemarks
+                                                    ));
+                                                }
                                             }
                                         }
                                     );

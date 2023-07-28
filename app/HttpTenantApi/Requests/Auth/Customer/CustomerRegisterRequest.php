@@ -7,6 +7,7 @@ namespace App\HttpTenantApi\Requests\Auth\Customer;
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
+use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Models\Customer;
 use Illuminate\Database\Query\Builder;
@@ -19,6 +20,8 @@ class CustomerRegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'email_verification_type' => ['nullable', Rule::enum(EmailVerificationType::class)],
+
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => [

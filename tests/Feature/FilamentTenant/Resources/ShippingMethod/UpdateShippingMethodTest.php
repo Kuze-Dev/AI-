@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\ShippingmethodResource\Pages\EditShippingmethod;
+use Domain\Address\Database\Factories\StateFactory;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Filament\Facades\Filament;
@@ -39,7 +40,7 @@ it('can edit shipping method', function () {
                 'address' => '185 BERRY ST',
                 'state' => 'CA',
                 'city' => 'SAN FRANCISCO',
-                'zip3' => '94107',
+                'zip5' => '94107',
                 'zip4' => '1741',
             ],
         ])->call('save')
@@ -57,6 +58,8 @@ it('can edit shipping method', function () {
 
 it('can edit update shipping method status', function () {
 
+    StateFactory::new();
+
     $record = ShippingMethodFactory::new()->createOne();
 
     livewire(EditShippingmethod::class, ['record' => $record->getRouteKey()])
@@ -66,13 +69,11 @@ it('can edit update shipping method status', function () {
             'description' => 'test',
             'driver' => 'store-pickup',
             'status' => true,
-            'ship_from_address' => [
-                'address' => '185 BERRY ST',
-                'state' => 'CA',
-                'city' => 'SAN FRANCISCO',
-                'zip3' => '94107',
-                'zip4' => '1741',
-            ],
+            'shipper_country_id' => '1',
+            'shipper_state_id' => '1',
+            'shipper_address' => '123 Test',
+            'shipper_city' => 'Test City',
+            'shipper_zipcode' => '62423',
         ])->call('save')
         ->assertHasNoFormErrors()
         ->assertOk()
@@ -82,7 +83,7 @@ it('can edit update shipping method status', function () {
     assertDatabaseHas(ShippingMethod::class, [
         'title' => 'Store Pickup',
         'driver' => 'store-pickup',
-        'status' => true,
+        'active' => true,
 
     ]);
 });

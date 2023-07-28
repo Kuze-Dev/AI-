@@ -20,9 +20,9 @@ class ReviewRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\Fieldset::make('customer')->relationship('customer')->schema([
-                    Forms\Components\TextInput::make('first_name')->default('Anonymous'),
-                    Forms\Components\TextInput::make('email')->default('Anonymous'),
+                Forms\Components\Fieldset::make('customer')->schema([
+                    Forms\Components\TextInput::make('customer_name')->label('Name')->default('Anonymous'),
+                    Forms\Components\TextInput::make('customer_email')->label('email')->default('Anonymous'),
                 ]),
                 Forms\Components\TextInput::make('comment'),
                 Forms\Components\TextInput::make('rating'),
@@ -33,7 +33,7 @@ class ReviewRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('Customer.first_name')->default('Anonymous')
+                Tables\Columns\TextColumn::make('customer_name')->default('Anonymous')
                     ->label('Name')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('rating')

@@ -34,6 +34,7 @@ use Domain\Review\Models\Review;
 use Domain\Taxation\Models\TaxZone;
 use Domain\Page\Models\Page;
 use Domain\Shipment\Models\Shipment;
+use Domain\Shipment\Models\ShippingBox;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Tier\Models\Tier;
 use Domain\PaymentMethod\Models\PaymentMethod;
@@ -42,6 +43,7 @@ use Support\MetaData\Models\MetaData;
 use Domain\Product\Models\Product;
 use Domain\Payments\Models\Payment;
 use Domain\Product\Models\ProductVariant;
+use Domain\Payments\Models\PaymentRefund;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\MissingAttributeException;
@@ -123,6 +125,8 @@ class AppServiceProvider extends ServiceProvider
             Review::class,
             Shipment::class,
             ShippingMethod::class,
+            ShippingBox::class,
+            PaymentRefund::class,
         ]);
 
         Password::defaults(

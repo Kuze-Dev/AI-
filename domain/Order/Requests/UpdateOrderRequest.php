@@ -12,15 +12,16 @@ class UpdateOrderRequest extends FormRequest
 {
     public function rules(): array
     {
+        //mali
         $paymentMethods = PaymentMethod::whereNotIn('gateway', ['manual', 'bank-transfer'])->get();
 
         $slugs = $paymentMethods->pluck('slug')->toArray();
-        $slugsStrings = implode(', ', $slugs);
+        array_push($slugs, 'status', 'bank-transfer');
 
         return [
             'type' => [
                 'required',
-                Rule::in(['status', 'bank-transfer', $slugsStrings]),
+                Rule::in($slugs),
             ],
             'status' => [
                 'nullable',

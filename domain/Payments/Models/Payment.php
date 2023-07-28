@@ -11,6 +11,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Eloquent;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Domain\Payments\Models\Payment
@@ -92,6 +93,12 @@ class Payment extends Model implements HasMedia
     public function paymentMethod(): BelongsTo
     {
         return $this->belongsTo(PaymentMethod::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Payments\Models\PaymentRefund>*/
+    public function refunds(): HasMany
+    {
+        return $this->hasMany(PaymentRefund::class);
     }
 
     /** @return MorphTo<Model, self> */

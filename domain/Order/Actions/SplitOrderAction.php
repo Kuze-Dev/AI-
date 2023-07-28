@@ -7,6 +7,7 @@ namespace Domain\Order\Actions;
 use Domain\Cart\Models\CartLine;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
+use Domain\Order\Events\OrderPlacedEvent;
 use Domain\Order\Models\Order;
 use Domain\Payments\Actions\CreatePaymentAction;
 use Domain\Payments\DataTransferObjects\AmountData;
@@ -14,8 +15,8 @@ use Domain\Payments\DataTransferObjects\CreatepaymentData;
 use Domain\Payments\DataTransferObjects\PaymentDetailsData;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\TransactionData;
-use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class SplitOrderAction
@@ -40,6 +41,13 @@ class SplitOrderAction
 
                 $payment = $this->proceedPayment($order, $preparedOrderData);
 
+                event(new OrderPlacedEvent(
+                    $preparedOrderData->customer,
+                    $order,
+                    $preparedOrderData->shippingAddress,
+                    $preparedOrderData->shippingMethod
+                ));
+
                 DB::commit();
 
                 return [
@@ -63,7 +71,7 @@ class SplitOrderAction
                     'reference_id' => $order->reference,
                     'amount' => AmountData::fromArray([
                         'currency' => $preparedOrderData->currency->code,
-                        'total' => strval($order->total),
+                        'total' => (int) $order->total,
                         'details' => PaymentDetailsData::fromArray(
                             [
                                 'subtotal' => strval($order->sub_total - $order->discount_total),

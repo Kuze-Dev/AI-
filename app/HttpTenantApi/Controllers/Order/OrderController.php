@@ -14,6 +14,7 @@ use Domain\Order\Models\Order;
 use Domain\Order\Requests\PlaceOrderRequest;
 use Domain\Order\Requests\UpdateOrderRequest;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
+use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -29,10 +30,11 @@ class OrderController extends Controller
     {
         return OrderResource::collection(
             QueryBuilder::for(Order::with([
-                'shippingAddress', 'billingAddress',
+                'shippingAddress',
+                'billingAddress',
                 'orderLines.media',
             ])->whereBelongsTo(auth()->user()))
-                ->allowedIncludes(['orderLines'])
+                ->allowedIncludes(['orderLines', 'orderLines.review.media'])
                 ->allowedFilters(['status', 'reference', AllowedFilter::scope('for_payment', 'whereHasForPayment')])
                 ->allowedSorts(['reference', 'total', 'status', 'created_at'])
                 ->jsonPaginate()
@@ -45,6 +47,12 @@ class OrderController extends Controller
 
         $result = app(PlaceOrderAction::class)
             ->execute(PlaceOrderData::fromArray($validatedData));
+
+        if ($result instanceof USPSServiceNotFoundException) {
+            return response()->json([
+                'service_id' => 'Shipping method service id is required',
+            ], 404);
+        }
 
         if ( ! $result['order'] instanceof Order) {
             return response()->json([
@@ -66,8 +74,10 @@ class OrderController extends Controller
 
         $model = QueryBuilder::for(
             $order->with([
-                'shippingAddress', 'billingAddress',
-                'orderLines.media', 'orderLines.review.media',
+                'shippingAddress',
+                'billingAddress',
+                'orderLines.media',
+                'orderLines.review.media',
                 'payments.paymentMethod.media',
             ])->whereBelongsTo(auth()->user())
                 ->whereReference($order->reference)
