@@ -32,7 +32,7 @@ class Report extends Page
     protected function getFooterWidgets(): array
     {
         return [
-            Widgets\MostSoldProduct::class,
+            Widgets\MostSoldProduct ::class,
             Widgets\AverageOrderValue::class,
             Widgets\ConversionRate::class,
             Widgets\TotalSales::class,

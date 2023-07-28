@@ -32,8 +32,6 @@ class CreateCartLineAction
 
             match ($cartLineData->purchasable_type) {
                 'Product' => $purchasableType = Product::class,
-                // 'Service' => $purchasableType = Service::class,
-                // 'Booking' => $purchasableType = Booking::class,
                 default => null
             };
 

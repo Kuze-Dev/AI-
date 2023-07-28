@@ -4,16 +4,26 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Actions;
 
+use DB;
 use Domain\Cart\Models\CartLine;
+use Exception;
 
 class BulkDestroyCartLineAction
 {
     public function execute(array $cartLineIds): bool
     {
-        $cartLines = CartLine::whereIn((new CartLine())->getRouteKeyName(), $cartLineIds);
+        try {
+            DB::beginTransaction();
 
-        $cartLines->delete();
+            $cartLines = CartLine::whereIn((new CartLine())->getRouteKeyName(), $cartLineIds);
 
-        return true;
+            $cartLines->delete();
+
+            return true;
+        } catch (Exception) {
+            DB::rollBack();
+
+            return false;
+        }
     }
 }

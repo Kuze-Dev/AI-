@@ -4,19 +4,23 @@ declare(strict_types=1);
 
 namespace Domain\Order\Notifications;
 
+use App\Settings\SiteSettings;
 use Domain\Order\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class OrderStatusUpdatedMail extends Notification implements ShouldQueue
+class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
 {
     use Queueable;
 
     private Order $order;
     private string $status;
     private ?string $remarks;
+    private string $logo;
+    private string $title;
+    private string $description;
 
     /** Create a new notification instance. */
     public function __construct(Order $order, string $status, ?string $remarks)
@@ -24,6 +28,10 @@ class OrderStatusUpdatedMail extends Notification implements ShouldQueue
         $this->order = $order;
         $this->status = $status;
         $this->remarks = $remarks;
+
+        $this->logo = app(SiteSettings::class)->getLogoUrl();
+        $this->title = app(SiteSettings::class)->name;
+        $this->description = app(SiteSettings::class)->description;
     }
 
     /**
@@ -44,6 +52,9 @@ class OrderStatusUpdatedMail extends Notification implements ShouldQueue
             ->subject('Order ' .  $this->order->reference . ' has been ' . $this->status)
             ->from('tenantone@example.com')
             ->view('filament.emails.order.updated', [
+                'logo' => $this->logo,
+                'title' => $this->title,
+                'description' => $this->description,
                 'status' => $this->status,
                 'remarks' => $this->remarks,
                 'order' => $this->order,
@@ -58,8 +69,6 @@ class OrderStatusUpdatedMail extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
-        return [
-
-        ];
+        return [];
     }
 }

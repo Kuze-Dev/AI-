@@ -62,7 +62,6 @@ final class DiscountHelperFunctions
 
         if (is_null($discount)) {
             return DiscountMessagesData::fromArray([
-                'status' => 'invalid',
                 'message' => 'This discount code is invalid.',
             ]);
         }
@@ -72,28 +71,24 @@ final class DiscountHelperFunctions
 
         if ($discount?->status === DiscountStatus::INACTIVE) {
             return DiscountMessagesData::fromArray([
-                'status' => 'invalid',
                 'message' => 'This discount code is invalid.',
             ]);
         }
 
         if ($discount?->valid_end_at && $discount->valid_end_at < now()) {
             return DiscountMessagesData::fromArray([
-                'status' => 'invalid',
                 'message' => 'This discount code has expired.',
             ]);
         }
 
         if ($discount?->max_uses == 0) {
             return DiscountMessagesData::fromArray([
-                'status' => 'invalid',
                 'message' => 'This discount code max usage limit has been reached.',
             ]);
         }
 
         if ($grandTotal < $discountAmount->minimum_amount) {
             return DiscountMessagesData::fromArray([
-                'status' => 'invalid',
                 'message' => 'You need to purchase at least '
                     . $discountAmount->minimum_amount  . ' to apply this discount',
             ]);

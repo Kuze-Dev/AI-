@@ -86,7 +86,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @method static ProductBuilder|Product whereWeight($value)
  * @mixin \Eloquent
  */
-#[OnDeleteCascade(['metaData'])]
+#[OnDeleteCascade(['metaData', 'productOptions', 'productVariants'])]
 class Product extends Model implements HasMetaDataContract, HasMedia
 {
     use LogsActivity;

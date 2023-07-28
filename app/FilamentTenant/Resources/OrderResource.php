@@ -20,7 +20,7 @@ use Domain\Customer\Models\Customer;
 use Domain\Discount\Models\Discount;
 use Domain\Discount\Models\DiscountLimit;
 use Domain\Order\Enums\OrderStatuses;
-use Domain\Order\Events\OrderStatusUpdatedEvent;
+use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
 use Domain\Taxation\Enums\PriceDisplay;
 use Filament\Notifications\Notification;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -320,23 +320,22 @@ class OrderResource extends Resource
                                             $shouldSendEmail = $livewire->mountedFormComponentActionData['send_email'];
                                             $emailRemarks = $livewire->mountedFormComponentActionData['email_remarks'];
 
-                                            if ($shouldSendEmail) {
-                                                $customer = Customer::where('id', $order->customer_id)->first();
+                                            $customer = Customer::where('id', $order->customer_id)->first();
 
-                                                if ($customer) {
-                                                    event(new OrderStatusUpdatedEvent(
-                                                        $customer,
-                                                        $order,
-                                                        $data['status_options'],
-                                                        $emailRemarks
-                                                    ));
-                                                }
+                                            if ($customer) {
+                                                event(new AdminOrderStatusUpdatedEvent(
+                                                    $customer,
+                                                    $order,
+                                                    $shouldSendEmail,
+                                                    $data['status_options'],
+                                                    $emailRemarks
+                                                ));
                                             }
                                         }
                                     );
                             })->disableLabel()->columnSpan(1)->alignRight()->size('sm')
                             ->hidden(function (Order $record) {
-                                return $record->status == OrderStatuses::CANCELLED;
+                                return $record->status == OrderStatuses::CANCELLED || $record->status == OrderStatuses::FULFILLED;
                             }),
                     ]),
                 Forms\Components\Grid::make(2)
@@ -401,7 +400,7 @@ class OrderResource extends Resource
                             ->requiresConfirmation();
                     })->fullWidth()->size('md')
                     ->hidden(function (Order $record) {
-                        return $record->status == OrderStatuses::CANCELLED;
+                        return $record->status == OrderStatuses::CANCELLED || $record->status == OrderStatuses::FULFILLED;
                     }),
                 Support\ButtonAction::make('proof_of_payment')
                     ->disableLabel()

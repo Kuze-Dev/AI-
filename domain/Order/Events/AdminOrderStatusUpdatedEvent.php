@@ -8,21 +8,27 @@ use Domain\Customer\Models\Customer;
 use Domain\Order\Models\Order;
 use Illuminate\Queue\SerializesModels;
 
-class OrderStatusUpdatedEvent
+class AdminOrderStatusUpdatedEvent
 {
     use SerializesModels;
 
     public Customer $customer;
     public Order $order;
+    public bool $shouldSendEmail;
     public string $status;
+    public ?string $emailRemarks;
 
     public function __construct(
         Customer $customer,
         Order $order,
-        string $status
+        bool $shouldSendEmail,
+        string $status,
+        ?string $emailRemarks
     ) {
         $this->customer = $customer;
         $this->order = $order;
+        $this->shouldSendEmail = $shouldSendEmail;
         $this->status = $status;
+        $this->emailRemarks = $emailRemarks;
     }
 }
