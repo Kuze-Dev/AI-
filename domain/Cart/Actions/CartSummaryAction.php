@@ -133,19 +133,49 @@ class CartSummaryAction
     {
         $productlist = [];
 
-        foreach ($collections as $collection) {
-            if ($collection->purchasable instanceof Product) {
-                $product = $collection->purchasable;
+        if ($collections instanceof Collection) {
+            foreach ($collections as $collection) {
+                if ($collection->purchasable instanceof Product) {
+                    $product = $collection->purchasable;
+
+                    $purchasableId = $product->id;
+                    $length = $product->dimension['length'];
+                    $width = $product->dimension['width'];
+                    $height = $product->dimension['height'];
+                    $weight = $product->weight;
+                } else if ($collection->purchasable instanceof ProductVariant) {
+                    $product = $collection->purchasable->product;
+
+                    $purchasableId = $collection->purchasable->id;
+                    $length = $product->dimension['length'];
+                    $width = $product->dimension['width'];
+                    $height = $product->dimension['height'];
+                    $weight = $product->weight;
+                }
+
+                $productlist[] = [
+                    'product_id' => (string) $purchasableId,
+                    'length' => $length,
+                    'width' => $width,
+                    'height' => $height,
+                    'weight' => (float) $weight,
+                ];
+            }
+        } else {
+            $cartLine = $collections->purchasable;
+
+            if ($cartLine instanceof Product) {
+                $product = $cartLine;
 
                 $purchasableId = $product->id;
                 $length = $product->dimension['length'];
                 $width = $product->dimension['width'];
                 $height = $product->dimension['height'];
                 $weight = $product->weight;
-            } elseif ($collection->purchasable instanceof ProductVariant) {
-                $product = $collection->purchasable->product;
+            } else if ($cartLine instanceof ProductVariant) {
+                $product = $cartLine->product;
 
-                $purchasableId = $collection->purchasable->id;
+                $purchasableId = $cartLine->id;
                 $length = $product->dimension['length'];
                 $width = $product->dimension['width'];
                 $height = $product->dimension['height'];
@@ -178,7 +208,7 @@ class CartSummaryAction
 
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
 
-        if ( ! $taxZone instanceof TaxZone) {
+        if (!$taxZone instanceof TaxZone) {
             throw new BadRequestHttpException('No tax zone found');
         }
 
@@ -196,7 +226,7 @@ class CartSummaryAction
     {
         $discountTotal = 0;
 
-        if ( ! is_null($discount)) {
+        if (!is_null($discount)) {
             $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal);
         }
 

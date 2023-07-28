@@ -28,7 +28,7 @@ class UpdateOrderAction
     {
         try {
             if ($updateOrderData->status) {
-                if ($updateOrderData->status == 'Cancelled' && $order->status !== OrderStatuses::PENDING) {
+                if ($updateOrderData->status ==  OrderStatuses::CANCELLED && $order->status !== OrderStatuses::PENDING) {
                     return "You can't cancelled this order";
                 }
 
@@ -36,7 +36,7 @@ class UpdateOrderAction
                     'status' => $updateOrderData->status,
                 ];
 
-                if ($updateOrderData->status == 'Cancelled') {
+                if ($updateOrderData->status == OrderStatuses::CANCELLED) {
                     $orderData['cancelled_reason'] = $updateOrderData->notes;
                 } else {
                     $orderData['cancelled_reason'] = null;
@@ -60,7 +60,7 @@ class UpdateOrderAction
                     $image = $this->convertUrlToUploadedFile($updateOrderData->proof_of_payment);
 
                     if ($image instanceof UploadedFile) {
-                        if ( ! empty($orderPayment->payments) && ! empty($orderPayment->payments->first())) {
+                        if (!empty($orderPayment->payments) && !empty($orderPayment->payments->first())) {
                             app(UploadProofofPaymentAction::class)->execute(
                                 $orderPayment->payments->first(),
                                 new ProofOfPaymentData(
@@ -78,7 +78,7 @@ class UpdateOrderAction
                         $query->where('payable_id', $order->id);
                     })->whereNot('status', 'paid')->first();
 
-                    if ( ! $payment) {
+                    if (!$payment) {
                         return 'Your order already paid';
                     }
 

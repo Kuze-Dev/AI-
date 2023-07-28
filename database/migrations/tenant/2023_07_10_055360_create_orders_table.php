@@ -34,7 +34,6 @@ return new class() extends Migration
             $table->decimal('shipping_total');
             $table->decimal('total')->index();
             $table->longText('notes')->nullable();
-            $table->string('shipping_method')->index();
             $table->boolean('is_paid')->default(false);
             $table->string('status')->index();
             $table->string('cancelled_reason')->nullable();

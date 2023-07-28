@@ -21,8 +21,6 @@ class CreateOrderLineAction
     public function execute(Order $order,  PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData)
     {
 
-        $orderLines = [];
-
         foreach ($preparedOrderData->cartLine as $cartLine) {
 
             try {
