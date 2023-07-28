@@ -15,18 +15,18 @@ class DatabaseSeeder extends Seeder
         Artisan::call('permission:cache-reset');
 
         $this->call([
-            // Auth\PermissionSeeder::class,
-            // Auth\RoleSeeder::class,
-            // Auth\AdminSeeder::class,
-            // Page\PageSeeder::class,
-            // Address\CountrySeeder::class,
-            // DiscountSeeder::class,
+            Auth\PermissionSeeder::class,
+            Auth\RoleSeeder::class,
+            Auth\AdminSeeder::class,
+            Page\PageSeeder::class,
+            Address\CountrySeeder::class,
+            DiscountSeeder::class,
             Product\ProductSeeder::class,
-            // Currency\CurrencySeeder::class,
-            // Tier\TierSeeder::class,
-            // Customer\CustomerSeeder::class,
-            // ShippingMethod\ShippingMethodSeeder::class,
-            // ShippingMethod\ShippingBoxSeeder::class,
+            Currency\CurrencySeeder::class,
+            Tier\TierSeeder::class,
+            Customer\CustomerSeeder::class,
+            ShippingMethod\ShippingMethodSeeder::class,
+            ShippingMethod\ShippingBoxSeeder::class,
         ]);
     }
 }
