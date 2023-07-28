@@ -28,8 +28,6 @@ class OrderLineResource extends JsonApiResource
             'total' => $this->total,
             'reviewed_at' => $this->reviewed_at,
             'purchasable' => function () {
-                // (WIP) DTO is my work around here becase the
-                // purchable_data is an array coming from column
                 if ( ! isset($this->purchasable_data['product'])) {
                     return ProductOrderData::fromArray($this->purchasable_data);
                 } elseif (isset($this->purchasable_data['product'])) {

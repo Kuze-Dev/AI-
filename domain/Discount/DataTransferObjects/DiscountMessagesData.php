@@ -22,7 +22,7 @@ class DiscountMessagesData
     {
         return new self(
             message: $data['message'],
-            status: $data['status'] ?? "invalid",
+            status: $data['status'] ?? 'invalid',
             amount_type: $data['amount_type'] ?? null,
             amount: $data['amount'] ?? 0,
             discount_type: $data['discount_type'] ?? null,

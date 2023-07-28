@@ -142,7 +142,7 @@ class CartSummaryAction
                 $width = $product->dimension['width'];
                 $height = $product->dimension['height'];
                 $weight = $product->weight;
-            } else if ($collection->purchasable instanceof ProductVariant) {
+            } elseif ($collection->purchasable instanceof ProductVariant) {
                 $product = $collection->purchasable->product;
 
                 $purchasableId = $collection->purchasable->id;
@@ -178,7 +178,7 @@ class CartSummaryAction
 
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
 
-        if (!$taxZone instanceof TaxZone) {
+        if ( ! $taxZone instanceof TaxZone) {
             throw new BadRequestHttpException('No tax zone found');
         }
 
@@ -196,7 +196,7 @@ class CartSummaryAction
     {
         $discountTotal = 0;
 
-        if (!is_null($discount)) {
+        if ( ! is_null($discount)) {
             $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal);
         }
 

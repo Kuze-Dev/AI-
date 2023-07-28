@@ -22,6 +22,7 @@ class BulkDestroyCartLineAction
             return true;
         } catch (Exception) {
             DB::rollBack();
+
             return false;
         }
     }
