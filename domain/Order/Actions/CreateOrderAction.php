@@ -67,12 +67,11 @@ class CreateOrderAction
 
             'notes' => $preparedOrderData->notes,
             'shipping_method' => 'test shipping_method',
-            'shipping_details' => 'test shipping details',
 
             'is_paid' => false,
         ]);
 
-        if ( ! is_null($preparedOrderData->discount)) {
+        if (!is_null($preparedOrderData->discount)) {
             app(CreateDiscountLimitAction::class)->execute($preparedOrderData->discount, $order, $preparedOrderData->customer);
         }
 

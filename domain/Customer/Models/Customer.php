@@ -58,9 +58,9 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property-read int|null $addresses_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, DiscountLimit> $discountLimits
  * @property-read int|null $discount_limits_count
+ * @property-read \Domain\Auth\Model\EmailVerificationOneTimePassword|null $emailVerificationOneTimePassword
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Favorite> $favorites
  * @property-read int|null $favorites_count
- * @property-read \Domain\Auth\Model\EmailVerificationOneTimePassword|null $emailVerificationOneTimePassword
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications

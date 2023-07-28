@@ -59,6 +59,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read Customer|null $customer
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
+ * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Order\Models\OrderLine> $orderLines
  * @property-read int|null $order_lines_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Payments\Models\Payment> $payments
@@ -126,7 +128,6 @@ class Order extends Model implements HasMedia, PayableInterface
         'total',
         'notes',
         'shipping_method',
-        'shipping_details',
         'is_paid',
         'status',
         'cancelled_reason',
