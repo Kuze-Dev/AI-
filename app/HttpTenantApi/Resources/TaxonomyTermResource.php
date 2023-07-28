@@ -8,6 +8,7 @@ use App\HttpTenantApi\Resources\Concerns\TransformsSchemaPayload;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
 use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
+use RuntimeException;
 
 /**
  * @mixin \Domain\Taxonomy\Models\TaxonomyTerm
@@ -35,6 +36,13 @@ class TaxonomyTermResource extends JsonApiResource
 
     protected function getSchemaData(): SchemaData
     {
-        return $this->taxonomy->blueprint->schema;
+        if ($this->taxonomy && $this->taxonomy->blueprint->exists()) {
+            return $this->taxonomy->blueprint->schema;
+        }
+
+        // Handle the case when taxonomy or blueprint is null
+        // Return an appropriate default or throw an exception
+        // For example:
+        throw new RuntimeException('Invalid taxonomy or missing blueprint.');
     }
 }

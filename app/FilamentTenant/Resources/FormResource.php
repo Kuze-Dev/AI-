@@ -116,7 +116,7 @@ class FormResource extends Resource
                                             : ($state ?? [])),
                                 ])
                                 ->columns(3),
-                            Forms\Components\TextInput::make('sender')
+                            Forms\Components\TextInput::make('sender_name')
                                 ->required(),
                             Forms\Components\TextInput::make('reply_to')
                                 ->helperText('Seperated by comma')
@@ -173,7 +173,8 @@ class FormResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->truncate('max-w-xs 2xl:max-w-xl', true),
                 Tables\Columns\BadgeColumn::make('form_submissions_count')
                     ->counts('formSubmissions')
                     ->formatStateUsing(fn (FormModel $record, ?int $state) => $record->store_submission ? $state : 'N/A')

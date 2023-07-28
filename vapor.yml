@@ -1,49 +1,57 @@
 id: 44015
 name: HASP
 environments:
-  production:
-    domain:
-      - haspcms.net
-      - "*.haspcms.net"
-    timeout: 30
-    warm: 10
-    cache: hasp-cache
-    memory: 1024
-    cli-memory: 512
-    runtime: "php-8.1:al2"
-    build:
-      - "composer install --no-dev"
-      - "php artisan event:cache"
-      # - 'npm ci && npm run build && rm -rf node_modules'
-    firewall:
-      rate-limit: 1000
-      bot-control:
-        - CategorySearchEngine
-        - CategorySocialMedia
-        - CategoryScrapingFramework
-  staging:
-    domain:
-      - staging.haspcms.net
-    timeout: 30
-    warm: 10
-    cache: hasp-cache
-    memory: 1024
-    cli-memory: 512
-    runtime: "php-8.1:al2"
-    build:
-      - "composer install --no-dev"
-      - "php artisan event:cache"
-      # - 'npm ci && npm run build && rm -rf node_modules'
-    firewall:
-      rate-limit: 1000
-      bot-control:
-        - CategorySearchEngine
-        - CategorySocialMedia
-        - CategoryScrapingFramework
+    ecommerce-branch:
+        domain:
+            - staging-ecommerce.haspcms-1.com
+        memory: 1024
+        cli-memory: 512
+        runtime: 'php-8.2:al2'
+        build:
+            - 'COMPOSER_MIRROR_PATH_REPOS=1 composer install --no-dev'
+            - 'php artisan event:cache'
+            - 'npm ci && npm run build && rm -rf node_modules'
+    production:
+        domain:
+            - haspcms.net
+            - '*.haspcms.net'
+        timeout: 30
+        warm: 10
+        cache: hasp-cache
+        memory: 1024
+        cli-memory: 512
+        runtime: 'php-8.1:al2'
+        build:
+            - 'composer install --no-dev'
+            - 'php artisan event:cache'
+        firewall:
+            rate-limit: 1000
+            bot-control:
+                - CategorySearchEngine
+                - CategorySocialMedia
+                - CategoryScrapingFramework
+    staging:
+        domain:
+            - staging.haspcms.net
+        timeout: 30
+        warm: 10
+        cache: hasp-cache
+        memory: 1024
+        cli-memory: 512
+        runtime: 'php-8.1:al2'
+        build:
+            - 'composer install --no-dev'
+            - 'php artisan event:cache'
+        firewall:
+            rate-limit: 1000
+            bot-control:
+                - CategorySearchEngine
+                - CategorySocialMedia
+                - CategoryScrapingFramework
 ignore:
-  - "node_modules"
-  - "public/storage"
-  - "resources/assets"
-  - "storage"
-  - "tests"
-  - "build"
+    - node_modules
+    - public/storage
+    - resources/assets
+    - storage
+    - tests
+    - build

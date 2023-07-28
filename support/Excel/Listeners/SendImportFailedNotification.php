@@ -17,7 +17,7 @@ class SendImportFailedNotification
     ) {
     }
 
-    public function handle(ImportFailed $event): void
+    public function __invoke(ImportFailed $event): void
     {
         if ($event->getException() instanceof ValidationException) {
             Notification::send(

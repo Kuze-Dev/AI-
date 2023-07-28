@@ -35,7 +35,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read Blueprint $blueprint
+ * @property-read Blueprint|null $blueprint
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Content\Models\ContentEntry> $contentEntries
  * @property-read int|null $content_entries_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Taxonomy> $taxonomies
