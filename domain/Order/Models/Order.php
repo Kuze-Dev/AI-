@@ -125,8 +125,6 @@ class Order extends Model implements HasMedia, PayableInterface
         'shipping_total',
         'total',
         'notes',
-        'shipping_method',
-        'shipping_details',
         'is_paid',
         'status',
         'cancelled_reason',

@@ -10,6 +10,7 @@ use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Discount\Actions\CreateDiscountLimitAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
+use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Illuminate\Support\Str;
@@ -66,13 +67,12 @@ class CreateOrderAction
             'total' => $summary->grandTotal,
 
             'notes' => $preparedOrderData->notes,
-            'shipping_method' => 'test shipping_method',
-            'shipping_details' => 'test shipping details',
+            'status' => OrderStatuses::PENDING,
 
             'is_paid' => false,
         ]);
 
-        if ( ! is_null($preparedOrderData->discount)) {
+        if (!is_null($preparedOrderData->discount)) {
             app(CreateDiscountLimitAction::class)->execute($preparedOrderData->discount, $order, $preparedOrderData->customer);
         }
 

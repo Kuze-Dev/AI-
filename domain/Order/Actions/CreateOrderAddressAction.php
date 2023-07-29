@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Order\Actions;
 
 use Domain\Order\DataTransferObjects\PreparedOrderData;
+use Domain\Order\Enums\OrderAddressTypes;
 use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderAddress;
 
@@ -15,7 +16,7 @@ class CreateOrderAddressAction
         $addressesToInsert = [
             [
                 'order_id' => $order->id,
-                'type' => 'Shipping',
+                'type' => OrderAddressTypes::SHIPPING,
                 'country' => $preparedOrderData->shippingAddress->state->country->name,
                 'state' => $preparedOrderData->shippingAddress->state ? $preparedOrderData->shippingAddress->state->name : null,
                 'label_as' => $preparedOrderData->shippingAddress->label_as,
@@ -27,7 +28,7 @@ class CreateOrderAddressAction
             ],
             [
                 'order_id' => $order->id,
-                'type' => 'Billing',
+                'type' => OrderAddressTypes::BILLING,
                 'country' => $preparedOrderData->billingAddress->state->country->name,
                 'state' => $preparedOrderData->billingAddress->state ? $preparedOrderData->billingAddress->state->name : null,
                 'label_as' => $preparedOrderData->shippingAddress->label_as,
