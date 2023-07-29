@@ -145,32 +145,47 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('reference')->label('Order ID')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('customer_name')->label('Customer')
+                Tables\Columns\TextColumn::make('reference')
+                    ->label(trans('Order ID'))
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('customer_name')
+                    ->label(trans('Customer'))
                     ->sortable()
                     ->formatStateUsing(function ($record) {
                         return $record->customer_first_name . ' ' . $record->customer_last_name;
                     }),
-                Tables\Columns\TextColumn::make('tax_total')->label('Tax Total')->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('total')->sortable(),
-                Tables\Columns\TextColumn::make('shipping_method')->label('Shipping Method')->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\IconColumn::make('is_paid')->label('isPaid')
+                Tables\Columns\TextColumn::make('tax_total')
+                    ->label(trans('Tax Total'))
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('total')
+                    ->label(trans('Total'))
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('shipping_method')
+                    ->label(trans('Shipping Method'))
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\IconColumn::make('is_paid')
+                    ->label(trans('Paid'))
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()
-                    ->label('Order Date')
+                    ->label(trans('Order Date'))
                     ->dateTime(timezone: Auth::user()?->timezone),
                 Tables\Columns\BadgeColumn::make('status')
+                    ->label(trans('Status'))
+                    ->formatStateUsing(function ($state) {
+                        return ucfirst($state);
+                    })
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\Filter::make('created_at')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
-                            ->label('Created from'),
+                            ->label(trans('Created from')),
                         Forms\Components\DatePicker::make('created_until')
-                            ->label('Created until'),
+                            ->label(trans('Created until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -196,6 +211,34 @@ class OrderResource extends Resource
 
                         return $indicators;
                     }),
+
+                Tables\Filters\SelectFilter::make('status')->label(trans('Status'))
+                    ->options([
+                        OrderStatuses::PENDING->value => trans('Pending'),
+                        OrderStatuses::CANCELLED->value => trans('Cancelled'),
+                        OrderStatuses::REFUNDED->value => trans('Refunded'),
+                        OrderStatuses::PACKED->value => trans('Packed'),
+                        OrderStatuses::SHIPPED->value => trans('Shipped'),
+                        OrderStatuses::DELIVERED->value => trans('Delivered'),
+                        OrderStatuses::FULFILLED->value => trans('Fulfilled'),
+                        OrderStatuses::FORPAYMENT->value => trans('For Payment'),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        $query->when(filled($data['value']), function (Builder $query) use ($data) {
+                            $isForPayment = $data['value'] == OrderStatuses::FORPAYMENT->value;
+
+                            if ($isForPayment) {
+                                return $query->whereHas('payments', function ($subQuery) {
+                                    $subQuery->where(function ($query) {
+                                        $query->whereIn('gateway', ['paypal', 'bank-transfer', 'stripe']);
+                                    })->where('status', 'pending');
+                                })->where('is_paid', false);
+                            }
+
+                            return $query->where('status', $data['value']);
+                        });
+                    })
+                    ->attribute('status')
             ])
             ->bulkActions([
                 // Tables\Actions\BulkAction::make('export')
@@ -373,7 +416,7 @@ class OrderResource extends Resource
                             ->action(function () use ($get, $set) {
                                 $order = Order::with('payments')->find($get('id'));
 
-                                $isPaid = ! $order->is_paid;
+                                $isPaid = !$order->is_paid;
 
                                 $result = $order->update([
                                     'is_paid' => $isPaid,
