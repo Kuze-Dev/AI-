@@ -25,8 +25,6 @@ class OrderResource extends JsonApiResource
             'shipping_total' => $this->shipping_total,
             'total' => $this->total,
             'notes' => $this->notes,
-            'shipping_method' => $this->shipping_method,
-            'shipping_details' => $this->shipping_details,
             'is_paid' => $this->is_paid,
             'status' => $this->status,
             'shipping_address' => $this->shippingAddress,
