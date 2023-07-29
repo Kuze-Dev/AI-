@@ -30,7 +30,8 @@ class OrderLinesRelationManager extends RelationManager
                             ? 'https://via.placeholder.com/500x300/333333/fff?text=No+preview+available'
                             : null
                     )->square(),
-                Tables\Columns\TextColumn::make('name')->label('Product Name')
+                Tables\Columns\TextColumn::make('name')
+                    ->label(trans('Product Name'))
                     ->description(function (OrderLine $record) {
                         if ($record->purchasable_type == ProductVariant::class) {
                             $combinations = array_values($record->purchasable_data['combination']);
@@ -43,14 +44,17 @@ class OrderLinesRelationManager extends RelationManager
                         return '';
                     })
                     ->alignLeft(),
-                Tables\Columns\TextColumn::make('unit_price')->label('Unit Price'),
-                Tables\Columns\TextColumn::make('quantity')->label('Quantity'),
-                Tables\Columns\TextColumn::make('sub_total')->label('Amount'),
+                Tables\Columns\TextColumn::make('unit_price')->label(trans('Unit Price')),
+                Tables\Columns\TextColumn::make('quantity')->label(trans('Quantity')),
+                Tables\Columns\TextColumn::make('sub_total')->label(trans('Amount')),
             ])
             ->headerActions([
-                Tables\Actions\Action::make('view')->label('View Details')->color('secondary')->action(function ($livewire) {
-                    return redirect(OrderResource::getUrl('details', ['record' => $livewire->ownerRecord]));
-                })->button(),
+                Tables\Actions\Action::make('view')
+                    ->label(trans('View Details'))
+                    ->color('secondary')
+                    ->action(function ($livewire) {
+                        return redirect(OrderResource::getUrl('details', ['record' => $livewire->ownerRecord]));
+                    })->button(),
             ]);
     }
 
