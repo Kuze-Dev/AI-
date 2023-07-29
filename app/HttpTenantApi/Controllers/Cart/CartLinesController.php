@@ -28,6 +28,7 @@ class CartLinesController extends Controller
     {
         $validatedData = $request->validated();
 
+        /** @var \Domain\Customer\Models\Customer $customer */
         $customer = auth()->user();
 
         $cart = app(CreateCartAction::class)->execute($customer);
@@ -68,11 +69,6 @@ class CartLinesController extends Controller
                     'message' => 'Cart updated successfully',
                 ]);
         }
-
-        return response()
-            ->json([
-                'message' => 'Cart didnt update',
-            ], 400);
     }
 
     public function destroy(CartLine $cartline): mixed

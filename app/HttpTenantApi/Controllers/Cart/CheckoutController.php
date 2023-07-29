@@ -23,7 +23,7 @@ use Spatie\RouteAttributes\Attributes\Resource;
 ]
 class CheckoutController
 {
-    public function index(Request $request)
+    public function index(Request $request): mixed
     {
         $validated = $request->validate([
             'reference' => 'required|string',

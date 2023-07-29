@@ -92,10 +92,11 @@ class CartSummaryRequest extends FormRequest
         ];
     }
 
+    /** @return \Domain\Address\Models\Country|null */
     public function getCountry(): ?Country
     {
         if ($id = $this->validated('country_id')) {
-            return app(Country::class)->resolveRouteBinding($id);
+            return app(Country::class)->where((new Country())->getRouteKeyName(), $id)->first();
         }
 
         return null;
@@ -104,7 +105,7 @@ class CartSummaryRequest extends FormRequest
     public function getShippingMethod(): ?ShippingMethod
     {
         if ($id = $this->validated('shipping_method_id')) {
-            return app(ShippingMethod::class)->resolveRouteBinding($id);
+            return app(ShippingMethod::class)->where((new ShippingMethod())->getRouteKeyName(), $id)->first();
         }
 
         return null;
@@ -113,7 +114,7 @@ class CartSummaryRequest extends FormRequest
     public function getShippingAddress(): ?Address
     {
         if ($id = $this->validated('shipping_address_id')) {
-            return app(Address::class)->resolveRouteBinding($id);
+            return app(Address::class)->where((new Address())->getRouteKeyName(), $id)->first();
         }
 
         return null;
@@ -122,7 +123,7 @@ class CartSummaryRequest extends FormRequest
     public function getState(): ?State
     {
         if ($id = $this->validated('state_id')) {
-            return app(State::class)->resolveRouteBinding($id);
+            return app(State::class)->where((new State())->getRouteKeyName(), $id)->first();
         }
 
         return null;

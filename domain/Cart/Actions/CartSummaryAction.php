@@ -27,6 +27,7 @@ use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 
 class CartSummaryAction
 {
+    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
     public function getSummary(
         CartLine|Collection $collections,
         CartSummaryTaxData $cartSummaryTaxData,
@@ -70,23 +71,31 @@ class CartSummaryAction
         return SummaryData::fromArray($summaryData);
     }
 
+    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
     public function getSubTotal(CartLine|Collection $collections): float
     {
         $subTotal = 0;
 
         if ($collections instanceof Collection) {
             $subTotal = $collections->reduce(function ($carry, $collection) {
+                /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
                 $purchasable = $collection->purchasable;
+                $sellingPrice = (float) $purchasable->selling_price;
 
-                return $carry + ($purchasable->selling_price * $collection->quantity);
+                return $carry + ($sellingPrice * $collection->quantity);
             }, 0);
         } elseif ($collections instanceof CartLine) {
-            $subTotal = $collections->purchasable->selling_price * $collections->quantity;
+            /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
+            $purchasable = $collections->purchasable;
+            $sellingPrice = (float) $purchasable->selling_price;
+
+            $subTotal = $sellingPrice * $collections->quantity;
         }
 
         return $subTotal;
     }
 
+    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
     public function getShippingFee(
         CartLine|Collection $collections,
         Customer $customer,
@@ -96,7 +105,7 @@ class CartSummaryAction
     ): float {
         $shippingFeeTotal = 0;
 
-        if ($shippingAddress) {
+        if ($shippingAddress && $shippingMethod) {
             // $productlist = $this->getProducts($collections);
             $productlist = [
                 ['product_id' => '1', 'length' => 10, 'width' => 5, 'height' => 0.3, 'weight' => 0.18],
@@ -202,7 +211,7 @@ class CartSummaryAction
         $discountTotal = 0;
 
         if ( ! is_null($discount)) {
-            $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal);
+            $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal) ?? 0;
         }
 
         return $discountTotal;

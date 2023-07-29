@@ -8,6 +8,9 @@ use Domain\Cart\Models\CartLine;
 use Domain\Product\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Cart\Models\CartLine>
+ */
 class CartLineFactory extends Factory
 {
     protected $model = CartLine::class;

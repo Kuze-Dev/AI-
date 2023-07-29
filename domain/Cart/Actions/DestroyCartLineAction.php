@@ -11,13 +11,13 @@ class DestroyCartLineAction
 {
     public function execute(CartLine $cartLine): bool
     {
-        $cartLine->whereHas(
-            'cart',
-            function (Builder $query) {
-                $query->whereBelongsTo(auth()->user());
-            }
-        )->whereNull('checked_out_at')->firstOrFail();
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = auth()->user();
 
-        return $cartLine->delete();
+        $cartLine->whereHas('cart', function (Builder $query) use ($customer) {
+            $query->whereBelongsTo($customer);
+        })->whereNull('checked_out_at')->first();
+
+        return (bool) $cartLine->delete();
     }
 }
