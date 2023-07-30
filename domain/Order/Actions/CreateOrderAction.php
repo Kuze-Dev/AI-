@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Order\Actions;
 
-use Domain\Address\Models\Address;
 use Domain\Cart\Actions\CartSummaryAction;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
@@ -73,7 +72,7 @@ class CreateOrderAction
             'is_paid' => false,
         ]);
 
-        if (!is_null($preparedOrderData->discount)) {
+        if ( ! is_null($preparedOrderData->discount)) {
             app(CreateDiscountLimitAction::class)->execute($preparedOrderData->discount, $order, $preparedOrderData->customer);
         }
 

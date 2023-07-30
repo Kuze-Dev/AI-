@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace Domain\Order\Requests;
 
 use Domain\Address\Models\Address;
-use Domain\Address\Models\Country;
-use Domain\Address\Models\State;
 use Domain\Cart\Actions\PurchasableCheckerAction;
 use Domain\Cart\Models\CartLine;
-use Domain\Customer\Models\Customer;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Validation\Rule;
@@ -49,7 +46,7 @@ class PlaceOrderRequest extends FormRequest
                         ->whereNull('checked_out_at')
                         ->count();
 
-                    if (!$cartLines) {
+                    if ( ! $cartLines) {
                         $fail('No cart lines for checkout');
 
                         return;

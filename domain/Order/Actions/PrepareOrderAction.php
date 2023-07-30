@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Domain\Order\Actions;
 
 use Domain\Address\Models\Address;
-use Domain\Address\Models\Country;
-use Domain\Address\Models\State;
 use Domain\Cart\Models\CartLine;
 use Domain\Currency\Models\Currency;
 use Domain\Discount\Enums\DiscountStatus;
@@ -19,7 +17,6 @@ use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Log;
@@ -78,7 +75,7 @@ class PrepareOrderAction
     {
         $currency = Currency::where('default', true)->first();
 
-        if (!$currency instanceof Currency) {
+        if ( ! $currency instanceof Currency) {
 
             throw new BadRequestHttpException('No currency found');
         }
@@ -96,7 +93,7 @@ class PrepareOrderAction
             $query->morphWith([
                 ProductVariant::class => ['product'],
             ]);
-        },])
+        }, ])
             ->whereCheckoutReference($placeOrderData->cart_reference)
             ->get();
     }
@@ -109,7 +106,7 @@ class PrepareOrderAction
 
         $taxZone = Taxation::getTaxZone($address->state->country->id, $address->state->id);
 
-        if (!$taxZone instanceof TaxZone) {
+        if ( ! $taxZone instanceof TaxZone) {
             // Log::info('No tax zone found');
 
             throw new BadRequestHttpException('No tax zone found');
@@ -148,7 +145,7 @@ class PrepareOrderAction
     {
         $paymentMethod = PaymentMethod::whereSlug($placeOrderData->payment_method)->first();
 
-        if (!$paymentMethod instanceof PaymentMethod) {
+        if ( ! $paymentMethod instanceof PaymentMethod) {
 
             throw new BadRequestHttpException('No paymentMethod found');
         }
