@@ -49,7 +49,7 @@ class PlaceOrderRequest extends FormRequest
                         ->whereNull('checked_out_at')
                         ->count();
 
-                    if ( ! $cartLines) {
+                    if (!$cartLines) {
                         $fail('No cart lines for checkout');
 
                         return;
@@ -69,40 +69,6 @@ class PlaceOrderRequest extends FormRequest
                     $checkStocks = app(PurchasableCheckerAction::class)->checkStock($cartLineIds);
                     if ($checkStocks !== count($cartLineIds)) {
                         $fail('Invalid stocks');
-                    }
-                },
-            ],
-            'taxations.state_id' => [
-                'nullable',
-                function ($attribute, $value, $fail) {
-                    $customerId = auth()->user()?->id;
-
-                    $customer = Customer::query()
-                        ->whereHas('addresses.state', function ($query) use ($value) {
-                            $query->where((new State())->getRouteKeyName(), $value);
-                        })
-                        ->whereId($customerId)
-                        ->count();
-
-                    if ($customer == 0) {
-                        $fail('Invalid state id');
-                    }
-                },
-            ],
-            'taxations.country_id' => [
-                'required',
-                function ($attribute, $value, $fail) {
-                    $customerId = auth()->user()?->id;
-
-                    $customer = Customer::query()
-                        ->whereHas('addresses.state.country', function ($query) use ($value) {
-                            $query->where((new Country())->getRouteKeyName(), $value);
-                        })
-                        ->whereId($customerId)
-                        ->count();
-
-                    if ($customer == 0) {
-                        $fail('Invalid country id');
                     }
                 },
             ],

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Order\Actions;
 
+use Domain\Address\Models\Address;
 use Domain\Cart\Actions\CartSummaryAction;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
@@ -24,11 +25,12 @@ class CreateOrderLineAction
         foreach ($preparedOrderData->cartLine as $cartLine) {
 
             try {
+
                 $summary = app(CartSummaryAction::class)->getSummary(
                     $cartLine,
                     new CartSummaryTaxData(
-                        $placeOrderData->taxation_data->country_id,
-                        $placeOrderData->taxation_data->state_id
+                        $preparedOrderData->billingAddress->state->country->id,
+                        $preparedOrderData->billingAddress->state->id,
                     ),
                     new CartSummaryShippingData(
                         $preparedOrderData->customer,
