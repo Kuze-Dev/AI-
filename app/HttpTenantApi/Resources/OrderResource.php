@@ -26,17 +26,21 @@ class OrderResource extends JsonApiResource
             'total' => $this->total,
             'notes' => $this->notes,
             'is_paid' => $this->is_paid,
-            'status' => $this->status,
             'shipping_address' => $this->shippingAddress,
             'billing_address' => $this->billingAddress,
         ];
     }
 
+    /** @return array<string, callable> */
     public function toRelationships(Request $request): array
     {
+
+        /** @var \Domain\Payments\Models\Payment $payment */
+        $payment = $this->payments->first();
+
         return [
             'orderLines' => fn () => OrderLineResource::collection($this->orderLines),
-            'payments' => fn () => PaymentMethodOrderResource::make($this->payments->first()->paymentMethod),
+            'payments' => fn () => PaymentMethodOrderResource::make($payment->paymentMethod),
         ];
     }
 }

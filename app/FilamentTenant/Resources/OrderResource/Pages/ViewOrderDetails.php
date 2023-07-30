@@ -154,9 +154,9 @@ class ViewOrderDetails extends ViewRecord
                         Forms\Components\FileUpload::make('customer_upload_' . $sectionIndex)
                             ->label(trans('Customer Upload'))
                             ->formatStateUsing(function () use ($orderLine) {
-                                return $orderLine?->getMedia('order_line_notes')
+                                return $orderLine->getMedia('order_line_notes')
                                     ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                                    ->toArray() ?? [];
+                                    ->toArray();
                             })
                             ->hidden(function () use ($orderLine) {
                                 return (bool) (empty($orderLine->getFirstMediaUrl('order_line_notes')));

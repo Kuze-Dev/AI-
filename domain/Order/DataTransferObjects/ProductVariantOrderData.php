@@ -50,6 +50,9 @@ class ProductVariantOrderData
             );
         }
 
+        /** @var \Domain\Product\Models\Product $product */
+        $product = $productVariant->product;
+
         return new self(
             sku: $productVariant->sku,
             combination: [],
@@ -57,7 +60,7 @@ class ProductVariantOrderData
             selling_price: $productVariant->selling_price,
             stock: $productVariant->stock,
             status: $productVariant->status,
-            product: ProductOrderData::fromProduct($productVariant->product),
+            product: ProductOrderData::fromProduct($product),
         );
     }
 }

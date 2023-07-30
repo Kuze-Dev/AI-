@@ -26,7 +26,7 @@ class OrderLinesRelationManager extends RelationManager
                 SpatieMediaLibraryImageColumn::make('image')
                     ->collection('order_line_images')
                     ->default(
-                        fn (OrderLine $record) => $record->getFirstMediaUrl('order_line_images') === null
+                        fn (OrderLine $record) => $record->getFirstMediaUrl('order_line_images') == null
                             ? 'https://via.placeholder.com/500x300/333333/fff?text=No+preview+available'
                             : null
                     )->square(),
@@ -34,7 +34,10 @@ class OrderLinesRelationManager extends RelationManager
                     ->label(trans('Product Name'))
                     ->description(function (OrderLine $record) {
                         if ($record->purchasable_type == ProductVariant::class) {
-                            $combinations = array_values($record->purchasable_data['combination']);
+                            /** @var \Domain\Product\Models\ProductVariant $productVariant */
+                            $productVariant = $record->purchasable_data;
+
+                            $combinations = array_values($productVariant['combination']);
                             $optionValues = array_column($combinations, 'option_value');
                             $variantString = implode(' / ', array_map('ucfirst', $optionValues));
 

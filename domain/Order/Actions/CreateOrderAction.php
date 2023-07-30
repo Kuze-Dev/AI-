@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
 
 class CreateOrderAction
 {
-    public function execute(PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData)
+    public function execute(PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData): Order
     {
         $referenceNumber = Str::upper(Str::random(12));
 

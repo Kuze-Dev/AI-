@@ -44,6 +44,7 @@ class UpdateOrderAction
 
                 $order->update($orderData);
 
+                /** @var \Domain\Customer\Models\Customer $customer */
                 $customer = auth()->user();
 
                 event(new OrderStatusUpdatedEvent(
@@ -122,17 +123,19 @@ class UpdateOrderAction
     {
         $fileContent = file_get_contents($url);
 
-        $tempFilePath = tempnam(sys_get_temp_dir(), 'upload');
+        $tempFilePath = (string) tempnam(sys_get_temp_dir(), 'upload');
 
         if ($tempFilePath) {
 
             file_put_contents($tempFilePath, $fileContent);
 
+            $mimeType = mime_content_type($tempFilePath) ?: 'application/octet-stream';
+
             // Create an instance of UploadedFile using the temporary file
             $uploadedFile = new UploadedFile(
                 $tempFilePath,
                 basename($url),
-                mime_content_type($tempFilePath),
+                $mimeType,
                 null,
                 true
             );

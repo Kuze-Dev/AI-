@@ -38,6 +38,7 @@ class OrderResource extends Resource
 
     protected static function getNavigationBadge(): ?string
     {
+        /** @phpstan-ignore-next-line https://filamentphp.com/docs/2.x/admin/navigation#navigation-item-badges */
         return strval(static::$model::where('status', OrderStatuses::PENDING)->count());
     }
 
@@ -53,67 +54,117 @@ class OrderResource extends Resource
                                     ->schema([
                                         Forms\Components\Placeholder::make('first_name')
                                             ->label(trans('First Name'))
-                                            ->content(fn (Order $record): ?string => $record->customer_first_name),
+                                            ->content(fn (Order $record): string => $record->customer_first_name),
                                         Forms\Components\Placeholder::make('last_name')
                                             ->label(trans('Last Name'))
-                                            ->content(fn (Order $record): ?string => $record->customer_last_name),
+                                            ->content(fn (Order $record): string => $record->customer_last_name),
                                     ]),
                                 Forms\Components\Grid::make(2)
                                     ->schema([
                                         Forms\Components\Placeholder::make('email')
                                             ->label(trans('Email'))
-                                            ->content(fn (Order $record): ?string => $record->customer_email),
+                                            ->content(fn (Order $record): string => $record->customer_email),
                                         Forms\Components\Placeholder::make('contact_number')
                                             ->label(trans('Contact Number'))
-                                            ->content(fn (Order $record): ?string => $record->customer_mobile),
+                                            ->content(fn (Order $record): string => $record->customer_mobile),
                                     ]),
                             ])->collapsible(),
                         Forms\Components\Section::make(trans('Shipping Address'))
                             ->schema([
                                 Forms\Components\Placeholder::make('sa_line_one')
                                     ->label(trans('House/Unit/Flr #, Bldg Name, Blk or Lot #'))
-                                    ->content(fn (Order $record): ?string => $record->shippingAddress->address_line_1),
+                                    ->content(function (Order $record): string {
+                                        /** @var \Domain\Order\Models\OrderAddress $orderShippingAddress */
+                                        $orderShippingAddress = $record->shippingAddress;
+
+                                        return $orderShippingAddress->address_line_1;
+                                    }),
                                 Forms\Components\Grid::make(2)
                                     ->schema([
                                         Forms\Components\Placeholder::make('sa_country')
                                             ->label(trans('Country'))
-                                            ->content(fn (Order $record): ?string => $record->shippingAddress->country),
+                                            ->content(function (Order $record): string {
+                                                /** @var \Domain\Order\Models\OrderAddress $orderShippingAddress */
+                                                $orderShippingAddress = $record->shippingAddress;
+
+                                                return $orderShippingAddress->country;
+                                            }),
                                         Forms\Components\Placeholder::make('sa_state')
                                             ->label(trans('State'))
-                                            ->content(fn (Order $record): ?string => $record->shippingAddress->state),
+                                            ->content(function (Order $record): string {
+                                                /** @var \Domain\Order\Models\OrderAddress $orderShippingAddress */
+                                                $orderShippingAddress = $record->shippingAddress;
+
+                                                return $orderShippingAddress->state;
+                                            }),
                                     ]),
                                 Forms\Components\Grid::make(2)
                                     ->schema([
                                         Forms\Components\Placeholder::make('sa_city_province')
                                             ->label(trans('City/Province'))
-                                            ->content(fn (Order $record): ?string => $record->shippingAddress->city),
+                                            ->content(function (Order $record): string {
+                                                /** @var \Domain\Order\Models\OrderAddress $orderShippingAddress */
+                                                $orderShippingAddress = $record->shippingAddress;
+
+                                                return $orderShippingAddress->city;
+                                            }),
                                         Forms\Components\Placeholder::make('sa_zip_code')
                                             ->label(trans('Zip Code'))
-                                            ->content(fn (Order $record): ?string => $record->shippingAddress->zip_code),
+                                            ->content(function (Order $record): string {
+                                                /** @var \Domain\Order\Models\OrderAddress $orderShippingAddress */
+                                                $orderShippingAddress = $record->shippingAddress;
+
+                                                return $orderShippingAddress->zip_code;
+                                            }),
                                     ]),
                             ])->collapsible(),
                         Forms\Components\Section::make(trans('Billing Address'))
                             ->schema([
                                 Forms\Components\Placeholder::make('ba_line_one')
                                     ->label(trans('House/Unit/Flr #, Bldg Name, Blk or Lot #'))
-                                    ->content(fn (Order $record): ?string => $record->billingAddress->address_line_1),
+                                    ->content(function (Order $record): string {
+                                        /** @var \Domain\Order\Models\OrderAddress $orderBillingAddress */
+                                        $orderBillingAddress = $record->billingAddress;
+
+                                        return $orderBillingAddress->address_line_1;
+                                    }),
                                 Forms\Components\Grid::make(2)
                                     ->schema([
                                         Forms\Components\Placeholder::make('ba_country')
                                             ->label(trans('Country'))
-                                            ->content(fn (Order $record): ?string => $record->billingAddress->country),
+                                            ->content(function (Order $record): string {
+                                                /** @var \Domain\Order\Models\OrderAddress $orderBillingAddress */
+                                                $orderBillingAddress = $record->billingAddress;
+
+                                                return $orderBillingAddress->country;
+                                            }),
                                         Forms\Components\Placeholder::make('ba_state')
                                             ->label(trans('State'))
-                                            ->content(fn (Order $record): ?string => $record->billingAddress->state),
+                                            ->content(function (Order $record): string {
+                                                /** @var \Domain\Order\Models\OrderAddress $orderBillingAddress */
+                                                $orderBillingAddress = $record->billingAddress;
+
+                                                return $orderBillingAddress->state;
+                                            }),
                                     ]),
                                 Forms\Components\Grid::make(2)
                                     ->schema([
                                         Forms\Components\Placeholder::make('ba_city_province')
                                             ->label(trans('City/Province'))
-                                            ->content(fn (Order $record): ?string => $record->billingAddress->city),
+                                            ->content(function (Order $record): string {
+                                                /** @var \Domain\Order\Models\OrderAddress $orderBillingAddress */
+                                                $orderBillingAddress = $record->billingAddress;
+
+                                                return $orderBillingAddress->city;
+                                            }),
                                         Forms\Components\Placeholder::make('ba_zip_code')
                                             ->label(trans('Zip Code'))
-                                            ->content(fn (Order $record): ?string => $record->billingAddress->zip_code),
+                                            ->content(function (Order $record): string {
+                                                /** @var \Domain\Order\Models\OrderAddress $orderBillingAddress */
+                                                $orderBillingAddress = $record->billingAddress;
+
+                                                return $orderBillingAddress->zip_code;
+                                            }),
                                     ]),
                             ])->collapsible(),
                         Forms\Components\Section::make(trans('Payment Method'))
@@ -122,7 +173,10 @@ class OrderResource extends Resource
                                     ->formatStateUsing(function (Order $record) {
                                         $record->load('payments.paymentMethod');
 
-                                        return $record->payments->first()->paymentMethod?->getMedia('logo')
+                                        /** @var \Domain\Payments\Models\Payment $payment */
+                                        $payment = $record->payments->first();
+
+                                        return $payment->paymentMethod?->getMedia('logo')
                                             ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
                                             ->toArray() ?? [];
                                     })
@@ -288,7 +342,7 @@ class OrderResource extends Resource
         ];
     }
 
-    public static function summaryCard()
+    public static function summaryCard(): Forms\Components\Section
     {
         return Forms\Components\Section::make(trans('Summary'))
             ->schema([
@@ -313,8 +367,10 @@ class OrderResource extends Resource
                             ->size('md')
                             ->inline()
                             ->formatStateUsing(function ($state) {
+                                /** @phpstan-ignore-next-line */
                                 $format ??= config('tables.date_format');
                                 $formattedState = Carbon::parse($state)
+                                    /** @phpstan-ignore-next-line */
                                     ->setTimezone(Auth::user()?->timezone)
                                     ->translatedFormat($format);
 
@@ -491,6 +547,8 @@ class OrderResource extends Resource
 
                                 if ($record->discount_code != null) {
                                     DiscountLimit::whereOrderId($record->id)->delete();
+
+                                    /** @var \Domain\Discount\Models\Discount $discount */
                                     $discount = Discount::whereCode($record->discount_code)->first();
 
                                     $discount->update([
@@ -568,12 +626,14 @@ class OrderResource extends Resource
                         ]);
 
                         if ($result) {
+                            /** @var \Domain\Payments\Models\Payment $payment */
+                            $payment = $order->payments->first();
                             if ($order->is_paid) {
-                                $order->payments->first()->update([
+                                $payment->update([
                                     'status' => 'paid',
                                 ]);
                             } else {
-                                $order->payments->first()->update([
+                                $payment->update([
                                     'status' => 'pending',
                                 ]);
                             }
@@ -651,7 +711,10 @@ class OrderResource extends Resource
                         Forms\Components\Textarea::make('Message')
                             ->label(trans('Message'))
                             ->formatStateUsing(function () use ($order) {
-                                return $order->payments->first()->message;
+                                /** @var \Domain\Payments\Models\Payment $payment */
+                                $payment = $order->payments->first();
+
+                                return $payment->message;
                             }),
                     ])
                     ->slideOver()
@@ -662,7 +725,10 @@ class OrderResource extends Resource
             ->hidden(function (Order $record) {
                 $order = $record->load('payments');
 
-                return $order->payments->first()->gateway != 'bank-transfer';
+                /** @var \Domain\Payments\Models\Payment $payment */
+                $payment = $order->payments->first();
+
+                return $payment->gateway != 'bank-transfer';
             });
     }
 }

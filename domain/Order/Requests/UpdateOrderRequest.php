@@ -13,6 +13,7 @@ class UpdateOrderRequest extends FormRequest
 {
     public function rules(): array
     {
+        /** @var \Domain\Order\Models\Order $order */
         $order = $this->route('order');
 
         $paymentMethods = PaymentMethod::whereNotIn('gateway', ['manual', 'bank-transfer'])->get();
