@@ -106,12 +106,7 @@ class CartSummaryAction
         $shippingFeeTotal = 0;
 
         if ($shippingAddress && $shippingMethod) {
-            // $productlist = $this->getProducts($collections);
-            $productlist = [
-                ['product_id' => '1', 'length' => 10, 'width' => 5, 'height' => 0.3, 'weight' => 0.18],
-                ['product_id' => '1', 'length' => 10, 'width' => 5, 'height' => 0.3, 'weight' => 0.18],
-                ['product_id' => '1', 'length' => 10, 'width' => 5, 'height' => 0.3, 'weight' => 0.18],
-            ];
+            $productlist = $this->getProducts($collections);
 
             $boxData = app(GetBoxAction::class)->execute(
                 $shippingMethod,
@@ -143,40 +138,55 @@ class CartSummaryAction
         return $shippingFeeTotal;
     }
 
-    // private function getProducts(CartLine|Collection $collections): array
-    // {
-    //     $productlist = [];
+    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
+    private function getProducts(CartLine|Collection $collections): array
+    {
+        $productlist = [];
 
-    //     foreach ($collections as $collection) {
-    //         if ($collection->purchasable instanceof Product) {
-    //             $product = $collection->purchasable;
+        if ( ! is_iterable($collections)) {
+            if ($collections->purchasable instanceof Product) {
+                $product = $collections->purchasable;
+            } elseif ($collections->purchasable instanceof ProductVariant) {
+                $product = $collections->purchasable->product;
+            }
+            $purchasableId = $product->id;
+            $length = $product->dimension['length'];
+            $width = $product->dimension['width'];
+            $height = $product->dimension['height'];
+            $weight = $product->weight;
 
-    //             $purchasableId = $product->id;
-    //             $length = $product->dimension['length'];
-    //             $width = $product->dimension['width'];
-    //             $height = $product->dimension['height'];
-    //             $weight = $product->weight;
-    //         } elseif ($collection->purchasable instanceof ProductVariant) {
-    //             $product = $collection->purchasable->product;
+            $productlist[] = [
+                'product_id' => (string) $purchasableId,
+                'length' => $length,
+                'width' => $width,
+                'height' => $height,
+                'weight' => (float) $weight,
+            ];
+        } else {
+            foreach ($collections as $collection) {
+                if ($collection->purchasable instanceof Product) {
+                    $product = $collection->purchasable;
+                } elseif ($collection->purchasable instanceof ProductVariant) {
+                    $product = $collection->purchasable->product;
+                }
+                $purchasableId = $product->id;
+                $length = $product->dimension['length'];
+                $width = $product->dimension['width'];
+                $height = $product->dimension['height'];
+                $weight = $product->weight;
 
-    //             $purchasableId = $collection->purchasable->id;
-    //             $length = $product->dimension['length'];
-    //             $width = $product->dimension['width'];
-    //             $height = $product->dimension['height'];
-    //             $weight = $product->weight;
-    //         }
+                $productlist[] = [
+                    'product_id' => (string) $purchasableId,
+                    'length' => $length,
+                    'width' => $width,
+                    'height' => $height,
+                    'weight' => (float) $weight,
+                ];
+            }
+        }
 
-    //         $productlist[] = [
-    //             'product_id' => (string) $purchasableId,
-    //             'length' => $length,
-    //             'width' => $width,
-    //             'height' => $height,
-    //             'weight' => (float) $weight,
-    //         ];
-    //     }
-
-    //     return $productlist;
-    // }
+        return $productlist;
+    }
 
     public function getTax(
         ?int $countryId,
