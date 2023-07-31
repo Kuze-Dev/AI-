@@ -7,6 +7,7 @@ namespace Domain\Customer\Actions;
 use Domain\Address\Actions\CreateAddressAction;
 use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Customer\DataTransferObjects\CustomerData;
+use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Models\Customer;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Str;
@@ -36,6 +37,7 @@ class CreateCustomerAction
             'birth_date' => $customerData->birth_date,
             'password' => $customerData->password,
             'email_verification_type' => $customerData->email_verification_type,
+            'register_status' => $customerData->register_status,
         ]);
 
         if ($customerData->shipping_address_data !== null) {
@@ -67,7 +69,9 @@ class CreateCustomerAction
             ));
         }
 
-        event(new Registered($customer));
+        if ($customer->register_status === RegisterStatus::REGISTERED) {
+            event(new Registered($customer));
+        }
 
         return $customer;
     }
