@@ -9,7 +9,6 @@ use Domain\Customer\Actions\CreateCustomerAction;
 use Domain\Customer\Actions\EditCustomerAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Enums\Gender;
-use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
@@ -37,10 +36,10 @@ class ListCustomers extends ListRecords
                             'email' => $row['email'],
                             'first_name' => $row['first_name'],
                             'last_name' => $row['last_name'],
-                            'mobile' => $row['mobile'],
-                            'gender' => $row['gender'],
-                            'status' => $row['status'],
-                            'birth_date' => $row['birth_date'],
+                            'mobile' => $row['mobile'] ?? null,
+                            'gender' => $row['gender'] ?? null,
+                            'status' => $row['status'] ?? null,
+                            'birth_date' => $row['birth_date'] ?? null,
                             'tier_id' => isset($row['tier'])
                                 ? (Tier::whereName($row['tier'])->first()?->getKey())
                                 : null,
@@ -67,10 +66,10 @@ class ListCustomers extends ListRecords
                         ],
                         'first_name' => 'required|string|min:3|max:100',
                         'last_name' => 'required|string|min:3|max:100',
-                        'mobile' => 'required|string|min:3|max:100',
-                        'gender' => ['required', Rule::enum(Gender::class)],
-                        'status' => ['required', Rule::enum(Status::class)],
-                        'birth_date' => 'required|date',
+                        'mobile' => 'nullable|string|min:3|max:100',
+                        'gender' => ['nullable', Rule::enum(Gender::class)],
+                        'status' => ['nullable', Rule::enum(Status::class)],
+                        'birth_date' => 'nullable|date',
                         'tier' => [
                             'nullable',
                             Rule::exists(Tier::class, 'name'),
@@ -82,7 +81,6 @@ class ListCustomers extends ListRecords
                 ->queue()
                 ->query(
                     fn (Builder $query) => $query
-                        ->where('register_status', RegisterStatus::REGISTERED)
                         ->with('tier')
                         ->latest()
                 )

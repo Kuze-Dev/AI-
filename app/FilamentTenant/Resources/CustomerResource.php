@@ -409,7 +409,6 @@ class CustomerResource extends Resource
                     ->queue()
                     ->query(
                         fn (Builder $query) => $query
-                            ->where('register_status', RegisterStatus::REGISTERED)
                             ->with('tier')
                             ->latest()
                     )
