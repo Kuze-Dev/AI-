@@ -9,6 +9,7 @@ use Domain\Customer\Actions\CreateCustomerAction;
 use Domain\Customer\Actions\EditCustomerAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Enums\Gender;
+use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
@@ -79,7 +80,12 @@ class ListCustomers extends ListRecords
             ExportAction::make()
                 ->model(Customer::class)
                 ->queue()
-                ->query(fn (Builder $query) => $query->with('tier')->latest())
+                ->query(
+                    fn (Builder $query) => $query
+                        ->where('register_status', RegisterStatus::REGISTERED)
+                        ->with('tier')
+                        ->latest()
+                )
                 ->mapUsing(
                     ['CUID', 'Email', 'First Name',  'Last Name', 'Mobile', 'Gender', 'Status', 'Birth Date', 'Tier', 'Created At'],
                     fn (Customer $customer): array => [
@@ -88,10 +94,10 @@ class ListCustomers extends ListRecords
                         $customer->first_name,
                         $customer->last_name,
                         $customer->mobile,
-                        $customer->gender->value,
-                        $customer->status->value,
-                        $customer->birth_date->format(config('tables.date_format')),
-                        $customer->tier->name,
+                        $customer->gender?->value,
+                        $customer->status?->value,
+                        $customer->birth_date?->format(config('tables.date_format')),
+                        $customer->tier?->name,
                         $customer->created_at?->format(config('tables.date_time_format')),
                     ]
                 ),

@@ -35,6 +35,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Support\Excel\Actions\ExportBulkAction;
+use ErrorException;
 
 class CustomerResource extends Resource
 {
@@ -319,13 +320,6 @@ class CustomerResource extends Resource
                             ->mapWithKeys(fn (Status $target) => [$target->value => Str::headline($target->value)])
                             ->toArray()
                     ),
-                Tables\Filters\SelectFilter::make('register_status')
-                    ->translateLabel()
-                    ->options(
-                        collect(RegisterStatus::cases())
-                            ->mapWithKeys(fn (RegisterStatus $target) => [$target->value => Str::headline($target->value)])
-                            ->toArray()
-                    ),
                 Tables\Filters\SelectFilter::make('email_verified')
                     ->translateLabel()
                     ->options(['1' => 'Verified', '0' => 'Not Verified'])
@@ -339,6 +333,14 @@ class CustomerResource extends Resource
                             };
                         });
                     }),
+                Tables\Filters\SelectFilter::make('register_status')
+                    ->translateLabel()
+                    ->default(RegisterStatus::REGISTERED->value)
+                    ->options(
+                        collect(RegisterStatus::cases())
+                            ->mapWithKeys(fn (RegisterStatus $target) => [$target->value => Str::headline($target->value)])
+                            ->toArray()
+                    ),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
@@ -348,6 +350,7 @@ class CustomerResource extends Resource
                         ->label(fn (Customer $record) => match ($record->register_status) {
                             RegisterStatus::UNREGISTERED => 'Send register invitation',
                             RegisterStatus::INVITED => 'Resend register invitation',
+                            default => throw new ErrorException('Invalid register status.'),
                         })
                         ->translateLabel()
                         ->requiresConfirmation()
@@ -404,7 +407,12 @@ class CustomerResource extends Resource
             ->bulkActions([
                 ExportBulkAction::make()
                     ->queue()
-                    ->query(fn (Builder $query) => $query->with('tier')->latest())
+                    ->query(
+                        fn (Builder $query) => $query
+                            ->where('register_status', RegisterStatus::REGISTERED)
+                            ->with('tier')
+                            ->latest()
+                    )
                     ->mapUsing(
                         ['CUID', 'Email', 'First Name',  'Last Name', 'Mobile', 'Status', 'Birth Date', 'Tier', 'Created At'],
                         fn (Customer $customer): array => [
@@ -413,9 +421,9 @@ class CustomerResource extends Resource
                             $customer->first_name,
                             $customer->last_name,
                             $customer->mobile,
-                            $customer->status->value,
-                            $customer->birth_date->format(config('tables.date_format')),
-                            $customer->tier->name,
+                            $customer->status?->value,
+                            $customer->birth_date?->format(config('tables.date_format')),
+                            $customer->tier?->name,
                             $customer->created_at?->format(config('tables.date_time_format')),
                         ]
                     ),

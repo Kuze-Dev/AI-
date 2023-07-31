@@ -11,13 +11,12 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Lang;
 
 class RegisterInvitationNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function via($notifiable): array
+    public function via(Customer $notifiable): array
     {
         return ['mail'];
     }
@@ -25,9 +24,9 @@ class RegisterInvitationNotification extends Notification implements ShouldQueue
     public function toMail(Customer $notifiable): MailMessage
     {
         return (new MailMessage())
-            ->subject(Lang::get('Register Invitation'))
-            ->line(Lang::get('Please click the button below to register your email address.'))
-            ->action(Lang::get('Register Email Address'), self::url($notifiable));
+            ->subject(trans('Register Invitation'))
+            ->line(trans('Please click the button below to register your email address.'))
+            ->action(trans('Register Email Address'), self::url($notifiable));
     }
 
     private static function url(Customer $customer): string
