@@ -11,8 +11,8 @@ class ProductVariantOrderData
     public function __construct(
         public readonly string $sku,
         public readonly array $combination,
-        public readonly string $retail_price,
-        public readonly string $selling_price,
+        public readonly float|string $retail_price,
+        public readonly float|string $selling_price,
         public readonly int $stock,
         public readonly string $status,
         public readonly ProductOrderData $product
