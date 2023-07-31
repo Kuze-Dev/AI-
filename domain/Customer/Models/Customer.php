@@ -42,9 +42,9 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string $first_name
  * @property string $last_name
  * @property string $mobile
- * @property \Domain\Customer\Enums\Gender $gender
- * @property \Domain\Customer\Enums\RegisterStatus $register_status
+ * @property Gender $gender
  * @property Status $status
+ * @property RegisterStatus $register_status
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon $birth_date
  * @property EmailVerificationType $email_verification_type
@@ -61,7 +61,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property-read int|null $media_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
- * @property-read Tier $tier
+ * @property-read Tier|null $tier
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newModelQuery()
@@ -81,6 +81,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereLastName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereMobile($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Customer whereRegisterStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereTierId($value)
