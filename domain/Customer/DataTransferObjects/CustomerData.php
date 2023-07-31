@@ -134,11 +134,11 @@ final class CustomerData
         return new self(
             first_name: $data['first_name'],
             last_name: $data['last_name'],
-            mobile: $data['mobile'],
-            gender: Gender::from($data['gender']),
-            birth_date: now()->parse($data['birth_date']),
-            status: Status::from($data['status']),
-            tier_id: (int) $data['tier_id'],
+            mobile: $data['mobile'] ?? null,
+            gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
+            birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
+            status: isset($data['status']) ? Status::from($data['status']) : null,
+            tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
             email: $data['email'],
             image: $data['image'],
         );
@@ -149,12 +149,13 @@ final class CustomerData
         return new self(
             first_name: $data['first_name'],
             last_name: $data['last_name'],
-            mobile: $data['mobile'],
-            gender: Gender::from($data['gender']),
-            birth_date: now()->parse($data['birth_date']),
-            status: Status::from($data['status']),
-            tier_id: $data['tier_id'] ?? null,
+            mobile: $data['mobile'] ?? null,
+            gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
+            birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
+            status: isset($data['status']) ? Status::from($data['status']) : null,
+            tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
             email: $data['email'],
+            register_status: RegisterStatus::UNREGISTERED,
         );
     }
 }
