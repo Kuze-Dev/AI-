@@ -34,20 +34,20 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * Domain\Customer\Models\Customer
  *
  * @property int $id
- * @property int $tier_id
+ * @property int|null $tier_id
  * @property string $cuid customer unique ID
  * @property string $email
  * @property mixed|null $password
  * @property-read  string $full_name
  * @property string $first_name
  * @property string $last_name
- * @property string $mobile
- * @property Gender $gender
- * @property Status $status
+ * @property string|null $mobile
+ * @property Gender|null $gender
+ * @property Status|null $status
  * @property RegisterStatus $register_status
  * @property string|null $remember_token
- * @property \Illuminate\Support\Carbon $birth_date
- * @property EmailVerificationType $email_verification_type
+ * @property \Illuminate\Support\Carbon|null $birth_date
+ * @property EmailVerificationType|null $email_verification_type
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
