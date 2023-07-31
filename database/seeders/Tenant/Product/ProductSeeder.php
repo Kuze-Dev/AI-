@@ -89,7 +89,7 @@ class ProductSeeder extends Seeder
         }
     }
 
-    public function data(): array
+    public static function data(): array
     {
         return [
             'products' => [

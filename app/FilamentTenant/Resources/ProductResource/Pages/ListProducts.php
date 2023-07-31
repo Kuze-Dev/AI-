@@ -167,7 +167,17 @@ class ListProducts extends ListRecords
                 )
                 ->withValidation(
                     rules: [
-                        'name' => 'required|string|min:3|max:100',
+                        'image_link' => 'nullable|string',
+                        'name' => 'required|unique:products|string|max:100',
+                        'category' => 'required|string|max:100',
+                        'brand' => 'required|string|max:100',
+                        'sku' => 'required|unique:products|string|max:30',
+                        'stock' => 'required|numeric',
+                        'retail_price' => 'required|numeric',
+                        'selling_price' => 'required|numeric',
+                        'weight' => 'required|numeric',
+                        'length' => 'required|numeric',
+                        'width' => 'required|numeric',
                     ],
                 ),
             ExportAction::make()

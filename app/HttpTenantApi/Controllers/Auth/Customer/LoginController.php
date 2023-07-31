@@ -6,6 +6,7 @@ namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
 use App\Features\ECommerce\ECommerceBase;
 use App\Http\Controllers\Controller;
+use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Illuminate\Auth\AuthenticationException;
@@ -33,6 +34,7 @@ class LoginController extends Controller
 
         $customer = Customer::whereEmail($validated['email'])
             ->whereStatus(Status::ACTIVE)
+            ->whereRegisterStatus(RegisterStatus::REGISTERED)
             ->first();
 
         if ($customer === null) {
