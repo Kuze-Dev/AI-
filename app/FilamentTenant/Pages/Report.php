@@ -12,13 +12,9 @@ class Report extends Page
 {
     use ContextualPage;
 
-
     protected static ?string $navigationGroup = 'eCommerce';
 
-
-    
     protected static string $view = 'filament.pages.Report';
-
 
     protected function getWidgets(): array
     {
@@ -28,20 +24,19 @@ class Report extends Page
         ];
     }
 
-
     protected function getFooterWidgets(): array
     {
         return [
-            Widgets\MostSoldProduct ::class,
+            Widgets\MostSoldProduct::class,
+            Widgets\ListSoldProduct::class,
+            Widgets\TotalOrder::class,
             Widgets\AverageOrderValue::class,
-            Widgets\ConversionRate::class,
-            Widgets\TotalSales::class,
-            Widgets\ConversionRate::class,
-            Widgets\TotalSales::class,
+            Widgets\MostOrderByCustomer::class,
+            Widgets\MostFavoriteProduct::class,
         ];
     }
 
-    protected function getColumns(): int | string | array
+    protected function getColumns(): int|string|array
     {
         return 1;
     }

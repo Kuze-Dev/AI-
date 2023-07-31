@@ -8,15 +8,13 @@ use App\FilamentTenant\Widgets\Report\utils\ChartColor;
 use Domain\Order\Models\OrderLine;
 use Filament\Widgets\PieChartWidget;
 
-class MostSoldProduct extends PieChartWidget
+class MostOrderByCustomer extends PieChartWidget
 {
-    protected static ?string $heading = 'Most Sold Product';
+    protected static ?string $heading = 'Most Order By Customer';
 
     protected function getData(): array
     {
-        $products = OrderLine::whereHas('order', function ($query) {
-            $query->where('status', 'Fulfilled');
-        })
+        $products = OrderLine::whereHas('order')
             ->selectRaw('name, COUNT(*) as count')
             ->groupBy('name')->limit(10)->orderByDesc('count')
             ->get()->toArray();
@@ -27,7 +25,7 @@ class MostSoldProduct extends PieChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Most Sold Product',
+                    'label' => 'Most Order By Customer',
                     'data' => $productCounts,
                     'borderColor' => ChartColor::$PIECHART,
                     'backgroundColor' => ChartColor::$PIECHART,

@@ -5,21 +5,18 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Widgets\Report;
 
 use App\FilamentTenant\Widgets\Report\utils\ChartColor;
-use Domain\Order\Models\OrderLine;
+use Domain\Favorite\Models\Favorite;
 use Filament\Widgets\PieChartWidget;
 
-class MostSoldProduct extends PieChartWidget
+class MostFavoriteProduct extends PieChartWidget
 {
-    protected static ?string $heading = 'Most Sold Product';
+    protected static ?string $heading = 'Most Favorite Product';
 
     protected function getData(): array
     {
-        $products = OrderLine::whereHas('order', function ($query) {
-            $query->where('status', 'Fulfilled');
-        })
-            ->selectRaw('name, COUNT(*) as count')
-            ->groupBy('name')->limit(10)->orderByDesc('count')
-            ->get()->toArray();
+        $products = Favorite::whereHas('product')->join('products', 'favorites.product_id', '=', 'products.id')
+            ->selectRaw('products.name, COUNT(*) as count')
+            ->groupBy('products.name')->limit(10)->orderByDesc('count')->get()->toArray();
 
         $productNames = collect($products)->pluck('name')->toArray();
         $productCounts = collect($products)->pluck('count')->toArray();
@@ -27,7 +24,7 @@ class MostSoldProduct extends PieChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Most Sold Product',
+                    'label' => 'Most Favorite Product',
                     'data' => $productCounts,
                     'borderColor' => ChartColor::$PIECHART,
                     'backgroundColor' => ChartColor::$PIECHART,
