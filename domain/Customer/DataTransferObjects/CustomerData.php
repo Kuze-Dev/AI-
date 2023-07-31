@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
+use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Tier\Models\Tier;
 use Illuminate\Http\UploadedFile;
@@ -29,6 +30,7 @@ final class CustomerData
         public readonly ?AddressData $shipping_address_data = null,
         public readonly ?AddressData $billing_address_data = null,
         public readonly EmailVerificationType $email_verification_type = EmailVerificationType::LINK,
+        public readonly ?RegisterStatus $register_status = RegisterStatus::REGISTERED,
     ) {
     }
 
@@ -121,6 +123,7 @@ final class CustomerData
                     is_default_shipping: false,
                     is_default_billing: true,
                 ),
+            register_status: RegisterStatus::UNREGISTERED,
         );
     }
 

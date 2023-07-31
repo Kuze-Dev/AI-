@@ -14,6 +14,7 @@ use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Actions\ForceDeleteCustomerAction;
 use Domain\Customer\Actions\RestoreCustomerAction;
 use Domain\Customer\Enums\Gender;
+use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
@@ -291,6 +292,15 @@ class CustomerResource extends Resource
                         'warning' => Status::INACTIVE->value,
                         'danger' => Status::BANNED->value,
                     ]),
+                Tables\Columns\BadgeColumn::make('register_status')
+                    ->translateLabel()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->colors([
+                        'success' => RegisterStatus::REGISTERED->value,
+                        'warning' => RegisterStatus::INVITED->value,
+                        'danger' => RegisterStatus::UNREGISTERED->value,
+                    ]),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->translateLabel()
                     ->dateTime(timezone: Filament::auth()->user()?->timezone)
@@ -307,6 +317,13 @@ class CustomerResource extends Resource
                     ->options(
                         collect(Status::cases())
                             ->mapWithKeys(fn (Status $target) => [$target->value => Str::headline($target->value)])
+                            ->toArray()
+                    ),
+                Tables\Filters\SelectFilter::make('register_status')
+                    ->translateLabel()
+                    ->options(
+                        collect(RegisterStatus::cases())
+                            ->mapWithKeys(fn (RegisterStatus $target) => [$target->value => Str::headline($target->value)])
                             ->toArray()
                     ),
                 Tables\Filters\SelectFilter::make('email_verified')
