@@ -7,9 +7,8 @@ namespace Domain\Shipment\Actions;
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
 use Domain\Customer\Models\Customer;
-use Domain\Shipment\API\UPS\Clients\UPSOAuthClient;
 use Domain\Shipment\API\USPS\Contracts\RateResponse;
-use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
+use Domain\Shipment\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\ShippingMethod\Models\ShippingMethod;
@@ -30,10 +29,11 @@ class GetShippingRateAction
         $shippingDriver = $this->shippingManager->driver($shippingMethod->driver->value);
 
         if ($this->isDomesticInUnitedStates($address)) {
+
             return $shippingDriver->getRate(
                 $customer,
                 $parcelData,
-                AddressValidateRequestData::formAddress($address),
+                $address, // AddressValidateRequestData::formAddress($address),
                 $shippingMethod,
             );
         }

@@ -41,11 +41,11 @@ class ShippingSettings extends TenantBaseSettings
                 Forms\Components\Section::make(trans('Ups Shipping'))
                     ->collapsible()
                     ->schema([
-                        Forms\Components\TextInput::make('access_license_number')
+                        Forms\Components\TextInput::make('ups_shipper_account')
                             ->translateLabel(),
-                        Forms\Components\TextInput::make('ups_username')
+                        Forms\Components\TextInput::make('ups_client_id')
                             ->translateLabel(),
-                        Forms\Components\TextInput::make('ups_password')
+                        Forms\Components\TextInput::make('ups_client_secret')
                             ->translateLabel(),
                         Forms\Components\Toggle::make('ups_production_mode')
                             ->inline(false)

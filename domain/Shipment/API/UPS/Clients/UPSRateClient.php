@@ -4,52 +4,25 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\API\UPS\Clients;
 
-use App\Settings\ShippingSettings;
 use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
 use Domain\Shipment\API\UPS\DataTransferObjects\UpsResponse;
 use Domain\Shipment\DataTransferObjects\ParcelData;
-use Domain\Shipment\Models\VerifiedAddress;
 
-class UPSRateClient
+class UPSRateClient extends BaseClient
 {
-    // protected UPSClient $client;
-    protected UPSOAuthClient $client;
-
-    public function __construct(
-    ) {
-
-        $setting = app(ShippingSettings::class);
-
-        if ($setting->ups_username === null || $setting->ups_password === null || $setting->access_license_number === null) {
-            abort(500, 'Setting UPS credential not setup yet.');
-        }
-
-        // $this->client = new UPSClient(
-        //     accessLicenseNumber: (string) $setting->access_license_number,
-        //     username: $setting->ups_username,
-        //     password: $setting->ups_password,
-        //     isProduction: true,
-        // );
-
-        $this->client = new UPSOAuthClient(false);
-    }
-
     public static function uri(): string
     {
-        // return'ship/v1/rating/Rate';
         return 'api/rating/v1/Rate';
     }
 
     public function getRate(
         Customer $customer,
         ParcelData $parcelData,
-        VerifiedAddress $verifiedAddress
+        Address $address
     ): UpsResponse {
 
         $shipper = $parcelData->ship_from_address;
-        /** @var array */
-        $address = $verifiedAddress->verified_address;
         // Create the associative array representing the JSON structure
         $data = [
             'RateRequest' => [
@@ -77,10 +50,10 @@ class UPSRateClient
                     'ShipTo' => [
                         'Name' => $customer->first_name. ' '. $customer->last_name,
                         'Address' => [
-                            'AddressLine' => $address['address2'],
-                            'City' => $address['city'],
-                            'StateProvinceCode' => $address['state'],
-                            'PostalCode' => $address['zip5'],
+                            'AddressLine' => $address->address_line_1,
+                            'City' => $address->city,
+                            'StateProvinceCode' => $address->state->name,
+                            'PostalCode' => $address->zip_code,
                             'CountryCode' => 'US',
                         ],
                     ],
@@ -131,12 +104,12 @@ class UPSRateClient
 
         /** @var string */
         $jsonString = json_encode($data);
-        dd($jsonString);
+
         $response = $this->client->getClient()
-            // ->withHeaders([
-            //     'transId' => 'string',
-            //     'transactionSrc' => 'testing',
-            // ])
+            ->withHeaders([
+                'transId' => 'string',
+                'transactionSrc' => 'testing',
+            ])
             ->withBody($jsonString, 'application/json')
             ->post(self::uri())
             ->body();
@@ -144,7 +117,7 @@ class UPSRateClient
         return UpsResponse::fromArray(json_decode($response, true));
     }
 
-    public function getInternationalRates(
+    public function getInternationalRate(
         Customer $customer,
         ParcelData $parcelData,
         Address $address,
@@ -232,7 +205,7 @@ class UPSRateClient
 
         /** @var string */
         $jsonString = json_encode($data);
-        
+
         $response = $this->client->getClient()
             ->withBody($jsonString, 'application/json')
             ->post(self::uri())

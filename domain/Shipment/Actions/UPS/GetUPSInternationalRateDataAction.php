@@ -23,7 +23,7 @@ class GetUPSInternationalRateDataAction
         Address $address
     ): UpsResponse {
 
-        return $this->rateClient->getInternationalRates(
+        return $this->rateClient->getInternationalRate(
             customer: $customer,
             parcelData: $parcelData,
             address: $address,
