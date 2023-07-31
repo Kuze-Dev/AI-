@@ -90,7 +90,7 @@ class OrderController extends Controller
             ])->whereBelongsTo($customer)
                 ->whereReference($order->reference)
         )
-            ->allowedIncludes(['orderLines', 'payments.paymentMethod.media'])->first();
+            ->allowedIncludes(['orderLines', 'payments.media', 'payments.paymentMethod.media'])->first();
 
         return OrderResource::make($model);
     }

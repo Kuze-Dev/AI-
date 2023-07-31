@@ -20,6 +20,7 @@ use Domain\Customer\Models\Customer;
 use Domain\Discount\Models\Discount;
 use Domain\Discount\Models\DiscountLimit;
 use Domain\Order\Enums\OrderStatuses;
+use Domain\Order\Events\AdminOrderBankPaymentEvent;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
 use Domain\Taxation\Enums\PriceDisplay;
 use Filament\Notifications\Notification;
@@ -666,8 +667,47 @@ class OrderResource extends Resource
                     ->color('secondary')
                     ->label(trans('View Proof of payment'))
                     ->size('sm')
-                    ->action(function () {
+                    ->action(function (array $data, $livewire) use ($order) {
                         // TODO update message and approval here
+                        $paymentRemarks = $data['payment_remarks'];
+                        $message = $data['message'];
+
+                        /** @var \Domain\Payments\Models\Payment $payment */
+                        $payment = $order->payments->first();
+
+                        $result = $payment->update([
+                            'remarks' => $paymentRemarks,
+                            'message' => $message,
+                        ]);
+
+                        if ($result) {
+                            $isPaid = $paymentRemarks == 'approved' ? true : false;
+
+                            $order->update([
+                                'is_paid' => $isPaid,
+                            ]);
+
+                            if ($isPaid) {
+                                $payment->update([
+                                    'status' => 'paid',
+                                ]);
+                            }
+
+                            Notification::make()
+                                ->title(trans('Proof of payment updated successfully'))
+                                ->success()
+                                ->send();
+
+                            $customer = Customer::where('id', $order->customer_id)->first();
+
+                            if ($customer) {
+                                event(new AdminOrderBankPaymentEvent(
+                                    $customer,
+                                    $order,
+                                    $paymentRemarks,
+                                ));
+                            }
+                        }
                     })
                     ->modalHeading(trans('Proof of Payment'))
                     ->modalWidth('lg')
@@ -702,13 +742,25 @@ class OrderResource extends Resource
                                 return $media?->getUrl();
                             })
                             ->disabled(),
-                        Forms\Components\Select::make('payment_status')
+                        Forms\Components\Select::make('payment_remarks')
                             ->label('')
                             ->options([
-                                'Approved' => 'Approved',
-                                'Declined' => 'Declined',
-                            ]),
-                        Forms\Components\Textarea::make('Message')
+                                'approved' => 'Approved',
+                                'declined' => 'Declined',
+                            ])
+                            ->disablePlaceholderSelection(function () use ($order) {
+                                /** @var \Domain\Payments\Models\Payment $payment */
+                                $payment = $order->payments->first();
+
+                                return in_array($payment->remarks, ['approved', 'declined']);
+                            })
+                            ->formatStateUsing(function () use ($order) {
+                                /** @var \Domain\Payments\Models\Payment $payment */
+                                $payment = $order->payments->first();
+
+                                return $payment->remarks;
+                            }),
+                        Forms\Components\Textarea::make('message')
                             ->label(trans('Message'))
                             ->formatStateUsing(function () use ($order) {
                                 /** @var \Domain\Payments\Models\Payment $payment */
