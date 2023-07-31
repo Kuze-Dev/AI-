@@ -67,7 +67,7 @@ it('can show cart with includes', function (string $include) {
                 ->has(
                     'included',
                     callback: function (AssertableJson $json) use ($cartLine) {
-                        $json->where('type', "cartLines")
+                        $json->where('type', 'cartLines')
                             ->where('id', $cartLine->uuid)
                             ->has('attributes')
                             ->etc();

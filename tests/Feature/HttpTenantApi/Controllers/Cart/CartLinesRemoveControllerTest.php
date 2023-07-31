@@ -6,10 +6,7 @@ use Domain\Cart\Database\Factories\CartFactory;
 use Domain\Cart\Database\Factories\CartLineFactory;
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Database\Factories\CustomerFactory;
-use Illuminate\Testing\Fluent\AssertableJson;
 
-use function Pest\Laravel\deleteJson;
-use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\withHeader;
 

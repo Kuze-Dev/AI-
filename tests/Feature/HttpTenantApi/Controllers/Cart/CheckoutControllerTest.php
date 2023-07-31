@@ -31,7 +31,6 @@ beforeEach(function () {
             $cartLine->save();
         })->create();
 
-
     withHeader('Authorization', 'Bearer ' . $customer
         ->createToken('testing-auth')
         ->plainTextToken);

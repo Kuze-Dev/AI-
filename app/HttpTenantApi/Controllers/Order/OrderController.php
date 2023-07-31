@@ -74,9 +74,6 @@ class OrderController extends Controller
 
     public function show(Order $order): OrderResource
     {
-        // return $order;
-        // $this->authorize('view', $order);
-
         /** @var \Domain\Customer\Models\Customer $customer */
         $customer = auth()->user();
 
@@ -97,8 +94,6 @@ class OrderController extends Controller
 
     public function update(UpdateOrderRequest $request, Order $order): JsonResponse
     {
-        // $this->authorize('update', $order);
-
         $validatedData = $request->validated();
 
         $result = app(UpdateOrderAction::class)
