@@ -6,6 +6,7 @@ namespace Domain\Customer\Models;
 
 use Domain\Address\Models\Address;
 use Domain\Customer\Enums\Gender;
+use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Customer\Enums\Status;
 use Domain\Tier\Models\Tier;
@@ -35,6 +36,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string $last_name
  * @property string $mobile
  * @property \Domain\Customer\Enums\Gender $gender
+ * @property \Domain\Customer\Enums\RegisterStatus $register_status
  * @property Status $status
  * @property \Illuminate\Support\Carbon $birth_date
  * @property \Illuminate\Support\Carbon|null $email_verified_at
@@ -92,6 +94,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
         'mobile',
         'gender',
         'status',
+        'register_status',
         'birth_date',
     ];
 
@@ -104,6 +107,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail
         'birth_date' => 'date',
         'status' => Status::class,
         'gender' => Gender::class,
+        'register_status' => RegisterStatus::class,
         'email_verified_at' => 'datetime',
     ];
 
