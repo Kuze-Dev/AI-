@@ -13,6 +13,7 @@ use Domain\Address\Models\State;
 use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Actions\ForceDeleteCustomerAction;
 use Domain\Customer\Actions\RestoreCustomerAction;
+use Domain\Customer\Actions\SendRegisterInvitationAction;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
@@ -344,6 +345,30 @@ class CustomerResource extends Resource
                 Tables\Actions\EditAction::make()
                     ->translateLabel(),
                 Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('send-register-invitation')
+                        ->requiresConfirmation()
+                        ->icon('heroicon-o-speakerphone')
+                        ->action(function (Customer $record, Tables\Actions\Action $action): void {
+                            $success = app(SendRegisterInvitationAction::class)
+                                ->execute($record);
+
+                            if ($success) {
+                                $action
+                                    ->successNotificationTitle(trans('A registration link has been sent to your email address.'))
+                                    ->success();
+
+                                return;
+                            }
+
+                            $action->failureNotificationTitle(trans('Failed to send register invitation.'))
+                                ->failure();
+                        })
+                        ->authorize('sendRegisterInvitation')
+                        ->withActivityLog(
+                            event: 'register-invitation-link-sent',
+                            description: fn (Customer $record) => $record->full_name . ' register invitation link sent'
+                        )
+                        ->visible(fn (Customer $record) => $record->register_status === RegisterStatus::UNREGISTERED),
                     Tables\Actions\DeleteAction::make()
                         ->translateLabel()
                         ->using(function (Customer $record) {

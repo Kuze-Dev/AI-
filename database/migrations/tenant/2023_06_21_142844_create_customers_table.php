@@ -26,21 +26,21 @@ return new class () extends Migration {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(Tier::class)->index();
+            $table->foreignIdFor(Tier::class)->index()->nullable();
 
             $table->string('cuid')->unique()->comment('customer unique ID');
             $table->string('email')->unique();
             $table->string('password')->nullable();
             $table->string('first_name')->index();
             $table->string('last_name')->index();
-            $table->string('mobile');
-            $table->string('gender');
-            $table->string('status')->default(Status::ACTIVE->value)->index();
+            $table->string('mobile')->nullable();
+            $table->string('gender')->nullable();
+            $table->string('status')->default(Status::ACTIVE->value)->index()->nullable();
             $table->string('register_status')->default(RegisterStatus::REGISTERED->value)->index();
 
             $table->rememberToken();
-            $table->date('birth_date');
-            $table->string('email_verification_type', 100)->default(EmailVerificationType::LINK->value);
+            $table->date('birth_date')->nullable();
+            $table->string('email_verification_type', 100)->default(EmailVerificationType::LINK->value)->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamps();
             $table->softDeletes();

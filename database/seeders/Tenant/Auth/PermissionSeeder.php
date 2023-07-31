@@ -46,7 +46,8 @@ class PermissionSeeder extends BasePermissionSeeder
                         'restoreAny',
                         'forceDeleteAny',
                     ],
-                    hasSoftDeletes: true
+                    hasSoftDeletes: true,
+                    customPermissions: ['sendRegisterInvitation']
                 ),
                 ...$this->generateFilamentResourcePermissions(
                     'tiers',
