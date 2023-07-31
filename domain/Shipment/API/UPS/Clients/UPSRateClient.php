@@ -13,7 +13,8 @@ use Domain\Shipment\Models\VerifiedAddress;
 
 class UPSRateClient
 {
-    protected UPSClient $client;
+    // protected UPSClient $client;
+    protected UPSOAuthClient $client;
 
     public function __construct(
     ) {
@@ -24,17 +25,20 @@ class UPSRateClient
             abort(500, 'Setting UPS credential not setup yet.');
         }
 
-        $this->client = new UPSClient(
-            accessLicenseNumber: (string) $setting->access_license_number,
-            username: $setting->ups_username,
-            password: $setting->ups_password,
-            isProduction: true,
-        );
+        // $this->client = new UPSClient(
+        //     accessLicenseNumber: (string) $setting->access_license_number,
+        //     username: $setting->ups_username,
+        //     password: $setting->ups_password,
+        //     isProduction: true,
+        // );
+
+        $this->client = new UPSOAuthClient(false);
     }
 
     public static function uri(): string
     {
-        return'ship/v1/rating/Rate';
+        // return'ship/v1/rating/Rate';
+        return 'api/rating/v1/Rate';
     }
 
     public function getRate(
@@ -127,8 +131,12 @@ class UPSRateClient
 
         /** @var string */
         $jsonString = json_encode($data);
-
+        dd($jsonString);
         $response = $this->client->getClient()
+            // ->withHeaders([
+            //     'transId' => 'string',
+            //     'transactionSrc' => 'testing',
+            // ])
             ->withBody($jsonString, 'application/json')
             ->post(self::uri())
             ->body();
@@ -224,7 +232,7 @@ class UPSRateClient
 
         /** @var string */
         $jsonString = json_encode($data);
-
+        
         $response = $this->client->getClient()
             ->withBody($jsonString, 'application/json')
             ->post(self::uri())

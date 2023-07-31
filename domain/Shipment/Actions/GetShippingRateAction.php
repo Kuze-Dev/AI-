@@ -7,6 +7,7 @@ namespace Domain\Shipment\Actions;
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
 use Domain\Customer\Models\Customer;
+use Domain\Shipment\API\UPS\Clients\UPSOAuthClient;
 use Domain\Shipment\API\USPS\Contracts\RateResponse;
 use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
