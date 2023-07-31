@@ -11,6 +11,7 @@ use Domain\Auth\EmailVerificationOTP;
 use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Notifications\ResetPassword;
+use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Customer\Enums\Status;
 use Domain\Tier\Models\Tier;
@@ -41,7 +42,8 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string $first_name
  * @property string $last_name
  * @property string $mobile
- * @property Gender $gender
+ * @property \Domain\Customer\Enums\Gender $gender
+ * @property \Domain\Customer\Enums\RegisterStatus $register_status
  * @property Status $status
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon $birth_date
@@ -108,6 +110,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
         'mobile',
         'gender',
         'status',
+        'register_status',
         'birth_date',
         'email_verification_type',
     ];
@@ -122,6 +125,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
         'status' => Status::class,
         'gender' => Gender::class,
         'email_verification_type' => EmailVerificationType::class,
+        'register_status' => RegisterStatus::class,
         'email_verified_at' => 'datetime',
     ];
 

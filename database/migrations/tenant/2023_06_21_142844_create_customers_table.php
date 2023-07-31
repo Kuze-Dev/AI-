@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Domain\Auth\Enums\EmailVerificationType;
+use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Tier\Models\Tier;
 use Illuminate\Database\Migrations\Migration;
@@ -35,6 +36,7 @@ return new class () extends Migration {
             $table->string('mobile');
             $table->string('gender');
             $table->string('status')->default(Status::ACTIVE->value)->index();
+            $table->string('register_status')->default(RegisterStatus::REGISTERED->value)->index();
 
             $table->rememberToken();
             $table->date('birth_date');
