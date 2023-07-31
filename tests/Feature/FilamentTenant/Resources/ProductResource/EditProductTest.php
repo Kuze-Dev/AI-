@@ -16,6 +16,7 @@ use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\MetaData\Models\MetaData;
+
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -73,7 +74,7 @@ it('can edit product', function () {
             'product_variants.record-1.stock' => 50,
             'product_variants.record-1.sku' => 'foosku',
             'images.0' => $dataImage,
-            'status' => !$product->status,
+            'status' => ! $product->status,
             'meta_data' => $metaData,
             'meta_data.image.0' => $dataImage,
         ])
@@ -87,13 +88,13 @@ it('can edit product', function () {
         'name' => 'Test Title Updated',
         'description' => 'Test Description Updated',
         'status' => $updatedProduct->status,
-        'updated_at' => $updatedProduct->updated_at
+        'updated_at' => $updatedProduct->updated_at,
     ]);
 
     assertDatabaseHas(ProductVariant::class, [
         'product_id' => $product->id,
-        "stock" => 50,
-        "sku" => "foosku",
+        'stock' => 50,
+        'sku' => 'foosku',
     ]);
 
     assertDatabaseHas(

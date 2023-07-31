@@ -80,34 +80,34 @@ it('can update product', function () {
                 'product_options' => [
                     [
                         [
-                            "id" => $productOption->id,
-                            "name" => "size",
-                            "productOptionValues" => [
+                            'id' => $productOption->id,
+                            'name' => 'size',
+                            'productOptionValues' => [
                                 [
-                                    "id" => $optionValue->id,
-                                    "name" => "small",
-                                    "product_option_id" => $productOption->id,
-                                ]
-                            ]
-                        ]
-                    ]
+                                    'id' => $optionValue->id,
+                                    'name' => 'small',
+                                    'product_option_id' => $productOption->id,
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
                 'product_variants' => [
                     [
-                        "combination" => [
+                        'combination' => [
                             [
-                                "option" => "size",
-                                "option_id" => $productOption->id,
-                                "option_value" => "small",
-                                "option_value_id" => $optionValue->id,
-                            ]
+                                'option' => 'size',
+                                'option_id' => $productOption->id,
+                                'option_value' => 'small',
+                                'option_value_id' => $optionValue->id,
+                            ],
                         ],
-                        "id" => $productVariant->id,
-                        "selling_price" => "58.45",
-                        "retail_price" => "90.95",
-                        "stock" => 11,
-                        "status" => 1,
-                        "sku" => "SKU4300",
+                        'id' => $productVariant->id,
+                        'selling_price' => '58.45',
+                        'retail_price' => '90.95',
+                        'stock' => 11,
+                        'status' => 1,
+                        'sku' => 'SKU4300',
                     ],
                 ],
             ])
@@ -117,25 +117,25 @@ it('can update product', function () {
 
     assertDatabaseHas(ProductOption::class, [
         'product_id' => $product->id,
-        "name" => "size",
+        'name' => 'size',
     ]);
 
     assertDatabaseHas(ProductOptionValue::class, [
         'product_option_id' => $productOption->id,
-        'name' => "small",
+        'name' => 'small',
     ]);
-    
+
     assertDatabaseHas(ProductVariant::class, [
         'product_id' => $product->id,
-        "sku" => "SKU4300",
-        "combination" => json_encode(
+        'sku' => 'SKU4300',
+        'combination' => json_encode(
             [
                 [
-                    "option" => 'size',
-                    "option_id" => $productOption->id,
-                    "option_value" => 'small',
-                    "option_value_id" => $optionValue->id,
-                ]
+                    'option' => 'size',
+                    'option_id' => $productOption->id,
+                    'option_value' => 'small',
+                    'option_value_id' => $optionValue->id,
+                ],
             ]
         ),
     ]);
