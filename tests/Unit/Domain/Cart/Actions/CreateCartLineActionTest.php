@@ -30,7 +30,7 @@ it('can create cart lines with product as purchasable', function () {
         ->createOne();
 
     $payload = [
-        'purchasable_id' => $product->id,
+        'purchasable_id' => $product->slug,
         'purchasable_type' => 'Product',
         'quantity' => 1,
     ];
@@ -56,7 +56,7 @@ it('can create cart lines with product_variant as purchasable', function () {
         ->createOne();
 
     $payload = [
-        'purchasable_id' => $product->id,
+        'purchasable_id' => $product->slug,
         'variant_id' => $productVariant->id,
         'purchasable_type' => 'Product',
         'quantity' => 1,
@@ -80,7 +80,7 @@ it('can create cart lines with remarks', function () {
         ->createOne();
 
     $payload = [
-        'purchasable_id' => $product->id,
+        'purchasable_id' => $product->slug,
         'purchasable_type' => 'Product',
         'quantity' => 1,
         'remarks' => [

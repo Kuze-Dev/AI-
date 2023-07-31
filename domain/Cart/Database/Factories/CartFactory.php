@@ -6,6 +6,7 @@ namespace Domain\Cart\Database\Factories;
 
 use Domain\Cart\Models\Cart;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Cart\Models\Cart>
@@ -17,6 +18,7 @@ class CartFactory extends Factory
     public function definition(): array
     {
         return [
+            'uuid' => (string) Str::uuid(),
             'customer_id' => 1,
             'coupon_code' => null,
         ];
