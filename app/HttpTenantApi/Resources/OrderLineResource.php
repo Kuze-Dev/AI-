@@ -29,7 +29,10 @@ class OrderLineResource extends JsonApiResource
             'reviewed_at' => $this->reviewed_at,
             'purchasable' => function () {
                 if ( ! isset($this->purchasable_data['product'])) {
-                    return ProductOrderData::fromArray($this->purchasable_data);
+                    /** @var array */
+                    $productArray = $this->purchasable_data;
+
+                    return ProductOrderData::fromArray($productArray);
                 } elseif (isset($this->purchasable_data['product'])) {
                     return ProductVariantOrderData::fromArray($this->purchasable_data);
                 }

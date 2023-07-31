@@ -12,7 +12,6 @@ use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
 use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Discount\Models\Discount;
-use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\Actions\GetShippingfeeAction;
@@ -144,32 +143,17 @@ class CartSummaryAction
         $productlist = [];
 
         if ( ! is_iterable($collections)) {
-            if ($collections->purchasable instanceof Product) {
-                $product = $collections->purchasable;
-            } elseif ($collections->purchasable instanceof ProductVariant) {
+            /** @var \Domain\Product\Models\Product $product */
+            $product = $collections->purchasable;
+
+            if ($collections->purchasable instanceof ProductVariant) {
+                /** @var \Domain\Product\Models\Product $product */
                 $product = $collections->purchasable->product;
             }
-            $purchasableId = $product->id;
-            $length = $product->dimension['length'];
-            $width = $product->dimension['width'];
-            $height = $product->dimension['height'];
-            $weight = $product->weight;
 
-            $productlist[] = [
-                'product_id' => (string) $purchasableId,
-                'length' => $length,
-                'width' => $width,
-                'height' => $height,
-                'weight' => (float) $weight,
-            ];
-        } else {
-            foreach ($collections as $collection) {
-                if ($collection->purchasable instanceof Product) {
-                    $product = $collection->purchasable;
-                } elseif ($collection->purchasable instanceof ProductVariant) {
-                    $product = $collection->purchasable->product;
-                }
+            if ( ! is_null($product->dimension)) {
                 $purchasableId = $product->id;
+
                 $length = $product->dimension['length'];
                 $width = $product->dimension['width'];
                 $height = $product->dimension['height'];
@@ -182,6 +166,32 @@ class CartSummaryAction
                     'height' => $height,
                     'weight' => (float) $weight,
                 ];
+            }
+        } else {
+            foreach ($collections as $collection) {
+                /** @var \Domain\Product\Models\Product $product */
+                $product = $collection->purchasable;
+
+                if ($collection->purchasable instanceof ProductVariant) {
+                    /** @var \Domain\Product\Models\Product $product */
+                    $product = $collection->purchasable->product;
+                }
+                if ( ! is_null($product->dimension)) {
+                    $purchasableId = $product->id;
+
+                    $length = $product->dimension['length'];
+                    $width = $product->dimension['width'];
+                    $height = $product->dimension['height'];
+                    $weight = $product->weight;
+
+                    $productlist[] = [
+                        'product_id' => (string) $purchasableId,
+                        'length' => $length,
+                        'width' => $width,
+                        'height' => $height,
+                        'weight' => (float) $weight,
+                    ];
+                }
             }
         }
 

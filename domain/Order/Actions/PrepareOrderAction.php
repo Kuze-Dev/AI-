@@ -102,9 +102,16 @@ class PrepareOrderAction
     {
         $billingAddressId = $placeOrderData->addresses->billing;
 
+        /** @var \Domain\Address\Models\Address $address */
         $address = Address::with('state.country')->where('id', $billingAddressId)->first();
 
-        $taxZone = Taxation::getTaxZone($address->state->country->id, $address->state->id);
+        /** @var \Domain\Address\Models\State $state */
+        $state = $address->state;
+
+        /** @var \Domain\Address\Models\Country $country */
+        $country = $state->country;
+
+        $taxZone = Taxation::getTaxZone($country->id, $state->id);
 
         if ( ! $taxZone instanceof TaxZone) {
             // Log::info('No tax zone found');

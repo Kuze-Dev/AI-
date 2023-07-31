@@ -22,11 +22,17 @@ class CreateOrderAction
         $referenceNumber = Str::upper(Str::random(12));
 
         try {
+            /** @var \Domain\Address\Models\State $state */
+            $state = $preparedOrderData->billingAddress->state;
+
+            /** @var \Domain\Address\Models\Country $country */
+            $country = $state->country;
+
             $summary = app(CartSummaryAction::class)->getSummary(
                 $preparedOrderData->cartLine,
                 new CartSummaryTaxData(
-                    $preparedOrderData->billingAddress->state->country->id,
-                    $preparedOrderData->billingAddress->state->id,
+                    $country->id,
+                    $state->id,
                 ),
                 new CartSummaryShippingData(
                     $preparedOrderData->customer,

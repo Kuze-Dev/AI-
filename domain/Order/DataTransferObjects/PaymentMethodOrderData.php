@@ -12,7 +12,7 @@ class PaymentMethodOrderData
         public readonly string $title,
         public readonly string $slug,
         public readonly string $gateway,
-        public readonly string $subtitle,
+        public readonly ?string $subtitle,
     ) {
     }
 
@@ -22,7 +22,7 @@ class PaymentMethodOrderData
             title: $paymentMethod->title,
             slug: $paymentMethod->slug,
             gateway: $paymentMethod->gateway,
-            subtitle: $paymentMethod->subtitle,
+            subtitle: $paymentMethod->subtitle ?? null,
         );
     }
 }

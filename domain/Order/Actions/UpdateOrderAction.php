@@ -54,24 +54,22 @@ class UpdateOrderAction
                 ));
             }
 
-            if ($updateOrderData->type == 'bank-transfer') {
-                if ($updateOrderData->proof_of_payment !== null) {
-                    $orderPayment = Order::with('payments')->find($order->id);
+            if ($updateOrderData->type == 'bank-transfer' && $updateOrderData->proof_of_payment !== null) {
+                $orderPayment = Order::with('payments')->find($order->id);
 
-                    $image = $this->convertUrlToUploadedFile($updateOrderData->proof_of_payment);
+                $image = $this->convertUrlToUploadedFile($updateOrderData->proof_of_payment);
 
-                    if ($image instanceof UploadedFile) {
-                        if ( ! empty($orderPayment->payments) && ! empty($orderPayment->payments->first())) {
-                            app(UploadProofofPaymentAction::class)->execute(
-                                $orderPayment->payments->first(),
-                                new ProofOfPaymentData(
-                                    $image
-                                )
-                            );
-                        }
-                    } else {
-                        return 'Invalid media';
+                if ($image instanceof UploadedFile) {
+                    if ( ! empty($orderPayment->payments) && ! empty($orderPayment->payments->first())) {
+                        app(UploadProofofPaymentAction::class)->execute(
+                            $orderPayment->payments->first(),
+                            new ProofOfPaymentData(
+                                $image
+                            )
+                        );
                     }
+                } else {
+                    return 'Invalid media';
                 }
             } else {
                 if ($updateOrderData->type != 'status') {
@@ -80,7 +78,7 @@ class UpdateOrderAction
                     })->whereNot('status', 'paid')->first();
 
                     if ( ! $payment) {
-                        return 'Your order already paid';
+                        return 'Your order is already paid';
                     }
 
                     $providerData = new CreatepaymentData(

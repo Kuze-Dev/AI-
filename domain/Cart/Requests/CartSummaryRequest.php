@@ -40,6 +40,7 @@ class CartSummaryRequest extends FormRequest
             'billing_address_id' => [
                 'nullable',
                 Rule::exists(Address::class, (new Address())->getRouteKeyName())
+                    /** @phpstan-ignore-next-line */
                     ->where('customer_id', auth()->user()->id),
             ],
             'shipping_method_id' => [
@@ -49,6 +50,7 @@ class CartSummaryRequest extends FormRequest
             'shipping_address_id' => [
                 'nullable',
                 Rule::exists(Address::class, (new Address())->getRouteKeyName())
+                    /** @phpstan-ignore-next-line */
                     ->where('customer_id', auth()->user()->id),
             ],
             'service_id' => [
@@ -67,10 +69,17 @@ class CartSummaryRequest extends FormRequest
     public function getCountry(): ?Country
     {
         if ($id = $this->validated('billing_address_id')) {
+            /** @var \Domain\Address\Models\Address $billingAddress */
             $billingAddress = Address::with('state.country')
                 ->where((new Address())->getRouteKeyName(), $id)->first();
 
-            return $billingAddress->state->country;
+            /** @var \Domain\Address\Models\State $state */
+            $state = $billingAddress->state;
+
+            /** @var \Domain\Address\Models\Country $country */
+            $country = $state->country;
+
+            return $country;
         }
 
         return null;
@@ -97,9 +106,14 @@ class CartSummaryRequest extends FormRequest
     public function getState(): ?State
     {
         if ($id = $this->validated('billing_address_id')) {
-            $billingAddress = Address::with('state.country')->where((new Address())->getRouteKeyName(), $id)->first();
+            /** @var \Domain\Address\Models\Address $billingAddress */
+            $billingAddress = Address::with('state')
+                ->where((new Address())->getRouteKeyName(), $id)->first();
 
-            return $billingAddress->state;
+            /** @var \Domain\Address\Models\State $state */
+            $state = $billingAddress->state;
+
+            return $state;
         }
 
         return null;

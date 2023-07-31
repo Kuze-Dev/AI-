@@ -667,7 +667,7 @@ class OrderResource extends Resource
                     ->color('secondary')
                     ->label(trans('View Proof of payment'))
                     ->size('sm')
-                    ->action(function (array $data, $livewire) use ($order) {
+                    ->action(function (array $data) use ($order) {
                         // TODO update message and approval here
                         $paymentRemarks = $data['payment_remarks'];
                         $message = $data['message'];
