@@ -13,6 +13,7 @@ use Domain\Cart\Requests\CartSummaryRequest;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
+use Throwable;
 
 #[
     Middleware(['auth:sanctum'])
@@ -64,10 +65,16 @@ class CartSummaryController extends Controller
                 $discount,
                 $serviceId ? (int) $serviceId : null
             );
-        } catch (USPSServiceNotFoundException) {
-            return response()->json([
-                'service_id' => 'Shipping method service id is required',
-            ], 404);
+        } catch (Throwable $th) {
+            if ($th instanceof USPSServiceNotFoundException) {
+                return response()->json([
+                    'service_id' => 'Shipping method service id is required',
+                ], 404);
+            } else {
+                return response()->json([
+                    'message' => $th->getMessage(),
+                ], 422);
+            }
         }
 
         return response()->json([
