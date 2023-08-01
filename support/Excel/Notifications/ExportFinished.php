@@ -34,7 +34,7 @@ class ExportFinished extends Notification implements ShouldQueue
         return FilamentNotification::make()
             ->success()
             ->title('Export finished')
-            ->body(implode(Str::replace(':value', $this->fileName, 'Your file [:value] is ready for download.')))
+            ->body(Str::replace(':value', $this->fileName, 'Your file [:value] is ready for download.'))
             ->icon('heroicon-o-download')
             ->actions([
                 Action::make('download')
