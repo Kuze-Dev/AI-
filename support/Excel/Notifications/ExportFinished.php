@@ -31,13 +31,10 @@ class ExportFinished extends Notification implements ShouldQueue
     /** @throws Exception */
     public function toDatabase(object $notifiable): array
     {
-        /** @var string */
-        $body = Str::replace(':value', $this->fileName, 'Your file [:value] is ready for download.');
-
         return FilamentNotification::make()
             ->success()
             ->title('Export finished')
-            ->body($body)
+            ->body(Str::replace(':value', $this->fileName, 'Your file [:value] is ready for download.'))
             ->icon('heroicon-o-download')
             ->actions([
                 Action::make('download')
