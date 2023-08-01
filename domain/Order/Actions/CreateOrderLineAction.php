@@ -13,7 +13,6 @@ use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
-use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 
@@ -23,30 +22,26 @@ class CreateOrderLineAction
     {
         foreach ($preparedOrderData->cartLine as $cartLine) {
 
-            try {
-                /** @var \Domain\Address\Models\State $state */
-                $state = $preparedOrderData->billingAddress->state;
+            /** @var \Domain\Address\Models\State $state */
+            $state = $preparedOrderData->billingAddress->state;
 
-                /** @var \Domain\Address\Models\Country $country */
-                $country = $state->country;
+            /** @var \Domain\Address\Models\Country $country */
+            $country = $state->country;
 
-                $summary = app(CartSummaryAction::class)->getSummary(
-                    $cartLine,
-                    new CartSummaryTaxData(
-                        $country->id,
-                        $state->id,
-                    ),
-                    new CartSummaryShippingData(
-                        $preparedOrderData->customer,
-                        $preparedOrderData->shippingAddress,
-                        $preparedOrderData->shippingMethod
-                    ),
-                    $preparedOrderData->discount,
-                    $placeOrderData->serviceId
-                );
-            } catch (USPSServiceNotFoundException) {
-                throw new USPSServiceNotFoundException();
-            }
+            $summary = app(CartSummaryAction::class)->getSummary(
+                $cartLine,
+                new CartSummaryTaxData(
+                    $country->id,
+                    $state->id,
+                ),
+                new CartSummaryShippingData(
+                    $preparedOrderData->customer,
+                    $preparedOrderData->shippingAddress,
+                    $preparedOrderData->shippingMethod
+                ),
+                $preparedOrderData->discount,
+                $placeOrderData->serviceId
+            );
 
             $name = null;
             if ($cartLine->purchasable instanceof Product) {

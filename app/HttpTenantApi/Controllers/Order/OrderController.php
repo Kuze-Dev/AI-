@@ -20,6 +20,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 #[
     Resource('orders', apiResource: true, except: 'destroy'),
@@ -56,6 +57,12 @@ class OrderController extends Controller
             return response()->json([
                 'service_id' => 'Shipping method service id is required',
             ], 404);
+        }
+
+        if ($result instanceof HttpException) {
+            return response()->json([
+                'message' => $result->getMessage(),
+            ], 422);
         }
 
         /** @phpstan-ignore-next-line */

@@ -138,7 +138,7 @@ class CartSummaryAction
     }
 
     /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
-    private function getProducts(CartLine|Collection $collections): array
+    public function getProducts(CartLine|Collection $collections): array
     {
         $productlist = [];
 
