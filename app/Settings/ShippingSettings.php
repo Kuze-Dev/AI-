@@ -16,9 +16,9 @@ class ShippingSettings extends Settings
     public ?string $usps_password = null;
 
     /** ups */
-    public ?string $ups_username = null;
-    public ?string $ups_password = null;
-    public ?string $access_license_number = null;
+    public ?string $ups_client_id = null;
+    public ?string $ups_client_secret = null;
+    public ?string $ups_shipper_account = null;
 
     public static function group(): string
     {
@@ -30,9 +30,8 @@ class ShippingSettings extends Settings
         return [
             'usps_username',
             'usps_password',
-            'ups_username',
-            'ups_password',
-            'access_license_number',
+            'ups_client_id',
+            'ups_client_secret',
         ];
     }
 }

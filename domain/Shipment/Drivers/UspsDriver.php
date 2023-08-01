@@ -17,9 +17,13 @@ class UspsDriver
     public function getRate(
         Customer $customer,
         ParcelData $parcelData,
-        AddressValidateRequestData $addressValidateRequestData
+        Address $address// AddressValidateRequestData $addressValidateRequestData
     ): RateResponse {
-        return app(GetUSPSRateDataAction::class)->execute(...func_get_args());
+        return app(GetUSPSRateDataAction::class)->execute(
+            $customer,
+            $parcelData,
+            AddressValidateRequestData::formAddress($address),
+        );
     }
 
     public function getInternationalRate(
