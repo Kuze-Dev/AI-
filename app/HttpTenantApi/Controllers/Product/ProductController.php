@@ -24,7 +24,7 @@ class ProductController
     public function index(): JsonApiResourceCollection
     {
         return ProductResource::collection(
-            QueryBuilder::for(Product::query())
+            QueryBuilder::for(Product::query()->whereStatus(true))
                 ->allowedFilters([
                     'name',
                     'slug',
@@ -56,7 +56,7 @@ class ProductController
 
     public function show(string $product): ProductResource
     {
-        $product = QueryBuilder::for(Product::whereSlug($product))
+        $product = QueryBuilder::for(Product::whereSlug($product)->whereStatus(true))
             ->allowedIncludes([
                 'taxonomyTerms',
                 'productOptions',
@@ -65,8 +65,6 @@ class ProductController
                 'metaData',
             ])
             ->firstOrFail();
-
-        abort_if( ! $product->status, 412);
 
         return ProductResource::make($product);
     }
