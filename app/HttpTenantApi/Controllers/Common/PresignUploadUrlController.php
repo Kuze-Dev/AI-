@@ -5,40 +5,45 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Common;
 
 use App\HttpTenantApi\Resources\SettingResource;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Livewire\GenerateSignedUploadUrl;
 use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\RouteAttributes\Attributes\Get;
+use Spatie\RouteAttributes\Attributes\Post;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 class PresignUploadUrlController
 {
-    #[Get('/generate/upload-url/{resource}' , name: 'generate.upload-url')]
-    public function index(string $resource)
-    {
-               
-
+    #[Post('/generate/upload-url' , name: 'generate.upload-url')]
+    public function index(Request $request)
+    {          
+       $path = match ($request->resource) {
+            'forms' => 'forms/'
+        };
+        
+        $filename = $request->resource_id.'/'.uniqid().'.'.$request->ext;
+       
+        $object_key = $path.$filename;
         $s3 = Storage::disk('s3');
-        dd($s3);
-        $adapter = $s3->getDriver()->getAdapter();
 
-        dd($adapter);
-        $client = $s3->getDriver()->getAdapter()->getClient();
-        $expiry = "+10 minutes";
-
-
-        $options = ['user-data' => 'user-meta-value'];
+        $client = $s3->getClient();
+        $expiry = "+20 minutes";
 
         $cmd = $client->getCommand('PutObject', [
             'Bucket' => config('filesystems.disks.s3.bucket'),
-            'Key' => 'path/to/file/',
+            'Key' => $object_key,
             'ACL' => 'public-read',
-            'Metadata' => $options,
         ]);
 
         $request = $client->createPresignedRequest($cmd, $expiry);
 
         $presignedUrl = (string)$request->getUri();
         
-        dd($presignedUrl);
+        return response()->json([
+            'upload_url' => $presignedUrl,
+            'object_key' => $object_key,
+        ]);
+        
     }
 }
