@@ -4,46 +4,57 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Common;
 
-use App\HttpTenantApi\Resources\SettingResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Livewire\GenerateSignedUploadUrl;
-use Spatie\LaravelSettings\SettingsContainer;
-use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Post;
-use TiMacDonald\JsonApi\JsonApiResource;
+use Illuminate\Http\JsonResponse;
+use InvalidArgumentException;
+use Throwable;
 
 class PresignUploadUrlController
 {
-    #[Post('/generate/upload-url' , name: 'generate.upload-url')]
-    public function index(Request $request)
-    {          
-       $path = match ($request->resource) {
-            'forms' => 'forms/'
-        };
-        
-        $filename = $request->resource_id.'/'.uniqid().'.'.$request->ext;
-       
-        $object_key = $path.$filename;
-        $s3 = Storage::disk('s3');
+    #[Post('/generate/upload-url', name: 'generate.upload-url')]
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $path = match ($request->resource) {
+                'forms' => 'forms/',
+                default => throw new InvalidArgumentException('resource not supported'),
+            };
 
-        $client = $s3->getClient();
-        $expiry = "+20 minutes";
+            $filename = $request->resource_id.'/'.uniqid().'.'.$request->ext;
 
-        $cmd = $client->getCommand('PutObject', [
-            'Bucket' => config('filesystems.disks.s3.bucket'),
-            'Key' => $object_key,
-            'ACL' => 'public-read',
-        ]);
+            $object_key = $path.$filename;
+            /** @var \Illuminate\Filesystem\AwsS3V3Adapter */
+            $s3 = Storage::disk('s3');
 
-        $request = $client->createPresignedRequest($cmd, $expiry);
+            $client = $s3->getClient();
 
-        $presignedUrl = (string)$request->getUri();
-        
-        return response()->json([
-            'upload_url' => $presignedUrl,
-            'object_key' => $object_key,
-        ]);
-        
+            $expiry = '+20 minutes';
+
+            $cmd = $client->getCommand('PutObject', [
+                'Bucket' => config('filesystems.disks.s3.bucket'),
+                'Key' => $object_key,
+                'ACL' => 'public-read',
+            ]);
+
+            $awsResponse = $client->createPresignedRequest($cmd, $expiry);
+
+            $presignedUrl = (string) $awsResponse->getUri();
+
+            return response()->json([
+                'upload_url' => $presignedUrl,
+                'object_key' => $object_key,
+            ]);
+        } catch (Throwable $th) {
+
+            return response()->json(
+                [
+                    'message' => $th->getMessage(),
+                ],
+                422
+            );
+        }
+
     }
 }

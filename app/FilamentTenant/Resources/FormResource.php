@@ -160,6 +160,8 @@ class FormResource extends Resource
                                         markdown;
                                 })
                                 ->columnSpanFull(),
+                            Forms\Components\Toggle::make('has_attachments')
+                                ->helperText('If Enabled Uploaded Files will be attach to this email notification'),
                         ])
                         ->columnSpan(['md' => 3]),
                 ])->columns(4),
