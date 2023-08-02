@@ -36,14 +36,17 @@
                 ])
             >
                 <div class="flex w-full justify-center">
-                    <img src="{{Storage::url(app(App\Settings\SiteSettings::class)->logo)}}">
+                    @if (empty(app(App\Settings\SiteSettings::class)->logo))
+                        <h3 class="text-center text-2xl font-bold tracking-tight">{{ app(App\Settings\SiteSettings::class)->name }}</h3>
+                    @endif
+                    <img src="{{ Storage::url(app(App\Settings\SiteSettings::class)->logo) }}">
                 </div>
 
-                @if (filled($title))
-                    <h2 class="text-center text-2xl font-bold tracking-tight">
-                        {{ $title }}
-                    </h2>
-                @endif
+
+                <h3 class="text-center text-2xl font-bold tracking-tight">
+                    HASP CMS Log in for Your Website
+                </h3>
+
 
                 <div {{ $attributes }}>
                     {{ $slot }}
