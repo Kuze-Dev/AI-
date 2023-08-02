@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\Order\Listeners;
 
+use App\Notifications\Order\OrderCancelledNotification;
 use Domain\Customer\Models\Customer;
 use Domain\Order\Enums\OrderStatuses;
-use Domain\Order\Events\OrderStatusUpdatedEvent;
 use Domain\Order\Models\Order;
+use Domain\Order\Notifications\AdminOrderStatusUpdatedMail;
 use Domain\Payments\Events\PaymentProcessEvent;
+use Illuminate\Support\Facades\Notification;
 
 class OrderPaymentUpdatedListener
 {
@@ -26,7 +28,7 @@ class OrderPaymentUpdatedListener
 
             match ($status) {
                 'paid' => $this->onOrderPaid($order),
-                "cancel" => $this->onOrderCancelled($order),
+                'cancel' => $this->onOrderCancelled($order),
                 default => null
             };
         }
@@ -48,10 +50,16 @@ class OrderPaymentUpdatedListener
         /** @var \Domain\Customer\Models\Customer $customer */
         $customer = Customer::find($order->customer_id);
 
-        event(new OrderStatusUpdatedEvent(
-            $customer,
+        Notification::send($customer, new OrderCancelledNotification($order));
+
+        $customer->notify(new AdminOrderStatusUpdatedMail(
             $order,
-            'cancelled'
+            'cancelled',
+            ''
         ));
+
+        // back the discount
+
+        // back the product stock
     }
 }

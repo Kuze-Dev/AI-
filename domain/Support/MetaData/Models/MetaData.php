@@ -22,7 +22,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string|null $keywords
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read Model|\Eloquent $model
+ * @property-read Model|Eloquent $model
  * @method static \Illuminate\Database\Eloquent\Builder|MetaData newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|MetaData newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|MetaData query()

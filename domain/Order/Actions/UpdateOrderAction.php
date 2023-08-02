@@ -28,7 +28,7 @@ class UpdateOrderAction
     {
         try {
             if ($updateOrderData->status) {
-                if ($updateOrderData->status ==  OrderStatuses::CANCELLED && $order->status !== OrderStatuses::PENDING) {
+                if ($updateOrderData->status == OrderStatuses::CANCELLED && $order->status !== OrderStatuses::PENDING) {
                     return "You can't cancelled this order";
                 }
 
@@ -59,14 +59,21 @@ class UpdateOrderAction
 
                 $image = $this->convertUrlToUploadedFile($updateOrderData->proof_of_payment);
 
+                $payment = $orderPayment->payments->first();
+
                 if ($image instanceof UploadedFile) {
-                    if (!empty($orderPayment->payments) && !empty($orderPayment->payments->first())) {
+                    if (
+                        ! empty($orderPayment->payments) && ! empty($payment) &&
+                        $payment->gateway == 'bank-transfer'
+                    ) {
                         app(UploadProofofPaymentAction::class)->execute(
-                            $orderPayment->payments->first(),
+                            $payment,
                             new ProofOfPaymentData(
                                 $image
                             )
                         );
+                    } else {
+                        return 'You cant upload a proof of payment in this gateway';
                     }
                 } else {
                     return 'Invalid media';
@@ -77,7 +84,7 @@ class UpdateOrderAction
                         $query->where('payable_id', $order->id);
                     })->whereNot('status', 'paid')->first();
 
-                    if (!$payment) {
+                    if ( ! $payment) {
                         return 'Your order is already paid';
                     }
 

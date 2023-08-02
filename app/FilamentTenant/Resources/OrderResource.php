@@ -619,7 +619,7 @@ class OrderResource extends Resource
                     ->size('sm')
                     ->action(function () use ($order, $set) {
 
-                        $isPaid = !$order->is_paid;
+                        $isPaid = ! $order->is_paid;
 
                         $result = $order->update([
                             'is_paid' => $isPaid,
@@ -779,7 +779,11 @@ class OrderResource extends Resource
                 /** @var \Domain\Payments\Models\Payment $payment */
                 $payment = $order->payments->first();
 
-                return $payment->gateway != 'bank-transfer';
+                if ($payment->gateway == 'bank-transfer') {
+                    return (bool) (empty($order->payments->first()?->getFirstMediaUrl('image')));
+                }
+
+                return true;
             });
     }
 }
