@@ -163,9 +163,9 @@ class CartSummaryAction
 
                 $productlist[] = [
                     'product_id' => (string) $purchasableId,
-                    'length' => $length * $cm_to_inches,
-                    'width' => $width * $cm_to_inches,
-                    'height' => $height * $cm_to_inches,
+                    'length' => ceil($length * $cm_to_inches),
+                    'width' => ceil($width * $cm_to_inches),
+                    'height' => ceil($height * $cm_to_inches),
                     'weight' => (float) $weight,
                 ];
             }
@@ -188,9 +188,9 @@ class CartSummaryAction
 
                     $productlist[] = [
                         'product_id' => (string) $purchasableId,
-                        'length' => $length * $cm_to_inches,
-                        'width' => $width * $cm_to_inches,
-                        'height' => $height * $cm_to_inches,
+                        'length' => ceil($length * $cm_to_inches),
+                        'width' => ceil($width * $cm_to_inches),
+                        'height' => ceil($height * $cm_to_inches),
                         'weight' => (float) $weight,
                     ];
                 }
