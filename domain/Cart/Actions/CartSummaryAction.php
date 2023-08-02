@@ -12,7 +12,6 @@ use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
 use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Discount\Models\Discount;
-use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\Actions\GetShippingfeeAction;
@@ -27,6 +26,7 @@ use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 
 class CartSummaryAction
 {
+    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
     public function getSummary(
         CartLine|Collection $collections,
         CartSummaryTaxData $cartSummaryTaxData,
@@ -70,23 +70,31 @@ class CartSummaryAction
         return SummaryData::fromArray($summaryData);
     }
 
+    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
     public function getSubTotal(CartLine|Collection $collections): float
     {
         $subTotal = 0;
 
         if ($collections instanceof Collection) {
             $subTotal = $collections->reduce(function ($carry, $collection) {
+                /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
                 $purchasable = $collection->purchasable;
+                $sellingPrice = (float) $purchasable->selling_price;
 
-                return $carry + ($purchasable->selling_price * $collection->quantity);
+                return $carry + ($sellingPrice * $collection->quantity);
             }, 0);
         } elseif ($collections instanceof CartLine) {
-            $subTotal = $collections->purchasable->selling_price * $collections->quantity;
+            /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
+            $purchasable = $collections->purchasable;
+            $sellingPrice = (float) $purchasable->selling_price;
+
+            $subTotal = $sellingPrice * $collections->quantity;
         }
 
         return $subTotal;
     }
 
+    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
     public function getShippingFee(
         CartLine|Collection $collections,
         Customer $customer,
@@ -96,14 +104,14 @@ class CartSummaryAction
     ): float {
         $shippingFeeTotal = 0;
 
-        $productlist = $this->getProducts($collections);
+        if ($shippingAddress && $shippingMethod) {
+            $productlist = $this->getProducts($collections);
 
-        $boxData = app(GetBoxAction::class)->execute(
-            $shippingMethod,
-            BoxData::fromArray($productlist)
-        );
+            $boxData = app(GetBoxAction::class)->execute(
+                $shippingMethod,
+                BoxData::fromArray($productlist)
+            );
 
-        if ($shippingAddress) {
             $parcelData = new ParcelData(
                 ship_from_address: new ShipFromAddressData(
                     address: $shippingMethod->shipper_address,
@@ -129,29 +137,27 @@ class CartSummaryAction
         return $shippingFeeTotal;
     }
 
-    private function getProducts(CartLine|Collection $collections): array
+    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
+    public function getProducts(CartLine|Collection $collections): array
     {
         $productlist = [];
 
-        if ($collections instanceof Collection) {
-            foreach ($collections as $collection) {
-                if ($collection->purchasable instanceof Product) {
-                    $product = $collection->purchasable;
+        if (!is_iterable($collections)) {
+            /** @var \Domain\Product\Models\Product $product */
+            $product = $collections->purchasable;
 
-                    $purchasableId = $product->id;
-                    $length = $product->dimension['length'];
-                    $width = $product->dimension['width'];
-                    $height = $product->dimension['height'];
-                    $weight = $product->weight;
-                } else if ($collection->purchasable instanceof ProductVariant) {
-                    $product = $collection->purchasable->product;
+            if ($collections->purchasable instanceof ProductVariant) {
+                /** @var \Domain\Product\Models\Product $product */
+                $product = $collections->purchasable->product;
+            }
 
-                    $purchasableId = $collection->purchasable->id;
-                    $length = $product->dimension['length'];
-                    $width = $product->dimension['width'];
-                    $height = $product->dimension['height'];
-                    $weight = $product->weight;
-                }
+            if (!is_null($product->dimension)) {
+                $purchasableId = $product->id;
+
+                $length = $product->dimension['length'];
+                $width = $product->dimension['width'];
+                $height = $product->dimension['height'];
+                $weight = $product->weight;
 
                 $productlist[] = [
                     'product_id' => (string) $purchasableId,
@@ -162,33 +168,31 @@ class CartSummaryAction
                 ];
             }
         } else {
-            $cartLine = $collections->purchasable;
+            foreach ($collections as $collection) {
+                /** @var \Domain\Product\Models\Product $product */
+                $product = $collection->purchasable;
 
-            if ($cartLine instanceof Product) {
-                $product = $cartLine;
+                if ($collection->purchasable instanceof ProductVariant) {
+                    /** @var \Domain\Product\Models\Product $product */
+                    $product = $collection->purchasable->product;
+                }
+                if (!is_null($product->dimension)) {
+                    $purchasableId = $product->id;
 
-                $purchasableId = $product->id;
-                $length = $product->dimension['length'];
-                $width = $product->dimension['width'];
-                $height = $product->dimension['height'];
-                $weight = $product->weight;
-            } else if ($cartLine instanceof ProductVariant) {
-                $product = $cartLine->product;
+                    $length = $product->dimension['length'];
+                    $width = $product->dimension['width'];
+                    $height = $product->dimension['height'];
+                    $weight = $product->weight;
 
-                $purchasableId = $cartLine->id;
-                $length = $product->dimension['length'];
-                $width = $product->dimension['width'];
-                $height = $product->dimension['height'];
-                $weight = $product->weight;
+                    $productlist[] = [
+                        'product_id' => (string) $purchasableId,
+                        'length' => $length,
+                        'width' => $width,
+                        'height' => $height,
+                        'weight' => (float) $weight,
+                    ];
+                }
             }
-
-            $productlist[] = [
-                'product_id' => (string) $purchasableId,
-                'length' => $length,
-                'width' => $width,
-                'height' => $height,
-                'weight' => (float) $weight,
-            ];
         }
 
         return $productlist;
@@ -227,7 +231,7 @@ class CartSummaryAction
         $discountTotal = 0;
 
         if (!is_null($discount)) {
-            $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal);
+            $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal) ?? 0;
         }
 
         return $discountTotal;

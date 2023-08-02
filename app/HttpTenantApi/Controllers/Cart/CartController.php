@@ -23,6 +23,9 @@ class CartController extends Controller
 {
     public function index(): mixed
     {
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = auth()->user();
+
         $model = QueryBuilder::for(
             Cart::with([
                 'cartLines.purchasable' => function (MorphTo $query) {
@@ -32,7 +35,7 @@ class CartController extends Controller
                     ]);
                 },
             ])
-                ->whereBelongsTo(auth()->user())
+                ->whereBelongsTo($customer)
         )->allowedIncludes(['cartLines.media'])
             ->first();
 

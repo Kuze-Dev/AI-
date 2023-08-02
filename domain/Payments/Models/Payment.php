@@ -112,6 +112,7 @@ class Payment extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')
-            ->singleFile();
+            ->singleFile()
+            ->registerMediaConversions(fn () => $this->addMediaConversion('preview'));
     }
 }

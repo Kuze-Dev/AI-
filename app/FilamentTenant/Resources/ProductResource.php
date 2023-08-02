@@ -25,6 +25,8 @@ use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\Contracts\HasProductOptions;
+use Domain\Product\Actions\DeleteProductAction;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class ProductResource extends Resource
 {
@@ -81,19 +83,19 @@ class ProductResource extends Resource
                                 ->schema([
                                     Forms\Components\TextInput::make('length')
                                         ->numeric()
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['length']))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['length'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Length'),
 
                                     Forms\Components\TextInput::make('width')
                                         ->numeric()
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['width']))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['width'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Width'),
 
                                     Forms\Components\TextInput::make('height')
                                         ->numeric()
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['height']))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['height'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Height'),
                                 ])->columns(3),
@@ -236,7 +238,14 @@ class ProductResource extends Resource
                 Tables\Actions\EditAction::make()
                     ->authorize('update'),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Product $record) {
+                            try {
+                                return app(DeleteProductAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
                 ]),
             ])
             ->bulkActions([

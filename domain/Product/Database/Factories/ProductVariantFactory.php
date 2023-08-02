@@ -23,12 +23,28 @@ class ProductVariantFactory extends Factory
             'product_id' => $this->faker->numberBetween(1, 5),
             'sku' => $this->faker->unique()->numerify('SKU###'),
             'combination' => [
-                'color' => $this->faker->randomElement($colors),
-                'size' => $this->faker->randomElement($sizes),
+                $this->setCombination('color', $colors),
+                $this->setCombination('size', $sizes),
             ],
             'retail_price' => $this->faker->randomFloat(2, 0, 100),
             'selling_price' => $this->faker->randomFloat(2, 0, 100),
             'stock' => $this->faker->numberBetween(0, 100),
+        ];
+    }
+
+    public function setCombination($optionName, $optionValues)
+    {
+        $option = ProductOptionFactory::new(['name' => $optionName])
+            ->has(
+                ProductOptionValueFactory::new(['name' => $this->faker->randomElement($optionValues)])
+            )
+            ->createOne()->load('productOptionValues');
+
+        return [
+            'option' => $option->name,
+            'option_id' => $option->id,
+            'option_value' => $option->productOptionValues()->first()->name,
+            'option_value_id' => $option->productOptionValues()->first()->id,
         ];
     }
 

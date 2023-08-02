@@ -13,6 +13,7 @@ use Domain\Cart\Requests\CartSummaryRequest;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
+use Throwable;
 
 #[
     Middleware(['auth:sanctum'])
@@ -20,7 +21,7 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 class CartSummaryController extends Controller
 {
     #[Get('carts/count', name: 'carts.count')]
-    public function count()
+    public function count(): mixed
     {
         $cartLinesCount = CartLine::query()
             ->whereHas('cart', function ($query) {
@@ -33,7 +34,7 @@ class CartSummaryController extends Controller
     }
 
     #[Get('carts/summary', name: 'carts.summary')]
-    public function summary(CartSummaryRequest $request)
+    public function summary(CartSummaryRequest $request): mixed
     {
         $validated = $request->validated();
 
@@ -64,10 +65,16 @@ class CartSummaryController extends Controller
                 $discount,
                 $serviceId ? (int) $serviceId : null
             );
-        } catch (USPSServiceNotFoundException) {
-            return response()->json([
-                'service_id' => 'Shipping method service id is required',
-            ], 404);
+        } catch (Throwable $th) {
+            if ($th instanceof USPSServiceNotFoundException) {
+                return response()->json([
+                    'service_id' => 'Shipping method service id is required',
+                ], 404);
+            } else {
+                return response()->json([
+                    'message' => $th->getMessage(),
+                ], 422);
+            }
         }
 
         return response()->json([
@@ -78,12 +85,12 @@ class CartSummaryController extends Controller
                 'amount' => $summary->taxTotal ? round($summary->taxTotal, 2) : 0,
             ],
             'discount' => [
-                'status' => $summary->discountMessages->status,
-                'message' => $summary->discountMessages->message,
-                'type' => $summary->discountMessages->amount_type,
-                'amount' => $summary->discountMessages->amount,
-                'discount_type' => $summary->discountMessages->discount_type,
-                'total_savings' => $discount ? round($summary->discountTotal, 2) : 0,
+                'status' => $summary->discountMessages->status ?? null,
+                'message' => $summary->discountMessages->message ?? null,
+                'type' => $summary->discountMessages->amount_type ?? null,
+                'amount' => $summary->discountMessages->amount ?? null,
+                'discount_type' => $summary->discountMessages->discount_type ?? null,
+                'total_savings' => $discount ? round($summary->discountTotal ?? 0, 2) : 0,
             ],
             'sub_total' => round($summary->subTotal, 2),
             'shipping_fee' => round($summary->shippingTotal, 2),

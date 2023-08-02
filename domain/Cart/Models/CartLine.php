@@ -82,6 +82,7 @@ class CartLine extends Model implements HasMedia
         return $this->belongsTo(Cart::class);
     }
 
+    /** @return MorphTo<Model, self> */
     public function purchasable(): MorphTo
     {
         return $this->morphTo();

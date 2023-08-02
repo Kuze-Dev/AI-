@@ -27,7 +27,14 @@ class CreateCartLineAction
         DB::beginTransaction();
 
         try {
-            $purchasableId = Product::where((new Product())->getRouteKeyName(), $cartLineData->purchasable_id)->first()->id;
+            $product = Product::where((new Product())->getRouteKeyName(), $cartLineData->purchasable_id)->first();
+
+            if ( ! $product) {
+                throw new Exception('Product not found');
+            }
+
+            $purchasableId = $product->id;
+
             $purchasableType = '';
 
             match ($cartLineData->purchasable_type) {

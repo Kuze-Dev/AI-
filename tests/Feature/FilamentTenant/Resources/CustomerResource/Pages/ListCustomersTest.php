@@ -66,6 +66,8 @@ it('can force delete customer', function () {
         ->deleted()
         ->createOne();
 
+    $customer->refresh();
+
     assertCount(1, $customer->addresses);
 
     livewire(ListCustomers::class)

@@ -48,7 +48,6 @@ class ProductController
                     'productOptions',
                     'productVariants',
                     'media',
-                    // 'routeUrls',
                     'metaData',
                 ])
                 ->jsonPaginate()
@@ -57,17 +56,18 @@ class ProductController
 
     public function show(string $product): ProductResource
     {
-        return ProductResource::make(
-            QueryBuilder::for(Product::whereSlug($product))
-                ->allowedIncludes([
-                    'taxonomyTerms.taxonomy',
-                    'productOptions',
-                    'productVariants',
-                    'media',
-                    // 'routeUrls',
-                    'metaData',
-                ])
-                ->firstOrFail()
-        );
+        $product = QueryBuilder::for(Product::whereSlug($product))
+            ->allowedIncludes([
+                'taxonomyTerms',
+                'productOptions',
+                'productVariants',
+                'media',
+                'metaData',
+            ])
+            ->firstOrFail();
+
+        abort_if( ! $product->status, 412);
+
+        return ProductResource::make($product);
     }
 }

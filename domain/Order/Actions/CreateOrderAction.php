@@ -12,33 +12,34 @@ use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
-use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Illuminate\Support\Str;
 
 class CreateOrderAction
 {
-    public function execute(PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData)
+    public function execute(PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData): Order
     {
         $referenceNumber = Str::upper(Str::random(12));
 
-        try {
-            $summary = app(CartSummaryAction::class)->getSummary(
-                $preparedOrderData->cartLine,
-                new CartSummaryTaxData(
-                    $placeOrderData->taxation_data->country_id,
-                    $placeOrderData->taxation_data->state_id
-                ),
-                new CartSummaryShippingData(
-                    $preparedOrderData->customer,
-                    $preparedOrderData->shippingAddress,
-                    $preparedOrderData->shippingMethod
-                ),
-                $preparedOrderData->discount,
-                $placeOrderData->serviceId
-            );
-        } catch (USPSServiceNotFoundException) {
-            throw new USPSServiceNotFoundException();
-        }
+        /** @var \Domain\Address\Models\State $state */
+        $state = $preparedOrderData->billingAddress->state;
+
+        /** @var \Domain\Address\Models\Country $country */
+        $country = $state->country;
+
+        $summary = app(CartSummaryAction::class)->getSummary(
+            $preparedOrderData->cartLine,
+            new CartSummaryTaxData(
+                $country->id,
+                $state->id,
+            ),
+            new CartSummaryShippingData(
+                $preparedOrderData->customer,
+                $preparedOrderData->shippingAddress,
+                $preparedOrderData->shippingMethod
+            ),
+            $preparedOrderData->discount,
+            $placeOrderData->serviceId
+        );
 
         $order = Order::create([
             'customer_id' => $preparedOrderData->customer->id,

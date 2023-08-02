@@ -13,40 +13,47 @@ use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
-use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Illuminate\Support\Str;
+use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 
 class CreateOrderLineAction
 {
-    public function execute(Order $order,  PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData)
+    public function execute(Order $order,  PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData): void
     {
-
         foreach ($preparedOrderData->cartLine as $cartLine) {
 
-            try {
-                $summary = app(CartSummaryAction::class)->getSummary(
-                    $cartLine,
-                    new CartSummaryTaxData(
-                        $placeOrderData->taxation_data->country_id,
-                        $placeOrderData->taxation_data->state_id
-                    ),
-                    new CartSummaryShippingData(
-                        $preparedOrderData->customer,
-                        $preparedOrderData->shippingAddress,
-                        $preparedOrderData->shippingMethod
-                    ),
-                    $preparedOrderData->discount,
-                    $placeOrderData->serviceId
-                );
-            } catch (USPSServiceNotFoundException) {
-                throw new USPSServiceNotFoundException();
-            }
+            /** @var \Domain\Address\Models\State $state */
+            $state = $preparedOrderData->billingAddress->state;
+
+            /** @var \Domain\Address\Models\Country $country */
+            $country = $state->country;
+
+            $summary = app(CartSummaryAction::class)->getSummary(
+                $cartLine,
+                new CartSummaryTaxData(
+                    $country->id,
+                    $state->id,
+                ),
+                new CartSummaryShippingData(
+                    $preparedOrderData->customer,
+                    $preparedOrderData->shippingAddress,
+                    $preparedOrderData->shippingMethod
+                ),
+                $preparedOrderData->discount,
+                $placeOrderData->serviceId
+            );
 
             $name = null;
             if ($cartLine->purchasable instanceof Product) {
-                $name = $cartLine->purchasable->name;
+                /** @var \Domain\Product\Models\Product $product */
+                $product = $cartLine->purchasable;
+
+                $name = $product->name;
             } elseif ($cartLine->purchasable instanceof ProductVariant) {
-                $name = $cartLine->purchasable->product->name;
+                /** @var \Domain\Product\Models\Product $product */
+                $product = $cartLine->purchasable->product;
+
+                $name = $product->name;
             }
 
             $orderLine = OrderLine::create([
@@ -72,7 +79,10 @@ class CreateOrderLineAction
                 $purchasableMedias = $cartLine->purchasable->getMedia('image');
                 $this->copyMediaToOrderLine($orderLine, $purchasableMedias, 'order_line_images');
             } elseif ($cartLine->purchasable instanceof ProductVariant) {
-                $purchasableMedias = $cartLine->purchasable->product->getMedia('image');
+                /** @var \Domain\Product\Models\Product $product */
+                $product = $cartLine->purchasable->product;
+
+                $purchasableMedias = $product->getMedia('image');
                 $this->copyMediaToOrderLine($orderLine, $purchasableMedias, 'order_line_images');
             }
 
@@ -81,7 +91,13 @@ class CreateOrderLineAction
         }
     }
 
-    private function copyMediaToOrderLine($orderLine, $medias, string $collection)
+    /**
+     * @param \Domain\Order\Models\OrderLine $orderLine
+     * @param \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $medias
+     * @param string $collection
+     * @return void
+     */
+    private function copyMediaToOrderLine(OrderLine $orderLine, MediaCollection $medias, string $collection): void
     {
         foreach ($medias as $media) {
             $orderLine->addMediaFromUrl($media->getUrl())->toMediaCollection($collection);

@@ -26,6 +26,7 @@ class OrderPlacedListener
 
         Notification::send($customer, new OrderPlacedNotification($order));
 
-        $customer->notify(new OrderPlacedMail($order, $shippingAddress, $shippingMethod));
+        //comment when the env and mail is not set
+        // $customer->notify(new OrderPlacedMail($order, $shippingAddress, $shippingMethod));
     }
 }

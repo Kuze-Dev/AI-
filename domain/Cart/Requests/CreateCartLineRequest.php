@@ -11,7 +11,7 @@ use Illuminate\Validation\Rule;
 
 class CreateCartLineRequest extends FormRequest
 {
-    public function rules()
+    public function rules(): array
     {
         return [
             'purchasable_id' => [
