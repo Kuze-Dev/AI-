@@ -6,6 +6,7 @@ namespace Domain\Order\Enums;
 
 enum OrderStatuses: string
 {
+        // case PROCESSING = 'processing';
     case PENDING = 'pending';
     case CANCELLED = 'cancelled';
     case REFUNDED = 'refunded';
