@@ -19,7 +19,7 @@ beforeEach(function () {
 });
 
 it('can list products', function () {
-    ProductFactory::new()
+    ProductFactory::new(['status' => 1])
         ->has(TaxonomyTermFactory::new()
             ->for(TaxonomyFactory::new()
                 ->withDummyBlueprint())
@@ -52,7 +52,7 @@ it('can show a product', function () {
 });
 
 it('can filter products', function (string $attribute) {
-    $products = ProductFactory::new()
+    $products = ProductFactory::new(['status' => 1])
         ->has(TaxonomyTermFactory::new()
             ->for(
                 TaxonomyFactory::new()->withDummyBlueprint()
@@ -108,10 +108,24 @@ it('can show a product with includes', function (string $include) {
     'metaData',
 ]);
 
+it('cant list inactive products', function () {
+    ProductFactory::new(['status' => 0])
+        ->count(5)
+        ->create();
+
+    getJson('api/products')
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) {
+            $json
+                ->count('data', 0)
+                ->etc();
+        });
+});
+
 it('cant show an inactive product', function () {
     $product = ProductFactory::new(['name' => 'Foo', 'status' => 0])
         ->createOne();
 
     getJson("api/products/{$product->getRouteKey()}")
-        ->assertStatus(412);
+        ->assertStatus(404);
 });

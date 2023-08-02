@@ -9,7 +9,6 @@ use Domain\Customer\Models\Customer;
 use Domain\Shipment\Actions\UPS\GetUPSInternationalRateDataAction;
 use Domain\Shipment\Actions\UPS\GetUPSRateDataAction;
 use Domain\Shipment\API\USPS\Contracts\RateResponse;
-use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 
@@ -18,14 +17,14 @@ class UpsDriver
     public function getRate(
         Customer $customer,
         ParcelData $parcelData,
-        AddressValidateRequestData $addressValidateRequestData,
+        Address $address,
         ShippingMethod $shippingMethod
     ): RateResponse {
 
         return app(GetUPSRateDataAction::class)->execute(
             $customer,
             $parcelData,
-            $addressValidateRequestData,
+            $address,
             $shippingMethod
         );
     }

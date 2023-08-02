@@ -184,7 +184,7 @@ class Product extends Model implements HasMetaDataContract, HasMedia
 
     public function isFavorite()
     {
-        if ( ! auth()->check()) {
+        if (!auth()->check()) {
             return false;
         }
 
