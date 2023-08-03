@@ -115,11 +115,11 @@ class UPSRateClient extends BaseClient
             ->body();
 
         $arrayResponse = json_decode($response, true);
-     
-        if (!isset($arrayResponse['RateResponse'])) {
+
+        if ( ! isset($arrayResponse['RateResponse'])) {
             self::throwError($arrayResponse['response'], __METHOD__.':'.__LINE__);
         }
-             
+
         return UpsResponse::fromArray($arrayResponse);
     }
 
@@ -217,12 +217,12 @@ class UPSRateClient extends BaseClient
             ->post(self::uri())
             ->body();
 
-            $arrayResponse = json_decode($response, true);
-     
-            if (!isset($arrayResponse['RateResponse'])) {
-                self::throwError($arrayResponse['response'], __METHOD__.':'.__LINE__);
-            }
-                 
-            return UpsResponse::fromArray($arrayResponse);
+        $arrayResponse = json_decode($response, true);
+
+        if ( ! isset($arrayResponse['RateResponse'])) {
+            self::throwError($arrayResponse['response'], __METHOD__.':'.__LINE__);
+        }
+
+        return UpsResponse::fromArray($arrayResponse);
     }
 }
