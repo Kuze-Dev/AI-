@@ -41,7 +41,7 @@ class OrderPaymentUpdatedListener
         ]);
     }
 
-    private function onOrderCancelled(Order $order)
+    private function onOrderCancelled(Order $order): void
     {
         $order->update([
             'status' => OrderStatuses::CANCELLED,

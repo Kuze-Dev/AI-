@@ -16,7 +16,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 class CartSummaryRequest extends FormRequest
 {
-    private $cartLinesCache;
+    /** @var \Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> */
+    private Collection $cartLinesCache;
 
     public function rules(): array
     {
@@ -63,9 +64,10 @@ class CartSummaryRequest extends FormRequest
         ];
     }
 
+    /** @return \Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> */
     public function getCartLines(): Collection
     {
-        if (!$this->cartLinesCache) {
+        if (empty($this->cartLinesCache)) {
             $cartLineIds = explode(',', $this->validated('cart_line_ids'));
 
             $this->cartLinesCache = CartLine::query()

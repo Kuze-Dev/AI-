@@ -35,7 +35,6 @@ class OrderResource extends JsonApiResource
     {
         return [
             'orderLines' => fn () => OrderLineResource::collection($this->orderLines),
-            /** @phpstan-ignore-next-line */
             'payments' => fn () => PaymentOrderResource::make($this->payments->first()),
         ];
     }
