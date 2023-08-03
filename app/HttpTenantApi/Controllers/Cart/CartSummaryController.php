@@ -38,19 +38,10 @@ class CartSummaryController extends Controller
     {
         $validated = $request->validated();
 
-        $cartLineIds = explode(',', $validated['cart_line_ids']);
-
         /** @var \Domain\Customer\Models\Customer $customer */
         $customer = auth()->user();
 
-        $cartLines = CartLine::query()
-            ->with('purchasable')
-            ->whereHas('cart', function ($query) {
-                $query->whereBelongsTo(auth()->user());
-            })
-            ->whereNull('checked_out_at')
-            ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
-            ->get();
+        $cartLines = $request->getCartLines();
 
         $country = $request->getCountry();
         $state = $request->getState();
