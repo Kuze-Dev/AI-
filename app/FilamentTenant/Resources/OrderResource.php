@@ -40,7 +40,7 @@ class OrderResource extends Resource
     protected static function getNavigationBadge(): ?string
     {
         /** @phpstan-ignore-next-line https://filamentphp.com/docs/2.x/admin/navigation#navigation-item-badges */
-        return strval(static::$model::where('status', OrderStatuses::PENDING)->count());
+        return strval(static::$model::whereIn('status', [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])->count());
     }
 
     public static function form(Form $form): Form
@@ -243,6 +243,10 @@ class OrderResource extends Resource
                 Tables\Columns\BadgeColumn::make('status')
                     ->label(trans('Status'))
                     ->formatStateUsing(function ($state) {
+                        if ($state == OrderStatuses::FORPAYMENT->value) {
+                            return 'For Payment';
+                        }
+
                         return ucfirst($state);
                     })
                     ->sortable(),
@@ -619,7 +623,7 @@ class OrderResource extends Resource
                     ->size('sm')
                     ->action(function () use ($order, $set) {
 
-                        $isPaid = !$order->is_paid;
+                        $isPaid = ! $order->is_paid;
 
                         $result = $order->update([
                             'is_paid' => $isPaid,

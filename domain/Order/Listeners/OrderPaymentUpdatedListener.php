@@ -26,7 +26,7 @@ class OrderPaymentUpdatedListener
 
             match ($status) {
                 'paid' => $this->onOrderPaid($order),
-                "cancel" => $this->onOrderCancelled($order),
+                'cancel' => $this->onOrderCancelled($order),
                 default => null
             };
         }
@@ -36,6 +36,7 @@ class OrderPaymentUpdatedListener
     {
         $order->update([
             'is_paid' => true,
+            'status' => OrderStatuses::PROCESSING,
         ]);
     }
 

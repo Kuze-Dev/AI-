@@ -41,6 +41,9 @@ class CreateOrderAction
             $placeOrderData->serviceId
         );
 
+        $paymentMethod = $preparedOrderData->paymentMethod->gateway == 'manual'
+            ? OrderStatuses::PENDING : OrderStatuses::FORPAYMENT;
+
         $order = Order::create([
             'customer_id' => $preparedOrderData->customer->id,
             'customer_first_name' => $preparedOrderData->customer->first_name,
@@ -68,11 +71,11 @@ class CreateOrderAction
             'total' => $summary->grandTotal,
 
             'notes' => $preparedOrderData->notes,
-            'status' => OrderStatuses::PENDING,
+            'status' => $paymentMethod,
             'is_paid' => false,
         ]);
 
-        if (!is_null($preparedOrderData->discount)) {
+        if ( ! is_null($preparedOrderData->discount)) {
             app(CreateDiscountLimitAction::class)->execute($preparedOrderData->discount, $order, $preparedOrderData->customer);
         }
 

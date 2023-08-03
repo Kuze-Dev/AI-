@@ -21,9 +21,9 @@ use Eloquent;
  * @property string $code
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read Model|\Eloquent $customer
+ * @property-read Model|Eloquent $customer
  * @property-read \Domain\Discount\Models\Discount|null $discount
- * @property-read Model|\Eloquent $order
+ * @property-read Model|Eloquent $order
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountLimit newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountLimit newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountLimit query()
