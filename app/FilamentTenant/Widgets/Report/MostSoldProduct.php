@@ -15,7 +15,7 @@ class MostSoldProduct extends PieChartWidget
     protected function getData(): array
     {
         $products = OrderLine::whereHas('order', function ($query) {
-            $query->where('status', 'Fulfilled');
+            $query->where('status', 'fulfilled');
         })
             ->selectRaw('name, COUNT(*) as count')
             ->groupBy('name')->limit(10)->orderByDesc('count')

@@ -16,7 +16,8 @@ class TotalSales extends BarChartWidget
 
     protected function getData(): array
     {
-        $salesData = Trend::query(Order::whereStatus('Fulfilled'))
+        $sortBy = request()->query('sortBy');
+        $salesData = Trend::query(Order::whereStatus('fulfilled'))
             ->between(
                 start: now()->startOfYear(),
                 end: now()->endOfYear(),
@@ -33,7 +34,7 @@ class TotalSales extends BarChartWidget
                 ],
 
             ],
-            'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            'labels' => [$sortBy, 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         ];
     }
 }

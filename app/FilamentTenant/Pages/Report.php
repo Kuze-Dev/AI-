@@ -16,6 +16,12 @@ class Report extends Page
 
     protected static string $view = 'filament.pages.Report';
 
+    public $sortBy = 'monthly';
+
+    protected $queryString = [
+        'sortBy',
+    ];
+
     protected function getWidgets(): array
     {
         return [
@@ -31,7 +37,6 @@ class Report extends Page
             Widgets\ListSoldProduct::class,
             Widgets\TotalOrder::class,
             Widgets\AverageOrderValue::class,
-            Widgets\MostOrderByCustomer::class,
             Widgets\MostFavoriteProduct::class,
         ];
     }

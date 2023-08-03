@@ -13,7 +13,7 @@ class TotalOrder extends Widget
 
     public array $widgetData = [];
 
-    public array $status = ['Pending', 'Cancelled', 'Packed', 'Delivered', 'Shipped', 'Refunded',  'Fulfilled'];
+    public array $status = ['pending', 'cancelled', 'packed', 'delivered', 'shipped', 'refunded',  'fulfilled'];
 
     protected function getViewData(): array
     {
