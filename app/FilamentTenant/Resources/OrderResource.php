@@ -656,14 +656,14 @@ class OrderResource extends Resource
     {
         return Support\ButtonAction::make('proof_of_payment')
             ->disableLabel()
-            ->execute(function (Order $record) {
+            ->execute(function (Order $record, Closure $set) {
                 $order = $record->load('payments');
 
                 return Forms\Components\Actions\Action::make('proof_of_payment')
                     ->color('secondary')
                     ->label(trans('View Proof of payment'))
                     ->size('sm')
-                    ->action(function (array $data) use ($order) {
+                    ->action(function (array $data) use ($order, $set) {
                         // TODO update message and approval here
                         $paymentRemarks = $data['payment_remarks'];
                         $message = $data['message'];
@@ -687,6 +687,12 @@ class OrderResource extends Resource
                                 $payment->update([
                                     'status' => 'paid',
                                 ]);
+
+                                $order->update([
+                                    'status' => OrderStatuses::PROCESSING,
+                                ]);
+
+                                $set('status', ucfirst(OrderStatuses::PROCESSING->value));
                             }
 
                             Notification::make()
