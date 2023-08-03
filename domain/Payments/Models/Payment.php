@@ -36,6 +36,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $media_count
  * @property-read Model|Eloquent $payable
  * @property-read PaymentMethod|null $paymentMethod
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Payments\Models\PaymentRefund> $refunds
+ * @property-read int|null $refunds_count
  * @method static \Illuminate\Database\Eloquent\Builder|Payment newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Payment newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Payment query()

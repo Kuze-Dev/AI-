@@ -6,6 +6,7 @@ namespace Domain\Order\Listeners;
 
 use App\Notifications\Order\OrderCancelledNotification;
 use App\Notifications\Order\OrderFulfilledNotification;
+use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Events\OrderStatusUpdatedEvent;
 use Illuminate\Support\Facades\Notification;
 
@@ -24,11 +25,11 @@ class OrderStatusUpdatedListener
         $status = $event->status;
 
         switch ($status) {
-            case 'Cancelled':
+            case OrderStatuses::CANCELLED->value:
                 Notification::send($customer, new OrderCancelledNotification($order));
 
                 break;
-            case 'Fulfilled':
+            case OrderStatuses::FULFILLED->value:
                 Notification::send($customer, new OrderFulfilledNotification($order));
 
                 break;

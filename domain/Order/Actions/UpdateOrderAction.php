@@ -28,15 +28,25 @@ class UpdateOrderAction
     {
         try {
             if ($updateOrderData->status) {
-                if ($updateOrderData->status == 'Cancelled' && $order->status !== OrderStatuses::PENDING) {
+                if (
+                    $updateOrderData->status == OrderStatuses::CANCELLED->value &&
+                    ! in_array($order->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])
+                ) {
                     return "You can't cancelled this order";
+                }
+
+                if (
+                    $updateOrderData->status == OrderStatuses::FULFILLED->value &&
+                    $order->status !== OrderStatuses::DELIVERED
+                ) {
+                    return "You can't fullfilled this order";
                 }
 
                 $orderData = [
                     'status' => $updateOrderData->status,
                 ];
 
-                if ($updateOrderData->status == 'Cancelled') {
+                if ($updateOrderData->status == OrderStatuses::CANCELLED) {
                     $orderData['cancelled_reason'] = $updateOrderData->notes;
                 } else {
                     $orderData['cancelled_reason'] = null;

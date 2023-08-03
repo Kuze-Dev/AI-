@@ -142,6 +142,8 @@ class CartSummaryAction
     {
         $productlist = [];
 
+        $cm_to_inches = 1 / 2.54;
+
         if ( ! is_iterable($collections)) {
             /** @var \Domain\Product\Models\Product $product */
             $product = $collections->purchasable;
@@ -161,9 +163,9 @@ class CartSummaryAction
 
                 $productlist[] = [
                     'product_id' => (string) $purchasableId,
-                    'length' => $length,
-                    'width' => $width,
-                    'height' => $height,
+                    'length' => ceil($length * $cm_to_inches),
+                    'width' => ceil($width * $cm_to_inches),
+                    'height' => ceil($height * $cm_to_inches),
                     'weight' => (float) $weight,
                 ];
             }
@@ -186,9 +188,9 @@ class CartSummaryAction
 
                     $productlist[] = [
                         'product_id' => (string) $purchasableId,
-                        'length' => $length,
-                        'width' => $width,
-                        'height' => $height,
+                        'length' => ceil($length * $cm_to_inches),
+                        'width' => ceil($width * $cm_to_inches),
+                        'height' => ceil($height * $cm_to_inches),
                         'weight' => (float) $weight,
                     ];
                 }

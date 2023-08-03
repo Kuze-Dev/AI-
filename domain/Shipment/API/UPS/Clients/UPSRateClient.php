@@ -114,7 +114,13 @@ class UPSRateClient extends BaseClient
             ->post(self::uri())
             ->body();
 
-        return UpsResponse::fromArray(json_decode($response, true));
+        $arrayResponse = json_decode($response, true);
+
+        if ( ! isset($arrayResponse['RateResponse'])) {
+            self::throwError($arrayResponse['response'], __METHOD__.':'.__LINE__);
+        }
+
+        return UpsResponse::fromArray($arrayResponse);
     }
 
     public function getInternationalRate(
@@ -211,6 +217,12 @@ class UPSRateClient extends BaseClient
             ->post(self::uri())
             ->body();
 
-        return UpsResponse::fromArray(json_decode($response, true));
+        $arrayResponse = json_decode($response, true);
+
+        if ( ! isset($arrayResponse['RateResponse'])) {
+            self::throwError($arrayResponse['response'], __METHOD__.':'.__LINE__);
+        }
+
+        return UpsResponse::fromArray($arrayResponse);
     }
 }
