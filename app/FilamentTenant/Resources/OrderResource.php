@@ -495,6 +495,7 @@ class OrderResource extends Resource
                         Forms\Components\Select::make('status_options')
                             ->label('')
                             ->options([
+                                OrderStatuses::PROCESSING->value => trans('Processing'),
                                 OrderStatuses::PENDING->value => trans('Pending'),
                                 OrderStatuses::CANCELLED->value => trans('Cancelled'),
                                 OrderStatuses::REFUNDED->value => trans('Refunded'),
@@ -502,6 +503,7 @@ class OrderResource extends Resource
                                 OrderStatuses::SHIPPED->value => trans('Shipped'),
                                 OrderStatuses::DELIVERED->value => trans('Delivered'),
                                 OrderStatuses::FULFILLED->value => trans('Fulfilled'),
+                                OrderStatuses::FORPAYMENT->value => trans('For Payment'),
                             ])
                             ->disablePlaceholderSelection()
                             ->formatStateUsing(function () use ($record) {
