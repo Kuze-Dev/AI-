@@ -38,6 +38,7 @@ class OrderPaymentUpdatedListener
     {
         $order->update([
             'is_paid' => true,
+            'status' => OrderStatuses::PROCESSING,
         ]);
     }
 

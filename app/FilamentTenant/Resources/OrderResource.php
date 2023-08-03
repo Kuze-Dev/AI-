@@ -40,7 +40,7 @@ class OrderResource extends Resource
     protected static function getNavigationBadge(): ?string
     {
         /** @phpstan-ignore-next-line https://filamentphp.com/docs/2.x/admin/navigation#navigation-item-badges */
-        return strval(static::$model::where('status', OrderStatuses::PENDING)->count());
+        return strval(static::$model::whereIn('status', [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])->count());
     }
 
     public static function form(Form $form): Form
@@ -243,6 +243,10 @@ class OrderResource extends Resource
                 Tables\Columns\BadgeColumn::make('status')
                     ->label(trans('Status'))
                     ->formatStateUsing(function ($state) {
+                        if ($state == OrderStatuses::FORPAYMENT->value) {
+                            return 'For Payment';
+                        }
+
                         return ucfirst($state);
                     })
                     ->sortable(),
@@ -281,6 +285,7 @@ class OrderResource extends Resource
                     }),
                 Tables\Filters\SelectFilter::make('status')->label(trans('Status'))
                     ->options([
+                        OrderStatuses::PROCESSING->value => trans('Processing'),
                         OrderStatuses::PENDING->value => trans('Pending'),
                         OrderStatuses::CANCELLED->value => trans('Cancelled'),
                         OrderStatuses::REFUNDED->value => trans('Refunded'),
@@ -290,21 +295,6 @@ class OrderResource extends Resource
                         OrderStatuses::FULFILLED->value => trans('Fulfilled'),
                         OrderStatuses::FORPAYMENT->value => trans('For Payment'),
                     ])
-                    ->query(function (Builder $query, array $data) {
-                        $query->when(filled($data['value']), function (Builder $query) use ($data) {
-                            $isForPayment = $data['value'] == OrderStatuses::FORPAYMENT->value;
-
-                            if ($isForPayment) {
-                                return $query->whereHas('payments', function ($subQuery) {
-                                    $subQuery->where(function ($query) {
-                                        $query->whereIn('gateway', ['paypal', 'bank-transfer', 'stripe']);
-                                    })->where('status', 'pending');
-                                })->where('is_paid', false);
-                            }
-
-                            return $query->where('status', $data['value']);
-                        });
-                    })
                     ->attribute('status'),
             ])
             ->bulkActions([
@@ -349,7 +339,12 @@ class OrderResource extends Resource
                 Forms\Components\Grid::make(2)
                     ->schema([
                         Support\BadgeLabel::make(trans('status'))
-                            ->formatStateUsing(fn (string $state): string => ucfirst($state))
+                            ->formatStateUsing(function (string $state): string {
+                                if ($state == OrderStatuses::FORPAYMENT->value) {
+                                    return trans("For Payment");
+                                }
+                                return trans(ucfirst($state));
+                            })
                             ->inline()
                             ->alignLeft(),
                         self::summaryEditButton(),
@@ -500,6 +495,7 @@ class OrderResource extends Resource
                         Forms\Components\Select::make('status_options')
                             ->label('')
                             ->options([
+                                OrderStatuses::PROCESSING->value => trans('Processing'),
                                 OrderStatuses::PENDING->value => trans('Pending'),
                                 OrderStatuses::CANCELLED->value => trans('Cancelled'),
                                 OrderStatuses::REFUNDED->value => trans('Refunded'),
@@ -507,6 +503,7 @@ class OrderResource extends Resource
                                 OrderStatuses::SHIPPED->value => trans('Shipped'),
                                 OrderStatuses::DELIVERED->value => trans('Delivered'),
                                 OrderStatuses::FULFILLED->value => trans('Fulfilled'),
+                                OrderStatuses::FORPAYMENT->value => trans('For Payment'),
                             ])
                             ->disablePlaceholderSelection()
                             ->formatStateUsing(function () use ($record) {

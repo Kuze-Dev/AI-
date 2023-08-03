@@ -40,6 +40,9 @@ class CreateOrderAction
             $placeOrderData->serviceId
         );
 
+        $paymentMethod = $preparedOrderData->paymentMethod->gateway == 'manual'
+            ? OrderStatuses::PENDING : OrderStatuses::FORPAYMENT;
+
         $order = Order::create([
             'customer_id' => $preparedOrderData->customer->id,
             'customer_first_name' => $preparedOrderData->customer->first_name,
@@ -67,7 +70,7 @@ class CreateOrderAction
             'total' => $summary->grandTotal,
 
             'notes' => $preparedOrderData->notes,
-            'status' => OrderStatuses::PENDING,
+            'status' => $paymentMethod,
             'is_paid' => false,
         ]);
 
