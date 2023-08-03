@@ -9,6 +9,7 @@ use Domain\Blueprint\DataTransferObjects\DatetimeFieldData;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\FileFieldData;
 use Domain\Blueprint\DataTransferObjects\MarkdownFieldData;
+use Domain\Blueprint\DataTransferObjects\MediaFieldData;
 use Domain\Blueprint\DataTransferObjects\RelatedResourceFieldData;
 use Domain\Blueprint\DataTransferObjects\RepeaterFieldData;
 use Domain\Blueprint\DataTransferObjects\RichtextFieldData;
@@ -166,6 +167,38 @@ class SchemaFormBuilder extends Component
         }
 
         return $fileUpload;
+    }
+
+    private function makeMediaComponent(MediaFieldData $mediaFieldData): FileUpload
+    {
+        $media = FileUpload::make($mediaFieldData->state_name);
+
+        if ($mediaFieldData->multiple) {
+            $media->multiple($mediaFieldData->multiple)
+                ->appendFiles()
+                ->minFiles($mediaFieldData->min_files)
+                ->maxFiles($mediaFieldData->max_files)
+                ->panelLayout('grid')
+                ->imagePreviewHeight('256');
+        }
+
+        if ($mediaFieldData->reorder) {
+            $media->enableReordering($mediaFieldData->reorder);
+        }
+
+        if ( ! empty($mediaFieldData->accept)) {
+            $media->acceptedFileTypes($mediaFieldData->accept);
+        }
+
+        if ($mediaFieldData->min_size) {
+            $media->minSize($mediaFieldData->min_size);
+        }
+
+        if ($mediaFieldData->max_size) {
+            $media->maxSize($mediaFieldData->max_size);
+        }
+
+        return $media;
     }
 
     private function makeTextAreaComponent(TextareaFieldData $textareaFieldData): Textarea

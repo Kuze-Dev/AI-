@@ -8,6 +8,6 @@ enum ManipulationType: string
 {
     case WIDTH = 'width';
     case HEIGHT = 'height';
-    case FIT = 'fit';
-    case CROP = 'crop';
+    // case FIT = 'fit';
+    // case CROP = 'crop';
 }

@@ -12,6 +12,7 @@ use Domain\Blueprint\Actions\DeleteBlueprintAction;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\SectionData;
 use Domain\Blueprint\Enums\FieldType;
+use Domain\Blueprint\Enums\ManipulationType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
 use Domain\Blueprint\Models\Blueprint;
@@ -448,8 +449,9 @@ class BlueprintResource extends Resource
                 self::getFieldsSchema()
                     ->columnSpanFull(),
             ],
-            FieldType::MEDIA => [Forms\Components\Toggle::make('multiple')
-                ->reactive(),
+            FieldType::MEDIA => [
+                Forms\Components\Toggle::make('multiple')
+                    ->reactive(),
                 Forms\Components\Toggle::make('reorder'),
                 Forms\Components\TextInput::make('accept')
                     ->afterStateHydrated(function (Closure $set, ?array $state): void {
@@ -485,6 +487,23 @@ class BlueprintResource extends Resource
                     ->integer()
                     ->when(fn (Closure $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\Repeater::make('conversions')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')->required(),
+                        Forms\Components\Fieldset::make('Manipulations')
+                            ->schema([
+                                Forms\Components\TextInput::make(ManipulationType::WIDTH->value)
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->required(),
+                                Forms\Components\TextInput::make(ManipulationType::HEIGHT->value)
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->required(),
+                            ])
+                            ->columns(2),
+                    ])
+                    ->columnSpanFull(),
             ],
             default => [],
         };
