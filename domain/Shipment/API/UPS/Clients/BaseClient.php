@@ -14,17 +14,17 @@ abstract class BaseClient
     ) {
     }
 
-    // abstract public static function uri(): string;
+    abstract public static function uri(): string;
 
-    // protected static function throwError(array $array, string $methodCall): void
-    // {
-    //     if (isset($array['Error'])) {
-    //         Log::error('Error on '.$methodCall, $array);
-    //         if (app()->isLocal()) {
-    //             throw new Exception($methodCall.': '.json_encode($array));
-    //         } else {
-    //             abort(422, 'Something wrong.');
-    //         }
-    //     }
-    // }
+    protected static function throwError(array $array, string $methodCall): void
+    {
+        if (isset($array['errors'])) {
+            Log::error('Error on '.$methodCall, $array);
+            if (app()->isLocal()) {
+                throw new Exception($methodCall.': '.json_encode($array));
+            } else {
+                abort(422, 'Something wrong. ('.json_encode($array).')');
+            }
+        }
+    }
 }
