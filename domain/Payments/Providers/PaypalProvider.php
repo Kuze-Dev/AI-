@@ -74,7 +74,7 @@ class PaypalProvider extends Provider
                         [
                             'paymentmethod' => $providerData->payment_method_id,
                             'transactionId' => $providerData->paymentModel->id,
-                            'status' => 'cancel',  ]
+                            'status' => 'cancelled',  ]
                     ),
 
                 ],
@@ -124,7 +124,7 @@ class PaypalProvider extends Provider
     {
         return match ($data['status']) {
             'success' => $this->processTransaction($paymentModel, $data),
-            'cancel' => $this->cancelTransaction($paymentModel),
+            'cancelled' => $this->cancelTransaction($paymentModel),
             default => throw new InvalidArgument(),
         };
     }
@@ -149,14 +149,14 @@ class PaypalProvider extends Provider
     {
 
         $paymentModel->update([
-            'status' => PaymentStatus::CANCEL->value,
+            'status' => PaymentStatus::CANCELLED->value,
         ]);
 
         event(new PaymentProcessEvent($paymentModel));
 
         return new PaymentCapture(
             success: false,
-            message: 'The request for payment has been canceled.'
+            message: 'The request for payment has been cancelled.'
         );
 
     }
