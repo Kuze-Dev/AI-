@@ -33,13 +33,10 @@ class OrderResource extends JsonApiResource
     /** @return array<string, callable> */
     public function toRelationships(Request $request): array
     {
-
-        /** @var \Domain\Payments\Models\Payment $payment */
-        $payment = $this->payments->first();
-
         return [
             'orderLines' => fn () => OrderLineResource::collection($this->orderLines),
-            'payments' => fn () => PaymentOrderResource::make($payment),
+            /** @phpstan-ignore-next-line */
+            'payments' => fn () => PaymentOrderResource::make($this->payments->first()),
         ];
     }
 }
