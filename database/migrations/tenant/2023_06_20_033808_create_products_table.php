@@ -47,7 +47,7 @@ return new class () extends Migration {
             $table->decimal('retail_price', 10, 2);
             $table->decimal('selling_price', 10, 2);
             $table->unsignedInteger('stock');
-            $table->string('status')->default(true);
+            $table->boolean('status')->default(true);
             $table->timestamps();
         });
 
