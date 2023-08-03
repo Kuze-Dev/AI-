@@ -59,6 +59,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read Customer|null $customer
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
+ * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Order\Models\OrderLine> $orderLines
  * @property-read int|null $order_lines_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Payments\Models\Payment> $payments
@@ -125,8 +127,6 @@ class Order extends Model implements HasMedia, PayableInterface
         'shipping_total',
         'total',
         'notes',
-        'shipping_method',
-        'shipping_details',
         'is_paid',
         'status',
         'cancelled_reason',
@@ -195,12 +195,15 @@ class Order extends Model implements HasMedia, PayableInterface
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return \Illuminate\Database\Eloquent\Builder<\Domain\Order\Models\Order> */
+    /**
+     * @param \Illuminate\Database\Eloquent\Builder<\Domain\Order\Models\Order> $query
+     * @return \Illuminate\Database\Eloquent\Builder<\Domain\Order\Models\Order>
+     */
     public function scopeWhereHasForPayment(Builder $query): Builder
     {
         return $query->whereHas('payments', function (Builder $subQuery) {
             $subQuery->where(function (Builder $query) {
-                $query->whereIn('gateway', ['paypal', 'bank-transfer']);
+                $query->whereIn('gateway', ['paypal', 'bank-transfer', 'stripe']);
             })->where('status', 'pending');
         })->where('is_paid', false);
     }

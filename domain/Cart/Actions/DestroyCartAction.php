@@ -10,6 +10,6 @@ class DestroyCartAction
 {
     public function execute(Cart $cart): bool
     {
-        return $cart->delete();
+        return (bool) $cart->delete();
     }
 }

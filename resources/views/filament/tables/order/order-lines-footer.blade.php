@@ -1,6 +1,6 @@
 <tr class="filament-tables-row">
     <td colspan="4" class="px-4 py-3 filament-tables-text-column">
-        Total:
+        {{ trans('Total:') }}
     </td>
 
     <td class="filament-tables-cell">

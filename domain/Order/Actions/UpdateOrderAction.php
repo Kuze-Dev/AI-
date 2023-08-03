@@ -28,7 +28,7 @@ class UpdateOrderAction
     {
         try {
             if ($updateOrderData->status) {
-                if ($updateOrderData->status == 'Cancelled' && $order->status !== OrderStatuses::PENDING) {
+                if ($updateOrderData->status ==  OrderStatuses::CANCELLED && $order->status !== OrderStatuses::PENDING) {
                     return "You can't cancelled this order";
                 }
 
@@ -36,7 +36,7 @@ class UpdateOrderAction
                     'status' => $updateOrderData->status,
                 ];
 
-                if ($updateOrderData->status == 'Cancelled') {
+                if ($updateOrderData->status == OrderStatuses::CANCELLED) {
                     $orderData['cancelled_reason'] = $updateOrderData->notes;
                 } else {
                     $orderData['cancelled_reason'] = null;
@@ -44,6 +44,7 @@ class UpdateOrderAction
 
                 $order->update($orderData);
 
+                /** @var \Domain\Customer\Models\Customer $customer */
                 $customer = auth()->user();
 
                 event(new OrderStatusUpdatedEvent(
@@ -53,24 +54,22 @@ class UpdateOrderAction
                 ));
             }
 
-            if ($updateOrderData->type == 'bank-transfer') {
-                if ($updateOrderData->proof_of_payment !== null) {
-                    $orderPayment = Order::with('payments')->find($order->id);
+            if ($updateOrderData->type == 'bank-transfer' && $updateOrderData->proof_of_payment !== null) {
+                $orderPayment = Order::with('payments')->find($order->id);
 
-                    $image = $this->convertUrlToUploadedFile($updateOrderData->proof_of_payment);
+                $image = $this->convertUrlToUploadedFile($updateOrderData->proof_of_payment);
 
-                    if ($image instanceof UploadedFile) {
-                        if ( ! empty($orderPayment->payments) && ! empty($orderPayment->payments->first())) {
-                            app(UploadProofofPaymentAction::class)->execute(
-                                $orderPayment->payments->first(),
-                                new ProofOfPaymentData(
-                                    $image
-                                )
-                            );
-                        }
-                    } else {
-                        return 'Invalid media';
+                if ($image instanceof UploadedFile) {
+                    if (!empty($orderPayment->payments) && !empty($orderPayment->payments->first())) {
+                        app(UploadProofofPaymentAction::class)->execute(
+                            $orderPayment->payments->first(),
+                            new ProofOfPaymentData(
+                                $image
+                            )
+                        );
                     }
+                } else {
+                    return 'Invalid media';
                 }
             } else {
                 if ($updateOrderData->type != 'status') {
@@ -78,8 +77,8 @@ class UpdateOrderAction
                         $query->where('payable_id', $order->id);
                     })->whereNot('status', 'paid')->first();
 
-                    if ( ! $payment) {
-                        return 'Your order already paid';
+                    if (!$payment) {
+                        return 'Your order is already paid';
                     }
 
                     $providerData = new CreatepaymentData(
@@ -122,17 +121,19 @@ class UpdateOrderAction
     {
         $fileContent = file_get_contents($url);
 
-        $tempFilePath = tempnam(sys_get_temp_dir(), 'upload');
+        $tempFilePath = (string) tempnam(sys_get_temp_dir(), 'upload');
 
         if ($tempFilePath) {
 
             file_put_contents($tempFilePath, $fileContent);
 
+            $mimeType = mime_content_type($tempFilePath) ?: 'application/octet-stream';
+
             // Create an instance of UploadedFile using the temporary file
             $uploadedFile = new UploadedFile(
                 $tempFilePath,
                 basename($url),
-                mime_content_type($tempFilePath),
+                $mimeType,
                 null,
                 true
             );

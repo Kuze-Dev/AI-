@@ -11,8 +11,8 @@ class ProductVariantOrderData
     public function __construct(
         public readonly string $sku,
         public readonly array $combination,
-        public readonly string $retail_price,
-        public readonly string $selling_price,
+        public readonly float|string $retail_price,
+        public readonly float|string $selling_price,
         public readonly int $stock,
         public readonly string $status,
         public readonly ProductOrderData $product
@@ -50,14 +50,17 @@ class ProductVariantOrderData
             );
         }
 
+        /** @var \Domain\Product\Models\Product $product */
+        $product = $productVariant->product;
+
         return new self(
             sku: $productVariant->sku,
-            combination: [],
+            combination: $combinations,
             retail_price: $productVariant->retail_price,
             selling_price: $productVariant->selling_price,
             stock: $productVariant->stock,
             status: $productVariant->status,
-            product: ProductOrderData::fromProduct($productVariant->product),
+            product: ProductOrderData::fromProduct($product),
         );
     }
 }

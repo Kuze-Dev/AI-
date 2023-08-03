@@ -30,6 +30,8 @@ class OrderPlacedMail extends Notification implements ShouldQueue
     public function __construct(Order $order, Address $shippingAddress, ShippingMethod $shippingMethod)
     {
         $this->order = $order;
+
+        /** @var \Domain\Address\Models\Address $shippingAddress */
         $this->shippingAddress = $shippingAddress;
         $this->shippingMethod = $shippingMethod;
 
@@ -53,11 +55,14 @@ class OrderPlacedMail extends Notification implements ShouldQueue
     {
         $admin = Admin::first();
 
+        $this->shippingAddress->load('state.country');
+
         $address = Arr::join(
             array_filter([
                 $this->shippingAddress->address_line_1,
-                $this->shippingAddress->state->country->name,
-                $this->shippingAddress->state->name,
+                $this->shippingAddress->state && $this->shippingAddress->state->country ?
+                    $this->shippingAddress->state->country->name : null,
+                $this->shippingAddress->state ? $this->shippingAddress->state->name : null,
                 $this->shippingAddress->zip_code,
                 $this->shippingAddress->city,
             ]),
@@ -75,7 +80,8 @@ class OrderPlacedMail extends Notification implements ShouldQueue
                 'order' => $this->order,
                 'customer' => $notifiable,
                 'address' => $address,
-                'paymentMethod' => $this->order->payments->first()->paymentMethod,
+                'paymentMethod' => $this->order->payments->first() ?
+                    $this->order->payments->first()->paymentMethod : null,
                 'shippingMethod' => $this->shippingMethod,
             ]);
     }

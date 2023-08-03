@@ -10,6 +10,7 @@ use App\Notifications\Order\OrderFulfilledNotification;
 use App\Notifications\Order\OrderPackedNotification;
 use App\Notifications\Order\OrderRefundedNotification;
 use App\Notifications\Order\OrderShippedNotification;
+use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
 use Domain\Order\Notifications\AdminOrderStatusUpdatedMail;
 use Illuminate\Support\Facades\Notification;
@@ -28,34 +29,35 @@ class AdminOrderStatusUpdatedListener
         $order = $event->order;
 
         switch ($event->status) {
-            case 'Cancelled':
+            case OrderStatuses::CANCELLED->value:
                 Notification::send($customer, new OrderCancelledNotification($order));
 
                 break;
-            case 'Refunded':
+            case OrderStatuses::REFUNDED->value:
                 Notification::send($customer, new OrderRefundedNotification($order));
 
                 break;
-            case 'Packed':
+            case OrderStatuses::PACKED->value:
                 Notification::send($customer, new OrderPackedNotification($order));
 
                 break;
-            case 'Shipped':
+            case OrderStatuses::SHIPPED->value:
                 Notification::send($customer, new OrderShippedNotification($order));
 
                 break;
-            case 'Delivered':
+            case OrderStatuses::DELIVERED->value:
                 Notification::send($customer, new OrderDeliveredNotification($order));
 
                 break;
-            case 'Fulfilled':
+            case OrderStatuses::FULFILLED->value:
                 Notification::send($customer, new OrderFulfilledNotification($order));
 
                 break;
         }
 
-        if ($event->shouldSendEmail) {
-            $customer->notify(new AdminOrderStatusUpdatedMail($order, $event->status, $event->emailRemarks));
-        }
+        // //comment when the env and mail is not set
+        // if ($event->shouldSendEmail) {
+        //     $customer->notify(new AdminOrderStatusUpdatedMail($order, $event->status, $event->emailRemarks));
+        // }
     }
 }

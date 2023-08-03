@@ -11,21 +11,37 @@ class CartLinePolicy
 {
     public function view(Customer $customer, CartLine $cartLine): bool
     {
-        return $cartLine->cart->customer->is($customer);
+        if ($cartLine->cart && $cartLine->cart->customer) {
+            return $cartLine->cart->customer->is($customer);
+        }
+
+        return false;
     }
 
     public function create(Customer $customer, CartLine $cartLine): bool
     {
-        return $cartLine->cart->customer->is($customer);
+        if ($cartLine->cart && $cartLine->cart->customer) {
+            return $cartLine->cart->customer->is($customer);
+        }
+
+        return false;
     }
 
     public function update(Customer $customer, CartLine $cartLine): bool
     {
-        return $cartLine->cart->customer->is($customer);
+        if ($cartLine->cart && $cartLine->cart->customer) {
+            return $cartLine->cart->customer->is($customer);
+        }
+
+        return false;
     }
 
     public function delete(Customer $customer, CartLine $cartLine): bool
     {
-        return $cartLine->cart->customer->is($customer);
+        if ($cartLine->cart && $cartLine->cart->customer) {
+            return $cartLine->cart->customer->is($customer);
+        }
+
+        return false;
     }
 }
