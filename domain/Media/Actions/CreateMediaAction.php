@@ -9,10 +9,11 @@ use Exception;
 use Log;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
+use Spatie\MediaLibrary\HasMedia;
 
 class CreateMediaAction
 {
-    public function execute(Model $model, array $medias, string $collection, bool $isCreate = true): void
+    public function execute(Model&HasMedia $model, array $medias, string $collection, bool $isCreate = true): void
     {
         if ($isCreate) {
             /** Clears unexpected media even before upload */

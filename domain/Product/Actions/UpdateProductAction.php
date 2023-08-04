@@ -39,9 +39,7 @@ class UpdateProductAction
             $this->createMediaAction->execute($product, Arr::wrap($productData->images), 'image', false);
         }
 
-        if (filled($productData->videos)) {
-            $this->createMediaAction->execute($product, Arr::wrap($productData->videos), 'video', false);
-        }
+        $this->createMediaAction->execute($product, Arr::wrap($productData->videos), 'video', false);
 
         $product->taxonomyTerms()->sync($productData->taxonomy_terms);
 
