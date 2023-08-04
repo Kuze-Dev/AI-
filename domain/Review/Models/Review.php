@@ -64,6 +64,7 @@ class Review extends Model implements HasMedia
     ];
 
     protected $casts = [
+        'data' => 'array',
         'is_anonymous' => 'bool',
     ];
 
