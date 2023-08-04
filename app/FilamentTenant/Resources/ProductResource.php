@@ -67,7 +67,7 @@ class ProductResource extends Resource
                                 ->acceptedFileTypes([
                                     'video/*',
                                 ])
-                                ->maxSize(50000),
+                                ->maxSize(25000),
                         ]),
 
                     Forms\Components\Section::make('Customer Remarks')
