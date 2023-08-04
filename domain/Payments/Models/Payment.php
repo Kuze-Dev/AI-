@@ -25,7 +25,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $amount
  * @property string $status
  * @property string|null $remarks
- * @property string|null $message
+ * @property string|null $customer_message
+ * @property string|null $admin_message
  * @property string|null $payment_id
  * @property string|null $transaction_id
  * @property array $payment_details
@@ -74,7 +75,8 @@ class Payment extends Model implements HasMedia
         'amount',
         'status',
         'remarks',
-        'message',
+        'customer_message',
+        'admin_message',
         'payment_id',
         'transaction_id',
         'payment_details',

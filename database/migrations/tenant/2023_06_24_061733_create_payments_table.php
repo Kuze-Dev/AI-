@@ -23,7 +23,8 @@ return new class () extends Migration {
             $table->string('amount');
             $table->string('status');
             $table->string('remarks')->nullable();
-            $table->longText('message')->nullable();
+            $table->longText('customer_message')->nullable();
+            $table->longText('admin_message')->nullable();
             $table->string('payment_id')->nullable();
             $table->string('transaction_id')->nullable();
 
