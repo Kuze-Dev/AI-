@@ -47,10 +47,11 @@ class CartController extends Controller
                 if (is_null($cartLine->purchasable)) {
                     $cartLineIdsTobeRemoved[] = $cartLine->uuid;
                 }
-                return !is_null($cartLine->purchasable);
+
+                return ! is_null($cartLine->purchasable);
             });
 
-            if (!is_null($cartLineIdsTobeRemoved)) {
+            if ( ! is_null($cartLineIdsTobeRemoved)) {
                 app(BulkDestroyCartLineAction::class)
                     ->execute($cartLineIdsTobeRemoved);
             }
@@ -73,7 +74,7 @@ class CartController extends Controller
         $result = app(DestroyCartAction::class)
             ->execute($cart);
 
-        if (!$result) {
+        if ( ! $result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

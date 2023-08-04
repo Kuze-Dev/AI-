@@ -86,10 +86,10 @@ class CartSummaryController extends Controller
                 'amount' => $summary->discountMessages->amount ?? null,
                 'discount_type' => $summary->discountMessages->discount_type ?? null,
                 'total_savings' => $discount ? round($summary->discountTotal ?? 0, 2) : 0,
-            ]
+            ],
         ];
 
-        if (!$discountCode) {
+        if ( ! $discountCode) {
             unset($responseArray['discount']);
         }
 

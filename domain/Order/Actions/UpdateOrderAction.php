@@ -30,7 +30,7 @@ class UpdateOrderAction
             if ($updateOrderData->status) {
                 if (
                     $updateOrderData->status == OrderStatuses::CANCELLED->value &&
-                    !in_array($order->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])
+                    ! in_array($order->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])
                 ) {
                     return "You can't cancelled this order";
                 }
@@ -75,9 +75,17 @@ class UpdateOrderAction
 
                 if ($image instanceof UploadedFile) {
                     if (
-                        !empty($orderPayment->payments) &&
+                        ! empty($orderPayment->payments) &&
                         $payment->gateway == 'bank-transfer'
                     ) {
+                        $order->update([
+                            'status' => OrderStatuses::FORAPPROVAL,
+                        ]);
+
+                        $payment->update([
+                            'customer_message' => $updateOrderData->notes,
+                        ]);
+
                         app(UploadProofofPaymentAction::class)->execute(
                             $payment,
                             new ProofOfPaymentData(
@@ -96,7 +104,7 @@ class UpdateOrderAction
                         $query->where('payable_id', $order->id);
                     })->whereNot('status', 'paid')->first();
 
-                    if (!$payment) {
+                    if ( ! $payment) {
                         return 'Your order is already paid';
                     }
 

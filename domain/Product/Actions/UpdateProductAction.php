@@ -7,7 +7,6 @@ namespace Domain\Product\Actions;
 use Domain\Media\Actions\CreateMediaAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
-use Illuminate\Http\UploadedFile;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\MetaData\Actions\UpdateMetaDataAction;
 use Illuminate\Support\Arr;

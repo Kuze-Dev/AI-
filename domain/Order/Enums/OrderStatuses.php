@@ -15,4 +15,5 @@ enum OrderStatuses: string
     case DELIVERED = 'delivered';
     case FULFILLED = 'fulfilled';
     case FORPAYMENT = 'for_payment';
+    case FORAPPROVAL = 'for_approval';
 }
