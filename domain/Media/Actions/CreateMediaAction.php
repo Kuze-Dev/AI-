@@ -42,6 +42,11 @@ class CreateMediaAction
             }
         }
 
+        if ( ! $isCreate) {
+            $excludedMedia = $model->getMedia($collection)->whereIn('uuid', $medias);
+            $model->clearMediaCollectionExcept($collection, $excludedMedia);
+        }
+
         if ( ! filled($medias)) {
             $model->clearMediaCollection($collection);
         }

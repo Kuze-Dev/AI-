@@ -10,6 +10,8 @@ use Domain\Auth\Contracts\HasEmailVerificationOTP;
 use Domain\Auth\EmailVerificationOTP;
 use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
+use Domain\Customer\Notifications\ResetPassword;
+use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Customer\Enums\Status;
 use Domain\Discount\Models\DiscountLimit;
@@ -36,18 +38,19 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * Domain\Customer\Models\Customer
  *
  * @property int $id
- * @property int $tier_id
+ * @property int|null $tier_id
  * @property string $cuid customer unique ID
  * @property string $email
  * @property mixed|null $password
  * @property string $first_name
  * @property string $last_name
- * @property string $mobile
- * @property Gender $gender
- * @property Status $status
+ * @property string|null $mobile
+ * @property Gender|null $gender
+ * @property Status|null $status
+ * @property RegisterStatus $register_status
  * @property string|null $remember_token
- * @property \Illuminate\Support\Carbon $birth_date
- * @property EmailVerificationType $email_verification_type
+ * @property \Illuminate\Support\Carbon|null $birth_date
+ * @property EmailVerificationType|null $email_verification_type
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -58,9 +61,9 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property-read int|null $addresses_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, DiscountLimit> $discountLimits
  * @property-read int|null $discount_limits_count
+ * @property-read \Domain\Auth\Model\EmailVerificationOneTimePassword|null $emailVerificationOneTimePassword
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Favorite> $favorites
  * @property-read int|null $favorites_count
- * @property-read \Domain\Auth\Model\EmailVerificationOneTimePassword|null $emailVerificationOneTimePassword
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
@@ -86,6 +89,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereLastName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereMobile($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Customer whereRegisterStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereTierId($value)
@@ -115,6 +119,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
         'mobile',
         'gender',
         'status',
+        'register_status',
         'birth_date',
         'email_verification_type',
     ];
@@ -129,6 +134,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
         'status' => Status::class,
         'gender' => Gender::class,
         'email_verification_type' => EmailVerificationType::class,
+        'register_status' => RegisterStatus::class,
         'email_verified_at' => 'datetime',
     ];
 
@@ -177,6 +183,11 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new VerifyEmail());
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPassword($token));
     }
 
     public function favorites(): HasMany

@@ -31,4 +31,16 @@ class MarkNotificationAsReadController
                 'message' => 'Successfully read notification!',
             ]);
     }
+
+    #[Patch('/mark-all-as-read')]
+    public function markAllAsRead(): JsonResponse
+    {
+        app(MarkAsReadNotificationAction::class)
+            ->markAllAsRead(Auth::user());
+
+        return response()
+            ->json([
+                'message' => 'All notifications marked as read!',
+            ]);
+    }
 }

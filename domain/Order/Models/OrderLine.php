@@ -35,9 +35,9 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property float $total
  * @property array|null $remarks_data
  * @property array|null $purchasable_data
+ * @property \Illuminate\Support\Carbon|null $reviewed_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $reviewed_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
@@ -60,6 +60,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine wherePurchasableType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereQuantity($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereRemarksData($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereReviewedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereSubTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereTaxDisplay($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereTaxPercentage($value)

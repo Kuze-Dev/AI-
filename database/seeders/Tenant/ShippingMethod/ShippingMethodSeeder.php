@@ -82,7 +82,7 @@ class ShippingMethodSeeder extends Seeder
                 AddressFactory::new([
                     'address_line_1' => '185 Berry Street',
                     'city' => 'San Francisco',
-                    'zip_code' => '4545',
+                    'zip_code' => '94107',
                 ])
                     ->defaultShipping()
                     ->defaultBilling()

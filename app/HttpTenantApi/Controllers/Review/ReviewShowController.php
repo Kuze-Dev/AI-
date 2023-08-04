@@ -26,7 +26,7 @@ class ReviewShowController
                 ->allowedIncludes([
                     'product',
                     'customer.media',
-                    'media'
+                    'media',
                 ])
                 ->get()
         );

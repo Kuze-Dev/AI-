@@ -15,7 +15,6 @@ class OrderResource extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         return [
-            // 'id' => $this->id,
             'reference' => $this->reference,
             'status' => $this->status,
             'created_at' => $this->created_at?->format('F d, Y H:i:s'),
@@ -25,20 +24,22 @@ class OrderResource extends JsonApiResource
             'shipping_total' => $this->shipping_total,
             'total' => $this->total,
             'notes' => $this->notes,
-            'shipping_method' => $this->shipping_method,
-            'shipping_details' => $this->shipping_details,
             'is_paid' => $this->is_paid,
-            'status' => $this->status,
             'shipping_address' => $this->shippingAddress,
             'billing_address' => $this->billingAddress,
         ];
     }
 
+    /** @return array<string, callable> */
     public function toRelationships(Request $request): array
     {
+
+        /** @var \Domain\Payments\Models\Payment $payment */
+        $payment = $this->payments->first();
+
         return [
             'orderLines' => fn () => OrderLineResource::collection($this->orderLines),
-            'payments' => fn () => PaymentMethodOrderResource::make($this->payments->first()->paymentMethod),
+            'payments' => fn () => PaymentOrderResource::make($payment),
         ];
     }
 }

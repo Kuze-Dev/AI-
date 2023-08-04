@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use Domain\Cart\Database\Factories\CartFactory;
+use Domain\Cart\Database\Factories\CartLineFactory;
 use Domain\Customer\Database\Factories\CustomerFactory;
+use Illuminate\Testing\Fluent\AssertableJson;
 
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
@@ -25,37 +27,59 @@ beforeEach(function () {
     return compact('cart');
 });
 
-it('can show customer cart', function () {
-    // getJson('api/carts')
-    //     ->assertValid()
-    //     ->assertJson([
-    //         'data' => [
-    //             'id' => (string) $this->cart->id,
-    //             'type' => 'carts',
-    //             'attributes' => [
-    //                 'id' => $this->cart->id,
-    //                 'coupon_code' => null,
-    //             ],
-    //             'relationships' => [
-    //                 'cartLines' => [
-    //                     'data' => [],
-    //                     'meta' => [],
-    //                     'links' => [],
-    //                 ],
-    //             ],
-    //             'meta' => [],
-    //             'links' => [],
-    //         ],
-    //         'included' => [],
-    //         'jsonapi' => [
-    //             'version' => '1.0',
-    //             'meta' => [],
-    //         ],
-    //     ]);
+it('can show cart', function () {
+    getJson('api/carts')
+        ->assertValid()
+        ->assertJson([
+            'data' => [
+                'id' => (string) $this->cart->uuid,
+                'type' => 'carts',
+                'attributes' => [
+                    'id' => $this->cart->uuid,
+                    'coupon_code' => null,
+                ],
+                'relationships' => [],
+                'meta' => [],
+                'links' => [],
+            ],
+            'included' => [],
+            'jsonapi' => [
+                'version' => '1.0',
+                'meta' => [],
+            ],
+        ])
+        ->assertOk();
 });
 
+it('can show cart with includes', function (string $include) {
+    $cart = $this->cart;
+
+    $cartLine = CartLineFactory::new()->createOne();
+
+    getJson('api/carts?' . http_build_query(['include' => $include]))
+        ->assertValid()
+        ->assertJson(function (AssertableJson $json) use ($cart, $cartLine) {
+            $json
+                ->where('data.type', 'carts')
+                ->where('data.id', $cart->uuid)
+                ->where('data.attributes.id', $cart->uuid)
+                ->has('included', 1)
+                ->has(
+                    'included',
+                    callback: function (AssertableJson $json) use ($cartLine) {
+                        $json->where('type', 'cartLines')
+                            ->where('id', $cartLine->uuid)
+                            ->has('attributes')
+                            ->etc();
+                    }
+                )
+                ->etc();
+        })
+        ->assertOk();
+})->with(['cartLines.media']);
+
 it('can delete cart', function () {
-    deleteJson('api/carts/' . $this->cart->id)
+    deleteJson('api/carts/' . $this->cart->uuid)
         ->assertValid()
         ->assertNoContent();
 });

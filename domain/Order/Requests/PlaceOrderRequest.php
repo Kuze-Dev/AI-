@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace Domain\Order\Requests;
 
 use Domain\Address\Models\Address;
-use Domain\Address\Models\Country;
-use Domain\Address\Models\State;
 use Domain\Cart\Actions\PurchasableCheckerAction;
 use Domain\Cart\Models\CartLine;
-use Domain\Customer\Models\Customer;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Validation\Rule;
@@ -41,69 +38,35 @@ class PlaceOrderRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $reference = $value;
 
-                    $cartLines = CartLine::whereHas('cart', function ($query) {
-                        $query->whereBelongsTo(auth()->user());
-                    })
-                        ->whereCheckoutReference($reference)
-                        ->where('checkout_expiration', '>', now())
-                        ->whereNull('checked_out_at')
-                        ->count();
+                    // $cartLines = CartLine::whereHas('cart', function ($query) {
+                    //     $query->whereBelongsTo(auth()->user());
+                    // })
+                    //     ->whereCheckoutReference($reference)
+                    //     ->where('checkout_expiration', '>', now())
+                    //     ->whereNull('checked_out_at')
+                    //     ->count();
 
-                    if ( ! $cartLines) {
-                        $fail('No cart lines for checkout');
+                    // if ( ! $cartLines) {
+                    //     $fail('No cart lines for checkout');
 
-                        return;
-                    }
+                    //     return;
+                    // }
 
-                    $cartLines = CartLine::whereCheckoutReference($reference)->get();
+                    // $cartLines = CartLine::whereCheckoutReference($reference)->get();
 
-                    $cartLineIds = array_values($cartLines->pluck('uuid')->toArray());
+                    // $cartLineIds = array_values($cartLines->pluck('uuid')->toArray());
 
-                    //auth check
-                    $checkAuth = app(PurchasableCheckerAction::class)->checkAuth($cartLineIds);
-                    if ($checkAuth !== count($cartLineIds)) {
-                        $fail('Invalid cart line IDs.');
-                    }
+                    // //auth check
+                    // $checkAuth = app(PurchasableCheckerAction::class)->checkAuth($cartLineIds);
+                    // if ($checkAuth !== count($cartLineIds)) {
+                    //     $fail('Invalid cart line IDs.');
+                    // }
 
-                    //stock check
-                    $checkStocks = app(PurchasableCheckerAction::class)->checkStock($cartLineIds);
-                    if ($checkStocks !== count($cartLineIds)) {
-                        $fail('Invalid stocks');
-                    }
-                },
-            ],
-            'taxations.state_id' => [
-                'nullable',
-                function ($attribute, $value, $fail) {
-                    $customerId = auth()->user()?->id;
-
-                    $customer = Customer::query()
-                        ->whereHas('addresses.state', function ($query) use ($value) {
-                            $query->where((new State())->getRouteKeyName(), $value);
-                        })
-                        ->whereId($customerId)
-                        ->count();
-
-                    if ($customer == 0) {
-                        $fail('Invalid state id');
-                    }
-                },
-            ],
-            'taxations.country_id' => [
-                'required',
-                function ($attribute, $value, $fail) {
-                    $customerId = auth()->user()?->id;
-
-                    $customer = Customer::query()
-                        ->whereHas('addresses.state.country', function ($query) use ($value) {
-                            $query->where((new Country())->getRouteKeyName(), $value);
-                        })
-                        ->whereId($customerId)
-                        ->count();
-
-                    if ($customer == 0) {
-                        $fail('Invalid country id');
-                    }
+                    // //stock check
+                    // $checkStocks = app(PurchasableCheckerAction::class)->checkStock($cartLineIds);
+                    // if ($checkStocks !== count($cartLineIds)) {
+                    //     $fail('Invalid stocks');
+                    // }
                 },
             ],
             'notes' => [

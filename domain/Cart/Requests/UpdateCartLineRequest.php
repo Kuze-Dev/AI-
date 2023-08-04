@@ -13,6 +13,7 @@ class UpdateCartLineRequest extends FormRequest
 {
     public function rules(): array
     {
+        /** @var \Domain\Cart\Models\CartLine $cartLine */
         $cartLine = $this->route('cartline');
 
         return [
@@ -29,6 +30,7 @@ class UpdateCartLineRequest extends FormRequest
                 'min:1',
                 function ($attribute, $value, $fail) use ($cartLine) {
 
+                    /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
                     $purchasable = $cartLine->purchasable;
 
                     if ($value > $purchasable->stock) {
@@ -42,6 +44,7 @@ class UpdateCartLineRequest extends FormRequest
                 'nullable',
                 'array',
                 function ($attribute, $value, $fail) use ($cartLine) {
+                    /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
                     $purchasable = $cartLine->purchasable;
 
                     if ($purchasable instanceof Product) {
@@ -49,10 +52,14 @@ class UpdateCartLineRequest extends FormRequest
                             $fail('You cant add remarks into this product.');
                         }
                     } elseif ($purchasable instanceof ProductVariant) {
+                        /** @var \Domain\Product\Models\ProductVariant $productVariant */
                         $productVariant = ProductVariant::with('product')
                             ->where('id', $cartLine->purchasable_id)->first();
 
-                        if ($value && ! $productVariant->product->allow_customer_remarks) {
+                        /** @var \Domain\Product\Models\Product $product */
+                        $product = $productVariant->product;
+
+                        if ($value && ! $product->allow_customer_remarks) {
                             $fail('You cant add remarks into this product.');
                         }
                     }
@@ -62,6 +69,7 @@ class UpdateCartLineRequest extends FormRequest
                 'nullable',
                 'array',
                 function ($attribute, $value, $fail) use ($cartLine) {
+                    /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
                     $purchasable = $cartLine->purchasable;
 
                     if ($purchasable instanceof Product) {
@@ -69,10 +77,14 @@ class UpdateCartLineRequest extends FormRequest
                             $fail('You cant add media remarks into this product.');
                         }
                     } elseif ($purchasable instanceof ProductVariant) {
+                        /** @var \Domain\Product\Models\ProductVariant $productVariant */
                         $productVariant = ProductVariant::with('product')
                             ->where('id', $cartLine->purchasable_id)->first();
 
-                        if ($value && ! $productVariant->product->allow_customer_remarks) {
+                        /** @var \Domain\Product\Models\Product $product */
+                        $product = $productVariant->product;
+
+                        if ($value && ! $product->allow_customer_remarks) {
                             $fail('You cant add media remarks into this product.');
                         }
                     }

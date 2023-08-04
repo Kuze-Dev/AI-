@@ -29,7 +29,6 @@ class ProductResource extends JsonApiResource
             'is_favorite' => $this->isFavorite(), // TODO: do not make resource as getter
             'is_special_offer' => $this->is_special_offer,
             'allow_customer_remarks' => $this->allow_customer_remarks,
-            'media' => $this->getMedia('image')->toArray(), // TODO: do not make resource as getter
         ];
     }
 
@@ -41,6 +40,7 @@ class ProductResource extends JsonApiResource
             'productOptions' => fn () => ProductOptionResource::collection($this->productOptions),
             'productVariants' => fn () => ProductVariantResource::collection($this->productVariants),
             'taxonomyTerms' => fn () => TaxonomyTermResource::collection($this->taxonomyTerms),
+            'metaData' => fn () => MetaDataResource::make($this->metaData),
         ];
     }
 }

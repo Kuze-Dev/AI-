@@ -7,6 +7,8 @@ namespace Domain\Cart\Models;
 use Domain\Customer\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 
@@ -52,12 +54,13 @@ class Cart extends Model
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Cart\Models\CartLine> */
-    public function cartLines()
+    public function cartLines(): HasMany
     {
         return $this->hasMany(CartLine::class)->whereNull('checked_out_at');
     }
 
-    public function customer()
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Cart\Models\Cart> */
+    public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }

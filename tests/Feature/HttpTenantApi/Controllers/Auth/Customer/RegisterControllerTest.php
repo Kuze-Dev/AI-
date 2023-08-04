@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Domain\Address\Database\Factories\StateFactory;
 use Domain\Address\Models\Address;
+use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Illuminate\Auth\Events\Registered;
@@ -59,6 +60,7 @@ it('register', function () {
         'gender' => $data['gender'],
         'status' => Status::ACTIVE->value,
         'birth_date' => $data['birth_date'] . ' 00:00:00',
+        'register_status' => RegisterStatus::REGISTERED,
     ]);
 
     $customer = Customer::latest()->first();
@@ -92,9 +94,6 @@ it('register w/ same address', function () {
         ->withShippingAddress($state)
         ->withBillingSameAsShipping()
         ->create();
-
-    // to get latest customer
-    travelTo(now()->addSecond());
 
     // to get latest customer
     travelTo(now()->addSecond());

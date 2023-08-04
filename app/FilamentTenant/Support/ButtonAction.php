@@ -59,6 +59,7 @@ class ButtonAction extends Field
     public function getActions(): array
     {
         $actions = collect($this->getExecutableActions())
+            /** @phpstan-ignore-next-line */
             ->mapWithKeys(fn ($action) => [$action->getName() => $action->component($this)])
             ->toArray();
 

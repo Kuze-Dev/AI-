@@ -26,16 +26,16 @@ it('can bulk delete cart lines', function () {
 
     CartFactory::new()->setCustomerId($customer->id)->createOne();
 
-    CartLineFactory::new()->times(3)
+    $result = CartLineFactory::new()->times(3)
         ->afterCreating(function (CartLine $cartLine, $index) {
             $cartLine->purchasable_id = $index + 1;
             $cartLine->save();
         })->create();
 
-    $cartLineIds = [1, 2];
+    $cartLineIds = $result->pluck('uuid')->toArray();
 
     $result = app(BulkDestroyCartLineAction::class)
-        ->execute($cartLineIds);
+        ->execute(array_slice($cartLineIds, 0, 2));
 
     expect($result)->toBe(true);
     assertEquals(1, CartLine::where('id', 3)->count());

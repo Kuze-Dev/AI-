@@ -15,10 +15,11 @@ use Domain\Order\Requests\PlaceOrderRequest;
 use Domain\Order\Requests\UpdateOrderRequest;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
-use Spatie\QueryBuilder\AllowedFilter;
+use Illuminate\Http\JsonResponse;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 #[
     Resource('orders', apiResource: true, except: 'destroy'),
@@ -26,22 +27,25 @@ use Spatie\RouteAttributes\Attributes\Resource;
 ]
 class OrderController extends Controller
 {
-    public function index()
+    public function index(): mixed
     {
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = auth()->user();
+
         return OrderResource::collection(
             QueryBuilder::for(Order::with([
                 'shippingAddress',
                 'billingAddress',
                 'orderLines.media',
-            ])->whereBelongsTo(auth()->user()))
+            ])->whereBelongsTo($customer))
                 ->allowedIncludes(['orderLines', 'orderLines.review.media'])
-                ->allowedFilters(['status', 'reference', AllowedFilter::scope('for_payment', 'whereHasForPayment')])
+                ->allowedFilters(['status', 'reference'])
                 ->allowedSorts(['reference', 'total', 'status', 'created_at'])
                 ->jsonPaginate()
         );
     }
 
-    public function store(PlaceOrderRequest $request)
+    public function store(PlaceOrderRequest $request): JsonResponse
     {
         $validatedData = $request->validated();
 
@@ -54,6 +58,13 @@ class OrderController extends Controller
             ], 404);
         }
 
+        if ($result instanceof HttpException) {
+            return response()->json([
+                'message' => $result->getMessage(),
+            ], 422);
+        }
+
+        /** @phpstan-ignore-next-line */
         if ( ! $result['order'] instanceof Order) {
             return response()->json([
                 'message' => 'Order failed to be created',
@@ -67,10 +78,10 @@ class OrderController extends Controller
             ]);
     }
 
-    public function show(Order $order)
+    public function show(Order $order): OrderResource
     {
-        // return $order;
-        // $this->authorize('view', $order);
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = auth()->user();
 
         $model = QueryBuilder::for(
             $order->with([
@@ -79,18 +90,16 @@ class OrderController extends Controller
                 'orderLines.media',
                 'orderLines.review.media',
                 'payments.paymentMethod.media',
-            ])->whereBelongsTo(auth()->user())
+            ])->whereBelongsTo($customer)
                 ->whereReference($order->reference)
         )
-            ->allowedIncludes(['orderLines', 'payments.paymentMethod.media'])->first();
+            ->allowedIncludes(['orderLines', 'payments.media', 'payments.paymentMethod.media'])->first();
 
         return OrderResource::make($model);
     }
 
-    public function update(UpdateOrderRequest $request, Order $order)
+    public function update(UpdateOrderRequest $request, Order $order): JsonResponse
     {
-        // $this->authorize('update', $order);
-
         $validatedData = $request->validated();
 
         $result = app(UpdateOrderAction::class)
