@@ -296,6 +296,7 @@ class OrderResource extends Resource
                         OrderStatuses::DELIVERED->value => trans('Delivered'),
                         OrderStatuses::FULFILLED->value => trans('Fulfilled'),
                         OrderStatuses::FORPAYMENT->value => trans('For Payment'),
+                        OrderStatuses::FORAPPROVAL->value => trans('For Approval'),
                     ])
                     ->attribute('status'),
             ])
@@ -509,6 +510,8 @@ class OrderResource extends Resource
                                 OrderStatuses::DELIVERED->value => trans('Delivered'),
                                 OrderStatuses::FULFILLED->value => trans('Fulfilled'),
                                 OrderStatuses::FORPAYMENT->value => trans('For Payment'),
+                                OrderStatuses::FORAPPROVAL->value => trans('For Approval'),
+
                             ])
                             ->disablePlaceholderSelection()
                             ->formatStateUsing(function () use ($record) {
@@ -546,6 +549,14 @@ class OrderResource extends Resource
                                 }
 
                                 $updateData['cancelled_at'] = now(Auth::user()?->timezone);
+
+                                $test = $record->load('payments');
+
+                                $payment = $test->payments->first();
+
+                                $payment->update([
+                                    'status' => 'cancelled',
+                                ]);
 
                                 if ($record->discount_code != null) {
                                     DiscountLimit::whereOrderId($record->id)->delete();
@@ -621,7 +632,7 @@ class OrderResource extends Resource
                     ->size('sm')
                     ->action(function () use ($order, $set) {
 
-                        $isPaid = ! $order->is_paid;
+                        $isPaid = !$order->is_paid;
 
                         $result = $order->update([
                             'is_paid' => $isPaid,
@@ -675,6 +686,14 @@ class OrderResource extends Resource
 
                         /** @var \Domain\Payments\Models\Payment $payment */
                         $payment = $order->payments->first();
+
+                        if (!is_null($payment->remarks)) {
+                            Notification::make()
+                                ->title(trans("Invalid action."))
+                                ->warning()
+                                ->send();
+                            return;
+                        }
 
                         $result = $payment->update([
                             'remarks' => $paymentRemarks,
