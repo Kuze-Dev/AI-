@@ -63,8 +63,11 @@ class ProductResource extends Resource
                                 ->multiple()
                                 ->required(),
                             Forms\Components\FileUpload::make('videos')
-                                ->mediaLibraryCollection('video'),
-                            // ->image()
+                                ->mediaLibraryCollection('video')
+                                ->acceptedFileTypes([
+                                    'video/*',
+                                ])
+                                ->maxSize(50000),
                         ]),
 
                     Forms\Components\Section::make('Customer Remarks')
