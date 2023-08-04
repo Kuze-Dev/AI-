@@ -19,21 +19,21 @@ class CreateMediaAction
             $model->clearMediaCollection($collection);
         }
 
-        foreach ($medias as $image) {
+        foreach ($medias as $media) {
             try {
-                if (is_string($image)) {
-                    $response = Http::get($image);
+                if (is_string($media)) {
+                    $response = Http::get($media);
                     if ($response->successful()) {
                         $model
-                            ->addMediaFromUrl($image)
+                            ->addMediaFromUrl($media)
                             ->toMediaCollection($collection);
                     }
                 } else {
-                    if ($image instanceof UploadedFile && $imageString = $image->get()) {
+                    if ($media instanceof UploadedFile && $mediaString = $media->get()) {
                         $model
-                            ->addMediaFromString($imageString)
-                            ->usingFileName($image->getClientOriginalName())
-                            ->usingName(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME))
+                            ->addMediaFromString($mediaString)
+                            ->usingFileName($media->getClientOriginalName())
+                            ->usingName(pathinfo($media->getClientOriginalName(), PATHINFO_FILENAME))
                             ->toMediaCollection($collection);
                     }
                 }

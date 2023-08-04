@@ -184,7 +184,7 @@ class Product extends Model implements HasMetaDataContract, HasMedia
 
     public function isFavorite()
     {
-        if ( ! auth()->check()) {
+        if (!auth()->check()) {
             return false;
         }
 
@@ -210,6 +210,9 @@ class Product extends Model implements HasMetaDataContract, HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')
+            ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
+
+        $this->addMediaCollection('video')
             ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 }
