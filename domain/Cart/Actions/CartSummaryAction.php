@@ -112,14 +112,20 @@ class CartSummaryAction
                 BoxData::fromArray($productlist)
             );
 
+            /** @var \Domain\Address\Models\State $state */
+            $state = $shippingMethod->state;
+
+            /** @var \Domain\Address\Models\Country $country */
+            $country = $shippingMethod->country;
+
             $parcelData = new ParcelData(
                 ship_from_address: new ShipFromAddressData(
                     address: $shippingMethod->shipper_address,
                     city: $shippingMethod->shipper_city,
-                    state: $shippingMethod->state,
+                    state: $state,
                     zipcode: $shippingMethod->shipper_zipcode,
-                    country: $shippingMethod->country,
-                    code: $shippingMethod->country->code,
+                    country: $country,
+                    code: $country->code,
                 ),
                 pounds: (string) $boxData->weight,
                 ounces: '0',

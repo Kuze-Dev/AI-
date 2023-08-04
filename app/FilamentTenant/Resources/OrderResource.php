@@ -245,6 +245,8 @@ class OrderResource extends Resource
                     ->formatStateUsing(function ($state) {
                         if ($state == OrderStatuses::FORPAYMENT->value) {
                             return 'For Payment';
+                        } elseif ($state == OrderStatuses::FORAPPROVAL->value) {
+                            return 'For Approval';
                         }
 
                         return ucfirst($state);
@@ -341,8 +343,11 @@ class OrderResource extends Resource
                         Support\BadgeLabel::make(trans('status'))
                             ->formatStateUsing(function (string $state): string {
                                 if ($state == OrderStatuses::FORPAYMENT->value) {
-                                    return trans("For Payment");
+                                    return trans('For Payment');
+                                } elseif ($state == OrderStatuses::FORAPPROVAL->value) {
+                                    return 'For Approval';
                                 }
+
                                 return trans(ucfirst($state));
                             })
                             ->inline()
@@ -616,7 +621,7 @@ class OrderResource extends Resource
                     ->size('sm')
                     ->action(function () use ($order, $set) {
 
-                        $isPaid = !$order->is_paid;
+                        $isPaid = ! $order->is_paid;
 
                         $result = $order->update([
                             'is_paid' => $isPaid,
@@ -673,7 +678,7 @@ class OrderResource extends Resource
 
                         $result = $payment->update([
                             'remarks' => $paymentRemarks,
-                            'message' => $message,
+                            'admin_message' => $message,
                         ]);
 
                         if ($result) {
@@ -693,6 +698,16 @@ class OrderResource extends Resource
                                 ]);
 
                                 $set('status', ucfirst(OrderStatuses::PROCESSING->value));
+                            } else {
+                                $payment->update([
+                                    'status' => 'cancelled',
+                                ]);
+
+                                $order->update([
+                                    'status' => OrderStatuses::CANCELLED,
+                                ]);
+
+                                $set('status', ucfirst(OrderStatuses::CANCELLED->value));
                             }
 
                             Notification::make()
@@ -714,6 +729,16 @@ class OrderResource extends Resource
                     ->modalHeading(trans('Proof of Payment'))
                     ->modalWidth('lg')
                     ->form([
+                        Forms\Components\Textarea::make('customer_message')
+                            ->label(trans('Customer Message'))
+                            ->formatStateUsing(function () use ($order) {
+                                /** @var \Domain\Payments\Models\Payment $payment */
+                                $payment = $order->payments->first();
+
+                                return $payment->customer_message;
+                            })
+                            ->disabled(),
+
                         Forms\Components\FileUpload::make('bank_proof_image')
                             ->label(trans('Customer Upload'))
                             ->formatStateUsing(function () use ($order) {
@@ -768,7 +793,7 @@ class OrderResource extends Resource
                                 /** @var \Domain\Payments\Models\Payment $payment */
                                 $payment = $order->payments->first();
 
-                                return $payment->message;
+                                return $payment->admin_message;
                             }),
                     ])
                     ->slideOver()
@@ -782,7 +807,11 @@ class OrderResource extends Resource
                 /** @var \Domain\Payments\Models\Payment $payment */
                 $payment = $order->payments->first();
 
-                return $payment->gateway != 'bank-transfer';
+                if ($payment->gateway == 'bank-transfer') {
+                    return (bool) (empty($order->payments->first()?->getFirstMediaUrl('image')));
+                }
+
+                return true;
             });
     }
 }

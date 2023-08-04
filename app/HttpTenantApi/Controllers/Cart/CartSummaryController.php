@@ -39,19 +39,10 @@ class CartSummaryController extends Controller
         $validated = $request->validated();
         $discountCode = $validated['discount_code'] ?? null;
 
-        $cartLineIds = explode(',', $validated['cart_line_ids']);
-
         /** @var \Domain\Customer\Models\Customer $customer */
         $customer = auth()->user();
 
-        $cartLines = CartLine::query()
-            ->with('purchasable')
-            ->whereHas('cart', function ($query) {
-                $query->whereBelongsTo(auth()->user());
-            })
-            ->whereNull('checked_out_at')
-            ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
-            ->get();
+        $cartLines = $request->getCartLines();
 
         $country = $request->getCountry();
         $state = $request->getState();
@@ -95,10 +86,10 @@ class CartSummaryController extends Controller
                 'amount' => $summary->discountMessages->amount ?? null,
                 'discount_type' => $summary->discountMessages->discount_type ?? null,
                 'total_savings' => $discount ? round($summary->discountTotal ?? 0, 2) : 0,
-            ]
+            ],
         ];
 
-        if (!$discountCode) {
+        if ( ! $discountCode) {
             unset($responseArray['discount']);
         }
 

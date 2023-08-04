@@ -7,7 +7,6 @@ namespace Domain\Order\Actions;
 use Domain\Cart\Actions\CartSummaryAction;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
-use Domain\Discount\Actions\CreateDiscountLimitAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Enums\OrderStatuses;
@@ -74,10 +73,6 @@ class CreateOrderAction
             'status' => $paymentMethod,
             'is_paid' => false,
         ]);
-
-        if ( ! is_null($preparedOrderData->discount)) {
-            app(CreateDiscountLimitAction::class)->execute($preparedOrderData->discount, $order, $preparedOrderData->customer);
-        }
 
         return $order;
     }

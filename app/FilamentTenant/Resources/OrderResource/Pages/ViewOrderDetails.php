@@ -55,6 +55,7 @@ class ViewOrderDetails extends ViewRecord
                                 ->schema([
                                     Forms\Components\FileUpload::make('image_' . $sectionIndex)
                                         ->formatStateUsing(function () use ($orderLine) {
+
                                             return $orderLine?->getMedia('order_line_images')
                                                 ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
                                                 ->toArray() ?? [];

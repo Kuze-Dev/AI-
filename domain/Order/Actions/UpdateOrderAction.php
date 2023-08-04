@@ -46,7 +46,7 @@ class UpdateOrderAction
                     'status' => $updateOrderData->status,
                 ];
 
-                if ($updateOrderData->status == OrderStatuses::CANCELLED) {
+                if ($updateOrderData->status == OrderStatuses::CANCELLED->value) {
                     $orderData['cancelled_reason'] = $updateOrderData->notes;
                 } else {
                     $orderData['cancelled_reason'] = null;
@@ -65,18 +65,35 @@ class UpdateOrderAction
             }
 
             if ($updateOrderData->type == 'bank-transfer' && $updateOrderData->proof_of_payment !== null) {
+                /** @var \Domain\Order\Models\Order $orderPayment */
                 $orderPayment = Order::with('payments')->find($order->id);
 
                 $image = $this->convertUrlToUploadedFile($updateOrderData->proof_of_payment);
 
+                /** @var \Domain\Payments\Models\Payment $payment */
+                $payment = $orderPayment->payments->first();
+
                 if ($image instanceof UploadedFile) {
-                    if ( ! empty($orderPayment->payments) && ! empty($orderPayment->payments->first())) {
+                    if (
+                        ! empty($orderPayment->payments) &&
+                        $payment->gateway == 'bank-transfer'
+                    ) {
+                        $order->update([
+                            'status' => OrderStatuses::FORAPPROVAL,
+                        ]);
+
+                        $payment->update([
+                            'customer_message' => $updateOrderData->notes,
+                        ]);
+
                         app(UploadProofofPaymentAction::class)->execute(
-                            $orderPayment->payments->first(),
+                            $payment,
                             new ProofOfPaymentData(
                                 $image
                             )
                         );
+                    } else {
+                        return 'You cant upload a proof of payment in this gateway';
                     }
                 } else {
                     return 'Invalid media';

@@ -7,7 +7,6 @@ namespace Domain\Product\Actions;
 use Domain\Media\Actions\CreateMediaAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
-use Illuminate\Http\UploadedFile;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 use Illuminate\Support\Arr;
@@ -37,7 +36,9 @@ class CreateProductAction
             $this->createMediaAction->execute($product, Arr::wrap($productData->images), 'image');
         }
 
-        $this->createMediaAction->execute($product, Arr::wrap($productData->videos), 'video', false);
+        if (filled($productData->videos)) {
+            $this->createMediaAction->execute($product, Arr::wrap($productData->videos), 'video');
+        }
 
         $product->taxonomyTerms()
             ->attach($productData->taxonomy_terms);
