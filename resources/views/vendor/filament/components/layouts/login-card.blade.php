@@ -36,10 +36,11 @@
                 ])
             >
                 <div class="flex w-full justify-center">
-                    @if (empty(app(App\Settings\SiteSettings::class)->logo))
-                        <h3 class="text-center text-2xl font-bold tracking-tight">{{ app(App\Settings\SiteSettings::class)->name }}</h3>
+                    @if (strlen(app(App\Settings\SiteSettings::class)->logo) === 0)
+                        <h3 class="text-center text-2xl font-bold tracking-tight">{{ app(App\Settings\SiteSettings::class)->name ?? 'Welcome!' }}</h3>
+                    @else
+                        <img src="{{ Storage::url(app(App\Settings\SiteSettings::class)->logo) }}">
                     @endif
-                    <img src="{{ Storage::url(app(App\Settings\SiteSettings::class)->logo) }}">
                 </div>
 
 
