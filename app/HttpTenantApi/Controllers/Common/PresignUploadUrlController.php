@@ -4,48 +4,28 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Common;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\HttpTenantApi\Requests\Common\PresignedUploadUrlRequest;
 use Spatie\RouteAttributes\Attributes\Post;
 use Illuminate\Http\JsonResponse;
-use InvalidArgumentException;
+use Support\Common\Actions\CreateS3PresignUploadUrlAction;
+use Support\Common\DataTransferObjects\CreatePresignUploadUrlData;
 use Throwable;
 
 class PresignUploadUrlController
 {
     #[Post('/generate/upload-url', name: 'generate.upload-url')]
-    public function index(Request $request): JsonResponse
+    public function index(PresignedUploadUrlRequest $request): JsonResponse
     {
         try {
-            $path = match ($request->resource) {
-                'forms' => 'forms/',
-                default => throw new InvalidArgumentException('resource not supported'),
-            };
 
-            $filename = $request->resource_id.'/'.uniqid().'.'.$request->ext;
+            $presignedData = app(CreateS3PresignUploadUrlAction::class)->execute(
+                presignedUrlData: CreatePresignUploadUrlData::fromArray($request->toArray())
+            );
 
-            $object_key = $path.$filename;
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter */
-            $s3 = Storage::disk('s3');
-
-            $client = $s3->getClient();
-
-            $expiry = '+20 minutes';
-
-            $cmd = $client->getCommand('PutObject', [
-                'Bucket' => config('filesystems.disks.s3.bucket'),
-                'Key' => $object_key,
-                'ACL' => 'public-read',
-            ]);
-
-            $awsResponse = $client->createPresignedRequest($cmd, $expiry);
-
-            $presignedUrl = (string) $awsResponse->getUri();
-
-            return response()->json([
-                'upload_url' => $presignedUrl,
-                'object_key' => $object_key,
-            ]);
+            return response()->json(
+                $presignedData->toArray(),
+                200
+            );
         } catch (Throwable $th) {
 
             return response()->json(
