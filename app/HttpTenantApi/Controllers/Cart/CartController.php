@@ -6,6 +6,7 @@ namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartResource;
+use Domain\Cart\Actions\BulkDestroyCartLineAction;
 use Domain\Cart\Actions\DestroyCartAction;
 use Domain\Cart\Models\Cart;
 use Domain\Product\Models\Product;
@@ -39,6 +40,22 @@ class CartController extends Controller
         )->allowedIncludes(['cartLines.media'])
             ->first();
 
+        if ($model && isset($model->cartLines)) {
+            $cartLineIdsTobeRemoved = [];
+
+            $model->cartLines = $model->cartLines->filter(function ($cartLine) use (&$cartLineIdsTobeRemoved) {
+                if (is_null($cartLine->purchasable)) {
+                    $cartLineIdsTobeRemoved[] = $cartLine->uuid;
+                }
+                return !is_null($cartLine->purchasable);
+            });
+
+            if (!is_null($cartLineIdsTobeRemoved)) {
+                app(BulkDestroyCartLineAction::class)
+                    ->execute($cartLineIdsTobeRemoved);
+            }
+        }
+
         if ($model) {
             return CartResource::make($model);
         }
@@ -56,7 +73,7 @@ class CartController extends Controller
         $result = app(DestroyCartAction::class)
             ->execute($cart);
 
-        if ( ! $result) {
+        if (!$result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);
