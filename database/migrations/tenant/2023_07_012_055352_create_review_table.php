@@ -24,7 +24,7 @@ return new class () extends Migration {
             $table->string('customer_name')->nullable();
             $table->string('customer_email')->nullable();
             $table->string('comment')->nullable();
-            $table->json('data');
+            $table->json('data')->nullable();
             $table->boolean('is_anonymous')->default(false);
 
             $table->timestamps();
