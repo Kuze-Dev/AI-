@@ -25,11 +25,10 @@ class ReviewShowController
             QueryBuilder::for(Review::whereProductId($review))
                 ->allowedIncludes([
                     'product',
-                    'order_line',
                     'customer.media',
                     'media',
                 ])
-                ->get()
+                ->jsonPaginate()
         );
     }
 

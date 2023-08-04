@@ -37,6 +37,7 @@ class CartSummaryController extends Controller
     public function summary(CartSummaryRequest $request): mixed
     {
         $validated = $request->validated();
+        $discountCode = $validated['discount_code'] ?? null;
 
         $cartLineIds = explode(',', $validated['cart_line_ids']);
 
@@ -77,13 +78,16 @@ class CartSummaryController extends Controller
             }
         }
 
-        return response()->json([
+        $responseArray = [
             'tax' => [
                 'inclusive_sub_total' => $summary->taxTotal ? round($summary->subTotal + $summary->taxTotal, 2) : null,
                 'display' => $summary->taxTotal ? $summary->taxDisplay : null,
                 'percentage' => $summary->taxPercentage ? round($summary->taxPercentage, 2) : 0,
                 'amount' => $summary->taxTotal ? round($summary->taxTotal, 2) : 0,
             ],
+            'sub_total' => round($summary->subTotal, 2),
+            'shipping_fee' => round($summary->shippingTotal, 2),
+            'total' => round($summary->grandTotal, 2),
             'discount' => [
                 'status' => $summary->discountMessages->status ?? null,
                 'message' => $summary->discountMessages->message ?? null,
@@ -91,10 +95,13 @@ class CartSummaryController extends Controller
                 'amount' => $summary->discountMessages->amount ?? null,
                 'discount_type' => $summary->discountMessages->discount_type ?? null,
                 'total_savings' => $discount ? round($summary->discountTotal ?? 0, 2) : 0,
-            ],
-            'sub_total' => round($summary->subTotal, 2),
-            'shipping_fee' => round($summary->shippingTotal, 2),
-            'total' => round($summary->grandTotal, 2),
-        ], 200);
+            ]
+        ];
+
+        if (!$discountCode) {
+            unset($responseArray['discount']);
+        }
+
+        return response()->json($responseArray, 200);
     }
 }
