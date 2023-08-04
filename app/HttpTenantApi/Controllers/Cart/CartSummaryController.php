@@ -23,14 +23,23 @@ class CartSummaryController extends Controller
     #[Get('carts/count', name: 'carts.count')]
     public function count(): mixed
     {
-        $cartLinesCount = CartLine::query()
+        $cartLines = CartLine::with('purchasable')
             ->whereHas('cart', function ($query) {
                 $query->whereBelongsTo(auth()->user());
             })
             ->whereNull('checked_out_at')
-            ->count();
+            ->get();
 
-        return response()->json(['cartCount' => $cartLinesCount], 200);
+        if (isset($cartLines)) {
+            $cartLines = $cartLines->filter(function ($cartLine) use (&$cartLineIdsTobeRemoved) {
+                if (is_null($cartLine->purchasable)) {
+                    $cartLineIdsTobeRemoved[] = $cartLine->uuid;
+                }
+                return !is_null($cartLine->purchasable);
+            });
+        }
+
+        return response()->json(['cartCount' => $cartLines->count()], 200);
     }
 
     #[Get('carts/summary', name: 'carts.summary')]
@@ -89,7 +98,7 @@ class CartSummaryController extends Controller
             ],
         ];
 
-        if ( ! $discountCode) {
+        if (!$discountCode) {
             unset($responseArray['discount']);
         }
 
