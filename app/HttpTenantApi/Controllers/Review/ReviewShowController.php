@@ -28,7 +28,7 @@ class ReviewShowController
                     'customer.media',
                     'media',
                 ])
-                ->get()
+                ->jsonPaginate()
         );
     }
 
