@@ -54,17 +54,19 @@ class ProductResource extends Resource
                             ->unique(ignoreRecord: true)
                             ->required(),
                         Forms\Components\RichEditor::make('description'),
-                        Forms\Components\FileUpload::make('images')
-                            ->label('Media')
-                            ->mediaLibraryCollection('image')
-                            ->image()
-                            ->multiple()
-                            ->required(),
-                        Forms\Components\FileUpload::make('videos')
-                            ->mediaLibraryCollection('video')
-                            // ->image()
-                            ->required(),
                     ]),
+                    Forms\Components\Section::make('Media')
+                        ->schema([
+                            Forms\Components\FileUpload::make('images')
+                                ->mediaLibraryCollection('image')
+                                ->image()
+                                ->multiple()
+                                ->required(),
+                            Forms\Components\FileUpload::make('videos')
+                                ->mediaLibraryCollection('video'),
+                            // ->image()
+                        ]),
+
                     Forms\Components\Section::make('Customer Remarks')
                         ->schema([
                             Forms\Components\Toggle::make('allow_customer_remarks')
