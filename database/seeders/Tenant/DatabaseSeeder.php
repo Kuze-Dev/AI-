@@ -19,12 +19,19 @@ class DatabaseSeeder extends Seeder
             Auth\RoleSeeder::class,
             Auth\AdminSeeder::class,
             Page\PageSeeder::class,
-            Address\CountrySeeder::class,
-            DiscountSeeder::class,
-            Product\ProductSeeder::class,
-            Currency\CurrencySeeder::class,
             Tier\TierSeeder::class,
-            Customer\CustomerSeeder::class,
         ]);
+
+        if ( ! app()->runningUnitTests()) {
+            $this->call([
+                Address\CountrySeeder::class,
+                DiscountSeeder::class,
+                Product\ProductSeeder::class,
+                Currency\CurrencySeeder::class,
+                Customer\CustomerSeeder::class,
+                ShippingMethod\ShippingMethodSeeder::class,
+                ShippingMethod\ShippingBoxSeeder::class,
+            ]);
+        }
     }
 }

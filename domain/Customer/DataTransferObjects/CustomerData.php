@@ -7,7 +7,9 @@ namespace Domain\Customer\DataTransferObjects;
 use App\HttpTenantApi\Requests\Auth\Customer\CustomerRegisterRequest;
 use Carbon\Carbon;
 use Domain\Address\DataTransferObjects\AddressData;
+use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
+use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Tier\Models\Tier;
 use Illuminate\Http\UploadedFile;
@@ -17,9 +19,9 @@ final class CustomerData
     private function __construct(
         public readonly string $first_name,
         public readonly string $last_name,
-        public readonly string $mobile,
-        public readonly Gender $gender,
-        public readonly Carbon $birth_date,
+        public readonly ?string $mobile,
+        public readonly ?Gender $gender,
+        public readonly ?Carbon $birth_date,
         public readonly ?Status $status = null,
         public readonly ?int $tier_id = null,
         public readonly ?string $email = null,
@@ -27,6 +29,9 @@ final class CustomerData
         public readonly UploadedFile|string|null $image = null,
         public readonly ?AddressData $shipping_address_data = null,
         public readonly ?AddressData $billing_address_data = null,
+        public readonly EmailVerificationType $email_verification_type = EmailVerificationType::LINK,
+        public readonly ?RegisterStatus $register_status = RegisterStatus::REGISTERED,
+        public readonly bool $through_api_registration = false,
     ) {
     }
 
@@ -68,6 +73,10 @@ final class CustomerData
                     is_default_shipping: false,
                     is_default_billing: true,
                 ),
+            email_verification_type: isset($validated['email_verification_type'])
+                ? EmailVerificationType::from($validated['email_verification_type'])
+                : EmailVerificationType::LINK,
+            through_api_registration: true,
         );
     }
 
@@ -88,34 +97,35 @@ final class CustomerData
         return new self(
             first_name: $data['first_name'],
             last_name: $data['last_name'],
-            mobile: $data['mobile'],
-            gender: Gender::from($data['gender']),
-            birth_date: now()->parse($data['birth_date']),
-            status: Status::from($data['status']),
-            tier_id: (int) $data['tier_id'],
+            mobile: $data['mobile'] ?? null,
+            gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
+            birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
+            status: isset($data['status']) ? Status::from($data['status']) : null,
+            tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
             email: $data['email'],
             password: $data['password'] ?? null,
-            image: $data['image'],
-            shipping_address_data: new AddressData(
-                state_id: (int) $data['shipping_state_id'],
-                label_as: $data['shipping_label_as'],
-                address_line_1: $data['shipping_address_line_1'],
-                zip_code: $data['shipping_zip_code'],
-                city: $data['shipping_city'],
-                is_default_shipping: true,
-                is_default_billing: $data['same_as_shipping'],
-            ),
-            billing_address_data: $data['same_as_shipping']
-                ? null
-                : new AddressData(
-                    state_id: (int) $data['billing_state_id'],
-                    label_as: $data['billing_label_as'],
-                    address_line_1: $data['billing_address_line_1'],
-                    zip_code: $data['billing_zip_code'],
-                    city: $data['billing_city'],
-                    is_default_shipping: false,
-                    is_default_billing: true,
-                ),
+            image: $data['image'] ?? null,
+            //            shipping_address_data: new AddressData(
+            //                state_id: (int) $data['shipping_state_id'],
+            //                label_as: $data['shipping_label_as'],
+            //                address_line_1: $data['shipping_address_line_1'],
+            //                zip_code: $data['shipping_zip_code'],
+            //                city: $data['shipping_city'],
+            //                is_default_shipping: true,
+            //                is_default_billing: $data['same_as_shipping'],
+            //            ),
+            //            billing_address_data: $data['same_as_shipping']
+            //                ? null
+            //                : new AddressData(
+            //                    state_id: (int) $data['billing_state_id'],
+            //                    label_as: $data['billing_label_as'],
+            //                    address_line_1: $data['billing_address_line_1'],
+            //                    zip_code: $data['billing_zip_code'],
+            //                    city: $data['billing_city'],
+            //                    is_default_shipping: false,
+            //                    is_default_billing: true,
+            //                ),
+            register_status: RegisterStatus::UNREGISTERED,
         );
     }
 
@@ -124,11 +134,11 @@ final class CustomerData
         return new self(
             first_name: $data['first_name'],
             last_name: $data['last_name'],
-            mobile: $data['mobile'],
-            gender: Gender::from($data['gender']),
-            birth_date: now()->parse($data['birth_date']),
-            status: Status::from($data['status']),
-            tier_id: (int) $data['tier_id'],
+            mobile: $data['mobile'] ?? null,
+            gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
+            birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
+            status: isset($data['status']) ? Status::from($data['status']) : null,
+            tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
             email: $data['email'],
             image: $data['image'],
         );
@@ -139,12 +149,13 @@ final class CustomerData
         return new self(
             first_name: $data['first_name'],
             last_name: $data['last_name'],
-            mobile: $data['mobile'],
-            gender: Gender::from($data['gender']),
-            birth_date: now()->parse($data['birth_date']),
-            status: Status::from($data['status']),
-            tier_id: $data['tier_id'] ?? null,
+            mobile: $data['mobile'] ?? null,
+            gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
+            birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
+            status: isset($data['status']) ? Status::from($data['status']) : null,
+            tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
             email: $data['email'],
+            register_status: RegisterStatus::UNREGISTERED,
         );
     }
 }

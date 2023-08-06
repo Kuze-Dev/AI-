@@ -11,23 +11,26 @@ use Illuminate\Validation\Rule;
 
 class CreateCartLineRequest extends FormRequest
 {
-    public function rules()
+    public function rules(): array
     {
         return [
             'purchasable_id' => [
                 'required',
-                Rule::exists(Product::class, 'id'),
+                Rule::exists(Product::class, (new Product())->getRouteKeyName()),
             ],
             'variant_id' => [
                 'nullable',
-                Rule::exists(ProductVariant::class, 'id')->where(function ($query) {
+                Rule::exists(ProductVariant::class, (new ProductVariant())->getRouteKeyName()),
+                function ($attribute, $value, $fail) {
                     $purchasableId = $this->input('purchasable_id');
                     $purchasableType = $this->input('purchasable_type');
 
                     if ($purchasableType === 'Product') {
-                        $query->where('product_id', $purchasableId);
+                        ProductVariant::whereHas('product', function ($subQuery) use ($purchasableId) {
+                            $subQuery->where((new Product())->getRouteKeyName(), $purchasableId);
+                        });
                     }
-                }),
+                },
             ],
             'purchasable_type' => [
                 'required',
@@ -46,7 +49,7 @@ class CreateCartLineRequest extends FormRequest
                     }
 
                     if (is_null($variantId)) {
-                        $product = Product::find($purchasableId);
+                        $product = Product::where((new Product())->getRouteKeyName(), $purchasableId)->first();
 
                         if ( ! $product) {
                             $fail('Invalid product.');
@@ -60,7 +63,12 @@ class CreateCartLineRequest extends FormRequest
                             return;
                         }
                     } else {
-                        $productVariant = ProductVariant::find($variantId);
+                        $productVariant = ProductVariant::where(
+                            (new ProductVariant())->getRouteKeyName(),
+                            $variantId
+                        )->whereHas('product', function ($query) use ($purchasableId) {
+                            $query->where((new Product())->getRouteKeyName(), $purchasableId);
+                        })->first();
 
                         if ( ! $productVariant) {
                             $fail('Invalid productVariant.');
@@ -82,7 +90,7 @@ class CreateCartLineRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $purchasableId = $this->input('purchasable_id');
 
-                    $product = Product::find($purchasableId);
+                    $product = Product::where((new Product())->getRouteKeyName(), $purchasableId)->first();
 
                     if ( ! $product) {
                         $fail('Invalid product.');
@@ -101,7 +109,7 @@ class CreateCartLineRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $purchasableId = $this->input('purchasable_id');
 
-                    $product = Product::find($purchasableId);
+                    $product = Product::where((new Product())->getRouteKeyName(), $purchasableId)->first();
 
                     if ( ! $product) {
                         $fail('Invalid product.');

@@ -42,6 +42,7 @@ class PermissionSeeder extends BasePermissionSeeder
                 ...$this->generateFilamentResourcePermissions('taxZone', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('country', only: ['viewAny', 'update']),
                 ...$this->generateFilamentResourcePermissions('currency', only: ['viewAny', 'update']),
+                ...$this->generateFilamentResourcePermissions('paymentMethod', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions(
                     'customers',
                     except: [
@@ -49,7 +50,8 @@ class PermissionSeeder extends BasePermissionSeeder
                         'restoreAny',
                         'forceDeleteAny',
                     ],
-                    hasSoftDeletes: true
+                    hasSoftDeletes: true,
+                    customPermissions: ['sendRegisterInvitation']
                 ),
                 ...$this->generateFilamentResourcePermissions(
                     'tiers',
@@ -62,6 +64,7 @@ class PermissionSeeder extends BasePermissionSeeder
                 ),
                 ...$this->generateFilamentResourcePermissions('addresses', ),
                 ...$this->generateFilamentResourcePermissions('paymentMethod', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('shippingMethod', except: ['deleteAny']),
             ],
         ];
     }

@@ -10,10 +10,8 @@ class BulkDestroyCartLineAction
 {
     public function execute(array $cartLineIds): bool
     {
-        $cartLines = CartLine::whereIn('id', $cartLineIds);
+        $cartLines = CartLine::whereIn((new CartLine())->getRouteKeyName(), $cartLineIds);
 
-        $cartLines->delete();
-
-        return true;
+        return (bool) $cartLines->delete();
     }
 }

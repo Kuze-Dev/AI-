@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\TaxZoneResource\Pages\EditTaxZone;
+use Domain\Address\Database\Factories\CountryFactory;
+use Domain\Address\Database\Factories\StateFactory;
+use Domain\Address\Models\Country;
 use Domain\Taxation\Database\Factories\TaxZoneFactory;
 use Domain\Taxation\Enums\PriceDisplay;
 use Domain\Taxation\Enums\TaxZoneType;
@@ -14,6 +17,11 @@ beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
+
+    CountryFactory::new()
+        ->count(3)
+        ->has(StateFactory::new()->count(3))
+        ->create();
 });
 
 it('can render page', function () {
@@ -43,6 +51,7 @@ it('can edit', function () {
             'is_active' => true,
             'is_default' => true,
             'type' => TaxZoneType::COUNTRY,
+            'countries' => Country::inRandomOrder()->limit(2)->pluck('id')->toArray(),
             'percentage' => 12.000,
         ])
         ->call('save')
@@ -56,7 +65,3 @@ it('can edit', function () {
         ->type->toBe(TaxZoneType::COUNTRY)
         ->percentage->toBe(12);
 });
-
-todo('can edit tax zone by country');
-
-todo('can edit tax zone by state');

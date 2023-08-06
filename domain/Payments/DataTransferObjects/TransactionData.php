@@ -18,7 +18,7 @@ class TransactionData
     public static function fromArray(array $data): self
     {
         return new self(
-            reference_id: $data['reference_id'] ?? null,
+            reference_id: $data['reference_id'],
             amount: $data['amount'],
             item_list: array_map(
                 fn (array $item) => new ItemsData(
@@ -39,9 +39,9 @@ class TransactionData
         );
     }
 
-    public function getTotal(): string
+    public function getTotal(): int
     {
-        return $this->amount->total;
+        return $this->amount->total / 100;
     }
 
     public function getCurrency(): string

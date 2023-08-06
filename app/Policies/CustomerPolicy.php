@@ -57,4 +57,9 @@ class CustomerPolicy
     {
         return $this->checkWildcardPermissions($user);
     }
+
+    public function sendRegisterInvitation(User $user, Customer $customer): bool
+    {
+        return $this->checkWildcardPermissions($user);
+    }
 }

@@ -34,6 +34,7 @@ class ExportFinished extends Notification implements ShouldQueue
         return FilamentNotification::make()
             ->success()
             ->title('Export finished')
+            /** @phpstan-ignore-next-line Parameter #1 $body of method Filament\Notifications\Notification::body() expects Closure|string|null, array<string>|string given. */
             ->body(Str::replace(':value', $this->fileName, 'Your file [:value] is ready for download.'))
             ->icon('heroicon-o-download')
             ->actions([

@@ -20,7 +20,7 @@ interface PaymentInterface
      */
     public function authorize(): PaymentAuthorize;
 
-    public function refund(): PaymentRefund;
+    public function refund(Payment $paymentModel, int $amount): PaymentRefund;
 
     public function capture(Payment $paymentModel, array $data): PaymentCapture;
 }

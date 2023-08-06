@@ -11,7 +11,6 @@ class ProductData
 {
     public function __construct(
         public readonly string $name,
-        // public readonly RouteUrlData $route_url_data,
         public readonly MetaDataData $meta_data,
         public readonly string $sku,
         public readonly float $retail_price,
@@ -32,6 +31,7 @@ class ProductData
         public readonly ?float $height = null,
         public readonly ?string $description = null,
         public readonly UploadedFile|string|null|array $images = null,
+        public readonly UploadedFile|string|null|array $videos = null,
     ) {
     }
 
@@ -39,7 +39,6 @@ class ProductData
     {
         return new self(
             name: $data['name'],
-            // route_url_data: RouteUrlData::fromArray($data['route_url'] ?? []),
             meta_data: MetaDataData::fromArray($data['meta_data']),
             taxonomy_terms: $data['taxonomy_terms'] ?? [],
             sku: $data['sku'],
@@ -58,6 +57,7 @@ class ProductData
             is_special_offer: $data['is_special_offer'],
             allow_customer_remarks: $data['allow_customer_remarks'],
             images: $data['images'],
+            videos: $data['videos'],
             product_options: $data['product_options'] ?? [],
             product_variants: $data['product_variants'] ?? [],
         );

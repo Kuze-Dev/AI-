@@ -7,6 +7,7 @@ namespace Domain\Payments\Providers;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentCapture;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentRefund;
+use Domain\Payments\Enums\PaymentStatus;
 use Domain\Payments\Events\PaymentProcessEvent;
 use Domain\Payments\Models\Payment;
 use InvalidArgumentException;
@@ -21,7 +22,7 @@ class OfflinePayment extends Provider
         return new PaymentAuthorize(true);
     }
 
-    public function refund(): PaymentRefund
+    public function refund(Payment $paymentModel, int $amount): PaymentRefund
     {
         return new PaymentRefund(success: false);
     }
@@ -38,7 +39,7 @@ class OfflinePayment extends Provider
     {
 
         $paymentModel->update([
-            'status' => 'paid',
+            'status' => PaymentStatus::PAID->value,
         ]);
 
         event(new PaymentProcessEvent($paymentModel));

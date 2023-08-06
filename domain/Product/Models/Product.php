@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Domain\Product\Models;
 
 use Domain\Favorite\Models\Favorite;
+use Domain\Product\Models\Builders\ProductBuilder;
+use Domain\Review\Models\Review;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\MetaData\HasMetaData;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
-use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
-use Support\RouteUrl\HasRouteUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
@@ -36,14 +36,14 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string|null $weight
  * @property int $stock
  * @property string|null $description
- * @property string $status
+ * @property int $status
  * @property int $is_digital_product
  * @property int $is_featured
  * @property int $is_special_offer
  * @property int $allow_customer_remarks
+ * @property int $minimum_order_quantity
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Favorite> $favorites
@@ -55,38 +55,39 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property-read int|null $product_options_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Product\Models\ProductVariant> $productVariants
  * @property-read int|null $product_variants_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Support\RouteUrl\Models\RouteUrl> $routeUrls
- * @property-read int|null $route_urls_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Review> $reviews
+ * @property-read int|null $reviews_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
- * @method static \Illuminate\Database\Eloquent\Builder|Product newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Product newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Product query()
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereAllowCustomerRemarks($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereDimension($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsDigitalProduct($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsFeatured($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsSpecialOffer($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereRetailPrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereSellingPrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereSku($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereStock($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereWeight($value)
+ * @method static ProductBuilder|Product newModelQuery()
+ * @method static ProductBuilder|Product newQuery()
+ * @method static ProductBuilder|Product query()
+ * @method static ProductBuilder|Product whereAllowCustomerRemarks($value)
+ * @method static ProductBuilder|Product whereCreatedAt($value)
+ * @method static ProductBuilder|Product whereDescription($value)
+ * @method static ProductBuilder|Product whereDimension($value)
+ * @method static ProductBuilder|Product whereId($value)
+ * @method static ProductBuilder|Product whereIsDigitalProduct($value)
+ * @method static ProductBuilder|Product whereIsFeatured($value)
+ * @method static ProductBuilder|Product whereIsSpecialOffer($value)
+ * @method static ProductBuilder|Product whereMinimumOrderQuantity($value)
+ * @method static ProductBuilder|Product whereName($value)
+ * @method static ProductBuilder|Product whereRetailPrice($value)
+ * @method static ProductBuilder|Product whereSellingPrice($value)
+ * @method static ProductBuilder|Product whereSku($value)
+ * @method static ProductBuilder|Product whereSlug($value)
+ * @method static ProductBuilder|Product whereStatus($value)
+ * @method static ProductBuilder|Product whereStock($value)
+ * @method static ProductBuilder|Product whereTaxonomyTerms(string $taxonomy, array $terms)
+ * @method static ProductBuilder|Product whereUpdatedAt($value)
+ * @method static ProductBuilder|Product whereWeight($value)
  * @mixin \Eloquent
  */
-#[OnDeleteCascade(['metaData'])]
-class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, HasMedia
+#[OnDeleteCascade(['metaData', 'productOptions', 'productVariants'])]
+class Product extends Model implements HasMetaDataContract, HasMedia
 {
     use LogsActivity;
     use HasSlug;
-    use HasRouteUrl;
     use HasMetaData;
     use ConstraintsRelationships;
     use InteractsWithMedia;
@@ -127,6 +128,12 @@ class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, 
         return [
             'title' => $this->name,
         ];
+    }
+
+    /** @return ProductBuilder<self> */
+    public function newEloquentBuilder($query): ProductBuilder
+    {
+        return new ProductBuilder($query);
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -170,6 +177,11 @@ class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, 
         return $this->hasMany(Favorite::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
     public function isFavorite()
     {
         if ( ! auth()->check()) {
@@ -197,6 +209,10 @@ class Product extends Model implements HasMetaDataContract, HasRouteUrlContact, 
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('image');
+        $this->addMediaCollection('image')
+            ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
+
+        $this->addMediaCollection('video')
+            ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 }

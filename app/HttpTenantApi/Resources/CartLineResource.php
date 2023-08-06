@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
+use Domain\Order\DataTransferObjects\ProductOrderData;
+use Domain\Order\DataTransferObjects\ProductVariantOrderData;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Http\Request;
@@ -17,18 +19,28 @@ class CartLineResource extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'cart_id' => $this->cart_id,
+            'id' => $this->uuid,
             'quantity' => $this->quantity,
-            'remarks' => $this->remarks,
+            'remarks' => [
+                'data' => $this->remarks,
+                'media' => MediaResource::collection($this->media),
+            ],
             'purchasable' => function () {
                 if ($this->purchasable instanceof Product) {
-                    return ProductResource::make($this->purchasable);
+                    return ProductOrderData::fromProduct($this->purchasable);
                 } elseif ($this->purchasable instanceof ProductVariant) {
-                    return $this->purchasable;
+                    return ProductVariantOrderData::fromProductVariant($this->purchasable);
                 }
             },
-            'remarks_images' => $this->media->toArray(),
+            'media' => function () {
+                if ($this->purchasable instanceof Product) {
+                    return MediaResource::collection($this->purchasable->media);
+                } elseif ($this->purchasable instanceof ProductVariant) {
+                    if ($this->purchasable->product) {
+                        return MediaResource::collection(collect($this->purchasable->product->media));
+                    }
+                }
+            },
         ];
     }
 }

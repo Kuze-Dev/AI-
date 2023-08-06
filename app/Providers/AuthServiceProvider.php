@@ -7,11 +7,13 @@ namespace App\Providers;
 use App\Settings\ECommerceSettings;
 use App\Settings\SiteSettings;
 use Domain\Admin\Models\Admin;
+use Domain\Auth\Contracts\HasEmailVerificationOTP;
 use Domain\Customer\Models\Customer;
 use Domain\Tenant\Models\Tenant;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Auth\Notifications\VerifyEmail as VerifyEmailNotification;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
@@ -46,6 +48,11 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Cart\Models\Cart::class => \App\Policies\CartPolicy::class,
         \Domain\Cart\Models\CartLine::class => \App\Policies\CartLinePolicy::class,
         \Domain\Order\Models\Order::class => \App\Policies\OrderPolicy::class,
+        \Domain\ShippingMethod\Models\ShippingMethod::class => \App\Policies\ShippingMethodPolicy::class,
+        \Domain\PaymentMethod\Models\PaymentMethod::class => \App\Policies\PaymentMethodPolicy::class,
+        \Domain\Customer\Models\Customer::class => \App\Policies\CustomerPolicy::class,
+        \Domain\Tier\Models\Tier::class => \App\Policies\TierPolicy::class,
+        \Domain\Address\Models\Address::class => \App\Policies\AddressPolicy::class,
     ];
 
     /** Register any authentication / authorization services. */
@@ -59,7 +66,32 @@ class AuthServiceProvider extends ServiceProvider
 
     protected function configureNotificationUrls(): void
     {
+        VerifyEmailNotification::toMailUsing(function (mixed $notifiable, $url): MailMessage {
+
+            if ($notifiable instanceof HasEmailVerificationOTP && $notifiable->isEmailVerificationUseOTP()) {
+                return (new MailMessage())
+                    ->subject(trans('Verify Email Address'))
+                    ->line(trans('Please copy OTP below to verify your email address.'))
+                    ->line('OTP: '.$notifiable->generateEmailVerificationOTP())
+                    ->line(trans('If you did not create an account, no further action is required.'));
+            }
+
+            // copied from \Illuminate\Auth\Notifications\VerifyEmail::buildMailMessage($url)
+            // https://github.com/laravel/framework/blob/v10.16.1/src/Illuminate/Auth/Notifications/VerifyEmail.php#L62
+            return (new MailMessage())
+                ->subject(trans('Verify Email Address'))
+                ->line(trans('Please click the button below to verify your email address.'))
+                ->action(trans('Verify Email Address'), $url)
+                ->line(trans('If you did not create an account, no further action is required.'));
+
+        });
+
         VerifyEmailNotification::createUrlUsing(function (mixed $notifiable) {
+
+            if ($notifiable instanceof HasEmailVerificationOTP && $notifiable->isEmailVerificationUseOTP()) {
+                return null;
+            }
+
             if ($notifiable instanceof Customer) {
                 /** @var Tenant $tenant */
                 $tenant = tenancy()->tenant;

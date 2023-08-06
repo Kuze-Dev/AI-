@@ -7,6 +7,8 @@ namespace Domain\Cart\Models;
 use Domain\Customer\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 
@@ -15,6 +17,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  *
  * @property int $id
  * @property int $customer_id
+ * @property string $uuid
  * @property string|null $coupon_code
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -29,6 +32,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereCustomerId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Cart whereUuid($value)
  * @mixin \Eloquent
  */
 
@@ -39,17 +43,24 @@ class Cart extends Model
     use ConstraintsRelationships;
 
     protected $fillable = [
+        'uuid',
         'customer_id',
         'coupon_code',
     ];
 
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
+
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Cart\Models\CartLine> */
-    public function cartLines()
+    public function cartLines(): HasMany
     {
         return $this->hasMany(CartLine::class)->whereNull('checked_out_at');
     }
 
-    public function customer()
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Cart\Models\Cart> */
+    public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }

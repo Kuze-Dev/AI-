@@ -5,19 +5,21 @@ declare(strict_types=1);
 namespace Domain\Order\Requests;
 
 use Domain\Address\Models\Address;
+use Domain\Cart\Actions\PurchasableCheckerAction;
 use Domain\Cart\Models\CartLine;
-use Domain\Customer\Models\Customer;
+use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class PlaceOrderRequest extends FormRequest
 {
-    public function rules()
+    public function rules(): array
     {
         return [
             'addresses.shipping' => [
                 'required',
-                Rule::exists(Address::class, 'id')->where(function ($query) {
+                Rule::exists(Address::class, (new Address())->getRouteKeyName())->where(function ($query) {
                     $customerId = auth()->user()?->id;
 
                     $query->where('customer_id', $customerId);
@@ -25,7 +27,7 @@ class PlaceOrderRequest extends FormRequest
             ],
             'addresses.billing' => [
                 'required',
-                Rule::exists(Address::class, 'id')->where(function ($query) {
+                Rule::exists(Address::class, (new Address())->getRouteKeyName())->where(function ($query) {
                     $customerId = auth()->user()?->id;
 
                     $query->where('customer_id', $customerId);
@@ -36,55 +38,35 @@ class PlaceOrderRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $reference = $value;
 
-                    $cartLines = CartLine::whereHas('cart', function ($query) {
-                        $query->whereBelongsTo(auth()->user());
-                    })
-                        ->whereCheckoutReference($reference)
-                        ->where('checkout_expiration', '>', now())
-                        ->whereNull('checked_out_at')
-                        ->count();
+                    // $cartLines = CartLine::whereHas('cart', function ($query) {
+                    //     $query->whereBelongsTo(auth()->user());
+                    // })
+                    //     ->whereCheckoutReference($reference)
+                    //     ->where('checkout_expiration', '>', now())
+                    //     ->whereNull('checked_out_at')
+                    //     ->count();
 
-                    if (!$cartLines) {
-                        $fail('No cart lines for checkout');
+                    // if ( ! $cartLines) {
+                    //     $fail('No cart lines for checkout');
 
-                        return;
-                    }
-                },
-            ],
-            'taxations.state_id' => [
-                'nullable',
-                function ($attribute, $value, $fail) {
-                    $customerId = auth()->user()?->id;
+                    //     return;
+                    // }
 
-                    $customer = Customer::query()
-                        ->whereHas('addresses', function ($query) use ($value) {
-                            $query->where('state_id', $value);
-                        })
-                        ->whereId($customerId)
-                        ->count();
+                    // $cartLines = CartLine::whereCheckoutReference($reference)->get();
 
-                    if ($customer == 0) {
-                        $fail('Invalid state id');
-                    }
-                },
-            ],
-            'taxations.country_id' => [
-                'required',
-                function ($attribute, $value, $fail) {
-                    $customerId = auth()->user()?->id;
+                    // $cartLineIds = array_values($cartLines->pluck('uuid')->toArray());
 
-                    $customer = Customer::query()
-                        ->whereHas('addresses', function ($query) use ($value) {
-                            $query->whereHas('state', function ($subQuery) use ($value) {
-                                $subQuery->where('country_id', $value);
-                            });
-                        })
-                        ->whereId($customerId)
-                        ->count();
+                    // //auth check
+                    // $checkAuth = app(PurchasableCheckerAction::class)->checkAuth($cartLineIds);
+                    // if ($checkAuth !== count($cartLineIds)) {
+                    //     $fail('Invalid cart line IDs.');
+                    // }
 
-                    if ($customer == 0) {
-                        $fail('Invalid country id');
-                    }
+                    // //stock check
+                    // $checkStocks = app(PurchasableCheckerAction::class)->checkStock($cartLineIds);
+                    // if ($checkStocks !== count($cartLineIds)) {
+                    //     $fail('Invalid stocks');
+                    // }
                 },
             ],
             'notes' => [
@@ -101,9 +83,16 @@ class PlaceOrderRequest extends FormRequest
             ],
             'payment_method' => [
                 'required',
-                Rule::in(['COD', 'Bank Transfer', 'Paypal']),
+                Rule::exists(PaymentMethod::class, (new PaymentMethod())->getRouteKeyName()),
             ],
-
+            'shipping_method' => [
+                'required',
+                Rule::exists(ShippingMethod::class, (new ShippingMethod())->getRouteKeyName()),
+            ],
+            'service_id' => [
+                'nullable',
+                'int',
+            ],
         ];
     }
 }

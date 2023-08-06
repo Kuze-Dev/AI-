@@ -4,6 +4,15 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use Domain\Order\Events\AdminOrderBankPaymentEvent;
+use Domain\Order\Events\OrderPlacedEvent;
+use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
+use Domain\Order\Events\OrderStatusUpdatedEvent;
+use Domain\Order\Listeners\AdminOrderBankPaymentListener;
+use Domain\Order\Listeners\OrderPlacedListener;
+use Domain\Order\Listeners\AdminOrderStatusUpdatedListener;
+use Domain\Order\Listeners\OrderPaymentUpdatedListener;
+use Domain\Order\Listeners\OrderStatusUpdatedListener;
 use Domain\Payments\Events\PaymentProcessEvent;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -21,6 +30,19 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         PaymentProcessEvent::class => [
+            OrderPaymentUpdatedListener::class,
+        ],
+        OrderPlacedEvent::class => [
+            OrderPlacedListener::class,
+        ],
+        AdminOrderStatusUpdatedEvent::class => [
+            AdminOrderStatusUpdatedListener::class,
+        ],
+        AdminOrderBankPaymentEvent::class => [
+            AdminOrderBankPaymentListener::class,
+        ],
+        OrderStatusUpdatedEvent::class => [
+            OrderStatusUpdatedListener::class,
         ],
     ];
 

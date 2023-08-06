@@ -20,9 +20,12 @@ return new class () extends Migration {
             $table->foreignIdFor(OrderLine::class)->index();
             $table->foreignIdFor(Customer::class)->nullable()->index();
 
-            $table->string('title')->index();
             $table->smallInteger('rating');
+            $table->string('customer_name')->nullable();
+            $table->string('customer_email')->nullable();
             $table->string('comment')->nullable();
+            $table->json('data')->nullable();
+            $table->boolean('is_anonymous')->default(false);
 
             $table->timestamps();
         });

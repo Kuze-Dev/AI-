@@ -6,11 +6,12 @@ namespace Domain\Order\Actions;
 
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
-use Domain\Order\Enums\OrderResult;
+use Exception;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PlaceOrderAction
 {
-    public function execute(PlaceOrderData $placeOrderData)
+    public function execute(PlaceOrderData $placeOrderData): array|Exception|HttpException
     {
         $payload = app(PrepareOrderAction::class)
             ->execute($placeOrderData);
@@ -20,7 +21,5 @@ class PlaceOrderAction
 
             return $result;
         }
-
-        return OrderResult::FAILED;
     }
 }

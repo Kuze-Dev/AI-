@@ -15,7 +15,7 @@ class CartResource extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->uuid,
             'coupon_code' => $this->coupon_code,
         ];
     }

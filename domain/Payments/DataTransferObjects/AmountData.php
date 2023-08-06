@@ -9,7 +9,7 @@ class AmountData
     public function __construct(
         public readonly PaymentDetailsData $details,
         public readonly string $currency,
-        public readonly string $total,
+        public readonly int $total,
     ) {
     }
 
@@ -17,7 +17,7 @@ class AmountData
     {
         return new self(
             currency: $data['currency'],
-            total: $data['total'],
+            total: $data['total'] * 100,
             details: $data['details'],
         );
     }

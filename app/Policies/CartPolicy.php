@@ -11,21 +11,37 @@ class CartPolicy
 {
     public function view(Customer $customer, Cart $cart): bool
     {
-        return $cart->customer->is($customer);
+        if ($cart->customer) {
+            return $cart->customer->is($customer);
+        }
+
+        return false;
     }
 
     public function create(Customer $customer, Cart $cart): bool
     {
-        return $cart->customer->is($customer);
+        if ($cart->customer) {
+            return $cart->customer->is($customer);
+        }
+
+        return false;
     }
 
     public function update(Customer $customer, Cart $cart): bool
     {
-        return $cart->customer->is($customer);
+        if ($cart->customer) {
+            return $cart->customer->is($customer);
+        }
+
+        return false;
     }
 
     public function delete(Customer $customer, Cart $cart): bool
     {
-        return $cart->customer->is($customer);
+        if ($cart->customer) {
+            return $cart->customer->is($customer);
+        }
+
+        return false;
     }
 }

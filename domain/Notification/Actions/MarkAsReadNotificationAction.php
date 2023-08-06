@@ -21,4 +21,13 @@ class MarkAsReadNotificationAction
 
         event(new NotificationRead());
     }
+
+    public function markAllAsRead(User $user): void
+    {
+        $unreadNotifications = $user->unreadNotifications;
+
+        foreach ($unreadNotifications as $notification) {
+            $this->execute($user, $notification);
+        }
+    }
 }

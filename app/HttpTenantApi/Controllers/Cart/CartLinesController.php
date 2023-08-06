@@ -9,13 +9,14 @@ use Domain\Cart\Actions\UpdateCartLineAction;
 use Domain\Cart\Actions\CreateCartAction;
 use Domain\Cart\DataTransferObjects\UpdateCartLineData;
 use Domain\Cart\DataTransferObjects\CreateCartData;
-use Domain\Cart\Enums\CartActionResult;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\UpdateCartLineRequest;
 use Domain\Cart\Requests\CreateCartLineRequest;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
 use App\Http\Controllers\Controller;
+use Domain\Cart\Actions\CreateCartLineAction;
+use Domain\Cart\Models\Cart;
 
 #[
     Resource('carts/cartlines', apiResource: true, except: ['show', 'index']),
@@ -27,12 +28,21 @@ class CartLinesController extends Controller
     {
         $validatedData = $request->validated();
 
+        /** @var \Domain\Customer\Models\Customer $customer */
         $customer = auth()->user();
 
-        $result = app(CreateCartAction::class)
-            ->execute($customer, CreateCartData::fromArray($validatedData));
+        $cart = app(CreateCartAction::class)->execute($customer);
 
-        if (CartActionResult::SUCCESS != $result) {
+        if ( ! $cart instanceof Cart) {
+            return response()->json([
+                'message' => 'Invalid action',
+            ], 400);
+        }
+
+        $cartline = app(CreateCartLineAction::class)
+            ->execute($cart, CreateCartData::fromArray($validatedData));
+
+        if ( ! $cartline instanceof CartLine) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);
@@ -59,11 +69,6 @@ class CartLinesController extends Controller
                     'message' => 'Cart updated successfully',
                 ]);
         }
-
-        return response()
-            ->json([
-                'message' => 'Cart didnt update',
-            ], 400);
     }
 
     public function destroy(CartLine $cartline): mixed

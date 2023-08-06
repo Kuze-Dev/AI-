@@ -6,12 +6,13 @@ namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartResource;
+use Domain\Cart\Actions\BulkDestroyCartLineAction;
 use Domain\Cart\Actions\DestroyCartAction;
 use Domain\Cart\Models\Cart;
+use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\RouteAttributes\Attributes\Resource;
 
@@ -23,19 +24,38 @@ class CartController extends Controller
 {
     public function index(): mixed
     {
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = auth()->user();
+
         $model = QueryBuilder::for(
             Cart::with([
-                'cartLines',
                 'cartLines.purchasable' => function (MorphTo $query) {
                     $query->morphWith([
+                        Product::class => ['media'],
                         ProductVariant::class => ['product.media'],
                     ]);
                 },
-                'cartLines.media',
             ])
-                ->whereBelongsTo(auth()->user())
-        )->allowedIncludes(['cartLines', 'cartLines.purchasable'])
+                ->whereBelongsTo($customer)
+        )->allowedIncludes(['cartLines.media'])
             ->first();
+
+        if ($model && isset($model->cartLines)) {
+            $cartLineIdsTobeRemoved = [];
+
+            $model->cartLines = $model->cartLines->filter(function ($cartLine) use (&$cartLineIdsTobeRemoved) {
+                if (is_null($cartLine->purchasable)) {
+                    $cartLineIdsTobeRemoved[] = $cartLine->uuid;
+                }
+
+                return ! is_null($cartLine->purchasable);
+            });
+
+            if ( ! is_null($cartLineIdsTobeRemoved)) {
+                app(BulkDestroyCartLineAction::class)
+                    ->execute($cartLineIdsTobeRemoved);
+            }
+        }
 
         if ($model) {
             return CartResource::make($model);
@@ -54,7 +74,7 @@ class CartController extends Controller
         $result = app(DestroyCartAction::class)
             ->execute($cart);
 
-        if (!$result) {
+        if ( ! $result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

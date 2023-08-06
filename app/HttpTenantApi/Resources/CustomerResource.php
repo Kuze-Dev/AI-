@@ -22,8 +22,17 @@ class CustomerResource extends JsonApiResource
             'mobile' => $this->mobile,
             'gender' => $this->gender,
             'status' => $this->status,
-            'birth_date' => $this->birth_date->toDateString(),
+            'birth_date' => $this->birth_date?->toDateString(),
             'is_verified' => $this->hasVerifiedEmail(),
+        ];
+    }
+
+    /** @return array<string, callable> */
+    public function toRelationships(Request $request): array
+    {
+        return [
+            'media' => fn () => MediaResource::collection($this->media),
+            'addresses' => fn () => AddressResource::collection($this->addresses),
         ];
     }
 }

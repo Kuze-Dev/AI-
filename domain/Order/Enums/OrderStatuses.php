@@ -6,12 +6,14 @@ namespace Domain\Order\Enums;
 
 enum OrderStatuses: string
 {
-    case PENDING = 'Pending';
-    case CANCELLED = 'Cancelled';
-    case FOR_CANCELLATION = 'For Cancellation';
-    case REFUNDED = 'Refunded';
-    case PACKED = 'Packed';
-    case SHIPPED = 'Shipped';
-    case DELIVERED = 'Delivered';
-    case FULFILLED = 'Fulfilled';
+    case PROCESSING = 'processing';
+    case PENDING = 'pending';
+    case CANCELLED = 'cancelled';
+    case REFUNDED = 'refunded';
+    case PACKED = 'packed';
+    case SHIPPED = 'shipped';
+    case DELIVERED = 'delivered';
+    case FULFILLED = 'fulfilled';
+    case FORPAYMENT = 'for_payment';
+    case FORAPPROVAL = 'for_approval';
 }
