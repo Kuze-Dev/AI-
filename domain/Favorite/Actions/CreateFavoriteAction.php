@@ -8,6 +8,7 @@ use Domain\Favorite\DataTransferObjects\FavoriteData;
 use Domain\Favorite\Models\Favorite;
 
 use Exception;
+
 class CreateFavoriteAction
 {
     public function execute(FavoriteData $favoriteData): bool

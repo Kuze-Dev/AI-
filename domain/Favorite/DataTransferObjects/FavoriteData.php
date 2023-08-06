@@ -19,6 +19,4 @@ class FavoriteData
             product_id: (int) $data['product_id'],
         );
     }
-
-
 }

@@ -7,7 +7,6 @@ namespace App\HttpTenantApi\Controllers\Favorite;
 use App\HttpTenantApi\Resources\FavoriteResource;
 use Domain\Favorite\Actions\CreateFavoriteAction;
 use Domain\Favorite\Actions\DestroyFavoriteAction;
-use Domain\Favorite\DataTransferObjects\CreateFavoriteData;
 use Domain\Favorite\DataTransferObjects\FavoriteData;
 use Domain\Favorite\Models\Favorite;
 use Domain\Favorite\Requests\FavoriteStoreRequest;
@@ -57,7 +56,7 @@ class FavoriteController
     public function destroy(int $favorite, DestroyFavoriteAction $destroyFavoriteAction): JsonResponse
     {
         $customer = auth()->user();
-        
+
         $favoriteData = FavoriteData::fromArray([
             'customer_id' => $customer->id,
             'product_id' => $favorite,
