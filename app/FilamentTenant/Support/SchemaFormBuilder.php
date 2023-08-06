@@ -108,7 +108,8 @@ class SchemaFormBuilder extends Component
                 ->options(Arr::pluck($field->options, 'label', 'value'))
                 ->multiple($field->multiple),
             CheckBoxFieldData::class => CheckboxList::make($field->state_name)
-                ->options(Arr::pluck($field->options, 'label', 'value')),
+                ->options(Arr::pluck($field->options, 'label', 'value'))
+                ->bulkToggleable($field->bulk_toggleable),
             TextareaFieldData::class => $this->makeTextAreaComponent($field),
             TextFieldData::class => $this->makeTextInputComponent($field),
             ToggleFieldData::class => Toggle::make($field->state_name),

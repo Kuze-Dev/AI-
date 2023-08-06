@@ -16,12 +16,10 @@ class CheckBoxFieldData extends FieldData
     public function __construct(
         public readonly string $title,
         public readonly string $state_name,
-        public readonly FieldType $type = FieldType::CHECKBOX,
         public readonly array $rules = [],
+        public readonly FieldType $type = FieldType::CHECKBOX,
         public readonly array $options = [],
-        public readonly bool $multiple = false,
-        public readonly ?int $min = null,
-        public readonly ?int $max = null,
+        public readonly bool $bulk_toggleable = false,
         public readonly ?string $helper_text = null,
     ) {
     }
@@ -44,9 +42,7 @@ class CheckBoxFieldData extends FieldData
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             rules: $data['rules'] ?? [],
             options: $data['options'] ?? [],
-            multiple: $data['multiple'] ?? false,
-            min: $data['min'] ?? null,
-            max: $data['max'] ?? null,
+            bulk_toggleable:  $data['bulk_toggleable'] ?? false,
             helper_text: $data['helper_text'] ?? null,
         );
     }
