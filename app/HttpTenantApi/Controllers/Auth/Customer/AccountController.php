@@ -24,7 +24,8 @@ use Throwable;
 
 #[
     Prefix('account'),
-    Middleware(['auth:sanctum', 'feature.tenant:' . ECommerceBase::class])]
+    Middleware(['auth:sanctum', 'feature.tenant:' . ECommerceBase::class])
+]
 class AccountController extends Controller
 {
     #[Get('/', name: 'account')]
