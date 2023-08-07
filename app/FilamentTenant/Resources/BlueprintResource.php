@@ -509,7 +509,7 @@ class BlueprintResource extends Resource
                                                 ->required()
                                                 ->formatStateUsing(fn () => $stateData($manipulationType)),
                                             default => throw new ErrorException(
-                                                $manipulationType->value . ' field not setup for conversion manipulation.'
+                                                ManipulationType::class.'::'.Str::upper($manipulationType->value) . ' field not setup for conversion manipulation.'
                                             )
                                         })
                                         ->toArray();
