@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Domain\Blueprint\Models\Blueprint as BlueprintModel;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,7 +13,7 @@ return new class () extends Migration {
         Schema::create('blueprint_data', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(Blueprint::class)->index();
+            $table->foreignIdFor(BlueprintModel::class)->index();
             $table->morphs('model');
 
             $table->string('state_path')->index();

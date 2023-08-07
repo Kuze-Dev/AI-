@@ -12,11 +12,12 @@ class MediaFieldData extends FieldData
     /**
      * @param array<string> $rules
      * @param array<string> $accept
+     * @param array<ConversionData> $conversions
      */
     private function __construct(
         public readonly string $title,
         public readonly string $state_name,
-        public readonly FieldType $type = FieldType::FILE,
+        public readonly FieldType $type = FieldType::MEDIA,
         public readonly array $rules = [],
         public readonly bool $multiple = false,
         public readonly bool $reorder = false,
@@ -32,16 +33,9 @@ class MediaFieldData extends FieldData
 
     public static function fromArray(array $data): self
     {
-        if ( ! $data['type'] instanceof FieldType) {
-            $data['type'] = FieldType::from($data['type']);
-        }
-
-        if ( ! empty($data['conversions'] ?? [])) {
-            $data['conversions'] = array_map(
-                fn (array $conversion) => ConversionData::fromArray($conversion),
-                $data['conversions']
-            );
-        }
+        //        if ( ! $data['type'] instanceof FieldType) {
+        //            $data['type'] = FieldType::from($data['type']);
+        //        }
 
         return new self(
             title: $data['title'],
@@ -55,7 +49,16 @@ class MediaFieldData extends FieldData
             min_files: $data['min_files'] ?? null,
             max_files: $data['max_files'] ?? null,
             helper_text: $data['helper_text'] ?? null,
-            conversions: $data['conversions'] ?? [],
+            conversions:array_map(
+                fn (array $conversion) => ConversionData::fromArray($conversion),
+                $data['conversions'] ?? []
+            ),
         );
+    }
+
+    /** @return array<string, mixed> */
+    public function toArray()
+    {
+        return (array) $this;
     }
 }

@@ -29,6 +29,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\HtmlString;
+use ErrorException;
 
 class BlueprintResource extends Resource
 {
@@ -491,16 +492,29 @@ class BlueprintResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('name')->required(),
                         Forms\Components\Fieldset::make('Manipulations')
-                            ->schema([
-                                Forms\Components\TextInput::make(ManipulationType::WIDTH->value)
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->required(),
-                                Forms\Components\TextInput::make(ManipulationType::HEIGHT->value)
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->required(),
-                            ])
+                            ->statePath('manipulations')
+                            ->schema(
+                                function (?Blueprint $record, $state) {
+
+                                    $stateData = fn (ManipulationType $type) => $state[$type->value]['params'][0] ?? null;
+
+                                    return collect(ManipulationType::cases())
+                                        ->map(fn (ManipulationType $manipulationType) => match ($manipulationType) {
+                                            ManipulationType::WIDTH, ManipulationType::HEIGHT => Forms\Components\TextInput::make(
+                                                $manipulationType->value
+                                            )
+                                                ->translateLabel()
+                                                ->numeric()
+                                                ->minValue(0)
+                                                ->required()
+                                                ->formatStateUsing(fn () => $stateData($manipulationType)),
+                                            default => throw new ErrorException(
+                                                $manipulationType->value . ' filed not setup.'
+                                            )
+                                        })
+                                        ->toArray();
+                                }
+                            )
                             ->columns(2),
                     ])
                     ->columnSpanFull(),

@@ -12,7 +12,7 @@ use Illuminate\Contracts\Support\Arrayable;
  */
 class ManipulationData implements Arrayable
 {
-    private function __construct(
+    public function __construct(
         public readonly ManipulationType $type,
         public readonly array $params = [],
     ) {
