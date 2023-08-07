@@ -11,6 +11,7 @@ use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Product\Database\Factories\ProductFactory;
 use Laravel\Sanctum\Sanctum;
 
+use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertIsString;
 
 beforeEach(function () {
@@ -27,14 +28,19 @@ it('can checkout cart lines', function () {
 
     CartFactory::new()->setCustomerId($customer->id)->createOne();
 
-    CartLineFactory::new()->times(3)
+    $result = CartLineFactory::new()->times(3)
         ->afterCreating(function (CartLine $cartLine, $index) {
             $cartLine->purchasable_id = $index + 1;
             $cartLine->save();
         })->create();
 
+    $cartLineIds = $result->pluck('uuid')->toArray();
+
     $result = app(CheckoutAction::class)
-        ->execute(CheckoutData::fromArray(['cart_line_ids' => [1, 2]]));
+        ->execute(CheckoutData::fromArray(['cart_line_ids' => $cartLineIds]));
 
     assertIsString($result);
+    assertDatabaseHas(CartLine::class, [
+        'checkout_reference' => $result,
+    ]);
 });

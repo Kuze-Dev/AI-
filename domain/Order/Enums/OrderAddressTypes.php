@@ -6,6 +6,6 @@ namespace Domain\Order\Enums;
 
 enum OrderAddressTypes: string
 {
-    case SHIPPING = 'Shipping';
-    case BILLING = 'Billing';
+    case SHIPPING = 'shipping';
+    case BILLING = 'billing';
 }

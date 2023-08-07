@@ -15,7 +15,7 @@ use Spatie\RouteAttributes\Attributes\Post;
 class CartLinesRemoveController
 {
     #[Post('carts/cartlines/bulk-remove', name: 'carts.bulk-remove')]
-    public function __invoke(BulkRemoveRequest $request)
+    public function __invoke(BulkRemoveRequest $request): mixed
     {
         $validated = $request->validated();
 

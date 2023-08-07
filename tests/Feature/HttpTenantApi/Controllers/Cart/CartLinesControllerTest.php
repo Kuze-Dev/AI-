@@ -38,7 +38,7 @@ beforeEach(function () {
 
 it('can add to cart a purchasable product', function () {
     postJson('api/carts/cartlines', [
-        'purchasable_id' => $this->product->id,
+        'purchasable_id' => $this->product->slug,
         'purchasable_type' => 'Product',
         'quantity' => 1,
     ])
@@ -51,7 +51,7 @@ it('can add to cart a purchasable product with variant', function () {
         ->createOne();
 
     postJson('api/carts/cartlines', [
-        'purchasable_id' => $this->product->id,
+        'purchasable_id' => $this->product->slug,
         'variant_id' => $productVariant->id,
         'purchasable_type' => 'Product',
         'quantity' => 1,
@@ -65,7 +65,7 @@ it('can add to cart a purchasable product with remarks', function () {
         ->createOne();
 
     postJson('api/carts/cartlines', [
-        'purchasable_id' => $this->product->id,
+        'purchasable_id' => $this->product->slug,
         'variant_id' => $productVariant->id,
         'purchasable_type' => 'Product',
         'quantity' => 1,
@@ -80,7 +80,7 @@ it('can add to cart a purchasable product with remarks', function () {
 it('can update cart line quantity', function () {
     $cartLine = CartLineFactory::new()->createOne();
 
-    patchJson('api/carts/cartlines/' . $cartLine->id, [
+    patchJson('api/carts/cartlines/' . $cartLine->uuid, [
         'type' => 'quantity',
         'quantity' => 2,
     ])
@@ -92,7 +92,7 @@ it('can update cart line remarks', function () {
 
     $cartLine = CartLineFactory::new()->createOne();
 
-    patchJson('api/carts/cartlines/' . $cartLine->id, [
+    patchJson('api/carts/cartlines/' . $cartLine->uuid, [
         'type' => 'remarks',
         'remarks' => [
             'notes' => 'test remarks',
@@ -106,7 +106,7 @@ it('can delete cart line', function () {
 
     $cartLine = CartLineFactory::new()->createOne();
 
-    deleteJson('api/carts/cartlines/' . $cartLine->id)
+    deleteJson('api/carts/cartlines/' . $cartLine->uuid)
         ->assertValid()
         ->assertNoContent();
 });

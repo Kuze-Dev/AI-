@@ -12,6 +12,7 @@ use Filament\Forms;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
 use App\FilamentTenant\Support;
+use Domain\Order\Models\OrderLine;
 
 class ViewOrderDetails extends ViewRecord
 {
@@ -19,7 +20,7 @@ class ViewOrderDetails extends ViewRecord
 
     protected function getHeading(): string|Htmlable
     {
-        return 'Order Details #' . $this->record->reference;
+        return trans('Order Details #') . $this->record->reference;
     }
 
     protected function getRelationManagers(): array
@@ -33,13 +34,14 @@ class ViewOrderDetails extends ViewRecord
             Forms\Components\Group::make()
                 ->schema([
                     Forms\Components\Group::make()
-                        ->schema($this->getSections())->columnSpan(2),
+                        ->schema($this->getSections())
+                        ->columnSpan(2),
                     OrderResource::summaryCard(),
                 ])->columns(3),
         ];
     }
 
-    private function getSections()
+    private function getSections(): array
     {
         $sections = [];
 
@@ -52,7 +54,7 @@ class ViewOrderDetails extends ViewRecord
                             Forms\Components\Group::make()
                                 ->schema([
                                     Forms\Components\FileUpload::make('image_' . $sectionIndex)
-                                        ->formatStateUsing(function ($record) use ($orderLine) {
+                                        ->formatStateUsing(function () use ($orderLine) {
                                             return $orderLine?->getMedia('order_line_images')
                                                 ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
                                                 ->toArray() ?? [];
@@ -63,7 +65,10 @@ class ViewOrderDetails extends ViewRecord
                                         })
                                         ->image()
                                         ->imagePreviewHeight('120')
-                                        ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                                        ->getUploadedFileUrlUsing(static function (
+                                            Forms\Components\FileUpload $component,
+                                            string $file
+                                        ): ?string {
                                             $mediaClass = config('media-library.media_model', Media::class);
 
                                             /** @var ?Media $media */
@@ -78,17 +83,21 @@ class ViewOrderDetails extends ViewRecord
                                             }
 
                                             return $media?->getUrl();
-                                        })->columnSpan(1),
-                                ])->columnSpan(1),
+                                        })
+                                        ->columnSpan(1),
+                                ])
+                                ->columnSpan(1),
                             Forms\Components\Group::make()
                                 ->schema([
                                     Forms\Components\Grid::make(4)
                                         ->schema([
                                             Forms\Components\Grid::make(2)
                                                 ->schema([
-                                                    Forms\Components\Placeholder::make('product_'  . $sectionIndex)->label('Product')
+                                                    Forms\Components\Placeholder::make('product_'  . $sectionIndex)
+                                                        ->label(trans('Product'))
                                                         ->content($orderLine->name),
-                                                    Forms\Components\Placeholder::make('variant_'  . $sectionIndex)->label('Variant')
+                                                    Forms\Components\Placeholder::make('variant_'  . $sectionIndex)
+                                                        ->label(trans('Variant'))
                                                         ->content(function () use ($orderLine) {
                                                             if ($orderLine->purchasable_type == ProductVariant::class) {
                                                                 $combinations = array_values($orderLine->purchasable_data['combination']);
@@ -103,67 +112,83 @@ class ViewOrderDetails extends ViewRecord
                                                 ]),
                                             Forms\Components\Grid::make(2)
                                                 ->schema([
-                                                    Forms\Components\Placeholder::make('quantity_' . $sectionIndex)->label('Quantity')
+                                                    Forms\Components\Placeholder::make('quantity_' . $sectionIndex)
+                                                        ->label(trans('Quantity'))
                                                         ->content($orderLine->quantity),
-                                                    Forms\Components\Placeholder::make('amount_' . $sectionIndex)->label('Amount')
+                                                    Forms\Components\Placeholder::make('amount_' . $sectionIndex)
+                                                        ->label(trans('Amount'))
                                                         ->content($orderLine->sub_total),
                                                 ]),
                                         ]),
-                                ])->columnSpan(2),
+                                ])
+                                ->columnSpan(2),
                         ])->columns(3),
                     Support\Divider::make(''),
-                    Support\ButtonAction::make('view_remarks_' . $sectionIndex)
-                        ->disableLabel()
-                        ->execute(function () use ($sectionIndex, $orderLine) {
-                            return Forms\Components\Actions\Action::make('view_remarks_btn_' . $sectionIndex)
-                                ->color('secondary')
-                                ->label('View Remarks')
-                                ->size('sm')
-                                ->action(function () {
-                                })
-                                ->modalActions([])
-                                ->modalHeading('Customer Remarks')
-                                ->modalWidth('lg')
-                                ->form([
-                                    Forms\Components\Placeholder::make('remarks_' . $sectionIndex)->label('Remarks')
-                                        ->hidden(is_null($orderLine->remarks_data) ? true : false)
-                                        ->content($orderLine->remarks_data['notes'] ?? ''),
-                                    Forms\Components\FileUpload::make('customer_upload_' . $sectionIndex)->label('Customer Upload')
-                                        ->formatStateUsing(function ($record) use ($orderLine) {
-                                            return $orderLine?->getMedia('order_line_notes')
-                                                ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                                                ->toArray() ?? [];
-                                        })
-                                        ->hidden(function () use ($orderLine) {
-                                            return (bool) (empty($orderLine->getFirstMediaUrl('order_line_notes')));
-                                        })
-                                        ->disabled()
-                                        ->multiple()
-                                        ->image()
-                                        ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
-                                            $mediaClass = config('media-library.media_model', Media::class);
-
-                                            /** @var ?Media $media */
-                                            $media = $mediaClass::findByUuid($file);
-
-                                            if ($component->getVisibility() === 'private') {
-                                                try {
-                                                    return $media?->getTemporaryUrl(now()->addMinutes(5));
-                                                } catch (Throwable $exception) {
-                                                }
-                                            }
-
-                                            return $media?->getUrl();
-                                        }),
-                                ])
-                                ->slideOver()
-                                ->icon('heroicon-o-document');
-                        })
-                        ->hidden(is_null($orderLine->remarks_data) && empty($orderLine->getFirstMediaUrl('order_line_notes')) ? true : false)
-                        ->fullWidth()->size('md'),
-                ])->collapsible();
+                    self::viewRemarksButton($orderLine, $sectionIndex),
+                ])
+                ->collapsible();
         }
 
         return $sections;
+    }
+
+    private function viewRemarksButton(OrderLine $orderLine, int $sectionIndex): Support\ButtonAction
+    {
+        return Support\ButtonAction::make('view_remarks_' . $sectionIndex)
+            ->disableLabel()
+            ->execute(function () use ($sectionIndex, $orderLine) {
+                return Forms\Components\Actions\Action::make('view_remarks_btn_' . $sectionIndex)
+                    ->color('secondary')
+                    ->label(trans('View Remarks'))
+                    ->size('sm')
+                    ->action(function () {
+                    })
+                    ->modalActions([])
+                    ->modalHeading(trans('Customer Remarks'))
+                    ->modalWidth('lg')
+                    ->form([
+                        Forms\Components\Placeholder::make('remarks_' . $sectionIndex)
+                            ->label(trans('Remarks'))
+                            ->hidden(is_null($orderLine->remarks_data) ? true : false)
+                            ->content($orderLine->remarks_data['notes'] ?? ''),
+                        Forms\Components\FileUpload::make('customer_upload_' . $sectionIndex)
+                            ->label(trans('Customer Upload'))
+                            ->formatStateUsing(function () use ($orderLine) {
+                                return $orderLine->getMedia('order_line_notes')
+                                    ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                                    ->toArray();
+                            })
+                            ->hidden(function () use ($orderLine) {
+                                return (bool) (empty($orderLine->getFirstMediaUrl('order_line_notes')));
+                            })
+                            ->disabled()
+                            ->multiple()
+                            ->image()
+                            ->getUploadedFileUrlUsing(static function (
+                                Forms\Components\FileUpload $component,
+                                string $file
+                            ): ?string {
+                                $mediaClass = config('media-library.media_model', Media::class);
+
+                                /** @var ?Media $media */
+                                $media = $mediaClass::findByUuid($file);
+
+                                if ($component->getVisibility() === 'private') {
+                                    try {
+                                        return $media?->getTemporaryUrl(now()->addMinutes(5));
+                                    } catch (Throwable $exception) {
+                                    }
+                                }
+
+                                return $media?->getUrl();
+                            }),
+                    ])
+                    ->slideOver()
+                    ->icon('heroicon-o-document');
+            })
+            ->hidden(is_null($orderLine->remarks_data) &&
+                empty($orderLine->getFirstMediaUrl('order_line_notes')) ? true : false)
+            ->fullWidth()
+            ->size('md');
     }
 }

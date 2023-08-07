@@ -36,10 +36,10 @@ class ListCustomers extends ListRecords
                             'email' => $row['email'],
                             'first_name' => $row['first_name'],
                             'last_name' => $row['last_name'],
-                            'mobile' => $row['mobile'],
-                            'gender' => $row['gender'],
-                            'status' => $row['status'],
-                            'birth_date' => $row['birth_date'],
+                            'mobile' => $row['mobile'] ?? null,
+                            'gender' => $row['gender'] ?? null,
+                            'status' => $row['status'] ?? null,
+                            'birth_date' => $row['birth_date'] ?? null,
                             'tier_id' => isset($row['tier'])
                                 ? (Tier::whereName($row['tier'])->first()?->getKey())
                                 : null,
@@ -66,10 +66,10 @@ class ListCustomers extends ListRecords
                         ],
                         'first_name' => 'required|string|min:3|max:100',
                         'last_name' => 'required|string|min:3|max:100',
-                        'mobile' => 'required|string|min:3|max:100',
-                        'gender' => ['required', Rule::enum(Gender::class)],
-                        'status' => ['required', Rule::enum(Status::class)],
-                        'birth_date' => 'required|date',
+                        'mobile' => 'nullable|string|min:3|max:100',
+                        'gender' => ['nullable', Rule::enum(Gender::class)],
+                        'status' => ['nullable', Rule::enum(Status::class)],
+                        'birth_date' => 'nullable|date',
                         'tier' => [
                             'nullable',
                             Rule::exists(Tier::class, 'name'),
@@ -79,7 +79,11 @@ class ListCustomers extends ListRecords
             ExportAction::make()
                 ->model(Customer::class)
                 ->queue()
-                ->query(fn (Builder $query) => $query->with('tier')->latest())
+                ->query(
+                    fn (Builder $query) => $query
+                        ->with('tier')
+                        ->latest()
+                )
                 ->mapUsing(
                     ['CUID', 'Email', 'First Name',  'Last Name', 'Mobile', 'Gender', 'Status', 'Birth Date', 'Tier', 'Created At'],
                     fn (Customer $customer): array => [
@@ -88,10 +92,10 @@ class ListCustomers extends ListRecords
                         $customer->first_name,
                         $customer->last_name,
                         $customer->mobile,
-                        $customer->gender->value,
-                        $customer->status->value,
-                        $customer->birth_date->format(config('tables.date_format')),
-                        $customer->tier->name,
+                        $customer->gender?->value,
+                        $customer->status?->value,
+                        $customer->birth_date?->format(config('tables.date_format')),
+                        $customer->tier?->name,
                         $customer->created_at?->format(config('tables.date_time_format')),
                     ]
                 ),

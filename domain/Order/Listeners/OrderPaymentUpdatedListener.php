@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Order\Listeners;
 
-use Domain\Order\Actions\DestroyOrderAction;
 use Domain\Order\Models\Order;
 use Domain\Payments\Events\PaymentProcessEvent;
 
-class OrderUpdatedListener
+class OrderPaymentUpdatedListener
 {
     /**
      * Handle the event.
@@ -16,7 +15,7 @@ class OrderUpdatedListener
      * @param  \Domain\Payments\Events\PaymentProcessEvent  $event
      * @return void
      */
-    public function handle(PaymentProcessEvent $event)
+    public function handle(PaymentProcessEvent $event): void
     {
         if ($event->payment->payable instanceof Order) {
             $status = $event->payment->status;

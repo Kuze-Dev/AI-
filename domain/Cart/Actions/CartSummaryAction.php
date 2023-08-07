@@ -12,7 +12,9 @@ use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
 use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Discount\Models\Discount;
-use Domain\Shipment\Actions\USPS\GetUSPSRateAction;
+use Domain\Product\Models\ProductVariant;
+use Domain\Shipment\Actions\GetBoxAction;
+use Domain\Shipment\Actions\GetShippingfeeAction;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ShipFromAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
@@ -20,9 +22,11 @@ use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
 use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 
 class CartSummaryAction
 {
+    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
     public function getSummary(
         CartLine|Collection $collections,
         CartSummaryTaxData $cartSummaryTaxData,
@@ -66,23 +70,31 @@ class CartSummaryAction
         return SummaryData::fromArray($summaryData);
     }
 
+    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
     public function getSubTotal(CartLine|Collection $collections): float
     {
         $subTotal = 0;
 
         if ($collections instanceof Collection) {
             $subTotal = $collections->reduce(function ($carry, $collection) {
+                /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
                 $purchasable = $collection->purchasable;
+                $sellingPrice = (float) $purchasable->selling_price;
 
-                return $carry + ($purchasable->selling_price * $collection->quantity);
+                return $carry + ($sellingPrice * $collection->quantity);
             }, 0);
         } elseif ($collections instanceof CartLine) {
-            $subTotal = $collections->purchasable->selling_price * $collections->quantity;
+            /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
+            $purchasable = $collections->purchasable;
+            $sellingPrice = (float) $purchasable->selling_price;
+
+            $subTotal = $sellingPrice * $collections->quantity;
         }
 
         return $subTotal;
     }
 
+    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
     public function getShippingFee(
         CartLine|Collection $collections,
         Customer $customer,
@@ -92,7 +104,14 @@ class CartSummaryAction
     ): float {
         $shippingFeeTotal = 0;
 
-        if ($shippingAddress) {
+        if ($shippingAddress && $shippingMethod) {
+            $productlist = $this->getProducts($collections);
+
+            $boxData = app(GetBoxAction::class)->execute(
+                $shippingMethod,
+                BoxData::fromArray($productlist)
+            );
+
             $parcelData = new ParcelData(
                 ship_from_address: new ShipFromAddressData(
                     address: $shippingMethod->shipper_address,
@@ -102,20 +121,81 @@ class CartSummaryAction
                     country: $shippingMethod->country,
                     code: $shippingMethod->country->code,
                 ),
-                pounds: '10',
+                pounds: (string) $boxData->weight,
                 ounces: '0',
-                width: '10',
-                height: '10',
-                length: '10',
+                width: (string) $boxData->width,
+                height: (string) $boxData->height,
+                length: (string) $boxData->length,
                 zip_origin: $shippingMethod->shipper_zipcode,
                 parcel_value: '200',
             );
 
-            $shippingFeeTotal = app(GetUSPSRateAction::class)
+            $shippingFeeTotal = app(GetShippingfeeAction::class)
                 ->execute($customer, $parcelData, $shippingMethod, $shippingAddress, $serviceId);
         }
 
         return $shippingFeeTotal;
+    }
+
+    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
+    private function getProducts(CartLine|Collection $collections): array
+    {
+        $productlist = [];
+
+        if ( ! is_iterable($collections)) {
+            /** @var \Domain\Product\Models\Product $product */
+            $product = $collections->purchasable;
+
+            if ($collections->purchasable instanceof ProductVariant) {
+                /** @var \Domain\Product\Models\Product $product */
+                $product = $collections->purchasable->product;
+            }
+
+            if ( ! is_null($product->dimension)) {
+                $purchasableId = $product->id;
+
+                $length = $product->dimension['length'];
+                $width = $product->dimension['width'];
+                $height = $product->dimension['height'];
+                $weight = $product->weight;
+
+                $productlist[] = [
+                    'product_id' => (string) $purchasableId,
+                    'length' => $length,
+                    'width' => $width,
+                    'height' => $height,
+                    'weight' => (float) $weight,
+                ];
+            }
+        } else {
+            foreach ($collections as $collection) {
+                /** @var \Domain\Product\Models\Product $product */
+                $product = $collection->purchasable;
+
+                if ($collection->purchasable instanceof ProductVariant) {
+                    /** @var \Domain\Product\Models\Product $product */
+                    $product = $collection->purchasable->product;
+                }
+                if ( ! is_null($product->dimension)) {
+                    $purchasableId = $product->id;
+
+                    $length = $product->dimension['length'];
+                    $width = $product->dimension['width'];
+                    $height = $product->dimension['height'];
+                    $weight = $product->weight;
+
+                    $productlist[] = [
+                        'product_id' => (string) $purchasableId,
+                        'length' => $length,
+                        'width' => $width,
+                        'height' => $height,
+                        'weight' => (float) $weight,
+                    ];
+                }
+            }
+        }
+
+        return $productlist;
     }
 
     public function getTax(
@@ -131,12 +211,13 @@ class CartSummaryAction
         }
 
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
-        $taxPercentage = (float) $taxZone->percentage;
-        $taxDisplay = $taxZone->price_display;
 
         if ( ! $taxZone instanceof TaxZone) {
             throw new BadRequestHttpException('No tax zone found');
         }
+
+        $taxPercentage = (float) $taxZone->percentage;
+        $taxDisplay = $taxZone->price_display;
 
         return [
             'taxZone' => $taxZone,
@@ -150,7 +231,7 @@ class CartSummaryAction
         $discountTotal = 0;
 
         if ( ! is_null($discount)) {
-            $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal);
+            $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal) ?? 0;
         }
 
         return $discountTotal;

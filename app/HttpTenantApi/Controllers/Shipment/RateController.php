@@ -17,7 +17,7 @@ use Spatie\RouteAttributes\Attributes\Get;
 #[Middleware(['feature.tenant:'. ECommerceBase::class, 'auth:sanctum'])]
 class RateController extends Controller
 {
-    #[Get('shipping-methods/{shippingMethod}/rate/{address}')]
+    // #[Get('shipping-methods/{shippingMethod}/rate/{address}')]
     public function __invoke(ShippingMethod $shippingMethod, Address $address): mixed
     {
         if ( ! $shippingMethod->active) {

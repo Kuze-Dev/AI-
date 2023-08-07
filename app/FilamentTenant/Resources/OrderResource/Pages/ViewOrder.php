@@ -14,6 +14,6 @@ class ViewOrder extends ViewRecord
 
     protected function getHeading(): string|Htmlable
     {
-        return 'Order #' . $this->record->reference;
+        return trans('Order #') . $this->record->reference;
     }
 }

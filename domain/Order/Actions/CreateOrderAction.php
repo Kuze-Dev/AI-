@@ -10,22 +10,29 @@ use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Discount\Actions\CreateDiscountLimitAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
+use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Illuminate\Support\Str;
 
 class CreateOrderAction
 {
-    public function execute(PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData)
+    public function execute(PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData): Order
     {
         $referenceNumber = Str::upper(Str::random(12));
 
         try {
+            /** @var \Domain\Address\Models\State $state */
+            $state = $preparedOrderData->billingAddress->state;
+
+            /** @var \Domain\Address\Models\Country $country */
+            $country = $state->country;
+
             $summary = app(CartSummaryAction::class)->getSummary(
                 $preparedOrderData->cartLine,
                 new CartSummaryTaxData(
-                    $placeOrderData->taxation_data->country_id,
-                    $placeOrderData->taxation_data->state_id
+                    $country->id,
+                    $state->id,
                 ),
                 new CartSummaryShippingData(
                     $preparedOrderData->customer,
@@ -66,8 +73,7 @@ class CreateOrderAction
             'total' => $summary->grandTotal,
 
             'notes' => $preparedOrderData->notes,
-            'shipping_method' => 'test shipping_method',
-            'shipping_details' => 'test shipping details',
+            'status' => OrderStatuses::PENDING,
 
             'is_paid' => false,
         ]);

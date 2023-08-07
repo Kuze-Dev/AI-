@@ -8,6 +8,7 @@ use Domain\Auth\Actions\GenerateOTPForEmailVerificationAction;
 use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Auth\Model\EmailVerificationOneTimePassword;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Exception;
 
 /**
  * @property-read \Domain\Auth\Model\EmailVerificationOneTimePassword|null $emailVerificationOneTimePassword
@@ -22,7 +23,7 @@ trait EmailVerificationOTP
 
     public function getEmailVerificationColumn(): EmailVerificationType
     {
-        return $this->email_verification_type;
+        return $this->email_verification_type ?? throw new Exception('Customer email_verification_type not defined.');
     }
 
     public function isEmailVerificationUseOTP(): bool

@@ -12,8 +12,6 @@ class BulkDestroyCartLineAction
     {
         $cartLines = CartLine::whereIn((new CartLine())->getRouteKeyName(), $cartLineIds);
 
-        $cartLines->delete();
-
-        return true;
+        return (bool) $cartLines->delete();
     }
 }

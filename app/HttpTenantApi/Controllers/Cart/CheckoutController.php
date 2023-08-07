@@ -23,7 +23,7 @@ use Spatie\RouteAttributes\Attributes\Resource;
 ]
 class CheckoutController
 {
-    public function index(Request $request)
+    public function index(Request $request): mixed
     {
         $validated = $request->validate([
             'reference' => 'required|string',
@@ -50,7 +50,7 @@ class CheckoutController
             // Check if there are expired cart lines
             if ($expiredCartLines->isNotEmpty()) {
                 return response()->json([
-                    'message' => 'Key has been expired, checkout again',
+                    'message' => 'Key has been expired, checkout again to revalidate your cart',
                 ], 400);
             }
 

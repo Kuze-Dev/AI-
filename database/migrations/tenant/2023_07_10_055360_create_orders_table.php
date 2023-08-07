@@ -33,12 +33,8 @@ return new class () extends Migration {
             $table->decimal('shipping_total');
             $table->decimal('total')->index();
             $table->longText('notes')->nullable();
-            $table->string('shipping_method')->index();
-            $table->string('shipping_details');
             $table->boolean('is_paid')->default(false);
-            $table->enum('status', [
-                'Pending', 'Cancelled', 'Refunded', 'Packed', 'Shipped', 'Delivered', 'Fulfilled',
-            ])->default('Pending')->index();
+            $table->string('status')->index();
             $table->string('cancelled_reason')->nullable();
 
             $table->timestamp('cancelled_at')->nullable();
@@ -49,7 +45,7 @@ return new class () extends Migration {
             $table->id();
 
             $table->foreignIdFor(Order::class);
-            $table->enum('type', ['Shipping', 'Billing'])->index();
+            $table->string('type')->index();
             $table->string('country');
             $table->string('state');
             $table->string('label_as');

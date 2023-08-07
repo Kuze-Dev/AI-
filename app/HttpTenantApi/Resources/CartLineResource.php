@@ -36,7 +36,9 @@ class CartLineResource extends JsonApiResource
                 if ($this->purchasable instanceof Product) {
                     return MediaResource::collection($this->purchasable->media);
                 } elseif ($this->purchasable instanceof ProductVariant) {
-                    return MediaResource::collection(collect($this->purchasable->product->media));
+                    if ($this->purchasable->product) {
+                        return MediaResource::collection(collect($this->purchasable->product->media));
+                    }
                 }
             },
         ];
