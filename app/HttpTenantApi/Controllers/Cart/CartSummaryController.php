@@ -31,10 +31,7 @@ class CartSummaryController extends Controller
             ->get();
 
         if (isset($cartLines)) {
-            $cartLines = $cartLines->filter(function ($cartLine) use (&$cartLineIdsTobeRemoved) {
-                if (is_null($cartLine->purchasable)) {
-                    $cartLineIdsTobeRemoved[] = $cartLine->uuid;
-                }
+            $cartLines = $cartLines->filter(function ($cartLine) {
                 return !is_null($cartLine->purchasable);
             });
         }
