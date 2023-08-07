@@ -449,6 +449,9 @@ class BlueprintResource extends Resource
                     ->columnSpanFull(),
             ],
             FieldType::CHECKBOX => [
+                Forms\Components\Toggle::make('bulk_toggleable')
+                    ->reactive()
+                    ->columnSpanFull(),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
                     ->orderable()
