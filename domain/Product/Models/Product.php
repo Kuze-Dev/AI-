@@ -115,6 +115,11 @@ class Product extends Model implements HasMetaDataContract, HasMedia
      */
     protected $casts = [
         'dimension' => 'array',
+        'status' => 'boolean',
+        'is_digital_product' => 'boolean',
+        'is_featured' => 'boolean',
+        'is_special_offer' => 'boolean',
+        'allow_customer_remarks' => 'boolean',
     ];
 
     /**
