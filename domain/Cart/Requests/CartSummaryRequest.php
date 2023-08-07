@@ -12,9 +12,13 @@ use Domain\Discount\Models\Discount;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Database\Eloquent\Collection;
 
 class CartSummaryRequest extends FormRequest
 {
+    /** @var \Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> */
+    private Collection $cartLinesCache;
+
     public function rules(): array
     {
         return [
@@ -25,12 +29,7 @@ class CartSummaryRequest extends FormRequest
 
                     $cartLineIds = explode(',', $value);
 
-                    $cartLines = CartLine::whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
-                        ->whereHas('cart', function ($query) {
-                            $query->whereBelongsTo(auth()->user());
-                        })
-                        ->whereNull('checked_out_at')
-                        ->get();
+                    $cartLines = $this->getCartLines();
 
                     if (count($cartLineIds) !== $cartLines->count()) {
                         $fail('Invalid cart line IDs.');
@@ -63,6 +62,25 @@ class CartSummaryRequest extends FormRequest
 
             ],
         ];
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> */
+    public function getCartLines(): Collection
+    {
+        if (empty($this->cartLinesCache)) {
+            $cartLineIds = explode(',', $this->validated('cart_line_ids'));
+
+            $this->cartLinesCache = CartLine::query()
+                ->with('purchasable')
+                ->whereHas('cart', function ($query) {
+                    $query->whereBelongsTo(auth()->user());
+                })
+                ->whereNull('checked_out_at')
+                ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
+                ->get();
+        }
+
+        return $this->cartLinesCache;
     }
 
     /** @return \Domain\Address\Models\Country|null */

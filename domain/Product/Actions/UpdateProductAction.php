@@ -38,6 +38,8 @@ class UpdateProductAction
             $this->createMediaAction->execute($product, Arr::wrap($productData->images), 'image', false);
         }
 
+        $this->createMediaAction->execute($product, Arr::wrap($productData->videos), 'video', false);
+
         $product->taxonomyTerms()->sync($productData->taxonomy_terms);
 
         return $product;

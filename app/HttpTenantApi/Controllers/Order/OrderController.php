@@ -16,7 +16,6 @@ use Domain\Order\Requests\UpdateOrderRequest;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
@@ -40,7 +39,7 @@ class OrderController extends Controller
                 'orderLines.media',
             ])->whereBelongsTo($customer))
                 ->allowedIncludes(['orderLines', 'orderLines.review.media'])
-                ->allowedFilters(['status', 'reference', AllowedFilter::scope('for_payment', 'whereHasForPayment')])
+                ->allowedFilters(['status', 'reference'])
                 ->allowedSorts(['reference', 'total', 'status', 'created_at'])
                 ->jsonPaginate()
         );
@@ -66,7 +65,7 @@ class OrderController extends Controller
         }
 
         /** @phpstan-ignore-next-line */
-        if (!$result['order'] instanceof Order) {
+        if ( ! $result['order'] instanceof Order) {
             return response()->json([
                 'message' => 'Order failed to be created',
             ], 400);

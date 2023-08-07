@@ -20,6 +20,7 @@ class ReviewResource extends JsonApiResource
             'customer_name' => $this->is_anonymous ? '*' : $this->customer_name,
             'customer_email' => $this->is_anonymous ? '*' : $this->customer_email,
             'is_anonymous' => $this->is_anonymous,
+            'data' => $this->data,
         ];
     }
 

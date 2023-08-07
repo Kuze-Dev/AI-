@@ -23,34 +23,35 @@ class CartSummaryController extends Controller
     #[Get('carts/count', name: 'carts.count')]
     public function count(): mixed
     {
-        $cartLinesCount = CartLine::query()
+        $cartLines = CartLine::with('purchasable')
             ->whereHas('cart', function ($query) {
                 $query->whereBelongsTo(auth()->user());
             })
             ->whereNull('checked_out_at')
-            ->count();
+            ->get();
 
-        return response()->json(['cartCount' => $cartLinesCount], 200);
+        if (isset($cartLines)) {
+            $cartLines = $cartLines->filter(function ($cartLine) use (&$cartLineIdsTobeRemoved) {
+                if (is_null($cartLine->purchasable)) {
+                    $cartLineIdsTobeRemoved[] = $cartLine->uuid;
+                }
+                return !is_null($cartLine->purchasable);
+            });
+        }
+
+        return response()->json(['cartCount' => $cartLines->count()], 200);
     }
 
     #[Get('carts/summary', name: 'carts.summary')]
     public function summary(CartSummaryRequest $request): mixed
     {
         $validated = $request->validated();
-
-        $cartLineIds = explode(',', $validated['cart_line_ids']);
+        $discountCode = $validated['discount_code'] ?? null;
 
         /** @var \Domain\Customer\Models\Customer $customer */
         $customer = auth()->user();
 
-        $cartLines = CartLine::query()
-            ->with('purchasable')
-            ->whereHas('cart', function ($query) {
-                $query->whereBelongsTo(auth()->user());
-            })
-            ->whereNull('checked_out_at')
-            ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
-            ->get();
+        $cartLines = $request->getCartLines();
 
         $country = $request->getCountry();
         $state = $request->getState();
@@ -77,13 +78,16 @@ class CartSummaryController extends Controller
             }
         }
 
-        return response()->json([
+        $responseArray = [
             'tax' => [
                 'inclusive_sub_total' => $summary->taxTotal ? round($summary->subTotal + $summary->taxTotal, 2) : null,
                 'display' => $summary->taxTotal ? $summary->taxDisplay : null,
                 'percentage' => $summary->taxPercentage ? round($summary->taxPercentage, 2) : 0,
                 'amount' => $summary->taxTotal ? round($summary->taxTotal, 2) : 0,
             ],
+            'sub_total' => round($summary->subTotal, 2),
+            'shipping_fee' => round($summary->shippingTotal, 2),
+            'total' => round($summary->grandTotal, 2),
             'discount' => [
                 'status' => $summary->discountMessages->status ?? null,
                 'message' => $summary->discountMessages->message ?? null,
@@ -92,9 +96,12 @@ class CartSummaryController extends Controller
                 'discount_type' => $summary->discountMessages->discount_type ?? null,
                 'total_savings' => $discount ? round($summary->discountTotal ?? 0, 2) : 0,
             ],
-            'sub_total' => round($summary->subTotal, 2),
-            'shipping_fee' => round($summary->shippingTotal, 2),
-            'total' => round($summary->grandTotal, 2),
-        ], 200);
+        ];
+
+        if (!$discountCode) {
+            unset($responseArray['discount']);
+        }
+
+        return response()->json($responseArray, 200);
     }
 }

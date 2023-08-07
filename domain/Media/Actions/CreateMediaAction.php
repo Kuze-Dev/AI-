@@ -9,31 +9,32 @@ use Exception;
 use Log;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
+use Spatie\MediaLibrary\HasMedia;
 
 class CreateMediaAction
 {
-    public function execute(Model $model, array $medias, string $collection, bool $isCreate = true): void
+    public function execute(Model&HasMedia $model, array $medias, string $collection, bool $isCreate = true): void
     {
         if ($isCreate) {
             /** Clears unexpected media even before upload */
             $model->clearMediaCollection($collection);
         }
 
-        foreach ($medias as $image) {
+        foreach ($medias as $media) {
             try {
-                if (is_string($image)) {
-                    $response = Http::get($image);
+                if (is_string($media)) {
+                    $response = Http::get($media);
                     if ($response->successful()) {
                         $model
-                            ->addMediaFromUrl($image)
+                            ->addMediaFromUrl($media)
                             ->toMediaCollection($collection);
                     }
                 } else {
-                    if ($image instanceof UploadedFile && $imageString = $image->get()) {
+                    if ($media instanceof UploadedFile && $mediaString = $media->get()) {
                         $model
-                            ->addMediaFromString($imageString)
-                            ->usingFileName($image->getClientOriginalName())
-                            ->usingName(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME))
+                            ->addMediaFromString($mediaString)
+                            ->usingFileName($media->getClientOriginalName())
+                            ->usingName(pathinfo($media->getClientOriginalName(), PATHINFO_FILENAME))
                             ->toMediaCollection($collection);
                     }
                 }
@@ -42,12 +43,12 @@ class CreateMediaAction
             }
         }
 
-        if (!$isCreate) {
+        if ( ! $isCreate) {
             $excludedMedia = $model->getMedia($collection)->whereIn('uuid', $medias);
             $model->clearMediaCollectionExcept($collection, $excludedMedia);
         }
 
-        if (!filled($medias)) {
+        if ( ! filled($medias)) {
             $model->clearMediaCollection($collection);
         }
     }

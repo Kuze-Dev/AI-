@@ -17,7 +17,7 @@ class CheckoutRequest extends FormRequest
                 'array',
                 function ($attribute, $value, $fail) {
 
-                    //auth check
+                    // //auth check
                     // $checkAuth = app(PurchasableCheckerAction::class)->checkAuth($value);
                     // if ($checkAuth !== count($value)) {
                     //     $fail('Invalid cart line IDs.');

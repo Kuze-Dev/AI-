@@ -42,10 +42,9 @@ class SplitOrderAction
                 $payment = $this->proceedPayment($order, $preparedOrderData);
 
                 event(new OrderPlacedEvent(
-                    $preparedOrderData->customer,
                     $order,
-                    $preparedOrderData->shippingAddress,
-                    $preparedOrderData->shippingMethod
+                    $preparedOrderData,
+                    $placeOrderData
                 ));
 
                 DB::commit();

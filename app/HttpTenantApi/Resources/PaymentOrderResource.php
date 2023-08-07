@@ -24,7 +24,8 @@ class PaymentOrderResource extends JsonApiResource
             'amount' => $this->amount,
             'status' => $this->status,
             'remarks' => $this->remarks,
-            'message' => $this->message,
+            'customer_message' => $this->customer_message,
+            'admin_message' => $this->admin_message,
             'media' => MediaResource::collection($this->media),
             'payment_method' => [
                 'data' => PaymentMethodOrderData::fromPaymentMethod($paymentMethod),

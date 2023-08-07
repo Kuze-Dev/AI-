@@ -13,7 +13,7 @@ use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentCapture;
 use Domain\Payments\DataTransferObjects\ProviderData;
 use Domain\Payments\DataTransferObjects\TransactionData;
-use Domain\Payments\Providers\PaypalProvider;
+use Domain\Payments\Providers\StripeProvider;
 use Mockery\MockInterface;
 
 use function PHPUnit\Framework\assertInstanceOf;
@@ -23,27 +23,27 @@ beforeEach(function () {
 
     testInTenantContext();
 
-    $paymentMethod = PaymentMethodFactory::new()->createOne(['title' => 'Paypal']);
+    $paymentMethod = PaymentMethodFactory::new()->createOne(['title' => 'Stripe']);
 
-    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new PaypalProvider());
+    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new StripeProvider());
 
 });
 
-it('Paypal payment Gateway must be instance of PaypalProvider  ', function () {
+it('Stripe payment Gateway must be instance of StripeProvider  ', function () {
 
     livewire(PaymentSettings::class)
         ->fillForm([
 
-            'paypal_secret_id' => 'test_paypal_secret_id',
-            'paypal_secret_key' => 'test_paypal_secret_d',
+            'stripe_publishable_key' => 'pk_test_dllptuueksoicl',
+            'stripe_secret_key' => 'sk_test_kfjsviefiskuhgkep',
 
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
-    $paymentGateway = app(PaymentManagerInterface::class)->driver('paypal');
+    $paymentGateway = app(PaymentManagerInterface::class)->driver('stripe');
 
-    assertInstanceOf(PaypalProvider::class, $paymentGateway);
+    assertInstanceOf(StripeProvider::class, $paymentGateway);
 });
 
 it('can generate payment authorization dto ', function () {
@@ -51,14 +51,14 @@ it('can generate payment authorization dto ', function () {
     livewire(PaymentSettings::class)
         ->fillForm([
 
-            'paypal_secret_id' => 'test_paypal_secret_id',
-            'paypal_secret_key' => 'test_paypal_secret_d',
+            'stripe_publishable_key' => 'pk_test_dllptuueksoicl',
+            'stripe_secret_key' => 'sk_test_kfjsviefiskuhgkep',
 
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
-    $paymentMethod = PaymentMethod::where('slug', 'paypal')->first();
+    $paymentMethod = PaymentMethod::where('slug', 'stripe')->first();
 
     $payment = PaymentFactory::new()->setPaymentMethod($paymentMethod->id)->create();
 
@@ -75,7 +75,7 @@ it('can generate payment authorization dto ', function () {
         payment_method_id: $paymentMethod->id,
     );
 
-    $paymentGateway = app(PaymentManagerInterface::class)->driver('paypal');
+    $paymentGateway = app(PaymentManagerInterface::class)->driver('stripe');
 
     $result = $paymentGateway->withData($providerData)->authorize();
 
@@ -87,19 +87,17 @@ it('can capture payment', function () {
     livewire(PaymentSettings::class)
         ->fillForm([
 
-            'paypal_secret_id' => 'test_paypal_secret_id',
-            'paypal_secret_key' => 'test_paypal_secret_d',
+            'stripe_publishable_key' => 'pk_test_dllptuueksoicl',
+            'stripe_secret_key' => 'sk_test_kfjsviefiskuhgkep',
 
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
-    $paymentMethod = PaymentMethod::where('slug', 'paypal')->first();
-
-    $payment = PaymentFactory::new()->setPaymentMethod($paymentMethod->id)->create();
+    $paymentMethod = PaymentMethod::where('slug', 'stripe')->first();
 
     $stp = $this->mock(
-        PaypalProvider::class,
+        StripeProvider::class,
         function (MockInterface $mock) {
 
             $mock->expects('capture')->andReturns(new PaymentCapture(true));

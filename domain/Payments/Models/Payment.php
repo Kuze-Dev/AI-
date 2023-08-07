@@ -25,7 +25,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $amount
  * @property string $status
  * @property string|null $remarks
- * @property string|null $message
+ * @property string|null $customer_message
+ * @property string|null $admin_message
  * @property string|null $payment_id
  * @property string|null $transaction_id
  * @property array $payment_details
@@ -34,7 +35,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $deleted_at
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
- * @property-read Model|\Eloquent $payable
+ * @property-read Model|Eloquent $payable
  * @property-read PaymentMethod|null $paymentMethod
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Payments\Models\PaymentRefund> $refunds
  * @property-read int|null $refunds_count
@@ -77,7 +78,8 @@ class Payment extends Model implements HasMedia
         'amount',
         'status',
         'remarks',
-        'message',
+        'customer_message',
+        'admin_message',
         'payment_id',
         'transaction_id',
         'payment_details',

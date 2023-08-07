@@ -40,7 +40,7 @@ class OrderBankPaymentNotification extends Notification
     {
         return [
             'type' => 'bank_transfer_payment',
-            'message' => "Your bank transfer for order #{$this->order->reference} has been {$this->paymentRemarks}",
+            'message' => "Your proof of payment for order #{$this->order->reference} has been {$this->paymentRemarks}",
             'button' => 'View Order Details',
             'reference' => $this->order->reference,
         ];

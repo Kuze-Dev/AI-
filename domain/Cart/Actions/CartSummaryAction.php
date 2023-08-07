@@ -112,14 +112,20 @@ class CartSummaryAction
                 BoxData::fromArray($productlist)
             );
 
+            /** @var \Domain\Address\Models\State $state */
+            $state = $shippingMethod->state;
+
+            /** @var \Domain\Address\Models\Country $country */
+            $country = $shippingMethod->country;
+
             $parcelData = new ParcelData(
                 ship_from_address: new ShipFromAddressData(
                     address: $shippingMethod->shipper_address,
                     city: $shippingMethod->shipper_city,
-                    state: $shippingMethod->state,
+                    state: $state,
                     zipcode: $shippingMethod->shipper_zipcode,
-                    country: $shippingMethod->country,
-                    code: $shippingMethod->country->code,
+                    country: $country,
+                    code: $country->code,
                 ),
                 pounds: (string) $boxData->weight,
                 ounces: '0',
@@ -144,7 +150,7 @@ class CartSummaryAction
 
         $cm_to_inches = 1 / 2.54;
 
-        if (!is_iterable($collections)) {
+        if ( ! is_iterable($collections)) {
             /** @var \Domain\Product\Models\Product $product */
             $product = $collections->purchasable;
 
@@ -153,7 +159,7 @@ class CartSummaryAction
                 $product = $collections->purchasable->product;
             }
 
-            if (!is_null($product->dimension)) {
+            if ( ! is_null($product->dimension)) {
                 $purchasableId = $product->id;
 
                 $length = $product->dimension['length'];
@@ -178,7 +184,7 @@ class CartSummaryAction
                     /** @var \Domain\Product\Models\Product $product */
                     $product = $collection->purchasable->product;
                 }
-                if (!is_null($product->dimension)) {
+                if ( ! is_null($product->dimension)) {
                     $purchasableId = $product->id;
 
                     $length = $product->dimension['length'];
@@ -214,7 +220,7 @@ class CartSummaryAction
 
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
 
-        if (!$taxZone instanceof TaxZone) {
+        if ( ! $taxZone instanceof TaxZone) {
             throw new BadRequestHttpException('No tax zone found');
         }
 
@@ -232,7 +238,7 @@ class CartSummaryAction
     {
         $discountTotal = 0;
 
-        if (!is_null($discount)) {
+        if ( ! is_null($discount)) {
             $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal) ?? 0;
         }
 
