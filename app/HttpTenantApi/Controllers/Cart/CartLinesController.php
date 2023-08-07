@@ -33,7 +33,7 @@ class CartLinesController extends Controller
 
         $cart = app(CreateCartAction::class)->execute($customer);
 
-        if (!$cart instanceof Cart) {
+        if ( ! $cart instanceof Cart) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);
@@ -42,7 +42,7 @@ class CartLinesController extends Controller
         $cartline = app(CreateCartLineAction::class)
             ->execute($cart, CreateCartData::fromArray($validatedData));
 
-        if (!$cartline instanceof CartLine) {
+        if ( ! $cartline instanceof CartLine) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);
@@ -78,7 +78,7 @@ class CartLinesController extends Controller
         $result = app(DestroyCartLineAction::class)
             ->execute($cartline);
 
-        if (!$result) {
+        if ( ! $result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

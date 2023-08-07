@@ -9,7 +9,6 @@ class PlaceOrderData
     public function __construct(
         public readonly PlaceOrderAddressData $addresses,
         public readonly string $cart_reference,
-        // public readonly PlaceOrderTaxationData $taxation_data,
         public readonly string $shipping_method,
         public readonly string $payment_method,
         public readonly ?string $notes,
@@ -26,10 +25,6 @@ class PlaceOrderData
                 billing: (int) $data['addresses']['billing']
             ),
             cart_reference: $data['cart_reference'],
-            // taxation_data: new PlaceOrderTaxationData(
-            //     country_id: (int) $data['taxations']['country_id'],
-            //     state_id: $data['taxations']['state_id'] ?? null
-            // ),
             shipping_method: $data['shipping_method'],
             payment_method: $data['payment_method'],
             notes: $data['notes'] ?? null,

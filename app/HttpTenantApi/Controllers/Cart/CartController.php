@@ -6,7 +6,6 @@ namespace App\HttpTenantApi\Controllers\Cart;
 
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartResource;
-use Domain\Cart\Actions\BulkDestroyCartLineAction;
 use Domain\Cart\Actions\DestroyCartAction;
 use Domain\Cart\Events\SanitizeCartEvent;
 use Domain\Cart\Models\Cart;
@@ -49,10 +48,10 @@ class CartController extends Controller
                     $cartLineIdsTobeRemoved[] = $cartLine->uuid;
                 }
 
-                return !is_null($cartLine->purchasable);
+                return ! is_null($cartLine->purchasable);
             });
 
-            if (!is_null($cartLineIdsTobeRemoved)) {
+            if ( ! is_null($cartLineIdsTobeRemoved)) {
                 event(new SanitizeCartEvent(
                     $cartLineIdsTobeRemoved,
                 ));
@@ -76,7 +75,7 @@ class CartController extends Controller
         $result = app(DestroyCartAction::class)
             ->execute($cart);
 
-        if (!$result) {
+        if ( ! $result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

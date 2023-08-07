@@ -38,35 +38,35 @@ class PlaceOrderRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $reference = $value;
 
-                    // $cartLines = CartLine::whereHas('cart', function ($query) {
-                    //     $query->whereBelongsTo(auth()->user());
-                    // })
-                    //     ->whereCheckoutReference($reference)
-                    //     ->where('checkout_expiration', '>', now())
-                    //     ->whereNull('checked_out_at')
-                    //     ->count();
+                    $cartLines = CartLine::whereHas('cart', function ($query) {
+                        $query->whereBelongsTo(auth()->user());
+                    })
+                        ->whereCheckoutReference($reference)
+                        ->where('checkout_expiration', '>', now())
+                        ->whereNull('checked_out_at')
+                        ->count();
 
-                    // if ( ! $cartLines) {
-                    //     $fail('No cart lines for checkout');
+                    if ( ! $cartLines) {
+                        $fail('No cart lines for checkout');
 
-                    //     return;
-                    // }
+                        return;
+                    }
 
-                    // $cartLines = CartLine::whereCheckoutReference($reference)->get();
+                    $cartLines = CartLine::whereCheckoutReference($reference)->get();
 
-                    // $cartLineIds = array_values($cartLines->pluck('uuid')->toArray());
+                    $cartLineIds = array_values($cartLines->pluck('uuid')->toArray());
 
-                    // //auth check
-                    // $checkAuth = app(PurchasableCheckerAction::class)->checkAuth($cartLineIds);
-                    // if ($checkAuth !== count($cartLineIds)) {
-                    //     $fail('Invalid cart line IDs.');
-                    // }
+                    //auth check
+                    $checkAuth = app(PurchasableCheckerAction::class)->checkAuth($cartLineIds);
+                    if ($checkAuth !== count($cartLineIds)) {
+                        $fail('Invalid cart line IDs.');
+                    }
 
-                    // //stock check
-                    // $checkStocks = app(PurchasableCheckerAction::class)->checkStock($cartLineIds);
-                    // if ($checkStocks !== count($cartLineIds)) {
-                    //     $fail('Invalid stocks');
-                    // }
+                    //stock check
+                    $checkStocks = app(PurchasableCheckerAction::class)->checkStock($cartLineIds);
+                    if ($checkStocks !== count($cartLineIds)) {
+                        $fail('Invalid stocks');
+                    }
                 },
             ],
             'notes' => [

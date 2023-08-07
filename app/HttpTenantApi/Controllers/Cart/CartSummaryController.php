@@ -32,7 +32,7 @@ class CartSummaryController extends Controller
 
         if (isset($cartLines)) {
             $cartLines = $cartLines->filter(function ($cartLine) {
-                return !is_null($cartLine->purchasable);
+                return ! is_null($cartLine->purchasable);
             });
         }
 
@@ -95,7 +95,7 @@ class CartSummaryController extends Controller
             ],
         ];
 
-        if (!$discountCode) {
+        if ( ! $discountCode) {
             unset($responseArray['discount']);
         }
 
