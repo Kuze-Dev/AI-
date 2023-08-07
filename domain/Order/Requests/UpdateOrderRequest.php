@@ -28,13 +28,13 @@ class UpdateOrderRequest extends FormRequest
                 Rule::in($slugs),
                 function ($attribute, $value, $fail) use ($order) {
 
-                    if ( ! in_array($value, ['status', 'bank-transfer'])) {
+                    if (!in_array($value, ['status', 'bank-transfer'])) {
 
                         $isValid = $order->whereHas('payments', function (Builder $query) use ($value, $order) {
                             $query->where('gateway', $value)->where('payable_id', $order->id);
                         })->first();
 
-                        if ( ! $isValid) {
+                        if (!$isValid) {
                             $fail('Invalid request');
 
                             return;
@@ -51,9 +51,9 @@ class UpdateOrderRequest extends FormRequest
                 function ($attribute, $value, $fail) use ($order) {
                     if (
                         $value == OrderStatuses::CANCELLED->value &&
-                        ! in_array($order->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])
+                        !in_array($order->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])
                     ) {
-                        $fail("You can't cancelled this order");
+                        $fail("You can't cancel this order");
 
                         return;
                     }

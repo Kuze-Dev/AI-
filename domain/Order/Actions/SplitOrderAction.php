@@ -36,8 +36,8 @@ class SplitOrderAction
                 app(CreateOrderAddressAction::class)
                     ->execute($order, $preparedOrderData);
 
-                // CartLine::whereCheckoutReference($placeOrderData->cart_reference)
-                //     ->update(['checked_out_at' => now()]);
+                CartLine::whereCheckoutReference($placeOrderData->cart_reference)
+                    ->update(['checked_out_at' => now()]);
 
                 $payment = $this->proceedPayment($order, $preparedOrderData);
 
