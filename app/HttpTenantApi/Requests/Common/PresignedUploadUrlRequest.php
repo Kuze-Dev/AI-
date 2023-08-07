@@ -11,10 +11,7 @@ class PresignedUploadUrlRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'resource' => 'required',
-            'resource_id' => 'required',
             'ext' => 'required',
-
         ];
     }
 }

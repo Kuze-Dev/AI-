@@ -13,15 +13,15 @@ class CreateS3PresignUploadUrlAction
     public function execute(CreatePresignUploadUrlData $presignedUrlData): PresignUrlData
     {
 
-        $filename = $presignedUrlData->resource_id.'/'.uniqid().'.'.$presignedUrlData->ext;
+        $filename = uniqid().'.'.$presignedUrlData->ext;
 
-        $object_key = $presignedUrlData->resource.'/'.$filename;
+        $object_key = 'tmp/'.$filename;
 
         while (Storage::disk('s3')->exists($object_key)) {
 
-            $filename = $presignedUrlData->resource_id.'/'.uniqid().'.'.$presignedUrlData->ext;
+            $filename = uniqid().'.'.$presignedUrlData->ext;
 
-            $object_key = $presignedUrlData->resource.'/'.$filename;
+            $object_key = 'tmp/'.$filename;
         }
 
         /** @var \Illuminate\Filesystem\AwsS3V3Adapter */
