@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Favorite;
 
 use App\HttpTenantApi\Resources\FavoriteResource;
+use Domain\Favorite\Actions\CreateFavoriteAction;
+use Domain\Favorite\Actions\DestroyFavoriteAction;
+use Domain\Favorite\DataTransferObjects\FavoriteData;
 use Domain\Favorite\Models\Favorite;
 use Domain\Favorite\Requests\FavoriteStoreRequest;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -28,33 +31,42 @@ class FavoriteController
                 ->allowedIncludes([
                     'product',
                     'customer',
+                    'product.media'
                 ])
                 ->get()
         );
     }
 
-    public function store(FavoriteStoreRequest $request, Favorite $favorite): JsonResponse
+    public function store(FavoriteStoreRequest $request, CreateFavoriteAction $createFavoriteAction): JsonResponse
     {
-
         $customer = auth()->user();
         $validatedData = $request->validated();
-        $favorite->product_id = $validatedData['product_id'];
-        $favorite->customer_id = $customer->id;
 
-        $favorite->save();
+        $favoriteData = FavoriteData::fromArray([
+            'customer_id' => $customer->id,
+            'product_id' => $validatedData['product_id'],
+        ]);
 
-        return response()->json(['message' => 'Favorite item created successfully'], 201);
+        if ($createFavoriteAction->execute($favoriteData)) {
+            return response()->json(['message' => 'Favorite item created successfully'], 201);
+        } else {
+            return response()->json(['message' => 'Failed to create favorite item'], 500);
+        }
     }
 
-    public function destroy(int $favorite): JsonResponse
+    public function destroy(int $favorite, DestroyFavoriteAction $destroyFavoriteAction): JsonResponse
     {
         $customer = auth()->user();
 
-        $favorite = Favorite::where('product_id', $favorite)->where('customer_id', $customer->id)
-            ->firstOrFail();
+        $favoriteData = FavoriteData::fromArray([
+            'customer_id' => $customer->id,
+            'product_id' => $favorite,
+        ]);
 
-        $favorite->delete();
-
-        return response()->json(['message' => 'Favorite item deleted']);
+        if ($destroyFavoriteAction->execute($favoriteData)) {
+            return response()->json(['message' => 'Favorite item deleted successfully'], 201);
+        } else {
+            return response()->json(['message' => 'Failed to delete favorite item'], 500);
+        }
     }
 }

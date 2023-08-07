@@ -8,7 +8,7 @@ enum PaymentStatus: string
 {
     case PENDING = 'pending';
     case PAID = 'paid';
-    case CANCEL = 'cancel';
+    case CANCELLED = 'cancelled';
     case VOID = 'void';
     case REFUNDED = 'refunded';
     case PARTIALLY_REFUNDED = 'partially refunded';

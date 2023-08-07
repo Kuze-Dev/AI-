@@ -13,24 +13,44 @@ class CreateOrUpdateProductVariantAction
     public function execute(Product $product, ProductData $productData, bool $isCreate = true): void
     {
         if (filled($productData->product_variants)) {
+            /** If for update */
             if ( ! $isCreate) {
-                $existingProductVariants = ProductVariant::where('product_id', $product->id)->get();
-                foreach ($existingProductVariants as $productVariant) {
-                    $productVariant->delete();
+                foreach ($productData->product_variants as $productVariant) {
+                    $variant = ProductVariant::where('combination', 'LIKE', '%"option_value_id": ' . $productVariant['combination'][0]['option_value_id'] . '%')
+                        ->when(isset($productVariant['combination'][1]), function ($query) use ($productVariant) {
+                            return $query->where('combination', 'LIKE', '%"option_value_id": ' . $productVariant['combination'][1]['option_value_id'] . '%');
+                        })->first();
+
+                    if ($variant) {
+                        $variant->update($this->prepareVariantData($productVariant));
+                    } else {
+                        $this->createProductVariant($product->id, $productVariant);
+                    }
+                }
+            } else {
+                foreach ($productData->product_variants as $productVariant) {
+                    $this->createProductVariant($product->id, $productVariant);
                 }
             }
-
-            foreach ($productData->product_variants as $productVariant) {
-                ProductVariant::create([
-                    'product_id' => $product->id,
-                    'sku' => $productVariant['sku'],
-                    'combination' => $productVariant['combination'],
-                    'retail_price' => $productVariant['retail_price'],
-                    'selling_price' => $productVariant['selling_price'],
-                    'stock' => $productVariant['stock'],
-                    'status' => $productVariant['status'] ?? 1,
-                ]);
-            }
         }
+    }
+
+    private function createProductVariant(int $productId, array $productVariant): void
+    {
+        ProductVariant::create(
+            array_merge(['product_id' => $productId], $this->prepareVariantData($productVariant))
+        );
+    }
+
+    private function prepareVariantData(array $productVariant): array
+    {
+        return [
+            'sku' => $productVariant['sku'],
+            'combination' => $productVariant['combination'],
+            'retail_price' => $productVariant['retail_price'],
+            'selling_price' => $productVariant['selling_price'],
+            'stock' => $productVariant['stock'],
+            'status' => $productVariant['status'],
+        ];
     }
 }

@@ -38,7 +38,12 @@ class ReviewController
 
         $orderLine = OrderLine::find($validatedData['order_line_id']);
         $orderLine->reviewed_at = now();
+
         $review->order_id = $orderLine->order_id;
+
+        if(isset($orderLine->purchasable_data['combination'])) {
+            $review->data = $orderLine->purchasable_data['combination'];
+        }
 
         if(isset($orderLine->purchasable_data['product'])) {
             $review->product_id = $orderLine->purchasable_data['product']['id'];

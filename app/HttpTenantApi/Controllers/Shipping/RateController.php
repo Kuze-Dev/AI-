@@ -7,6 +7,9 @@ namespace App\HttpTenantApi\Controllers\Shipping;
 use App\Features\ECommerce\ECommerceBase;
 use App\Http\Controllers\Controller;
 use Domain\Address\Models\Address;
+use Domain\Cart\Actions\CartSummaryAction;
+use Domain\Cart\Models\CartLine;
+use Domain\Cart\Requests\CartSummaryRequest;
 use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\Actions\GetShippingRateAction;
@@ -21,7 +24,7 @@ use Spatie\RouteAttributes\Attributes\Get;
 class RateController extends Controller
 {
     #[Get('shipping-methods/{shippingMethod}/rate/{address}')]
-    public function __invoke(ShippingMethod $shippingMethod, Address $address): mixed
+    public function __invoke(ShippingMethod $shippingMethod, Address $address, CartSummaryRequest $request): mixed
     {
         if ( ! $shippingMethod->active) {
             abort(404);
@@ -29,26 +32,23 @@ class RateController extends Controller
 
         $this->authorize('view', $address);
 
+        $validated = $request->validated();
+
+        $cartLineIds = explode(',', $validated['cart_line_ids']);
+
         /** @var \Domain\Customer\Models\Customer $customer */
         $customer = Auth::user();
 
-        /**
-         * NOTES:
-         *  unit for product dimencion is inch
-         *  L" x W" x H" = V "^3
-         *
-         * unit for weight is LBS
-         */
+        $cartLines = CartLine::query()
+            ->with('purchasable')
+            ->whereHas('cart', function ($query) use ($customer) {
+                $query->whereBelongsTo($customer);
+            })
+            ->whereNull('checked_out_at')
+            ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
+            ->get();
 
-        /**
-         * Test Data
-         *
-         * @var array */
-        $productlist = [
-            ['product_id' => '1', 'length' => 10, 'width' => 5, 'height' => 0.3, 'weight' => 0.18],
-            // ['product_id' => '1', 'length' => 10, 'width' => 5, 'height' => 0.3, 'weight' => 0.18],
-            // ['product_id' => '1', 'length' => 10, 'width' => 5, 'height' => 0.3, 'weight' => 0.18],
-        ];
+        $productlist = app(CartSummaryAction::class)->getProducts($cartLines);
 
         $boxData = app(GetBoxAction::class)->execute(
             $shippingMethod,

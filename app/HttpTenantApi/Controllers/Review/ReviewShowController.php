@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Spatie\QueryBuilder\QueryBuilder;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 use App\HttpTenantApi\Resources\ReviewResource;
+use Spatie\QueryBuilder\AllowedFilter;
+use Illuminate\Database\Eloquent\Builder;
 
 #[
     Resource('reviews', apiResource: true, only: ['show']),
@@ -25,11 +27,21 @@ class ReviewShowController
             QueryBuilder::for(Review::whereProductId($review))
                 ->allowedIncludes([
                     'product',
-                    'order_line',
                     'customer.media',
                     'media',
+                ]) ->allowedFilters([
+                    AllowedFilter::callback(
+                        'rating',
+                        function (Builder $query, string $value) {
+                            match ($value) {
+                                'asc' => $query->orderBy('rating', 'asc'),
+                                'desc' => $query->orderBy('rating', 'desc'),
+                                default => '',
+                            };
+                        }
+                    ),
                 ])
-                ->get()
+                ->jsonPaginate()
         );
     }
 

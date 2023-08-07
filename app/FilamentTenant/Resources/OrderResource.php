@@ -40,7 +40,7 @@ class OrderResource extends Resource
     protected static function getNavigationBadge(): ?string
     {
         /** @phpstan-ignore-next-line https://filamentphp.com/docs/2.x/admin/navigation#navigation-item-badges */
-        return strval(static::$model::where('status', OrderStatuses::PENDING)->count());
+        return strval(static::$model::whereIn('status', [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])->count());
     }
 
     public static function form(Form $form): Form
@@ -235,8 +235,7 @@ class OrderResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('is_paid')
                     ->label(trans('Paid'))
-                    ->boolean()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()
                     ->label(trans('Order Date'))
@@ -244,6 +243,12 @@ class OrderResource extends Resource
                 Tables\Columns\BadgeColumn::make('status')
                     ->label(trans('Status'))
                     ->formatStateUsing(function ($state) {
+                        if ($state == OrderStatuses::FORPAYMENT->value) {
+                            return 'For Payment';
+                        } elseif ($state == OrderStatuses::FORAPPROVAL->value) {
+                            return 'For Approval';
+                        }
+
                         return ucfirst($state);
                     })
                     ->sortable(),
@@ -282,6 +287,7 @@ class OrderResource extends Resource
                     }),
                 Tables\Filters\SelectFilter::make('status')->label(trans('Status'))
                     ->options([
+                        OrderStatuses::PROCESSING->value => trans('Processing'),
                         OrderStatuses::PENDING->value => trans('Pending'),
                         OrderStatuses::CANCELLED->value => trans('Cancelled'),
                         OrderStatuses::REFUNDED->value => trans('Refunded'),
@@ -290,22 +296,8 @@ class OrderResource extends Resource
                         OrderStatuses::DELIVERED->value => trans('Delivered'),
                         OrderStatuses::FULFILLED->value => trans('Fulfilled'),
                         OrderStatuses::FORPAYMENT->value => trans('For Payment'),
+                        OrderStatuses::FORAPPROVAL->value => trans('For Approval'),
                     ])
-                    ->query(function (Builder $query, array $data) {
-                        $query->when(filled($data['value']), function (Builder $query) use ($data) {
-                            $isForPayment = $data['value'] == OrderStatuses::FORPAYMENT->value;
-
-                            if ($isForPayment) {
-                                return $query->whereHas('payments', function ($subQuery) {
-                                    $subQuery->where(function ($query) {
-                                        $query->whereIn('gateway', ['paypal', 'bank-transfer', 'stripe']);
-                                    })->where('status', 'pending');
-                                })->where('is_paid', false);
-                            }
-
-                            return $query->where('status', $data['value']);
-                        });
-                    })
                     ->attribute('status'),
             ])
             ->bulkActions([
@@ -350,7 +342,15 @@ class OrderResource extends Resource
                 Forms\Components\Grid::make(2)
                     ->schema([
                         Support\BadgeLabel::make(trans('status'))
-                            ->formatStateUsing(fn (string $state): string => ucfirst($state))
+                            ->formatStateUsing(function (string $state): string {
+                                if ($state == OrderStatuses::FORPAYMENT->value) {
+                                    return trans('For Payment');
+                                } elseif ($state == OrderStatuses::FORAPPROVAL->value) {
+                                    return 'For Approval';
+                                }
+
+                                return trans(ucfirst($state));
+                            })
                             ->inline()
                             ->alignLeft(),
                         self::summaryEditButton(),
@@ -501,6 +501,7 @@ class OrderResource extends Resource
                         Forms\Components\Select::make('status_options')
                             ->label('')
                             ->options([
+                                OrderStatuses::PROCESSING->value => trans('Processing'),
                                 OrderStatuses::PENDING->value => trans('Pending'),
                                 OrderStatuses::CANCELLED->value => trans('Cancelled'),
                                 OrderStatuses::REFUNDED->value => trans('Refunded'),
@@ -508,6 +509,9 @@ class OrderResource extends Resource
                                 OrderStatuses::SHIPPED->value => trans('Shipped'),
                                 OrderStatuses::DELIVERED->value => trans('Delivered'),
                                 OrderStatuses::FULFILLED->value => trans('Fulfilled'),
+                                OrderStatuses::FORPAYMENT->value => trans('For Payment'),
+                                OrderStatuses::FORAPPROVAL->value => trans('For Approval'),
+
                             ])
                             ->disablePlaceholderSelection()
                             ->formatStateUsing(function () use ($record) {
@@ -545,6 +549,14 @@ class OrderResource extends Resource
                                 }
 
                                 $updateData['cancelled_at'] = now(Auth::user()?->timezone);
+
+                                $test = $record->load('payments');
+
+                                $payment = $test->payments->first();
+
+                                $payment->update([
+                                    'status' => 'cancelled',
+                                ]);
 
                                 if ($record->discount_code != null) {
                                     DiscountLimit::whereOrderId($record->id)->delete();
@@ -620,7 +632,7 @@ class OrderResource extends Resource
                     ->size('sm')
                     ->action(function () use ($order, $set) {
 
-                        $isPaid = ! $order->is_paid;
+                        $isPaid = !$order->is_paid;
 
                         $result = $order->update([
                             'is_paid' => $isPaid,
@@ -660,14 +672,14 @@ class OrderResource extends Resource
     {
         return Support\ButtonAction::make('proof_of_payment')
             ->disableLabel()
-            ->execute(function (Order $record) {
+            ->execute(function (Order $record, Closure $set) {
                 $order = $record->load('payments');
 
                 return Forms\Components\Actions\Action::make('proof_of_payment')
                     ->color('secondary')
                     ->label(trans('View Proof of payment'))
                     ->size('sm')
-                    ->action(function (array $data) use ($order) {
+                    ->action(function (array $data) use ($order, $set) {
                         // TODO update message and approval here
                         $paymentRemarks = $data['payment_remarks'];
                         $message = $data['message'];
@@ -675,9 +687,17 @@ class OrderResource extends Resource
                         /** @var \Domain\Payments\Models\Payment $payment */
                         $payment = $order->payments->first();
 
+                        if (!is_null($payment->remarks)) {
+                            Notification::make()
+                                ->title(trans("Invalid action."))
+                                ->warning()
+                                ->send();
+                            return;
+                        }
+
                         $result = $payment->update([
                             'remarks' => $paymentRemarks,
-                            'message' => $message,
+                            'admin_message' => $message,
                         ]);
 
                         if ($result) {
@@ -691,6 +711,22 @@ class OrderResource extends Resource
                                 $payment->update([
                                     'status' => 'paid',
                                 ]);
+
+                                $order->update([
+                                    'status' => OrderStatuses::PROCESSING,
+                                ]);
+
+                                $set('status', ucfirst(OrderStatuses::PROCESSING->value));
+                            } else {
+                                $payment->update([
+                                    'status' => 'cancelled',
+                                ]);
+
+                                $order->update([
+                                    'status' => OrderStatuses::CANCELLED,
+                                ]);
+
+                                $set('status', ucfirst(OrderStatuses::CANCELLED->value));
                             }
 
                             Notification::make()
@@ -712,6 +748,16 @@ class OrderResource extends Resource
                     ->modalHeading(trans('Proof of Payment'))
                     ->modalWidth('lg')
                     ->form([
+                        Forms\Components\Textarea::make('customer_message')
+                            ->label(trans('Customer Message'))
+                            ->formatStateUsing(function () use ($order) {
+                                /** @var \Domain\Payments\Models\Payment $payment */
+                                $payment = $order->payments->first();
+
+                                return $payment->customer_message;
+                            })
+                            ->disabled(),
+
                         Forms\Components\FileUpload::make('bank_proof_image')
                             ->label(trans('Customer Upload'))
                             ->formatStateUsing(function () use ($order) {
@@ -766,7 +812,7 @@ class OrderResource extends Resource
                                 /** @var \Domain\Payments\Models\Payment $payment */
                                 $payment = $order->payments->first();
 
-                                return $payment->message;
+                                return $payment->admin_message;
                             }),
                     ])
                     ->slideOver()
@@ -780,7 +826,11 @@ class OrderResource extends Resource
                 /** @var \Domain\Payments\Models\Payment $payment */
                 $payment = $order->payments->first();
 
-                return $payment->gateway != 'bank-transfer';
+                if ($payment->gateway == 'bank-transfer') {
+                    return (bool) (empty($order->payments->first()?->getFirstMediaUrl('image')));
+                }
+
+                return true;
             });
     }
 }

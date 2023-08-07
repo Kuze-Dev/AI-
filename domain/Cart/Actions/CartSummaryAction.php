@@ -112,14 +112,20 @@ class CartSummaryAction
                 BoxData::fromArray($productlist)
             );
 
+            /** @var \Domain\Address\Models\State $state */
+            $state = $shippingMethod->state;
+
+            /** @var \Domain\Address\Models\Country $country */
+            $country = $shippingMethod->country;
+
             $parcelData = new ParcelData(
                 ship_from_address: new ShipFromAddressData(
                     address: $shippingMethod->shipper_address,
                     city: $shippingMethod->shipper_city,
-                    state: $shippingMethod->state,
+                    state: $state,
                     zipcode: $shippingMethod->shipper_zipcode,
-                    country: $shippingMethod->country,
-                    code: $shippingMethod->country->code,
+                    country: $country,
+                    code: $country->code,
                 ),
                 pounds: (string) $boxData->weight,
                 ounces: '0',
@@ -138,9 +144,11 @@ class CartSummaryAction
     }
 
     /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
-    private function getProducts(CartLine|Collection $collections): array
+    public function getProducts(CartLine|Collection $collections): array
     {
         $productlist = [];
+
+        $cm_to_inches = 1 / 2.54;
 
         if ( ! is_iterable($collections)) {
             /** @var \Domain\Product\Models\Product $product */
@@ -161,9 +169,9 @@ class CartSummaryAction
 
                 $productlist[] = [
                     'product_id' => (string) $purchasableId,
-                    'length' => $length,
-                    'width' => $width,
-                    'height' => $height,
+                    'length' => ceil($length * $cm_to_inches),
+                    'width' => ceil($width * $cm_to_inches),
+                    'height' => ceil($height * $cm_to_inches),
                     'weight' => (float) $weight,
                 ];
             }
@@ -186,9 +194,9 @@ class CartSummaryAction
 
                     $productlist[] = [
                         'product_id' => (string) $purchasableId,
-                        'length' => $length,
-                        'width' => $width,
-                        'height' => $height,
+                        'length' => ceil($length * $cm_to_inches),
+                        'width' => ceil($width * $cm_to_inches),
+                        'height' => ceil($height * $cm_to_inches),
                         'weight' => (float) $weight,
                     ];
                 }

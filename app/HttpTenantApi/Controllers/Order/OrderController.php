@@ -16,10 +16,10 @@ use Domain\Order\Requests\UpdateOrderRequest;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 #[
     Resource('orders', apiResource: true, except: 'destroy'),
@@ -39,7 +39,7 @@ class OrderController extends Controller
                 'orderLines.media',
             ])->whereBelongsTo($customer))
                 ->allowedIncludes(['orderLines', 'orderLines.review.media'])
-                ->allowedFilters(['status', 'reference', AllowedFilter::scope('for_payment', 'whereHasForPayment')])
+                ->allowedFilters(['status', 'reference'])
                 ->allowedSorts(['reference', 'total', 'status', 'created_at'])
                 ->jsonPaginate()
         );
@@ -56,6 +56,12 @@ class OrderController extends Controller
             return response()->json([
                 'service_id' => 'Shipping method service id is required',
             ], 404);
+        }
+
+        if ($result instanceof HttpException) {
+            return response()->json([
+                'message' => $result->getMessage(),
+            ], 422);
         }
 
         /** @phpstan-ignore-next-line */

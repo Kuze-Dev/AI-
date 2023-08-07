@@ -20,7 +20,6 @@ use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 use Support\MetaData\Database\Factories\MetaDataFactory;
 
 class ProductSeeder extends Seeder
@@ -31,8 +30,10 @@ class ProductSeeder extends Seeder
         $this->seedBrandAndCategories();
 
         $taxonomyTermIds = TaxonomyTerm::whereIn('slug', ['brand-one', 'clothing'])->pluck('id');
+
+        $bar = $this->command->getOutput()->createProgressBar(count($this->data()['products']));
+
         foreach ($this->data()['products'] as $product) {
-            $productImageUrl = $product['image_url'];
             unset($product['image_url']);
 
             $product = ProductFactory::new($product)
@@ -42,15 +43,6 @@ class ProductSeeder extends Seeder
                 )
                 ->has(MetaDataFactory::new())
                 ->create();
-
-            $product->clearMediaCollection('image');
-
-            $response = Http::get($productImageUrl);
-            if ($response->successful()) {
-                $product
-                    ->addMediaFromUrl($productImageUrl)
-                    ->toMediaCollection('image');
-            }
 
             $product->taxonomyTerms()->attach($taxonomyTermIds);
             $productOptions = $product->productOptions;
@@ -65,14 +57,24 @@ class ProductSeeder extends Seeder
                     ],
                 ],
             ])->for($product)->create();
+
+            $bar->advance();
         }
+
+        $bar->finish();
+
+        $this->command->getOutput()->newLine();
     }
 
     public function seedBrandAndCategories(): void
     {
         $taxonomies = $this->data()['taxonomies'];
-        BlueprintFactory::new($this->data()['blueprint_for_taxonomy'])->create();
-        $blueprint = Blueprint::whereName($this->data()['blueprint_for_taxonomy']['name'])->first();
+        $blueprintId = null;
+        $blueprintId = Blueprint::whereName($this->data()['blueprint_for_taxonomy']['name'])->pluck('id')->first();
+
+        if ( ! $blueprintId) {
+            $blueprintId = BlueprintFactory::new($this->data()['blueprint_for_taxonomy'])->create()->id;
+        }
 
         // Seed Brand and Category in Taxonomy
         foreach ($taxonomies as $taxonomyData) {
@@ -82,7 +84,7 @@ class ProductSeeder extends Seeder
             TaxonomyFactory::new([
                 'name' => $taxonomyData['name'],
             ])
-                ->setBlueprintId($blueprint->id)
+                ->setBlueprintId($blueprintId)
                 ->has(
                     TaxonomyTermFactory::new($taxonomyData['term'])
                 )->create();

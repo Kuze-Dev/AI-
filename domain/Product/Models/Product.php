@@ -44,7 +44,6 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property int $minimum_order_quantity
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Favorite> $favorites
@@ -58,8 +57,6 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property-read int|null $product_variants_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Review> $reviews
  * @property-read int|null $reviews_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Support\RouteUrl\Models\RouteUrl> $routeUrls
- * @property-read int|null $route_urls_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
  * @method static ProductBuilder|Product newModelQuery()
@@ -213,6 +210,9 @@ class Product extends Model implements HasMetaDataContract, HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')
+            ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
+
+        $this->addMediaCollection('video')
             ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 }

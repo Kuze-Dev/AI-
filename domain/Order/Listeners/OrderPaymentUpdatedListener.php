@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\Order\Listeners;
 
+use App\Notifications\Order\OrderCancelledNotification;
+use Domain\Customer\Models\Customer;
+use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
+use Domain\Order\Notifications\AdminOrderStatusUpdatedMail;
 use Domain\Payments\Events\PaymentProcessEvent;
+use Illuminate\Support\Facades\Notification;
 
 class OrderPaymentUpdatedListener
 {
@@ -23,7 +28,7 @@ class OrderPaymentUpdatedListener
 
             match ($status) {
                 'paid' => $this->onOrderPaid($order),
-                // "cancel" => $this->onOrderCancelled($order),
+                'cancelled' => $this->onOrderCancelled($order),
                 default => null
             };
         }
@@ -33,12 +38,30 @@ class OrderPaymentUpdatedListener
     {
         $order->update([
             'is_paid' => true,
+            'status' => OrderStatuses::PROCESSING,
         ]);
     }
 
-    // private function onOrderCancelled(Order $order)
-    // {
-    //     //add balik ng discount
-    //     app(DestroyOrderAction::class)->execute($order);
-    // }
+    private function onOrderCancelled(Order $order): void
+    {
+        $order->update([
+            'status' => OrderStatuses::CANCELLED,
+        ]);
+
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = Customer::find($order->customer_id);
+
+        Notification::send($customer, new OrderCancelledNotification($order));
+
+        // off muna for now
+        // $customer->notify(new AdminOrderStatusUpdatedMail(
+        //     $order,
+        //     'cancelled',
+        //     ''
+        // ));
+
+        // back the discount
+
+        // back the product stock
+    }
 }

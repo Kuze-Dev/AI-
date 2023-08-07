@@ -20,12 +20,11 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int $product_id
  * @property int $order_id
  * @property int $order_line_id
- * @property string|null $customer_name
- * @property string|null $customer_email
  * @property int|null $customer_id
  * @property int $rating
+ * @property string|null $customer_name
+ * @property string|null $customer_email
  * @property string|null $comment
- * @property array|null $data
  * @property bool $is_anonymous
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -40,9 +39,11 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|Review query()
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereComment($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Review whereCustomerDetails($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Review whereData($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Review whereCustomerEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Review whereCustomerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Review whereCustomerName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Review whereIsAnonymous($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereOrderLineId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereProductId($value)
@@ -63,6 +64,7 @@ class Review extends Model implements HasMedia
     ];
 
     protected $casts = [
+        'data' => 'array',
         'is_anonymous' => 'bool',
     ];
 

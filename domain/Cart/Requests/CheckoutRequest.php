@@ -17,17 +17,17 @@ class CheckoutRequest extends FormRequest
                 'array',
                 function ($attribute, $value, $fail) {
 
-                    //auth check
-                    $checkAuth = app(PurchasableCheckerAction::class)->checkAuth($value);
-                    if ($checkAuth !== count($value)) {
-                        $fail('Invalid cart line IDs.');
-                    }
+                    // //auth check
+                    // $checkAuth = app(PurchasableCheckerAction::class)->checkAuth($value);
+                    // if ($checkAuth !== count($value)) {
+                    //     $fail('Invalid cart line IDs.');
+                    // }
 
-                    //stock check
-                    $checkStocks = app(PurchasableCheckerAction::class)->checkStock($value);
-                    if ($checkStocks !== count($value)) {
-                        $fail('Invalid stocks');
-                    }
+                    // //stock check
+                    // $checkStocks = app(PurchasableCheckerAction::class)->checkStock($value);
+                    // if ($checkStocks !== count($value)) {
+                    //     $fail('Invalid stocks');
+                    // }
                 },
             ],
         ];

@@ -53,6 +53,7 @@ final class CustomerData
             tier_id: $tier->getKey(),
             email: $validated['email'],
             password: $validated['password'],
+            image: $validated['profile_image'] ?? null,
             shipping_address_data: new AddressData(
                 state_id: (int) $validated['shipping']['state_id'],
                 label_as: $validated['shipping']['label_as'],

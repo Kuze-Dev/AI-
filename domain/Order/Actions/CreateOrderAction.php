@@ -7,12 +7,10 @@ namespace Domain\Order\Actions;
 use Domain\Cart\Actions\CartSummaryAction;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
-use Domain\Discount\Actions\CreateDiscountLimitAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
-use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Illuminate\Support\Str;
 
 class CreateOrderAction
@@ -21,30 +19,29 @@ class CreateOrderAction
     {
         $referenceNumber = Str::upper(Str::random(12));
 
-        try {
-            /** @var \Domain\Address\Models\State $state */
-            $state = $preparedOrderData->billingAddress->state;
+        /** @var \Domain\Address\Models\State $state */
+        $state = $preparedOrderData->billingAddress->state;
 
-            /** @var \Domain\Address\Models\Country $country */
-            $country = $state->country;
+        /** @var \Domain\Address\Models\Country $country */
+        $country = $state->country;
 
-            $summary = app(CartSummaryAction::class)->getSummary(
-                $preparedOrderData->cartLine,
-                new CartSummaryTaxData(
-                    $country->id,
-                    $state->id,
-                ),
-                new CartSummaryShippingData(
-                    $preparedOrderData->customer,
-                    $preparedOrderData->shippingAddress,
-                    $preparedOrderData->shippingMethod
-                ),
-                $preparedOrderData->discount,
-                $placeOrderData->serviceId
-            );
-        } catch (USPSServiceNotFoundException) {
-            throw new USPSServiceNotFoundException();
-        }
+        $summary = app(CartSummaryAction::class)->getSummary(
+            $preparedOrderData->cartLine,
+            new CartSummaryTaxData(
+                $country->id,
+                $state->id,
+            ),
+            new CartSummaryShippingData(
+                $preparedOrderData->customer,
+                $preparedOrderData->shippingAddress,
+                $preparedOrderData->shippingMethod
+            ),
+            $preparedOrderData->discount,
+            $placeOrderData->serviceId
+        );
+
+        $paymentMethod = $preparedOrderData->paymentMethod->gateway == 'manual'
+            ? OrderStatuses::PENDING : OrderStatuses::FORPAYMENT;
 
         $order = Order::create([
             'customer_id' => $preparedOrderData->customer->id,
@@ -73,14 +70,9 @@ class CreateOrderAction
             'total' => $summary->grandTotal,
 
             'notes' => $preparedOrderData->notes,
-            'status' => OrderStatuses::PENDING,
-
+            'status' => $paymentMethod,
             'is_paid' => false,
         ]);
-
-        if ( ! is_null($preparedOrderData->discount)) {
-            app(CreateDiscountLimitAction::class)->execute($preparedOrderData->discount, $order, $preparedOrderData->customer);
-        }
 
         return $order;
     }
