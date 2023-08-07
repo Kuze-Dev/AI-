@@ -13,6 +13,8 @@ class PaymentMethodOrderData
         public readonly string $slug,
         public readonly string $gateway,
         public readonly ?string $subtitle,
+        public readonly ?string $description,
+        public readonly ?string $instruction,
     ) {
     }
 
@@ -23,6 +25,8 @@ class PaymentMethodOrderData
             slug: $paymentMethod->slug,
             gateway: $paymentMethod->gateway,
             subtitle: $paymentMethod->subtitle ?? null,
+            description: $paymentMethod->description ?? null,
+            instruction: $paymentMethod->instruction ?? null,
         );
     }
 }
