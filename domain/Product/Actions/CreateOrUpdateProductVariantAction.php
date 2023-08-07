@@ -14,7 +14,7 @@ class CreateOrUpdateProductVariantAction
     {
         if (filled($productData->product_variants)) {
             /** If for update */
-            if (!$isCreate) {
+            if ( ! $isCreate) {
                 foreach ($productData->product_variants as $productVariant) {
                     $variant = ProductVariant::where('combination', 'LIKE', '%"option_value_id": ' . $productVariant['combination'][0]['option_value_id'] . '%')
                         ->when(isset($productVariant['combination'][1]), function ($query) use ($productVariant) {
@@ -37,15 +37,9 @@ class CreateOrUpdateProductVariantAction
 
     private function createProductVariant(int $productId, array $productVariant): void
     {
-        ProductVariant::create([
-            'product_id' => $productId,
-            'sku' => $productVariant['sku'],
-            'combination' => $productVariant['combination'],
-            'retail_price' => $productVariant['retail_price'],
-            'selling_price' => $productVariant['selling_price'],
-            'stock' => $productVariant['stock'],
-            'status' => $productVariant['status'] ?? 1,
-        ]);
+        ProductVariant::create(
+            array_merge(['product_id' => $productId], $this->prepareVariantData($productVariant))
+        );
     }
 
     private function prepareVariantData(array $productVariant): array
