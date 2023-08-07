@@ -12,7 +12,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Str;
 
 class ExportFinished extends Notification implements ShouldQueue
 {
@@ -34,8 +33,7 @@ class ExportFinished extends Notification implements ShouldQueue
         return FilamentNotification::make()
             ->success()
             ->title('Export finished')
-            /** @phpstan-ignore-next-line Parameter #1 $body of method Filament\Notifications\Notification::body() expects Closure|string|null, array<string>|string given. */
-            ->body(Str::replace(':value', $this->fileName, 'Your file [:value] is ready for download.'))
+            ->body('Your file [ '.$this->fileName.' ] is ready for download.')
             ->icon('heroicon-o-download')
             ->actions([
                 Action::make('download')
@@ -49,7 +47,7 @@ class ExportFinished extends Notification implements ShouldQueue
     {
         return (new MailMessage())
             ->greeting('Export finished')
-            ->line(Str::replace(':value', $this->fileName, 'Your file [:value] is ready for download.'))
+            ->line('Your file [ '.$this->fileName.' ] is ready for download.')
             ->action('Download', $this->downloadUrl());
     }
 
