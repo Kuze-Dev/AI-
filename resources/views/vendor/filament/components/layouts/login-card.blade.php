@@ -36,7 +36,7 @@
                 ])
             >
                 <div class="flex w-full justify-center">
-                    @if (strlen(app(App\Settings\SiteSettings::class)->logo) === 0)
+                    @if (app(App\Settings\SiteSettings::class)->logo === null)
                         <h3 class="text-center text-2xl font-bold tracking-tight">{{ app(App\Settings\SiteSettings::class)->name ?? 'Welcome!' }}</h3>
                     @else
                         <img src="{{ Storage::url(app(App\Settings\SiteSettings::class)->logo) }}">
@@ -45,7 +45,7 @@
 
 
                 <h3 class="text-center text-2xl font-bold tracking-tight">
-                    HASP CMS Log in for Your Website
+                    {{ trans('HASP CMS Log in for Your Website') }}
                 </h3>
 
 
