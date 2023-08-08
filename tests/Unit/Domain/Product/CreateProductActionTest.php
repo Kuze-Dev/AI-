@@ -35,6 +35,7 @@ it('can create product', function () {
                 $taxonomyTerm->id,
             ],
             'images' => [$productImage],
+            'videos' => [],
             'meta_data' => [
                 'title' => 'Test',
                 'author' => '',
