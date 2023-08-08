@@ -53,6 +53,8 @@ class RateController extends Controller
 
             $productlist = app(CartSummaryAction::class)->getProducts($cartLines);
 
+            $subTotal = app(CartSummaryAction::class)->getSubTotal($cartLines);
+
             $boxData = app(GetBoxAction::class)->execute(
                 $shippingMethod,
                 $address,
@@ -67,7 +69,7 @@ class RateController extends Controller
                             pounds: (string) $boxData->weight,
                             ounces: '0',
                             zip_origin: $shippingMethod->shipper_zipcode,
-                            parcel_value: '200',
+                            parcel_value: (string) $subTotal,
                             height: (string) $boxData->height,
                             width: (string) $boxData->width,
                             length: (string) $boxData->length,
@@ -94,6 +96,5 @@ class RateController extends Controller
                 422
             );
         }
-
     }
 }

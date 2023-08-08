@@ -35,7 +35,8 @@ class CartSummaryController extends Controller
                 if (is_null($cartLine->purchasable)) {
                     $cartLineIdsTobeRemoved[] = $cartLine->uuid;
                 }
-                return !is_null($cartLine->purchasable);
+
+                return ! is_null($cartLine->purchasable);
             });
         }
 
@@ -98,7 +99,7 @@ class CartSummaryController extends Controller
             ],
         ];
 
-        if (!$discountCode) {
+        if ( ! $discountCode) {
             unset($responseArray['discount']);
         }
 

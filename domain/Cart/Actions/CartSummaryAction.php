@@ -107,7 +107,9 @@ class CartSummaryAction
         if ($shippingAddress && $shippingMethod) {
             $productlist = $this->getProducts($collections);
 
-            $boxData = app(GetBoxAction::class)->execute(
+            $subTotal = $this->getSubTotal($collections);
+
+            $boxResponse = app(GetBoxAction::class)->execute(
                 $shippingMethod,
                 $shippingAddress,
                 BoxData::fromArray($productlist)
@@ -128,14 +130,14 @@ class CartSummaryAction
                     country: $country,
                     code: $country->code,
                 ),
-                pounds: (string) $boxData->weight,
+                pounds: (string) $boxResponse->weight,
                 ounces: '0',
-                width: (string) $boxData->width,
-                height: (string) $boxData->height,
-                length: (string) $boxData->length,
+                width: (string) $boxResponse->width,
+                height: (string) $boxResponse->height,
+                length: (string) $boxResponse->length,
                 zip_origin: $shippingMethod->shipper_zipcode,
-                boxData: $boxData,
-                parcel_value: '200',
+                boxData: $boxResponse->boxData,
+                parcel_value: (string) $subTotal,
             );
 
             $shippingFeeTotal = app(GetShippingfeeAction::class)

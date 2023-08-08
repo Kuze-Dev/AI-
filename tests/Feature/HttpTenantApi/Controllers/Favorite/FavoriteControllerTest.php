@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 use Domain\Favorite\Database\Factories\FavoriteFactory;
 use Domain\Customer\Database\Factories\CustomerFactory;
-use Domain\Favorite\Models\Favorite;
 use Domain\Product\Database\Factories\ProductFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
 
-use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
-use function Pest\Laravel\postJson;
 use function Pest\Laravel\withHeader;
 
 beforeEach(function () {
@@ -35,7 +32,6 @@ beforeEach(function () {
     return compact('favorite');
 });
 
-
 it('can show favorite with includes', function (string $include) {
     $favorite = $this->favorite;
     $product = $this->product;
@@ -47,7 +43,7 @@ it('can show favorite with includes', function (string $include) {
         ->assertJson(function (AssertableJson $json) use ($favorite, $product) {
             $json
                 ->where('data.0.type', 'favorites')
-                ->where('data.0.id', (string)$favorite->id)
+                ->where('data.0.id', (string) $favorite->id)
                 ->has('included', 1)
                 ->has(
                     'included',
@@ -63,7 +59,6 @@ it('can show favorite with includes', function (string $include) {
         ->assertOk();
 })->with(['product']);
 
-
 it('can store favorite', function () {
     $customer = CustomerFactory::new()->createOne();
     $product = ProductFactory::new()->createOne();
@@ -76,8 +71,6 @@ it('can store favorite', function () {
     $response->assertStatus(201);
     $response->assertJson(['message' => 'Favorite item created successfully']);
 });
-
-
 
 it('can delete favorite', function () {
     deleteJson('api/favorites/' . $this->favorite->product_id)
