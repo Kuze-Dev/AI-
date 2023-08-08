@@ -1,6 +1,20 @@
 <x-filament::widget class="filament-account-widget">
     <x-filament::card class="h-full">
-        <div class="text-xl font-bold">Total Order</div>
+        <div class="flex w-full justify-between">
+            <div class="text-xl font-bold min-w-fit">Total Order</div>
+            <div class="flex justify-end items-center space-x-2" >
+                <select wire:model="filter"
+                    class="filament-forms-input block rounded-lg text-gray-900 shadow-sm outline-none
+            transition duration-75 focus:border-primary-500 focus:ring-1 focus:ring-inset focus:ring-primary-500 
+            disabled:opacity-70 dark:bg-gray-700 dark:text-white dark:focus:border-primary-500 border-gray-300
+            dark:border-gray-600">
+                    <option value="allTime">All time</option>
+                    <option value="thisYear">This Year</option>
+                    <option value="thisMonth">This Month</option>
+                    <option value="thisDay">This Day</option>
+                </select>
+            </div>
+        </div>
         <div class="filament-hr border-t dark:border-gray-700"></div>
         <div class="py-4">
             <div class="text-3xl font-bold">{{ $order['totalOrder'] }}</div>
@@ -15,8 +29,7 @@
                     <div
                         class="min-h-6 inline-flex items-center justify-center space-x-1 whitespace-nowrap 
                     rounded-xl px-2 py-0.5 text-sm font-medium tracking-tight rtl:space-x-reverse 
-                    @if (strtolower($s) === 'cancelled') 
-                    text-warning-700
+                    @if (strtolower($s) === 'cancelled') text-warning-700
                     bg-warning-500/10
 
                     @elseif (strtolower($s) === 'fulfilled')

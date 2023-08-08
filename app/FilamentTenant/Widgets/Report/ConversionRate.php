@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Widgets\Report;
 
 use App\FilamentTenant\Widgets\Report\utils\ChartColor;
+use App\FilamentTenant\Widgets\Report\utils\DateLabelGenerator;
+use App\FilamentTenant\Widgets\Report\utils\DateRangeCalculator;
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
 use Filament\Widgets\LineChartWidget;
@@ -14,31 +16,47 @@ use Flowframe\Trend\TrendValue;
 class ConversionRate extends LineChartWidget
 {
     protected static ?string $heading = 'Conversion Rate';
+    public ?string $filter = 'perMonth';
+
+    protected function getFilters(): ?array
+    {
+        return [
+            'perDay' => 'Daily',
+            'perMonth' => 'Monthly',
+            'perYear' => 'Yearly',
+        ];
+    }
 
     protected function getData(): array
     {
+        $activeFilter = $this->filter;
+
+        $dateRange = DateRangeCalculator::calculateDateRange($activeFilter);
+        $startDate = $dateRange['start'];
+        $endDate = $dateRange['end'];
+
         $totalUser = Trend::model(Customer::class)
             ->between(
-                start: now()->startOfYear(),
-                end: now()->endOfYear(),
+                start:  $startDate,
+                end: $endDate,
             )
-            ->perMonth()
+            ->$activeFilter()
             ->count();
 
         $totalAddedToCart = Trend::model(CartLine::class)
             ->between(
-                start: now()->startOfYear(),
-                end: now()->endOfYear(),
+                start: $startDate,
+                end: $endDate,
             )
-            ->perMonth()
+            ->$activeFilter()
             ->count();
 
         $totalCheckout = Trend::query(CartLine::whereNotNull('checked_out_at'))
             ->between(
-                start: now()->startOfYear(),
-                end: now()->endOfYear(),
+                start:  $startDate,
+                end: $endDate,
             )
-            ->perMonth()
+            ->$activeFilter()
             ->count();
 
         return [
@@ -64,7 +82,7 @@ class ConversionRate extends LineChartWidget
                     'backgroundColor' => ChartColor::$LINECHART[2],
                 ],
             ],
-            'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            'labels' => DateLabelGenerator::generateLabels($activeFilter),
         ];
     }
 }

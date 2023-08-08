@@ -10,9 +10,8 @@ use Filament\Widgets\Widget;
 class TotalOrder extends Widget
 {
     protected static string $view = 'filament.widgets.total-order';
-
     public array $widgetData = [];
-
+    public string $filter = 'allTime';
     public array $status = ['pending', 'cancelled', 'packed', 'delivered', 'shipped', 'refunded',  'fulfilled'];
 
     protected function getViewData(): array
@@ -38,11 +37,35 @@ class TotalOrder extends Widget
 
     protected function getTotalOrder(): int
     {
-        return Order::count();
+        $query = Order::query();
+
+        $activeFilter = $this->filter;
+
+        if ($activeFilter === 'thisYear') {
+            $query->whereBetween('created_at', [now()->startOfYear(), now()]);
+        } elseif ($activeFilter === 'thisMonth') {
+            $query->whereBetween('created_at', [now()->startOfMonth(), now()]);
+        } elseif ($activeFilter === 'thisDay') {
+            $query->whereDate('created_at', now()->toDateString());
+        }
+
+        return $query->count();
     }
 
     protected function getOrderByStatus(string $status): int
     {
-        return Order::where('status', $status)->count();
+        $query = Order::where('status', $status);
+
+        $activeFilter = $this->filter;
+
+        if ($activeFilter === 'thisYear') {
+            $query->whereBetween('created_at', [now()->startOfYear(), now()]);
+        } elseif ($activeFilter === 'thisMonth') {
+            $query->whereBetween('created_at', [now()->startOfMonth(), now()]);
+        } elseif ($activeFilter === 'thisDay') {
+            $query->whereDate('created_at', now()->toDateString());
+        }
+
+        return $query->count();
     }
 }

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Widgets\Report;
 
 use App\FilamentTenant\Widgets\Report\utils\ChartColor;
+use App\FilamentTenant\Widgets\Report\utils\DateLabelGenerator;
+use App\FilamentTenant\Widgets\Report\utils\DateRangeCalculator;
 use Domain\Order\Models\Order;
 use Filament\Widgets\BarChartWidget;
 use Flowframe\Trend\Trend;
@@ -27,29 +29,18 @@ class TotalSales extends BarChartWidget
     protected function getData(): array
     {
         $activeFilter = $this->filter;
-        $salesData = [];
 
-        if ($activeFilter === 'perDay') {
-            $salesData = Trend::query(Order::whereStatus('fulfilled'))
-                ->between(
-                    start: now()->startOfYear(),
-                    end: now()->endOfYear(),
-                )
-                ->perDay()
-                ->average('total');
-        } elseif ($activeFilter === 'perMonth') {
-            $salesData = Trend::query(Order::whereStatus('fulfilled'))
-                ->between(
-                    start: now()->startOfYear(),
-                    end: now()->endOfYear(),
-                )
-                ->perMonth()
-                ->average('total');
-        } elseif ($activeFilter === 'perYear') {
-            $salesData = Trend::query(Order::whereStatus('fulfilled'))
-                ->perYear()
-                ->average('total');
-        }
+        $dateRange = DateRangeCalculator::calculateDateRange($activeFilter);
+        $startDate = $dateRange['start'];
+        $endDate = $dateRange['end'];
+
+        $salesData = Trend::query(Order::whereStatus('fulfilled'))
+            ->between(
+                start: $startDate,
+                end: $endDate
+            )
+            ->$activeFilter()
+            ->average('total');
 
         return [
             'datasets' => [
@@ -60,20 +51,7 @@ class TotalSales extends BarChartWidget
                 ],
 
             ],
-            'labels' => $this->getLabels($activeFilter),
+            'labels' => DateLabelGenerator::generateLabels($activeFilter),
         ];
-    }
-
-    protected function getLabels(string $activeFilter): array
-    {
-        if ($activeFilter === 'perDay') {
-            return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        } elseif ($activeFilter === 'perMonth') {
-            return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        } elseif ($activeFilter === 'perYear') {
-            return range(date('Y') - 9, date('Y'));
-        }
-
-        return [];
     }
 }
