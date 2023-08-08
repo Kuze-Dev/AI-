@@ -14,7 +14,7 @@ class ProductVariantOrderData
         public readonly float|string $retail_price,
         public readonly float|string $selling_price,
         public readonly int $stock,
-        public readonly string $status,
+        public readonly int|bool|string $status,
         public readonly ProductOrderData $product
     ) {
     }
