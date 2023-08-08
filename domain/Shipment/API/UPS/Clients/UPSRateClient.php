@@ -23,6 +23,9 @@ class UPSRateClient extends BaseClient
     ): UpsResponse {
 
         $shipper = $parcelData->ship_from_address;
+        // dd($parcelData);
+        $package = $this->getPackage($parcelData);
+
         // Create the associative array representing the JSON structure
         $data = [
             'RateRequest' => [
@@ -78,26 +81,8 @@ class UPSRateClient extends BaseClient
                         ],
                         'Weight' => $parcelData->pounds,
                     ],
-                    'Package' => [
-                        'PackagingType' => [
-                            'Code' => '02',
-                            'Description' => 'Package',
-                        ],
-                        'Dimensions' => [
-                            'UnitOfMeasurement' => [
-                                'Code' => 'IN',
-                            ],
-                            'Length' => $parcelData->length,
-                            'Width' => $parcelData->width,
-                            'Height' => $parcelData->height,
-                        ],
-                        'PackageWeight' => [
-                            'UnitOfMeasurement' => [
-                                'Code' => 'LBS',
-                            ],
-                            'Weight' => $parcelData->pounds,
-                        ],
-                    ],
+                    'Package' => $package,
+
                 ],
             ],
         ];
@@ -130,6 +115,8 @@ class UPSRateClient extends BaseClient
     ): UpsResponse {
 
         $shipper = $parcelData->ship_from_address;
+
+        $package = $this->getPackage($parcelData);
 
         $data = [
             'RateRequest' => [
@@ -185,26 +172,7 @@ class UPSRateClient extends BaseClient
                         ],
                         'Weight' => $parcelData->pounds,
                     ],
-                    'Package' => [
-                        'PackagingType' => [
-                            'Code' => '02',
-                            'Description' => 'Package',
-                        ],
-                        'Dimensions' => [
-                            'UnitOfMeasurement' => [
-                                'Code' => 'IN',
-                            ],
-                            'Length' => $parcelData->length,
-                            'Width' => $parcelData->width,
-                            'Height' => $parcelData->height,
-                        ],
-                        'PackageWeight' => [
-                            'UnitOfMeasurement' => [
-                                'Code' => 'LBS',
-                            ],
-                            'Weight' => $parcelData->pounds,
-                        ],
-                    ],
+                    'Package' => $package,
                 ],
             ],
         ];
@@ -224,5 +192,39 @@ class UPSRateClient extends BaseClient
         }
 
         return UpsResponse::fromArray($arrayResponse);
+    }
+
+    private function getPackage(ParcelData $parcelData): array
+    {
+
+        $package = [];
+
+        foreach ($parcelData->boxData->boxitems as $item) {
+
+            $package[] = [
+
+                'PackagingType' => [
+                    'Code' => '02',
+                    'Description' => 'Package',
+                ],
+                'Dimensions' => [
+                    'UnitOfMeasurement' => [
+                        'Code' => 'IN',
+                    ],
+                    'Length' => (string) $item->length,
+                    'Width' => (string) $item->width,
+                    'Height' => (string) $item->height,
+                ],
+                'PackageWeight' => [
+                    'UnitOfMeasurement' => [
+                        'Code' => 'LBS',
+                    ],
+                    'Weight' => (string) $item->weight,
+                ],
+            ];
+
+        }
+
+        return $package;
     }
 }

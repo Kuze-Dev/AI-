@@ -6,7 +6,6 @@ namespace Domain\Favorite\Database\Factories;
 
 use Domain\Favorite\Models\Favorite;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Favorite\Models\Favorite>
@@ -14,6 +13,7 @@ use Illuminate\Support\Str;
 class FavoriteFactory extends Factory
 {
     protected $model = Favorite::class;
+
     public function definition(): array
     {
         return [
@@ -21,6 +21,7 @@ class FavoriteFactory extends Factory
             'product_id' => 1,
         ];
     }
+
     public function setCustomerId(int $id): self
     {
         return $this->state(['customer_id' => $id]);

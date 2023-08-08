@@ -38,6 +38,8 @@ class AddressRequest extends FormRequest
             'zip_code' => 'required|string|max:255',
             'city' => 'required|string|max:255',
             'label_as' => ['required', Rule::enum(AddressLabelAs::class)],
+            'is_default_shipping' => 'nullable|bool',
+            'is_default_billing' => 'nullable|bool',
         ];
     }
 
@@ -51,8 +53,8 @@ class AddressRequest extends FormRequest
             address_line_1: $validated['address_line_1'],
             zip_code: $validated['zip_code'],
             city: $validated['city'],
-            is_default_shipping: $address?->is_default_shipping ?? false,
-            is_default_billing: $address?->is_default_billing ?? false,
+            is_default_shipping: ($validated['is_default_shipping'] ?? false) === true || ($address?->is_default_shipping ?? true),
+            is_default_billing:  ($validated['is_default_billing'] ?? false) === true || ($address?->is_default_billing ?? true),
             customer_id: $customer?->getKey() ?? $address?->customer->getKey(),
         );
     }

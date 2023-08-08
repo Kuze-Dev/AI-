@@ -31,7 +31,7 @@ class FavoriteController
                 ->allowedIncludes([
                     'product',
                     'customer',
-                    'product.media'
+                    'product.media',
                 ])
                 ->get()
         );
