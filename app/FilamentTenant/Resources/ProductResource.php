@@ -52,6 +52,7 @@ class ProductResource extends Resource
                         Forms\Components\TextInput::make('name')
                             ->label('Product Name')
                             ->unique(ignoreRecord: true)
+                            ->maxLength(255)
                             ->required(),
                         Forms\Components\RichEditor::make('description'),
                     ]),

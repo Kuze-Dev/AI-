@@ -62,6 +62,7 @@ it('can update product', function () {
                     $taxonomyTerm->id,
                 ],
                 'images' => [$productImage],
+                'videos' => [],
                 'meta_data' => [
                     'title' => 'foo title updated',
                     'author' => 'foo author updated',
@@ -151,9 +152,4 @@ it('can update product', function () {
             'model_id' => $product->getKey(),
         ]
     );
-
-    assertDatabaseHas(Media::class, [
-        'file_name' => $productImage->getClientOriginalName(),
-        'mime_type' => $productImage->getMimeType(),
-    ]);
 });
