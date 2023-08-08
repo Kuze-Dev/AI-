@@ -129,7 +129,6 @@ class PaymentMethodResource extends Resource
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
             ])
-            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\RestoreAction::make(),

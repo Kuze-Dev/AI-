@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Support;
 
 use Closure;
+use Domain\Blueprint\DataTransferObjects\CheckBoxFieldData;
 use Domain\Blueprint\DataTransferObjects\DatetimeFieldData;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\FileFieldData;
@@ -21,6 +22,7 @@ use Domain\Blueprint\DataTransferObjects\ToggleFieldData;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Field;
@@ -105,6 +107,9 @@ class SchemaFormBuilder extends Component
             SelectFieldData::class => Select::make($field->state_name)
                 ->options(Arr::pluck($field->options, 'label', 'value'))
                 ->multiple($field->multiple),
+            CheckBoxFieldData::class => CheckboxList::make($field->state_name)
+                ->options(Arr::pluck($field->options, 'label', 'value'))
+                ->bulkToggleable($field->bulk_toggleable),
             TextareaFieldData::class => $this->makeTextAreaComponent($field),
             TextFieldData::class => $this->makeTextInputComponent($field),
             ToggleFieldData::class => Toggle::make($field->state_name),
