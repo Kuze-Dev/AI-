@@ -7,6 +7,7 @@ namespace Domain\Shipment\API\Box\DataTransferObjects;
 class BoxResponseData
 {
     public function __construct(
+        public readonly BoxData $boxData,
         public readonly string $dimension_units,
         public readonly int|float $length,
         public readonly int|float $width,

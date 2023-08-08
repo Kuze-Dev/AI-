@@ -109,6 +109,7 @@ class CartSummaryAction
 
             $boxData = app(GetBoxAction::class)->execute(
                 $shippingMethod,
+                $shippingAddress,
                 BoxData::fromArray($productlist)
             );
 
@@ -133,6 +134,7 @@ class CartSummaryAction
                 height: (string) $boxData->height,
                 length: (string) $boxData->length,
                 zip_origin: $shippingMethod->shipper_zipcode,
+                boxData: $boxData,
                 parcel_value: '200',
             );
 
