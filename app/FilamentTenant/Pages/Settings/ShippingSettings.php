@@ -36,8 +36,9 @@ class ShippingSettings extends TenantBaseSettings
                                 )
                             )
                             ->reactive(),
-                    ]),
-
+                    ])->hidden(
+                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\ShippingUsps::class)
+                    ),
                 Forms\Components\Section::make(trans('Ups Shipping'))
                     ->collapsible()
                     ->schema([
@@ -57,7 +58,9 @@ class ShippingSettings extends TenantBaseSettings
                                 )
                             )
                             ->reactive(),
-                    ]),
+                    ])->hidden(
+                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\ShippingUps::class)
+                    ),
 
             ]),
 

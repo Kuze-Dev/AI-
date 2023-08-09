@@ -108,7 +108,11 @@ class TenantResource extends Resource
                                 ],
                                 Features\ECommerce\ECommerceBase::class => [
                                     'label' => trans('eCommerce'),
-                                    'extras' => [],
+                                    'extras' => [
+                                        Features\ECommerce\ShippingStorePickup::class => app(Features\ECommerce\ShippingStorePickup::class)->label,
+                                        Features\ECommerce\ShippingUsps::class => app(Features\ECommerce\ShippingUsps::class)->label,
+                                        Features\ECommerce\ShippingUps::class => app(Features\ECommerce\ShippingUps::class)->label,
+                                    ],
                                 ],
                             ]),
                     ]),
