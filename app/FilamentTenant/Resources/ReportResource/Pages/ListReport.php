@@ -2,18 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\FilamentTenant\Pages;
+namespace App\FilamentTenant\Resources\ReportResource\Pages;
 
+use App\FilamentTenant\Resources\ReportResource;
 use App\FilamentTenant\Widgets\Report as Widgets;
-use Artificertech\FilamentMultiContext\Concerns\ContextualPage;
-use Filament\Pages\Page;
+use Filament\Resources\Pages\ListRecords;
 
-class Report extends Page
+class ListReport extends ListRecords
 {
-    use ContextualPage;
 
-    protected static ?string $navigationGroup = 'eCommerce';
-
+    protected static string $resource = ReportResource::class;
     protected static string $view = 'filament.pages.Report';
 
     protected function getWidgets(): array
