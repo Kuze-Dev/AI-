@@ -223,6 +223,10 @@ class OrderResource extends Resource
                     ->sortable()
                     ->formatStateUsing(function ($record) {
                         return $record->customer_first_name . ' ' . $record->customer_last_name;
+                    })
+                    ->searchable(query: function (Builder $query, string $search) {
+                        $query->where('customer_first_name', 'like', "%{$search}%")
+                            ->orWhere('customer_last_name', 'like', "%{$search}%");
                     }),
                 Tables\Columns\TextColumn::make('tax_total')
                     ->label(trans('Tax Total'))
@@ -632,7 +636,7 @@ class OrderResource extends Resource
                     ->size('sm')
                     ->action(function () use ($order, $set) {
 
-                        $isPaid = ! $order->is_paid;
+                        $isPaid = !$order->is_paid;
 
                         $result = $order->update([
                             'is_paid' => $isPaid,
@@ -687,7 +691,7 @@ class OrderResource extends Resource
                         /** @var \Domain\Payments\Models\Payment $payment */
                         $payment = $order->payments->first();
 
-                        if ( ! is_null($payment->remarks)) {
+                        if (!is_null($payment->remarks)) {
                             Notification::make()
                                 ->title(trans('Invalid action.'))
                                 ->warning()

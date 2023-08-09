@@ -8,6 +8,7 @@ use App\FilamentTenant\Resources\ShippingmethodResource\Pages;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
+use Domain\ShippingMethod\Actions\GetAvailableShippingDriverAction;
 use Domain\ShippingMethod\Enums\Driver;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,7 +18,6 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
 use Exception;
@@ -76,11 +76,7 @@ class ShippingmethodResource extends Resource
                         ->reactive(),
                     Forms\Components\Select::make('driver')
                         ->required()
-                        ->options(
-                            collect(Driver::cases())
-                                ->mapWithKeys(fn (Driver $target) => [$target->value => Str::of($target->value)->headline()->upper()])
-                                ->toArray()
-                        )
+                        ->options(fn () => app(GetAvailableShippingDriverAction::class)->execute())
                         ->enum(Driver::class)
                         ->reactive(),
 
