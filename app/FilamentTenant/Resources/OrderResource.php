@@ -223,6 +223,10 @@ class OrderResource extends Resource
                     ->sortable()
                     ->formatStateUsing(function ($record) {
                         return $record->customer_first_name . ' ' . $record->customer_last_name;
+                    })
+                    ->searchable(query: function (Builder $query, string $search) {
+                        $query->where('customer_first_name', 'like', "%{$search}%")
+                            ->orWhere('customer_last_name', 'like', "%{$search}%");
                     }),
                 Tables\Columns\TextColumn::make('tax_total')
                     ->label(trans('Tax Total'))
@@ -689,9 +693,10 @@ class OrderResource extends Resource
 
                         if (!is_null($payment->remarks)) {
                             Notification::make()
-                                ->title(trans("Invalid action."))
+                                ->title(trans('Invalid action.'))
                                 ->warning()
                                 ->send();
+
                             return;
                         }
 

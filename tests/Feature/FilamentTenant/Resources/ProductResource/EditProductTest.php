@@ -55,7 +55,7 @@ it('can edit product', function () {
     $product = ProductFactory::new()
         ->has(TaxonomyTermFactory::new()->for(TaxonomyFactory::new()->withDummyBlueprint())->count(2))
         ->has(ProductOptionFactory::new()->has(ProductOptionValueFactory::new()))
-        ->has(ProductVariantFactory::new())
+        ->has(ProductVariantFactory::new()->setCombination())
         ->has(MetaDataFactory::new())
         ->createOne();
 

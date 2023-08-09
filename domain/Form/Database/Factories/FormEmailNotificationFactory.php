@@ -24,7 +24,15 @@ class FormEmailNotificationFactory extends Factory
             'reply_to' => $this->faker->safeEmail(),
             'subject' => $this->faker->sentence(),
             'template' => $this->faker->word(),
+            'has_attachments' => false,
         ];
+    }
+
+    public function hasAttachments(bool $state = true): self
+    {
+        return $this->state(
+            ['has_attachments' => $state]
+        );
     }
 
     protected function emails(?int $count = null): array

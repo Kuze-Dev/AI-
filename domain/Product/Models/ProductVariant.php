@@ -57,6 +57,7 @@ class ProductVariant extends Model
      */
     protected $casts = [
         'combination' => 'array',
+        'status' => 'boolean',
     ];
 
     /**

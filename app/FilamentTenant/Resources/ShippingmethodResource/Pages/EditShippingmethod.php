@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources\ShippingmethodResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ShippingmethodResource;
+use Domain\ShippingMethod\Actions\GetAvailableShippingDriverAction;
 use Domain\ShippingMethod\Actions\UpdateShippingMethodAction;
 use Domain\ShippingMethod\DataTransferObjects\ShippingMethodData;
 use Filament\Pages\Actions;
@@ -23,13 +24,22 @@ class EditShippingmethod extends EditRecord
 
     protected function getActions(): array
     {
-        return [
-            Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
-                ->action('save')
-                ->keyBindings(['mod+s']),
-            Actions\DeleteAction::make(),
-        ];
+
+        $drivers = app(GetAvailableShippingDriverAction::class)->execute();
+
+        if (array_key_exists($this->record->driver->value, $drivers)) {
+            return [
+                Action::make('save')
+                    ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                    ->action('save')
+                    ->keyBindings(['mod+s']),
+                Actions\DeleteAction::make(),
+            ];
+        }
+
+        $this->notify('warning', 'Shipping Method ['.$this->record->driver->value.'] is currently Disabled please inform your service provider if you wish to Re Enabled this feature');
+
+        return [];
     }
 
     /**

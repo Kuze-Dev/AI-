@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Features\ECommerce\BankTransfer;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use App\FilamentTenant\Resources\PaymentMethodResource\Pages;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -14,12 +13,9 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Domain\PaymentMethod\Actions\DeletePaymentMethodAction;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
-use App\Features\ECommerce\PaypalGateway;
-use App\Features\ECommerce\StripeGateway;
-use App\Features\ECommerce\OfflineGateway;
+use Domain\Payments\Actions\GetAvailablePaymentDriverAction;
 use Filament\Tables;
 use Filament\Forms;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
@@ -86,19 +82,7 @@ class PaymentMethodResource extends Resource
                         ->required()
                         ->options(function () {
 
-                            if (tenancy()->initialized) {
-
-                                $tenant = tenancy()->tenant;
-
-                                return array_filter([
-                                    'paypal' => $tenant?->features()->active(app(PaypalGateway::class)->name) ? app(PaypalGateway::class)->label : false,
-                                    'stripe' => $tenant?->features()->active(app(StripeGateway::class)->name) ? app(StripeGateway::class)->label : false,
-                                    'manual' => $tenant?->features()->active(app(OfflineGateway::class)->name) ? app(OfflineGateway::class)->label : false,
-                                    'bank-transfer' => $tenant?->features()->active(app(BankTransfer::class)->name) ? app(BankTransfer::class)->label : false,
-                                ], fn ($value) => $value !== false);
-                            }
-
-                            return [];
+                            return app(GetAvailablePaymentDriverAction::class)->execute();
 
                         })
                         ->reactive(),
@@ -122,6 +106,13 @@ class PaymentMethodResource extends Resource
                     ->formatStateUsing(fn ($state) => Str::headline($state))
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\IconColumn::make('status')
+                    ->label(trans('Enabled'))
+                    ->options([
+                        'heroicon-o-check-circle' => fn ($state) => $state == true,
+                        'heroicon-o-x-circle' => fn ($state) => $state === false,
+                    ])
+                    ->color(fn ($state) => $state == true ? 'success' : 'danger'),
                 Tables\Columns\TextColumn::make('subtitle')
                     ->sortable()
                     ->searchable(),
@@ -129,7 +120,6 @@ class PaymentMethodResource extends Resource
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
             ])
-            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\RestoreAction::make(),

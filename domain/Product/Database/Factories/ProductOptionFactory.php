@@ -19,7 +19,7 @@ class ProductOptionFactory extends Factory
         return [
 
             'name' => $this->faker->name,
-            'product_id' => ProductFactory::new(),
+            'product_id' => $this->faker->numberBetween(1, 5),
         ];
     }
 

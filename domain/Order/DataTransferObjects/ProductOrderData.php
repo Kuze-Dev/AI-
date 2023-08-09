@@ -17,11 +17,11 @@ class ProductOrderData
         public readonly float|string $retail_price,
         public readonly float|string $selling_price,
         public readonly int $stock,
-        public readonly int $status,
-        public readonly int $is_digital_product,
-        public readonly int $is_featured,
-        public readonly int $is_special_offer,
-        public readonly int $allow_customer_remarks
+        public readonly int|bool|string $status,
+        public readonly int|bool|string $is_digital_product,
+        public readonly int|bool|string $is_featured,
+        public readonly int|bool|string $is_special_offer,
+        public readonly int|bool|string $allow_customer_remarks
     ) {
     }
 

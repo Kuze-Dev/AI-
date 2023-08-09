@@ -14,6 +14,7 @@ use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\Payments\Actions\GetAvailablePaymentDriverAction;
 use Throwable;
 
 class EditPaymentMethod extends EditRecord
@@ -24,13 +25,22 @@ class EditPaymentMethod extends EditRecord
 
     protected function getActions(): array
     {
-        return [
-            Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
-                ->action('save')
-                ->keyBindings(['mod+s']),
-            Actions\DeleteAction::make(),
-        ];
+
+        $drivers = app(GetAvailablePaymentDriverAction::class)->execute();
+
+        if (array_key_exists($this->record->gateway, $drivers)) {
+            return [
+                Action::make('save')
+                    ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                    ->action('save')
+                    ->keyBindings(['mod+s']),
+                Actions\DeleteAction::make(),
+            ];
+        }
+
+        $this->notify('warning', 'Payment Gateway ['.$this->record->gateway.'] is currently Disabled please inform your service provider if you wish to Re Enabled this feature');
+
+        return [];
     }
 
     protected function getFormActions(): array

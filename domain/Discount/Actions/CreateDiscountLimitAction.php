@@ -22,11 +22,11 @@ final class CreateDiscountLimitAction
         $discountLimit = new DiscountLimit();
 
         $discountLimit->create([
-            'discount_id' => $discount->id,
-            'customer_id' => $customer->id,
-            'customer_type' => Customer::class,
-            'order_id' => $order->id,
-            'order_type' => Order::class,
+            'discount_id' => $discount->getKey(),
+            'customer_id' => $customer->getKey(),
+            'customer_type' => $customer->getMorphClass(),
+            'order_id' => $order->getKey(),
+            'order_type' => $order->getMorphClass(),
             'code' => $discount->code,
         ]);
     }

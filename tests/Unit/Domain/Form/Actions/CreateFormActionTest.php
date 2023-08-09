@@ -28,8 +28,10 @@ it('store', function () {
                     'sender_name' => 'test user',
                     'subject' => 'Foo Subject',
                     'template' => 'Foo Template',
+                    'has_attachments' => false,
                 ],
             ],
+
         ]));
 
     assertDatabaseHas(Form::class, [
