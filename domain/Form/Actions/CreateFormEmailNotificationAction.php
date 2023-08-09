@@ -21,6 +21,7 @@ class CreateFormEmailNotificationAction
                 'reply_to' => $formEmailNotificationData->reply_to,
                 'subject' => $formEmailNotificationData->subject,
                 'template' => $formEmailNotificationData->template,
+                'has_attachments' => $formEmailNotificationData->has_attachments,
             ]
         );
     }
