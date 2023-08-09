@@ -110,8 +110,10 @@ class ProductResource extends Resource
                                         ->label('Height'),
                                 ])->columns(3),
                         ]),
+
                     /** Form for variant section */
                     self::getVariantForm(),
+
                     Forms\Components\Section::make('Inventory')
                         ->schema([
                             Forms\Components\TextInput::make('minimum_order_quantity')
@@ -323,7 +325,6 @@ class ProductResource extends Resource
                                 ->disableItemMovement(),
                         ])
                         ->disableItemMovement()
-                        ->minItems(1)
                         ->maxItems(2)
                         ->collapsible(),
                 ]),

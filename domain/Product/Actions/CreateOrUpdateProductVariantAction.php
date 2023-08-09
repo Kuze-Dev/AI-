@@ -15,7 +15,7 @@ class CreateOrUpdateProductVariantAction
     {
         if (filled($productData->product_variants)) {
             /** If for update */
-            if (!$isCreate) {
+            if ( ! $isCreate) {
                 /** Removal of unnecessary product variants */
                 $productVariants = ProductVariant::where('product_id', $product->id);
                 $variants = $productVariants->get();
@@ -36,10 +36,11 @@ class CreateOrUpdateProductVariantAction
                                 return true;
                             }
                         }
+
                         return false;
                     });
 
-                    if (!$existingItem) {
+                    if ( ! $existingItem) {
                         $variant->delete();
                     }
                 }
@@ -63,6 +64,8 @@ class CreateOrUpdateProductVariantAction
                     $this->createProductVariant($product->id, $productVariant);
                 }
             }
+        } else {
+            ProductVariant::whereProductId($product->id)->delete();
         }
     }
 
