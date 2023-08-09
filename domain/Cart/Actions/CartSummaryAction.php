@@ -236,7 +236,12 @@ class CartSummaryAction
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
 
         if (!$taxZone instanceof TaxZone) {
-            throw new BadRequestHttpException('No tax zone found');
+            return [
+                'taxZone' => null,
+                'taxDisplay' => null,
+                'taxPercentage' => null,
+            ];
+            // throw new BadRequestHttpException('No tax zone found');
         }
 
         $taxPercentage = (float) $taxZone->percentage;
