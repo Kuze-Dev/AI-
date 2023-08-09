@@ -56,6 +56,7 @@ class FormEmailNotification extends Model
         'reply_to',
         'subject',
         'template',
+        'has_attachments',
     ];
 
     protected $casts = [
@@ -63,6 +64,7 @@ class FormEmailNotification extends Model
         'cc' => DelimitedCast::class,
         'bcc' => DelimitedCast::class,
         'reply_to' => DelimitedCast::class,
+        'has_attachments' => 'bool',
     ];
 
     public function getActivitylogOptions(): LogOptions
