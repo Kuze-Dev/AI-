@@ -12,7 +12,7 @@ class ChartColor
         'rgba(253, 208, 159, 0.7)',
         'rgba(253, 208, 159, 0.7)',
         'rgba(169, 244, 208, 0.7)',
-        'rgba(251, 227, 142, 0.7)'
+        'rgba(251, 227, 142, 0.7)',
     ];
 
     public static array $BARCHART = [
@@ -23,6 +23,6 @@ class ChartColor
     public static array $LINECHART = [
         'rgba(251, 227, 142, 0.7)',
         'rgba(154, 137, 255, 0.7)',
-        'rgba(253, 156, 255, 0.7)'
+        'rgba(253, 156, 255, 0.7)',
     ];
 }

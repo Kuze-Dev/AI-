@@ -26,5 +26,4 @@ class ReportPolicy
     {
         return $this->checkWildcardPermissions($user);
     }
-
 }
