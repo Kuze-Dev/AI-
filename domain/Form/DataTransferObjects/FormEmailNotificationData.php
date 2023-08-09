@@ -11,6 +11,7 @@ class FormEmailNotificationData
         public readonly string $sender_name,
         public readonly string $subject,
         public readonly string $template,
+        public readonly bool $has_attachments,
         public readonly ?int $id = null,
         public readonly array $cc = [],
         public readonly array $bcc = [],

@@ -126,9 +126,9 @@ class AdminResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('full_name')
-                    ->wrap()
                     ->sortable(['first_name', 'last_name'])
-                    ->searchable(['first_name', 'last_name']),
+                    ->searchable(['first_name', 'last_name'])
+                    ->truncate('xs', true),
                 Tables\Columns\IconColumn::make('email_verified_at')
                     ->label(trans('Verified'))
                     ->getStateUsing(fn (Admin $record): bool => $record->hasVerifiedEmail())
