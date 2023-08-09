@@ -13,7 +13,7 @@ class UpdateProductOptionAction
 {
     public function execute(Product $product, ProductData $productData): void
     {
-        if (filled($productData->product_options)) {
+        if (filled($productData->product_options) && filled($productData->product_options[0])) {
             foreach ($productData->product_options[0] as $key => &$productOption) {
                 $productOptionModel = ProductOption::find($productOption['id']);
 
@@ -87,6 +87,8 @@ class UpdateProductOptionAction
                     $option->delete();
                 }
             }
+        } else {
+            ProductOption::whereProductId($product->id)->delete();
         }
     }
 
