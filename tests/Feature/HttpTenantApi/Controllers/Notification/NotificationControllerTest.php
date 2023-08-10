@@ -20,13 +20,13 @@ beforeEach(function () {
     $customer = CustomerFactory::new()->createOne();
 
     withHeader('Authorization', 'Bearer ' . $customer
-    ->createToken('testing-auth')
+        ->createToken('testing-auth')
     ->plainTextToken);
 
     $this->customer = $customer;
+
     return $customer;
 });
-
 
 it('return list', function () {
     createNotificationForCustomer();
@@ -135,7 +135,6 @@ it('paginate', function (int $page, int $size) {
         'size 10' => 10,
         'size 20' => 20,
     ]);
-
 
 function createNotificationForCustomer(): Customer
 {

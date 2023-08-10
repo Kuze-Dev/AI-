@@ -17,10 +17,11 @@ beforeEach(function () {
     $customer = CustomerFactory::new()->createOne();
 
     withHeader('Authorization', 'Bearer ' . $customer
-    ->createToken('testing-auth')
+        ->createToken('testing-auth')
     ->plainTextToken);
 
     $this->customer = $customer;
+
     return $customer;
 });
 
