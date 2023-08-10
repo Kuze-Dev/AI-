@@ -96,7 +96,7 @@ final class DiscountHelperFunctions
 
         return DiscountMessagesData::fromArray([
             'status' => 'valid',
-            'message' => 'Your discount code is valid',
+            'message' => 'Discount code applied',
             'amount_type' => $discountCondition->amount_type,
             'amount' => $discountCondition->amount,
             'discount_type' => $discountCondition->discount_type,

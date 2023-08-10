@@ -12,6 +12,7 @@ use Filament\Widgets\PieChartWidget;
 class LeastSoldProduct extends PieChartWidget
 {
     protected static ?string $heading = 'List Sold Product';
+    protected static ?string $pollingInterval = null;
     public ?string $filter = 'allTime';
 
     protected function getFilters(): ?array

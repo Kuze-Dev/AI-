@@ -44,27 +44,10 @@ class CurrencyResource extends Resource
                     ->sortable()
                     ->toggleable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('exchange_rate')
-                    ->label('Exchange Rate')
-                    ->sortable()
-                    ->toggleable()
-                    ->searchable(),
                 Tables\Columns\ToggleColumn::make('enabled')->label('status')
                     ->updateStateUsing(function (Currency $record) {
-                        return app(UpdateCurrencyEnabledAction::class)->execute($record, );
+                        return app(UpdateCurrencyEnabledAction::class)->execute($record);
                     }),
-                Tables\Columns\BadgeColumn::make('default')
-                    ->enum([
-                        '1' => 'Selected',
-                        '0' => 'Not Selected',
-                    ])
-                    ->color(static function ($state): string {
-                        if ($state == '1') {
-                            return 'success';
-                        }
-
-                        return 'secondary';
-                    })->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()
                     ->toggleable(),
@@ -81,8 +64,7 @@ class CurrencyResource extends Resource
                         '0' => 'Not Selected',
                     ]),
             ])
-            ->actions([
-            ])
+            ->actions([])
             ->bulkActions([])
             ->defaultSort('id', 'asc');
     }
