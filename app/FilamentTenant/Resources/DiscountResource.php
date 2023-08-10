@@ -197,10 +197,10 @@ class DiscountResource extends Resource
                 TextColumn::make('name'),
                 TextColumn::make('discountCondition.amount')
                     ->formatStateUsing(function ($record) {
-                        return $record->discountCondition->amount_type === DiscountAmountType::PERCENTAGE
-                            ? (string) $record->discountCondition->amount . '%'
-                            : ($record->discountCondition->amount_type === DiscountAmountType::FIXED_VALUE
-                                ? (string) $record->discountCondition->amount . 'PHP'
+                        return $record?->discountCondition?->amount_type === DiscountAmountType::PERCENTAGE
+                            ? (string) $record?->discountCondition?->amount . '%'
+                            : ($record?->discountCondition?->amount_type === DiscountAmountType::FIXED_VALUE
+                                ? (string) $record?->discountCondition?->amount . 'PHP'
                                 : null);
                     })
                     ->label(trans('Amount')),
