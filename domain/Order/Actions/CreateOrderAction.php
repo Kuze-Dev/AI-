@@ -52,7 +52,7 @@ class CreateOrderAction
 
             'currency_code' => $preparedOrderData->currency->code,
             'currency_name' => $preparedOrderData->currency->name,
-            'currency_exchange_rate' => $preparedOrderData->currency->exchange_rate,
+            'currency_symbol' => $preparedOrderData->currency->symbol,
 
             'reference' => $referenceNumber,
 

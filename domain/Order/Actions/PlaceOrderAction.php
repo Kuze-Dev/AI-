@@ -20,7 +20,6 @@ class PlaceOrderAction
         if ($payload instanceof PreparedOrderData) {
             $result = app(SplitOrderAction::class)->execute($payload, $placeOrderData);
 
-
             $customer = auth()->user();
             // Notification::send($customer, new OrderPlacedNotification($result['order']));
 

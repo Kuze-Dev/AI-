@@ -118,7 +118,9 @@ class ViewOrderDetails extends ViewRecord
                                                         ->content($orderLine->quantity),
                                                     Forms\Components\Placeholder::make('amount_' . $sectionIndex)
                                                         ->label(trans('Amount'))
-                                                        ->content($orderLine->sub_total),
+                                                        ->content(function () use ($orderLine) {
+                                                            return $orderLine->order->currency_symbol . ' ' . number_format($orderLine->sub_total, 2, '.', '');
+                                                        }),
                                                 ]),
                                         ]),
                                 ])

@@ -73,7 +73,7 @@ class PrepareOrderAction
 
     private function prepareCurrency(): Currency
     {
-        $currency = Currency::where('default', true)->first();
+        $currency = Currency::where('enabled', true)->first();
 
         if ( ! $currency instanceof Currency) {
 
@@ -98,7 +98,7 @@ class PrepareOrderAction
             ->get();
     }
 
-    private function prepareTax(PlaceOrderData $placeOrderData): TaxZone
+    private function prepareTax(PlaceOrderData $placeOrderData): ?TaxZone
     {
         $billingAddressId = $placeOrderData->addresses->billing;
 
@@ -115,8 +115,8 @@ class PrepareOrderAction
 
         if ( ! $taxZone instanceof TaxZone) {
             // Log::info('No tax zone found');
-
-            throw new BadRequestHttpException('No tax zone found');
+            return null;
+            // throw new BadRequestHttpException('No tax zone found');
         }
 
         return $taxZone;

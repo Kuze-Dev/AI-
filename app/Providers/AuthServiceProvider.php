@@ -56,6 +56,8 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Tier\Models\Tier::class => \App\Policies\TierPolicy::class,
         \Domain\Address\Models\Address::class => \App\Policies\AddressPolicy::class,
         \Domain\Order\Models\Order::class => \App\Policies\ReportPolicy::class,
+        \Domain\Discount\Models\Discount::class => \App\Policies\DiscountPolicy::class,
+        \Domain\Taxation\Models\TaxZone::class => \App\Policies\TaxZonePolicy::class,
     ];
 
     /** Register any authentication / authorization services. */
@@ -75,7 +77,7 @@ class AuthServiceProvider extends ServiceProvider
                 return (new MailMessage())
                     ->subject(trans('Verify Email Address'))
                     ->line(trans('Please copy OTP below to verify your email address.'))
-                    ->line('OTP: '.$notifiable->generateEmailVerificationOTP())
+                    ->line('OTP: ' . $notifiable->generateEmailVerificationOTP())
                     ->line(trans('If you did not create an account, no further action is required.'));
             }
 
@@ -86,7 +88,6 @@ class AuthServiceProvider extends ServiceProvider
                 ->line(trans('Please click the button below to verify your email address.'))
                 ->action(trans('Verify Email Address'), $url)
                 ->line(trans('If you did not create an account, no further action is required.'));
-
         });
 
         VerifyEmailNotification::createUrlUsing(function (mixed $notifiable) {
@@ -142,7 +143,7 @@ class AuthServiceProvider extends ServiceProvider
                 $baseUrl = app(ECommerceSettings::class)->domainWithScheme()
                     ?? app(SiteSettings::class)->domainWithScheme();
 
-                return $baseUrl.'/password/reset'.'?'.http_build_query([
+                return $baseUrl . '/password/reset' . '?' . http_build_query([
                     'token' => $token,
                     'email' => $notifiable->getEmailForPasswordReset(),
                 ]);

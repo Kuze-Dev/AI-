@@ -21,11 +21,11 @@ return new class () extends Migration {
             $table->string('customer_email')->index();
             $table->string('currency_code')->index();
             $table->string('currency_name')->index();
-            $table->decimal('currency_exchange_rate');
+            $table->string('currency_symbol');
             $table->string('reference')->unique();
-            $table->decimal('tax_total');
-            $table->decimal('tax_percentage');
-            $table->string('tax_display');
+            $table->decimal('tax_total')->nullable();
+            $table->decimal('tax_percentage')->nullable();
+            $table->string('tax_display')->nullable();
             $table->decimal('sub_total');
             $table->decimal('discount_total');
             $table->integer('discount_id')->nullable();
@@ -67,9 +67,9 @@ return new class () extends Migration {
             $table->string('name')->index();
             $table->decimal('unit_price');
             $table->integer('quantity');
-            $table->decimal('tax_total');
-            $table->decimal('tax_percentage');
-            $table->string('tax_display');
+            $table->decimal('tax_total')->nullable();
+            $table->decimal('tax_percentage')->nullable();
+            $table->string('tax_display')->nullable();
             $table->decimal('sub_total');
             $table->decimal('discount_total');
             $table->integer('discount_id')->nullable();

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use Domain\Cart\Events\SanitizeCartEvent;
+use Domain\Cart\Listeners\SanitizeCartListener;
 use Domain\Order\Events\AdminOrderBankPaymentEvent;
 use Domain\Order\Events\OrderPlacedEvent;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
@@ -43,6 +45,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         OrderStatusUpdatedEvent::class => [
             OrderStatusUpdatedListener::class,
+        ],
+        SanitizeCartEvent::class => [
+            SanitizeCartListener::class,
         ],
     ];
 
