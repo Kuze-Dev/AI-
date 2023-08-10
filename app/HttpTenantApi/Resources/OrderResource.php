@@ -27,6 +27,7 @@ class OrderResource extends JsonApiResource
             'is_paid' => $this->is_paid,
             'shipping_address' => $this->shippingAddress,
             'billing_address' => $this->billingAddress,
+            'cancelled_reason' => $this->cancelled_reason,
         ];
     }
 

@@ -12,15 +12,18 @@ class CreateMediaFromUrlAction
 {
     public function execute(Model&HasMedia $model, array $medias, string $collection): void
     {
-        $model->clearMediaCollection($collection);
+        $mediaExcepts = [];
         foreach ($medias as $imageUrl) {
             try {
                 /** @phpstan-ignore-next-line */
-                $model->addMediaFromUrl($imageUrl)
+                $media = $model->addMediaFromUrl($imageUrl)
                     ->toMediaCollection($collection);
+
+                $mediaExcepts[] = $media;
             } catch (Exception $e) {
-                // Log::info($e);
             }
         }
+
+        $model->clearMediaCollectionExcept($collection, $mediaExcepts);
     }
 }
