@@ -13,6 +13,7 @@ use App\Notifications\Order\OrderShippedNotification;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
 use Domain\Order\Notifications\AdminOrderStatusUpdatedMail;
+use Domain\Product\Actions\UpdateProductStockAction;
 use Illuminate\Support\Facades\Notification;
 
 class AdminOrderStatusUpdatedListener
@@ -30,6 +31,10 @@ class AdminOrderStatusUpdatedListener
 
         switch ($event->status) {
             case OrderStatuses::CANCELLED->value:
+                foreach ($order->orderLines as $orderLine) {
+                    app(UpdateProductStockAction::class)->execute($orderLine->purchasable_type, $orderLine->purchasable_id, $orderLine->quantity, true);
+                }
+
                 Notification::send($customer, new OrderCancelledNotification($order));
 
                 break;

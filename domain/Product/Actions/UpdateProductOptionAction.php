@@ -12,7 +12,7 @@ use Domain\Product\Models\ProductOptionValue;
 class UpdateProductOptionAction
 {
     public function execute(Product $product, ProductData $productData): void
-    {   
+    {
         /** for product option [[]] condition */
         if (filled($productData->product_options) && filled($productData->product_options[0])) {
             foreach ($productData->product_options[0] as $key => &$productOption) {
