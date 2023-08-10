@@ -9,6 +9,7 @@ module.exports = {
         './vendor/filament/**/*.blade.php',
         "./app/Filament/**/*.php",
         "./app/FilamentTenant/**/*.php",
+        "./app/Providers/FilamentServiceProvider.php",
     ],
     darkMode: 'class',
     theme: {

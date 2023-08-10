@@ -1,6 +1,36 @@
 # Release Notes
+## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.7)
 
-## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.4)
+## [v0.2.7](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.7)
+
+### Added
+
+- Add `protected function buildMailMessage($url)` on `Domain\Admin\Notifications\VerifyEmail`.
+ overide buildMailMessage added custom message. 
+### Changed
+
+- Updated `self::authorizeAccess()` to ` static::authorizeAccess()` implementation on BaseSettings
+
+
+## [0.2.6](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.5)
+### Fixed
+
+- Fixed various redirects.
+- Fix `ExportFinished:class()` static analysis.
+- Fix `FilamentServiceProvider` fix format.
+
+## [0.2.5](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.2.5%0Dv0.2.4)
+
+### Added
+
+- Check for resource permission when rendering url for subject in `ActivityResource`.
+- Add `TextColumn::truncate()` macro.
+
+### Fixed
+
+- Fixed various redirects.
+- Fix `Select::optionsFromModel()` searchability.
+- Fix `SendImportFailedNotification` execution.
 
 ## [0.2.4](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/0.2.4%0Dv0.2.3)
 
