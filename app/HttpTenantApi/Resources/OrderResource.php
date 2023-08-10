@@ -28,6 +28,11 @@ class OrderResource extends JsonApiResource
             'shipping_address' => $this->shippingAddress,
             'billing_address' => $this->billingAddress,
             'cancelled_reason' => $this->cancelled_reason,
+            'currency' => [
+                'symbol' => $this->currency_symbol,
+                'code' => $this->currency_code,
+                'name' => $this->currency_name,
+            ]
         ];
     }
 

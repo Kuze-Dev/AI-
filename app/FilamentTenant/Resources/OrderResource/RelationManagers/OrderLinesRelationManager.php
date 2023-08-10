@@ -47,9 +47,17 @@ class OrderLinesRelationManager extends RelationManager
                         return '';
                     })
                     ->alignLeft(),
-                Tables\Columns\TextColumn::make('unit_price')->label(trans('Unit Price')),
+                Tables\Columns\TextColumn::make('unit_price')
+                    ->formatStateUsing(function (OrderLine $record) {
+                        return $record->order->currency_symbol . ' ' . number_format($record->unit_price, 2, '.', '');
+                    })
+                    ->label(trans('Unit Price')),
                 Tables\Columns\TextColumn::make('quantity')->label(trans('Quantity')),
-                Tables\Columns\TextColumn::make('sub_total')->label(trans('Amount')),
+                Tables\Columns\TextColumn::make('sub_total')
+                    ->formatStateUsing(function (OrderLine $record) {
+                        return $record->order->currency_symbol . ' ' . number_format($record->sub_total, 2, '.', '');
+                    })
+                    ->label(trans('Amount')),
             ])
             ->headerActions([
                 Tables\Actions\Action::make('view')
