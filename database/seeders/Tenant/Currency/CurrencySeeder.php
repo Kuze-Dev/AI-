@@ -17,17 +17,15 @@ class CurrencySeeder extends Seeder
                 [
                     'code' => 'PHP',
                     'name' => 'Philippine Peso',
-                    'exchange_rate' => 56.00,
-                    'default' => false,
+                    'symbol' => '₱',
                 ],
                 [
                     'code' => 'USD',
                     'name' => 'US Dollar',
-                    'exchange_rate' => 1.00,
-                    'default' => true,
+                    'symbol' => '$',
+                    'enabled' => true,
                 ]
-            )
-            ->create(['enabled' => false]);
+            )->create();
 
     }
 }

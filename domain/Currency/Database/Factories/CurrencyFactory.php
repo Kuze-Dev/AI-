@@ -6,7 +6,6 @@ namespace Domain\Currency\Database\Factories;
 
 use Domain\Currency\Models\Currency;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Arr;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<Currency>
@@ -21,9 +20,8 @@ class CurrencyFactory extends Factory
         return [
             'code' => $this->faker->unique()->word(),
             'name' => $this->faker->unique()->name(),
-            'exchange_rate' => Arr::random(range(10, 100, 0.1222)),
+            'symbol' => $this->faker->unique()->name(),
             'enabled' => $this->faker->boolean(),
-            'default' => $this->faker->boolean(),
         ];
     }
 }
