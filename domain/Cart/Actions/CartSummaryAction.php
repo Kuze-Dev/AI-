@@ -55,13 +55,15 @@ class CartSummaryAction
 
         $discountMessages = (new DiscountHelperFunctions())->validateDiscountCode($discount, $grandTotal);
 
+        $grandTotal -= $discountMessages->status == 'valid' ? $discountTotal : 0;
+
         $summaryData = [
             'subTotal' => $subtotal,
             'taxZone' => $tax['taxZone'],
             'taxDisplay' => $tax['taxDisplay'],
             'taxPercentage' => $tax['taxPercentage'],
             'taxTotal' => $taxTotal,
-            'grandTotal' => $grandTotal - ($discountMessages->status == 'valid' ? $discountTotal : 0),
+            'grandTotal' => $grandTotal,
             'discountTotal' => $discountMessages->status == 'valid' ? $discountTotal : 0,
             'discountMessages' => $discountMessages,
             'shippingTotal' => $shippingTotal,
@@ -107,8 +109,11 @@ class CartSummaryAction
         if ($shippingAddress && $shippingMethod) {
             $productlist = $this->getProducts($collections);
 
-            $boxData = app(GetBoxAction::class)->execute(
+            $subTotal = $this->getSubTotal($collections);
+
+            $boxResponse = app(GetBoxAction::class)->execute(
                 $shippingMethod,
+                $shippingAddress,
                 BoxData::fromArray($productlist)
             );
 
@@ -127,13 +132,14 @@ class CartSummaryAction
                     country: $country,
                     code: $country->code,
                 ),
-                pounds: (string) $boxData->weight,
+                pounds: (string) $boxResponse->weight,
                 ounces: '0',
-                width: (string) $boxData->width,
-                height: (string) $boxData->height,
-                length: (string) $boxData->length,
+                width: (string) $boxResponse->width,
+                height: (string) $boxResponse->height,
+                length: (string) $boxResponse->length,
                 zip_origin: $shippingMethod->shipper_zipcode,
-                parcel_value: '200',
+                boxData: $boxResponse->boxData,
+                parcel_value: (string) $subTotal,
             );
 
             $shippingFeeTotal = app(GetShippingfeeAction::class)
@@ -221,7 +227,12 @@ class CartSummaryAction
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
 
         if ( ! $taxZone instanceof TaxZone) {
-            throw new BadRequestHttpException('No tax zone found');
+            return [
+                'taxZone' => null,
+                'taxDisplay' => null,
+                'taxPercentage' => null,
+            ];
+            // throw new BadRequestHttpException('No tax zone found');
         }
 
         $taxPercentage = (float) $taxZone->percentage;

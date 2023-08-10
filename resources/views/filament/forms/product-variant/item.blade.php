@@ -20,7 +20,7 @@
             <div class="relative flex items-center">
                 <label
                     class="filament-forms-field-wrapper-label mr-2 inline-flex items-center space-x-3 rtl:space-x-reverse">
-                    <button x-data="{ state: {{ $item['status'] }} }" role="switch" aria-checked="true"
+                    <button x-data="{ state: {{ $item['status'] ? 1 : 0 }} }" role="switch" aria-checked="true"
                         x-bind:aria-checked="state?.toString()" x-on:click="state = ! state"
                         wire:click.stop="dispatchFormEvent('productVariant::toggleItem', '{{ $statePath }}')"
                         x-bind:class="{

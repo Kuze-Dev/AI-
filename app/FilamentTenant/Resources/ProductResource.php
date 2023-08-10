@@ -52,6 +52,7 @@ class ProductResource extends Resource
                         Forms\Components\TextInput::make('name')
                             ->label('Product Name')
                             ->unique(ignoreRecord: true)
+                            ->maxLength(255)
                             ->required(),
                         Forms\Components\RichEditor::make('description'),
                     ]),
@@ -67,7 +68,7 @@ class ProductResource extends Resource
                                 ->acceptedFileTypes([
                                     'video/*',
                                 ])
-                                ->maxSize(50000),
+                                ->maxSize(25000),
                         ]),
 
                     Forms\Components\Section::make('Customer Remarks')
@@ -109,8 +110,10 @@ class ProductResource extends Resource
                                         ->label('Height'),
                                 ])->columns(3),
                         ]),
+
                     /** Form for variant section */
                     self::getVariantForm(),
+
                     Forms\Components\Section::make('Inventory')
                         ->schema([
                             Forms\Components\TextInput::make('minimum_order_quantity')
@@ -322,7 +325,6 @@ class ProductResource extends Resource
                                 ->disableItemMovement(),
                         ])
                         ->disableItemMovement()
-                        ->minItems(1)
                         ->maxItems(2)
                         ->collapsible(),
                 ]),

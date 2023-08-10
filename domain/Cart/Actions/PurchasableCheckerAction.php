@@ -26,7 +26,7 @@ class PurchasableCheckerAction
                             $subSubQuery->select('id')
                                 ->from('products')
                                 ->whereColumn('products.id', 'cart_lines.purchasable_id')
-                                ->where('stock', '>', DB::raw('cart_lines.quantity'));
+                                ->where('stock', '>=', DB::raw('cart_lines.quantity'));
                         });
                 })->orWhere(function ($subQuery) {
                     $subQuery->where('purchasable_type', ProductVariant::class)
@@ -34,7 +34,7 @@ class PurchasableCheckerAction
                             $subSubQuery->select('id')
                                 ->from('product_variants')
                                 ->whereColumn('product_variants.id', 'cart_lines.purchasable_id')
-                                ->where('stock', '>', DB::raw('cart_lines.quantity'));
+                                ->where('stock', '>=', DB::raw('cart_lines.quantity'));
                         });
                 });
             })
