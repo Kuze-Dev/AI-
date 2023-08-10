@@ -81,13 +81,6 @@ final class DiscountHelperFunctions
             ]);
         }
 
-        if ($discount?->valid_start_at > now()) {
-            return DiscountMessagesData::fromArray([
-                'message' => 'This discount code is invalid',
-            ]);
-        }
-
-
         if ($discount?->max_uses == 0) {
             return DiscountMessagesData::fromArray([
                 'message' => 'This discount code max usage limit has been reached.',
