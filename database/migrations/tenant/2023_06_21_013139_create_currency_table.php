@@ -14,9 +14,8 @@ return new class () extends Migration {
 
             $table->string('code')->unique();
             $table->string('name')->unique();
-            $table->decimal('exchange_rate', 10, 4);
+            $table->string('symbol')->unique();
             $table->boolean('enabled')->default(false);
-            $table->boolean('default')->default(false);
 
             $table->timestamps();
         });
