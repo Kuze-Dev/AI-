@@ -36,7 +36,7 @@ class CartSummaryController extends Controller
                     $cartLineIdsTobeRemoved[] = $cartLine->uuid;
                 }
 
-                return ! is_null($cartLine->purchasable);
+                return !is_null($cartLine->purchasable);
             });
         }
 
@@ -86,10 +86,14 @@ class CartSummaryController extends Controller
                 'percentage' => $summary->taxPercentage ? round($summary->taxPercentage, 2) : 0,
                 'amount' => $summary->taxTotal ? round($summary->taxTotal, 2) : 0,
             ],
-            'sub_total' => round($summary->subTotal, 2),
-            'shipping_fee' => round($summary->shippingTotal, 2),
-            'discountedSubTotal' => round($summary->discountedSubTotal, 2),
-            'discountedShippingTotal' => round($summary->discountedShippingTotal, 2),
+            'sub_total' => [
+                "initial" =>  round($summary->initialSubTotal, 2),
+                "final" => round($summary->subTotal, 2)
+            ],
+            'shipping_fee' => [
+                "initial" => round($summary->initialShippingTotal, 2),
+                "final" => round($summary->shippingTotal, 2)
+            ],
             'total' => round($summary->grandTotal, 2),
             'discount' => [
                 'status' => $summary->discountMessages->status ?? null,
@@ -101,7 +105,7 @@ class CartSummaryController extends Controller
             ],
         ];
 
-        if ( ! $discountCode) {
+        if (!$discountCode) {
             unset($responseArray['discount']);
         }
 
