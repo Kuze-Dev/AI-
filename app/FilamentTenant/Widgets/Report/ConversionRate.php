@@ -16,6 +16,7 @@ use Flowframe\Trend\TrendValue;
 class ConversionRate extends LineChartWidget
 {
     protected static ?string $heading = 'Conversion Rate';
+    protected static ?string $pollingInterval = null;
     public ?string $filter = 'perMonth';
 
     protected function getFilters(): ?array
