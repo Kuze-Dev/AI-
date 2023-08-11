@@ -60,13 +60,13 @@ class CreateOrderAction
             'tax_display' => $summary->taxDisplay,
             'tax_percentage' => $summary->taxPercentage,
 
-            'sub_total' => $summary->subTotal,
+            'sub_total' => $summary->initialSubTotal,
 
             'discount_total' => $summary->discountTotal,
             'discount_id' => $preparedOrderData->discount ? $preparedOrderData->discount->id : null,
             'discount_code' => $preparedOrderData->discount ? $preparedOrderData->discount->code : null,
 
-            'shipping_total' => $summary->shippingTotal,
+            'shipping_total' => $summary->initialShippingTotal,
             'total' => $summary->grandTotal,
 
             'notes' => $preparedOrderData->notes,
