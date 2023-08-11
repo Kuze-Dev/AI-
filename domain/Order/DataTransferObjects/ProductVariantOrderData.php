@@ -14,7 +14,7 @@ class ProductVariantOrderData
         public readonly float|string $retail_price,
         public readonly float|string $selling_price,
         public readonly int $stock,
-        public readonly int|bool|string $status,
+        public readonly bool $status,
         public readonly ProductOrderData $product
     ) {
     }
@@ -59,7 +59,7 @@ class ProductVariantOrderData
             retail_price: $productVariant->retail_price,
             selling_price: $productVariant->selling_price,
             stock: $productVariant->stock,
-            status: $productVariant->status,
+            status: (bool) $productVariant->status,
             product: ProductOrderData::fromProduct($product),
         );
     }
