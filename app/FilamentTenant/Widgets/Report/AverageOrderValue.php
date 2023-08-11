@@ -15,7 +15,7 @@ use Flowframe\Trend\TrendValue;
 class AverageOrderValue extends BarChartWidget
 {
     protected static ?string $heading = 'Average Order Value';
-
+    protected static ?string $pollingInterval = null;
     public ?string $filter = 'perMonth';
 
     protected function getFilters(): ?array

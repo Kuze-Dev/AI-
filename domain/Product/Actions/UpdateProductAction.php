@@ -30,7 +30,10 @@ class UpdateProductAction
             ? $this->updateMetaData->execute($product, $productData->meta_data)
             : $this->createMetaData->execute($product, $productData->meta_data);
 
-        $this->updateProductOptionAction->execute($product, $productData);
+        /** needed for product option [] condition */
+        if (count($productData->product_options)) {
+            $this->updateProductOptionAction->execute($product, $productData);
+        }
 
         $this->createOrUpdateProductVariantAction->execute($product, $productData, false);
 
