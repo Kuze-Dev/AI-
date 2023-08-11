@@ -10,6 +10,7 @@ use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
 use Domain\Order\Notifications\AdminOrderStatusUpdatedMail;
 use Domain\Payments\Events\PaymentProcessEvent;
+use Domain\Product\Actions\UpdateProductStockAction;
 use Illuminate\Support\Facades\Notification;
 
 class OrderPaymentUpdatedListener
@@ -63,5 +64,8 @@ class OrderPaymentUpdatedListener
         // back the discount
 
         // back the product stock
+        foreach ($order->orderLines as $orderLine) {
+            app(UpdateProductStockAction::class)->execute($orderLine->purchasable_type, $orderLine->purchasable_id, $orderLine->quantity, true);
+        }
     }
 }

@@ -8,6 +8,7 @@ use App\Notifications\Order\OrderPlacedNotification;
 use Domain\Discount\Actions\CreateDiscountLimitAction;
 use Domain\Order\Events\OrderPlacedEvent;
 use Domain\Order\Notifications\OrderPlacedMail;
+use Domain\Product\Actions\UpdateProductStockAction;
 use Illuminate\Support\Facades\Notification;
 
 class OrderPlacedListener
@@ -36,6 +37,8 @@ class OrderPlacedListener
             app(CreateDiscountLimitAction::class)->execute($discount, $order, $customer);
         }
 
-        // minus the product stocks
+        foreach ($order->orderLines as $orderLine) {
+            app(UpdateProductStockAction::class)->execute($orderLine->purchasable_type, $orderLine->purchasable_id, $orderLine->quantity, false);
+        }
     }
 }

@@ -12,6 +12,7 @@ class MostOrderByCustomer extends PieChartWidget
 {
     protected static ?string $heading = 'Most Order By Customer';
     protected static ?string $pollingInterval = null;
+
     protected function getData(): array
     {
         $products = OrderLine::whereHas('order')
