@@ -11,6 +11,7 @@ use Domain\Cart\DataTransferObjects\SummaryData;
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
 use Domain\Discount\Actions\DiscountHelperFunctions;
+use Domain\Discount\Enums\DiscountConditionType;
 use Domain\Discount\Models\Discount;
 use Domain\Product\Models\ProductVariant;
 use Domain\Shipment\Actions\GetBoxAction;
@@ -50,10 +51,23 @@ class CartSummaryAction
         );
 
         $discountTotal = $this->getDiscount($discount, $subtotal, $shippingTotal);
+        $discountedSubTotal = 0;
+        $discountedShippingTotal= 0;
 
         $grandTotal = $subtotal + $taxTotal + $shippingTotal;
 
         $discountMessages = (new DiscountHelperFunctions())->validateDiscountCode($discount, $grandTotal);
+
+        if($discount?->discountCondition?->discount_type === DiscountConditionType::ORDER_SUB_TOTAL){
+            $discountedSubTotal = $subtotal - $discountTotal;
+
+        }
+
+        if($discount?->discountCondition?->discount_type === DiscountConditionType::DELIVERY_FEE){
+            $discountedShippingTotal = $shippingTotal - $discountTotal;
+
+        }
+
 
         $grandTotal -= $discountMessages->status == 'valid' ? $discountTotal : 0;
 
@@ -65,6 +79,8 @@ class CartSummaryAction
             'taxTotal' => $taxTotal,
             'grandTotal' => $grandTotal,
             'discountTotal' => $discountMessages->status == 'valid' ? $discountTotal : 0,
+            'discountedSubTotal' => $discountedSubTotal,
+            'discountedShippingTotal' => $discountedShippingTotal,
             'discountMessages' => $discountMessages,
             'shippingTotal' => $shippingTotal,
         ];
