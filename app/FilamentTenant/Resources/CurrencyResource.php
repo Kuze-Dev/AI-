@@ -44,6 +44,10 @@ class CurrencyResource extends Resource
                     ->sortable()
                     ->toggleable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('symbol')
+                    ->label('Symbol')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\ToggleColumn::make('enabled')->label('status')
                     ->updateStateUsing(function (Currency $record) {
                         return app(UpdateCurrencyEnabledAction::class)->execute($record);
