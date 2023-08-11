@@ -19,8 +19,7 @@ class SummaryData
         public readonly float $grandTotal,
         public readonly float $shippingTotal,
         public readonly float|null $discountTotal,
-        public readonly float|null $discountedSubTotal,
-        public readonly float|null $discountedShippingTotal,
+        public readonly float|null $discounted_total_amount,
         public readonly ?DiscountMessagesData $discountMessages,
     ) {
     }
@@ -36,8 +35,7 @@ class SummaryData
             grandTotal: $data['grandTotal'],
             shippingTotal: $data['shippingTotal'],
             discountTotal: $data['discountTotal'] ?? null,
-            discountedSubTotal: $data['discountedSubTotal'] ?? null,
-            discountedShippingTotal: $data['discountedShippingTotal'] ?? null,
+            discounted_total_amount: $data['discounted_total_amount'] ?? null,
             discountMessages: $data['discountMessages'] ?? null,
         );
     }

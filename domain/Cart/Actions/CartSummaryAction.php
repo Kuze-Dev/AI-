@@ -51,23 +51,26 @@ class CartSummaryAction
         );
 
         $discountTotal = $this->getDiscount($discount, $subtotal, $shippingTotal);
-        $discountedSubTotal = 0;
-        $discountedShippingTotal= 0;
+
+        $discounted_total_amount = 0;
 
         $grandTotal = $subtotal + $taxTotal + $shippingTotal;
 
         $discountMessages = (new DiscountHelperFunctions())->validateDiscountCode($discount, $grandTotal);
 
-        if($discount?->discountCondition?->discount_type === DiscountConditionType::ORDER_SUB_TOTAL){
-            $discountedSubTotal = $subtotal - $discountTotal;
+        if ($discount) {
+            $discountType = $discount->discountCondition->discount_type ?? null;
 
+            switch ($discountType) {
+                case DiscountConditionType::ORDER_SUB_TOTAL:
+                    $discounted_total_amount = $subtotal - $discountTotal;
+                    break;
+
+                case DiscountConditionType::DELIVERY_FEE:
+                    $discounted_total_amount = $shippingTotal - $discountTotal;
+                    break;
+            }
         }
-
-        if($discount?->discountCondition?->discount_type === DiscountConditionType::DELIVERY_FEE){
-            $discountedShippingTotal = $shippingTotal - $discountTotal;
-
-        }
-
 
         $grandTotal -= $discountMessages->status == 'valid' ? $discountTotal : 0;
 
@@ -78,9 +81,8 @@ class CartSummaryAction
             'taxPercentage' => $tax['taxPercentage'],
             'taxTotal' => $taxTotal,
             'grandTotal' => $grandTotal,
-            'discountTotal' => $discountMessages->status == 'valid' ? $discountTotal : 0,
-            'discountedSubTotal' => $discountedSubTotal,
-            'discountedShippingTotal' => $discountedShippingTotal,
+            'discountTotal' => $discountMessages->status == 'valid' ? $discountTotal : 0, //the overall deductable amount
+            'discounted_total_amount' => $discounted_total_amount, //the overall discounted amount wether its on order sub total or shipping fee
             'discountMessages' => $discountMessages,
             'shippingTotal' => $shippingTotal,
         ];

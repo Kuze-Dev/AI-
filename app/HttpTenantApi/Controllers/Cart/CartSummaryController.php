@@ -88,8 +88,7 @@ class CartSummaryController extends Controller
             ],
             'sub_total' => round($summary->subTotal, 2),
             'shipping_fee' => round($summary->shippingTotal, 2),
-            'discountedSubTotal' => round($summary->discountedSubTotal, 2),
-            'discountedShippingTotal' => round($summary->discountedShippingTotal, 2),
+            'discounted_total_amount' => round($summary->discounted_total_amount, 2),
             'total' => round($summary->grandTotal, 2),
             'discount' => [
                 'status' => $summary->discountMessages->status ?? null,
