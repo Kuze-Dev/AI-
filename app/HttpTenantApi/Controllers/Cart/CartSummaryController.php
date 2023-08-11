@@ -87,12 +87,12 @@ class CartSummaryController extends Controller
                 'amount' => $summary->taxTotal ? round($summary->taxTotal, 2) : 0,
             ],
             'sub_total' => [
-                "initial" =>  round($summary->initialSubTotal, 2),
-                "final" => round($summary->subTotal, 2)
+                "initial_amount" =>  round($summary->initialSubTotal, 2),
+                "discounted_amount" => round($summary->subTotal, 2)
             ],
             'shipping_fee' => [
-                "initial" => round($summary->initialShippingTotal, 2),
-                "final" => round($summary->shippingTotal, 2)
+                "initial_amount" => round($summary->initialShippingTotal, 2),
+                "discounted_amount" => round($summary->shippingTotal, 2)
             ],
             'total' => round($summary->grandTotal, 2),
             'discount' => [
