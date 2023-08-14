@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Review;
 
 use App\HttpTenantApi\Resources\ReviewResource;
-use Domain\Order\Models\OrderLine;
+use Domain\Review\Actions\CreateReviewAction;
+use Domain\Review\DataTransferObjects\CreateReviewData;
 use Domain\Review\Models\Review;
 use Domain\Review\Requests\ReviewStoreRequest;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -13,7 +14,6 @@ use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Get;
-use Exception;
 
 #[
     Resource('reviews', apiResource: true, only: ['destroy', 'store']),
@@ -21,49 +21,15 @@ use Exception;
 ]
 class ReviewController
 {
-    public function store(ReviewStoreRequest $request, Review $review): JsonResponse
+    public function store(ReviewStoreRequest $request, CreateReviewAction $createReviewAction): JsonResponse
     {
 
         $validatedData = $request->validated();
+
+        /** @var \Domain\Customer\Models\Customer $customer */
         $customer = auth()->user();
 
-        $review->customer_id = $customer->id;
-        $review->customer_name = $customer->first_name . ' ' . $customer->last_name;
-        $review->customer_email = $customer->email;
-
-        $review->rating = $validatedData['rating'];
-        $review->comment = $validatedData['comment'];
-        $review->order_line_id = $validatedData['order_line_id'];
-        $review->is_anonymous = $validatedData['is_anonymous'];
-
-        $orderLine = OrderLine::find($validatedData['order_line_id']);
-        $orderLine->reviewed_at = now();
-
-        $review->order_id = $orderLine->order_id;
-
-        if(isset($orderLine->purchasable_data['combination'])) {
-            $review->data = $orderLine->purchasable_data['combination'];
-        }
-
-        if(isset($orderLine->purchasable_data['product'])) {
-            $review->product_id = $orderLine->purchasable_data['product']['id'];
-        } else {
-            $review->product_id = $orderLine->purchasable_data['id'];
-        }
-
-        if (isset($validatedData['media'])) {
-            foreach ($validatedData['media'] as $imageUrl) {
-                try {
-                    $review->addMediaFromUrl($imageUrl)
-                        ->toMediaCollection('review_product_media');
-                } catch (Exception $e) {
-                    // dd($e);
-                }
-            }
-        }
-
-        $orderLine->save();
-        $review->save();
+        $createReviewAction->execute(CreateReviewData::fromArray($validatedData), $customer);
 
         return response()->json(['message' => 'Review item created successfully'], 201);
     }

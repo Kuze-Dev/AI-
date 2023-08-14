@@ -56,11 +56,16 @@ class Review extends Model implements HasMedia
     use InteractsWithMedia;
 
     protected $fillable = [
-        'ratings',
         'comment',
         'data',
         'customer_name',
         'customer_email',
+        'customer_id',
+        'rating',
+        'order_line_id',
+        'is_anonymous',
+        'order_id',
+        'product_id',
     ];
 
     protected $casts = [
