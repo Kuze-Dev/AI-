@@ -34,7 +34,7 @@ class CreateS3PresignUploadUrlAction
         $cmd = $client->getCommand('PutObject', [
             'Bucket' => config('filesystems.disks.s3.bucket'),
             'Key' => $object_key,
-            'ACL' => 'private-read',
+            'ACL' => 'public-read',
         ]);
 
         $awsResponse = $client->createPresignedRequest($cmd, $expiry);
