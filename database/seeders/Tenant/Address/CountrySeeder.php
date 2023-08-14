@@ -18,17 +18,23 @@ class CountrySeeder extends Seeder
         $bar = $this->command->getOutput()->createProgressBar(count($countries));
 
         foreach ($countries as $countryData) {
+            $timezone = null;
+            if (isset($countryData['timezones'][0]['gmtOffsetName'])) {
+                $timezone = $countryData['timezones'][0]['gmtOffsetName'];
+            }
+
             $country = Country::create([
                 'code' => $countryData['iso2'],
                 'name' => $countryData['name'],
                 'capital' => $countryData['capital'],
-                'timezone' => $countryData['timezones'][0]['gmtOffsetName'],
+                'timezone' => $timezone,
                 'active' => false,
             ]);
 
             foreach ($countryData['states'] as $stateData) {
                 $country->states()->create([
                     'name' => $stateData['name'],
+                    'code' => $stateData['state_code'],
                 ]);
             }
 
