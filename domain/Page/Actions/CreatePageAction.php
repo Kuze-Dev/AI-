@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Page\Actions;
 
+use Domain\Blueprint\Actions\CreateBlueprintDataAction;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Support\MetaData\Actions\CreateMetaDataAction;
@@ -15,6 +16,7 @@ class CreatePageAction
         protected CreateBlockContentAction $createBlockContent,
         protected CreateMetaDataAction $createMetaTags,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
+        protected CreateBlueprintDataAction $createBlueprintData,
     ) {
     }
 
