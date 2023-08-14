@@ -55,7 +55,7 @@ class UPSRateClient extends BaseClient
                         'Address' => [
                             'AddressLine' => $address->address_line_1,
                             'City' => $address->city,
-                            'StateProvinceCode' => $address->state->name,
+                            // 'StateProvinceCode' => $address->state->name,
                             'PostalCode' => $address->zip_code,
                             'CountryCode' => 'US',
                         ],
