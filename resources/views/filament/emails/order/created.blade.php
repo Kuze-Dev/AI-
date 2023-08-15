@@ -218,7 +218,8 @@
                         ">
                             <div>{{ $orderLine->name }}</div>
                             <div>
-                                {{ $order->currency_symbol }} {{ number_format($orderLine->sub_total, 2, '.', '') }}
+                                {{ $order->currency_symbol }}
+                                {{ number_format((float) $orderLine->sub_total, 2, '.', ',') }}
                             </div>
                             @if (isset($orderLine->purchasable_data['combination']))
                                 @php
@@ -266,16 +267,16 @@
                 </div>
                 <div style="text-align: right">
                     <p>{{ $order->currency_symbol }}
-                        {{ number_format($order->sub_total, 2, '.', '') }}
+                        {{ number_format((float) $order->sub_total, 2, '.', ',') }}
                     </p>
                     <p>{{ $order->currency_symbol }}
-                        {{ number_format($order->tax_total, 2, '.', '') }}
+                        {{ number_format((float) $order->tax_total, 2, '.', ',') }}
                     </p>
                     <p>{{ $order->currency_symbol }}
-                        {{ number_format($order->shipping_total, 2, '.', '') }}
+                        {{ number_format((float) $order->shipping_total, 2, '.', ',') }}
                     </p>
                     <p>{{ $order->currency_symbol }}
-                        {{ number_format($order->discount_total, 2, '.', '') }}
+                        {{ number_format((float) $order->discount_total, 2, '.', ',') }}
                     </p>
                 </div>
             </div>
@@ -285,7 +286,7 @@
                 </div>
                 <div style="text-align: right">
                     <p>{{ $order->currency_symbol }}
-                        {{ number_format($order->total, 2, '.', '') }}
+                        {{ number_format((float) $order->total, 2, '.', ',') }}
                     </p>
                 </div>
             </div>
