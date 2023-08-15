@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Admin\Notifications;
 
-use App\Settings\SiteSettings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
