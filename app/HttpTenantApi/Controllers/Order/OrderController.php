@@ -65,7 +65,7 @@ class OrderController extends Controller
         }
 
         /** @phpstan-ignore-next-line */
-        if ( ! $result['order'] instanceof Order) {
+        if (!$result['order'] instanceof Order) {
             return response()->json([
                 'message' => 'Order failed to be created',
             ], 400);
@@ -93,7 +93,7 @@ class OrderController extends Controller
             ])->whereBelongsTo($customer)
                 ->whereReference($order->reference)
         )
-            ->allowedIncludes(['orderLines', 'payments.media', 'payments.paymentMethod.media'])->first();
+            ->allowedIncludes(['orderLines', 'payments.media', 'payments.paymentMethod.media', 'shippingMethod'])->first();
 
         return OrderResource::make($model);
     }

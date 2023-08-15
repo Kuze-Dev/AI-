@@ -67,6 +67,8 @@ class CreateOrderAction
             'discount_code' => $preparedOrderData->discount ? $preparedOrderData->discount->code : null,
 
             'shipping_total' => $summary->initialShippingTotal,
+            'shipping_method_id' => $preparedOrderData->shippingMethod->id,
+
             'total' => $summary->grandTotal,
 
             'notes' => $preparedOrderData->notes,

@@ -42,6 +42,7 @@ class OrderResource extends JsonApiResource
         return [
             'orderLines' => fn () => OrderLineResource::collection($this->orderLines),
             'payments' => fn () => PaymentOrderResource::make($this->payments->first()),
+            'shippingMethod' => fn () => ShippingMethodResource::make($this->shippingMethod),
         ];
     }
 }

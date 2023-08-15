@@ -9,6 +9,7 @@ use Domain\Order\Enums\OrderAddressTypes;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Payments\Interfaces\PayableInterface;
 use Domain\Payments\Models\Traits\HasPayments;
+use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Taxation\Enums\PriceDisplay;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -125,6 +126,7 @@ class Order extends Model implements HasMedia, PayableInterface
         'discount_id',
         'discount_code',
         'shipping_total',
+        'shipping_method_id',
         'total',
         'notes',
         'is_paid',
@@ -174,6 +176,12 @@ class Order extends Model implements HasMedia, PayableInterface
     {
         return $this->hasOne(OrderAddress::class)->where('type', OrderAddressTypes::BILLING);
     }
+
+    public function shippingMethod(): BelongsTo
+    {
+        return $this->belongsTo(ShippingMethod::class, 'shipping_method_id');
+    }
+
 
     public function registerMediaCollections(): void
     {

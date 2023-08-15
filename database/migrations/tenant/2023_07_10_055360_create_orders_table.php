@@ -8,7 +8,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class() extends Migration
+{
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
@@ -31,6 +32,7 @@ return new class () extends Migration {
             $table->integer('discount_id')->nullable();
             $table->string('discount_code')->nullable();
             $table->decimal('shipping_total');
+            $table->string('shipping_method_id')->index();
             $table->decimal('total')->index();
             $table->longText('notes')->nullable();
             $table->boolean('is_paid')->default(false);
