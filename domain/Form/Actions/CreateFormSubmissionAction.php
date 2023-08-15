@@ -30,10 +30,10 @@ class CreateFormSubmissionAction
         $attachments = [];
 
         if (count($filesFields) > 0) {
-            foreach ($data as $fields) {
+            foreach ($data as $field_key => $fields) {
                 foreach ($filesFields as $fieldkey) {
                     $value = ($fields[$fieldkey]);
-
+                    
                     if ( ! is_null($value)) {
 
                         if ( ! Storage::disk('s3')->exists($value)) {
@@ -43,8 +43,9 @@ class CreateFormSubmissionAction
                             $objectkey = 'uploads/forms/'.$form->id.'/'.basename($value);
 
                             Storage::disk('s3')->move($value, $objectkey);
-
-                            $fields[$fieldkey] = $objectkey;
+                           
+                            $data[$field_key][$fieldkey] = $objectkey;
+                          
                         }
 
                         $attachments[] = $objectkey;
