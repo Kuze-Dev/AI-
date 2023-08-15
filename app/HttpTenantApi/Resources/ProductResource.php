@@ -20,8 +20,8 @@ class ProductResource extends JsonApiResource
             'slug' => $this->slug,
             'sku' => $this->sku,
             'description' => $this->description,
-            'retail_price' => $this->retail_price,
-            'selling_price' => $this->selling_price,
+            'retail_price' => number_format((float) $this->retail_price, 2, '.', ','),
+            'selling_price' => number_format((float) $this->selling_price, 2, '.', ','),
             'stock' => $this->stock,
             'status' => $this->status, // TODO: use enum, to clarify what is available as valid
             'is_digital_product' => $this->is_digital_product,

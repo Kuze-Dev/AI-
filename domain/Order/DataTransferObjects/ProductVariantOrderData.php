@@ -32,8 +32,8 @@ class ProductVariantOrderData
         return new self(
             sku: $data['sku'],
             combination: $combinations,
-            retail_price: $data['retail_price'],
-            selling_price: $data['selling_price'],
+            retail_price: number_format((float) $data['retail_price'], 2, '.', ','),
+            selling_price: number_format((float) $data['selling_price'], 2, '.', ','),
             stock: $data['stock'],
             status: $data['status'],
             product: ProductOrderData::fromArray($data['product']),
@@ -56,8 +56,8 @@ class ProductVariantOrderData
         return new self(
             sku: $productVariant->sku,
             combination: $combinations,
-            retail_price: $productVariant->retail_price,
-            selling_price: $productVariant->selling_price,
+            retail_price: number_format((float) $productVariant->retail_price, 2, '.', ','),
+            selling_price: number_format((float) $productVariant->selling_price, 2, '.', ','),
             stock: $productVariant->stock,
             status: (bool) $productVariant->status,
             product: ProductOrderData::fromProduct($product),
