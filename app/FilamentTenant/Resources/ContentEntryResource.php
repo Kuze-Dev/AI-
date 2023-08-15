@@ -13,7 +13,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
 use Closure;
@@ -101,7 +100,9 @@ class ContentEntryResource extends Resource
                                     ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
                                     ?->dispatchEvent('route_url::update');
                             })
-                            ->required(),
+                            ->required()
+                            ->string()
+                            ->maxLength(255),
                         RouteUrlFieldset::make()
                             ->generateModelForRouteUrlUsing(function ($livewire, ContentEntry|string $model) {
                                 return $model instanceof ContentEntry
@@ -159,11 +160,13 @@ class ContentEntryResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('activeRouteUrl.url')
                     ->label('URL')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable(['first_name', 'last_name'])
                     ->searchable(query: function (Builder $query, string $search): Builder {
@@ -240,7 +243,7 @@ class ContentEntryResource extends Resource
                     ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
             ])
             ->reorderable('order')
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->url(fn ($livewire, ContentEntry $record) => self::getUrl('edit', [$livewire->ownerRecord, $record])),

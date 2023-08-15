@@ -14,13 +14,12 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Domain\Blueprint\Models\Blueprint;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Domain\Taxonomy\Actions\DeleteTaxonomyAction;
 use Illuminate\Support\Facades\Auth;
 
@@ -69,6 +68,8 @@ class TaxonomyResource extends Resource
                 Forms\Components\Card::make()->schema([
                     Forms\Components\TextInput::make('name')
                         ->required()
+                        ->string()
+                        ->maxLength(255)
                         ->unique(ignoreRecord: true),
                     Forms\Components\Select::make('blueprint_id')
                         ->label(trans('Blueprint'))
@@ -104,7 +105,10 @@ class TaxonomyResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->sortable()
+                    ->searchable()
+                    ->truncate('max-w-xs 2xl:max-w-xl', true),
                 Tables\Columns\BadgeColumn::make('taxonomy_terms_count')
                     ->counts('taxonomyTerms')
                     ->sortable(),
@@ -113,7 +117,7 @@ class TaxonomyResource extends Resource
                     ->sortable(),
             ])
             ->filters([])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([

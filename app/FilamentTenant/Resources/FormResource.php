@@ -17,7 +17,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 use Filament\Resources\RelationManagers\RelationGroup;
@@ -43,7 +42,9 @@ class FormResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
-                        ->required(),
+                        ->required()
+                        ->string()
+                        ->maxLength(255),
                     Forms\Components\Select::make('blueprint_id')
                         ->label(trans('Blueprint'))
                         ->required()
@@ -115,7 +116,7 @@ class FormResource extends Resource
                                             : ($state ?? [])),
                                 ])
                                 ->columns(3),
-                            Forms\Components\TextInput::make('sender')
+                            Forms\Components\TextInput::make('sender_name')
                                 ->required(),
                             Forms\Components\TextInput::make('reply_to')
                                 ->helperText('Seperated by comma')
@@ -159,6 +160,8 @@ class FormResource extends Resource
                                         markdown;
                                 })
                                 ->columnSpanFull(),
+                            Forms\Components\Toggle::make('has_attachments')
+                                ->helperText('If Enabled Uploaded Files will be attach to this email notification'),
                         ])
                         ->columnSpan(['md' => 3]),
                 ])->columns(4),
@@ -172,7 +175,8 @@ class FormResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->truncate('max-w-xs 2xl:max-w-xl', true),
                 Tables\Columns\BadgeColumn::make('form_submissions_count')
                     ->counts('formSubmissions')
                     ->formatStateUsing(fn (FormModel $record, ?int $state) => $record->store_submission ? $state : 'N/A')
@@ -183,7 +187,7 @@ class FormResource extends Resource
                     ->sortable(),
             ])
             ->filters([])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([

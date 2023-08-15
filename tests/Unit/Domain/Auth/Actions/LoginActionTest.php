@@ -10,17 +10,18 @@ use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Support\Facades\Auth;
 use Mockery\MockInterface;
+use Pest\Mock\Mock;
 use Tests\Fixtures\User;
 
 it('can login a user', function () {
-    $user = mock(new User())
+    $user = (new Mock(new User()))
         ->expect(hasEnabledTwoFactorAuthentication: fn () => false);
-    $userProvider = mock(EloquentUserProvider::class)
+    $userProvider = (new Mock(EloquentUserProvider::class))
         ->expect(
             retrieveByCredentials: fn () => $user,
             validateCredentials: fn () => true,
         );
-    $guard = mock(StatefulGuard::class)
+    $guard = (new Mock(StatefulGuard::class))
         ->expect(attempt: fn (array $credentials, ?bool $remember) => true);
     Auth::shouldReceive('guard')
         ->once()

@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ActivityResource\RelationManagers;
 
 use App\Filament\Resources\ActivityResource;
+use Closure;
 use Exception;
 use Filament\Resources\Form;
 use Filament\Resources\Table;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class ActivitiesRelationManager extends RelationManager
 {
@@ -45,5 +48,13 @@ class ActivitiesRelationManager extends RelationManager
     protected function canDelete(Model $record): bool
     {
         return false;
+    }
+
+    protected function getTableHeading(): string|Htmlable|Closure|null
+    {
+        return (string) Str::of($this->getOwnerRecord()::class)
+            ->classBasename()
+            ->headline()
+            ->append(' ' . static::getTitle());
     }
 }

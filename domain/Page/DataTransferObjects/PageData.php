@@ -6,8 +6,8 @@ namespace Domain\Page\DataTransferObjects;
 
 use Domain\Page\Enums\Visibility;
 use Carbon\Carbon;
-use Domain\Support\MetaData\DataTransferObjects\MetaDataData;
-use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
+use Support\MetaData\DataTransferObjects\MetaDataData;
+use Support\RouteUrl\DataTransferObjects\RouteUrlData;
 
 class PageData
 {

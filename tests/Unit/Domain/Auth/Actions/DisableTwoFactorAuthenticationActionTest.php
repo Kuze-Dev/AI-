@@ -6,6 +6,7 @@ use Domain\Auth\Actions\DisableTwoFactorAuthenticationAction;
 use Domain\Auth\Events\TwoFactorAuthenticationDisabled;
 use Domain\Auth\Model\TwoFactorAuthentication;
 use Illuminate\Support\Facades\Event;
+use Pest\Mock\Mock;
 use Tests\Fixtures\User;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -36,7 +37,7 @@ it('can disable two factor authentication', function () {
 it('will reload two factor authentication if loaded in relations', function () {
     $this->user->load('twoFactorAuthentication');
 
-    $user = mock($this->user)->expect(load: fn () => $this->user);
+    $user = (new Mock($this->user))->expect(load: fn () => $this->user);
 
     $result = app(DisableTwoFactorAuthenticationAction::class)->execute($user);
 

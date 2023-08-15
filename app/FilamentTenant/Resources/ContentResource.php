@@ -14,11 +14,10 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Content\Actions\DeleteContentAction;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -71,6 +70,8 @@ class ContentResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
+                        ->string()
+                        ->maxLength(255)
                         ->lazy()
                         ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
                             if ($get('prefix') === Str::slug($state) || blank($get('prefix'))) {
@@ -87,6 +88,7 @@ class ContentResource extends Resource
                     Forms\Components\TextInput::make('prefix')
                         ->required()
                         ->string()
+                        ->maxLength(255)
                         ->alphaDash()
                         ->unique(ignoreRecord: true)
                         ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
@@ -146,7 +148,8 @@ class ContentResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -157,7 +160,7 @@ class ContentResource extends Resource
                     ->searchable()
                     ->optionsLimit(20),
             ])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([

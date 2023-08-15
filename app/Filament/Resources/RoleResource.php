@@ -11,13 +11,12 @@ use App\Filament\Resources\RoleResource\Support\PermissionGroupCollection;
 use Closure;
 use Domain\Role\Actions\DeleteRoleAction;
 use Domain\Role\Models\Role;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -49,6 +48,7 @@ class RoleResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->required()
+                        ->string()
                         ->maxLength(255),
                     Forms\Components\Select::make('guard_name')
                         ->default(config('auth.defaults.guard'))
@@ -82,7 +82,7 @@ class RoleResource extends Resource
                 Tables\Filters\SelectFilter::make('guard_name')
                     ->options(self::getGuards()->mapWithKeys(fn (string $guardName) => [$guardName => $guardName])),
             ])
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->authorize('update'),
@@ -184,12 +184,10 @@ class RoleResource extends Resource
                                 Forms\Components\Fieldset::make('Abilities')
                                     ->schema([
                                         Forms\Components\CheckboxList::make("{$groupName}_abilities")
-                                            ->label('')
-                                            ->options($permissionGroup->abilities->mapWithKeys(
-                                                fn (Permission $permission) => [
-                                                    $permission->id => Str::headline(explode('.', $permission->name, 2)[1]),
-                                                ]
-                                            ))
+                                            ->disableLabel()
+                                            ->options($permissionGroup->abilities->mapWithKeys(fn (Permission $permission) => [
+                                                $permission->id => Str::headline(explode('.', $permission->name, 2)[1]),
+                                            ]))
                                             ->columns(2)
                                             ->reactive()
                                             ->formatStateUsing(function (Forms\Components\CheckboxList $component, ?Role $record) use ($permissionGroup): array {
