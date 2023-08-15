@@ -10,6 +10,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Blade;
@@ -28,6 +29,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
     public function __construct(
         protected readonly FormEmailNotification $formEmailNotification,
         protected readonly array $data,
+        protected readonly ?array $form_attachments = [],
     ) {
     }
 
@@ -131,6 +133,17 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
 
     public function attachments(): array
     {
-        return [];
+        $attach = [];
+
+        if ($this->formEmailNotification->has_attachments && $this->form_attachments !== null) {
+
+            foreach ($this->form_attachments as $value) {
+                $attach[] = Attachment::fromStorageDisk('s3', $value)
+                    ->as(basename($value));
+            }
+        }
+
+        return $attach;
+
     }
 }

@@ -43,6 +43,7 @@ it('can create form', function () {
                     'reply_to' => ['test@user'],
                     'subject' => 'Test Subject',
                     'template' => 'Some test template',
+                    'has_attachments' => false,
                 ],
             ],
         ])
@@ -62,6 +63,7 @@ it('can create form', function () {
         'reply_to' => ['test@user'],
         'subject' => 'Test Subject',
         'template' => 'Some test template',
+        'has_attachments' => false,
     ]);
 });
 
