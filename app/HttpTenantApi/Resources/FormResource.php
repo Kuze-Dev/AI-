@@ -8,8 +8,7 @@ use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @property-read string $name
- * @property-read \Domain\Blueprint\Models\Blueprint $blueprint
+ * @mixin \Domain\Form\Models\Form
  */
 class FormResource extends JsonApiResource
 {
@@ -17,6 +16,8 @@ class FormResource extends JsonApiResource
     {
         return  [
             'name' => $this->name,
+            'store_submission' => $this->store_submission,
+            'uses_captcha' => $this->uses_captcha,
         ];
     }
 

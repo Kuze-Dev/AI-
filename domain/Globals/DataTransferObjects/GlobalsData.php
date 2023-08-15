@@ -8,9 +8,8 @@ class GlobalsData
 {
     public function __construct(
         public readonly string $name,
-        public readonly string $slug,
         public readonly string $blueprint_id,
-        public readonly ?array $data = null,
+        public readonly array $data = [],
         public readonly array $sites = [],
     ) {
     }
@@ -19,9 +18,8 @@ class GlobalsData
     {
         return new self(
             name: $data['name'],
-            slug: $data['slug'],
             blueprint_id: $data['blueprint_id'],
-            data: $data['data'],
+            data: $data['data'] ?? [],
             sites: $data['sites'],
         );
     }

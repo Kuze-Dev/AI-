@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Listeners\SettingsActivityLog;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
-use Spatie\LaravelSettings\Events\SavingSettings;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -22,26 +19,15 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        SavingSettings::class => [
-            SettingsActivityLog::class,
-        ],
     ];
 
-    /**
-     * Register any events for your application.
-     *
-     * @return void
-     */
-    public function boot()
+    /** Register any events for your application. */
+    public function boot(): void
     {
     }
 
-    /**
-     * Determine if events and listeners should be automatically discovered.
-     *
-     * @return bool
-     */
-    public function shouldDiscoverEvents()
+    /** Determine if events and listeners should be automatically discovered. */
+    public function shouldDiscoverEvents(): bool
     {
         return false;
     }

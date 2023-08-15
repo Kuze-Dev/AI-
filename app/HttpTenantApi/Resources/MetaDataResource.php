@@ -8,17 +8,21 @@ use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @mixin \Domain\Support\MetaData\Models\MetaData
+ * @mixin \Support\MetaData\Models\MetaData
  */
 class MetaDataResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
+        $image = $this->getFirstMedia('image');
+
         return [
             'title' => $this->title,
             'author' => $this->description,
             'keywords' => $this->keywords,
             'description' => $this->description,
+            'image' => $image?->getUrl(),
+            'image_alt_text' => $image?->getCustomProperty('alt_text'),
         ];
     }
 }

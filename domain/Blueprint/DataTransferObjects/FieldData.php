@@ -18,6 +18,7 @@ abstract class FieldData implements Arrayable
         public readonly string $state_name,
         public readonly FieldType $type,
         public readonly array $rules = [],
+        public readonly ?string $helper_text = null,
     ) {
     }
 

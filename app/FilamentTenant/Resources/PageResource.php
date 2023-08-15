@@ -6,23 +6,29 @@ namespace App\FilamentTenant\Resources;
 
 use Closure;
 use Exception;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Support\Str;
 use Domain\Page\Models\Page;
 use Domain\Site\Models\Site;
 use Filament\Resources\Form;
-use Domain\Page\Models\Slice;
+use Domain\Page\Models\Block;
 use Filament\Resources\Table;
 use Filament\Resources\Resource;
 use App\FilamentTenant\Resources;
-use Domain\Page\Models\SliceContent;
+use Domain\Page\Enums\Visibility;
+use Domain\Page\Models\BlockContent;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Component;
+use Domain\Page\Actions\DeletePageAction;
+use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\MetaDataForm;
 use Illuminate\Database\Eloquent\Collection;
+use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class PageResource extends Resource
@@ -37,110 +43,135 @@ class PageResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /** @var Collection<int, Slice> */
-    public static ?Collection $cachedSlices = null;
+    /** @var Collection<int, Block> */
+    public static ?Collection $cachedBlocks = null;
 
     public static function form(Form $form): Form
     {
-        return $form->schema([
-            Forms\Components\Card::make([
-                Forms\Components\TextInput::make('name')
-                    ->unique(ignoreRecord: true)
-                    ->lazy()
-                    ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
-                        if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
-                            $set('slug', Str::slug($state));
-                        }
-                    })
-                    ->required(),
-                Forms\Components\TextInput::make('slug')
-                    ->unique(ignoreRecord: true)
-                    ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
-                Forms\Components\TextInput::make('route_url')
-                    ->required()
-                    ->helperText('Use "{{ $slug }}" to insert the current slug.'),
-                Forms\Components\Card::make([
-                    Forms\Components\CheckboxList::make('sites')
-                        ->options(
-                            fn () => Site::orderBy('name')
-                                ->pluck('name', 'id')
-                                ->toArray()
-                        )
-                        ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Page $record): void {
-                            if ( ! $record) {
-                                $component->state([]);
+        return $form
+            ->columns(3)
+            ->schema([
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Card::make([
+                            Forms\Components\TextInput::make('name')
+                                ->unique(ignoreRecord: true)
+                                ->lazy()
+                                ->afterStateUpdated(function (Forms\Components\TextInput $component) {
+                                    $component->getContainer()
+                                        ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
+                                        ?->dispatchEvent('route_url::update');
+                                })
+                                ->required()
+                                ->string()
+                                ->maxLength(255),
+                            RouteUrlFieldset::make()
+                                ->disabled(fn (?Page $record) => $record?->isHomePage()),
+                            Forms\Components\Group::make([
+                                Forms\Components\Toggle::make('published_at')
+                                    ->label(trans('Published'))
+                                    ->formatStateUsing(fn (Carbon|bool|null $state) => $state instanceof Carbon ? true : (bool) $state)
+                                    ->dehydrateStateUsing(fn (?bool $state) => $state ? now() : null)
+                                    ->disabled(fn (?Page $record) => $record?->isHomePage()),
+                                Forms\Components\Select::make('visibility')
+                                    ->options(
+                                        collect(Visibility::cases())
+                                            ->mapWithKeys(fn (Visibility $visibility) => [
+                                                $visibility->value => Str::headline($visibility->value),
+                                            ])
+                                            ->toArray()
+                                    )
+                                    ->disabled(fn (?Page $record) => $record?->isHomePage())
+                                    ->default(Visibility::PUBLIC->value)
+                                    ->required(),
+                            ])
+                                ->columns('grid-cols-[10rem,1fr] items-center'),
 
-                                return;
-                            }
-
-                            $component->state(
-                                $record->sites->pluck('id')
-                                    ->intersect(array_keys($component->getOptions()))
-                                    ->values()
-                                    ->toArray()
-                            );
-                        }),
-                ]),
-            ]),
-            Forms\Components\Section::make(trans('Slices'))
-                ->schema([
-                    Forms\Components\Repeater::make('slice_contents')
-                        ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Page $record, ?array $state) {
-                            if ($record === null || $record->sliceContents->isEmpty()) {
-                                $component->state($state ?? []);
-
-                                return;
-                            }
-
-                            $component->state(
-                                $record->sliceContents->sortBy('order')
-                                    ->mapWithKeys(fn (SliceContent $item) => ["record-{$item->getKey()}" => $item])
-                                    ->toArray()
-                            );
-
-                            // WORKAROUND: Force after state hydrate after setting the new state
-                            foreach ($component->getChildComponentContainers() as $componentContainer) {
-                                $componentContainer->callAfterStateHydrated();
-                            }
-                        })
-                        ->itemLabel(fn (array $state) => self::getCachedSlices()->firstWhere('id', $state['slice_id'])?->name)
-                        ->disableLabel()
-                        ->minItems(1)
-                        ->collapsed(fn (string $context) => $context === 'edit')
-                        ->orderable('order')
-                        ->schema([
-                            Forms\Components\Select::make('slice_id')
-                                ->label('Slice')
+                            Forms\Components\Hidden::make('author_id')
+                                ->default(Auth::id()),
+                        ]),
+                        Forms\Components\Card::make([
+                            Forms\Components\CheckboxList::make('sites')
                                 ->options(
-                                    self::getCachedSlices()
-                                        ->sortBy('name')
+                                    fn () => Site::orderBy('name')
                                         ->pluck('name', 'id')
                                         ->toArray()
                                 )
-                                ->hidden(fn (?Page $record, Closure $get) => $record && $record->sliceContents->firstWhere('id', $get('id')))
-                                ->required()
-                                ->exists(Slice::class, 'id')
-                                ->searchable()
-                                ->reactive()
-                                ->afterStateUpdated(function (Forms\Components\Select $component, $state) {
-                                    $slice = self::getCachedSlices()->firstWhere('id', $state);
+                                ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Page $record): void {
+                                    if ( ! $record) {
+                                        $component->state([]);
 
-                                    $component->getContainer()
-                                        ->getComponent(fn (Component $component) => $component->getId() === 'schema-form')
-                                        ?->getChildComponentContainer()
-                                        ->fill($slice?->is_fixed_content ? $slice->data : []);
-                                })
-                                ->dehydrateStateUsing(fn (string|int $state) => (int) $state),
-                            SchemaFormBuilder::make('data')
-                                ->id('schema-form')
-                                ->dehydrated(fn (Closure $get) => ! (self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->is_fixed_content))
-                                ->disabled(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->is_fixed_content ?? false)
-                                ->schemaData(fn (Closure $get) => self::getCachedSlices()->firstWhere('id', $get('slice_id'))?->blueprint->schema),
+                                        return;
+                                    }
 
+                                    $component->state(
+                                        $record->sites->pluck('id')
+                                            ->intersect(array_keys($component->getOptions()))
+                                            ->values()
+                                            ->toArray()
+                                    );
+                                }),
                         ]),
-                ]),
-            MetaDataForm::make('Meta Data'),
-        ]);
+                        Forms\Components\Repeater::make('block_contents')
+                            ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Page $record, ?array $state) {
+                                if ($record === null || $record->blockContents->isEmpty()) {
+                                    $component->state($state ?? []);
+
+                                    return;
+                                }
+
+                                $component->state(
+                                    $record->blockContents->sortBy('order')
+                                        ->mapWithKeys(fn (BlockContent $item) => ["record-{$item->getKey()}" => $item])
+                                        ->toArray()
+                                );
+
+                                // WORKAROUND: Force after state hydrate after setting the new state
+                                foreach ($component->getChildComponentContainers() as $componentContainer) {
+                                    $componentContainer->callAfterStateHydrated();
+                                }
+                            })
+                            ->itemLabel(fn (array $state) => self::getCachedBlocks()->firstWhere('id', $state['block_id'])?->name)
+                            ->label('Blocks')
+                            ->default([])
+                            ->collapsed(fn (string $context) => $context === 'edit')
+                            ->orderable('order')
+                            ->schema([
+                                Forms\Components\ViewField::make('block_id')
+                                    ->label('Block')
+                                    ->required()
+                                    ->view('filament.forms.components.block-picker')
+                                    ->viewData([
+                                        'blocks' => self::getCachedBlocks()
+                                            ->sortBy('name')
+                                            ->mapWithKeys(function (Block $block) {
+                                                return [
+                                                    $block->id => [
+                                                        'name' => $block['name'],
+                                                        'image' => $block->getFirstMediaUrl('image'),
+                                                    ],
+                                                ];
+                                            })
+                                            ->toArray(),
+                                    ])
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($component, $state) {
+                                        $block = self::getCachedBlocks()->firstWhere('id', $state);
+                                        $component->getContainer()
+                                            ->getComponent(fn ($component) => $component->getId() === 'schema-form')
+                                            ?->getChildComponentContainer()
+                                            ->fill($block?->is_fixed_content ? $block->data : []);
+                                    }),
+                                SchemaFormBuilder::make('data')
+                                    ->id('schema-form')
+                                    ->dehydrated(fn (Closure $get) => ! (self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content))
+                                    ->disabled(fn (Closure $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content ?? false)
+                                    ->schemaData(fn (Closure $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->blueprint->schema),
+                            ]),
+                    ])->columnSpan(2),
+                MetaDataForm::make('Meta Data')
+                    ->columnSpan(1),
+            ]);
     }
 
     /** @throws Exception */
@@ -150,23 +181,63 @@ class PageResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
+                    ->searchable()
+                    ->truncate('xs', true),
+                Tables\Columns\TextColumn::make('activeRouteUrl.url')
+                    ->label('URL')
+                    ->sortable()
+                    ->searchable()
+                    ->truncate('xs', true),
+                Tables\Columns\BadgeColumn::make('visibility')
+                    ->formatStateUsing(fn ($state) => Str::headline($state))
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\IconColumn::make('published_at')
+                    ->label(trans('Published'))
+                    ->options([
+                        'heroicon-o-check-circle' => fn ($state) => $state !== null,
+                        'heroicon-o-x-circle' => fn ($state) => $state === null,
+                    ])
+                    ->color(fn ($state) => $state !== null ? 'success' : 'danger'),
+                Tables\Columns\TextColumn::make('author.full_name')
+                    ->sortable(['first_name', 'last_name'])
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        /** @var Builder|Page $query */
+                        return $query->whereHas('author', function ($query) use ($search) {
+                            $query->where('first_name', 'like', "%{$search}%")
+                                ->orWhere('last_name', 'like', "%{$search}%");
+                        });
+                    }),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable()
-                    ->toggleable()
-                    ->toggledHiddenByDefault(),
             ])
-            ->filters([])
+            ->filters([
+                Tables\Filters\SelectFilter::make('visibility')
+                    ->options(
+                        collect(Visibility::cases())
+                            ->mapWithKeys(fn (Visibility $visibility) => [
+                                $visibility->value => Str::headline($visibility->value),
+                            ])
+                            ->toArray()
+                    ),
+                Tables\Filters\TernaryFilter::make('published_at')
+                    ->label(trans('Published'))
+                    ->nullable(),
+            ])
+
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Page $record) {
+                            try {
+                                return app(DeletePageAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
@@ -190,13 +261,13 @@ class PageResource extends Resource
         ];
     }
 
-    /** @return Collection<int, Slice> $cachedSlices */
-    protected static function getCachedSlices(): Collection
+    /** @return Collection<int, Block> $cachedBlocks */
+    protected static function getCachedBlocks(): Collection
     {
-        if ( ! isset(self::$cachedSlices)) {
-            self::$cachedSlices = Slice::with('blueprint')->get();
+        if ( ! isset(self::$cachedBlocks)) {
+            self::$cachedBlocks = Block::with(['blueprint', 'media'])->get();
         }
 
-        return self::$cachedSlices;
+        return self::$cachedBlocks;
     }
 }

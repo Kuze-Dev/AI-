@@ -20,6 +20,7 @@ class MarkdownFieldData extends FieldData
         public readonly FieldType $type = FieldType::MARKDOWN,
         public readonly array $rules = [],
         public readonly array $buttons = [],
+        public readonly ?string $helper_text = null,
     ) {
     }
 
@@ -42,7 +43,8 @@ class MarkdownFieldData extends FieldData
             title: $data['title'],
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             rules: $data['rules'] ?? [],
-            buttons: $data['buttons'] ?? []
+            buttons: $data['buttons'] ?? [],
+            helper_text: $data['helper_text'] ?? null,
         );
     }
 }

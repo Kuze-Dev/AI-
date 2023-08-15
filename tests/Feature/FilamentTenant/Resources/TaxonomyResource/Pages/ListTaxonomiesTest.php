@@ -5,8 +5,7 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\TaxonomyResource\Pages\ListTaxonomies;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
-use Domain\Collection\Database\Factories\CollectionFactory;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Domain\Content\Database\Factories\ContentFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Filament\Facades\Filament;
@@ -57,17 +56,25 @@ it('can delete taxonomy', function () {
     assertModelMissing($taxonomy->taxonomyTerms->first());
 });
 
-it('can\'t delete taxonomy with existing collections', function () {
+it('can\'t delete taxonomy with existing contents', function () {
     $taxonomy = TaxonomyFactory::new()
         ->withDummyBlueprint()
         ->createOne();
 
-    CollectionFactory::new()
+    ContentFactory::new()
         ->withDummyBlueprint()
         ->createOne()
         ->taxonomies()
         ->attach($taxonomy);
 
     livewire(ListTaxonomies::class)
-        ->callTableAction(DeleteAction::class, $taxonomy);
-})->throws(DeleteRestrictedException::class);
+        ->callTableAction(DeleteAction::class, $taxonomy)
+        ->assertNotified(trans(
+            'Unable to :action :resource.',
+            [
+                'action' => 'delete',
+                'resource' => 'taxonomy',
+            ]
+        ))
+        ->assertOk();
+});

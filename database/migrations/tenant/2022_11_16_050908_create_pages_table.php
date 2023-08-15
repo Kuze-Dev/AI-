@@ -7,7 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Domain\Blueprint\Models\Blueprint as BlueprintModel;
 use Domain\Page\Models\Page;
-use Domain\Page\Models\Slice;
+use Domain\Page\Models\Block;
 
 return new class () extends Migration {
     public function up(): void
@@ -22,21 +22,23 @@ return new class () extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('slices', function (Blueprint $table) {
+        Schema::create('blocks', function (Blueprint $table) {
             $table->id();
 
             $table->foreignIdFor(BlueprintModel::class)->index();
 
             $table->string('name')->unique();
-            $table->string('component')->unique();
+            $table->string('component');
+            $table->boolean('is_fixed_content')->default(false);
+            $table->json('data')->nullable();
 
             $table->timestamps();
         });
 
-        Schema::create('slice_contents', function (Blueprint $table) {
+        Schema::create('block_contents', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(Slice::class)->index();
+            $table->foreignIdFor(Block::class)->index();
             $table->foreignIdFor(Page::class)->index();
 
             $table->json('data')->nullable();
@@ -48,8 +50,8 @@ return new class () extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('slice_contents');
-        Schema::dropIfExists('slices');
+        Schema::dropIfExists('block_contents');
+        Schema::dropIfExists('blocks');
         Schema::dropIfExists('pages');
     }
 };

@@ -7,7 +7,6 @@ namespace App\FilamentTenant\Resources;
 use Closure;
 use Filament\Forms;
 use Filament\Tables;
-use Illuminate\Support\Str;
 use Domain\Site\Models\Site;
 use Filament\Resources\Form;
 use Filament\Resources\Table;
@@ -42,51 +41,38 @@ class GlobalsResource extends Resource
             Forms\Components\Card::make([
                 Forms\Components\TextInput::make('name')
                     ->unique(ignoreRecord: true)
-                    ->lazy()
-                    ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
-                        if ($get('slug') === Str::slug($state) || blank($get('slug'))) {
-                            $set('slug', Str::slug($state));
-                        }
-                    })
-                    ->required(),
-                Forms\Components\TextInput::make('slug')
-                    ->unique(ignoreRecord: true)
-                    ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
-                Forms\Components\Card::make([
-                    Forms\Components\CheckboxList::make('sites')
-                        ->options(
-                            fn () => Site::orderBy('name')
-                                ->pluck('name', 'id')
-                                ->toArray()
-                        )
-                        ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Globals $record): void {
-                            if ( ! $record) {
-                                $component->state([]);
-
-                                return;
-                            }
-
-                            $component->state(
-                                $record->sites->pluck('id')
-                                    ->intersect(array_keys($component->getOptions()))
-                                    ->values()
-                                    ->toArray()
-                            );
-                        }),
-                ]),
-                Forms\Components\Select::make('blueprint_id')
-                    ->options(
-                        fn () => Blueprint::orderBy('name')
-                            ->pluck('name', 'id')
-                            ->toArray()
-                    )
                     ->required()
-                    ->exists(Blueprint::class, 'id')
-                    ->searchable()
-                    ->reactive()
+                    ->string()
+                    ->maxLength(255),
+                Forms\Components\Select::make('blueprint_id')
+                    ->label(trans('Blueprint'))
+                    ->required()
                     ->preload()
-                    ->disabled(fn (?Globals $record) => $record !== null),
+                    ->optionsFromModel(Blueprint::class, 'name')
+                    ->disabled(fn (?Globals $record) => $record !== null)
+                    ->reactive(),
+                    Forms\Components\Card::make([
+                        Forms\Components\CheckboxList::make('sites')
+                            ->options(
+                                fn () => Site::orderBy('name')
+                                    ->pluck('name', 'id')
+                                    ->toArray()
+                            )
+                            ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Globals $record): void {
+                                if ( ! $record) {
+                                    $component->state([]);
 
+                                    return;
+                                }
+
+                                $component->state(
+                                    $record->sites->pluck('id')
+                                        ->intersect(array_keys($component->getOptions()))
+                                        ->values()
+                                        ->toArray()
+                                );
+                            }),
+                    ]),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
                     ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
@@ -100,19 +86,11 @@ class GlobalsResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('blueprint.name')
-                    ->sortable()
                     ->searchable()
-                    ->url(fn (Globals $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
+                    ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable()
-                    ->toggleable()
-                    ->toggledHiddenByDefault(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('blueprint')
@@ -120,9 +98,12 @@ class GlobalsResource extends Resource
                     ->searchable()
                     ->optionsLimit(20),
             ])
+
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

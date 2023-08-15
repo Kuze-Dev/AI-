@@ -4,16 +4,22 @@ declare(strict_types=1);
 
 namespace Domain\Page\DataTransferObjects;
 
-use Domain\Support\MetaData\DataTransferObjects\MetaDataData;
+use Carbon\Carbon;
+use Domain\Page\Enums\Visibility;
+use Domain\Page\DataTransferObjects\BlockContentData;
+use Support\MetaData\DataTransferObjects\MetaDataData;
+use Support\RouteUrl\DataTransferObjects\RouteUrlData;
 
 class PageData
 {
     public function __construct(
         public readonly string $name,
-        public readonly string $route_url,
+        public readonly RouteUrlData $route_url_data,
         public readonly MetaDataData $meta_data,
-        public readonly array $slice_contents = [],
-        public readonly ?string $slug = null,
+        public readonly ?int $author_id = null,
+        public readonly Visibility $visibility = Visibility::PUBLIC,
+        public readonly ?Carbon $published_at = null,
+        public readonly array $block_contents = [],
         public readonly array $sites = []
     ) {
     }
@@ -22,23 +28,22 @@ class PageData
     {
         return new self(
             name: $data['name'],
-            slice_contents: array_map(
-                fn (array $sliceContentData) => new SliceContentData(
-                    slice_id: $sliceContentData['slice_id'],
-                    data: $sliceContentData['data'] ?? null,
-                    id: $sliceContentData['id'] ?? null,
+            visibility: ($data['visibility'] ?? null) instanceof Visibility
+                ? $data['visibility']
+                : (Visibility::tryFrom($data['visibility'] ?? '') ?? Visibility::PUBLIC),
+            route_url_data: RouteUrlData::fromArray($data['route_url'] ?? []),
+            meta_data: MetaDataData::fromArray($data['meta_data']),
+            author_id: $data['author_id'] ?? null,
+            published_at: isset($data['published_at']) ? Carbon::parse($data['published_at']) : null,
+            block_contents: array_map(
+                fn (array $blockContentData) => new BlockContentData(
+                    block_id: $blockContentData['block_id'],
+                    data: $blockContentData['data'] ?? null,
+                    id: $blockContentData['id'] ?? null,
                 ),
-                $data['slice_contents'] ?? []
+                $data['block_contents'] ?? [],
             ),
-            slug: $data['slug'] ?? null,
-            route_url: $data['route_url'],
-            meta_data: new MetaDataData(
-                title: $data['meta_data']['title'] ?? null,
-                author: $data['meta_data']['author'] ?? null,
-                description: $data['meta_data']['description'] ?? null,
-                keywords: $data['meta_data']['keywords'] ?? null,
-            ),
-            sites: $data['sites']
+            sites: $data['sites'] ?? [],
         );
     }
 }

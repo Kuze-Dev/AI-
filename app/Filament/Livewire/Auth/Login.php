@@ -32,6 +32,10 @@ class Login extends Component implements HasForms
 
     public function mount(): void
     {
+        if (Filament::auth()->check()) {
+            redirect()->intended(Filament::getUrl());
+        }
+
         $this->form->fill();
     }
 
@@ -84,7 +88,7 @@ class Login extends Component implements HasForms
     public function render(): View
     {
         return view('filament.auth.login')
-            ->layout('filament::components.layouts.card', [
+            ->layout('filament::components.layouts.login-card', [
                 'title' => __('filament::login.title'),
             ]);
     }

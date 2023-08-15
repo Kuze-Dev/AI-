@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Str;
+use function Pest\Laravel\getJson;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Site\Database\Factories\SiteFactory;
 
-use Domain\Page\Database\Factories\SliceFactory;
-
-use function Pest\Laravel\getJson;
+use Domain\Page\Database\Factories\BlockFactory;
+use Support\RouteUrl\Database\Factories\RouteUrlFactory;
 
 beforeEach(function () {
     testInTenantContext();
@@ -16,7 +18,8 @@ beforeEach(function () {
 
 it('can list pages', function () {
     PageFactory::new()
-        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
+        ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->published()
         ->count(10)
         ->create();
 
@@ -24,7 +27,7 @@ it('can list pages', function () {
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json
-                ->count('data', 10)
+                ->count('data', 11)
                 ->where('data.0.type', 'pages')
                 ->whereType('data.0.attributes.name', 'string')
                 ->etc();
@@ -33,11 +36,13 @@ it('can list pages', function () {
 
 it('can filter pages', function ($attribute) {
     $pages = PageFactory::new()
-        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
+        ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->published()
         ->count(2)
         ->sequence(
-            ['name' => 'Foo'],
-            ['name' => 'Bar'],
+            ['name' => 'Foo', 'visibility' => 'authenticated'],
+            ['name' => 'Bar', 'visibility' => 'guest'],
+            ['name' => 'Example', 'visibility' => 'public']
         )
         ->create();
 
@@ -53,11 +58,13 @@ it('can filter pages', function ($attribute) {
                     ->etc();
             });
     }
-})->with(['name', 'slug']);
+})->with(['name', 'slug', 'visibility']);
 
 it('can show a page with includes', function (string $include) {
     $page = PageFactory::new()
-        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
+        ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->has(RouteUrlFactory::new())
+        ->published()
         ->createOne();
 
     $page->metaData()->create([
@@ -74,7 +81,7 @@ it('can show a page with includes', function (string $include) {
                 ->where('data.type', 'pages')
                 ->where('data.id', Str::slug($page->name))
                 ->where('data.attributes.name', $page->name)
-                ->where('data.attributes.route_url', $page->qualified_route_url)
+                ->where('data.attributes.route_url', $page->activeRouteUrl->url)
                 ->has(
                     'included',
                     callback: fn (AssertableJson $json) => $json->where('type', $include)->etc()
@@ -82,20 +89,44 @@ it('can show a page with includes', function (string $include) {
                 ->etc();
         });
 })->with([
-    'sliceContents',
-    'slugHistories',
+    'blockContents',
+    'routeUrls',
     'metaData',
 ]);
+
+it('cant show an unpublished page', function () {
+    $page = PageFactory::new()
+        ->createOne();
+
+    getJson("api/pages/{$page->getRouteKey()}")
+        ->assertStatus(412);
+});
+
+it('can show an unpublished page with valid signature', function () {
+    $page = PageFactory::new()
+        ->createOne();
+
+    $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$page->getRouteKey()], false), '?');
+
+    getJson("api/pages/{$page->getRouteKey()}?{$queryString}")
+        ->assertStatus(200)
+        ->assertJson(function (AssertableJson $json) use ($page) {
+            $json
+                ->where('data.type', 'pages')
+                ->where('data.id', Str::slug($page->name))
+                ->etc();
+        });
+});
 
 it('can list pages of specific site', function () {
     $site = SiteFactory::new()->createOne();
     PageFactory::new()
-        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
+        ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
         ->hasAttached($site)
         ->count(1)
         ->create();
     PageFactory::new()
-        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
+        ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
         ->count(2)
         ->create();
 

@@ -18,13 +18,13 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property array|null $to
  * @property array|null|null $cc
  * @property array|null|null $bcc
- * @property string $sender
+ * @property string $sender_name
  * @property array|null|null $reply_to
  * @property string $subject
  * @property string $template
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Activitylog\Models\Activity[] $activities
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \Domain\Form\Models\Form $form
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification newModelQuery()
@@ -52,10 +52,11 @@ class FormEmailNotification extends Model
         'to',
         'cc',
         'bcc',
-        'sender',
+        'sender_name',
         'reply_to',
         'subject',
         'template',
+        'has_attachments',
     ];
 
     protected $casts = [
@@ -63,6 +64,7 @@ class FormEmailNotification extends Model
         'cc' => DelimitedCast::class,
         'bcc' => DelimitedCast::class,
         'reply_to' => DelimitedCast::class,
+        'has_attachments' => 'bool',
     ];
 
     public function getActivitylogOptions(): LogOptions

@@ -6,46 +6,51 @@ namespace Domain\Page\Actions;
 
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
-use Domain\Page\Models\SliceContent;
-use Domain\Support\MetaData\Actions\CreateMetaDataAction;
-use Domain\Support\MetaData\Actions\UpdateMetaDataAction;
+use Domain\Page\Models\BlockContent;
+use Support\MetaData\Actions\CreateMetaDataAction;
+use Support\MetaData\Actions\UpdateMetaDataAction;
+use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 use Illuminate\Support\Arr;
 
 class UpdatePageAction
 {
     public function __construct(
-        protected CreateSliceContentAction $createSliceContent,
-        protected UpdateSliceContentAction $updateSliceContent,
-        protected DeleteSliceContentAction $deleteSliceContent,
+        protected CreateBlockContentAction $createBlockContent,
+        protected UpdateBlockContentAction $updateBlockContent,
+        protected DeleteBlockContentAction $deleteBlockContent,
         protected CreateMetaDataAction $createMetaData,
         protected UpdateMetaDataAction $updateMetaData,
+        protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
     ) {
     }
 
     public function execute(Page $page, PageData $pageData): Page
     {
         $page->update([
+            'author_id' => $pageData->author_id,
             'name' => $pageData->name,
-            'slug' => $pageData->slug,
-            'route_url' => $pageData->route_url,
+            'visibility' => $pageData->visibility,
+            'published_at' => $pageData->published_at,
         ]);
 
         $page->metaData()->exists()
             ? $this->updateMetaData->execute($page, $pageData->meta_data)
             : $this->createMetaData->execute($page, $pageData->meta_data);
 
-        foreach ($page->sliceContents->whereNotIn('id', Arr::pluck($pageData->slice_contents, 'id')) as $domain) {
-            $this->deleteSliceContent->execute($domain);
+        foreach ($page->blockContents->whereNotIn('id', Arr::pluck($pageData->block_contents, 'id')) as $domain) {
+            $this->deleteBlockContent->execute($domain);
         }
 
-        $sliceContentIds = array_map(
-            fn ($sliceContentData) => ($sliceContent = $page->sliceContents->firstWhere('id', $sliceContentData->id))
-                ? $this->updateSliceContent->execute($sliceContent, $sliceContentData)->id
-                : $this->createSliceContent->execute($page, $sliceContentData)->id,
-            $pageData->slice_contents
+        $blockContentIds = array_map(
+            fn ($blockContentData) => ($blockContent = $page->blockContents->firstWhere('id', $blockContentData->id))
+                ? $this->updateBlockContent->execute($blockContent, $blockContentData)->id
+                : $this->createBlockContent->execute($page, $blockContentData)->id,
+            $pageData->block_contents
         );
 
-        SliceContent::setNewOrder($sliceContentIds);
+        BlockContent::setNewOrder($blockContentIds);
+
+        $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url_data);
 
         $page->sites()
             ->sync($pageData->sites);

@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
 
 /**
  * Domain\Site\Models\Site
@@ -31,14 +30,13 @@ use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
  * @method static \Illuminate\Database\Eloquent\Builder|Site whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class Site extends Model implements IsActivitySubject
+class Site extends Model
 {
     use LogsActivity;
     use SoftDeletes;
 
     protected $fillable = [
         'name',
-        'slug',
     ];
 
     public function getActivitylogOptions(): LogOptions

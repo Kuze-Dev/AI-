@@ -7,7 +7,7 @@ use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Taxonomy\Models\Taxonomy;
 use Filament\Facades\Filament;
 
-use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
@@ -27,7 +27,7 @@ it('can create page', function () {
         ->withDummySchema()
         ->createOne();
 
-    $taxonomy = livewire(CreateTaxonomy::class)
+    livewire(CreateTaxonomy::class)
         ->fillForm([
             'name' => 'Test',
             'blueprint_id' => $blueprint->getKey(),
@@ -35,5 +35,9 @@ it('can create page', function () {
         ->call('create')
         ->assertHasNoFormErrors()
         ->assertOk();
-    assertDatabaseCount(Taxonomy::class, 1);
+
+    assertDatabaseHas(Taxonomy::class, [
+        'name' => 'Test',
+        'blueprint_id' => $blueprint->getKey(),
+    ]);
 });

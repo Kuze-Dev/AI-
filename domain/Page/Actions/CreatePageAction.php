@@ -6,29 +6,34 @@ namespace Domain\Page\Actions;
 
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
-use Domain\Support\MetaData\Actions\CreateMetaDataAction;
+use Support\MetaData\Actions\CreateMetaDataAction;
+use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
 class CreatePageAction
 {
     public function __construct(
-        protected CreateSliceContentAction $createSliceContent,
-        protected CreateMetaDataAction $createMetaTags
+        protected CreateBlockContentAction $createBlockContent,
+        protected CreateMetaDataAction $createMetaTags,
+        protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
     ) {
     }
 
     public function execute(PageData $pageData): Page
     {
         $page = Page::create([
+            'author_id' => $pageData->author_id,
             'name' => $pageData->name,
-            'slug' => $pageData->slug,
-            'route_url' => $pageData->route_url,
+            'visibility' => $pageData->visibility,
+            'published_at' => $pageData->published_at,
         ]);
 
         $this->createMetaTags->execute($page, $pageData->meta_data);
 
-        foreach ($pageData->slice_contents as $sliceContentData) {
-            $this->createSliceContent->execute($page, $sliceContentData);
+        foreach ($pageData->block_contents as $blockContentData) {
+            $this->createBlockContent->execute($page, $blockContentData);
         }
+
+        $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url_data);
 
         $page->sites()
             ->attach($pageData->sites);

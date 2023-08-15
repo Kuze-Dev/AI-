@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\MenuResource\Pages\CreateMenu;
+use Domain\Menu\Enums\NodeType;
+use Domain\Menu\Enums\Target;
 use Filament\Facades\Filament;
 
 use function Pest\Livewire\livewire;
@@ -25,24 +27,22 @@ it('can create menu', function () {
             'name' => 'Test Main Menu',
             'nodes' => [
                 [
-                    'name' => 'Test Home',
+                    'label' => 'Test Home',
+                    'target' => Target::BLANK->value,
+                    'type' => NodeType::URL->value,
                     'url' => 'https://test-url-home.com',
-                    'target' => '_blank',
-                ],
-                [
-                    'name' => 'Test About',
-                    'url' => 'https://test-url-about.com',
-                    'target' => '_blank',
-                    'childs' => [
+                    'children' => [
                         [
-                            'name' => 'Test About Child',
-                            'url' => 'https://test-url-about-child.com',
-                            'target' => '_blank',
+                            'label' => 'Test Home',
+                            'target' => Target::BLANK->value,
+                            'type' => NodeType::URL->value,
+                            'url' => 'https://test-url-home.com',
                         ],
                         [
-                            'name' => 'Test About Child 2',
-                            'url' => 'https://test-url-about-child-2.com',
-                            'target' => '_blank',
+                            'label' => 'Test About Child 2',
+                            'target' => Target::BLANK->value,
+                            'type' => NodeType::URL->value,
+                            'url' => 'https://test-url-home.com',
                         ],
                     ],
                 ],

@@ -3,21 +3,19 @@
 declare(strict_types=1);
 
 use Domain\Page\Models\Page;
-use Domain\Page\Models\SliceContent;
+use Domain\Page\Models\BlockContent;
+use Support\MetaData\Models\MetaData;
 use Domain\Page\Actions\CreatePageAction;
-use Domain\Support\MetaData\Models\MetaData;
-use Domain\Page\DataTransferObjects\PageData;
-use Domain\Site\Database\Factories\SiteFactory;
-
-use Domain\Page\Database\Factories\SliceFactory;
-
 use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\assertDatabaseCount;
+use Domain\Page\DataTransferObjects\PageData;
+
+use Domain\Site\Database\Factories\SiteFactory;
+use Domain\Page\Database\Factories\BlockFactory;
 
 beforeEach(fn () => testInTenantContext());
 
 it('can create page', function () {
-    $sliceId = SliceFactory::new()
+    $blockId = BlockFactory::new()
         ->withDummyBlueprint()
         ->createOne()
         ->getKey();
@@ -28,10 +26,13 @@ it('can create page', function () {
     $page = app(CreatePageAction::class)
         ->execute(PageData::fromArray([
             'name' => 'Foo',
-            'route_url' => 'foo',
-            'slice_contents' => [
+            'route_url' => [
+                'url' => 'foo',
+            ],
+            'author_id' => 1,
+            'block_contents' => [
                 [
-                    'slice_id' => $sliceId,
+                    'block_id' => $blockId,
                     'data' => ['name' => 'foo'],
                 ],
             ],
@@ -44,8 +45,12 @@ it('can create page', function () {
             'sites' => [$site->id],
         ]));
 
-    assertDatabaseCount(Page::class, 1);
-    assertDatabaseCount(SliceContent::class, 1);
+    assertDatabaseHas(Page::class, ['name' => 'Foo']);
+    assertDatabaseHas(BlockContent::class, [
+        'page_id' => $page->id,
+        'block_id' => $blockId,
+        'data' => json_encode(['name' => 'foo']),
+    ]);
     assertDatabaseHas(
         MetaData::class,
         [
@@ -54,15 +59,9 @@ it('can create page', function () {
             'keywords' => '',
             'description' => '',
             'model_type' => $page->getMorphClass(),
-            'model_id' => $page->id,
+            'model_id' => $page->getKey(),
         ]
     );
-    assertDatabaseHas(Page::class, ['name' => 'Foo']);
-    assertDatabaseHas(SliceContent::class, [
-        'page_id' => $page->id,
-        'slice_id' => $sliceId,
-        'data' => json_encode(['name' => 'foo']),
-    ]);
 
     expect($page->sites->pluck('id'))->toContain($site->id);
 });

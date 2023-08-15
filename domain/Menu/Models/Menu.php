@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Domain\Menu\Models;
 
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
-use Spatie\Activitylog\LogOptions;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 use Domain\Site\Traits\Sites;
 
 /**
@@ -24,11 +23,11 @@ use Domain\Site\Traits\Sites;
  * @property string $slug
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Menu\Models\Node[] $nodes
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Menu\Models\Node> $nodes
  * @property-read int|null $nodes_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Domain\Menu\Models\Node[] $parentNodes
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Menu\Models\Node> $parentNodes
  * @property-read int|null $parent_nodes_count
  * @method static \Illuminate\Database\Eloquent\Builder|Menu newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Menu newQuery()
@@ -41,7 +40,7 @@ use Domain\Site\Traits\Sites;
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['parentNodes'])]
-class Menu extends Model implements IsActivitySubject
+class Menu extends Model
 {
     use HasSlug;
     use LogsActivity;
@@ -59,11 +58,6 @@ class Menu extends Model implements IsActivitySubject
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
-    }
-
-    public function getActivitySubjectDescription(Activity $activity): string
-    {
-        return 'Menu: ' . $this->name;
     }
 
     /** @return HasMany<Node> */

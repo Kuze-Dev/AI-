@@ -18,7 +18,6 @@ class UpdateMenuAction
     {
         $menu->update([
             'name' => $menuData->name,
-            'slug' => $menuData->slug,
         ]);
 
         $this->syncNodeAction->execute($menu, $menuData->nodes);

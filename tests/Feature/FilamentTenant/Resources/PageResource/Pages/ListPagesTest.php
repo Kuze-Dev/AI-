@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 use App\FilamentTenant\Resources\PageResource\Pages\ListPages;
 use Domain\Page\Database\Factories\PageFactory;
-use Domain\Page\Database\Factories\SliceFactory;
+use Domain\Page\Database\Factories\BlockFactory;
+use Support\MetaData\Database\Factories\MetaDataFactory;
+use Support\RouteUrl\Database\Factories\RouteUrlFactory;
 use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 
@@ -24,7 +26,7 @@ it('can render page', function () {
 
 it('can list pages', function () {
     $pages = PageFactory::new()
-        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
+        ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
         ->count(5)
         ->create();
 
@@ -35,9 +37,12 @@ it('can list pages', function () {
 
 it('can delete page', function () {
     $page = PageFactory::new()
-        ->addSliceContent(SliceFactory::new()->withDummyBlueprint())
+        ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->has(RouteUrlFactory::new())
+        ->has(MetaDataFactory::new())
         ->createOne();
-    $sliceContent = $page->sliceContents->first();
+
+    $blockContent = $page->blockContents->first();
     $metaData = $page->metaData;
 
     livewire(ListPages::class)
@@ -45,6 +50,6 @@ it('can delete page', function () {
         ->assertOk();
 
     assertModelMissing($page);
-    assertModelMissing($sliceContent);
+    assertModelMissing($blockContent);
     assertModelMissing($metaData);
 });

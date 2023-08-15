@@ -8,7 +8,8 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\Filament\Resources\AdminResource\Pages;
 use Domain\Admin\Models\Admin;
 use Domain\Auth\Actions\ForgotPasswordAction;
-use Domain\Role\Models\Role;
+use Exception;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -17,9 +18,10 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
-use Spatie\Permission\Models\Permission;
-use STS\FilamentImpersonate\Impersonate;
+use STS\FilamentImpersonate\Tables\Actions\Impersonate;
+use Support\Excel\Actions\ExportBulkAction;
 
 class AdminResource extends Resource
 {
@@ -53,7 +55,8 @@ class AdminResource extends Resource
                         ->required(),
                     Forms\Components\TextInput::make('email')
                         ->email()
-                        ->rules('email:rfc,dns')
+                        ->rules(Rule::email())
+                        ->unique(ignoreRecord: true)
                         ->required()
                         ->helperText(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email') ? 'Email update is currently disabled.' : '')
                         ->disabled(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email')),
@@ -62,7 +65,7 @@ class AdminResource extends Resource
                         ->required()
                         ->rule(Password::default())
                         ->helperText(
-                            fn () => config('app.env') === 'local' || config('app.env') === 'testing'
+                            app()->environment('local', 'testing')
                                 ? trans('Password must be at least 4 characters.')
                                 : trans('Password must be at least 8 characters, have 1 special character, 1 number, 1 upper case and 1 lower case.')
                         )
@@ -94,24 +97,22 @@ class AdminResource extends Resource
                         ->schema([
                             Forms\Components\Select::make('roles')
                                 ->multiple()
-                                ->options(
-                                    fn () => Role::orderBy('name')
-                                        ->pluck('name', 'id')
-                                        ->toArray()
+                                ->preload()
+                                ->optionsFromModel(
+                                    config('permission.models.role'),
+                                    'name',
+                                    fn (Builder $query) => $query->where('guard_name', 'admin')
                                 )
-                                ->afterStateHydrated(function (Forms\Components\Select $component, ?Admin $record): void {
-                                    $component->state($record ? $record->roles->pluck('id')->toArray() : []);
-                                }),
+                                ->formatStateUsing(fn (?Admin $record) => $record ? $record->roles->pluck('id')->toArray() : []),
                             Forms\Components\Select::make('permissions')
                                 ->multiple()
-                                ->options(
-                                    fn () => Permission::orderBy('name')
-                                        ->pluck('name', 'id')
-                                        ->toArray()
+                                ->preload()
+                                ->optionsFromModel(
+                                    config('permission.models.permission'),
+                                    'name',
+                                    fn (Builder $query) => $query->where('guard_name', 'admin')
                                 )
-                                ->afterStateHydrated(function (Forms\Components\Select $component, ?Admin $record): void {
-                                    $component->state($record ? $record->permissions->pluck('id')->toArray() : []);
-                                }),
+                                ->formatStateUsing(fn (?Admin $record) => $record ? $record->permissions->pluck('id')->toArray() : []),
                         ]),
                 ])
                     ->columnSpan(['lg' => 1]),
@@ -119,18 +120,15 @@ class AdminResource extends Resource
             ->columns(3);
     }
 
+    /** @throws Exception */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('full_name')
-                    ->sortable()
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        /** @var Builder|Admin $query */
-                        return $query
-                            ->where('first_name', 'like', "%{$search}%")
-                            ->orWhere('last_name', 'like', "%{$search}%");
-                    }),
+                    ->sortable(['first_name', 'last_name'])
+                    ->searchable(['first_name', 'last_name'])
+                    ->truncate('xs', true),
                 Tables\Columns\IconColumn::make('email_verified_at')
                     ->label(trans('Verified'))
                     ->getStateUsing(fn (Admin $record): bool => $record->hasVerifiedEmail())
@@ -189,25 +187,30 @@ class AdminResource extends Resource
                         });
                     }),
             ])
+
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->authorize('update'),
-                Tables\Actions\DeleteAction::make()
-                    ->authorize('delete'),
-                Tables\Actions\RestoreAction::make()
-                    ->authorize('restore'),
-                Tables\Actions\ForceDeleteAction::make()
-                    ->authorize('forceDelete'),
+                Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\RestoreAction::make(),
+                    Tables\Actions\ForceDeleteAction::make(),
                     Tables\Actions\Action::make('resend-verification')
                         ->requiresConfirmation()
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
-                            $record->sendEmailVerificationNotification();
-                            $action->success();
+                            try {
+                                $record->sendEmailVerificationNotification();
+                                $action
+                                    ->successNotificationTitle(trans('A fresh verification link has been sent to your email address.'))
+                                    ->success();
+                            } catch (Exception $e) {
+                                $action->failureNotificationTitle(trans('Failed to send verification link.'))
+                                    ->failure();
+                            }
                         })
                         ->authorize('resendVerification'),
                     Tables\Actions\Action::make('send-password-reset')
                         ->requiresConfirmation()
+                        ->icon('heroicon-o-lock-open')
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
                             $result = app(ForgotPasswordAction::class)
                                 ->execute($record->email, 'admin');
@@ -219,16 +222,42 @@ class AdminResource extends Resource
                                 return;
                             }
 
-                            $action->success();
+                            $action
+                                ->successNotificationTitle(trans('A password reset link has been sent to your email address.'))
+                                ->success();
                         })
-                        ->authorize('sendPasswordReset'),
+                        ->authorize('sendPasswordReset')
+                        ->withActivityLog(
+                            event: 'password-reset-link-sent',
+                            description: fn (Admin $record) => $record->full_name . ' password reset sent'
+                        ),
                     Impersonate::make()
                         ->guard('admin')
-                        ->redirectTo(route('filament.pages.dashboard'))
-                        ->authorize('impersonate'),
+                        ->redirectTo(Filament::getUrl() ?? '/')
+                        ->authorize('impersonate')
+                        ->withActivityLog(
+                            event: 'impersonated',
+                            description: fn (Admin $record) => $record->full_name . ' impersonated',
+                            causedBy: Auth::user()
+                        ),
                 ]),
             ])
-            ->bulkActions([])
+            ->bulkActions([
+                ExportBulkAction::make()
+                    ->queue()
+                    ->query(fn (Builder $query) => $query->with('roles')->whereKeyNot(1)->latest())
+                    ->mapUsing(
+                        ['Email', 'First Name',  'Last Name', 'Active', 'Roles', 'Created At'],
+                        fn (Admin $admin): array => [
+                            $admin->email,
+                            $admin->first_name,
+                            $admin->last_name,
+                            $admin->active ? 'Yes' : 'No',
+                            $admin->getRoleNames()->implode(', '),
+                            $admin->created_at?->format(config('tables.date_time_format')),
+                        ]
+                    ),
+            ])
             ->defaultSort('created_at', 'desc');
     }
 

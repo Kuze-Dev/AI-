@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Filament\Resources\RoleResource\Pages\ListRoles;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Role\Database\Factories\RoleFactory;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Domain\Role\Exceptions\CantDeleteRoleWithAssociatedUsersException;
 use Filament\Pages\Actions\DeleteAction;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Spatie\Permission\Models\Permission;
@@ -23,14 +23,12 @@ it('can list', function () {
         ->assertCanSeeTableRecords($roles);
 });
 
-it('can delete role', function () {
+it('can delete', function () {
     $permission = Permission::first();
 
-    $role = RoleFactory::new()
-        ->create();
+    $role = RoleFactory::new()->create();
 
-    $role->permissions()
-        ->attach($permission);
+    $role->permissions()->attach($permission);
 
     livewire(ListRoles::class)
         ->callTableAction(DeleteAction::class, $role);
@@ -56,4 +54,4 @@ it('can not delete role with existing user', function () {
 
     livewire(ListRoles::class)
         ->callTableAction(DeleteAction::class, $role);
-})->throws(DeleteRestrictedException::class);
+})->throws(CantDeleteRoleWithAssociatedUsersException::class);

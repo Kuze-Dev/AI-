@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Domain\Site\Models\Site;
 use Filament\Resources\Form;
 use Filament\Resources\Table;
+use App\Settings\FormSettings;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
 use Domain\Blueprint\Models\Blueprint;
@@ -42,26 +43,16 @@ class FormResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
-                        ->required(),
-                    Forms\Components\TextInput::make('slug')
-                        ->unique(ignoreRecord: true)
-                        ->rules('alpha_dash')
-                        ->disabled(fn (?FormModel $record) => $record !== null)
-                        ->afterStateUpdated(function ($state, $set) {
-                            $set('slug', Str::slug($state));
-                        }),
-                    Forms\Components\Select::make('blueprint_id')
-                        ->options(
-                            fn () => Blueprint::orderBy('name')
-                                ->pluck('name', 'id')
-                                ->toArray()
-                        )
-                        ->disabled(fn (?FormModel $record) => $record !== null)
                         ->required()
-                        ->exists(Blueprint::class, 'id')
-                        ->searchable()
-                        ->reactive()
-                        ->preload(),
+                        ->string()
+                        ->maxLength(255),
+                    Forms\Components\Select::make('blueprint_id')
+                        ->label(trans('Blueprint'))
+                        ->required()
+                        ->preload()
+                        ->optionsFromModel(Blueprint::class, 'name')
+                        ->disabled(fn (?FormModel $record) => $record !== null)
+                        ->reactive(),
                     Forms\Components\Toggle::make('store_submission'),
                     Forms\Components\Card::make([
                         Forms\Components\CheckboxList::make('sites')
@@ -85,6 +76,13 @@ class FormResource extends Resource
                                 );
                             }),
                     ]),
+                    Forms\Components\Toggle::make('uses_captcha')
+                        ->disabled(fn (FormSettings $formSettings) => ! $formSettings->provider)
+                        ->helperText(
+                            fn (FormSettings $formSettings) => ! $formSettings->provider
+                                ? trans('Currently unavailable. Please setup Captcha(in Settings > Form Settings) first.')
+                                : null
+                        ),
                 ]),
                 Forms\Components\Card::make([
                     Forms\Components\Section::make('Available Values')
@@ -141,7 +139,7 @@ class FormResource extends Resource
                                             : ($state ?? [])),
                                 ])
                                 ->columns(3),
-                            Forms\Components\TextInput::make('sender')
+                            Forms\Components\TextInput::make('sender_name')
                                 ->required(),
                             Forms\Components\TextInput::make('reply_to')
                                 ->helperText('Seperated by comma')
@@ -185,6 +183,8 @@ class FormResource extends Resource
                                         markdown;
                                 })
                                 ->columnSpanFull(),
+                            Forms\Components\Toggle::make('has_attachments')
+                                ->helperText('If Enabled Uploaded Files will be attach to this email notification'),
                         ])
                         ->columnSpan(['md' => 3]),
                 ])->columns(4),
@@ -198,14 +198,8 @@ class FormResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('blueprint.name')
-                    ->sortable()
                     ->searchable()
-                    ->url(fn (FormModel $record) => BlueprintResource::getUrl('edit', $record->blueprint)),
+                    ->truncate('max-w-xs 2xl:max-w-xl', true),
                 Tables\Columns\BadgeColumn::make('form_submissions_count')
                     ->counts('formSubmissions')
                     ->formatStateUsing(fn (FormModel $record, ?int $state) => $record->store_submission ? $state : 'N/A')
@@ -214,16 +208,14 @@ class FormResource extends Resource
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable()
-                    ->toggleable()
-                    ->toggledHiddenByDefault(),
             ])
             ->filters([])
+
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->defaultSort('updated_at', 'desc');
     }

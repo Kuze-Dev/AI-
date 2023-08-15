@@ -6,14 +6,18 @@ use App\FilamentTenant\Resources\PageResource\Pages\EditPage;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Page\Database\Factories\PageFactory;
-use Domain\Page\Database\Factories\SliceFactory;
+use Domain\Page\Database\Factories\BlockFactory;
+use Domain\Page\Enums\Visibility;
+use Domain\Page\Models\BlockContent;
 use Domain\Page\Models\Page;
-use Domain\Page\Models\SliceContent;
-use Domain\Support\MetaData\Models\MetaData;
-use Domain\Support\SlugHistory\SlugHistory;
+use Support\MetaData\Database\Factories\MetaDataFactory;
+use Support\MetaData\Models\MetaData;
+use Support\RouteUrl\Models\RouteUrl;
 use Filament\Facades\Filament;
+use Illuminate\Http\UploadedFile;
 
-use function Pest\Laravel\assertDatabaseCount;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -25,8 +29,9 @@ beforeEach(function () {
 
 it('can render page', function () {
     $page = PageFactory::new()
-        ->addSliceContent(
-            SliceFactory::new()
+        ->published()
+        ->addBlockContent(
+            BlockFactory::new()
                 ->for(
                     BlueprintFactory::new()
                         ->addSchemaSection(['title' => 'Main'])
@@ -34,22 +39,25 @@ it('can render page', function () {
                 ),
             ['data' => ['main' => ['header' => 'Foo']]]
         )
-        ->createOne();
+        ->createOne([
+            'visibility' => 'public',
+        ]);
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->assertFormExists()
         ->assertSuccessful()
         ->assertFormSet([
             'name' => $page->name,
-            'slice_contents.record-1' => $page->sliceContents->first()->toArray(),
+            'published_at' => true,
+            'block_contents.record-1' => $page->blockContents->first()->toArray(),
         ])
         ->assertOk();
 });
 
 it('can edit page', function () {
     $page = PageFactory::new()
-        ->addSliceContent(
-            SliceFactory::new()
+        ->addBlockContent(
+            BlockFactory::new()
                 ->for(
                     BlueprintFactory::new()
                         ->addSchemaSection(['title' => 'Main'])
@@ -57,62 +65,79 @@ it('can edit page', function () {
                 ),
             ['data' => ['main' => ['header' => 'Foo']]]
         )
-        ->createOne();
+        ->has(MetaDataFactory::new([
+            'title' => 'Foo title',
+            'description' => 'Foo description',
+            'author' => 'Foo author',
+            'keywords' => 'Foo keywords',
+        ]))
+        ->createOne([
+            'visibility' => 'public',
+        ]);
 
-    $metaDataData = [
-        'title' => $page->slug,
-        'description' => 'Foo description',
-        'author' => 'Foo author',
-        'keywords' => 'Foo keywords',
-    ];
-
-    $page->metaData()->create($metaDataData);
-
-    $updatedMetaDataData = [
+    $metaData = [
         'title' => 'Foo title updated',
         'description' => 'Foo description updated',
         'author' => 'Foo author updated',
         'keywords' => 'Foo keywords updated',
     ];
+    $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
 
-    livewire(EditPage::class, ['record' => $page->getRouteKey()])
+    $updatedPage = livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
-            'route_url' => 'test-url',
-            'slice_contents.record-1.data.main.header' => 'Bar',
-            'meta_data' => $updatedMetaDataData,
+            'published_at' => true,
+            'block_contents.record-1.data.main.header' => 'Bar',
+            'meta_data' => $metaData,
+            'visibility' => 'authenticated',
+            'meta_data.image.0' => $metaDataImage,
         ])
         ->call('save')
         ->assertHasNoFormErrors()
-        ->assertOk();
+        ->assertOk()
+        ->instance()
+        ->record;
 
     assertDatabaseHas(Page::class, [
         'name' => 'Test',
-        'route_url' => 'test-url',
+        'visibility' => Visibility::AUTHENTICATED->value,
+        'published_at' => $updatedPage->published_at,
     ]);
 
     assertDatabaseHas(
         MetaData::class,
         array_merge(
-            $updatedMetaDataData,
+            $metaData,
             [
                 'model_type' => $page->getMorphClass(),
-                'model_id' => $page->id,
+                'model_id' => $page->getKey(),
             ]
         )
     );
 
-    assertDatabaseHas(SliceContent::class, [
+    assertDatabaseHas(Media::class, [
+        'file_name' => $metaDataImage->getClientOriginalName(),
+        'mime_type' => $metaDataImage->getMimeType(),
+    ]);
+
+    assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
-        'slice_id' => $page->sliceContents->first()->slice_id,
+        'block_id' => $page->blockContents->first()->block_id,
         'data' => json_encode(['main' => ['header' => 'Bar']]),
+    ]);
+
+    assertDatabaseHas(RouteUrl::class, [
+        'model_type' => $page->getMorphClass(),
+        'model_id' => $page->getKey(),
+        'url' => Page::generateRouteUrl($page, $updatedPage->toArray()),
+        'is_override' => false,
     ]);
 });
 
-it('can edit page slug', function () {
+it('can edit page with custom url', function () {
     $page = PageFactory::new(['slug' => 'foo'])
-        ->addSliceContent(
-            SliceFactory::new()
+        ->addBlockContent(
+            BlockFactory::new()
                 ->for(
                     BlueprintFactory::new()
                         ->addSchemaSection(['title' => 'Main'])
@@ -120,42 +145,34 @@ it('can edit page slug', function () {
                 ),
             ['data' => ['main' => ['header' => 'Foo']]]
         )
-        ->createOne();
-
-    $metaDataData = [
-        'title' => $page->slug,
-        'description' => 'Foo description',
-        'author' => 'Foo author',
-        'keywords' => 'Foo keywords',
-    ];
-
-    $page->metaData()->create($metaDataData);
+        ->createOne([
+            'visibility' => 'public',
+        ]);
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
-            'slug' => 'new-foo',
-            'slice_contents.record-1.data.main.header' => 'Bar',
+            'route_url' => [
+                'is_override' => true,
+                'url' => '/some/custom/url',
+            ],
+            'block_contents.record-1.data.main.header' => 'Bar',
         ])
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk();
 
-    assertDatabaseHas(Page::class, [
-        'id' => $page->id,
-        'slug' => 'new-foo',
-    ]);
-    assertDatabaseCount(SlugHistory::class, 2);
-    assertDatabaseHas(SlugHistory::class, [
+    assertDatabaseHas(RouteUrl::class, [
         'model_type' => $page->getMorphClass(),
-        'model_id' => $page->id,
-        'slug' => 'new-foo',
+        'model_id' => $page->getKey(),
+        'url' => '/some/custom/url',
+        'is_override' => true,
     ]);
 });
 
-it('page slice with default value will fill the slices fields', function () {
+it('page block with default value will fill the blocks fields', function () {
     $page = PageFactory::new()
-        ->addSliceContent(
-            SliceFactory::new(
+        ->addBlockContent(
+            BlockFactory::new(
                 [
                     'is_fixed_content' => true,
                     'data' => ['main' => ['header' => 'Foo']],
@@ -168,7 +185,9 @@ it('page slice with default value will fill the slices fields', function () {
                 ),
             ['data' => null]
         )
-        ->createOne();
+        ->createOne([
+            'visibility' => 'public',
+        ]);
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
@@ -177,14 +196,14 @@ it('page slice with default value will fill the slices fields', function () {
         ->assertHasNoFormErrors()
         ->assertOk()
         ->assertFormSet([
-            'slice_contents.record-1.data.main.header' => 'Foo',
+            'block_contents.record-1.data.main.header' => 'Foo',
         ]);
 });
 
-it('page slice with default value column data must be dehydrated', function () {
+it('page block with default value column data must be dehydrated', function () {
     $page = PageFactory::new(['slug' => 'foo'])
-        ->addSliceContent(
-            SliceFactory::new(
+        ->addBlockContent(
+            BlockFactory::new(
                 [
                     'is_fixed_content' => true,
                     'data' => ['main' => ['header' => 'Foo']],
@@ -197,17 +216,16 @@ it('page slice with default value column data must be dehydrated', function () {
                 ),
             ['data' => null]
         )
-        ->createOne();
+        ->createOne([
+            'visibility' => 'public',
+        ]);
 
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
-        ->fillForm([
-            'slug' => 'new-foo',
-        ])
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk();
 
-    assertDatabaseHas(SliceContent::class, [
+    assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
         'data' => null,
     ]);

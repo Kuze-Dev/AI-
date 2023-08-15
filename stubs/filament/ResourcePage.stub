@@ -1,0 +1,30 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Filament\Pages\Concerns\LogsFormActivity;
+use {{ resource }};
+use {{ baseResourcePage }};
+use Filament\Pages\Actions\Action;
+
+class {{ resourcePageClass }} extends CreateRecord
+{
+    use LogsFormActivity;
+
+    protected static string $resource = {{ resourceClass }}::class;
+
+    protected function getActions(): array
+    {
+        return [
+            Action::make('create')
+                ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
+                ->action('create')
+                ->keyBindings(['mod+s']),
+        ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
+    }
+}

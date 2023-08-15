@@ -48,6 +48,6 @@ class CreateS3Bucket implements ShouldQueue
 
     protected function generateBucketName(): string
     {
-        return Str::of(config('app.name'))->lower()->kebab() . '-' . Str::of($this->tenant->name)->lower()->kebab();
+        return Str::of(config('app.name'))->slug() . '-' . Str::of($this->tenant->name)->slug();
     }
 }

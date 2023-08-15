@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Menu;
 
+use App\Features\CMS\CMSBase;
+use App\HttpTenantApi\Resources\MenuResource;
 use Domain\Menu\Models\Menu;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use App\HttpTenantApi\Resources\MenuResource;
 use Spatie\RouteAttributes\Attributes\ApiResource;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
-#[ApiResource('menus', only: ['index', 'show'])]
+#[
+    ApiResource('menus', only: ['index', 'show']),
+    Middleware('feature.tenant:' . CMSBase::class)
+]
 class MenuController
 {
     public function index(): JsonApiResourceCollection
@@ -23,6 +28,10 @@ class MenuController
                     'slug',
                     AllowedFilter::exact('sites.id'),
                 ])
+                ->allowedIncludes([
+                    'nodes.children',
+                    'parentNodes.children',
+                ])
                 ->jsonPaginate()
         );
     }
@@ -31,7 +40,10 @@ class MenuController
     {
         return MenuResource::make(
             QueryBuilder::for(Menu::whereSlug($menu))
-                ->allowedIncludes(['nodes.children', 'parentNodes.children'])
+                ->allowedIncludes([
+                    'nodes.children',
+                    'parentNodes.children',
+                ])
                 ->firstOrFail()
         );
     }

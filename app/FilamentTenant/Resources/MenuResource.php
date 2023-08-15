@@ -10,16 +10,21 @@ use Filament\Tables;
 use Illuminate\Support\Str;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
+use Domain\Page\Models\Page;
 use Domain\Site\Models\Site;
 use Filament\Resources\Form;
 use Domain\Menu\Enums\Target;
 use Filament\Resources\Table;
+use Domain\Menu\Enums\NodeType;
 use Filament\Resources\Resource;
+use Domain\Content\Models\Content;
 use App\FilamentTenant\Support\Tree;
 use Illuminate\Support\Facades\Auth;
+use Domain\Content\Models\ContentEntry;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Resources\MenuResource\Pages;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
@@ -49,6 +54,7 @@ class MenuResource extends Resource
     /** @param Menu $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
+        /** @phpstan-ignore-next-line */
         return [trans('Total Nodes') => $record->nodes_count];
     }
 
@@ -67,37 +73,30 @@ class MenuResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->required()
-                        ->reactive()
-                        ->afterStateUpdated(function (Closure $set, $state) {
-                            $set('slug', Str::slug($state));
-                        }),
-                    Forms\Components\TextInput::make('slug')->required()
-                        ->disabled(fn (?Menu $record) => $record !== null)
-                        ->unique(ignoreRecord: true)
-                        ->rules('alpha_dash')
-                        ->disabled(),
-                    Forms\Components\Card::make([
-                        Forms\Components\CheckboxList::make('sites')
-                            ->options(
-                                fn () => Site::orderBy('name')
-                                    ->pluck('name', 'id')
+                        ->string()
+                        ->maxLength(255),
+                ]),
+                Forms\Components\Card::make([
+                    Forms\Components\CheckboxList::make('sites')
+                        ->options(
+                            fn () => Site::orderBy('name')
+                                ->pluck('name', 'id')
+                                ->toArray()
+                        )
+                        ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Menu $record): void {
+                            if ( ! $record) {
+                                $component->state([]);
+
+                                return;
+                            }
+
+                            $component->state(
+                                $record->sites->pluck('id')
+                                    ->intersect(array_keys($component->getOptions()))
+                                    ->values()
                                     ->toArray()
-                            )
-                            ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Menu $record): void {
-                                if ( ! $record) {
-                                    $component->state([]);
-
-                                    return;
-                                }
-
-                                $component->state(
-                                    $record->sites->pluck('id')
-                                        ->intersect(array_keys($component->getOptions()))
-                                        ->values()
-                                        ->toArray()
-                                );
-                            }),
-                    ]),
+                            );
+                        }),
                 ]),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([
@@ -123,11 +122,65 @@ class MenuResource extends Resource
                                                     ->toArray()
                                             )
                                             ->columnSpan(['md' => 1]),
-                                        Forms\Components\TextInput::make('url')
-                                            ->inputMode('url')
-                                            ->placeholder('https://example.com')
-                                            ->columnSpanFull(),
                                     ]),
+                                Forms\Components\Card::make([
+                                    Forms\Components\Radio::make('type')
+                                        ->lazy()
+                                        ->inline()
+                                        ->options(
+                                            collect(NodeType::cases())
+                                                ->mapWithKeys(fn (NodeType $nodeType) => [$nodeType->value => Str::headline($nodeType->value)])
+                                                ->toArray()
+                                        ),
+                                    Forms\Components\Group::make()
+                                        ->visible(fn (Closure $get) => filled($get('type')))
+                                        ->schema(
+                                            fn (Closure $get) => match ($get('type')) {
+                                                NodeType::URL->value => [
+                                                    Forms\Components\TextInput::make('url')
+                                                        ->inputMode('url')
+                                                        ->placeholder('https://example.com'),
+                                                ],
+                                                NodeType::RESOURCE->value => [
+                                                    Forms\Components\Select::make('model_type')
+                                                        ->label(trans('Resource'))
+                                                        ->options(
+                                                            collect([
+                                                                Page::class,
+                                                                Content::class,
+                                                                ContentEntry::class,
+                                                            ])
+                                                                ->mapWithKeys(
+                                                                    function (string $model) {
+                                                                        /** @var class-string<\Illuminate\Database\Eloquent\Model> $model */
+                                                                        return [(new $model())->getMorphClass() => Str::of($model)->classBasename()->headline()];
+                                                                    }
+                                                                )
+                                                                ->sort()
+                                                                ->toArray()
+                                                        )
+                                                        ->lazy(),
+                                                    Forms\Components\Select::make('model_id')
+                                                        ->label(
+                                                            fn (Closure $get) => ($modelClass = Relation::getMorphedModel($get('model_type')))
+                                                                ? (string) Str::of($modelClass)->classBasename()->headline()
+                                                                : null
+                                                        )
+                                                        ->options(
+                                                            fn (Closure $get) => ($modeClass = Relation::getMorphedModel($get('model_type')))
+                                                                ? match ($modeClass) {
+                                                                    ContentEntry::class => $modeClass::pluck('title', 'id')->toArray(),
+                                                                    default => $modeClass::pluck('name', 'id')->toArray()
+                                                                }
+                                                                : null
+                                                        )
+                                                        ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
+                                                        ->visible(fn (Closure $get) => filled($get('model_type'))),
+                                                ],
+                                                default => []
+                                            }
+                                        ),
+                                ]),
                             ]),
                     ])
                     ->hiddenOn('create'),
@@ -140,19 +193,19 @@ class MenuResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('slug'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable(),
+                    ->searchable()
+                    ->truncate('max-w-xs lg:max-w-md 2xl:max-w-3xl', true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
             ->filters([])
+
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

@@ -6,12 +6,14 @@ namespace App\Providers;
 
 use App\FilamentTenant\Livewire\Auth;
 use App\FilamentTenant\Middleware\Authenticate;
+use App\FilamentTenant\Pages\Auth\Account;
 use Artificertech\FilamentMultiContext\ContextServiceProvider;
 use Artificertech\FilamentMultiContext\Http\Middleware\ApplyContext;
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\UserMenuItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 
 class FilamentTenantServiceProvider extends ContextServiceProvider
@@ -27,6 +29,15 @@ class FilamentTenantServiceProvider extends ContextServiceProvider
                 return;
             }
 
+            Filament::registerUserMenuItems([
+                'account' => UserMenuItem::make()
+                    ->url(
+                        Filament::auth()->user()?->isZeroDayAdmin()
+                            ? null
+                            : Account::getUrl()
+                    ),
+            ]);
+
             Filament::registerNavigationGroups([
                 NavigationGroup::make('CMS')
                     ->icon('heroicon-s-document-text'),
@@ -35,6 +46,11 @@ class FilamentTenantServiceProvider extends ContextServiceProvider
                 NavigationGroup::make('System')
                     ->icon('heroicon-s-exclamation'),
             ]);
+
+            Filament::registerRenderHook(
+                'body.start',
+                static fn (): string => Blade::render('<x-filament-impersonate::banner/>')
+            );
         });
 
         $this->registerRoutes();

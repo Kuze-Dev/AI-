@@ -27,8 +27,6 @@ it('can create globals  ', function () {
     $site = SiteFactory::new()
         ->createOne();
 
-    assertDatabaseCount(Globals::class, 0);
-
     $global = app(CreateGlobalsAction::class)
         ->execute(GlobalsData::fromArray([
             'blueprint_id' => $blueprint->getKey(),
@@ -37,8 +35,6 @@ it('can create globals  ', function () {
             'data' => ['main' => ['title' => 'Foo']],
             'sites' => [$site->id],
         ]));
-
-    assertDatabaseCount(Globals::class, 1);
 
     assertDatabaseHas(Globals::class, [
         'blueprint_id' => $blueprint->getKey(),

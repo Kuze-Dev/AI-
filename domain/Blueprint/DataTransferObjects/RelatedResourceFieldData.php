@@ -27,6 +27,7 @@ class RelatedResourceFieldData extends FieldData
         public readonly array $relation_scopes = [],
         public readonly ?int $min = null,
         public readonly ?int $max = null,
+        public readonly ?string $helper_text = null,
     ) {
     }
 
@@ -46,6 +47,7 @@ class RelatedResourceFieldData extends FieldData
             relation_scopes: $data['relation_scopes'] ?? [],
             min: $data['min'] ?? null,
             max: $data['max'] ?? null,
+            helper_text: $data['helper_text'] ?? null,
         );
     }
 
@@ -80,6 +82,7 @@ class RelatedResourceFieldData extends FieldData
             ? $this->getRelatedResourceQuery()
                 ->whereIn($related->getKeyName(), $value)
                 ->get()
+                ->sortBy(fn (Model $model) => array_search($model->getKey(), $value))
             : $this->getRelatedResourceQuery()
                 ->where($related->getKeyName(), $value)
                 ->first();

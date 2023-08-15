@@ -3,14 +3,20 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\PageResource\Pages\CreatePage;
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Blueprint\Enums\FieldType;
 use Domain\Page\Database\Factories\PageFactory;
-use Domain\Page\Database\Factories\SliceFactory;
+use Domain\Page\Database\Factories\BlockFactory;
+use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\Page;
-use Domain\Page\Models\SliceContent;
-use Domain\Support\SlugHistory\SlugHistory;
+use Domain\Page\Models\BlockContent;
+use Support\MetaData\Database\Factories\MetaDataFactory;
+use Support\MetaData\Models\MetaData;
+use Support\RouteUrl\Models\RouteUrl;
 use Filament\Facades\Filament;
+use Illuminate\Http\UploadedFile;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -27,7 +33,189 @@ it('can render page', function () {
 });
 
 it('can create page', function () {
-    $sliceId = SliceFactory::new()
+    $block = BlockFactory::new()
+        ->withDummyBlueprint()
+        ->createOne();
+
+    $page = livewire(CreatePage::class)
+        ->fillForm([
+            'name' => 'Test',
+            'block_contents' => [
+                [
+                    'block_id' => $block->getKey(),
+                    'data' => ['name' => 'foo'],
+                ],
+            ],
+            'visibility' => 'public',
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(Page::class, [
+        'author_id' => auth()->user()->id,
+        'name' => 'Test',
+        'visibility' => Visibility::PUBLIC->value,
+    ]);
+
+    assertDatabaseHas(BlockContent::class, [
+        'page_id' => $page->id,
+        'block_id' => $block->getKey(),
+        'data' => json_encode($block->blockContents->first()->data),
+    ]);
+
+    assertDatabaseHas(
+        MetaData::class,
+        [
+            'title' => $page->name,
+            'model_type' => $page->getMorphClass(),
+            'model_id' => $page->getKey(),
+        ]
+    );
+    assertDatabaseHas(RouteUrl::class, [
+        'model_type' => $page->getMorphClass(),
+        'model_id' => $page->getKey(),
+        'url' => Page::generateRouteUrl($page, $page->toArray()),
+        'is_override' => false,
+    ]);
+});
+
+it('can not create page with same name', function () {
+    $blockId = BlockFactory::new()
+        ->withDummyBlueprint()
+        ->createOne()
+        ->getKey();
+
+    PageFactory::new()
+        ->createOne(['name' => 'page 1']);
+
+    livewire(CreatePage::class)
+        ->fillForm([
+            'name' => 'page 1',
+            'block_contents' => [
+                [
+                    'block_id' => $blockId,
+                    'data' => ['name' => 'foo'],
+                ],
+            ],
+            'visibility' => 'public',
+        ])
+        ->call('create')
+        ->assertHasFormErrors(['name' => 'unique'])
+        ->assertOk();
+});
+
+it('can clone page', function () {
+    $page = PageFactory::new()
+        ->addBlockContent(
+            BlockFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+                ),
+            ['data' => ['main' => ['header' => 'Foo']]]
+        )
+        ->has(MetaDataFactory::new())
+        ->createOne();
+
+    Livewire::withQueryParams(['clone' => $page->slug]);
+
+    $clonePage = livewire(CreatePage::class)
+        ->assertFormSet([
+            'visibility' => $page->visibility,
+            'published_at' => $page->published_at,
+            'block_contents' => $page->blockContents->toArray(),
+            'meta_data' => [
+                'author' => $page->metaData?->author,
+                'description' => $page->metaData?->description,
+                'keywords' => $page->metaData?->keywords,
+            ],
+        ])
+        ->fillForm(['name' => 'Test Clone'])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(Page::class, [
+        'name' => 'Test Clone',
+        'visibility' => $page->visibility->value,
+        'published_at' => $page->published_at,
+    ]);
+    assertDatabaseHas(BlockContent::class, [
+        'page_id' => $clonePage->id,
+        'block_id' => $page->blockContents->first()->block_id,
+        'data' => json_encode($page->blockContents->first()->data),
+    ]);
+    assertDatabaseHas(MetaData::class, [
+        'model_id' => $clonePage->id,
+        'model_type' => $clonePage->getMorphClass(),
+        'description' => $page->metaData->description,
+        'author' => $page->metaData->author,
+        'keywords' => $page->metaData->keywords,
+    ]);
+});
+
+it('can create page with meta data', function () {
+    $blockId = BlockFactory::new()
+        ->withDummyBlueprint()
+        ->createOne()
+        ->getKey();
+
+    $metaData = [
+        'title' => 'Test Title',
+        'keywords' => 'Test Keywords',
+        'author' => 'Test Author',
+        'description' => 'Test Description',
+    ];
+    $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
+
+    $page = livewire(CreatePage::class)
+        ->fillForm([
+            'name' => 'Test',
+            'block_contents' => [
+                [
+                    'block_id' => $blockId,
+                    'data' => ['name' => 'foo'],
+                ],
+            ],
+            'meta_data' => $metaData,
+            'meta_data.image.0' => $metaDataImage,
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(Page::class, ['name' => 'Test']);
+    assertDatabaseHas(BlockContent::class, [
+        'page_id' => $page->id,
+        'block_id' => $blockId,
+        'data' => json_encode(['name' => 'foo']),
+    ]);
+    assertDatabaseHas(
+        MetaData::class,
+        array_merge(
+            $metaData,
+            [
+                'model_type' => $page->getMorphClass(),
+                'model_id' => $page->getKey(),
+            ]
+        )
+    );
+    assertDatabaseHas(Media::class, [
+        'file_name' => $metaDataImage->getClientOriginalName(),
+        'mime_type' => $metaDataImage->getMimeType(),
+    ]);
+});
+
+it('can create page with published at date', function () {
+    $blockId = BlockFactory::new()
         ->withDummyBlueprint()
         ->createOne()
         ->getKey();
@@ -35,10 +223,11 @@ it('can create page', function () {
     $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
-            'route_url' => 'test-url',
-            'slice_contents' => [
+            'published_at' => true,
+            'visibility' => 'public',
+            'block_contents' => [
                 [
-                    'slice_id' => $sliceId,
+                    'block_id' => $blockId,
                     'data' => ['name' => 'foo'],
                 ],
             ],
@@ -49,42 +238,45 @@ it('can create page', function () {
         ->instance()
         ->record;
 
-    assertDatabaseHas(Page::class, ['name' => 'Test']);
-    assertDatabaseHas(SliceContent::class, [
-        'page_id' => $page->id,
-        'slice_id' => $sliceId,
-        'data' => json_encode(['name' => 'foo']),
-    ]);
-    assertDatabaseHas(SlugHistory::class, [
-        'model_type' => $page->getMorphClass(),
-        'model_id' => $page->id,
-    ]);
+    assertDatabaseHas(
+        Page::class,
+        [
+            'name' => 'Test',
+            'published_at' => $page->published_at,
+        ]
+    );
 });
 
-it('can not create page with same name', function () {
-    $sliceId = SliceFactory::new()
+it('can create page with custom url', function () {
+    $blockId = BlockFactory::new()
         ->withDummyBlueprint()
         ->createOne()
         ->getKey();
 
-    PageFactory::new()
-        ->createOne(['name' => 'page 1']);
-
-    assertDatabaseCount(Page::class, 1);
-
-    livewire(CreatePage::class)
+    $page = livewire(CreatePage::class)
         ->fillForm([
-            'name' => 'page 1',
-            'slice_contents' => [
+            'name' => 'Test',
+            'route_url' => [
+                'is_override' => true,
+                'url' => '/some/custom/url',
+            ],
+            'block_contents' => [
                 [
-                    'slice_id' => $sliceId,
+                    'block_id' => $blockId,
                     'data' => ['name' => 'foo'],
                 ],
             ],
         ])
         ->call('create')
-        ->assertHasFormErrors(['name' => 'unique'])
-        ->assertOk();
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+        ->record;
 
-    assertDatabaseCount(Page::class, 1);
+    assertDatabaseHas(RouteUrl::class, [
+        'model_type' => $page->getMorphClass(),
+        'model_id' => $page->getKey(),
+        'url' => '/some/custom/url',
+        'is_override' => true,
+    ]);
 });
