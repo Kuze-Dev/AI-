@@ -9,11 +9,24 @@ use Illuminate\Database\Seeder;
 use Domain\Shipment\Enums\BoxTypeEnum;
 use Domain\Shipment\Enums\UnitEnum;
 use Domain\Shipment\Models\ShippingBox;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class ShippingBoxSeeder extends Seeder
 {
     public function run(): void
     {
+
+        $shippingBoxes = ShippingBox::all();
+
+        if ($shippingBoxes->count() > 0) {
+
+            Model::unguard();
+
+            DB::table('shipping_boxes')->truncate();
+
+            Model::reguard();
+        }
 
         foreach ($this->data() as $box) {
             ShippingBox::create($box);
@@ -99,6 +112,91 @@ class ShippingBoxSeeder extends Seeder
                 'width' => 14,
                 'height' => 12,
                 'volume' => 2352,
+                'weight_units' => UnitEnum::LBS,
+
+            ],
+            [
+                'name' => 'USPS Customize Box 4',
+                'dimension_units' => UnitEnum::INCH,
+                'package_type' => BoxTypeEnum::BOX,
+                'courier' => Driver::USPS,
+                'length' => 8,
+                'width' => 8,
+                'height' => 8,
+                'volume' => 512,
+                'weight_units' => UnitEnum::LBS,
+
+            ],
+
+            [
+                'name' => 'USPS Customize Box 5',
+                'dimension_units' => UnitEnum::INCH,
+                'package_type' => BoxTypeEnum::BOX,
+                'courier' => Driver::USPS,
+                'length' => 10,
+                'width' => 8,
+                'height' => 6,
+                'volume' => 480,
+                'weight_units' => UnitEnum::LBS,
+
+            ],
+            [
+                'name' => 'USPS Customize Box 6',
+                'dimension_units' => UnitEnum::INCH,
+                'package_type' => BoxTypeEnum::BOX,
+                'courier' => Driver::USPS,
+                'length' => 16,
+                'width' => 8,
+                'height' => 6,
+                'volume' => 768,
+                'weight_units' => UnitEnum::LBS,
+
+            ],
+            [
+                'name' => 'USPS Customize Box 7',
+                'dimension_units' => UnitEnum::INCH,
+                'package_type' => BoxTypeEnum::BOX,
+                'courier' => Driver::USPS,
+                'length' => 26,
+                'width' => 8,
+                'height' => 8,
+                'volume' => 1664,
+                'weight_units' => UnitEnum::LBS,
+
+            ],
+            [
+                'name' => 'USPS Customize Box 8',
+                'dimension_units' => UnitEnum::INCH,
+                'package_type' => BoxTypeEnum::BOX,
+                'courier' => Driver::USPS,
+                'length' => 26,
+                'width' => 16,
+                'height' => 8,
+                'volume' => 3328,
+                'weight_units' => UnitEnum::LBS,
+
+            ],
+            [
+                'name' => 'USPS Customize Box 9',
+                'dimension_units' => UnitEnum::INCH,
+                'package_type' => BoxTypeEnum::BOX,
+                'courier' => Driver::USPS,
+                'length' => 26,
+                'width' => 24,
+                'height' => 8,
+                'volume' => 4992,
+                'weight_units' => UnitEnum::LBS,
+
+            ],
+            [
+                'name' => 'USPS Customize Box 10',
+                'dimension_units' => UnitEnum::INCH,
+                'package_type' => BoxTypeEnum::BOX,
+                'courier' => Driver::USPS,
+                'length' => 28,
+                'width' => 28,
+                'height' => 8,
+                'volume' => 6272,
                 'weight_units' => UnitEnum::LBS,
 
             ],
@@ -229,6 +327,18 @@ class ShippingBoxSeeder extends Seeder
                 'width' => 14,
                 'height' => 14,
                 'volume' => 2744,
+                'weight_units' => UnitEnum::LBS,
+
+            ],
+            [
+                'name' => 'UPS Customize Box 8',
+                'dimension_units' => UnitEnum::INCH,
+                'package_type' => BoxTypeEnum::BOX,
+                'courier' => Driver::UPS,
+                'length' => 28,
+                'width' => 28,
+                'height' => 8,
+                'volume' => 6272,
                 'weight_units' => UnitEnum::LBS,
 
             ],
