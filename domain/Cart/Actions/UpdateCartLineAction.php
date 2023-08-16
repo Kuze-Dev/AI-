@@ -30,7 +30,7 @@ class UpdateCartLineAction
                 ] : null,
             ]);
 
-            if (count($cartLineData->remarks->medias) > 0) {
+            if ($cartLineData->remarks->medias && count($cartLineData->remarks->medias) > 0) {
                 $this->createMediaFromUrlAction->execute(
                     $cartLine,
                     $cartLineData->remarks->medias,
