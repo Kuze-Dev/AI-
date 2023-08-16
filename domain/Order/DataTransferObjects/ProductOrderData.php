@@ -17,11 +17,11 @@ class ProductOrderData
         public readonly float|string $retail_price,
         public readonly float|string $selling_price,
         public readonly int $stock,
-        public readonly int|bool|string $status,
-        public readonly int|bool|string $is_digital_product,
-        public readonly int|bool|string $is_featured,
-        public readonly int|bool|string $is_special_offer,
-        public readonly int|bool|string $allow_customer_remarks
+        public readonly bool $status,
+        public readonly bool $is_digital_product,
+        public readonly bool $is_featured,
+        public readonly bool $is_special_offer,
+        public readonly bool $allow_customer_remarks
     ) {
     }
 
@@ -33,8 +33,8 @@ class ProductOrderData
             slug: $data['slug'],
             sku: $data['sku'],
             description: $data['description'] ?? null,
-            retail_price: $data['retail_price'],
-            selling_price: $data['selling_price'],
+            retail_price: number_format((float) $data['retail_price'], 2, '.', ','),
+            selling_price: number_format((float) $data['selling_price'], 2, '.', ','),
             stock: $data['stock'],
             status: $data['status'],
             is_digital_product: $data['is_digital_product'],
@@ -52,14 +52,14 @@ class ProductOrderData
             slug: $product->slug,
             sku: $product->sku,
             description: $product->description ?? null,
-            retail_price: $product->retail_price,
-            selling_price: $product->selling_price,
+            retail_price: number_format((float) $product->retail_price, 2, '.', ','),
+            selling_price: number_format((float) $product->selling_price, 2, '.', ','),
             stock: $product->stock,
-            status: $product->status,
-            is_digital_product: $product->is_digital_product,
-            is_featured: $product->is_featured,
-            is_special_offer: $product->is_special_offer,
-            allow_customer_remarks: $product->allow_customer_remarks,
+            status: (bool) $product->status,
+            is_digital_product: (bool) $product->is_digital_product,
+            is_featured: (bool) $product->is_featured,
+            is_special_offer: (bool) $product->is_special_offer,
+            allow_customer_remarks: (bool) $product->allow_customer_remarks,
         );
     }
 }

@@ -9,7 +9,6 @@ class UpdateCartLineData
     public function __construct(
         public readonly ?int $quantity,
         public readonly ?CartRemarksData $remarks,
-        public readonly ?array $medias,
     ) {
     }
 
@@ -20,7 +19,6 @@ class UpdateCartLineData
         return new self(
             quantity: $data['quantity'] ?? null,
             remarks: $remarksData,
-            medias: $data['media'] ?? null,
         );
     }
 }

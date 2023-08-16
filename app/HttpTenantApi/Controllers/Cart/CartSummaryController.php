@@ -36,7 +36,7 @@ class CartSummaryController extends Controller
                     $cartLineIdsTobeRemoved[] = $cartLine->uuid;
                 }
 
-                return ! is_null($cartLine->purchasable);
+                return !is_null($cartLine->purchasable);
             });
         }
 
@@ -81,27 +81,31 @@ class CartSummaryController extends Controller
 
         $responseArray = [
             'tax' => [
-                'inclusive_sub_total' => $summary->taxTotal ? round($summary->subTotal + $summary->taxTotal, 2) : null,
+                'inclusive_sub_total' => $summary->taxTotal ? number_format((float) ($summary->subTotal + $summary->taxTotal), 2, '.', ',') : null,
                 'display' => $summary->taxTotal ? $summary->taxDisplay : null,
                 'percentage' => $summary->taxPercentage ? round($summary->taxPercentage, 2) : 0,
-                'amount' => $summary->taxTotal ? round($summary->taxTotal, 2) : 0,
+                'amount' => $summary->taxTotal ? number_format((float) $summary->taxTotal, 2, '.', ',') : 0,
             ],
-            'sub_total' => round($summary->subTotal, 2),
-            'shipping_fee' => round($summary->shippingTotal, 2),
-            'discountedSubTotal' => round($summary->discountedSubTotal, 2),
-            'discountedShippingTotal' => round($summary->discountedShippingTotal, 2),
-            'total' => round($summary->grandTotal, 2),
+            'sub_total' => [
+                "initial_amount" =>  number_format((float) $summary->initialSubTotal, 2, '.', ','),
+                "discounted_amount" => number_format((float) $summary->subTotal, 2, '.', ',')
+            ],
+            'shipping_fee' => [
+                "initial_amount" => number_format((float) $summary->initialShippingTotal, 2, '.', ','),
+                "discounted_amount" => number_format((float) $summary->shippingTotal, 2, '.', ',')
+            ],
+            'total' => number_format((float) $summary->grandTotal, 2, '.', ','),
             'discount' => [
                 'status' => $summary->discountMessages->status ?? null,
                 'message' => $summary->discountMessages->message ?? null,
                 'type' => $summary->discountMessages->amount_type ?? null,
-                'amount' => $summary->discountMessages->amount ?? null,
+                'amount' => number_format((float) $summary->discountMessages->amount, 2, '.', ',') ?? null,
                 'discount_type' => $summary->discountMessages->discount_type ?? null,
-                'total_savings' => $discount ? round($summary->discountTotal ?? 0, 2) : 0,
+                'total_savings' => $discount ? number_format((float) $summary->discountTotal, 2, '.', ',') : 0,
             ],
         ];
 
-        if ( ! $discountCode) {
+        if (!$discountCode) {
             unset($responseArray['discount']);
         }
 
