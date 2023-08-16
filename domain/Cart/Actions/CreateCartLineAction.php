@@ -29,7 +29,7 @@ class CreateCartLineAction
         try {
             $product = Product::where((new Product())->getRouteKeyName(), $cartLineData->purchasable_id)->first();
 
-            if ( ! $product) {
+            if (!$product) {
                 throw new Exception('Product not found');
             }
 
@@ -58,7 +58,6 @@ class CreateCartLineAction
             if ($cartLine) {
                 $cartLine->update([
                     'quantity' => $cartLine->quantity + $cartLineData->quantity,
-                    'remarks' => $cartLineData->remarks,
                 ]);
             } else {
                 $cartLine = CartLine::create([
@@ -67,13 +66,27 @@ class CreateCartLineAction
                     'purchasable_id' => $purchasableId,
                     'purchasable_type' => $purchasableType,
                     'quantity' => $cartLineData->quantity,
-                    'remarks' => $cartLineData->remarks,
                 ]);
             }
 
-            if ($cartLineData->medias !== null) {
-                $this->createMediaFromUrlAction->execute($cartLine, $cartLineData->medias, 'cart_line_notes');
+            if ($cartLineData->remarks) {
+                $cartLine->update([
+                    'remarks' =>  $cartLineData->remarks->notes !== null ? [
+                        'notes' => $cartLineData->remarks->notes
+                    ] : null,
+                ]);
+
+                if (count($cartLineData->remarks->medias) > 0) {
+                    $this->createMediaFromUrlAction->execute(
+                        $cartLine,
+                        $cartLineData->remarks->medias,
+                        'cart_line_notes'
+                    );
+                } else {
+                    $cartLine->clearMediaCollection("cart_line_notes");
+                }
             }
+
 
             DB::commit();
 
