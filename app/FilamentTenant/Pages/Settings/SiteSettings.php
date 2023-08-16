@@ -59,4 +59,9 @@ class SiteSettings extends TenantBaseSettings
                 ->columns(2),
         ];
     }
+
+    protected function afterSave(): void
+    {
+        cache()->flush();
+    }
 }
