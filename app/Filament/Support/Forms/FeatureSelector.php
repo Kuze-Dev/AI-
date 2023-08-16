@@ -68,10 +68,13 @@ class FeatureSelector extends Field
                                 if (count($groupOptions) > 0) {
                                     foreach ($groupOptions as $key => $value) {
 
-                                        $fields[] = Fieldset::make($key)
-                                            ->label(ucfirst(trans($key)))
+                                        /** @var string */
+                                        $label = $key;
+
+                                        $fields[] = Fieldset::make($label)
+                                            ->label(ucfirst(trans($label)))
                                             ->schema([
-                                                CheckboxList::make($statePath .'_'.$key. '_extras')
+                                                CheckboxList::make($statePath .'_'.$label. '_extras')
                                                     ->disableLabel()
                                                     ->options($value)
                                                     ->formatStateUsing(
