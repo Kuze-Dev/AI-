@@ -51,6 +51,7 @@ it('can edit form', function () {
                     'sender_name' => 'test user',
                     'subject' => 'Foo Subject',
                     'template' => 'Foo Template',
+                    'has_attachments' => false,
                 ],
             ],
         ])

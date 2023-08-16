@@ -39,18 +39,59 @@ class FeatureSelector extends Field
                             ->dehydrated(false),
                         Fieldset::make('Extras')
                             ->visible(fn (Closure $get) => count($data['extras']) && $get($statePath))
-                            ->schema([
-                                CheckboxList::make($statePath . '_extras')
-                                    ->disableLabel()
-                                    ->options($data['extras'])
-                                    ->formatStateUsing(
-                                        fn (CheckboxList $component, ?Model $record) => collect($component->getOptions())
-                                            ->keys()
-                                            ->filter(fn (string $feature) => $record && Feature::for($record)->active($feature))
-                                            ->toArray()
-                                    )
-                                    ->dehydrated(false),
-                            ]),
+                            ->schema(function () use ($statePath, $data) {
+
+                                $fields = [];
+
+                                $unGroupOptions = [];
+                                $groupOptions = [];
+
+                                foreach ($data['extras'] as $key => $value) {
+
+                                    is_array($value) ? $groupOptions[$key] = $value : $unGroupOptions[$key] = $value;
+                                }
+
+                                if (count($unGroupOptions) > 0) {
+
+                                    $fields[] = CheckboxList::make($statePath . '_extras')
+                                        ->disableLabel()
+                                        ->options($unGroupOptions)
+                                        ->formatStateUsing(
+                                            fn (CheckboxList $component, ?Model $record) => collect($component->getOptions())
+                                                ->keys()
+                                                ->filter(fn (string $feature) => $record && Feature::for($record)->active($feature))
+                                                ->toArray()
+                                        )
+                                        ->dehydrated(false);
+                                }
+
+                                if (count($groupOptions) > 0) {
+                                    foreach ($groupOptions as $key => $value) {
+
+                                        /** @var string */
+                                        $label = $key;
+
+                                        $fields[] = Fieldset::make($label)
+                                            ->label(ucfirst(trans($label)))
+                                            ->schema([
+                                                CheckboxList::make($statePath .'_'.$label. '_extras')
+                                                    ->disableLabel()
+                                                    ->options($value)
+                                                    ->formatStateUsing(
+                                                        fn (CheckboxList $component, ?Model $record) => collect($component->getOptions())
+                                                            ->keys()
+                                                            ->filter(fn (string $feature) => $record && Feature::for($record)->active($feature))
+                                                            ->toArray()
+                                                    )
+                                                    ->dehydrated(false),
+                                            ]);
+
+                                    }
+                                }
+
+                                return $fields;
+
+                            }),
                     ])
                         ->columnSpan(1);
                 })
@@ -63,14 +104,37 @@ class FeatureSelector extends Field
             fn (self $component, Closure $get) => collect($component->getOptions())
                 ->reduce(
                     function (array $state, array $data, string $key) use ($component, $get) {
+
                         $statePath = $component->getStatePath(false) . '.' . class_basename($key);
+
+                        $mutateState = [];
+
+                        foreach ($data['extras'] as $xkey => $value) {
+                            if (is_array($value)) {
+
+                                $mutateState = array_merge($mutateState, $get($statePath . '_'.$xkey.'_extras') ?: []);
+
+                            }
+
+                        }
+
+                        if (count($mutateState) > 0) {
+
+                            return array_merge(
+                                $state,
+                                $mutateState,
+                                $get($statePath . '_extras') ?: [],
+                                [$key]
+                            );
+                        }
 
                         return array_merge(
                             $state,
                             $get($statePath)
-                                ? [$key, ...$get($statePath . '_extras')]
-                                : []
+                                    ? ($get($statePath . '_extras') ? [$key, ...$get($statePath . '_extras')] : [$key])
+                                    : []
                         );
+
                     },
                     []
                 )

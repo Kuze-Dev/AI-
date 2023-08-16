@@ -23,17 +23,33 @@ class FormSubmissionController extends Controller
     #[Post('forms/{form}/submissions')]
     public function __invoke(FormSubmissionRequest $request, Form $form): JsonResponse
     {
-        DB::transaction(
-            function () use ($request, $form) {
-                return app(CreateFormSubmissionAction::class)
-                    ->execute(
-                        form: $form,
-                        data: Arr::except($request->validated(), 'captcha_token'),
-                    );
-            }
-        );
 
-        return response()
-            ->json(['message' => 'Form submitted!'], 201);
+        try {
+
+            DB::transaction(
+                function () use ($request, $form) {
+                    return app(CreateFormSubmissionAction::class)
+                        ->execute(
+                            form: $form,
+                            data: Arr::except($request->validated(), 'captcha_token'),
+                        );
+                }
+            );
+
+            return response()
+                ->json([
+                    'message' => 'Form submitted!',
+                ], 201);
+
+        } catch (Throwable $th) {
+            return response()
+                ->json(
+                    [
+                        'message' => $th->getMessage(),
+                    ],
+                    422
+                );
+        }
+
     }
 }
