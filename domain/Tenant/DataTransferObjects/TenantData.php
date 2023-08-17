@@ -36,7 +36,7 @@ class TenantData
                 ),
                 $data['domains']
             ),
-            features: array_filter($data['features']) ?? []
+            features: array_filter($data['features'] ?? []),
         );
     }
 
