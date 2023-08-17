@@ -68,14 +68,12 @@ class FeatureSelector extends Field
                                 if (count($groupOptions) > 0) {
                                     foreach ($groupOptions as $key => $value) {
 
-                                        /** @var string */
-                                        $label = $key;
-
-                                        $fields[] = Fieldset::make($label)
-                                            ->label(ucfirst(trans($label)))
+                                        $fields[] = Fieldset::make($key)
+                                            ->label(ucfirst(trans($key)))
                                             ->schema([
-                                                CheckboxList::make($statePath .'_'.$label. '_extras')
+                                                CheckboxList::make($statePath .'_'.$key. '_extras')
                                                     ->disableLabel()
+                                                    ->bulkToggleable()
                                                     ->options($value)
                                                     ->formatStateUsing(
                                                         fn (CheckboxList $component, ?Model $record) => collect($component->getOptions())
@@ -111,8 +109,10 @@ class FeatureSelector extends Field
 
                         foreach ($data['extras'] as $xkey => $value) {
                             if (is_array($value)) {
+                                /** @var array */
+                                $checkboxState = is_array($get($statePath . '_'.$xkey.'_extras')) ? $get($statePath . '_'.$xkey.'_extras') : ($get($statePath . '_'.$xkey.'_extras') ? [$get($statePath . '_'.$xkey.'_extras')] : []);
 
-                                $mutateState = array_merge($mutateState, $get($statePath . '_'.$xkey.'_extras') ?: []);
+                                $mutateState = array_merge($mutateState, $checkboxState);
 
                             }
 
