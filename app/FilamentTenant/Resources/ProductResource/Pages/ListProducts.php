@@ -7,6 +7,8 @@ namespace App\FilamentTenant\Resources\ProductResource\Pages;
 use App\FilamentTenant\Resources\ProductResource;
 use Domain\Product\Actions\CreateProductAction;
 use Domain\Product\DataTransferObjects\ProductData;
+use Domain\Product\Enums\Decision;
+use Domain\Product\Enums\Status;
 use Domain\Product\Models\Product;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
@@ -139,7 +141,7 @@ class ListProducts extends ListRecords
                             if ($taxonomy) {
                                 $termModel = TaxonomyTerm::whereName($taxonomyTerm)->first();
 
-                                if ( ! $termModel) {
+                                if (!$termModel) {
                                     $termModel = TaxonomyTerm::create(
                                         [
                                             'name' => $taxonomyTerm,
@@ -198,11 +200,11 @@ class ListProducts extends ListRecords
                         $product->retail_price,
                         $product->selling_price,
                         $product->stock,
-                        $product->status ? 'Active' : 'Inactive',
-                        $product->is_digital_product ? 'Yes' : 'No',
-                        $product->is_featured ? 'Yes' : 'No',
-                        $product->is_special_offer ? 'Yes' : 'No',
-                        $product->allow_customer_remarks ? 'Yes' : 'No',
+                        $product->status ? Status::ACTIVE->value : STATUS::INACTIVE->value,
+                        $product->is_digital_product ? Decision::YES->value : Decision::NO->value,
+                        $product->is_featured ? Decision::YES->value : Decision::NO->value,
+                        $product->is_special_offer ? Decision::YES->value : Decision::NO->value,
+                        $product->allow_customer_remarks ? Decision::YES->value : Decision::NO->value,
                         $product->weight,
                         $product->dimension,
                         $product->minimum_order_quantity,
