@@ -130,7 +130,7 @@ class FeatureSelector extends Field
                         return array_merge(
                             $state,
                             $get($statePath)
-                                ? [$key, ...$get($statePath . '_extras')]
+                                ? [$key, ...(is_array($get($statePath . '_extras')) ? $get($statePath . '_extras') : [$get($statePath . '_extras')])]
                                 : []
                         );
                     },
