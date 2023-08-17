@@ -104,7 +104,9 @@ class TenantResource extends Resource
                             ->options([
                                 Features\CMS\CMSBase::class => [
                                     'label' => trans('CMS'),
-                                    'extras' => [],
+                                    'extras' => [
+                                        Features\CMS\SitesManagement::class => app(Features\CMS\SitesManagement::class)->label,
+                                    ],
                                 ],
                                 Features\ECommerce\ECommerceBase::class => [
                                     'label' => trans('eCommerce'),

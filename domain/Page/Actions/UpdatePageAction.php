@@ -52,6 +52,9 @@ class UpdatePageAction
 
         $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url_data);
 
+        $page->sites()
+            ->sync($pageData->sites);
+
         return $page;
     }
 }

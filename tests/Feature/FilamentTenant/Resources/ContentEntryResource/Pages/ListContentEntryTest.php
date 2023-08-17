@@ -179,3 +179,18 @@ it('can delete content entry', function () {
     ]);
     assertModelMissing($metaData);
 });
+
+it('can list content entries of specific site', function () {
+    $content = ContentFactory::new()
+        ->withDummyBlueprint()
+        ->createOne();
+
+    $contentEntries = ContentEntryFactory::new()
+        ->for($content)
+        ->count(5)
+        ->create();
+
+    livewire(ListContentEntry::class, ['ownerRecord' => $content->getRouteKey()])
+        ->assertCanSeeTableRecords($contentEntries)
+        ->assertOk();
+});

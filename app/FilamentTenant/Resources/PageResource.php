@@ -4,31 +4,32 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use Closure;
+use Exception;
+use Carbon\Carbon;
+use Filament\Forms;
+use Filament\Tables;
+use Illuminate\Support\Str;
+use Domain\Page\Models\Page;
+use Domain\Site\Models\Site;
+use Filament\Resources\Form;
+use Domain\Page\Models\Block;
+use Filament\Resources\Table;
+use Filament\Resources\Resource;
 use App\FilamentTenant\Resources;
+use Domain\Page\Enums\Visibility;
+use Domain\Page\Models\BlockContent;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Component;
+use Domain\Page\Actions\DeletePageAction;
+use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\MetaDataForm;
+use Illuminate\Database\Eloquent\Collection;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Carbon\Carbon;
-use Closure;
-use Domain\Page\Enums\Visibility;
-use Domain\Page\Models\Page;
-use Domain\Page\Models\Block;
-use Domain\Page\Models\BlockContent;
-use Exception;
-use Filament\Forms;
-use Filament\Forms\Components\Component;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
-use Domain\Page\Actions\DeletePageAction;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class PageResource extends Resource
 {
@@ -89,6 +90,29 @@ class PageResource extends Resource
                             Forms\Components\Hidden::make('author_id')
                                 ->default(Auth::id()),
                         ]),
+                        Forms\Components\Card::make([
+                            Forms\Components\CheckboxList::make('sites')
+                                ->options(
+                                    fn () => Site::orderBy('name')
+                                        ->pluck('name', 'id')
+                                        ->toArray()
+                                )
+                                ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Page $record): void {
+                                    if ( ! $record) {
+                                        $component->state([]);
+
+                                        return;
+                                    }
+
+                                    $component->state(
+                                        $record->sites->pluck('id')
+                                            ->intersect(array_keys($component->getOptions()))
+                                            ->values()
+                                            ->toArray()
+                                    );
+                                }),
+                        ])
+                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
                         Forms\Components\Repeater::make('block_contents')
                             ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Page $record, ?array $state) {
                                 if ($record === null || $record->blockContents->isEmpty()) {

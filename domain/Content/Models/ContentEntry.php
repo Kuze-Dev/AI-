@@ -4,24 +4,25 @@ declare(strict_types=1);
 
 namespace Domain\Content\Models;
 
-use Domain\Admin\Models\Admin;
-use Domain\Content\Models\Builders\ContentEntryBuilder;
-use Support\MetaData\HasMetaData;
-use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
-use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
-use Support\RouteUrl\HasRouteUrl;
-use Domain\Taxonomy\Models\TaxonomyTerm;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
-use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 use Illuminate\Support\Str;
+use Domain\Site\Traits\Sites;
+use Spatie\Sluggable\HasSlug;
+use Domain\Admin\Models\Admin;
+use Spatie\Sluggable\SlugOptions;
+use Support\MetaData\HasMetaData;
+use Support\RouteUrl\HasRouteUrl;
+use Spatie\Activitylog\LogOptions;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Models\Activity;
+use Domain\Taxonomy\Models\TaxonomyTerm;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Domain\Content\Models\Builders\ContentEntryBuilder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
+use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 
 /**
  * Domain\Content\Models\ContentEntry
@@ -73,6 +74,7 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
     use HasRouteUrl;
     use HasMetaData;
     use ConstraintsRelationships;
+    use Sites;
 
     /**
      * Declare columns
