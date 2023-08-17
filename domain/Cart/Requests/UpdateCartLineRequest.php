@@ -95,7 +95,6 @@ class UpdateCartLineRequest extends FormRequest
                     }
                 },
             ],
-            'remarks.media.*' => 'url',
         ];
     }
 }

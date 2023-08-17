@@ -127,7 +127,6 @@ class CreateCartLineRequest extends FormRequest
                     }
                 },
             ],
-            'remarks.media.*' => 'url',
         ];
     }
 }

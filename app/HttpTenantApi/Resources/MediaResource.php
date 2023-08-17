@@ -18,6 +18,7 @@ class MediaResource extends JsonApiResource
             'collection_name' => $this->collection_name,
             'file_name' => $this->file_name,
             'custom_properties' => $this->custom_properties,
+            'original_url' => $this->getUrl(),
             'generated_conversions' => $this->generatedConversionUrls(),
             'type' => $this->type,
         ];

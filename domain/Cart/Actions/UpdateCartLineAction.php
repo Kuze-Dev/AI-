@@ -6,12 +6,12 @@ namespace Domain\Cart\Actions;
 
 use Domain\Cart\DataTransferObjects\UpdateCartLineData;
 use Domain\Cart\Models\CartLine;
-use Domain\Media\Actions\CreateMediaFromUrlAction;
+use Domain\Media\Actions\CreateMediaFromS3UrlAction;
 
 class UpdateCartLineAction
 {
     public function __construct(
-        private readonly CreateMediaFromUrlAction $createMediaFromUrlAction
+        private readonly CreateMediaFromS3UrlAction $createMediaFromS3UrlAction
     ) {
     }
 
@@ -31,7 +31,7 @@ class UpdateCartLineAction
             ]);
 
             if ($cartLineData->remarks->medias && count($cartLineData->remarks->medias) > 0) {
-                $this->createMediaFromUrlAction->execute(
+                $this->createMediaFromS3UrlAction->execute(
                     $cartLine,
                     $cartLineData->remarks->medias,
                     'cart_line_notes'
