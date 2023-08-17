@@ -102,7 +102,6 @@ class FeatureSelector extends Field
             fn (self $component, Closure $get) => collect($component->getOptions())
                 ->reduce(
                     function (array $state, array $data, string $key) use ($component, $get) {
-
                         $statePath = $component->getStatePath(false) . '.' . class_basename($key);
 
                         $mutateState = [];
@@ -131,10 +130,9 @@ class FeatureSelector extends Field
                         return array_merge(
                             $state,
                             $get($statePath)
-                                    ? ($get($statePath . '_extras') ? [$key, ...$get($statePath . '_extras')] : [$key])
-                                    : []
+                                ? [$key, ...$get($statePath . '_extras')]
+                                : []
                         );
-
                     },
                     []
                 )
