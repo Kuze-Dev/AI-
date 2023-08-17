@@ -11,7 +11,6 @@ class CreateCartData
         public readonly string $purchasable_type,
         public readonly int $quantity,
         public readonly ?int $variant_id,
-        public readonly ?array $medias,
         public readonly ?CartRemarksData $remarks,
     ) {
     }
@@ -25,7 +24,6 @@ class CreateCartData
             purchasable_type: $data['purchasable_type'],
             quantity: (int) $data['quantity'],
             variant_id: $data['variant_id'] ?? null,
-            medias: $data['media'] ?? null,
             remarks: $remarksData,
         );
     }

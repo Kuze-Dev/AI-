@@ -7,7 +7,7 @@ namespace Domain\Cart\Actions;
 use Domain\Cart\DataTransferObjects\CreateCartData;
 use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
-use Domain\Media\Actions\CreateMediaFromUrlAction;
+use Domain\Media\Actions\CreateMediaFromS3UrlAction;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +18,7 @@ use Illuminate\Support\Str;
 class CreateCartLineAction
 {
     public function __construct(
-        private readonly CreateMediaFromUrlAction $createMediaFromUrlAction
+        private readonly CreateMediaFromS3UrlAction $createMediaFromS3UrlAction
     ) {
     }
 
@@ -58,7 +58,6 @@ class CreateCartLineAction
             if ($cartLine) {
                 $cartLine->update([
                     'quantity' => $cartLine->quantity + $cartLineData->quantity,
-                    'remarks' => $cartLineData->remarks,
                 ]);
             } else {
                 $cartLine = CartLine::create([
@@ -67,12 +66,25 @@ class CreateCartLineAction
                     'purchasable_id' => $purchasableId,
                     'purchasable_type' => $purchasableType,
                     'quantity' => $cartLineData->quantity,
-                    'remarks' => $cartLineData->remarks,
                 ]);
             }
 
-            if ($cartLineData->medias !== null) {
-                $this->createMediaFromUrlAction->execute($cartLine, $cartLineData->medias, 'cart_line_notes');
+            if ($cartLineData->remarks) {
+                $cartLine->update([
+                    'remarks' => $cartLineData->remarks->notes !== null ? [
+                        'notes' => $cartLineData->remarks->notes,
+                    ] : null,
+                ]);
+
+                if ($cartLineData->remarks->medias && count($cartLineData->remarks->medias) > 0) {
+                    $this->createMediaFromS3UrlAction->execute(
+                        $cartLine,
+                        $cartLineData->remarks->medias,
+                        'cart_line_notes'
+                    );
+                } else {
+                    $cartLine->clearMediaCollection('cart_line_notes');
+                }
             }
 
             DB::commit();

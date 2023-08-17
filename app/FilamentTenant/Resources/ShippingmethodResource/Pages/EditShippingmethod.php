@@ -27,7 +27,10 @@ class EditShippingmethod extends EditRecord
 
         $drivers = app(GetAvailableShippingDriverAction::class)->execute();
 
-        if (array_key_exists($this->record->driver->value, $drivers)) {
+        /** @var \Domain\ShippingMethod\Models\ShippingMethod */
+        $model = $this->record;
+
+        if (array_key_exists($model->driver->value, $drivers)) {
             return [
                 Action::make('save')
                     ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
@@ -37,7 +40,7 @@ class EditShippingmethod extends EditRecord
             ];
         }
 
-        $this->notify('warning', 'Shipping Method ['.$this->record->driver->value.'] is currently Disabled please inform your service provider if you wish to Re Enabled this feature');
+        $this->notify('warning', 'Shipping Method ['.$model->driver->value.'] is currently Disabled please inform your service provider if you wish to Re Enabled this feature');
 
         return [];
     }

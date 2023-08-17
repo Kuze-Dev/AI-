@@ -84,7 +84,7 @@ class CreateOrUpdateProductVariantAction
             'retail_price' => $productVariant['retail_price'],
             'selling_price' => $productVariant['selling_price'],
             'stock' => $productVariant['stock'],
-            'status' => $productVariant['status'],
+            'status' => $productVariant['status'] ?? false,
         ];
     }
 }

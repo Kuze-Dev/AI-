@@ -109,13 +109,17 @@ class TenantResource extends Resource
                                 Features\ECommerce\ECommerceBase::class => [
                                     'label' => trans('eCommerce'),
                                     'extras' => [
-                                        Features\ECommerce\PaypalGateway::class => app(Features\ECommerce\PaypalGateway::class)->label,
-                                        Features\ECommerce\StripeGateway::class => app(Features\ECommerce\StripeGateway::class)->label,
-                                        Features\ECommerce\OfflineGateway::class => app(Features\ECommerce\OfflineGateway::class)->label,
-                                        Features\ECommerce\BankTransfer::class => app(Features\ECommerce\BankTransfer::class)->label,
-                                        Features\ECommerce\ShippingStorePickup::class => app(Features\ECommerce\ShippingStorePickup::class)->label,
-                                        Features\ECommerce\ShippingUsps::class => app(Features\ECommerce\ShippingUsps::class)->label,
-                                        Features\ECommerce\ShippingUps::class => app(Features\ECommerce\ShippingUps::class)->label,
+                                        'Payments' => [
+                                            Features\ECommerce\PaypalGateway::class => app(Features\ECommerce\PaypalGateway::class)->label,
+                                            Features\ECommerce\StripeGateway::class => app(Features\ECommerce\StripeGateway::class)->label,
+                                            Features\ECommerce\OfflineGateway::class => app(Features\ECommerce\OfflineGateway::class)->label,
+                                            Features\ECommerce\BankTransfer::class => app(Features\ECommerce\BankTransfer::class)->label,
+                                        ],
+                                        'shipping' => [
+                                            Features\ECommerce\ShippingStorePickup::class => app(Features\ECommerce\ShippingStorePickup::class)->label,
+                                            Features\ECommerce\ShippingUsps::class => app(Features\ECommerce\ShippingUsps::class)->label,
+                                            Features\ECommerce\ShippingUps::class => app(Features\ECommerce\ShippingUps::class)->label,
+                                        ],
                                     ],
                                 ],
                             ]),

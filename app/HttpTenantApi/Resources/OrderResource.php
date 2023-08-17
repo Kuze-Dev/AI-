@@ -32,7 +32,7 @@ class OrderResource extends JsonApiResource
                 'symbol' => $this->currency_symbol,
                 'code' => $this->currency_code,
                 'name' => $this->currency_name,
-            ]
+            ],
         ];
     }
 

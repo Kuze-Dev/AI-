@@ -103,7 +103,12 @@ class CreateCartLineRequest extends FormRequest
                     }
                 },
             ],
-            'media' => [
+            'remarks.notes' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+            'remarks.media' => [
                 'nullable',
                 'array',
                 function ($attribute, $value, $fail) {
@@ -122,7 +127,6 @@ class CreateCartLineRequest extends FormRequest
                     }
                 },
             ],
-            'media.*' => 'url',
         ];
     }
 }
