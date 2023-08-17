@@ -25,9 +25,12 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property string|null $customer_name
  * @property string|null $customer_email
  * @property string|null $comment
+ * @property array|null $data
  * @property bool $is_anonymous
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Review\Models\ReviewLike> $ReviewLikes
+ * @property-read int|null $review_likes_count
  * @property-read Customer|null $customer
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
@@ -42,6 +45,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereCustomerEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereCustomerId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereCustomerName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Review whereData($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereIsAnonymous($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereOrderId($value)
@@ -101,5 +105,10 @@ class Review extends Model implements HasMedia
     public function order_line()
     {
         return $this->belongsTo(OrderLine::class);
+    }
+
+    public function review_likes()
+    {
+        return $this->hasMany(ReviewLike::class);
     }
 }

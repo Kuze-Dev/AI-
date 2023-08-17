@@ -20,8 +20,9 @@ class ReviewResource extends JsonApiResource
             'customer_name' => $this->is_anonymous ? '*' : $this->customer_name,
             'customer_email' => $this->is_anonymous ? '*' : $this->customer_email,
             'is_anonymous' => $this->is_anonymous,
-            'personalized' => ! empty($this->order_line->remarks_data) || count($this->order_line->media->filter(fn ($media) => $media->collection_name === 'order_line_notes')) > 0,
+            // 'personalized' => ! empty($this->order_line->remarks_data) || count($this->order_line->media->filter(fn ($media) => $media->collection_name === 'order_line_notes')) > 0,
             'data' => $this->data,
+            'like_count' => $this->review_likes->count(),
         ];
     }
 

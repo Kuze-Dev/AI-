@@ -6,6 +6,7 @@ namespace App\HttpTenantApi\Controllers\Review;
 
 use App\HttpTenantApi\Resources\ReviewResource;
 use Domain\Review\Actions\CreateReviewAction;
+use Domain\Review\Actions\DestroyReviewAction;
 use Domain\Review\DataTransferObjects\CreateReviewData;
 use Domain\Review\Models\Review;
 use Domain\Review\Requests\ReviewStoreRequest;
@@ -34,14 +35,11 @@ class ReviewController
         return response()->json(['message' => 'Review item created successfully'], 201);
     }
 
-    public function destroy(int $review): JsonResponse
+    public function destroy(int $review, DestroyReviewAction $destroyReviewAction): JsonResponse
     {
-        $review = Review::where('id', $review)
-            ->firstOrFail();
+        $destroyReviewAction->execute($review);
 
-        $review->delete();
-
-        return response()->json(['message' => 'Review item deleted']);
+        return response()->json(['message' => 'Review item deleted'], 200);
     }
 
     #[Get('orderline-review/{orderLineId}')]
