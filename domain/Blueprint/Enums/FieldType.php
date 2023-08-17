@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Blueprint\Enums;
 
+use Domain\Blueprint\DataTransferObjects\CheckBoxFieldData;
 use Domain\Blueprint\DataTransferObjects\DatetimeFieldData;
 use Domain\Blueprint\DataTransferObjects\FileFieldData;
 use Domain\Blueprint\DataTransferObjects\MarkdownFieldData;
@@ -34,6 +35,7 @@ enum FieldType: string
     case RELATED_RESOURCE = 'related_resource';
     case REPEATER = 'repeater';
     case MEDIA = 'media';
+    case CHECKBOX = 'checkbox';
 
     public function getFieldDataClass(): string
     {
@@ -54,6 +56,7 @@ enum FieldType: string
             self::RELATED_RESOURCE => RelatedResourceFieldData::class,
             self::REPEATER => RepeaterFieldData::class,
             self::MEDIA => MediaFieldData::class,
+            self::CHECKBOX => CheckBoxFieldData::class,
         };
     }
 }

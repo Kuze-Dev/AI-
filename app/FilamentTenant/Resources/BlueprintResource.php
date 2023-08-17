@@ -328,6 +328,21 @@ class BlueprintResource extends Resource
                         Forms\Components\TextInput::make('label'),
                     ]),
             ],
+            FieldType::CHECKBOX => [
+                Forms\Components\Toggle::make('bulk_toggleable')
+                    ->reactive()
+                    ->columnSpanFull(),
+                Forms\Components\Repeater::make('options')
+                    ->collapsible()
+                    ->orderable()
+                    ->itemLabel(fn (array $state) => $state['title'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('value'),
+                        Forms\Components\TextInput::make('label'),
+                    ]),
+            ],
             FieldType::TEXTAREA => [
                 Forms\Components\TextInput::make('min_length')
                     ->numeric()
@@ -518,8 +533,9 @@ class BlueprintResource extends Resource
                             ->columns(2),
                     ])
                     ->columnSpanFull(),
-            ],
-            default => [],
+
+            ],   default => [],
+
         };
     }
 }
