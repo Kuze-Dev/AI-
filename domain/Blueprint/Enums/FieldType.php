@@ -8,6 +8,7 @@ use Domain\Blueprint\DataTransferObjects\CheckBoxFieldData;
 use Domain\Blueprint\DataTransferObjects\DatetimeFieldData;
 use Domain\Blueprint\DataTransferObjects\FileFieldData;
 use Domain\Blueprint\DataTransferObjects\MarkdownFieldData;
+use Domain\Blueprint\DataTransferObjects\RadioFieldData;
 use Domain\Blueprint\DataTransferObjects\RelatedResourceFieldData;
 use Domain\Blueprint\DataTransferObjects\RepeaterFieldData;
 use Domain\Blueprint\DataTransferObjects\RichtextFieldData;
@@ -34,6 +35,7 @@ enum FieldType: string
     case RELATED_RESOURCE = 'related_resource';
     case REPEATER = 'repeater';
     case CHECKBOX = 'checkbox';
+    case RADIO = 'radio';
 
     public function getFieldDataClass(): string
     {
@@ -54,6 +56,7 @@ enum FieldType: string
             self::RELATED_RESOURCE => RelatedResourceFieldData::class,
             self::REPEATER => RepeaterFieldData::class,
             self::CHECKBOX => CheckBoxFieldData::class,
+            self::RADIO => RadioFieldData::class,
         };
     }
 }
