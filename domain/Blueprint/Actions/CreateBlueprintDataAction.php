@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Domain\Blueprint\Actions;
 
 use Domain\Blueprint\DataTransferObjects\BlueprintDataData;
-use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Models\BlueprintData;
 
 class CreateBlueprintDataAction

@@ -111,6 +111,7 @@ class SchemaFormBuilder extends Component
             ToggleFieldData::class => Toggle::make($field->state_name),
             RepeaterFieldData::class => $this->makeRepeaterComponent($field),
             RelatedResourceFieldData::class => $this->makeRelatedResourceComponent($field),
+            MediaFieldData::class => $this->makeMediaComponent($field),
             default => throw new InvalidArgumentException('Cannot generate field component for `' . $field::class . '` as its not supported.'),
         };
 
