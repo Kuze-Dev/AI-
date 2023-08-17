@@ -8,6 +8,7 @@ class CreatePresignUploadUrlData
 {
     public function __construct(
         public readonly string $ext,
+        public readonly string $acl,
     ) {
     }
 
@@ -15,6 +16,7 @@ class CreatePresignUploadUrlData
     {
         return new self(
             ext: $data['ext'],
+            acl: $data['acl'],
         );
     }
 }
