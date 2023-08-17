@@ -65,7 +65,12 @@ class UpdateCartLineRequest extends FormRequest
                     }
                 },
             ],
-            'media' => [
+            'remarks.notes' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+            'remarks.media' => [
                 'nullable',
                 'array',
                 function ($attribute, $value, $fail) use ($cartLine) {
@@ -90,7 +95,6 @@ class UpdateCartLineRequest extends FormRequest
                     }
                 },
             ],
-            'media.*' => 'url',
         ];
     }
 }

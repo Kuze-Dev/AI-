@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Review;
 
 use Domain\Review\Models\Review;
-use Illuminate\Support\Facades\DB;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Spatie\QueryBuilder\QueryBuilder;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 use App\HttpTenantApi\Resources\ReviewResource;
+use Domain\Review\Actions\ShowSummaryAction;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -29,39 +29,40 @@ class ReviewShowController
                     'product',
                     'customer.media',
                     'media',
-                ]) ->allowedFilters([
+                ])->allowedFilters([
                     AllowedFilter::callback(
                         'rating',
                         function (Builder $query, string $value) {
                             match ($value) {
                                 'asc' => $query->orderBy('rating', 'asc'),
                                 'desc' => $query->orderBy('rating', 'desc'),
+                                $value => $query->where('rating', $value),
                                 default => '',
                             };
                         }
                     ),
+                    AllowedFilter::callback(
+                        'orderBy',
+                        function (Builder $query, string $value) {
+                            match ($value) {
+                                'recent' => $query->orderBy('created_at', 'desc'),
+                                'relevance' => $query->withCount('review_likes')->orderBy('review_likes_count', 'desc'),
+                                'low' => $query->orderBy('rating', 'asc'),
+                                'high' => $query->orderBy('rating', 'desc'),
+                                default => '',
+                            };
+                        }
+                    ), 
                 ])
                 ->jsonPaginate()
         );
     }
 
     #[Get('reviews/ratings/{rating}')]
-    public function showSummary(string $product_id): JsonResponse
+    public function showSummary(int $product_id, ShowSummaryAction $showSummaryAction): JsonResponse
     {
-        $review = Review::where('product_id', $product_id);
+        $review = $showSummaryAction->execute($product_id);
 
-        $reviewCount = $review->count();
-        $averageRating = $review->avg('rating');
-
-        $ratingCounts = $review
-            ->select('rating', DB::raw('COUNT(rating) as rating_count'))
-            ->groupBy('rating')->get()->toArray();
-
-        return response()->json([
-            'product_id' => $product_id,
-            'raviewcount' => $reviewCount,
-            'average_rating' => $averageRating,
-            'rating_counts' => $ratingCounts,
-        ]);
+        return response()->json($review, 200);
     }
 }
