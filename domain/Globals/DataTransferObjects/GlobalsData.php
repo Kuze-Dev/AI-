@@ -20,7 +20,7 @@ class GlobalsData
             name: $data['name'],
             blueprint_id: $data['blueprint_id'],
             data: $data['data'] ?? [],
-            sites: $data['sites'],
+            sites: $data['sites'] ?? [],
         );
     }
 }

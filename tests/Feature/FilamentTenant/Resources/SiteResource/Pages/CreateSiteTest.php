@@ -13,6 +13,7 @@ use function Pest\Livewire\livewire;
 beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
+    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
     loginAsSuperAdmin();
 });
 

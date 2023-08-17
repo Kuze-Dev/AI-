@@ -38,7 +38,7 @@ class FormData
                 ),
                 $data['form_email_notifications'] ?? []
             ),
-            sites: $data['sites']
+            sites: $data['sites'] ?? []
         );
     }
 }
