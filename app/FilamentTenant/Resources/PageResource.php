@@ -112,7 +112,7 @@ class PageResource extends Resource
                                     );
                                 }),
                         ])
-                            ->hidden(tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
                         Forms\Components\Repeater::make('block_contents')
                             ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Page $record, ?array $state) {
                                 if ($record === null || $record->blockContents->isEmpty()) {
