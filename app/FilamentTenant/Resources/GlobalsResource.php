@@ -72,7 +72,8 @@ class GlobalsResource extends Resource
                                     ->toArray()
                             );
                         }),
-                ]),
+                ])
+                ->hidden(tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
                     ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),

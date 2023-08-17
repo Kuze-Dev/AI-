@@ -97,7 +97,8 @@ class MenuResource extends Resource
                                     ->toArray()
                             );
                         }),
-                ]),
+                ])
+                ->hidden(tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([
                         Tree::make('nodes')
