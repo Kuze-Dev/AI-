@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace Domain\Page\Models;
 
-use Domain\Page\Models\Builders\PageBuilder;
+use Illuminate\Support\Str;
+use Domain\Site\Traits\Sites;
+use Spatie\Sluggable\HasSlug;
 use Domain\Admin\Models\Admin;
 use Domain\Page\Enums\Visibility;
+use Spatie\Sluggable\SlugOptions;
 use Support\MetaData\HasMetaData;
-use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
-use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
 use Support\RouteUrl\HasRouteUrl;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
+use Domain\Page\Models\Builders\PageBuilder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
 use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 
 /**
@@ -67,6 +68,7 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
     use HasRouteUrl;
     use HasMetaData;
     use ConstraintsRelationships;
+    use Sites;
 
     protected $fillable = [
         'author_id',
