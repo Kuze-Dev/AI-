@@ -232,6 +232,9 @@ class OrderResource extends Resource
                     ->label(trans('Tax Total'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('total')
+                    ->formatStateUsing(function (Order $record) {
+                        return $record->currency_symbol . ' ' . $record->total;
+                    })
                     ->label(trans('Total'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('shipping_method')
@@ -400,6 +403,9 @@ class OrderResource extends Resource
                             ->inline()
                             ->readOnly(),
                         Support\TextLabel::make('sub_total')
+                            ->formatStateUsing(function (Order $record) {
+                                return $record->currency_symbol . ' ' . number_format($record->sub_total, 2, '.', '');
+                            })
                             ->alignRight()
                             ->size('md')
                             ->inline(),
@@ -417,7 +423,7 @@ class OrderResource extends Resource
                             ->size('md')
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
-                                return number_format($record->shipping_total, 2, '.', '');
+                                return $record->currency_symbol . ' ' . number_format($record->shipping_total, 2, '.', '');
                             }),
                     ]),
                 Forms\Components\Grid::make(2)
@@ -435,7 +441,7 @@ class OrderResource extends Resource
                             ->size('md')
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
-                                return number_format($record->tax_total, 2, '.', '');
+                                return $record->currency_symbol . ' ' . number_format($record->tax_total, 2, '.', '');
                             }),
                     ]),
                 Forms\Components\Grid::make(2)
@@ -451,7 +457,7 @@ class OrderResource extends Resource
                             ->size('md')
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
-                                return number_format($record->discount_total, 2, '.', '');
+                                return $record->currency_symbol . ' ' . number_format($record->discount_total, 2, '.', '');
                             }),
                     ]),
                 Forms\Components\Grid::make(2)
@@ -485,7 +491,7 @@ class OrderResource extends Resource
                             ->color('primary')
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
-                                return number_format($record->total, 2, '.', '');
+                                return $record->currency_symbol . ' ' . number_format($record->total, 2, '.', '');
                             }),
                     ]),
             ])->columnSpan(1);

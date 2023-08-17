@@ -6,8 +6,11 @@ namespace App\HttpTenantApi\Controllers\Product;
 
 use App\Features\ECommerce\ECommerceBase;
 use App\HttpTenantApi\Resources\ProductResource;
+use Domain\Order\Enums\OrderStatuses;
+use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\Builders\ProductBuilder;
 use Domain\Product\Models\Product;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -54,9 +57,11 @@ class ProductController
         );
     }
 
-    public function show(string $product): ProductResource
+    public function show(string $product)
     {
-        $product = QueryBuilder::for(Product::whereSlug($product)->whereStatus(true))
+        $product = QueryBuilder::for(
+            Product::whereSlug($product)->whereStatus(true)
+        )
             ->allowedIncludes([
                 'taxonomyTerms',
                 'productOptions',
@@ -65,6 +70,14 @@ class ProductController
                 'metaData',
             ])
             ->firstOrFail();
+
+        $totalSold = OrderLine::whereHas('order', function (Builder $query) {
+            $query->where('status', OrderStatuses::FULFILLED);
+        })
+            ->where('purchasable_id', $product->id)
+            ->sum('quantity');
+
+        $product->setAttribute('total_sold', $totalSold);
 
         return ProductResource::make($product);
     }

@@ -5,7 +5,7 @@
 
     <td class="filament-tables-cell">
         <div class="px-4 py-3 filament-tables-text-column">
-            {{ $this->getTableRecords()->sum('sub_total') }}
+            {{ $this->ownerRecord->currency_symbol . ' ' . number_format($this->getTableRecords()->sum('sub_total'), 2, '.', '') }}
         </div>
     </td>
 </tr>

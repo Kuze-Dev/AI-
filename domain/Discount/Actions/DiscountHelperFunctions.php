@@ -18,40 +18,20 @@ final class DiscountHelperFunctions
     {
         $deductable = 0;
 
-        if (
-            $discount->discountCondition->discount_type === DiscountConditionType::ORDER_SUB_TOTAL
-            && $subTotal >= $discount->discountRequirement?->minimum_amount
-            && $discount->discountCondition->amount_type === DiscountAmountType::FIXED_VALUE
-        ) {
-
-            $deductable = $discount->discountCondition->amount;
-        }
+        $discountCondition = $discount->discountCondition;
+        $discountRequirement = $discount->discountRequirement;
 
         if (
-            $discount->discountCondition->discount_type === DiscountConditionType::ORDER_SUB_TOTAL
-            && $subTotal >= $discount->discountRequirement?->minimum_amount
-            && $discount->discountCondition->amount_type === DiscountAmountType::PERCENTAGE
+            $subTotal >= ($discountRequirement?->minimum_amount ?? 0) &&
+            ($discountCondition->discount_type === DiscountConditionType::ORDER_SUB_TOTAL ||
+            $discountCondition->discount_type === DiscountConditionType::DELIVERY_FEE)
         ) {
-
-            $deductable = round($subTotal * $discount->discountCondition->amount / 100, 2);
-        }
-
-        if (
-            $discount->discountCondition->discount_type === DiscountConditionType::DELIVERY_FEE
-            && $subTotal >= $discount->discountRequirement?->minimum_amount
-            && $discount->discountCondition->amount_type === DiscountAmountType::FIXED_VALUE
-        ) {
-
-            $deductable = $discount->discountCondition->amount;
-        }
-
-        if (
-            $discount->discountCondition->discount_type === DiscountConditionType::DELIVERY_FEE
-            && $subTotal >= $discount->discountRequirement?->minimum_amount
-            && $discount->discountCondition->amount_type === DiscountAmountType::PERCENTAGE
-        ) {
-
-            $deductable = round($shippingTotal * $discount->discountCondition->amount / 100, 2);
+            if ($discountCondition->amount_type === DiscountAmountType::FIXED_VALUE) {
+                $deductable = $discountCondition->amount;
+            } elseif ($discountCondition->amount_type === DiscountAmountType::PERCENTAGE) {
+                $amountToApply = ($discountCondition->discount_type === DiscountConditionType::ORDER_SUB_TOTAL) ? $subTotal : $shippingTotal;
+                $deductable = round($amountToApply * $discountCondition->amount / 100, 2);
+            }
         }
 
         return $deductable;
@@ -61,37 +41,39 @@ final class DiscountHelperFunctions
     {
 
         if (is_null($discount)) {
-            return DiscountMessagesData::fromArray([
-                'message' => 'This discount code is invalid.',
-            ]);
+            return DiscountMessagesData::fromArray(['message' => 'This discount code is invalid.']);
         }
 
-        $discountAmount = DiscountRequirement::whereBelongsTo($discount)->first();
-        $discountCondition = DiscountCondition::whereBelongsTo($discount)->first();
+        $discountAmount = optional(DiscountRequirement::whereBelongsTo($discount)->first());
+        $discountCondition = optional(DiscountCondition::whereBelongsTo($discount)->first());
 
-        if ($discount?->status === DiscountStatus::INACTIVE) {
-            return DiscountMessagesData::fromArray([
+        $validationChecks = [
+            'status' => [
+                'condition' => $discount->status === DiscountStatus::INACTIVE,
                 'message' => 'This discount code is invalid.',
-            ]);
-        }
-
-        if ($discount?->valid_end_at && $discount->valid_end_at < now()) {
-            return DiscountMessagesData::fromArray([
+            ],
+            'valid_end_at' => [
+                'condition' => $discount->valid_end_at && $discount->valid_end_at < now(),
                 'message' => 'This discount code has expired.',
-            ]);
-        }
-
-        if ($discount?->max_uses == 0) {
-            return DiscountMessagesData::fromArray([
+            ],
+            'valid_start_at' => [
+                'condition' => $discount->valid_start_at > now(),
+                'message' => 'This discount code is invalid.',
+            ],
+            'max_uses' => [
+                'condition' => $discount->max_uses == 0,
                 'message' => 'This discount code max usage limit has been reached.',
-            ]);
-        }
+            ],
+            'grandTotal' => [
+                'condition' => $grandTotal < $discountAmount->minimum_amount,
+                'message' => 'You need to purchase at least ' . $discountAmount->minimum_amount . ' to apply this discount',
+            ],
+        ];
 
-        if ($grandTotal < $discountAmount->minimum_amount) {
-            return DiscountMessagesData::fromArray([
-                'message' => 'You need to purchase at least '
-                    . $discountAmount->minimum_amount  . ' to apply this discount',
-            ]);
+        foreach ($validationChecks as $check) {
+            if ($check['condition']) {
+                return DiscountMessagesData::fromArray(['message' => $check['message']]);
+            }
         }
 
         return DiscountMessagesData::fromArray([

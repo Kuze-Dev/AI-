@@ -8,6 +8,7 @@ class CartRemarksData
 {
     public function __construct(
         public readonly ?string $notes,
+        public readonly ?array $medias,
     ) {
     }
 
@@ -15,6 +16,7 @@ class CartRemarksData
     {
         return new self(
             notes: $data['notes'] ?? null,
+            medias: $data['media'] ?? null,
         );
     }
 }

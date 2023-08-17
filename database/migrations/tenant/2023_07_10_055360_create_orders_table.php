@@ -21,7 +21,7 @@ return new class () extends Migration {
             $table->string('customer_email')->index();
             $table->string('currency_code')->index();
             $table->string('currency_name')->index();
-            $table->decimal('currency_exchange_rate');
+            $table->string('currency_symbol');
             $table->string('reference')->unique();
             $table->decimal('tax_total')->nullable();
             $table->decimal('tax_percentage')->nullable();

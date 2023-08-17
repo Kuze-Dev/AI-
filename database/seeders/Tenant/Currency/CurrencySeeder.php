@@ -18,6 +18,7 @@ class CurrencySeeder extends Seeder
                     'code' => 'PHP',
                     'name' => 'Philippine Peso',
                     'symbol' => '₱',
+                    'enabled' => false,
                 ],
                 [
                     'code' => 'USD',

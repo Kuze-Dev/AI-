@@ -73,7 +73,7 @@ class PrepareOrderAction
 
     private function prepareCurrency(): Currency
     {
-        $currency = Currency::where('default', true)->first();
+        $currency = Currency::where('enabled', true)->first();
 
         if ( ! $currency instanceof Currency) {
 

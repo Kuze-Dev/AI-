@@ -181,14 +181,23 @@ class ProductOptionFormAction extends Action
 
         $result = [];
 
-        foreach ($mergedCombination as $key => $combination) {
+        foreach ($mergedCombination as $combination) {
             $keyData = serialize($combination['combination']);
+            /** Generate SKU for variant */
+            $hasMatched = true;
+            while ($hasMatched) {
+                $generatedSku = $record->sku . rand(1000, 9999);
+
+                if ( ! in_array($generatedSku, array_map(fn ($item) => $item['sku'], array_values($result)))) {
+                    $combination['sku'] = $generatedSku;
+                    $hasMatched = false;
+                }
+            }
 
             $combination['selling_price'] = isset($combination['selling_price']) ? $combination['selling_price'] : $record->selling_price;
             $combination['retail_price'] = isset($combination['retail_price']) ? $combination['retail_price'] : $record->retail_price;
             $combination['stock'] = isset($combination['stock']) ? $combination['stock'] : $record->stock;
             $combination['status'] = isset($combination['status']) ? $combination['status'] : $record->status;
-            $combination['sku'] = isset($combination['sku']) ? $combination['sku'] : $record->sku . $key;
             unset($combination['product_id'], $combination['created_at'], $combination['updated_at']);
 
             $result[$keyData] = $combination;

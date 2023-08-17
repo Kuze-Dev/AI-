@@ -33,7 +33,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property string $customer_email
  * @property string $currency_code
  * @property string $currency_name
- * @property float $currency_exchange_rate
+ * @property float $currency_symbol
  * @property string $reference
  * @property float $tax_total
  * @property float $tax_percentage
@@ -115,7 +115,7 @@ class Order extends Model implements HasMedia, PayableInterface
         'customer_email',
         'currency_code',
         'currency_name',
-        'currency_exchange_rate',
+        'currency_symbol',
         'reference',
         'tax_total',
         'tax_display',
@@ -134,7 +134,6 @@ class Order extends Model implements HasMedia, PayableInterface
     ];
 
     protected $casts = [
-        'currency_exchange_rate' => 'float',
         'tax_total' => 'float',
         'tax_display' => PriceDisplay::class,
         'tax_percentage' => 'float',

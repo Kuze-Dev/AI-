@@ -22,13 +22,13 @@ class OrderLineResource extends JsonApiResource
             'name' => $this->name,
             'unit_price' => $this->unit_price,
             'quantity' => $this->quantity,
-            'tax_total' => $this->tax_total,
-            'sub_total' => $this->sub_total,
-            'discount_total' => $this->discount_total,
-            'total' => $this->total,
+            'tax_total' => number_format((float) $this->tax_total, 2, '.', ','),
+            'sub_total' => number_format((float) $this->sub_total, 2, '.', ','),
+            'discount_total' => number_format((float) $this->discount_total, 2, '.', ','),
+            'total' => number_format((float) $this->total, 2, '.', ','),
             'reviewed_at' => $this->reviewed_at,
             'purchasable' => function () {
-                if ( ! isset($this->purchasable_data['product'])) {
+                if (!isset($this->purchasable_data['product'])) {
                     /** @var array */
                     $productArray = $this->purchasable_data;
 

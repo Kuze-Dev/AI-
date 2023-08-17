@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Order\Requests;
 
+use Domain\Order\Enums\OrderStatuses;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rule;
@@ -47,6 +48,25 @@ class UpdateOrderRequest extends FormRequest
                 Rule::requiredIf(function () {
                     return $this->input('type') === 'status';
                 }),
+                function ($attribute, $value, $fail) use ($order) {
+                    if (
+                        $value == OrderStatuses::CANCELLED->value &&
+                        ! in_array($order->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])
+                    ) {
+                        $fail("You can't cancel this order");
+
+                        return;
+                    }
+
+                    if (
+                        $value == OrderStatuses::FULFILLED->value &&
+                        $order->status !== OrderStatuses::DELIVERED
+                    ) {
+                        $fail("You can't fullfilled this order");
+
+                        return;
+                    }
+                },
             ],
             'notes' => [
                 'nullable',

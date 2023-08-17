@@ -56,6 +56,8 @@ class CreateOrderLineAction
                 $name = $product->name;
             }
 
+            $total = $summary->initialSubTotal + $summary->taxTotal;
+
             $orderLine = OrderLine::create([
                 'uuid' => (string) Str::uuid(),
                 'order_id' => $order->id,
@@ -68,9 +70,9 @@ class CreateOrderLineAction
                 'tax_total' => $summary->taxTotal,
                 'tax_display' => $summary->taxDisplay,
                 'tax_percentage' => $summary->taxPercentage,
-                'sub_total' => $summary->subTotal,
+                'sub_total' => $summary->initialSubTotal,
                 'discount_total' => 0,
-                'total' => $summary->grandTotal,
+                'total' => $total,
                 'remarks_data' => $cartLine->remarks,
                 'purchasable_data' => $cartLine->purchasable,
             ]);

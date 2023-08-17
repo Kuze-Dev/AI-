@@ -26,7 +26,8 @@ return new class () extends Migration {
             $table->id();
 
             $table->foreignIdFor(Country::class)->index();
-            $table->string('name')->index();
+            $table->string('code')->index();
+            $table->string('name')->nullable();
 
             $table->timestamps();
         });
