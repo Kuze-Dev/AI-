@@ -3,16 +3,17 @@
 declare(strict_types=1);
 
 use Carbon\Carbon;
-use function Pest\Laravel\getJson;
 use Domain\Blueprint\Enums\FieldType;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Domain\Site\Database\Factories\SiteFactory;
 use Domain\Content\Database\Factories\ContentFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
-
 use Domain\Content\Database\Factories\ContentEntryFactory;
+
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
+
+use function Pest\Laravel\getJson;
 
 beforeEach(function () {
     testInTenantContext();

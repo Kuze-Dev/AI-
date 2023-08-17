@@ -11,7 +11,6 @@ use Domain\Globals\DataTransferObjects\GlobalsData;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 
 use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\assertDatabaseCount;
 
 beforeEach(fn () => testInTenantContext());
 

@@ -6,7 +6,6 @@ namespace Domain\Page\DataTransferObjects;
 
 use Carbon\Carbon;
 use Domain\Page\Enums\Visibility;
-use Domain\Page\DataTransferObjects\BlockContentData;
 use Support\MetaData\DataTransferObjects\MetaDataData;
 use Support\RouteUrl\DataTransferObjects\RouteUrlData;
 

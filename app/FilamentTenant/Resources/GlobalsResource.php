@@ -51,28 +51,28 @@ class GlobalsResource extends Resource
                     ->optionsFromModel(Blueprint::class, 'name')
                     ->disabled(fn (?Globals $record) => $record !== null)
                     ->reactive(),
-                    Forms\Components\Card::make([
-                        Forms\Components\CheckboxList::make('sites')
-                            ->options(
-                                fn () => Site::orderBy('name')
-                                    ->pluck('name', 'id')
+                Forms\Components\Card::make([
+                    Forms\Components\CheckboxList::make('sites')
+                        ->options(
+                            fn () => Site::orderBy('name')
+                                ->pluck('name', 'id')
+                                ->toArray()
+                        )
+                        ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Globals $record): void {
+                            if ( ! $record) {
+                                $component->state([]);
+
+                                return;
+                            }
+
+                            $component->state(
+                                $record->sites->pluck('id')
+                                    ->intersect(array_keys($component->getOptions()))
+                                    ->values()
                                     ->toArray()
-                            )
-                            ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Globals $record): void {
-                                if ( ! $record) {
-                                    $component->state([]);
-
-                                    return;
-                                }
-
-                                $component->state(
-                                    $record->sites->pluck('id')
-                                        ->intersect(array_keys($component->getOptions()))
-                                        ->values()
-                                        ->toArray()
-                                );
-                            }),
-                    ]),
+                            );
+                        }),
+                ]),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
                     ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),

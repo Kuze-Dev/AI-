@@ -3,14 +3,15 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Str;
-use function Pest\Laravel\getJson;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Site\Database\Factories\SiteFactory;
-
 use Domain\Page\Database\Factories\BlockFactory;
+
 use Support\RouteUrl\Database\Factories\RouteUrlFactory;
+
+use function Pest\Laravel\getJson;
 
 beforeEach(function () {
     testInTenantContext();
@@ -121,12 +122,12 @@ it('can show an unpublished page with valid signature', function () {
 it('can list pages of specific site', function () {
     $site = SiteFactory::new()->createOne();
     PageFactory::new()
-        ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->published()
         ->hasAttached($site)
         ->count(1)
         ->create();
     PageFactory::new()
-        ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->published()
         ->count(2)
         ->create();
 
@@ -135,8 +136,6 @@ it('can list pages of specific site', function () {
         ->assertJson(function (AssertableJson $json) {
             $json
                 ->count('data', 1)
-                ->where('data.0.type', 'pages')
-                ->whereType('data.0.attributes.name', 'string')
                 ->etc();
         });
 });

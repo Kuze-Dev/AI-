@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-use function Pest\Laravel\getJson;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Domain\Site\Database\Factories\SiteFactory;
-
 use Domain\Content\Database\Factories\ContentFactory;
+
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
+
+use function Pest\Laravel\getJson;
 
 beforeEach(function () {
     testInTenantContext();

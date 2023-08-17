@@ -6,12 +6,13 @@ use Domain\Page\Models\Page;
 use Domain\Page\Models\BlockContent;
 use Support\MetaData\Models\MetaData;
 use Domain\Page\Actions\UpdatePageAction;
-use function Pest\Laravel\assertDatabaseHas;
 use Domain\Page\DataTransferObjects\PageData;
-
 use Domain\Page\Database\Factories\PageFactory;
+
 use Domain\Site\Database\Factories\SiteFactory;
 use Domain\Page\Database\Factories\BlockFactory;
+
+use function Pest\Laravel\assertDatabaseHas;
 
 beforeEach(fn () => testInTenantContext());
 
