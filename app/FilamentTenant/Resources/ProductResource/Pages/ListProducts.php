@@ -141,7 +141,7 @@ class ListProducts extends ListRecords
                             if ($taxonomy) {
                                 $termModel = TaxonomyTerm::whereName($taxonomyTerm)->first();
 
-                                if (!$termModel) {
+                                if ( ! $termModel) {
                                     $termModel = TaxonomyTerm::create(
                                         [
                                             'name' => $taxonomyTerm,

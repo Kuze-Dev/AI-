@@ -36,7 +36,7 @@ class CartSummaryController extends Controller
                     $cartLineIdsTobeRemoved[] = $cartLine->uuid;
                 }
 
-                return !is_null($cartLine->purchasable);
+                return ! is_null($cartLine->purchasable);
             });
         }
 
@@ -87,12 +87,12 @@ class CartSummaryController extends Controller
                 'amount' => $summary->taxTotal ? number_format((float) $summary->taxTotal, 2, '.', ',') : 0,
             ],
             'sub_total' => [
-                "initial_amount" =>  number_format((float) $summary->initialSubTotal, 2, '.', ','),
-                "discounted_amount" => number_format((float) $summary->subTotal, 2, '.', ',')
+                'initial_amount' => number_format((float) $summary->initialSubTotal, 2, '.', ','),
+                'discounted_amount' => number_format((float) $summary->subTotal, 2, '.', ','),
             ],
             'shipping_fee' => [
-                "initial_amount" => number_format((float) $summary->initialShippingTotal, 2, '.', ','),
-                "discounted_amount" => number_format((float) $summary->shippingTotal, 2, '.', ',')
+                'initial_amount' => number_format((float) $summary->initialShippingTotal, 2, '.', ','),
+                'discounted_amount' => number_format((float) $summary->shippingTotal, 2, '.', ','),
             ],
             'total' => number_format((float) $summary->grandTotal, 2, '.', ','),
             'discount' => [
@@ -105,7 +105,7 @@ class CartSummaryController extends Controller
             ],
         ];
 
-        if (!$discountCode) {
+        if ( ! $discountCode) {
             unset($responseArray['discount']);
         }
 

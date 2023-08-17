@@ -44,14 +44,14 @@ class CreateCartLineRequest extends FormRequest
                     $purchasableId = $this->input('purchasable_id');
                     $variantId = $this->input('variant_id') ?? null;
 
-                    if (!$purchasableId) {
+                    if ( ! $purchasableId) {
                         $fail('Invalid product.');
                     }
 
                     if (is_null($variantId)) {
                         $product = Product::where((new Product())->getRouteKeyName(), $purchasableId)->first();
 
-                        if (!$product) {
+                        if ( ! $product) {
                             $fail('Invalid product.');
 
                             return;
@@ -70,7 +70,7 @@ class CreateCartLineRequest extends FormRequest
                             $query->where((new Product())->getRouteKeyName(), $purchasableId);
                         })->first();
 
-                        if (!$productVariant) {
+                        if ( ! $productVariant) {
                             $fail('Invalid productVariant.');
 
                             return;
@@ -92,13 +92,13 @@ class CreateCartLineRequest extends FormRequest
 
                     $product = Product::where((new Product())->getRouteKeyName(), $purchasableId)->first();
 
-                    if (!$product) {
+                    if ( ! $product) {
                         $fail('Invalid product.');
 
                         return;
                     }
 
-                    if ($value && !$product->allow_customer_remarks) {
+                    if ($value && ! $product->allow_customer_remarks) {
                         $fail('You cant add remarks into this product.');
                     }
                 },
@@ -106,7 +106,7 @@ class CreateCartLineRequest extends FormRequest
             'remarks.notes' => [
                 'nullable',
                 'string',
-                'max:255'
+                'max:255',
             ],
             'remarks.media' => [
                 'nullable',
@@ -116,13 +116,13 @@ class CreateCartLineRequest extends FormRequest
 
                     $product = Product::where((new Product())->getRouteKeyName(), $purchasableId)->first();
 
-                    if (!$product) {
+                    if ( ! $product) {
                         $fail('Invalid product.');
 
                         return;
                     }
 
-                    if ($value && !$product->allow_customer_remarks) {
+                    if ($value && ! $product->allow_customer_remarks) {
                         $fail('You cant add media remarks into this product.');
                     }
                 },

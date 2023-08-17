@@ -48,7 +48,7 @@ class UpdateCartLineRequest extends FormRequest
                     $purchasable = $cartLine->purchasable;
 
                     if ($purchasable instanceof Product) {
-                        if ($value && !$purchasable->allow_customer_remarks) {
+                        if ($value && ! $purchasable->allow_customer_remarks) {
                             $fail('You cant add remarks into this product.');
                         }
                     } elseif ($purchasable instanceof ProductVariant) {
@@ -59,7 +59,7 @@ class UpdateCartLineRequest extends FormRequest
                         /** @var \Domain\Product\Models\Product $product */
                         $product = $productVariant->product;
 
-                        if ($value && !$product->allow_customer_remarks) {
+                        if ($value && ! $product->allow_customer_remarks) {
                             $fail('You cant add remarks into this product.');
                         }
                     }
@@ -68,7 +68,7 @@ class UpdateCartLineRequest extends FormRequest
             'remarks.notes' => [
                 'nullable',
                 'string',
-                'max:255'
+                'max:255',
             ],
             'remarks.media' => [
                 'nullable',
@@ -78,7 +78,7 @@ class UpdateCartLineRequest extends FormRequest
                     $purchasable = $cartLine->purchasable;
 
                     if ($purchasable instanceof Product) {
-                        if ($value && !$purchasable->allow_customer_remarks) {
+                        if ($value && ! $purchasable->allow_customer_remarks) {
                             $fail('You cant add media remarks into this product.');
                         }
                     } elseif ($purchasable instanceof ProductVariant) {
@@ -89,7 +89,7 @@ class UpdateCartLineRequest extends FormRequest
                         /** @var \Domain\Product\Models\Product $product */
                         $product = $productVariant->product;
 
-                        if ($value && !$product->allow_customer_remarks) {
+                        if ($value && ! $product->allow_customer_remarks) {
                             $fail('You cant add media remarks into this product.');
                         }
                     }

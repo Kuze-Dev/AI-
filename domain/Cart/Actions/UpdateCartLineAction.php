@@ -25,8 +25,8 @@ class UpdateCartLineAction
 
         if ($cartLineData->remarks) {
             $cartLine->update([
-                'remarks' =>  $cartLineData->remarks->notes !== null ? [
-                    'notes' => $cartLineData->remarks->notes
+                'remarks' => $cartLineData->remarks->notes !== null ? [
+                    'notes' => $cartLineData->remarks->notes,
                 ] : null,
             ]);
 
@@ -37,10 +37,9 @@ class UpdateCartLineAction
                     'cart_line_notes'
                 );
             } else {
-                $cartLine->clearMediaCollection("cart_line_notes");
+                $cartLine->clearMediaCollection('cart_line_notes');
             }
         }
-
 
         return $cartLine;
     }

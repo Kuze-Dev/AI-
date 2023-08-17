@@ -29,7 +29,7 @@ class CreateCartLineAction
         try {
             $product = Product::where((new Product())->getRouteKeyName(), $cartLineData->purchasable_id)->first();
 
-            if (!$product) {
+            if ( ! $product) {
                 throw new Exception('Product not found');
             }
 
@@ -71,8 +71,8 @@ class CreateCartLineAction
 
             if ($cartLineData->remarks) {
                 $cartLine->update([
-                    'remarks' =>  $cartLineData->remarks->notes !== null ? [
-                        'notes' => $cartLineData->remarks->notes
+                    'remarks' => $cartLineData->remarks->notes !== null ? [
+                        'notes' => $cartLineData->remarks->notes,
                     ] : null,
                 ]);
 
@@ -83,10 +83,9 @@ class CreateCartLineAction
                         'cart_line_notes'
                     );
                 } else {
-                    $cartLine->clearMediaCollection("cart_line_notes");
+                    $cartLine->clearMediaCollection('cart_line_notes');
                 }
             }
-
 
             DB::commit();
 
