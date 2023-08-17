@@ -32,7 +32,7 @@ return new class() extends Migration
             $table->integer('discount_id')->nullable();
             $table->string('discount_code')->nullable();
             $table->decimal('shipping_total',  10, 2);
-            $table->string('shipping_method_id')->index();
+            $table->integer('shipping_method_id')->index();
             $table->decimal('total', 10, 2)->index();
             $table->longText('notes')->nullable();
             $table->boolean('is_paid')->default(false);
