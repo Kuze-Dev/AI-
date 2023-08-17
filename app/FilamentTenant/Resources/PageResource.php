@@ -30,7 +30,6 @@ use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\Features\CMS\SitesManagement;
 
 class PageResource extends Resource
 {
@@ -113,7 +112,7 @@ class PageResource extends Resource
                                     );
                                 }),
                         ])
-                        ->hidden(tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+                            ->hidden(tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
                         Forms\Components\Repeater::make('block_contents')
                             ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Page $record, ?array $state) {
                                 if ($record === null || $record->blockContents->isEmpty()) {

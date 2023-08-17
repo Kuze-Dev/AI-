@@ -76,7 +76,7 @@ class FormResource extends Resource
                                 );
                             }),
                     ])
-                    ->hidden(tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+                        ->hidden(tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
                     Forms\Components\Toggle::make('uses_captcha')
                         ->disabled(fn (FormSettings $formSettings) => ! $formSettings->provider)
                         ->helperText(
