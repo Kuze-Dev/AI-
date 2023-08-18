@@ -11,61 +11,57 @@ use Domain\Page\Models\BlockContent;
 
 class CreateBlueprintDataAction
 {
-    private function storeBlueprintData(BlueprintDataData $blueprintDataData): BlueprintData
+    // private function storeBlueprintData(BlueprintDataData $blueprintDataData): BlueprintData
+    // {
+    //     return BlueprintData::create([
+    //         'blueprint_id' => $blueprintDataData->blueprint_id,
+    //         'model_id' => $blueprintDataData->model_id,
+    //         'model_type' => $blueprintDataData->model_type,
+    //         'state_path' => $blueprintDataData->state_path,
+    //         'value' => $blueprintDataData->value,
+    //         'type' => $blueprintDataData->type,
+    //     ]);
+    // }
+
+    // public function execute(BlockContent $blockContent):BlueprintData
+    // {
+    //     $blueprintfieldtype = $blockContent->block->blueprint->schema;
+    //     $data = json_decode($blockContent->data, true);
+
+    //     $statePaths = $this->extractStatePaths($data);
+
+    //     foreach ($statePaths as $statePath) {
+    //       return $this->storeBlueprintData(BlueprintDataData::fromArray($blockContent, $statePath));
+    //     }
+
+
+    // }
+
+    public function extractStatePathsAndFieldType(BlockContent $blockContent, $parentKey = ''): array
     {
-        return BlueprintData::create([
-            'blueprint_id' => $blueprintDataData->blueprint_id,
-            'model_id' => $blueprintDataData->model_id,
-            'model_type' => $blueprintDataData->model_type,
-            'state_path' => $blueprintDataData->state_path,
-            'value' => $blueprintDataData->value,
-            'type' => $blueprintDataData->type,
-        ]);
-    }
-
-    public function execute(BlockContent $blockContent):BlueprintData
-    {
-        $blueprintfieldtype = $blockContent->block->blueprint->schema;
-        $data = json_decode($blockContent->data, true);
-
-        $statePaths = $this->extractStatePaths($data);
-
-        foreach ($statePaths as $statePath) {
-          return $this->storeBlueprintData(BlueprintDataData::fromArray($blockContent, $statePath));
-        }
-
-
-    }
-
-    private function extractStatePathsAndFieldType(BlockContent $blockContent, $parentKey = ''): array
-    {
-        $state_path_data = json_decode($blockContent->data, true);
-        $field_type_data = $blockContent->block?->blueprint?->schema;
-
-        $statePaths = [];
-        foreach ($state_path_data as $key => $value) {
-            $currentKeyPath = ($parentKey !== '') ? "$parentKey.$key" : $key;
-
-            if (is_array($value) || is_object($value)) {
-                $nestedPaths = $this->extractStatePathsAndFieldType($value, $currentKeyPath);
-                $statePaths = array_merge($statePaths, $nestedPaths);
-            } else {
-                $statePaths[] = $currentKeyPath;
-            }
-        }
-
+        $state_path_data = [];
         $typeValues = [];
 
-        foreach ($field_type_data as $key => $value) {
-            if ($key === "type") {
-                $typeValues[] = $value;
-            } elseif (is_array($value) || is_object($value)) {
-                $nestedTypeValues = $this->extractStatePathsAndFieldType($value);
-                $typeValues = array_merge($typeValues, $nestedTypeValues);
+        foreach ($blockContent->block?->blueprint?->schema?->sections as $section) {
+            foreach ($section->fields as $field) {
+                if (isset($field->type)) {
+                    $typeValues[] = $field->type->value;
+                }
+            }
+        }
+
+        foreach ($blockContent->data as $outerKey => $outerValue) {
+            if (is_array($outerValue)) {
+                foreach ($outerValue as $innerKey => $innerValue) {
+                    $concatenatedKey = $outerKey . '.' . $innerKey;
+                    $state_path_data[] = $concatenatedKey;
+                }
             }
         }
 
 
-        return $statePaths;
+
+
+        return [$state_path_data];
     }
 }
