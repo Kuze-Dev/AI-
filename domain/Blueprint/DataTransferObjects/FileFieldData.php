@@ -20,11 +20,13 @@ class FileFieldData extends FieldData
         public readonly array $rules = [],
         public readonly bool $multiple = false,
         public readonly bool $reorder = false,
+        public readonly bool $can_download = false,
         public readonly array $accept = [],
         public readonly ?int $min_size = null,
         public readonly ?int $max_size = null,
         public readonly ?int $min_files = null,
         public readonly ?int $max_files = null,
+        public readonly ?string $helper_text = null,
     ) {
     }
 
@@ -40,11 +42,13 @@ class FileFieldData extends FieldData
             rules: $data['rules'] ?? [],
             multiple: $data['multiple'] ?? false,
             reorder: $data['reorder'] ?? false,
+            can_download: $data['can_download'] ?? false,
             accept: $data['accept'] ?? [],
             min_size: $data['min_size'] ?? null,
             max_size: $data['max_size'] ?? null,
             min_files: $data['min_files'] ?? null,
             max_files: $data['max_files'] ?? null,
+            helper_text: $data['helper_text'] ?? null,
         );
     }
 }

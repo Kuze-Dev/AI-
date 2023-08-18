@@ -4,24 +4,25 @@ declare(strict_types=1);
 
 namespace Domain\Page\Models;
 
-use Domain\Page\Models\Builders\PageBuilder;
+use Illuminate\Support\Str;
+use Domain\Site\Traits\Sites;
+use Spatie\Sluggable\HasSlug;
 use Domain\Admin\Models\Admin;
 use Domain\Page\Enums\Visibility;
-use Domain\Support\MetaData\HasMetaData;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
-use Domain\Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
-use Domain\Support\RouteUrl\HasRouteUrl;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
+use Spatie\Sluggable\SlugOptions;
+use Support\MetaData\HasMetaData;
+use Support\RouteUrl\HasRouteUrl;
 use Spatie\Activitylog\LogOptions;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
+use Domain\Page\Models\Builders\PageBuilder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
+use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 
 /**
  * Domain\Page\Models\Page
@@ -34,14 +35,14 @@ use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Domain\Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
+ * @property-read \Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Admin|null $author
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Page\Models\BlockContent> $blockContents
  * @property-read int|null $block_contents_count
- * @property-read \Domain\Support\MetaData\Models\MetaData|null $metaData
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Support\RouteUrl\Models\RouteUrl> $routeUrls
+ * @property-read \Support\MetaData\Models\MetaData|null $metaData
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Support\RouteUrl\Models\RouteUrl> $routeUrls
  * @property-read int|null $route_urls_count
  * @method static PageBuilder|Page newModelQuery()
  * @method static PageBuilder|Page newQuery()
@@ -67,6 +68,7 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
     use HasRouteUrl;
     use HasMetaData;
     use ConstraintsRelationships;
+    use Sites;
 
     protected $fillable = [
         'author_id',
@@ -140,5 +142,15 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
     public function author(): BelongsTo
     {
         return $this->belongsTo(Admin::class, 'author_id');
+    }
+
+    public function isPublished(): bool
+    {
+        return is_null($this->published_at);
+    }
+
+    public function isHomePage(): bool
+    {
+        return $this->slug === 'home';
     }
 }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Menu\Models;
 
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
@@ -13,6 +13,7 @@ use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Domain\Site\Traits\Sites;
 
 /**
  * Domain\Menu\Models\Menu
@@ -44,6 +45,7 @@ class Menu extends Model
     use HasSlug;
     use LogsActivity;
     use ConstraintsRelationships;
+    use Sites;
 
     protected $fillable = [
         'name',

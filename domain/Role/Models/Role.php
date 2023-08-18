@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Role\Models;
 
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;

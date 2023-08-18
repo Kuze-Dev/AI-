@@ -18,6 +18,8 @@ class NodeResource extends JsonApiResource
             'label' => $this->label,
             'url' => $this->url,
             'target' => $this->target,
+            'type' => $this->type->value,
+            'order' => $this->order,
         ];
     }
 

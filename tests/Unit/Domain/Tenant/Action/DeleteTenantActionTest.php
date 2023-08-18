@@ -6,7 +6,7 @@ use Domain\Tenant\Actions\DeleteTenantAction;
 use Domain\Tenant\Database\Factories\TenantFactory;
 use Domain\Tenant\Models\Tenant;
 
-use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertModelMissing;
 
 it('can delete tenant', function () {
     /** @var Tenant $tenant */
@@ -14,7 +14,7 @@ it('can delete tenant', function () {
         ->withDomains('test')
         ->createOne();
 
-    $tenant = app(DeleteTenantAction::class)->execute($tenant);
+    app(DeleteTenantAction::class)->execute($tenant);
 
-    assertDatabaseCount(Tenant::class, 0);
+    assertModelMissing($tenant);
 });

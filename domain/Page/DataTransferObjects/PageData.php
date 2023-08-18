@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Page\DataTransferObjects;
 
-use Domain\Page\Enums\Visibility;
 use Carbon\Carbon;
-use Domain\Support\MetaData\DataTransferObjects\MetaDataData;
-use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
+use Domain\Page\Enums\Visibility;
+use Support\MetaData\DataTransferObjects\MetaDataData;
+use Support\RouteUrl\DataTransferObjects\RouteUrlData;
 
 class PageData
 {
@@ -19,6 +19,7 @@ class PageData
         public readonly Visibility $visibility = Visibility::PUBLIC,
         public readonly ?Carbon $published_at = null,
         public readonly array $block_contents = [],
+        public readonly array $sites = []
     ) {
     }
 
@@ -26,7 +27,9 @@ class PageData
     {
         return new self(
             name: $data['name'],
-            visibility: Visibility::tryFrom($data['visibility'] ?? '') ?? Visibility::PUBLIC,
+            visibility: ($data['visibility'] ?? null) instanceof Visibility
+                ? $data['visibility']
+                : (Visibility::tryFrom($data['visibility'] ?? '') ?? Visibility::PUBLIC),
             route_url_data: RouteUrlData::fromArray($data['route_url'] ?? []),
             meta_data: MetaDataData::fromArray($data['meta_data']),
             author_id: $data['author_id'] ?? null,
@@ -37,8 +40,9 @@ class PageData
                     data: $blockContentData['data'] ?? null,
                     id: $blockContentData['id'] ?? null,
                 ),
-                $data['block_contents'] ?? []
+                $data['block_contents'] ?? [],
             ),
+            sites: $data['sites'] ?? [],
         );
     }
 }

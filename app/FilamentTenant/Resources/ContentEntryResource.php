@@ -4,32 +4,32 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Resources;
-use App\FilamentTenant\Support\RouteUrlFieldset;
-use App\FilamentTenant\Support\SchemaFormBuilder;
-use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
-use Filament\Tables\Filters\Layout;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Carbon\Carbon;
 use Closure;
-use Domain\Content\Models\ContentEntry;
-use App\FilamentTenant\Support\MetaDataForm;
-use Domain\Content\Models\Builders\ContentEntryBuilder;
-use Domain\Taxonomy\Models\Taxonomy;
-use Domain\Taxonomy\Models\TaxonomyTerm;
-use Filament\Facades\Filament;
-use Filament\Forms\Components\Component;
+use Carbon\Carbon;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Support\Arr;
+use Domain\Site\Models\Site;
+use Filament\Resources\Form;
+use Filament\Resources\Table;
+use Filament\Facades\Filament;
+use Filament\Resources\Resource;
+use App\FilamentTenant\Resources;
+use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Validation\Rules\Unique;
+use Domain\Content\Models\ContentEntry;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\Rules\Unique;
+use Domain\Taxonomy\Models\TaxonomyTerm;
+use Filament\Forms\Components\Component;
 use Illuminate\Database\Eloquent\Builder;
+use App\FilamentTenant\Support\MetaDataForm;
+use App\FilamentTenant\Support\RouteUrlFieldset;
+use App\FilamentTenant\Support\SchemaFormBuilder;
+use Domain\Content\Models\Builders\ContentEntryBuilder;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class ContentEntryResource extends Resource
 {
@@ -101,7 +101,9 @@ class ContentEntryResource extends Resource
                                     ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
                                     ?->dispatchEvent('route_url::update');
                             })
-                            ->required(),
+                            ->required()
+                            ->string()
+                            ->maxLength(255),
                         RouteUrlFieldset::make()
                             ->generateModelForRouteUrlUsing(function ($livewire, ContentEntry|string $model) {
                                 return $model instanceof ContentEntry
@@ -111,6 +113,29 @@ class ContentEntryResource extends Resource
                         Forms\Components\Hidden::make('author_id')
                             ->default(Auth::id()),
                     ]),
+                    Forms\Components\Card::make([
+                        Forms\Components\CheckboxList::make('sites')
+                            ->options(
+                                fn () => Site::orderBy('name')
+                                    ->pluck('name', 'id')
+                                    ->toArray()
+                            )
+                            ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?ContentEntry $record): void {
+                                if ( ! $record) {
+                                    $component->state([]);
+
+                                    return;
+                                }
+
+                                $component->state(
+                                    $record->sites->pluck('id')
+                                        ->intersect(array_keys($component->getOptions()))
+                                        ->values()
+                                        ->toArray()
+                                );
+                            }),
+                    ])
+                        ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
                     Forms\Components\Section::make(trans('Taxonomies'))
                         ->schema([
                             Forms\Components\Group::make()
@@ -159,16 +184,13 @@ class ContentEntryResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('activeRouteUrl.url')
                     ->label('URL')
                     ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->sortable()
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->searchable(),
+                    ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable(['first_name', 'last_name'])
                     ->searchable(query: function (Builder $query, string $search): Builder {
@@ -188,11 +210,6 @@ class ContentEntryResource extends Resource
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable()
-                    ->toggleable()
-                    ->toggledHiddenByDefault(),
             ])
             ->filters([
                 Tables\Filters\Filter::make('taxonomies')
@@ -250,7 +267,7 @@ class ContentEntryResource extends Resource
                     ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
             ])
             ->reorderable('order')
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->url(fn ($livewire, ContentEntry $record) => self::getUrl('edit', [$livewire->ownerRecord, $record])),

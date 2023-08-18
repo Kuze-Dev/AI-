@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @mixin \Domain\Support\MetaData\Models\MetaData
+ * @mixin \Support\MetaData\Models\MetaData
  */
 class MetaDataResource extends JsonApiResource
 {

@@ -19,6 +19,7 @@ class DatetimeFieldData extends FieldData
         public readonly ?Carbon $min = null,
         public readonly ?Carbon $max = null,
         public readonly ?string $format = null,
+        public readonly ?string $helper_text = null,
     ) {
     }
 
@@ -43,6 +44,7 @@ class DatetimeFieldData extends FieldData
             min: $data['min'] ?? null,
             max: $data['max'] ?? null,
             format: $data['format'] ?? null,
+            helper_text: $data['helper_text'] ?? null,
         );
     }
 }

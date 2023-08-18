@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Domain\Content\DataTransferObjects;
 
 use Carbon\Carbon;
-use Domain\Support\MetaData\DataTransferObjects\MetaDataData;
-use Domain\Support\RouteUrl\DataTransferObjects\RouteUrlData;
+use Support\MetaData\DataTransferObjects\MetaDataData;
+use Support\RouteUrl\DataTransferObjects\RouteUrlData;
 
 class ContentEntryData
 {
@@ -18,6 +18,7 @@ class ContentEntryData
         public readonly ?Carbon $published_at = null,
         public readonly array $data = [],
         public readonly ?int $author_id = null,
+        public readonly array $sites = [],
     ) {
     }
 
@@ -30,7 +31,8 @@ class ContentEntryData
             taxonomy_terms: $data['taxonomy_terms'] ?? [],
             data: $data['data'],
             author_id: $data['author_id'] ?? null,
-            meta_data: MetaDataData::fromArray($data['meta_data'])
+            meta_data: MetaDataData::fromArray($data['meta_data']),
+            sites: $data['sites'] ?? [],
         );
     }
 }

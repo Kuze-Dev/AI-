@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @mixin \Domain\Support\RouteUrl\Models\RouteUrl
+ * @mixin \Support\RouteUrl\Models\RouteUrl
  */
 class RouteUrlResource extends JsonApiResource
 {

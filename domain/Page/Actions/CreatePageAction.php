@@ -6,8 +6,8 @@ namespace Domain\Page\Actions;
 
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
-use Domain\Support\MetaData\Actions\CreateMetaDataAction;
-use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
+use Support\MetaData\Actions\CreateMetaDataAction;
+use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
 class CreatePageAction
 {
@@ -34,6 +34,9 @@ class CreatePageAction
         }
 
         $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url_data);
+
+        $page->sites()
+            ->attach($pageData->sites);
 
         return $page;
     }

@@ -10,7 +10,6 @@ use Filament\Facades\Filament;
 use Spatie\Activitylog\ActivitylogServiceProvider;
 
 use function Pest\Laravel\assertDatabaseCount;
-use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -31,7 +30,6 @@ it('log', function () {
 
     $activityModel = ActivitylogServiceProvider::determineActivityModel();
     $activityModel::truncate();
-    assertDatabaseEmpty($activityModel);
 
     livewire(DeployStaticSite::class)
         ->call('deploy');
