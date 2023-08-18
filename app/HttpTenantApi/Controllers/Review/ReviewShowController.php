@@ -52,7 +52,7 @@ class ReviewShowController
                                 default => '',
                             };
                         }
-                    ), 
+                    ),
                 ])
                 ->jsonPaginate()
         );

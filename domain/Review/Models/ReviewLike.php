@@ -17,18 +17,17 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|ReviewLike query()
  * @mixin \Eloquent
  */
-class ReviewLike extends Model 
+class ReviewLike extends Model
 {
     protected $fillable = [
         'customer_id',
     ];
 
-
     public function review()
     {
         return $this->belongsTo(Review::class);
     }
-    
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);

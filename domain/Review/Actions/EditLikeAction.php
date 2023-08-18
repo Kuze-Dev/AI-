@@ -9,7 +9,8 @@ use Domain\Review\Models\Review;
 use Domain\Review\Models\ReviewLike;
 
 class EditLikeAction
-{   public function execute(int $reviewId, Customer $customer): Review
+{
+    public function execute(int $reviewId, Customer $customer): Review
     {
         $review = Review::findOrFail($reviewId);
         $hasLiked = $review->review_likes->contains('customer_id', $customer->id);
@@ -24,6 +25,7 @@ class EditLikeAction
         }
 
         $review->load('review_likes');
+
         return $review;
     }
 }

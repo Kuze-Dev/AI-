@@ -74,7 +74,7 @@ class UpdateOrderRequest extends FormRequest
                 'min:1',
                 'max:500',
             ],
-            'proof_of_payment' => 'nullable|string|url',
+            'proof_of_payment' => 'nullable|string',
         ];
     }
 }

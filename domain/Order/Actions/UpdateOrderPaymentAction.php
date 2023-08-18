@@ -18,6 +18,8 @@ use Domain\Payments\DataTransferObjects\CreatepaymentData;
 use Domain\Payments\DataTransferObjects\PaymentDetailsData;
 use Domain\Payments\DataTransferObjects\AmountData;
 use Domain\Payments\DataTransferObjects\TransactionData;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class UpdateOrderPaymentAction
 {
@@ -65,25 +67,30 @@ class UpdateOrderPaymentAction
             throw new BadRequestHttpException('Invalid action');
         }
 
-        $image = $this->convertUrlToUploadedFile($proofOfPayment);
+        if (Str::contains($proofOfPayment, 'tmp/')) {
+            if (Storage::disk('s3')->exists($proofOfPayment)) {
 
-        if ($image instanceof UploadedFile) {
-            $order->update([
-                'status' => OrderStatuses::FORAPPROVAL,
-            ]);
+                $image = $this->convertUrlToUploadedFile($proofOfPayment);
 
-            $payment->update([
-                'customer_message' => $notes,
-            ]);
+                if ($image instanceof UploadedFile) {
+                    $order->update([
+                        'status' => OrderStatuses::FORAPPROVAL,
+                    ]);
 
-            app(UploadProofofPaymentAction::class)->execute(
-                $payment,
-                new ProofOfPaymentData(
-                    $image
-                )
-            );
-        } else {
-            throw new BadRequestHttpException('Invalid media');
+                    $payment->update([
+                        'customer_message' => $notes,
+                    ]);
+
+                    app(UploadProofofPaymentAction::class)->execute(
+                        $payment,
+                        new ProofOfPaymentData(
+                            $image
+                        )
+                    );
+                } else {
+                    throw new BadRequestHttpException('Invalid media');
+                }
+            }
         }
     }
 
@@ -126,7 +133,7 @@ class UpdateOrderPaymentAction
 
     private function convertUrlToUploadedFile(string $url): UploadedFile|string
     {
-        $fileContent = file_get_contents($url);
+        $fileContent = Storage::disk('s3')->get($url);
 
         $tempFilePath = (string) tempnam(sys_get_temp_dir(), 'upload');
 

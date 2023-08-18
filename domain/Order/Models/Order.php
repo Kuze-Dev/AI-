@@ -182,7 +182,6 @@ class Order extends Model implements HasMedia, PayableInterface
         return $this->belongsTo(ShippingMethod::class, 'shipping_method_id');
     }
 
-
     public function registerMediaCollections(): void
     {
         $registerMediaConversions = function () {
