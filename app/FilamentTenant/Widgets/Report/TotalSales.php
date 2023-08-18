@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Widgets\Report;
 use App\FilamentTenant\Widgets\Report\utils\ChartColor;
 use App\FilamentTenant\Widgets\Report\utils\DateLabelGenerator;
 use App\FilamentTenant\Widgets\Report\utils\DateRangeCalculator;
+use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
 use Filament\Widgets\BarChartWidget;
 use Flowframe\Trend\Trend;
@@ -34,7 +35,7 @@ class TotalSales extends BarChartWidget
         $startDate = $dateRange['start'];
         $endDate = $dateRange['end'];
 
-        $salesData = Trend::query(Order::whereStatus('fulfilled'))
+        $salesData = Trend::query(Order::whereStatus(OrderStatuses::FULFILLED))
             ->between(
                 start: $startDate,
                 end: $endDate

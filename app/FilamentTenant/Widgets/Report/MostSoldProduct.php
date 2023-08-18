@@ -6,6 +6,8 @@ namespace App\FilamentTenant\Widgets\Report;
 
 use App\FilamentTenant\Widgets\Report\utils\ChartColor;
 use App\FilamentTenant\Widgets\Report\utils\DateRangeCalculator;
+use App\FilamentTenant\Widgets\Report\utils\PercentageCalculator;
+use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\OrderLine;
 use Filament\Widgets\PieChartWidget;
 
@@ -29,7 +31,7 @@ class MostSoldProduct extends PieChartWidget
         $activeFilter = $this->filter;
 
         $query = OrderLine::whereHas('order', function ($query) {
-            $query->where('status', 'fulfilled');
+            $query->where('status', OrderStatuses::FULFILLED);
         });
 
         $query = DateRangeCalculator::pieDateRange($query, $activeFilter);
@@ -39,8 +41,9 @@ class MostSoldProduct extends PieChartWidget
             ->groupBy('name')->limit(10)->orderByDesc('count')
             ->get()->toArray();
 
-        $productNames = collect($products)->pluck('name')->toArray();
         $productCounts = collect($products)->pluck('count')->toArray();
+        $percentages = PercentageCalculator::calculatePercentages($products);
+        $productNames = PercentageCalculator::formatProductNamesWithPercentages($products, $percentages);
 
         return [
             'datasets' => [

@@ -6,12 +6,13 @@ namespace App\FilamentTenant\Widgets\Report;
 
 use App\FilamentTenant\Widgets\Report\utils\ChartColor;
 use App\FilamentTenant\Widgets\Report\utils\DateRangeCalculator;
+use App\FilamentTenant\Widgets\Report\utils\PercentageCalculator;
 use Domain\Order\Models\OrderLine;
 use Filament\Widgets\PieChartWidget;
 
 class LeastSoldProduct extends PieChartWidget
 {
-    protected static ?string $heading = 'List Sold Product';
+    protected static ?string $heading = 'Least Sold Product';
     public ?string $filter = 'allTime';
 
     protected function getFilters(): ?array
@@ -39,13 +40,14 @@ class LeastSoldProduct extends PieChartWidget
             ->groupBy('name')->limit(10)
             ->get()->toArray();
 
-        $productNames = collect($products)->pluck('name')->toArray();
         $productCounts = collect($products)->pluck('count')->toArray();
+        $percentages = PercentageCalculator::calculatePercentages($products);
+        $productNames = PercentageCalculator::formatProductNamesWithPercentages($products, $percentages);
 
         return [
             'datasets' => [
                 [
-                    'label' => 'List Sold Product',
+                    'label' => 'Least Sold Product',
                     'data' => $productCounts,
                     'borderColor' => ChartColor::$PIECHART,
                     'backgroundColor' => ChartColor::$PIECHART,
