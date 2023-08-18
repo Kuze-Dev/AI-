@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Page\Actions;
 
 use Domain\Blueprint\Actions\CreateBlueprintDataAction;
+use Domain\Blueprint\DataTransferObjects\BlueprintDataData;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Support\MetaData\Actions\CreateMetaDataAction;
@@ -34,7 +35,9 @@ class CreatePageAction
         foreach ($pageData->block_contents as $blockContentData) {
            $blockContent =  $this->createBlockContent->execute($page, $blockContentData);
 
-           $this->;
+            $this->createBlueprintDataAction->execute($blockContent);
+
+
         }
 
         $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url_data);

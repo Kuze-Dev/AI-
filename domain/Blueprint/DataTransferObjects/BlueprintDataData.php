@@ -16,10 +16,10 @@ class BlueprintDataData
         public readonly string $model_type,
         public readonly string $state_path,
         public readonly ?array $value,
-        public readonly FieldType $type = FieldType::MEDIA,
+        public readonly FieldType $type,
     ) {
     }
-    public static function fromArray(array $data, BlockContent $block_content): self
+    public static function fromArray(BlockContent $block_content, string $state_path): self
     {
         if ( ! $data['type'] instanceof FieldType) {
             $data['type'] = FieldType::from($data['type']);
@@ -29,8 +29,9 @@ class BlueprintDataData
             blueprint_id: $block_content->block?->blueprint?->getKey(),
             model_id: $block_content->getKey(),
             model_type: $block_content->getMorphClass(),
-            state_path: $data['state_path'] ?? (string) Str::of($data['title'])->lower()->snake(),
+            state_path: $state_path,
             value: $data['value'] ?? [],
+            type: $block_content->f
         );
     }
 }

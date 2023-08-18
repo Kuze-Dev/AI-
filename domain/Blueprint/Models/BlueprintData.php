@@ -6,6 +6,7 @@ namespace Domain\Blueprint\Models;
 
 use Domain\Blueprint\DataTransferObjects\MediaFieldData;
 use Domain\Blueprint\Enums\BlueprintDataType;
+use Domain\Blueprint\Enums\FieldType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -27,7 +28,7 @@ class BlueprintData extends Model implements HasMedia
 
     protected $casts = [
         'type' => BlueprintDataType::class,
-        'value' => 'array', // TODO: DTO
+        'value' => MediaFieldData::class, // TODO: DTO
     ];
 
     public function blueprint(): BelongsTo
