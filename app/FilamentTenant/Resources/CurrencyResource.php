@@ -48,17 +48,12 @@ class CurrencyResource extends Resource
                     ->label('Symbol')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\ToggleColumn::make('enabled')->label('status')
+                Tables\Columns\ToggleColumn::make('enabled')->label('status')->disabled(function (Currency $record) {
+                    return $record->enabled;
+                })
                     ->updateStateUsing(function (Currency $record) {
                         return app(UpdateCurrencyEnabledAction::class)->execute($record);
                     }),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->sortable()
-                    ->toggleable(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->sortable()
-                    ->toggleable(),
-
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('enabled')
@@ -68,7 +63,12 @@ class CurrencyResource extends Resource
                         '0' => 'Not Selected',
                     ]),
             ])
-            ->actions([])
+            ->actions([Tables\Actions\EditAction::make()
+                ->label('Edit Status')
+                ->modalHeading('Change enabled currency?')
+                ->requiresConfirmation()->action(function (Currency $record) {
+                    return app(UpdateCurrencyEnabledAction::class)->execute($record);
+                })])
             ->bulkActions([])
             ->defaultSort('id', 'asc');
     }
