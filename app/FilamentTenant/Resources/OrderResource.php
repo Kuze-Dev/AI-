@@ -168,42 +168,32 @@ class OrderResource extends Resource
                                             }),
                                     ]),
                             ])->collapsible(),
-                        Forms\Components\Section::make(trans('Payment Method'))
+                        Forms\Components\Section::make(trans('Others'))
                             ->schema([
-                                Forms\Components\FileUpload::make('payment_image')
-                                    ->formatStateUsing(function (Order $record) {
-                                        $record->load('payments.paymentMethod');
+                                Forms\Components\Grid::make(2)
+                                    ->schema([
 
-                                        /** @var \Domain\Payments\Models\Payment $payment */
-                                        $payment = $record->payments->first();
+                                        Forms\Components\Placeholder::make('payment_method')
+                                            ->label(trans('Payment Method'))
+                                            ->content(function (Order $record): string {
+                                                $record->load('payments.paymentMethod');
 
-                                        return $payment->paymentMethod?->getMedia('logo')
-                                            ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                                            ->toArray() ?? [];
-                                    })
-                                    ->disabled()
-                                    ->disableLabel()
-                                    ->image()
-                                    ->imagePreviewHeight('150')
-                                    ->getUploadedFileUrlUsing(static function (
-                                        Forms\Components\FileUpload $component,
-                                        string $file
-                                    ): ?string {
-                                        $mediaClass = config('media-library.media_model', Media::class);
+                                                /** @var \Domain\Payments\Models\Payment $payment */
+                                                $payment = $record->payments->first();
 
-                                        /** @var ?Media $media */
-                                        $media = $mediaClass::findByUuid($file);
+                                                return $payment->paymentMethod->title;
+                                            }),
+                                        Forms\Components\Placeholder::make('shipping_method')
+                                            ->label(trans('Shipping Method'))
+                                            ->content(function (Order $record): string {
+                                                $record->load('shippingMethod');
 
-                                        if ($component->getVisibility() === 'private') {
-                                            try {
-                                                return $media?->getTemporaryUrl(now()->addMinutes(5));
-                                            } catch (Throwable $exception) {
-                                                // This driver does not support creating temporary URLs.
-                                            }
-                                        }
+                                                /** @var \Domain\ShippingMethod\Models\ShippingMethod $shippingMethod */
+                                                $shippingMethod = $record->shippingMethod;
 
-                                        return $media?->getUrl();
-                                    }),
+                                                return $shippingMethod->title;
+                                            }),
+                                    ])
                             ])->collapsible(),
                     ])->columnSpan(2),
                 self::summaryCard(),
@@ -233,7 +223,7 @@ class OrderResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('total')
                     ->formatStateUsing(function (Order $record) {
-                        return $record->currency_symbol . ' ' . $record->total;
+                        return $record->currency_symbol . ' ' . number_format((float) $record->total, 2, '.', ',');
                     })
                     ->label(trans('Total'))
                     ->sortable(),
@@ -294,16 +284,16 @@ class OrderResource extends Resource
                     }),
                 Tables\Filters\SelectFilter::make('status')->label(trans('Status'))
                     ->options([
-                        OrderStatuses::PROCESSING->value => trans('Processing'),
                         OrderStatuses::PENDING->value => trans('Pending'),
+                        OrderStatuses::FORPAYMENT->value => trans('For Payment'),
+                        OrderStatuses::FORAPPROVAL->value => trans('For Approval'),
+                        OrderStatuses::PROCESSING->value => trans('Processing'),
                         OrderStatuses::CANCELLED->value => trans('Cancelled'),
                         OrderStatuses::REFUNDED->value => trans('Refunded'),
                         OrderStatuses::PACKED->value => trans('Packed'),
                         OrderStatuses::SHIPPED->value => trans('Shipped'),
                         OrderStatuses::DELIVERED->value => trans('Delivered'),
                         OrderStatuses::FULFILLED->value => trans('Fulfilled'),
-                        OrderStatuses::FORPAYMENT->value => trans('For Payment'),
-                        OrderStatuses::FORAPPROVAL->value => trans('For Approval'),
                     ])
                     ->attribute('status'),
             ])
@@ -315,9 +305,7 @@ class OrderResource extends Resource
                 //     ->color('primary')
                 //     ->icon('heroicon-o-check')
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()->color('primary'),
-            ])
+            ->actions([])
             ->defaultSort('id', 'DESC');
     }
 
@@ -376,11 +364,10 @@ class OrderResource extends Resource
                             ->inline()
                             ->formatStateUsing(function ($state) {
                                 /** @phpstan-ignore-next-line */
-                                $format ??= config('tables.date_format');
                                 $formattedState = Carbon::parse($state)
                                     /** @phpstan-ignore-next-line */
                                     ->setTimezone(Auth::user()?->timezone)
-                                    ->translatedFormat($format);
+                                    ->translatedFormat('jS F Y h:i A');
 
                                 return $formattedState;
                             }),
@@ -404,7 +391,7 @@ class OrderResource extends Resource
                             ->readOnly(),
                         Support\TextLabel::make('sub_total')
                             ->formatStateUsing(function (Order $record) {
-                                return $record->currency_symbol . ' ' . number_format($record->sub_total, 2, '.', '');
+                                return $record->currency_symbol . ' ' . number_format($record->sub_total, 2, '.', ',');
                             })
                             ->alignRight()
                             ->size('md')
@@ -423,7 +410,7 @@ class OrderResource extends Resource
                             ->size('md')
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
-                                return $record->currency_symbol . ' ' . number_format($record->shipping_total, 2, '.', '');
+                                return $record->currency_symbol . ' ' . number_format($record->shipping_total, 2, '.', ',');
                             }),
                     ]),
                 Forms\Components\Grid::make(2)
@@ -441,7 +428,7 @@ class OrderResource extends Resource
                             ->size('md')
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
-                                return $record->currency_symbol . ' ' . number_format($record->tax_total, 2, '.', '');
+                                return $record->currency_symbol . ' ' . number_format($record->tax_total, 2, '.', ',');
                             }),
                     ]),
                 Forms\Components\Grid::make(2)
@@ -457,7 +444,7 @@ class OrderResource extends Resource
                             ->size('md')
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
-                                return $record->currency_symbol . ' ' . number_format($record->discount_total, 2, '.', '');
+                                return $record->currency_symbol . ' ' . number_format($record->discount_total, 2, '.', ',');
                             }),
                     ]),
                 Forms\Components\Grid::make(2)
@@ -491,7 +478,7 @@ class OrderResource extends Resource
                             ->color('primary')
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
-                                return $record->currency_symbol . ' ' . number_format($record->total, 2, '.', '');
+                                return $record->currency_symbol . ' ' . number_format($record->total, 2, '.', ',');
                             }),
                     ]),
             ])->columnSpan(1);
@@ -511,17 +498,16 @@ class OrderResource extends Resource
                         Forms\Components\Select::make('status_options')
                             ->label('')
                             ->options([
-                                OrderStatuses::PROCESSING->value => trans('Processing'),
                                 OrderStatuses::PENDING->value => trans('Pending'),
+                                OrderStatuses::FORPAYMENT->value => trans('For Payment'),
+                                OrderStatuses::FORAPPROVAL->value => trans('For Approval'),
+                                OrderStatuses::PROCESSING->value => trans('Processing'),
                                 OrderStatuses::CANCELLED->value => trans('Cancelled'),
                                 OrderStatuses::REFUNDED->value => trans('Refunded'),
                                 OrderStatuses::PACKED->value => trans('Packed'),
                                 OrderStatuses::SHIPPED->value => trans('Shipped'),
                                 OrderStatuses::DELIVERED->value => trans('Delivered'),
                                 OrderStatuses::FULFILLED->value => trans('Fulfilled'),
-                                OrderStatuses::FORPAYMENT->value => trans('For Payment'),
-                                OrderStatuses::FORAPPROVAL->value => trans('For Approval'),
-
                             ])
                             ->disablePlaceholderSelection()
                             ->formatStateUsing(function () use ($record) {
@@ -642,7 +628,7 @@ class OrderResource extends Resource
                     ->size('sm')
                     ->action(function () use ($order, $set) {
 
-                        $isPaid = ! $order->is_paid;
+                        $isPaid = !$order->is_paid;
 
                         $result = $order->update([
                             'is_paid' => $isPaid,
@@ -697,7 +683,7 @@ class OrderResource extends Resource
                         /** @var \Domain\Payments\Models\Payment $payment */
                         $payment = $order->payments->first();
 
-                        if ( ! is_null($payment->remarks)) {
+                        if (!is_null($payment->remarks)) {
                             Notification::make()
                                 ->title(trans('Invalid action.'))
                                 ->warning()
