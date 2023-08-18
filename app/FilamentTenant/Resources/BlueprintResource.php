@@ -238,6 +238,7 @@ class BlueprintResource extends Resource
                 Forms\Components\Toggle::make('multiple')
                     ->reactive(),
                 Forms\Components\Toggle::make('reorder'),
+                Forms\Components\Toggle::make('can_download'),
                 Forms\Components\TextInput::make('accept')
                     ->afterStateHydrated(function (Closure $set, ?array $state): void {
                         $set('accept', implode(',', $state ?? []));

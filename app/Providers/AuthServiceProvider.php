@@ -36,6 +36,7 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Content\Models\ContentEntry::class => \App\Policies\ContentEntryPolicy::class,
         \Domain\Globals\Models\Globals::class => \App\Policies\GlobalsPolicy::class,
         \Domain\Internationalization\Models\Locale::class => \App\Policies\LocalePolicy::class,
+        \Domain\Site\Models\Site::class => \App\Policies\SitePolicy::class,
     ];
 
     /** Register any authentication / authorization services. */

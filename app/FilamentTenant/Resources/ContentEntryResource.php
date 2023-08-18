@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Support\Arr;
+use Domain\Site\Models\Site;
 use Filament\Resources\Form;
 use Filament\Resources\Table;
 use Filament\Facades\Filament;
@@ -119,6 +120,29 @@ class ContentEntryResource extends Resource
                         Forms\Components\Hidden::make('author_id')
                             ->default(Auth::id()),
                     ]),
+                    Forms\Components\Card::make([
+                        Forms\Components\CheckboxList::make('sites')
+                            ->options(
+                                fn () => Site::orderBy('name')
+                                    ->pluck('name', 'id')
+                                    ->toArray()
+                            )
+                            ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?ContentEntry $record): void {
+                                if ( ! $record) {
+                                    $component->state([]);
+
+                                    return;
+                                }
+
+                                $component->state(
+                                    $record->sites->pluck('id')
+                                        ->intersect(array_keys($component->getOptions()))
+                                        ->values()
+                                        ->toArray()
+                                );
+                            }),
+                    ])
+                        ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
                     Forms\Components\Section::make(trans('Taxonomies'))
                         ->schema([
                             Forms\Components\Group::make()

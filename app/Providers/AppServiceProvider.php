@@ -32,6 +32,7 @@ use Illuminate\Validation\Rules\Password;
 use Laravel\Pennant\Feature;
 use Stancl\Tenancy\Database\Models\Tenant;
 use TiMacDonald\JsonApi\JsonApiResource;
+use Domain\Site\Models\Site;
 
 /** @property \Illuminate\Foundation\Application $app */
 class AppServiceProvider extends ServiceProvider
@@ -71,6 +72,7 @@ class AppServiceProvider extends ServiceProvider
             Globals::class,
             MetaData::class,
             Locale::class,
+            Site::class,
         ]);
 
         Password::defaults(

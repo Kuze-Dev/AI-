@@ -37,6 +37,9 @@ class CreatePageAction
 
         $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url_data);
 
+        $page->sites()
+            ->attach($pageData->sites);
+
         return $page;
     }
 }

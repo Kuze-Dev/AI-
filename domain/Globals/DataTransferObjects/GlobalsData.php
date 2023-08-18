@@ -10,6 +10,7 @@ class GlobalsData
         public readonly string $name,
         public readonly string $blueprint_id,
         public readonly array $data = [],
+        public readonly array $sites = [],
     ) {
     }
 
@@ -19,6 +20,7 @@ class GlobalsData
             name: $data['name'],
             blueprint_id: $data['blueprint_id'],
             data: $data['data'] ?? [],
+            sites: $data['sites'] ?? [],
         );
     }
 }

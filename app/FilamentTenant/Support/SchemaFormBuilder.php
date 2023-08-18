@@ -154,6 +154,10 @@ class SchemaFormBuilder extends Component
                 ->imagePreviewHeight('256');
         }
 
+        if ($fileFieldData->can_download) {
+            $fileUpload->enableDownload($fileFieldData->can_download);
+        }
+
         if ($fileFieldData->reorder) {
             $fileUpload->enableReordering($fileFieldData->reorder);
         }

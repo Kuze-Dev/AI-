@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Page\DataTransferObjects;
 
-use Domain\Page\Enums\Visibility;
 use Carbon\Carbon;
+use Domain\Page\Enums\Visibility;
 use Support\MetaData\DataTransferObjects\MetaDataData;
 use Support\RouteUrl\DataTransferObjects\RouteUrlData;
 
@@ -20,6 +20,7 @@ class PageData
         public readonly Visibility $visibility = Visibility::PUBLIC,
         public readonly ?Carbon $published_at = null,
         public readonly array $block_contents = [],
+        public readonly array $sites = []
     ) {
     }
 
@@ -41,8 +42,9 @@ class PageData
                     data: $blockContentData['data'] ?? null,
                     id: $blockContentData['id'] ?? null,
                 ),
-                $data['block_contents'] ?? []
+                $data['block_contents'] ?? [],
             ),
+            sites: $data['sites'] ?? [],
         );
     }
 }

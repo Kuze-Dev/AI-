@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\MenuResource\Pages\EditMenu;
 use Domain\Menu\Database\Factories\MenuFactory;
 use Domain\Menu\Database\Factories\NodeFactory;
+use Domain\Site\Database\Factories\SiteFactory;
 use Domain\Menu\Enums\NodeType;
 use Domain\Menu\Enums\Target;
 use Domain\Menu\Models\Menu;
@@ -16,6 +17,7 @@ use function Pest\Livewire\livewire;
 beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
+    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
     loginAsSuperAdmin();
 });
 
@@ -36,10 +38,14 @@ it('can edit menu', function () {
         ->has(NodeFactory::new(), 'nodes')
         ->createOne();
 
+    $site = SiteFactory::new()
+        ->createOne();
+
     livewire(EditMenu::class, ['record' => $menu->getRouteKey()])
         ->fillForm(
             [
                 'name' => 'Test Edit Menu',
+                'sites' => [$site->id],
                 'nodes' => [
                     [
                         'label' => 'Test Edit Node',
@@ -62,4 +68,6 @@ it('can edit menu', function () {
         ->assertHasNoFormErrors();
 
     assertDatabaseHas(Menu::class, ['name' => 'Test Edit Menu']);
+
+    expect($menu->sites->pluck('id'))->toContain($site->id);
 });
