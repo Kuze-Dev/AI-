@@ -486,10 +486,16 @@ class BlueprintResource extends Resource
                     })
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('min_size')
+                    ->helperText(new HtmlString(<<<HTML
+                         in kb
+                        HTML))
                     ->numeric()
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_size')
+                    ->helperText(new HtmlString(<<<HTML
+                         in kb
+                        HTML))
                     ->numeric()
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),

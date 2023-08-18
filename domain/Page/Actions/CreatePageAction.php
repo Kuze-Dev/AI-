@@ -16,7 +16,7 @@ class CreatePageAction
         protected CreateBlockContentAction $createBlockContent,
         protected CreateMetaDataAction $createMetaTags,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
-        protected CreateBlueprintDataAction $createBlueprintData,
+        protected CreateBlueprintDataAction $createBlueprintDataAction,
     ) {
     }
 
@@ -32,7 +32,9 @@ class CreatePageAction
         $this->createMetaTags->execute($page, $pageData->meta_data);
 
         foreach ($pageData->block_contents as $blockContentData) {
-            $this->createBlockContent->execute($page, $blockContentData);
+           $blockContent =  $this->createBlockContent->execute($page, $blockContentData);
+
+           $this->;
         }
 
         $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url_data);

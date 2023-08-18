@@ -13,6 +13,8 @@ class CreateBlueprintDataAction
     {
         return BlueprintData::create([
             'blueprint_id' => $blueprintDataData->blueprint_id,
+            'model_id' => $blueprintDataData->model_id,
+            'model_type' => $blueprintDataData->model_type,
             'state_path' => $blueprintDataData->state_path,
             'value' => $blueprintDataData->value,
             'type' => $blueprintDataData->type,
