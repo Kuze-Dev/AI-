@@ -248,6 +248,19 @@ class OrderResource extends Resource
 
                         return ucfirst($state);
                     })
+                    ->color(function ($state) {
+                        return match ($state) {
+                            OrderStatuses::FORAPPROVAL->value => 'warning',
+                            OrderStatuses::REFUNDED->value,
+                            OrderStatuses::CANCELLED->value => 'danger',
+                            OrderStatuses::FULFILLED->value,
+                            OrderStatuses::DELIVERED->value => 'success',
+                            OrderStatuses::PACKED->value,
+                            OrderStatuses::PROCESSING->value,
+                            OrderStatuses::SHIPPED->value => 'primary',
+                            default => 'secondary',
+                        };
+                    })
                     ->sortable(),
             ])
             ->filters([
@@ -345,6 +358,20 @@ class OrderResource extends Resource
                                 }
 
                                 return trans(ucfirst($state));
+                            })
+                            ->color(function ($state) {
+                                $newState = str_replace(' ', '_', strtolower($state));
+                                return match ($newState) {
+                                    OrderStatuses::FORAPPROVAL->value => 'warning',
+                                    OrderStatuses::REFUNDED->value,
+                                    OrderStatuses::CANCELLED->value => 'danger',
+                                    OrderStatuses::FULFILLED->value,
+                                    OrderStatuses::DELIVERED->value => 'success',
+                                    OrderStatuses::PROCESSING->value,
+                                    OrderStatuses::PACKED->value,
+                                    OrderStatuses::SHIPPED->value => 'primary',
+                                    default => 'secondary',
+                                };
                             })
                             ->inline()
                             ->alignLeft(),
