@@ -106,11 +106,19 @@ class PageResource extends Resource
                             Forms\Components\CheckboxList::make('sites')
                                 ->reactive()
                                 ->rule(fn (?Page $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
-                                ->options(
-                                    fn () => Site::orderBy('name')
+                                ->options(function () {
+
+                                if(auth('admin')->user()->hasRole(config('domain.role.super_admin'))){
+                                    return Site::orderBy('name')
                                         ->pluck('name', 'id')
-                                        ->toArray()
-                                )
+                                        ->toArray();
+                                    }
+                                  
+                                    return  Site::orderBy('name')
+                                    ->whereHas('siteManager', fn ($query) => $query->where('admin_id',auth('admin')->user()->id) )
+                                    ->pluck('name', 'id')
+                                    ->toArray();
+                                })
                                 ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Page $record): void {
                                     if ( ! $record) {
                                         $component->state([]);

@@ -54,7 +54,7 @@ class SiteResource extends Resource
                                 ->formatStateUsing(fn (?Site $record) => $record ? $record->siteManager->pluck('id')->toArray() : [])
                                 ->columns(2)
                                 ->options(function () {
-                                    return  \Domain\Admin\Models\Admin::permission('sites.siteManager')
+                                    return  \Domain\Admin\Models\Admin::permission('site.siteManager')
                                         ->get()
                                         ->pluck('full_name', 'id')
                                         ->toArray();
@@ -78,7 +78,9 @@ class SiteResource extends Resource
             ])
             ->actions([
                 Tables\Actions\Action::make('deploy')
+                    ->button()
                     ->icon('heroicon-o-cog')
+                    ->color('secondary')
                     ->action(function (Site $record) {
 
                         if (is_null($record->deploy_hook)) {
@@ -122,9 +124,12 @@ class SiteResource extends Resource
 
                     }),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\ForceDeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\ForceDeleteAction::make(),
+                    Tables\Actions\RestoreAction::make(),
+                ]),
+             
             ]);
     }
 

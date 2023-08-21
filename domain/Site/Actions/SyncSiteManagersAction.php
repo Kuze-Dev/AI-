@@ -11,8 +11,8 @@ class SyncSiteManagersAction
 {
     public function execute(Site $model, SiteData $siteData): void
     {
-
-        $model->siteManager()->sync($siteData->site_manager ?? []);
-
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+            $model->siteManager()->sync($siteData->site_manager ?? []);
+        }
     }
 }
