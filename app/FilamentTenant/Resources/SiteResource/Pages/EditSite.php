@@ -35,11 +35,10 @@ class EditSite extends EditRecord
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
+
         return DB::transaction(
             fn () => app(UpdateSiteAction::class)
-                ->execute($record, new SiteData(
-                    name: $data['name']
-                ))
+                ->execute($record, SiteData::fromArray($data))
         );
     }
 }

@@ -9,11 +9,19 @@ use Domain\Site\Models\Site;
 
 class UpdateSiteAction
 {
+    public function __construct(
+        protected SyncSiteManagersAction $syncSiteManagers,
+    ) {
+    }
+
     public function execute(Site $site, SiteData $siteData): Site
     {
         $site->update([
             'name' => $siteData->name,
+            'deploy_hook' => $siteData->deploy_hook,
         ]);
+
+        $this->syncSiteManagers->execute($site, $siteData);
 
         return $site;
     }

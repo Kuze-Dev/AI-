@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Site\Models;
 
+use Domain\Admin\Models\Admin;
 use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Models\Activity;
@@ -37,6 +38,7 @@ class Site extends Model
 
     protected $fillable = [
         'name',
+        'deploy_hook',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -45,6 +47,12 @@ class Site extends Model
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
+    }
+
+    public function siteManager()
+    {
+
+        return $this->belongsToMany(Admin::class);
     }
 
     public function getActivitySubjectDescription(Activity $activity): string
