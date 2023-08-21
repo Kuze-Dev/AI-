@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Product\DataTransferObjects;
 
+use Domain\Taxonomy\DataTransferObjects\TaxonomyTermData;
 use Support\MetaData\DataTransferObjects\MetaDataData;
 use Illuminate\Http\UploadedFile;
 
@@ -24,8 +25,8 @@ class ProductData
         public readonly bool $allow_customer_remarks = false,
         public readonly array $taxonomy_terms = [],
         public readonly ?float $weight = null,
-        public ?array $product_options = null,
-        public ?array $product_variants = null,
+        public ?array $product_options = [],
+        public ?array $product_variants = [],
         public readonly ?float $length = null,
         public readonly ?float $width = null,
         public readonly ?float $height = null,
@@ -40,7 +41,7 @@ class ProductData
         return new self(
             name: $data['name'],
             meta_data: MetaDataData::fromArray($data['meta_data']),
-            taxonomy_terms: $data['taxonomy_terms'] ?? [],
+            taxonomy_terms: array_map(fn ($termData) => (int)$termData, $data['taxonomy_terms']),
             sku: $data['sku'],
             description: $data['description'],
             retail_price: $data['retail_price'],
@@ -52,14 +53,45 @@ class ProductData
             status: $data['status'],
             stock: $data['stock'],
             minimum_order_quantity: $data['minimum_order_quantity'],
-            // is_digital_product: $data['is_digital_product'],
             is_featured: $data['is_featured'],
             is_special_offer: $data['is_special_offer'],
             allow_customer_remarks: $data['allow_customer_remarks'],
             images: $data['images'],
             videos: $data['videos'],
             product_options: $data['product_options'] ?? [],
-            product_variants: $data['product_variants'] ?? [],
+            product_variants: array_map(fn ($variant) => (ProductVariantData::fromArray([
+                ...$variant,
+                'selling_price' => (float)$variant['selling_price'],
+                'retail_price' => (float)$variant['retail_price']
+            ])), $data['product_variants']),
+        );
+    }
+
+    public static function withVariants(array $variants, self $data): self
+    {
+        return new self(
+            product_variants: $variants,
+            name: $data->name,
+            // ??
+            meta_data: $data->meta_data,
+            taxonomy_terms: array_map(fn ($termData) => (int)$termData, $data->taxonomy_terms),
+            sku: $data->sku,
+            description: $data->description,
+            retail_price: $data->retail_price,
+            selling_price: $data->selling_price,
+            length: $data->length,
+            width: $data->width,
+            height: $data->height,
+            weight: $data->weight,
+            status: $data->status,
+            stock: $data->stock,
+            minimum_order_quantity: $data->minimum_order_quantity,
+            is_featured: $data->is_featured,
+            is_special_offer: $data->is_special_offer,
+            allow_customer_remarks: $data->allow_customer_remarks,
+            images: $data->images,
+            videos: $data->videos,
+            product_options: $data->product_options ?? [],
         );
     }
 }

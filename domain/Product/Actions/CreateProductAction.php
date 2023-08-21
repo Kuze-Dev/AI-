@@ -17,7 +17,7 @@ class CreateProductAction
         protected CreateMetaDataAction $createMetaTags,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
         protected CreateProductOptionAction $createProductOptionAction,
-        protected CreateOrUpdateProductVariantAction $createOrUpdateProductVariantAction,
+        protected CreateProductVariantAction $createProductVariantAction,
         protected CreateMediaAction $createMediaAction,
     ) {
     }
@@ -30,7 +30,9 @@ class CreateProductAction
 
         $this->createProductOptionAction->execute($product, $productData);
 
-        $this->createOrUpdateProductVariantAction->execute($product, $productData);
+        foreach($productData->product_variants as $productVariant) {
+            $this->createProductVariantAction->execute($productVariant);
+        }
 
         if (filled($productData->images)) {
             $this->createMediaAction->execute($product, Arr::wrap($productData->images), 'image');

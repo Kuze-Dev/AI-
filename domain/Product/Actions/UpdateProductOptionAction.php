@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Domain\Product\Actions;
 
 use Domain\Product\DataTransferObjects\ProductData;
+use Domain\Product\DataTransferObjects\ProductVariantData;
+use Domain\Product\DataTransferObjects\VariantCombinationData;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductOption;
 use Domain\Product\Models\ProductOptionValue;
@@ -28,11 +30,14 @@ class UpdateProductOptionAction
                         'name' => $productOption['name'],
                     ]);
 
-                    $productData->product_variants = $this->searchAndChangeValue(
+                    $newVariants = $this->searchAndChangeValue(
                         $productOption['id'],
                         $productData->product_variants,
                         $newProductOptionModel->id
                     );
+
+                    // Update product variant
+                    $productData->withVariants($newVariants, $productData);
                     $productData->product_options[0][$key]['id'] = $newProductOptionModel->id;
                 }
 
@@ -50,16 +55,17 @@ class UpdateProductOptionAction
                         ]);
 
                         $productOption['productOptionValues'][$key2]['id'] = $newOptionValueModel->id;
-                        $productData->product_variants = $this->searchAndChangeValue(
+                        $newVariants = $this->searchAndChangeValue(
                             $productOptionValue['id'],
                             $productData->product_variants,
                             $newOptionValueModel->id,
                             'option_value_id'
                         );
+                        $productData->withVariants($newVariants, $productData);
                     }
                 }
 
-                /** Removal of Option Values */
+                // Removal of Option Values
                 $mappedOptionValueIds = array_map(function ($item) {
                     return $item['id'];
                 }, $productOption['productOptionValues']);
@@ -74,7 +80,7 @@ class UpdateProductOptionAction
                 }
             }
 
-            /** Removal of product options */
+            // Removal of product options
             $mappedOptionIds = array_map(function ($item) {
                 return $item['id'];
             }, $productData->product_options[0]);
@@ -93,16 +99,23 @@ class UpdateProductOptionAction
         }
     }
 
-    protected function searchAndChangeValue($needle, &$haystack, $newValue, $field = 'option_id')
+    protected function searchAndChangeValue($needle, $haystack, $newValue, $field = 'option_id')
     {
+        $newCombinations = [];
+        $newVariants = [];
         foreach ($haystack as $key => $variant) {
-            foreach ($variant['combination'] as $key2 => $combination) {
-                if ($combination[$field] == $needle) {
-                    $haystack[$key]['combination'][$key2][$field] = $newValue;
-                }
+            foreach ($variant->combination as $key2 => $combination) {
+                $variantCombination = $haystack[$key]->combination[$key2];
+
+                $combination->{$field} == $needle
+                    ? array_push($newCombinations, $variantCombination->withOptionId($newValue, $variantCombination))
+                    : array_push($newCombinations, $variantCombination);
             }
+
+            array_push($newVariants, $variant->withCombination($newCombinations, $variant));
+            $newCombinations = [];
         }
 
-        return $haystack;
+        return $newVariants;
     }
 }
