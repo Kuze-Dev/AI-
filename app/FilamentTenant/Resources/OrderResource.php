@@ -186,12 +186,15 @@ class OrderResource extends Resource
                                         Forms\Components\Placeholder::make('shipping_method')
                                             ->label(trans('Shipping Method'))
                                             ->content(function (Order $record): string {
-                                                $record->load('shippingMethod');
+                                                if ($record->shipping_method_id) {
+                                                    $record->load('shippingMethod');
 
-                                                /** @var \Domain\ShippingMethod\Models\ShippingMethod $shippingMethod */
-                                                $shippingMethod = $record->shippingMethod;
+                                                    /** @var \Domain\ShippingMethod\Models\ShippingMethod $shippingMethod */
+                                                    $shippingMethod = $record->shippingMethod;
 
-                                                return $shippingMethod->title;
+                                                    return $shippingMethod->title;
+                                                }
+                                                return "";
                                             }),
                                     ])
                             ])->collapsible(),
@@ -210,7 +213,10 @@ class OrderResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('customer_name')
                     ->label(trans('Customer'))
-                    ->sortable()
+                    ->sortable(query: function (Builder $query, string $direction): Builder {
+                        return $query
+                            ->orderBy('customer_first_name', $direction);
+                    })
                     ->formatStateUsing(function ($record) {
                         return $record->customer_first_name . ' ' . $record->customer_last_name;
                     })
@@ -219,17 +225,40 @@ class OrderResource extends Resource
                             ->orWhere('customer_last_name', 'like', "%{$search}%");
                     }),
                 Tables\Columns\TextColumn::make('tax_total')
+                    ->alignRight()
                     ->label(trans('Tax Total'))
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->formatStateUsing(function (Order $record) {
+                        return $record->currency_symbol . ' ' . number_format((float) $record->tax_total, 2, '.', ',');
+                    }),
                 Tables\Columns\TextColumn::make('total')
                     ->formatStateUsing(function (Order $record) {
                         return $record->currency_symbol . ' ' . number_format((float) $record->total, 2, '.', ',');
                     })
+                    ->alignRight()
                     ->label(trans('Total'))
                     ->sortable(),
+                Tables\Columns\TextColumn::make('payment_method')
+                    ->label(trans('Payment Method'))
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->formatStateUsing(function (Order $record) {
+                        /** @var \Domain\Payments\Models\Payment $payment */
+                        $payment = $record->payments->first();
+
+                        return $payment->paymentMethod->title;
+                    }),
                 Tables\Columns\TextColumn::make('shipping_method')
                     ->label(trans('Shipping Method'))
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->formatStateUsing(function (Order $record) {
+                        if ($record->shipping_method_id) {
+                            /** @var \Domain\ShippingMethod\Models\ShippingMethod $shippingMethod */
+                            $shippingMethod = $record->shippingMethod;
+
+                            return $shippingMethod->title;
+                        }
+                        return "";
+                    }),
                 Tables\Columns\IconColumn::make('is_paid')
                     ->label(trans('Paid'))
                     ->boolean(),
