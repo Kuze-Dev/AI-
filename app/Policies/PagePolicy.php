@@ -41,14 +41,14 @@ class PagePolicy
     public function update(User $user, Page $page): bool
     {
         if ($user->hasRole(config('domain.role.super_admin'))) {
-            
+
             return true;
         }
-        
+
         if ($page->author_id != $user->id) {
             return false;
         }
-        
+
         return $this->checkWildcardPermissions($user);
     }
 

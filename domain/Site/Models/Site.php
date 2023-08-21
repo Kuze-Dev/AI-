@@ -57,9 +57,7 @@ class Site extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Admin\Models\Admin>
-     */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Admin\Models\Admin> */
     public function siteManager(): BelongsToMany
     {
 

@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Http;
 use Spatie\Activitylog\ActivityLogger;
+use Throwable;
 
 class SiteResource extends Resource
 {
@@ -56,7 +57,7 @@ class SiteResource extends Resource
                                 ->options(function () {
                                     return  \Domain\Admin\Models\Admin::permission('site.siteManager')
                                         ->get()
-                                        ->pluck('full_name', 'id')
+                                        ->pluck('site_label', 'id')
                                         ->toArray();
 
                                 }),
@@ -81,55 +82,73 @@ class SiteResource extends Resource
                     ->button()
                     ->icon('heroicon-o-cog')
                     ->color('secondary')
+                    ->disabled(function (Site $record) {
+
+                        return (bool) (is_null($record->deploy_hook));
+                    })
                     ->action(function (Site $record) {
 
-                        if (is_null($record->deploy_hook)) {
+                        try {
 
-                            Notification::make()
-                                ->danger()
-                                ->title(trans('No Deploy Hook Set for '. $record->name))
-                                ->body(trans('Please set a deploy hook first before trying to deploy.'))
-                                ->send();
+                            if (is_null($record->deploy_hook)) {
 
-                            return;
-                        }
-
-                        /** @var \Illuminate\Http\Client\Response $response */
-                        $response = Http::post($record->deploy_hook);
-
-                        tap(Notification::make(), function (Notification $notification) use ($response, $record) {
-                            if ($exception = $response->toException()) {
-                                report($exception);
-                                $notification->danger()
-                                    ->title(trans('Unable to Deploy Static Site'))
-                                    ->body(trans('There was a problem when trying to request a deployment. Please try again later.'));
+                                Notification::make()
+                                    ->danger()
+                                    ->title(trans('No Deploy Hook Set for '. $record->name))
+                                    ->body(trans('Please set a deploy hook first before trying to deploy.'))
+                                    ->send();
 
                                 return;
                             }
 
-                            app(ActivityLogger::class)
-                                ->useLog('admin')
-                                ->event('deployed-hook')
-                                ->withProperties([
-                                    'custom' => [
-                                        'site' => $record->name,
-                                        'deploy_hook' => $record->deploy_hook,
-                                    ],
-                                ])
-                                ->log('Deployed hook '.$record->name);
+                            /** @var \Illuminate\Http\Client\Response $response */
+                            $response = Http::post($record->deploy_hook);
 
-                            $notification->success()
-                                ->title(trans('Deployment Request Sent'));
-                        })->send();
+                            tap(Notification::make(), function (Notification $notification) use ($response, $record) {
+                                if ($exception = $response->toException()) {
+                                    report($exception);
+                                    $notification->danger()
+                                        ->title(trans('Unable to Deploy Static Site'))
+                                        ->body(trans('There was a problem when trying to request a deployment. Please try again later.'));
+
+                                    return;
+                                }
+
+                                app(ActivityLogger::class)
+                                    ->useLog('admin')
+                                    ->event('deployed-hook')
+                                    ->withProperties([
+                                        'custom' => [
+                                            'site' => $record->name,
+                                            'deploy_hook' => $record->deploy_hook,
+                                        ],
+                                    ])
+                                    ->log('Deployed hook '.$record->name);
+
+                                $notification->success()
+                                    ->title(trans('Deployment Request Sent'));
+                            })->send();
+
+                        } catch (Throwable $th) {
+
+                            if($th instanceof \Illuminate\Http\Client\ConnectionException) {
+                                Notification::make()
+                                    ->danger()
+                                    ->title('Unable to Deploy Static Site')
+                                    ->body($th->getMessage())
+                                    ->send();
+                            }
+
+                        }
 
                     }),
-                Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make(),
                     Tables\Actions\ForceDeleteAction::make(),
                     Tables\Actions\RestoreAction::make(),
                 ]),
-             
+
             ]);
     }
 
