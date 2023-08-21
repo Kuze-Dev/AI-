@@ -12,7 +12,7 @@ class SyncSiteManagersAction
     public function execute(Site $model, SiteData $siteData): void
     {
 
-        $model->siteManager()->sync($siteData->site_manager);
+        $model->siteManager()->sync($siteData->site_manager ?? []);
 
     }
 }

@@ -44,6 +44,8 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property-read \Support\MetaData\Models\MetaData|null $metaData
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Support\RouteUrl\Models\RouteUrl> $routeUrls
  * @property-read int|null $route_urls_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Site\Models\Site> $sites
+ * @property-read int|null $sites_count
  * @method static PageBuilder|Page newModelQuery()
  * @method static PageBuilder|Page newQuery()
  * @method static PageBuilder|Page query()
