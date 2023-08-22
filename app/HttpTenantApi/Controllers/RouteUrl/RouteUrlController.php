@@ -36,9 +36,8 @@ class RouteUrlController
 
             $siteId = request('site');
 
-            $queryRouteUrl->whereHas('model.sites', function ($query) use ($siteId) {
-
-                return $query->where('site_id', $siteId);
+            $queryRouteUrl->whereHas('model', function ($query) use ($siteId) {
+                return $query->whereHas('sites', fn ($q) => $q->where('site_id', $siteId));
             });
 
         }
