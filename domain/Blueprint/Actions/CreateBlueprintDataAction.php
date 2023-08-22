@@ -29,15 +29,13 @@ class CreateBlueprintDataAction
         $statePaths = $this->extractStatePath($blockContent->data);
         $fieldTypes = $this->extractFieldType($blueprintfieldtype);
 
-        for ($i = 0; $i < count($statePaths); $i++) {
-            $statePath = $statePaths[$i];
-            $fieldType = $fieldTypes[$i];
-
+        foreach (array_combine($statePaths, $fieldTypes) as $statePath => $fieldType) {
             $this->storeBlueprintData(BlueprintDataData::fromArray($blockContent, $statePath, $fieldType));
         }
 
         return new BlueprintData();
     }
+
 
     private function extractStatePath(array $data, $parentKey = ''): array
     {
