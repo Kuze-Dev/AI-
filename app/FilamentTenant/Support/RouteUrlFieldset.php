@@ -10,6 +10,7 @@ use Support\RouteUrl\Rules\UniqueActiveRouteUrlRule;
 use Filament\Forms;
 use Filament\Forms\Components\Group;
 use Illuminate\Database\Eloquent\Model;
+use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
 
 class RouteUrlFieldset extends Group
 {
@@ -54,7 +55,11 @@ class RouteUrlFieldset extends Group
                 ->string()
                 ->maxLength(255)
                 ->startsWith('/')
-                ->rule(fn (?HasRouteUrl $record) => new UniqueActiveRouteUrlRule($record)),
+                ->rule(
+                    fn (?HasRouteUrl $record, Closure $get) => tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class) ?
+                    new UniqueActiveRouteUrlRule($record) : null
+                    // new MicroSiteUniqueRouteUrlRule($record, $get('sites'))
+                ),
         ]);
 
         $this->generateModelForRouteUrlUsing(function (HasRouteUrl|string $model) {

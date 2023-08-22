@@ -21,11 +21,10 @@ class CreateSite extends CreateRecord
      */
     protected function handleRecordCreation(array $data): Model
     {
+
         return DB::transaction(
             fn () => app(CreateSiteAction::class)
-                ->execute(new SiteData(
-                    name: $data['name'],
-                ))
+                ->execute(SiteData::fromArray($data))
         );
     }
 }
