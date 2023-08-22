@@ -41,16 +41,13 @@ class CreateOrUpdateProductVariantAction
 
                 // Creation / Update of Product Variant records
                 foreach ($productData->product_variants as $key => $productVariant) {
+
                     $variant = ProductVariant::where('combination', 'LIKE', '%"option_value_id": ' . $productVariant->combination[0]->option_value_id . '%')
                         ->when(isset($productVariant->combination[1]), function ($query) use ($productVariant) {
                             return $query->where('combination', 'LIKE', '%"option_value_id": ' . $productVariant->combination[1]->option_value_id . '%');
                         })
                         ->where('product_id', $product->id)
                         ->first();
-
-                    if (!$variant) {
-                        dd($productVariant);
-                    }
 
                     $variant
                         ? $variant->update($this->prepareVariantData($productVariant))

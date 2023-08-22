@@ -33,4 +33,14 @@ class VariantCombinationData
             option_value_id: $data->option_value_id,
         );
     }
+
+    public static function withOptionValueId(int | string $optionValueId, self $data): self
+    {
+        return new self(
+            option: $data->option,
+            option_id: $data->option_id,
+            option_value: $data->option_value,
+            option_value_id: $optionValueId,
+        );
+    }
 }

@@ -37,7 +37,7 @@ class UpdateProductOptionAction
                     );
 
                     // Update product variant
-                    $productData->withVariants($newVariants, $productData);
+                    $productData->product_variants = $newVariants;
                     $productData->product_options[0][$key]['id'] = $newProductOptionModel->id;
                 }
 
@@ -61,7 +61,9 @@ class UpdateProductOptionAction
                             $newOptionValueModel->id,
                             'option_value_id'
                         );
-                        $productData->withVariants($newVariants, $productData);
+
+                        // Update product variant
+                        $productData->product_variants = $newVariants;
                     }
                 }
 
@@ -107,9 +109,18 @@ class UpdateProductOptionAction
             foreach ($variant->combination as $key2 => $combination) {
                 $variantCombination = $haystack[$key]->combination[$key2];
 
-                $combination->{$field} == $needle
-                    ? array_push($newCombinations, $variantCombination->withOptionId($newValue, $variantCombination))
-                    : array_push($newCombinations, $variantCombination);
+                if ($combination->{$field} != $needle) {
+                    array_push($newCombinations, $variantCombination);
+                    return;
+                }
+
+                if ($field == "option_id") {
+                    array_push($newCombinations, $variantCombination->withOptionId($newValue, $variantCombination));
+                }
+
+                if ($field == "option_value_id") {
+                    array_push($newCombinations, $variantCombination->withOptionValueId($newValue, $variantCombination));
+                }
             }
 
             array_push($newVariants, $variant->withCombination($newCombinations, $variant));

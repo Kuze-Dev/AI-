@@ -67,31 +67,43 @@ class ProductData
         );
     }
 
-    public static function withVariants(array $variants, self $data): self
-    {
-        return new self(
-            product_variants: $variants,
-            name: $data->name,
-            // ??
-            meta_data: $data->meta_data,
-            taxonomy_terms: array_map(fn ($termData) => (int)$termData, $data->taxonomy_terms),
-            sku: $data->sku,
-            description: $data->description,
-            retail_price: $data->retail_price,
-            selling_price: $data->selling_price,
-            length: $data->length,
-            width: $data->width,
-            height: $data->height,
-            weight: $data->weight,
-            status: $data->status,
-            stock: $data->stock,
-            minimum_order_quantity: $data->minimum_order_quantity,
-            is_featured: $data->is_featured,
-            is_special_offer: $data->is_special_offer,
-            allow_customer_remarks: $data->allow_customer_remarks,
-            images: $data->images,
-            videos: $data->videos,
-            product_options: $data->product_options ?? [],
-        );
-    }
+    // public static function withVariants(array $variants, self $data): self
+    // {
+    //     // dd('hehe', $variants);
+    //     $newVariants = array_map(function ($variant) {
+    //         $variant->withCombination($variant->combination, $variant);
+
+    //         return $variant;
+    //         // return array_merge($variant, [
+    //         //     'combination' => $variant->withCombination($variant->combination, $variant),
+    //         // ]);
+    //     }, $variants);
+
+    //     // dd($newVariants);
+
+    //     return new self(
+    //         product_variants: $newVariants,
+    //         name: 'hehehe',
+    //         // ??
+    //         meta_data: $data->meta_data,
+    //         taxonomy_terms: array_map(fn ($termData) => (int)$termData, $data->taxonomy_terms),
+    //         sku: $data->sku,
+    //         description: $data->description,
+    //         retail_price: $data->retail_price,
+    //         selling_price: $data->selling_price,
+    //         length: $data->length,
+    //         width: $data->width,
+    //         height: $data->height,
+    //         weight: $data->weight,
+    //         status: $data->status,
+    //         stock: $data->stock,
+    //         minimum_order_quantity: $data->minimum_order_quantity,
+    //         is_featured: $data->is_featured,
+    //         is_special_offer: $data->is_special_offer,
+    //         allow_customer_remarks: $data->allow_customer_remarks,
+    //         images: $data->images,
+    //         videos: $data->videos,
+    //         product_options: $data->product_options ?? [],
+    //     );
+    // }
 }
