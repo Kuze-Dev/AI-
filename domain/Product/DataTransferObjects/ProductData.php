@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Product\DataTransferObjects;
 
-use Domain\Taxonomy\DataTransferObjects\TaxonomyTermData;
 use Support\MetaData\DataTransferObjects\MetaDataData;
 use Illuminate\Http\UploadedFile;
 
@@ -58,12 +57,15 @@ class ProductData
             allow_customer_remarks: $data['allow_customer_remarks'],
             images: $data['images'],
             videos: $data['videos'],
-            product_options: $data['product_options'] ?? [],
+            product_options: array_map(
+                fn ($option) => (ProductOptionData::fromArray($option)),
+                $data['product_options'][0] ?? []
+            ),
             product_variants: array_map(fn ($variant) => (ProductVariantData::fromArray([
                 ...$variant,
                 'selling_price' => (float)$variant['selling_price'],
                 'retail_price' => (float)$variant['retail_price']
-            ])), $data['product_variants']),
+            ])), $data['product_variants'] ?? []),
         );
     }
 }

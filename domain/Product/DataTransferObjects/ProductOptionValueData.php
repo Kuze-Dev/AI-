@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\Product\DataTransferObjects;
 
-class ProductOptionData
+class ProductOptionValueData
 {
     public function __construct(
         public readonly int | string $id,
         public readonly string $name,
         public readonly string $slug,
-        public array $productOptionValues,
+        public readonly int | string $product_option_id,
     ) {
     }
 
@@ -20,10 +20,7 @@ class ProductOptionData
             id: $data['id'],
             name: $data['name'],
             slug: $data['slug'],
-            productOptionValues: array_map(
-                fn ($optionValue) => (ProductOptionValueData::fromArray($optionValue)),
-                $data['productOptionValues']
-            ),
+            product_option_id: $data['product_option_id'],
         );
     }
 
@@ -33,7 +30,7 @@ class ProductOptionData
             id: $id,
             name: $data->name,
             slug: $data->slug,
-            productOptionValues: $data->productOptionValues,
+            product_option_id: $data->product_option_id,
         );
     }
 }
