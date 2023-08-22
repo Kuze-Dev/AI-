@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Domain\Product\Actions;
 
 use Domain\Product\DataTransferObjects\ProductData;
-use Domain\Product\DataTransferObjects\ProductVariantData;
-use Domain\Product\DataTransferObjects\VariantCombinationData;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductOption;
 use Domain\Product\Models\ProductOptionValue;
@@ -18,6 +16,7 @@ class UpdateProductOptionAction
         /** for product option [[]] condition */
         if (filled($productData->product_options) && filled($productData->product_options[0])) {
             foreach ($productData->product_options[0] as $key => &$productOption) {
+                // Process Update or Create of Product Option                
                 $productOptionModel = ProductOption::find($productOption['id']);
 
                 if ($productOptionModel) {
@@ -30,17 +29,17 @@ class UpdateProductOptionAction
                         'name' => $productOption['name'],
                     ]);
 
-                    $newVariants = $this->searchAndChangeValue(
+                    // Update product variant
+                    $productData->product_variants = $this->searchAndChangeValue(
                         $productOption['id'],
                         $productData->product_variants,
                         $newProductOptionModel->id
                     );
 
-                    // Update product variant
-                    $productData->product_variants = $newVariants;
                     $productData->product_options[0][$key]['id'] = $newProductOptionModel->id;
                 }
 
+                // Process Update or Create of Product Option Value             
                 foreach ($productOption['productOptionValues'] as $key2 => $productOptionValue) {
                     $optionValueModel = ProductOptionValue::find($productOptionValue['id']);
 
@@ -55,19 +54,17 @@ class UpdateProductOptionAction
                         ]);
 
                         $productOption['productOptionValues'][$key2]['id'] = $newOptionValueModel->id;
-                        $newVariants = $this->searchAndChangeValue(
+
+                        $productData->product_variants = $this->searchAndChangeValue(
                             $productOptionValue['id'],
                             $productData->product_variants,
                             $newOptionValueModel->id,
                             'option_value_id'
                         );
-
-                        // Update product variant
-                        $productData->product_variants = $newVariants;
                     }
                 }
 
-                // Removal of Option Values
+                // Removal of Product Option Values
                 $mappedOptionValueIds = array_map(function ($item) {
                     return $item['id'];
                 }, $productOption['productOptionValues']);
@@ -82,7 +79,7 @@ class UpdateProductOptionAction
                 }
             }
 
-            // Removal of product options
+            // Removal of Product Options
             $mappedOptionIds = array_map(function ($item) {
                 return $item['id'];
             }, $productData->product_options[0]);
@@ -109,17 +106,16 @@ class UpdateProductOptionAction
             foreach ($variant->combination as $key2 => $combination) {
                 $variantCombination = $haystack[$key]->combination[$key2];
 
-                if ($combination->{$field} != $needle) {
+                if ($combination->{$field} == $needle) {
+                    if ($field == "option_id") {
+                        array_push($newCombinations, $variantCombination->withOptionId($newValue, $variantCombination));
+                    }
+
+                    if ($field == "option_value_id") {
+                        array_push($newCombinations, $variantCombination->withOptionValueId($newValue, $variantCombination));
+                    }
+                } else {
                     array_push($newCombinations, $variantCombination);
-                    return;
-                }
-
-                if ($field == "option_id") {
-                    array_push($newCombinations, $variantCombination->withOptionId($newValue, $variantCombination));
-                }
-
-                if ($field == "option_value_id") {
-                    array_push($newCombinations, $variantCombination->withOptionValueId($newValue, $variantCombination));
                 }
             }
 
