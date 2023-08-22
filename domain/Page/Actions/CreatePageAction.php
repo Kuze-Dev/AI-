@@ -21,6 +21,7 @@ class CreatePageAction
 
     public function execute(PageData $pageData): Page
     {
+
         $page = Page::create([
             'author_id' => $pageData->author_id,
             'name' => $pageData->name,
