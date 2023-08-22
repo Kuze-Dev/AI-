@@ -22,7 +22,6 @@ use Domain\Discount\Models\DiscountLimit;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Events\AdminOrderBankPaymentEvent;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
-use Domain\Taxation\Enums\PriceDisplay;
 use Filament\Notifications\Notification;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
@@ -194,9 +193,10 @@ class OrderResource extends Resource
 
                                                     return $shippingMethod->title;
                                                 }
-                                                return "";
+
+                                                return '';
                                             }),
-                                    ])
+                                    ]),
                             ])->collapsible(),
                     ])->columnSpan(2),
                 self::summaryCard(),
@@ -257,7 +257,8 @@ class OrderResource extends Resource
 
                             return $shippingMethod->title;
                         }
-                        return "";
+
+                        return '';
                     }),
                 Tables\Columns\IconColumn::make('is_paid')
                     ->label(trans('Paid'))
@@ -390,6 +391,7 @@ class OrderResource extends Resource
                             })
                             ->color(function ($state) {
                                 $newState = str_replace(' ', '_', strtolower($state));
+
                                 return match ($newState) {
                                     OrderStatuses::FORAPPROVAL->value => 'warning',
                                     OrderStatuses::REFUNDED->value,
@@ -434,13 +436,7 @@ class OrderResource extends Resource
                 Forms\Components\Grid::make(2)
                     ->schema([
                         Support\TextLabel::make('')
-                            ->label(function (Order $record) {
-                                if ($record->tax_display == PriceDisplay::INCLUSIVE) {
-                                    return trans('Subtotal ' . ' (Tax Included)');
-                                }
-
-                                return trans('Subtotal');
-                            })
+                            ->label(trans('Subtotal'))
                             ->alignLeft()
                             ->size('md')
                             ->inline()
@@ -684,7 +680,7 @@ class OrderResource extends Resource
                     ->size('sm')
                     ->action(function () use ($order, $set) {
 
-                        $isPaid = !$order->is_paid;
+                        $isPaid = ! $order->is_paid;
 
                         $result = $order->update([
                             'is_paid' => $isPaid,
@@ -739,7 +735,7 @@ class OrderResource extends Resource
                         /** @var \Domain\Payments\Models\Payment $payment */
                         $payment = $order->payments->first();
 
-                        if (!is_null($payment->remarks)) {
+                        if ( ! is_null($payment->remarks)) {
                             Notification::make()
                                 ->title(trans('Invalid action.'))
                                 ->warning()
