@@ -53,7 +53,9 @@ class CreateCartLineRequest extends FormRequest
                         $product = Product::where((new Product())->getRouteKeyName(), $purchasableId)->first();
                         $cartLine = CartLine::whereHas('cart', function ($query) {
                             $query->whereBelongsTo(auth()->user());
-                        })->where("purchasable_type", Product::class)
+                        })
+                            ->whereNull('checked_out_at')
+                            ->where("purchasable_type", Product::class)
                             ->where("purchasable_id", $product->id)->first();
 
                         if (!$product) {
@@ -89,7 +91,9 @@ class CreateCartLineRequest extends FormRequest
 
                         $cartLine = CartLine::whereHas('cart', function ($query) {
                             $query->whereBelongsTo(auth()->user());
-                        })->where("purchasable_type", ProductVariant::class)
+                        })
+                            ->whereNull('checked_out_at')
+                            ->where("purchasable_type", ProductVariant::class)
                             ->where("purchasable_id", $productVariant->id)->first();
 
 
