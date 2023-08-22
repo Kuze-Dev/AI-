@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Blueprint\Actions;
 
-use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\DataTransferObjects\BlueprintDataData;
+use Domain\Blueprint\DataTransferObjects\SchemaData;
 use Domain\Blueprint\Models\BlueprintData;
 use Domain\Page\Models\BlockContent;
 
@@ -23,49 +23,51 @@ class CreateBlueprintDataAction
         ]);
     }
 
-    public function execute(BlockContent $blockContent):BlueprintData
+    public function execute(BlockContent $blockContent): BlueprintData
     {
         $blueprintfieldtype = $blockContent->block->blueprint->schema;
-        $data = json_decode($blockContent->data, true);
+        $statePaths = $this->extractStatePath($blockContent->data);
+        $fieldTypes = $this->extractFieldType($blueprintfieldtype);
 
-        $statePaths = $this->extractStatePaths($data);
+        for ($i = 0; $i < count($statePaths); $i++) {
+            $statePath = $statePaths[$i];
+            $fieldType = $fieldTypes[$i];
 
-        foreach ($statePaths as $statePath) {
-          return $this->storeBlueprintData(BlueprintDataData::fromArray($blockContent, $statePath));
+            $this->storeBlueprintData(BlueprintDataData::fromArray($blockContent, $statePath, $fieldType));
         }
 
-
+        return new BlueprintData();
     }
 
-    private function extractStatePathsAndFieldType(BlockContent $blockContent, $parentKey = ''): array
+    private function extractStatePath(array $data, $parentKey = ''): array
     {
-        $state_path_data = json_decode($blockContent->data, true);
-        $field_type_data = $blockContent->block?->blueprint?->schema;
-
         $statePaths = [];
-        foreach ($state_path_data as $key => $value) {
-            $currentKeyPath = ($parentKey !== '') ? "$parentKey.$key" : $key;
 
-            if (is_array($value) || is_object($value)) {
-                $nestedPaths = $this->extractStatePathsAndFieldType($value, $currentKeyPath);
+        foreach ($data as $key => $value) {
+            $currentPath = ($parentKey !== '') ? $parentKey . '.' . $key : $key;
+            if (is_array($value)) {
+                $nestedPaths = $this->extractStatePath($value, $currentPath);
                 $statePaths = array_merge($statePaths, $nestedPaths);
             } else {
-                $statePaths[] = $currentKeyPath;
+                $statePaths[] = $currentPath;
             }
         }
-
-        $typeValues = [];
-
-        foreach ($field_type_data as $key => $value) {
-            if ($key === "type") {
-                $typeValues[] = $value;
-            } elseif (is_array($value) || is_object($value)) {
-                $nestedTypeValues = $this->extractStatePathsAndFieldType($value);
-                $typeValues = array_merge($typeValues, $nestedTypeValues);
-            }
-        }
-
 
         return $statePaths;
+    }
+
+    private function extractFieldType(SchemaData $blueprintfieldtype, $parentKey = ''): array
+    {
+        $fieldTypes = [];
+
+        foreach ($blueprintfieldtype->sections as $section) {
+            foreach ($section->fields as $field) {
+                if (isset($field->type)) {
+                    $fieldTypes[] = $field->type;
+                }
+            }
+        }
+
+        return $fieldTypes;
     }
 }

@@ -28,7 +28,7 @@ class BlueprintData extends Model implements HasMedia
 
     protected $casts = [
         'type' => BlueprintDataType::class,
-        'value' => MediaFieldData::class, // TODO: DTO
+        // 'value' => MediaFieldData::class, // TODO: DTO
     ];
 
     public function blueprint(): BelongsTo
@@ -41,28 +41,28 @@ class BlueprintData extends Model implements HasMedia
         return $this->morphTo();
     }
 
-    public function registerMediaCollections(): void
-    {
-        $fieldData = $this->blueprint->findField($this->state_path);
+    // public function registerMediaCollections(): void
+    // {
+    //     $fieldData = $this->blueprint->findField($this->state_path);
 
-        if (! $fieldData instanceof MediaFieldData) {
-            return;
-        }
+    //     if (! $fieldData instanceof MediaFieldData) {
+    //         return;
+    //     }
 
-        $mediaCollection = $this->addMediaCollection('default')
-            ->registerMediaConversions(function () {
-                foreach($fieldData->conversions as $conversionData) {
-                    $conversion = $this->addMediaConversion($conversionData->name);
+    //     $mediaCollection = $this->addMediaCollection('default')
+    //         ->registerMediaConversions(function () {
+    //             foreach($fieldData->conversions as $conversionData) {
+    //                 $conversion = $this->addMediaConversion($conversionData->name);
 
-                    foreach ($conversionData->manipulations as $manipulationData) {
-                        $conversion->{$manipulationData->type->value}(...$manipulationData->params);
-                    }
-                }
-            });
+    //                 foreach ($conversionData->manipulations as $manipulationData) {
+    //                     $conversion->{$manipulationData->type->value}(...$manipulationData->params);
+    //                 }
+    //             }
+    //         });
 
-        if(!$fieldData->multiple){
-            $mediaCollection->isSingleFile();
-        }
-    }
+    //     if(!$fieldData->multiple){
+    //         $mediaCollection->isSingleFile();
+    //     }
+    // }
 
 }
