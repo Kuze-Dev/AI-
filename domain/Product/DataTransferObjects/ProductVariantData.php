@@ -24,12 +24,6 @@ class ProductVariantData
             id: $data['id'],
             product_id: $data['product_id'] ?? null,
             sku: $data['sku'],
-            // combination: array_map(fn ($item) => [
-            //     'option' => $item['option'],
-            //     'option_id' => $item['option_id'],
-            //     'option_value' => $item['option_value'],
-            //     'option_value_id' => $item['option_value_id'],
-            // ], $data['combination']),
             combination: array_map(fn ($item) => (VariantCombinationData::fromArray($item)), $data['combination']),
             retail_price: $data['retail_price'],
             selling_price: $data['selling_price'],
