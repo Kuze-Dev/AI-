@@ -30,6 +30,8 @@ use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
+use Illuminate\Validation\Rules\Unique;
 
 class PageResource extends Resource
 {
@@ -55,7 +57,17 @@ class PageResource extends Resource
                     ->schema([
                         Forms\Components\Card::make([
                             Forms\Components\TextInput::make('name')
-                                ->unique(ignoreRecord: true)
+                                ->unique(
+                                    ignoreRecord: true,
+                                    callback: function (Unique $rule) {
+
+                                        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+                                            return false;
+                                        }
+
+                                        return $rule;
+                                    }
+                                )
                                 ->lazy()
                                 ->afterStateUpdated(function (Forms\Components\TextInput $component) {
                                     $component->getContainer()
@@ -65,8 +77,8 @@ class PageResource extends Resource
                                 ->required()
                                 ->string()
                                 ->maxLength(255),
-                            RouteUrlFieldset::make()
-                                ->disabled(fn (?Page $record) => $record?->isHomePage()),
+                            RouteUrlFieldset::make(),
+                            // ->disabled(fn (?Page $record) => $record?->isHomePage()),
                             Forms\Components\Group::make([
                                 Forms\Components\Toggle::make('published_at')
                                     ->label(trans('Published'))
@@ -92,11 +104,21 @@ class PageResource extends Resource
                         ]),
                         Forms\Components\Card::make([
                             Forms\Components\CheckboxList::make('sites')
-                                ->options(
-                                    fn () => Site::orderBy('name')
+                                ->reactive()
+                                ->rule(fn (?Page $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
+                                ->options(function () {
+
+                                    if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+                                        return Site::orderBy('name')
+                                            ->pluck('name', 'id')
+                                            ->toArray();
+                                    }
+
+                                    return  Site::orderBy('name')
+                                        ->whereHas('siteManager', fn ($query) => $query->where('admin_id', Auth::user()?->id))
                                         ->pluck('name', 'id')
-                                        ->toArray()
-                                )
+                                        ->toArray();
+                                })
                                 ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Page $record): void {
                                     if ( ! $record) {
                                         $component->state([]);

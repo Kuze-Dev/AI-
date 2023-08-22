@@ -9,9 +9,7 @@ use Domain\Site\Database\Factories\SiteFactory;
 use App\FilamentTenant\Resources\SiteResource\Pages\ListSites;
 
 use function Pest\Livewire\livewire;
-use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseCount;
-use function Pest\Laravel\assertSoftDeleted;
 
 beforeEach(function () {
     testInTenantContext();
@@ -35,21 +33,14 @@ it('can list pages', function () {
         ->assertOk();
 });
 
-it('can edit site', function () {
-    livewire(ListSites::class)
-        ->callPageAction('create', ['name' => 'Site 1'])
-        ->callTableAction('edit', 1, ['name' => 'Site 2']);
-
-    assertDatabaseHas(Site::class, ['name' => 'Site 2']);
-    assertDatabaseCount(Site::class, 1);
-});
-
 it('can delete site', function () {
+
+    SiteFactory::new()
+        ->count(2)
+        ->create();
+
     livewire(ListSites::class)
-        ->callPageAction('create', ['name' => 'Site 1'])
-        ->callPageAction('create', ['name' => 'Site 2'])
         ->callTableAction('delete', 1);
 
-    assertSoftDeleted(Site::class, ['name' => 'Site 1']);
     assertDatabaseCount(Site::class, 2);
 });

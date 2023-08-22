@@ -31,6 +31,7 @@ it('can edit site', function () {
         ->fillForm([
             'name' => 'Test',
             'slug' => 'test',
+            'site_manager' => [],
             'data.main.header' => 'Bar',
         ])
         ->call('save')

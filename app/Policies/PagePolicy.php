@@ -9,6 +9,7 @@ use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Page\Models\Page;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Facades\Auth;
 
 class PagePolicy
 {
@@ -40,6 +41,15 @@ class PagePolicy
 
     public function update(User $user, Page $page): bool
     {
+        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+
+            return true;
+        }
+
+        if ($page->author_id != $user->id) {
+            return false;
+        }
+
         return $this->checkWildcardPermissions($user);
     }
 

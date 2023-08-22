@@ -9,10 +9,20 @@ use Domain\Site\Models\Site;
 
 class CreateSiteAction
 {
+    public function __construct(
+        protected SyncSiteManagersAction $syncSiteManagers,
+    ) {
+    }
+
     public function execute(SiteData $siteData): Site
     {
-        return Site::create([
+        $model = Site::create([
             'name' => $siteData->name,
+            'deploy_hook' => $siteData->deploy_hook,
         ]);
+
+        $this->syncSiteManagers->execute($model, $siteData);
+
+        return $model;
     }
 }
