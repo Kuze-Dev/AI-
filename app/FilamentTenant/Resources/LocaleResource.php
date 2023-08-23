@@ -37,7 +37,7 @@ class LocaleResource extends Resource
     public static function form(Form $form): Form
     {
         /** @var array<string, array> $locales_json */
-        $locales_json = json_decode(File::get(public_path('locales.json')), true);
+        $locales_json = json_decode(File::get(base_path('locales.json')), true);
         $locales = collect($locales_json);
 
         $options = $locales->map(function ($locale) {
