@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Auth;
 use Domain\Content\Models\ContentEntry;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Domain\Internationalization\Models\Locale;
 use App\FilamentTenant\Resources\MenuResource\Pages;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
@@ -99,6 +100,12 @@ class MenuResource extends Resource
                         }),
                 ])
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+                Forms\Components\Select::make('locale')
+                    ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                    ->default((string) optional(Locale::where('is_default', true)->first())->code)
+                    ->searchable()
+                    ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->required(),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([
                         Tree::make('nodes')

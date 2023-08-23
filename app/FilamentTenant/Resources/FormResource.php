@@ -17,6 +17,7 @@ use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Form\Models\Form as FormModel;
+use Domain\Internationalization\Models\Locale;
 use App\FilamentTenant\Resources\FormResource\Pages;
 use App\FilamentTenant\Support\SchemaInterpolations;
 use Filament\Resources\RelationManagers\RelationGroup;
@@ -53,6 +54,12 @@ class FormResource extends Resource
                         ->optionsFromModel(Blueprint::class, 'name')
                         ->disabled(fn (?FormModel $record) => $record !== null)
                         ->reactive(),
+                    Forms\Components\Select::make('locale')
+                        ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                        ->default((string) optional(Locale::where('is_default', true)->first())->code)
+                        ->searchable()
+                        ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                        ->required(),
                     Forms\Components\Toggle::make('store_submission'),
                     Forms\Components\Card::make([
                         Forms\Components\CheckboxList::make('sites')
