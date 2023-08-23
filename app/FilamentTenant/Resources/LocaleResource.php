@@ -10,7 +10,6 @@ use Filament\Tables;
 use Filament\Resources\Form;
 use Filament\Resources\Table;
 use Filament\Resources\Resource;
-use Illuminate\Support\Facades\DB;
 use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -34,9 +33,7 @@ class LocaleResource extends Resource
 
     protected static ?int $navigationSort = 9;
 
-    /**
-     * @throws FileNotFoundException
-     */
+    /** @throws FileNotFoundException */
     public static function form(Form $form): Form
     {
         /** @var array<string, array> $locales_json */
