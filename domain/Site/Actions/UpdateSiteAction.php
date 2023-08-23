@@ -18,6 +18,7 @@ class UpdateSiteAction
     {
         $site->update([
             'name' => $siteData->name,
+            'domain' => $siteData->domain,
             'deploy_hook' => $siteData->deploy_hook,
         ]);
 
