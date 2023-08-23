@@ -137,6 +137,10 @@ it('can show field options', function (FieldType $fieldType, array $fieldOptions
         'type' => FieldType::CHECKBOX,
         'field_options' => [],
     ],
+    'radio field' => [
+        'type' => FieldType::RADIO,
+        'field_options' => [],
+    ],
     'textarea field' => [
         'type' => FieldType::TEXTAREA,
         'field_options' => [

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Domain\Globals\Database\Factories\GlobalsFactory;
+use Domain\Site\Database\Factories\SiteFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
 
 use function Pest\Laravel\getJson;
@@ -51,3 +52,26 @@ it('can filter globals', function ($attribute) {
             });
     }
 })->with(['name', 'slug']);
+
+it('can list globals of specific site', function () {
+    $site = SiteFactory::new()->createOne();
+    GlobalsFactory::new()
+        ->withDummyBlueprint()
+        ->hasAttached($site)
+        ->count(1)
+        ->create();
+    GlobalsFactory::new()
+        ->withDummyBlueprint()
+        ->count(2)
+        ->create();
+
+    getJson("api/globals?filter[sites.id]={$site->id}")
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) {
+            $json
+                ->count('data', 1)
+                ->where('data.0.type', 'globals')
+                ->whereType('data.0.attributes.name', 'string')
+                ->etc();
+        });
+});

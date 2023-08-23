@@ -139,6 +139,14 @@ class Admin extends Authenticatable implements MustVerifyEmail, HasName, TwoFact
         );
     }
 
+    /** @return Attribute<string, never> */
+    protected function siteLabel(): Attribute
+    {
+        return Attribute::get(
+            fn ($value) => "{$this->first_name} {$this->last_name} | {$this->email}"
+        );
+    }
+
     public function getFilamentName(): string
     {
         return $this->full_name;

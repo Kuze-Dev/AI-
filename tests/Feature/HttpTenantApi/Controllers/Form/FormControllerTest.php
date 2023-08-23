@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use Illuminate\Testing\Fluent\AssertableJson;
+
 use Domain\Form\Database\Factories\FormFactory;
 
-use Illuminate\Testing\Fluent\AssertableJson;
+use Domain\Site\Database\Factories\SiteFactory;
 
 use function Pest\Laravel\getJson;
 
@@ -88,6 +90,29 @@ it('can list forms and filter by name', function () {
             $json->count('data', 1)
                 ->where('data.0.type', 'forms')
                 ->where('data.0.attributes.name', $form->name)
+                ->etc();
+        });
+});
+
+it('can list forms of specific site', function () {
+    $site = SiteFactory::new()->createOne();
+
+    FormFactory::new()
+        ->withDummyBlueprint()
+        ->hasAttached($site)
+        ->create();
+
+    FormFactory::new()
+        ->withDummyBlueprint()
+        ->count(2)
+        ->create();
+
+    getJson("api/forms?filter[sites.id]={$site->id}")
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) {
+            $json->count('data', 1)
+                ->where('data.0.type', 'forms')
+                ->whereType('data.0.attributes.name', 'string')
                 ->etc();
         });
 });

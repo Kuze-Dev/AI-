@@ -10,6 +10,7 @@ class MenuData
     public function __construct(
         public readonly string $name,
         public readonly array $nodes = [],
+        public readonly array $sites = [],
     ) {
     }
 
@@ -18,6 +19,7 @@ class MenuData
         return new self(
             name: $data['name'],
             nodes: array_map(fn (array $nodeData) => NodeData::fromArray($nodeData), $data['nodes'] ?? []),
+            sites: $data['sites'] ?? [],
         );
     }
 }
