@@ -177,6 +177,7 @@ class Product extends Model implements HasMetaDataContract, HasMedia
         return $this->hasMany(ProductOption::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Favorite\Models\Favorite> */
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);
@@ -187,7 +188,7 @@ class Product extends Model implements HasMetaDataContract, HasMedia
         return $this->hasMany(Review::class);
     }
 
-    public function isFavorite()
+    public function isFavorite(): bool
     {
         if ( ! auth()->check()) {
             return false;

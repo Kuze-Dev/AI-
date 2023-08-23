@@ -32,11 +32,13 @@ class Favorite extends Model
 {
     protected $fillable = ['customer_id', 'product_id'];
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Favorite\Models\Favorite> */
     public function customer()
     {
         return $this->belongsTo(Customer::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\Product, \Domain\Favorite\Models\Favorite> */
     public function product()
     {
         return $this->belongsTo(Product::class);
