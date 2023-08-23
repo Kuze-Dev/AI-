@@ -11,7 +11,7 @@ use App\Filament\Resources\RoleResource\Support\PermissionGroupCollection;
 use Closure;
 use Domain\Role\Actions\DeleteRoleAction;
 use Domain\Role\Models\Role;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;

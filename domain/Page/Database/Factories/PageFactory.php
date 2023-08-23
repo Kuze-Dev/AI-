@@ -8,8 +8,8 @@ use Carbon\Carbon;
 use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
-use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
-use Domain\Support\RouteUrl\Database\Factories\RouteUrlFactory;
+use Support\MetaData\Database\Factories\MetaDataFactory;
+use Support\RouteUrl\Database\Factories\RouteUrlFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\Relationship;
 use Illuminate\Support\Arr;
@@ -26,6 +26,7 @@ class PageFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'published_at' => null,
+            'locale' => 'en',
             'visibility' => Arr::random(Visibility::cases()),
         ];
     }

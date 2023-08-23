@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Domain\Content\Database\Factories;
 
 use Domain\Content\Models\ContentEntry;
-use Domain\Support\MetaData\Database\Factories\MetaDataFactory;
-use Domain\Support\RouteUrl\Database\Factories\RouteUrlFactory;
+use Support\MetaData\Database\Factories\MetaDataFactory;
+use Support\RouteUrl\Database\Factories\RouteUrlFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

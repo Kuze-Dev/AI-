@@ -4,21 +4,23 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Support\SchemaFormBuilder;
+use Closure;
+use Filament\Forms;
+use Filament\Tables;
+use Domain\Site\Models\Site;
+use Filament\Resources\Form;
+use Filament\Resources\Table;
+use Filament\Resources\Resource;
+use Domain\Globals\Models\Globals;
+use Illuminate\Support\Facades\Auth;
 use Domain\Blueprint\Models\Blueprint;
-use App\FilamentTenant\Resources\GlobalsResource\Pages\CreateGlobals;
+use Domain\Internationalization\Models\Locale;
+use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\EditGlobals;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\ListGlobals;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Domain\Globals\Models\Globals;
-use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
-use Illuminate\Support\Facades\Auth;
-use Closure;
+use App\FilamentTenant\Resources\GlobalsResource\Pages\CreateGlobals;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class GlobalsResource extends Resource
 {
@@ -40,7 +42,9 @@ class GlobalsResource extends Resource
             Forms\Components\Card::make([
                 Forms\Components\TextInput::make('name')
                     ->unique(ignoreRecord: true)
-                    ->required(),
+                    ->required()
+                    ->string()
+                    ->maxLength(255),
                 Forms\Components\Select::make('blueprint_id')
                     ->label(trans('Blueprint'))
                     ->required()
@@ -48,6 +52,35 @@ class GlobalsResource extends Resource
                     ->optionsFromModel(Blueprint::class, 'name')
                     ->disabled(fn (?Globals $record) => $record !== null)
                     ->reactive(),
+                Forms\Components\Select::make('locale')
+                    ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                    ->default((string) optional(Locale::where('is_default', true)->first())->code)
+                    ->searchable()
+                    ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->required(),
+                Forms\Components\Card::make([
+                    Forms\Components\CheckboxList::make('sites')
+                        ->options(
+                            fn () => Site::orderBy('name')
+                                ->pluck('name', 'id')
+                                ->toArray()
+                        )
+                        ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Globals $record): void {
+                            if ( ! $record) {
+                                $component->state([]);
+
+                                return;
+                            }
+
+                            $component->state(
+                                $record->sites->pluck('id')
+                                    ->intersect(array_keys($component->getOptions()))
+                                    ->values()
+                                    ->toArray()
+                            );
+                        }),
+                ])
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
                     ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
@@ -61,7 +94,8 @@ class GlobalsResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),

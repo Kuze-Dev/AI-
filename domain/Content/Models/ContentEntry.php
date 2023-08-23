@@ -4,24 +4,25 @@ declare(strict_types=1);
 
 namespace Domain\Content\Models;
 
-use Domain\Admin\Models\Admin;
-use Domain\Content\Models\Builders\ContentEntryBuilder;
-use Domain\Support\MetaData\HasMetaData;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
-use Domain\Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
-use Domain\Support\RouteUrl\HasRouteUrl;
-use Domain\Taxonomy\Models\TaxonomyTerm;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
-use Domain\Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 use Illuminate\Support\Str;
+use Domain\Site\Traits\Sites;
+use Spatie\Sluggable\HasSlug;
+use Domain\Admin\Models\Admin;
+use Spatie\Sluggable\SlugOptions;
+use Support\MetaData\HasMetaData;
+use Support\RouteUrl\HasRouteUrl;
+use Spatie\Activitylog\LogOptions;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Models\Activity;
+use Domain\Taxonomy\Models\TaxonomyTerm;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Domain\Content\Models\Builders\ContentEntryBuilder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
+use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 
 /**
  * Domain\Content\Models\ContentEntry
@@ -31,18 +32,19 @@ use Illuminate\Support\Str;
  * @property int $content_id
  * @property string $title
  * @property string $slug
+ * @property string $locale
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property array $data
  * @property int|null $order
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Domain\Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
+ * @property-read \Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Admin|null $author
  * @property-read \Domain\Content\Models\Content $content
- * @property-read \Domain\Support\MetaData\Models\MetaData|null $metaData
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Support\RouteUrl\Models\RouteUrl> $routeUrls
+ * @property-read \Support\MetaData\Models\MetaData|null $metaData
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Support\RouteUrl\Models\RouteUrl> $routeUrls
  * @property-read int|null $route_urls_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
@@ -73,6 +75,7 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
     use HasRouteUrl;
     use HasMetaData;
     use ConstraintsRelationships;
+    use Sites;
 
     /**
      * Declare columns
@@ -85,6 +88,7 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
         'order',
         'author_id',
         'published_at',
+        'locale',
     ];
 
     /**
@@ -94,6 +98,10 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
     protected $casts = [
         'data' => 'array',
         'published_at' => 'datetime',
+    ];
+
+    protected $with = [
+        'sites',
     ];
 
     /** @return LogOptions */

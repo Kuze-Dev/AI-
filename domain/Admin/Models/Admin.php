@@ -10,8 +10,8 @@ use Domain\Auth\Contracts\HasActiveState as HasActiveStateContract;
 use Domain\Auth\Contracts\TwoFactorAuthenticatable as TwoFactorAuthenticatableContract;
 use Domain\Auth\HasActiveState;
 use Domain\Auth\TwoFactorAuthenticatable;
-use Domain\Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -136,6 +136,14 @@ class Admin extends Authenticatable implements MustVerifyEmail, HasName, TwoFact
     {
         return Attribute::get(
             fn ($value) => "{$this->first_name} {$this->last_name}"
+        );
+    }
+
+    /** @return Attribute<string, never> */
+    protected function siteLabel(): Attribute
+    {
+        return Attribute::get(
+            fn ($value) => "{$this->first_name} {$this->last_name} | {$this->email}"
         );
     }
 

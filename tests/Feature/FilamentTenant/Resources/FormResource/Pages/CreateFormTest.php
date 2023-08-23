@@ -6,7 +6,7 @@ use App\FilamentTenant\Resources\FormResource\Pages\CreateForm;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
-use Domain\Support\Captcha\CaptchaProvider;
+use Support\Captcha\CaptchaProvider;
 use Filament\Facades\Filament;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 
@@ -39,10 +39,11 @@ it('can create form', function () {
                     'to' => ['test@user'],
                     'cc' => ['test@user'],
                     'bcc' => ['test@user'],
-                    'sender' => 'test@user',
+                    'sender_name' => 'test user',
                     'reply_to' => ['test@user'],
                     'subject' => 'Test Subject',
                     'template' => 'Some test template',
+                    'has_attachments' => false,
                 ],
             ],
         ])
@@ -58,10 +59,11 @@ it('can create form', function () {
         'to' => ['test@user'],
         'cc' => ['test@user'],
         'bcc' => ['test@user'],
-        'sender' => 'test@user',
+        'sender_name' => 'test user',
         'reply_to' => ['test@user'],
         'subject' => 'Test Subject',
         'template' => 'Some test template',
+        'has_attachments' => false,
     ]);
 });
 

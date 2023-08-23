@@ -4,28 +4,30 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Resources\MenuResource\Pages;
-use App\FilamentTenant\Support\Tree;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
-use Domain\Content\Models\Content;
-use Domain\Content\Models\ContentEntry;
-use Domain\Menu\Enums\NodeType;
-use Domain\Menu\Enums\Target;
+use Filament\Forms;
+use Filament\Tables;
+use Illuminate\Support\Str;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
 use Domain\Page\Models\Page;
-use Filament\Forms;
+use Domain\Site\Models\Site;
 use Filament\Resources\Form;
-use Filament\Resources\Resource;
+use Domain\Menu\Enums\Target;
 use Filament\Resources\Table;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Model;
+use Domain\Menu\Enums\NodeType;
+use Filament\Resources\Resource;
+use Domain\Content\Models\Content;
+use App\FilamentTenant\Support\Tree;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use Domain\Content\Models\ContentEntry;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Domain\Internationalization\Models\Locale;
+use App\FilamentTenant\Resources\MenuResource\Pages;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class MenuResource extends Resource
 {
@@ -71,8 +73,39 @@ class MenuResource extends Resource
             ->schema([
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
-                        ->required(),
+                        ->required()
+                        ->string()
+                        ->maxLength(255),
                 ]),
+                Forms\Components\Card::make([
+                    Forms\Components\CheckboxList::make('sites')
+                        ->options(
+                            fn () => Site::orderBy('name')
+                                ->pluck('name', 'id')
+                                ->toArray()
+                        )
+                        ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Menu $record): void {
+                            if ( ! $record) {
+                                $component->state([]);
+
+                                return;
+                            }
+
+                            $component->state(
+                                $record->sites->pluck('id')
+                                    ->intersect(array_keys($component->getOptions()))
+                                    ->values()
+                                    ->toArray()
+                            );
+                        }),
+                ])
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+                Forms\Components\Select::make('locale')
+                    ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                    ->default((string) optional(Locale::where('is_default', true)->first())->code)
+                    ->searchable()
+                    ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->required(),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([
                         Tree::make('nodes')
@@ -168,7 +201,8 @@ class MenuResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->truncate('max-w-xs lg:max-w-md 2xl:max-w-3xl', true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),

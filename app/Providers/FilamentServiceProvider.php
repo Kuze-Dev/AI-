@@ -21,7 +21,7 @@ use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\UserMenuItem;
 use Filament\Pages\Actions as PageActions;
 use Filament\Support\Actions as SupportActions;
-use Filament\Tables\Actions as TableActions;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Vite;
@@ -201,7 +201,7 @@ class FilamentServiceProvider extends ServiceProvider
                         $activityLogger->log($description);
                     };
 
-                    if ($action instanceof TableActions\BulkAction) {
+                    if ($action instanceof Tables\Actions\BulkAction) {
                         foreach ($action->getRecords() ?? [] as $record) {
                             $log($record);
                         }
@@ -216,22 +216,24 @@ class FilamentServiceProvider extends ServiceProvider
 
         Forms\Components\Select::macro(
             'optionsFromModel',
-            function (string $model, string $titleColumnName, ?Closure $callback = null): Forms\Components\Select {
+            function (string|Closure $model, string|Closure $titleColumnName, ?Closure $callback = null): Forms\Components\Select {
                 /** @var Forms\Components\Select $this */
 
                 if (blank($this->getSearchColumns())) {
-                    $this->searchable([$titleColumnName]);
+                    $this->searchable([$this->evaluate($titleColumnName)]);
                 }
 
                 $this->getSearchResultsUsing(function (Forms\Components\Select $component, ?string $search) use ($model, $titleColumnName, $callback): array {
 
-                    $query = $model::query();
+                    $query = $component->evaluate($model)::query();
 
                     $keyName = $query->getModel()->getKeyName();
 
                     if ($callback) {
                         $query = $component->evaluate($callback, ['query' => $query]) ?? $query;
                     }
+
+                    $titleColumnName = $component->evaluate($titleColumnName);
 
                     if (empty($query->getQuery()->orders)) {
                         $query->orderBy($titleColumnName);
@@ -267,7 +269,7 @@ class FilamentServiceProvider extends ServiceProvider
                         return null;
                     }
 
-                    $query = $model::query();
+                    $query = $component->evaluate($model)::query();
 
                     $keyName = $query->getModel()->getKeyName();
 
@@ -285,6 +287,8 @@ class FilamentServiceProvider extends ServiceProvider
                             ->toArray();
                     }
 
+                    $titleColumnName = $component->evaluate($titleColumnName);
+
                     if (str_contains($titleColumnName, '->') && ! str_contains($titleColumnName, ' as ')) {
                         $titleColumnName .= " as {$titleColumnName}";
                     }
@@ -295,7 +299,7 @@ class FilamentServiceProvider extends ServiceProvider
 
                 $this->getOptionLabelUsing(function (Forms\Components\Select $component, $value) use ($model, $titleColumnName, $callback): ?string {
 
-                    $query = $model::query();
+                    $query = $component->evaluate($model)::query();
 
                     if ($callback) {
                         $query = $component->evaluate($callback, ['query' => $query]) ?? $query;
@@ -309,12 +313,12 @@ class FilamentServiceProvider extends ServiceProvider
 
                     return $component->hasOptionLabelFromRecordUsingCallback()
                         ? $component->getOptionLabelFromRecord($record)
-                        : $record->getAttributeValue($titleColumnName);
+                        : $record->getAttributeValue($component->evaluate($titleColumnName));
                 });
 
                 $this->getOptionLabelsUsing(function (Forms\Components\Select $component, array $values) use ($model, $titleColumnName, $callback): array {
 
-                    $query = $model::query();
+                    $query = $component->evaluate($model)::query();
 
                     $keyName = $query->getModel()->getKeyName();
 
@@ -330,6 +334,8 @@ class FilamentServiceProvider extends ServiceProvider
                             ->toArray();
                     }
 
+                    $titleColumnName = $component->evaluate($titleColumnName);
+
                     if (str_contains($titleColumnName, '->') && ! str_contains($titleColumnName, ' as ')) {
                         $titleColumnName .= " as {$titleColumnName}";
                     }
@@ -338,7 +344,12 @@ class FilamentServiceProvider extends ServiceProvider
                         ->toArray();
                 });
 
-                $this->rule(Rule::exists($model, $model::query()->getModel()->getKeyName()));
+                $this->rule(function (Forms\Components\Select $component) use ($model) {
+                    $model = $component->evaluate($model);
+                    $keyName = $model::query()->getModel()->getKeyName();
+
+                    return Rule::exists($model, $keyName);
+                });
 
                 return $this;
             }
@@ -389,6 +400,46 @@ class FilamentServiceProvider extends ServiceProvider
 
             return $this;
         });
+
+        Tables\Columns\TextColumn::macro('truncate', function (string $size = 'md', bool|Closure $tooltip = false): Tables\Columns\TextColumn {
+            /** @var Tables\Columns\TextColumn $this */
+
+            $this->tooltip(function (Tables\Columns\TextColumn $column) use ($tooltip): ?string {
+                if ($tooltip instanceof Closure) {
+                    return $column->evaluate($tooltip);
+                }
+
+                return $tooltip
+                    ? $column->getState()
+                    : null;
+            });
+
+            $this->formatStateUsing(function (?string $state) use ($size): HtmlString {
+                $cssClass = match ($size) {
+                    'xs' => 'max-w-xs',
+                    'sm' => 'max-w-sm',
+                    'md' => 'max-w-md',
+                    'lg' => 'max-w-lg',
+                    'xl' => 'max-w-xl',
+                    '2xl' => 'max-w-2xl',
+                    '3xl' => 'max-w-3xl',
+                    '4xl' => 'max-w-4xl',
+                    '5xl' => 'max-w-5xl',
+                    '6xl' => 'max-w-6xl',
+                    default => $size,
+                };
+
+                return new HtmlString(
+                    <<<html
+                            <div class="truncate {$cssClass}">
+                                {$state}
+                            </div>
+                        html
+                );
+            });
+
+            return $this;
+        });
     }
 
     protected function configureComponents(): void
@@ -398,27 +449,27 @@ class FilamentServiceProvider extends ServiceProvider
         PageActions\RestoreAction::configureUsing($this->createActionConfiguration(), isImportant: true);
         PageActions\ForceDeleteAction::configureUsing($this->createActionConfiguration(), isImportant: true);
 
-        TableActions\EditAction::configureUsing(fn (TableActions\EditAction $action) => $action->button());
-        TableActions\DeleteAction::configureUsing($this->createActionConfiguration(), isImportant: true);
-        TableActions\RestoreAction::configureUsing($this->createActionConfiguration(), isImportant: true);
-        TableActions\ForceDeleteAction::configureUsing($this->createActionConfiguration(), isImportant: true);
+        Tables\Actions\EditAction::configureUsing(fn (Tables\Actions\EditAction $action) => $action->button());
+        Tables\Actions\DeleteAction::configureUsing($this->createActionConfiguration(), isImportant: true);
+        Tables\Actions\RestoreAction::configureUsing($this->createActionConfiguration(), isImportant: true);
+        Tables\Actions\ForceDeleteAction::configureUsing($this->createActionConfiguration(), isImportant: true);
 
-        TableActions\DeleteBulkAction::configureUsing($this->createBulkActionConfiguration(), isImportant: true);
-        TableActions\RestoreBulkAction::configureUsing($this->createBulkActionConfiguration(), isImportant: true);
-        TableActions\ForceDeleteBulkAction::configureUsing($this->createBulkActionConfiguration(), isImportant: true);
+        Tables\Actions\DeleteBulkAction::configureUsing($this->createBulkActionConfiguration(), isImportant: true);
+        Tables\Actions\RestoreBulkAction::configureUsing($this->createBulkActionConfiguration(), isImportant: true);
+        Tables\Actions\ForceDeleteBulkAction::configureUsing($this->createBulkActionConfiguration(), isImportant: true);
     }
 
     private function createActionConfiguration(): Closure
     {
-        return fn (PageActions\Action|TableActions\Action $action) => $action
+        return fn (PageActions\Action|Tables\Actions\Action $action) => $action
             ->withActivityLog(
-                event: fn (PageActions\Action|TableActions\Action $action) => match ($action->getName()) {
+                event: fn (PageActions\Action|Tables\Actions\Action $action) => match ($action->getName()) {
                     'delete' => 'deleted',
                     'restore' => 'restored',
                     'forceDelete' => 'force-deleted',
                     default => throw new Exception(),
                 },
-                description: fn (PageActions\Action|TableActions\Action $action) => match ($action->getName()) {
+                description: fn (PageActions\Action|Tables\Actions\Action $action) => match ($action->getName()) {
                     'delete' => $action->getRecordTitle() . ' deleted',
                     'restore' => $action->getRecordTitle() . ' restored',
                     'forceDelete' => $action->getRecordTitle() . ' force deleted',
@@ -426,7 +477,7 @@ class FilamentServiceProvider extends ServiceProvider
                 }
             )
             ->modalSubheading(
-                fn (PageActions\Action|TableActions\Action $action) => trans(
+                fn (PageActions\Action|Tables\Actions\Action $action) => trans(
                     'Are you sure you want to :action this :resource?',
                     [
                         'action' => Str::of($action->getName())->headline()->lower()->toString(),
@@ -435,7 +486,7 @@ class FilamentServiceProvider extends ServiceProvider
                 )
             )
             ->failureNotificationTitle(
-                fn (PageActions\Action|TableActions\Action $action) => trans(
+                fn (PageActions\Action|Tables\Actions\Action $action) => trans(
                     'Unable to :action :resource.',
                     [
                         'action' => Str::of($action->getName())->headline()->lower()->toString(),
@@ -447,15 +498,15 @@ class FilamentServiceProvider extends ServiceProvider
 
     private function createBulkActionConfiguration(): Closure
     {
-        return fn (TableActions\BulkAction $action) => $action
-            ->withActivityLog(event: fn (TableActions\BulkAction $action) => match ($action->getName()) {
+        return fn (Tables\Actions\BulkAction $action) => $action
+            ->withActivityLog(event: fn (Tables\Actions\BulkAction $action) => match ($action->getName()) {
                 'delete' => 'deleted',
                 'restore' => 'restored',
                 'forceDelete' => 'force-deleted',
                 default => throw new Exception(),
             })
             ->modalSubheading(
-                fn (TableActions\BulkAction $action) => trans(
+                fn (Tables\Actions\BulkAction $action) => trans(
                     'Are you sure you want to :action :count :resource/s?',
                     [
                         'action' => Str::of($action->getName())->headline()->lower()->toString(),
@@ -465,7 +516,7 @@ class FilamentServiceProvider extends ServiceProvider
                 )
             )
             ->failureNotificationTitle(
-                fn (PageActions\Action|TableActions\Action $action) => trans(
+                fn (PageActions\Action|Tables\Actions\Action $action) => trans(
                     'Unable to :action :resource/s.',
                     [
                         'action' => Str::of($action->getName())->headline()->lower()->toString(),

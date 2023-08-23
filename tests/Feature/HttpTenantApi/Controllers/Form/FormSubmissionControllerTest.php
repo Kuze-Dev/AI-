@@ -7,8 +7,8 @@ use Domain\Blueprint\Enums\FieldType;
 use Domain\Form\Database\Factories\FormFactory;
 
 use Domain\Form\Models\FormSubmission;
-use Domain\Support\Captcha\CaptchaProvider;
-use Domain\Support\Captcha\Facades\Captcha;
+use Support\Captcha\CaptchaProvider;
+use Support\Captcha\Facades\Captcha;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 
 use function Pest\Laravel\assertDatabaseHas;

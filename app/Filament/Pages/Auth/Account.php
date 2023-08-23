@@ -15,6 +15,7 @@ use Filament\Pages\Concerns\HasFormActions;
 use Filament\Pages\Page;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 /**
@@ -79,7 +80,7 @@ class Account extends Page
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->required()
-                    ->rule(app()->environment('local', 'testing') ? 'email' : 'email:rfc,dns')
+                    ->rules(Rule::email())
                     ->unique(Admin::class, ignorable: $this->admin)
                     ->helperText( ! config('domain.admin.can_change_email') ? 'Email update is currently disabled.' : null)
                     ->disabled( ! config('domain.admin.can_change_email'))

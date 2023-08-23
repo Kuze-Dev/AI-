@@ -15,7 +15,7 @@ use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
 use Domain\Blueprint\Models\Blueprint;
-use Domain\Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
 use Filament\Resources\Form;
@@ -53,7 +53,9 @@ class BlueprintResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->required()
-                        ->unique(ignoreRecord: true),
+                        ->unique(ignoreRecord: true)
+                        ->string()
+                        ->maxLength(255),
                 ]),
                 Forms\Components\Card::make()
                     ->statePath('schema')
@@ -66,7 +68,9 @@ class BlueprintResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('title')
                                     ->lazy()
-                                    ->required(),
+                                    ->required()
+                                    ->string()
+                                    ->maxLength(255),
                                 Forms\Components\TextInput::make('state_name')
                                     ->disabled(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
                                         $record->schema->sections,
@@ -84,7 +88,8 @@ class BlueprintResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -152,6 +157,8 @@ class BlueprintResource extends Resource
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->lazy()
+                    ->string()
+                    ->maxLength(255)
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('state_name')
                     ->columnSpan(['sm' => 2])
@@ -231,6 +238,7 @@ class BlueprintResource extends Resource
                 Forms\Components\Toggle::make('multiple')
                     ->reactive(),
                 Forms\Components\Toggle::make('reorder'),
+                Forms\Components\Toggle::make('can_download'),
                 Forms\Components\TextInput::make('accept')
                     ->afterStateHydrated(function (Closure $set, ?array $state): void {
                         $set('accept', implode(',', $state ?? []));
@@ -440,6 +448,45 @@ class BlueprintResource extends Resource
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 self::getFieldsSchema()
                     ->columnSpanFull(),
+            ],
+            FieldType::CHECKBOX => [
+                Forms\Components\Toggle::make('bulk_toggleable')
+                    ->reactive()
+                    ->columnSpanFull(),
+                Forms\Components\Repeater::make('options')
+                    ->collapsible()
+                    ->orderable()
+                    ->itemLabel(fn (array $state) => $state['title'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('value'),
+                        Forms\Components\TextInput::make('label'),
+                    ]),
+            ],
+            FieldType::RADIO => [
+                Forms\Components\Toggle::make('inline')
+                    ->columnSpanFull(),
+                Forms\Components\Repeater::make('options')
+                    ->collapsible()
+                    ->orderable()
+                    ->itemLabel(fn (array $state) => $state['title'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('value'),
+                        Forms\Components\TextInput::make('label'),
+                    ]),
+                Forms\Components\Repeater::make('descriptions')
+                    ->collapsible()
+                    ->orderable()
+                    ->itemLabel(fn (array $state) => $state['title'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('value'),
+                        Forms\Components\TextInput::make('description'),
+                    ]),
             ],
             default => [],
         };
