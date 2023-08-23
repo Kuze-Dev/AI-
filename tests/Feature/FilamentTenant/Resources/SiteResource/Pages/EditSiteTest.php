@@ -30,6 +30,7 @@ it('can edit site', function () {
     livewire(EditSite::class, ['record' => $site->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
+            'domain' => 'https://example.com',
             'slug' => 'test',
             'site_manager' => [],
             'data.main.header' => 'Bar',
