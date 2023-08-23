@@ -9,6 +9,7 @@ use App\FilamentTenant\Resources\DiscountResource\Pages\CreateDiscount;
 use App\FilamentTenant\Resources\DiscountResource\Pages\EditDiscount;
 use App\FilamentTenant\Resources\DiscountResource\Pages\ListDiscounts;
 use Closure;
+use Domain\Currency\Models\Currency;
 use Domain\Discount\Actions\AutoGenerateCode;
 use Domain\Discount\Actions\ForceDeleteDiscountAction;
 use Domain\Discount\Actions\RestoreDiscountAction;
@@ -200,7 +201,7 @@ class DiscountResource extends Resource
                         return $record?->discountCondition?->amount_type === DiscountAmountType::PERCENTAGE
                             ? (string) $record?->discountCondition?->amount . '%'
                             : ($record?->discountCondition?->amount_type === DiscountAmountType::FIXED_VALUE
-                                ? (string) $record?->discountCondition?->amount . 'PHP'
+                                ? Currency::whereEnabled(true)->value('symbol').' '. (string) $record?->discountCondition?->amount
                                 : null);
                     })
                     ->label(trans('Amount')),
@@ -212,6 +213,7 @@ class DiscountResource extends Resource
                 TextColumn::make('valid_end_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->date('F j, Y, g:i a')
+                    ->placeholder('No expiry')
                     ->label(trans('Expiration Date')),
 
                 BadgeColumn::make('status')

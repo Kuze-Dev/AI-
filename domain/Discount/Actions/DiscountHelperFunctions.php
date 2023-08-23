@@ -61,7 +61,7 @@ final class DiscountHelperFunctions
                 'message' => 'This discount code is invalid.',
             ],
             'max_uses' => [
-                'condition' => $discount->max_uses == 0,
+                'condition' => $discount->max_uses == 0 && $discount->max_uses != null,
                 'message' => 'This discount code max usage limit has been reached.',
             ],
             'grandTotal' => [

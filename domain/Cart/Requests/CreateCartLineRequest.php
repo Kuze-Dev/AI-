@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Requests;
 
+use Domain\Cart\Models\CartLine;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Foundation\Http\FormRequest;
@@ -50,6 +51,12 @@ class CreateCartLineRequest extends FormRequest
 
                     if (is_null($variantId)) {
                         $product = Product::where((new Product())->getRouteKeyName(), $purchasableId)->first();
+                        $cartLine = CartLine::whereHas('cart', function ($query) {
+                            $query->whereBelongsTo(auth()->user());
+                        })
+                            ->whereNull('checked_out_at')
+                            ->where('purchasable_type', Product::class)
+                            ->where('purchasable_id', $product->id)->first();
 
                         if ( ! $product) {
                             $fail('Invalid product.');
@@ -62,6 +69,18 @@ class CreateCartLineRequest extends FormRequest
 
                             return;
                         }
+
+                        if ($value > $product->stock) {
+                        }
+
+                        if ($cartLine) {
+                            $payloadQuantity = $cartLine->quantity + $value;
+                            if ($payloadQuantity > $product->stock) {
+                                $fail($value . ' can not be added to cart. The quantity is limited to ' . $product->stock);
+
+                                return;
+                            }
+                        }
                     } else {
                         $productVariant = ProductVariant::where(
                             (new ProductVariant())->getRouteKeyName(),
@@ -69,6 +88,13 @@ class CreateCartLineRequest extends FormRequest
                         )->whereHas('product', function ($query) use ($purchasableId) {
                             $query->where((new Product())->getRouteKeyName(), $purchasableId);
                         })->first();
+
+                        $cartLine = CartLine::whereHas('cart', function ($query) {
+                            $query->whereBelongsTo(auth()->user());
+                        })
+                            ->whereNull('checked_out_at')
+                            ->where('purchasable_type', ProductVariant::class)
+                            ->where('purchasable_id', $productVariant->id)->first();
 
                         if ( ! $productVariant) {
                             $fail('Invalid productVariant.');
@@ -80,6 +106,15 @@ class CreateCartLineRequest extends FormRequest
                             $fail('The quantity exceeds the available quantity of the product.');
 
                             return;
+                        }
+
+                        if ($cartLine) {
+                            $payloadQuantity = $cartLine->quantity + $value;
+                            if ($payloadQuantity > $productVariant->stock) {
+                                $fail($value . ' can not be added to cart. The quantity is limited to ' . $productVariant->stock);
+
+                                return;
+                            }
                         }
                     }
                 },

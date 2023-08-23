@@ -38,6 +38,7 @@ class OrderController extends Controller
                 'billingAddress',
                 'orderLines.media',
             ])->whereBelongsTo($customer))
+                ->defaultSort('-created_at')
                 ->allowedIncludes(['orderLines', 'orderLines.review.media'])
                 ->allowedFilters(['status', 'reference'])
                 ->allowedSorts(['reference', 'total', 'status', 'created_at'])

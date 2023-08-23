@@ -16,7 +16,6 @@ use Spatie\RouteAttributes\Attributes\Patch;
 ]
 class LikeController
 {
-
     #[Patch('like/{reviewId}')]
     public function __invoke(int $reviewId, EditLikeAction $editLikeAction): JsonResponse
     {

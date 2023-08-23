@@ -17,9 +17,12 @@ class OrderResource extends JsonApiResource
         return [
             'reference' => $this->reference,
             'status' => $this->status,
-            'created_at' => $this->created_at?->format('F d, Y H:i:s'),
+            'created_at' => $this->created_at->setTimezone(config('domain.admin.default_timezone'))->format('F d, Y g:i A'),
+            'tax_percentage' => $this->tax_percentage,
+            'tax_display' => $this->tax_display,
             'tax_total' => number_format((float) $this->tax_total, 2, '.', ','),
             'sub_total' => number_format((float) $this->sub_total, 2, '.', ','),
+            'discount_code' => $this->discount_code,
             'discount_total' => number_format((float) $this->discount_total, 2, '.', ','),
             'shipping_total' => number_format((float) $this->shipping_total, 2, '.', ','),
             'total' => number_format((float) $this->total, 2, '.', ','),

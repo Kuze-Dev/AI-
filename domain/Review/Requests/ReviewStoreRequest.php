@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Review\Requests;
 
+use Domain\Order\Enums\OrderStatuses;
+use Domain\Order\Models\OrderLine;
 use Domain\Review\Models\Review;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -36,6 +38,10 @@ class ReviewStoreRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $orderLineId = $this->input('order_line_id');
                     $review = Review::where('order_line_id', $orderLineId);
+                    $orderStatus = OrderLine::find($orderLineId)->order->status;
+                    if($orderStatus != OrderStatuses::FULFILLED) {
+                        $fail('You cannot review this item; the product hasn\'t been fulfilled yet.');
+                    }
                     if($review->exists()) {
                         $fail('You already review this product');
                     }

@@ -56,7 +56,7 @@ class Cart extends Model
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Cart\Models\CartLine> */
     public function cartLines(): HasMany
     {
-        return $this->hasMany(CartLine::class)->whereNull('checked_out_at');
+        return $this->hasMany(CartLine::class)->whereNull('checked_out_at')->orderBy('created_at', 'desc');
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Cart\Models\Cart> */
