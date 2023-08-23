@@ -201,7 +201,7 @@ class DiscountResource extends Resource
                         return $record?->discountCondition?->amount_type === DiscountAmountType::PERCENTAGE
                             ? (string) $record?->discountCondition?->amount . '%'
                             : ($record?->discountCondition?->amount_type === DiscountAmountType::FIXED_VALUE
-                                ? (string) $record?->discountCondition?->amount . Currency::whereEnabled(true)->value('symbol')
+                                ?  Currency::whereEnabled(true)->value('symbol').' '. (string) $record?->discountCondition?->amount
                                 : null);
                     })
                     ->label(trans('Amount')),
