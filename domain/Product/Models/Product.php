@@ -182,6 +182,7 @@ class Product extends Model implements HasMetaDataContract, HasMedia
         return $this->hasMany(Favorite::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Review\Models\Review> */
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);

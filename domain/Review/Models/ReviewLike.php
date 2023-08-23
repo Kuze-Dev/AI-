@@ -23,11 +23,13 @@ class ReviewLike extends Model
         'customer_id',
     ];
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Review\Models\Review, \Domain\Review\Models\ReviewLike> */
     public function review()
     {
         return $this->belongsTo(Review::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Review\Models\ReviewLike> */
     public function customer()
     {
         return $this->belongsTo(Customer::class);
