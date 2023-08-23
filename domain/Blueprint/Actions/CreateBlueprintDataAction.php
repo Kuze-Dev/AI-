@@ -6,6 +6,7 @@ namespace Domain\Blueprint\Actions;
 
 use Domain\Blueprint\DataTransferObjects\BlueprintDataData;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
+use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Models\BlueprintData;
 use Domain\Page\Models\BlockContent;
 
@@ -13,7 +14,8 @@ class CreateBlueprintDataAction
 {
     private function storeBlueprintData(BlueprintDataData $blueprintDataData): BlueprintData
     {
-        return BlueprintData::create([
+
+        $blueprintData = BlueprintData::create([
             'blueprint_id' => $blueprintDataData->blueprint_id,
             'model_id' => $blueprintDataData->model_id,
             'model_type' => $blueprintDataData->model_type,
@@ -21,6 +23,13 @@ class CreateBlueprintDataAction
             'value' => $blueprintDataData->value,
             'type' => $blueprintDataData->type,
         ]);
+
+        if($blueprintData->type == FieldType::MEDIA) {
+            $blueprintData->addMediaFromDisk($blueprintData->value, 's3')
+                ->toMediaCollection('blueprint_media');
+        }
+
+        return new BlueprintData();
     }
 
     public function execute(BlockContent $blockContent): BlueprintData
@@ -35,7 +44,6 @@ class CreateBlueprintDataAction
 
         return new BlueprintData();
     }
-
 
     private function extractStatePath(array $data, $parentKey = ''): array
     {
