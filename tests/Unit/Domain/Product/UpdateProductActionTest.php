@@ -78,6 +78,7 @@ it('can update product', function () {
                 'is_featured' => true,
                 'is_special_offer' => true,
                 'allow_customer_remarks' => true,
+                'allow_stocks' => true,
                 'product_options' => [
                     [
                         [

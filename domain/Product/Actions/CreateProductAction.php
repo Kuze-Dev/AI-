@@ -63,6 +63,7 @@ class CreateProductAction
                 'is_featured' => $productData->is_featured,
                 'is_special_offer' => $productData->is_special_offer,
                 'allow_customer_remarks' => $productData->allow_customer_remarks,
+                'allow_stocks' => $productData->allow_stocks,
                 'dimension' => ['length' => $productData->length, 'width' => $productData->width, 'height' => $productData->height],
             ],
             fn ($value) => filled($value)

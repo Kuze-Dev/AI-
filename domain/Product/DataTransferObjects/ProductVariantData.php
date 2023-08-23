@@ -12,8 +12,8 @@ class ProductVariantData
         public readonly array $combination,
         public readonly float $retail_price,
         public readonly float $selling_price,
-        public readonly int $stock,
         public readonly ?bool $status = false,
+        public readonly ?int $stock = null,
         public readonly ?int $product_id = null,
     ) {
     }

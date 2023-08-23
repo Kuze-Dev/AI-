@@ -104,6 +104,7 @@ class Product extends Model implements HasMetaDataContract, HasMedia
         'is_featured',
         'is_special_offer',
         'allow_customer_remarks',
+        'allow_stocks',
         'weight',
         'dimension',
         'minimum_order_quantity',
@@ -120,6 +121,7 @@ class Product extends Model implements HasMetaDataContract, HasMedia
         'is_featured' => 'boolean',
         'is_special_offer' => 'boolean',
         'allow_customer_remarks' => 'boolean',
+        'allow_stocks' => 'boolean',
     ];
 
     /**
@@ -191,7 +193,7 @@ class Product extends Model implements HasMetaDataContract, HasMedia
 
     public function isFavorite(): bool
     {
-        if ( ! auth()->check()) {
+        if (!auth()->check()) {
             return false;
         }
 

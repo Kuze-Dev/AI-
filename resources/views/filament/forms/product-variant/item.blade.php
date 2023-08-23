@@ -14,7 +14,9 @@
                         {{ ucfirst($itemOne['option_value']) }} /
                     @endforeach
                     (SKU: {{ $item['sku'] }})
-                    (Stock: {{ $item['stock'] }})
+                    @if (filled($item['stock']))
+                        (Stock: {{ $item['stock'] }})
+                    @endif
                 </span>
             </div>
             <div class="relative flex items-center">
