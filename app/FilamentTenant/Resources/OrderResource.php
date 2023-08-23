@@ -681,7 +681,7 @@ class OrderResource extends Resource
                     ->size('sm')
                     ->action(function () use ($order, $set) {
 
-                        $isPaid = !$order->is_paid;
+                        $isPaid = ! $order->is_paid;
 
                         $result = $order->update([
                             'is_paid' => $isPaid,
@@ -736,7 +736,7 @@ class OrderResource extends Resource
                         /** @var \Domain\Payments\Models\Payment $payment */
                         $payment = $order->payments->first();
 
-                        if (!is_null($payment->remarks)) {
+                        if ( ! is_null($payment->remarks)) {
                             Notification::make()
                                 ->title(trans('Invalid action.'))
                                 ->warning()

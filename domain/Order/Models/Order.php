@@ -201,19 +201,6 @@ class Order extends Model implements HasMedia, PayableInterface
             ->dontSubmitEmptyLogs();
     }
 
-    // /**
-    //  * @param \Illuminate\Database\Eloquent\Builder<\Domain\Order\Models\Order> $query
-    //  * @return \Illuminate\Database\Eloquent\Builder<\Domain\Order\Models\Order>
-    //  */
-    // public function scopeWhereHasForPayment(Builder $query): Builder
-    // {
-    //     return $query->whereHas('payments', function (Builder $subQuery) {
-    //         $subQuery->where(function (Builder $query) {
-    //             $query->whereIn('gateway', ['paypal', 'bank-transfer', 'stripe']);
-    //         })->where('status', 'pending');
-    //     })->where('is_paid', false);
-    // }
-
     public function getReferenceNumber(): string
     {
         return $this->reference;
