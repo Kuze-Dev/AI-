@@ -30,6 +30,7 @@ use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Support\RouteUrl\Rules\MicrositeContentEntryUniqueRouteUrlRule;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class ContentEntryResource extends Resource
@@ -93,7 +94,15 @@ class ContentEntryResource extends Resource
                     Forms\Components\Card::make([
                         Forms\Components\TextInput::make('title')
                             ->unique(
-                                callback: fn ($livewire, Unique $rule) => $rule->where('content_id', $livewire->ownerRecord->id),
+                                callback: function ($livewire, Unique $rule) {
+
+                                    if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+
+                                        return false;
+                                    }
+
+                                    return $rule->where('content_id', $livewire->ownerRecord->id);
+                                },
                                 ignoreRecord: true
                             )
                             ->lazy()
@@ -128,6 +137,7 @@ class ContentEntryResource extends Resource
                     ]),
                     Forms\Components\Card::make([
                         Forms\Components\CheckboxList::make('sites')
+                            ->rule(fn (?ContentEntry $record, Closure $get) => new MicrositeContentEntryUniqueRouteUrlRule($record, $get('route_url')))
                             ->options(
                                 fn () => Site::orderBy('name')
                                     ->pluck('name', 'id')

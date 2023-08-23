@@ -43,6 +43,11 @@ class UpdateContentEntryAction
 
         $this->createOrUpdateRouteUrl->execute($contentEntry, $contentEntryData->route_url_data);
 
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+
+            $contentEntry->sites()->sync($contentEntryData->sites);
+        }
+
         return $contentEntry;
     }
 }
