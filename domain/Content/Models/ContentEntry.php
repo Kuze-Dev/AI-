@@ -98,6 +98,10 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
         'published_at' => 'datetime',
     ];
 
+    protected $with = [
+        'sites',
+    ];
+
     /** @return LogOptions */
     public function getActivitylogOptions(): LogOptions
     {

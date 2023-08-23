@@ -215,6 +215,8 @@ class PageResource extends Resource
                     ->formatStateUsing(fn ($state) => Str::headline($state))
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TagsColumn::make('sites.name')
+                    ->toggleable(),
                 Tables\Columns\IconColumn::make('published_at')
                     ->label(trans('Published'))
                     ->options([
@@ -244,6 +246,9 @@ class PageResource extends Resource
                             ])
                             ->toArray()
                     ),
+                Tables\Filters\SelectFilter::make('sites')
+                    ->multiple()
+                    ->relationship('sites', 'name'),
                 Tables\Filters\TernaryFilter::make('published_at')
                     ->label(trans('Published'))
                     ->nullable(),
