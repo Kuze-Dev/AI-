@@ -216,7 +216,7 @@ class PageResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TagsColumn::make('sites.name')
-                ->toggleable(),
+                    ->toggleable(),
                 Tables\Columns\IconColumn::make('published_at')
                     ->label(trans('Published'))
                     ->options([
