@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Support\Str;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class CreateMediaFromS3UrlAction
 {
@@ -27,11 +28,13 @@ class CreateMediaFromS3UrlAction
                     }
                 } else {
                     if (Str::contains($imageUrl, env('AWS_ENDPOINT'))) {
-                        /** @phpstan-ignore-next-line */
-                        $media = $model->addMediaFromUrl($imageUrl)
-                            ->toMediaCollection($collection);
+                        $name = $this->getMediaName($imageUrl);
+                        $objectPath = $this->getBucketUrl($imageUrl);
 
-                        $mediaExcepts[] = $media;
+                        if (Storage::disk('s3')->exists($objectPath)) {
+                            $media = Media::where('name', $name)->first();
+                            $mediaExcepts[] = $media;
+                        }
                     }
                 }
             } catch (Exception $e) {
@@ -39,5 +42,32 @@ class CreateMediaFromS3UrlAction
         }
 
         $model->clearMediaCollectionExcept($collection, $mediaExcepts);
+    }
+
+    private function getMediaName(string $mediaUrl): string
+    {
+        /** @phpstan-ignore-next-line */
+        $pathInfo = pathinfo(parse_url($mediaUrl, PHP_URL_PATH));
+
+        if (Str::contains($pathInfo['filename'], '-preview')) {
+            $extractedString = explode('-', $pathInfo['filename'])[0];
+
+            return $extractedString;
+        }
+
+        return $pathInfo['filename'];
+    }
+
+    private function getBucketUrl(string $mediaUrl): string
+    {
+        /** @phpstan-ignore-next-line */
+        $pathInfo = pathinfo(parse_url($mediaUrl, PHP_URL_PATH));
+        $dirname = $pathInfo['dirname'] ?? '';
+        $segments = explode('/', $dirname);
+        array_splice($segments, 1, 1);
+        $outputString = implode('/', $segments);
+        $objectPath = $outputString . '/' . $pathInfo['basename'];
+
+        return $objectPath;
     }
 }
