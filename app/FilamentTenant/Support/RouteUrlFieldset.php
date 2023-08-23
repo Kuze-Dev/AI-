@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Support;
 
 use Closure;
-use Support\RouteUrl\Contracts\HasRouteUrl;
-use Support\RouteUrl\Rules\UniqueActiveRouteUrlRule;
 use Filament\Forms;
 use Filament\Forms\Components\Group;
 use Illuminate\Database\Eloquent\Model;
+use Support\RouteUrl\Contracts\HasRouteUrl;
+use Domain\Internationalization\Models\Locale;
+use Support\RouteUrl\Rules\UniqueActiveRouteUrlRule;
 use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
 
 class RouteUrlFieldset extends Group
@@ -32,7 +33,13 @@ class RouteUrlFieldset extends Group
                             return;
                         }
 
-                        $set('route_url.url', $model::generateRouteUrl($this->getModelForRouteUrl(), $get('data', true)));
+                        $locale = $get('locale');
+                        $defaultLocale = Locale::where('is_default', true)->first()?->code;
+
+                        $newUrl = $model::generateRouteUrl($this->getModelForRouteUrl(), $get('data', true));
+                        $newUrl = $locale !== $defaultLocale ? "/$locale$newUrl" : $newUrl;
+
+                        $set('route_url.url', $newUrl);
                     });
                 },
             ],

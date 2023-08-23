@@ -8,6 +8,7 @@ use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
+use Domain\Internationalization\Models\Locale;
 
 class CreatePageAction
 {
@@ -26,6 +27,7 @@ class CreatePageAction
             'name' => $pageData->name,
             'visibility' => $pageData->visibility,
             'published_at' => $pageData->published_at,
+            'locale' => $pageData->locale ?? Locale::where('is_default', true)->first()?->code,
         ]);
 
         $this->createMetaTags->execute($page, $pageData->meta_data);

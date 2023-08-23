@@ -9,6 +9,7 @@ use Domain\Content\Models\ContentEntry;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\MetaData\Actions\UpdateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
+use Domain\Internationalization\Models\Locale;
 
 class UpdateContentEntryAction
 {
@@ -30,6 +31,7 @@ class UpdateContentEntryAction
             'title' => $contentEntryData->title,
             'published_at' => $contentEntryData->published_at,
             'data' => $contentEntryData->data,
+            'locale' => $contentEntryData->locale ?? Locale::where('is_default', true)->first()?->code,
         ]);
 
         $contentEntry->metaData()->exists()
