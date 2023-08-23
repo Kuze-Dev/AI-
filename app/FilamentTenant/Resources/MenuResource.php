@@ -98,7 +98,7 @@ class MenuResource extends Resource
                             );
                         }),
                 ])
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([
                         Tree::make('nodes')
