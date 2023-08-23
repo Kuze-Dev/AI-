@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Product\Actions;
 
 use Domain\Product\DataTransferObjects\ProductData;
+use Domain\Product\DataTransferObjects\ProductOptionData;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductOption;
 use Domain\Product\Models\ProductOptionValue;
@@ -19,7 +20,7 @@ class UpdateProductOptionAction
             return;
         }
 
-        /** Process Update or Create of Product Options and Option Values */               
+        /** Process Update or Create of Product Options and Option Values */
         foreach ($productData->product_options as $key => $productOption) {
             $productOptionModel = ProductOption::find($productOption->id);
 
@@ -50,6 +51,9 @@ class UpdateProductOptionAction
 
             // Process Update or Create of Product Option Value             
             foreach ($productOption->productOptionValues as $key2 => $productOptionValue) {
+                $productOptionValue = $productOptionValue->withOptionId($productOption->id, $productOptionValue);
+                $proxyOptionValueId = $productOptionValue->id;
+
                 $optionValueModel = ProductOptionValue::find($productOptionValue->id);
 
                 if ($optionValueModel) {
@@ -66,7 +70,7 @@ class UpdateProductOptionAction
                         ->withId($newOptionValueModel->id, $productOptionValue);
 
                     $productData->product_variants = $this->searchAndChangeValue(
-                        $productOptionValue->id,
+                        $proxyOptionValueId,
                         $productData->product_variants,
                         $newOptionValueModel->id,
                         'option_value_id'
@@ -78,24 +82,14 @@ class UpdateProductOptionAction
 
             $productData->product_options[$key] = $productOption;
 
-            // Removal of Product Option Values
-            $mappedOptionValueIds = array_map(function ($item) {
-                return $item->id;
-            }, $productOption->productOptionValues);
-
-            if (count($mappedOptionValueIds)) {
-                $toRemoveOptionValues = ProductOptionValue::where(
-                    'product_option_id',
-                    $productOption->id
-                )->whereNotIn('id', $mappedOptionValueIds)->get();
-
-                foreach ($toRemoveOptionValues as $optionValue) {
-                    $optionValue->delete();
-                }
-            }
-            
+            $this->sanitizeOptionValues($productOption);
         }
 
+        $this->sanitizeOptions($productData, $product->id);
+    }
+
+    protected function sanitizeOptions(ProductData $productData, int $productId): void
+    {
         // Removal of Product Options
         $mappedOptionIds = array_map(function ($item) {
             return $item->id;
@@ -104,10 +98,29 @@ class UpdateProductOptionAction
         if (count($mappedOptionIds)) {
             $toRemoveOptions = ProductOption::where(
                 'product_id',
-                $product->id
+                $productId
             )->whereNotIn('id', $mappedOptionIds)->get();
             foreach ($toRemoveOptions as $option) {
                 $option->delete();
+            }
+        }
+    }
+
+    protected function sanitizeOptionValues(ProductOptionData $productOption): void
+    {
+        // Removal of Product Option Values
+        $mappedOptionValueIds = array_map(function ($item) {
+            return $item->id;
+        }, $productOption->productOptionValues);
+
+        if (count($mappedOptionValueIds)) {
+            $toRemoveOptionValues = ProductOptionValue::where(
+                'product_option_id',
+                $productOption->id
+            )->whereNotIn('id', $mappedOptionValueIds)->get();
+
+            foreach ($toRemoveOptionValues as $optionValue) {
+                $optionValue->delete();
             }
         }
     }

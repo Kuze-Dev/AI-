@@ -33,4 +33,14 @@ class ProductOptionValueData
             product_option_id: $data->product_option_id,
         );
     }
+
+    public static function withOptionId(int $optionId, self $data): self
+    {
+        return new self(
+            id: $data->id,
+            name: $data->name,
+            slug: $data->slug,
+            product_option_id: $optionId,
+        );
+    }
 }

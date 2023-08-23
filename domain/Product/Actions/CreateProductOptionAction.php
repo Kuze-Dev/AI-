@@ -33,6 +33,9 @@ class CreateProductOptionAction
                     );
 
                 foreach ($productOption->productOptionValues as $key2 => $productOptionValue) {
+                    $productOptionValue = $productOptionValue->withOptionId($productOption->id, $productOptionValue);
+                    $proxyOptionValueId = $productOptionValue->id;
+
                     $newOptionValueModel = ProductOptionValue::create([
                         'name' => $productOptionValue->name,
                         'product_option_id' => $productOption->id,
@@ -42,7 +45,7 @@ class CreateProductOptionAction
                         ->withId($newOptionValueModel->id, $productOptionValue);
 
                     $productData->product_variants = $this->searchAndChangeValue(
-                        $productOptionValue->id,
+                        $proxyOptionValueId,
                         $productData->product_variants,
                         $newOptionValueModel->id,
                         'option_value_id'
