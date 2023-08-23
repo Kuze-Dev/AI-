@@ -20,6 +20,7 @@ use App\FilamentTenant\Resources\GlobalsResource\Pages\ListGlobals;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\CreateGlobals;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use Illuminate\Validation\Rules\Unique;
 
 class GlobalsResource extends Resource
 {
@@ -40,7 +41,13 @@ class GlobalsResource extends Resource
         return $form->schema([
             Forms\Components\Card::make([
                 Forms\Components\TextInput::make('name')
-                    ->unique(ignoreRecord: true)
+                    ->unique(
+                        callback: function ($livewire, Unique $rule) {
+
+                            return ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class));
+                        },
+                        ignoreRecord: true
+                    )
                     ->required()
                     ->string()
                     ->maxLength(255),
@@ -53,6 +60,29 @@ class GlobalsResource extends Resource
                     ->reactive(),
                 Forms\Components\Card::make([
                     Forms\Components\CheckboxList::make('sites')
+                        ->rules([
+                            function (?Globals $record, Closure $get) {
+
+                                return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+
+                                    $siteIDs = $value;
+
+                                    if ($record) {
+                                        $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
+                                    }
+
+                                    $globals = Globals::where('name', $get('name'))->whereHas(
+                                        'sites',
+                                        fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                    )->count();
+
+                                    if ($globals > 0) {
+                                        $fail("Globals {$get('name')} is already available in selected sites.");
+                                    }
+
+                                };
+                            },
+                        ])
                         ->options(
                             fn () => Site::orderBy('name')
                                 ->pluck('name', 'id')
