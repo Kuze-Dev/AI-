@@ -196,7 +196,7 @@ class ProductOptionFormAction extends Action
 
             $combination['selling_price'] = isset($combination['selling_price']) ? $combination['selling_price'] : $record->selling_price;
             $combination['retail_price'] = isset($combination['retail_price']) ? $combination['retail_price'] : $record->retail_price;
-            $combination['stock'] = isset($combination['stock']) ? $combination['stock'] : $record->stock;
+            $combination['stock'] = isset($combination['stock']) ? $combination['stock'] : $record->stock ?? null;
             $combination['status'] = isset($combination['status']) ? $combination['status'] : $record->status;
             unset($combination['product_id'], $combination['created_at'], $combination['updated_at']);
 

@@ -33,10 +33,7 @@ class UpdateProductAction
                 ? $this->updateMetaData->execute($product, $productData->meta_data)
                 : $this->createMetaData->execute($product, $productData->meta_data);
 
-            /** needed for product option [] condition */
-            if (count($productData->product_options)) {
-                $this->updateProductOptionAction->execute($product, $productData);
-            }
+            $this->updateProductOptionAction->execute($product, $productData);
 
             $this->createOrUpdateProductVariantAction->execute($product, $productData, false);
 
@@ -54,7 +51,6 @@ class UpdateProductAction
 
             return $e;
         }
-
     }
 
     protected function getProductAttributes(ProductData $productData): array
@@ -74,6 +70,7 @@ class UpdateProductAction
                 'is_featured' => $productData->is_featured,
                 'is_special_offer' => $productData->is_special_offer,
                 'allow_customer_remarks' => $productData->allow_customer_remarks,
+                'allow_stocks' => $productData->allow_stocks,
                 'dimension' => ['length' => $productData->length, 'width' => $productData->width, 'height' => $productData->height],
             ],
             fn ($value) => filled($value)

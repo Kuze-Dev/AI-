@@ -104,6 +104,7 @@ class Product extends Model implements HasMetaDataContract, HasMedia
         'is_featured',
         'is_special_offer',
         'allow_customer_remarks',
+        'allow_stocks',
         'weight',
         'dimension',
         'minimum_order_quantity',
@@ -120,6 +121,7 @@ class Product extends Model implements HasMetaDataContract, HasMedia
         'is_featured' => 'boolean',
         'is_special_offer' => 'boolean',
         'allow_customer_remarks' => 'boolean',
+        'allow_stocks' => 'boolean',
     ];
 
     /**
@@ -177,25 +179,31 @@ class Product extends Model implements HasMetaDataContract, HasMedia
         return $this->hasMany(ProductOption::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Favorite\Models\Favorite> */
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Review\Models\Review> */
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
     }
 
-    public function isFavorite()
+    public function isFavorite(): bool
     {
-        if ( ! auth()->check()) {
+        if (!auth()->check()) {
             return false;
         }
 
         $customer = auth()->user();
 
-        return $this->favorites()->where('customer_id', $customer->id)->exists();
+        if ($customer) {
+            return $this->favorites()->where('customer_id', $customer->id)->exists();
+        }
+
+        return false;
     }
 
     public function getSlugOptions(): SlugOptions
