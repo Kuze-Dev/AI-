@@ -84,7 +84,7 @@ class PageResource extends Resource
                                 ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                                 ->default((string) optional(Locale::where('is_default', true)->first())->code)
                                 ->searchable()
-                                ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class))
+                                ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                                 ->reactive()
                                 ->afterStateUpdated(function (Forms\Components\Select $component, Closure $get) {
                                     $component->getContainer()
@@ -225,7 +225,7 @@ class PageResource extends Resource
                     ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+                    ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\BadgeColumn::make('visibility')
                     ->formatStateUsing(fn ($state) => Str::headline($state))
                     ->sortable()

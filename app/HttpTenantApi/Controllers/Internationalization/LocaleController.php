@@ -12,7 +12,7 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 
 #[
-    ApiResource('locale', only: ['index']),
+    ApiResource('locales', only: ['index']),
     Middleware('feature.tenant:'. CMSBase::class)
 ]
 class LocaleController
