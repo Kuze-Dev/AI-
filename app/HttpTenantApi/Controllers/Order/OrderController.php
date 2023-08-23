@@ -38,6 +38,7 @@ class OrderController extends Controller
                 'billingAddress',
                 'orderLines.media',
             ])->whereBelongsTo($customer))
+                ->defaultSort('-created_at')
                 ->allowedIncludes(['orderLines', 'orderLines.review.media'])
                 ->allowedFilters(['status', 'reference'])
                 ->allowedSorts(['reference', 'total', 'status', 'created_at'])
@@ -65,7 +66,7 @@ class OrderController extends Controller
         }
 
         /** @phpstan-ignore-next-line */
-        if ( ! $result['order'] instanceof Order) {
+        if (!$result['order'] instanceof Order) {
             return response()->json([
                 'message' => 'Order failed to be created',
             ], 400);
