@@ -177,6 +177,7 @@ class Order extends Model implements HasMedia, PayableInterface
         return $this->hasOne(OrderAddress::class)->where('type', OrderAddressTypes::BILLING);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ShippingMethod\Models\ShippingMethod, \Domain\Order\Models\Order> */
     public function shippingMethod(): BelongsTo
     {
         return $this->belongsTo(ShippingMethod::class, 'shipping_method_id');

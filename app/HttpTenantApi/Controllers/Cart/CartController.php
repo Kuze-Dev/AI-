@@ -51,7 +51,7 @@ class CartController extends Controller
                 return ! is_null($cartLine->purchasable);
             });
 
-            if ( ! is_null($cartLineIdsTobeRemoved)) {
+            if ( ! empty($cartLineIdsTobeRemoved)) {
                 event(new SanitizeCartEvent(
                     $cartLineIdsTobeRemoved,
                 ));

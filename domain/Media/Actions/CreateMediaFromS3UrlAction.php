@@ -17,9 +17,9 @@ class CreateMediaFromS3UrlAction
         $mediaExcepts = [];
         foreach ($medias as $imageUrl) {
             try {
-                /** @phpstan-ignore-next-line */
                 if (Str::contains($imageUrl, 'tmp/')) {
                     if (Storage::disk('s3')->exists($imageUrl)) {
+                        /** @phpstan-ignore-next-line */
                         $media = $model->addMediaFromDisk($imageUrl, 's3')
                             ->toMediaCollection($collection);
 
@@ -27,6 +27,7 @@ class CreateMediaFromS3UrlAction
                     }
                 } else {
                     if (Str::contains($imageUrl, env('AWS_ENDPOINT'))) {
+                        /** @phpstan-ignore-next-line */
                         $media = $model->addMediaFromUrl($imageUrl)
                             ->toMediaCollection($collection);
 
