@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notification;
 class OrderFulfilledNotification extends Notification
 {
     use Queueable;
-    private $order;
+    private Order $order;
 
     /** Create a new notification instance. */
     public function __construct(Order $order)
