@@ -246,9 +246,9 @@ class PageResource extends Resource
                             ])
                             ->toArray()
                     ),
-                    Tables\Filters\SelectFilter::make('sites')
-                        ->multiple()
-                        ->relationship('sites', 'name'),
+                Tables\Filters\SelectFilter::make('sites')
+                    ->multiple()
+                    ->relationship('sites', 'name'),
                 Tables\Filters\TernaryFilter::make('published_at')
                     ->label(trans('Published'))
                     ->nullable(),
