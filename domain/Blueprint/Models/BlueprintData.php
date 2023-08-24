@@ -64,7 +64,7 @@ class BlueprintData extends Model implements HasMedia
                             }
                             $this->addMediaConversion($title)
                                 ->width($width)
-                                ->height($height);
+                                ->height($height)->keepOriginalImageFormat();
                         }
                     }
                 }
