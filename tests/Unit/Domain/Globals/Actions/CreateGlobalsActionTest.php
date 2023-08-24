@@ -23,6 +23,34 @@ it('can create globals  ', function () {
         ])
         ->createOne();
 
+    app(CreateGlobalsAction::class)
+        ->execute(GlobalsData::fromArray([
+            'blueprint_id' => $blueprint->getKey(),
+            'name' => 'Test',
+            'slug' => 'test',
+            'data' => ['main' => ['title' => 'Foo']],
+        ]));
+
+    assertDatabaseHas(Globals::class, [
+        'blueprint_id' => $blueprint->getKey(),
+        'name' => 'Test',
+        'data' => json_encode(['main' => ['title' => 'Foo']]),
+    ]);
+
+});
+
+it('can create globals for micro sites  ', function () {
+
+    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+
+    $blueprint = BlueprintFactory::new()
+        ->addSchemaSection(['title' => 'Main'])
+        ->addSchemaField([
+            'title' => 'Title',
+            'type' => FieldType::TEXT,
+        ])
+        ->createOne();
+
     $site = SiteFactory::new()
         ->createOne();
 
