@@ -197,7 +197,7 @@ class DiscountResource extends Resource
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('discountCondition.amount')
-                ->formatStateUsing(function ($record) {
+                    ->formatStateUsing(function ($record) {
                         $discountCondition = $record->discountCondition;
 
                         if ($discountCondition !== null) {
@@ -225,8 +225,8 @@ class DiscountResource extends Resource
                 BadgeColumn::make('status')
                     ->colors([
 
-                        'success' => 'active',
-                        'warning' => 'inactive',
+                    'success' => 'active',
+                    'warning' => 'inactive',
 
                     ])->formatStateUsing(fn (string $state): string => __(ucfirst($state)))->weight('bold'),
             ])

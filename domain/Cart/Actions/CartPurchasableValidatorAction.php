@@ -15,17 +15,7 @@ class CartPurchasableValidatorAction
     {
         $product = Product::where((new Product())->getRouteKeyName(), $productId)->first();
 
-        if (!$product) {
-            throw new InvalidPurchasableException('Invalid product.');
-        }
-
-        if (!$product->status) {
-            throw new InvalidPurchasableException('Inactive product.');
-        }
-
-        if (!$product->allow_stocks) {
-            return;
-        }
+        $this->validatePurchasable($product);
 
         $cartLine = CartLine::whereHas('cart', function ($query) {
             $query->whereBelongsTo(auth()->user());
@@ -34,16 +24,13 @@ class CartPurchasableValidatorAction
             ->where('purchasable_type', Product::class)
             ->where('purchasable_id', $product->id)->first();
 
-        if ($quantity > $product->stock) {
-            throw new InvalidPurchasableException('The quantity exceeds the available quantity of the product.');
-        }
+        $this->validateMinimumQuantity($product, $quantity, $cartLine);
 
-        if ($cartLine) {
-            $payloadQuantity = $cartLine->quantity + $quantity;
-            if ($payloadQuantity > $product->stock) {
-                throw new InvalidPurchasableException($quantity . ' can not be added to cart. The quantity is limited to ' . $product->stock);
-            }
+        //stock control
+        if ( ! $product->allow_stocks) {
+            return;
         }
+        $this->validateStockControl($product,  $quantity, $cartLine);
     }
 
     public function validateProductVariant(
@@ -58,19 +45,7 @@ class CartPurchasableValidatorAction
             $query->where((new Product())->getRouteKeyName(), $productId);
         })->first();
 
-        if (!$productVariant) {
-            throw new InvalidPurchasableException('Invalid productVariant.');
-        }
-
-        if (!$productVariant->status) {
-            throw new InvalidPurchasableException('Inactive productVariant.');
-        }
-
-        /** @var \Domain\Product\Models\Product $product */
-        $product = $productVariant->product;
-        if (!$product->allow_stocks) {
-            return;
-        }
+        $this->validatePurchasable($productVariant);
 
         $cartLine = CartLine::whereHas('cart', function ($query) {
             $query->whereBelongsTo(auth()->user());
@@ -79,45 +54,40 @@ class CartPurchasableValidatorAction
             ->where('purchasable_type', ProductVariant::class)
             ->where('purchasable_id', $productVariant->id)->first();
 
-        if ($quantity > $productVariant->stock) {
-            throw new InvalidPurchasableException('The quantity exceeds the available quantity of the product.');
-        }
+        /** @var \Domain\Product\Models\Product $product */
+        $product = $productVariant->product;
 
-        if ($cartLine) {
-            $payloadQuantity = $cartLine->quantity + $quantity;
-            if ($payloadQuantity > $productVariant->stock) {
-                throw new InvalidPurchasableException($quantity .
-                    ' can not be added to cart. The quantity is limited to ' . $productVariant->stock);
-            }
+        $this->validateMinimumQuantity($product, $quantity, $cartLine);
+
+        //stock control
+        if ( ! $product->allow_stocks) {
+            return;
         }
+        $this->validateStockControl($productVariant, $quantity, $cartLine);
     }
 
     public function validatePurchasableUpdate(Product|ProductVariant $purchasable, int $quantity): void
     {
         if ($purchasable instanceof Product) {
-            if (!$purchasable->status) {
-                throw new InvalidPurchasableException('Inactive product.');
-            }
+            $this->validatePurchasable($purchasable);
+            $this->validateMinimumQuantity($purchasable, $quantity);
 
-            if (!$purchasable->allow_stocks) {
+            if ( ! $purchasable->allow_stocks) {
                 return;
             }
         } elseif ($purchasable instanceof ProductVariant) {
             /** @var \Domain\Product\Models\Product $product */
             $product = $purchasable->product;
 
-            if (!$product->status) {
-                throw new InvalidPurchasableException('Inactive productVariant.');
-            }
+            $this->validatePurchasable($product);
+            $this->validateMinimumQuantity($product, $quantity);
 
-            if (!$product->allow_stocks) {
+            if ( ! $product->allow_stocks) {
                 return;
             }
         }
 
-        if ($quantity > $purchasable->stock) {
-            throw new InvalidPurchasableException('Quantity exceeds stock');
-        }
+        $this->validateStockControl($purchasable, $quantity);
     }
 
     public function validateCheckout(array $cartLineIds): int
@@ -133,10 +103,14 @@ class CartPurchasableValidatorAction
 
         foreach ($cartLines as $cartLine) {
             if ($cartLine->purchasable instanceof Product) {
-                if (!$cartLine->purchasable->status) {
-                    throw new InvalidPurchasableException('Inactive product.');
-                }
-                if (!$cartLine->purchasable->allow_stocks) {
+                /** @var \Domain\Product\Models\Product $product */
+                $product = $cartLine->purchasable;
+
+                $this->validatePurchasable($product);
+
+                $this->validateMinimumQuantity($product, 0, $cartLine);
+
+                if ( ! $cartLine->purchasable->allow_stocks) {
                     $count++;
                 } else {
                     if ($cartLine->purchasable->stock >= $cartLine->quantity) {
@@ -147,11 +121,12 @@ class CartPurchasableValidatorAction
                 /** @var \Domain\Product\Models\Product $product */
                 $product = $cartLine->purchasable->product;
 
-                if (!$cartLine->purchasable->status) {
-                    throw new InvalidPurchasableException('Inactive productVariant.');
-                }
+                $this->validatePurchasable($product);
+
+                $this->validateMinimumQuantity($product, 0, $cartLine);
+
                 if (
-                    !$product->allow_stocks
+                    ! $product->allow_stocks
                 ) {
                     $count++;
                 } else {
@@ -163,6 +138,47 @@ class CartPurchasableValidatorAction
         }
 
         return $count;
+    }
+
+    public function validatePurchasable(Product|ProductVariant $purchasable): void
+    {
+        //purchasable checking
+        if ( ! $purchasable) {
+            throw new InvalidPurchasableException('Invalid purchasable.');
+        }
+
+        if ( ! $purchasable->status) {
+            throw new InvalidPurchasableException('Inactive purchasable.');
+        }
+    }
+
+    public function validateMinimumQuantity(Product $product, int $quantity, ?CartLine $cartLine = null): void
+    {
+        //minimum order quantity
+        if ( ! is_null($cartLine)) {
+            $payloadQuantity = $cartLine->quantity + $quantity;
+            if ($payloadQuantity < $product->minimum_order_quantity) {
+                throw new InvalidPurchasableException('Minimum order quantity must be ' . $product->minimum_order_quantity . '.');
+            }
+        } else {
+            if ($quantity < $product->minimum_order_quantity) {
+                throw new InvalidPurchasableException('Minimum order quantity must be ' . $product->minimum_order_quantity . '.');
+            }
+        }
+    }
+
+    public function validateStockControl(Product|ProductVariant $purchasable, int $quantity, ?CartLine $cartLine = null): void
+    {
+        if ($quantity > $purchasable->stock) {
+            throw new InvalidPurchasableException('The quantity exceeds the available quantity of the purchasable.');
+        }
+
+        if ($cartLine) {
+            $payloadQuantity = $cartLine->quantity + $quantity;
+            if ($payloadQuantity > $purchasable->stock) {
+                throw new InvalidPurchasableException($quantity . ' can not be added to cart. The quantity is limited to ' . $purchasable->stock);
+            }
+        }
     }
 
     public function validateAuth(array $cartLineIds): int

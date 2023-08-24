@@ -91,7 +91,7 @@ class Discount extends Model
         return $this->hasOne(DiscountRequirement::class);
     }
 
-     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Discount\Models\DiscountLimit> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Discount\Models\DiscountLimit> */
     public function discountLimits(): HasMany
     {
         return $this->hasMany(DiscountLimit::class);

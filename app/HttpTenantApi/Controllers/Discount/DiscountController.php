@@ -26,9 +26,9 @@ class DiscountController extends Controller
             QueryBuilder::for(Discount::query()
                 ->whereStatus(DiscountStatus::ACTIVE)
                 ->jsonPaginate())
-                    ->allowedIncludes([
-                        'discountCondition',
-                        'discountRequirement'])
+                ->allowedIncludes([
+                    'discountCondition',
+                    'discountRequirement'])
         );
     }
 
@@ -36,17 +36,17 @@ class DiscountController extends Controller
     {
         return DiscountResource::make(
             QueryBuilder::for(Discount::whereCode($code)
-            ->whereStatus(DiscountStatus::ACTIVE)
-            ->where(function ($query) {
-                $query->where('max_uses', '>', 0)
-                    ->orWhereNull('max_uses');
-            })
-            ->where(function ($query) {
-                $query->where('valid_end_at', '>=', now())
-                    ->orWhereNull('valid_end_at');
-            }))
-            ->allowedIncludes(['discountCondition','discountRequirement'])
-            ->firstOrFail()
+                ->whereStatus(DiscountStatus::ACTIVE)
+                ->where(function ($query) {
+                    $query->where('max_uses', '>', 0)
+                        ->orWhereNull('max_uses');
+                })
+                ->where(function ($query) {
+                    $query->where('valid_end_at', '>=', now())
+                        ->orWhereNull('valid_end_at');
+                }))
+                ->allowedIncludes(['discountCondition', 'discountRequirement'])
+                ->firstOrFail()
         );
     }
 }
