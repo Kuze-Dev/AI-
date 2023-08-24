@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Discount\Models;
 
+use Domain\Customer\Models\Customer;
+use Domain\Order\Models\Order;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -50,18 +52,23 @@ class DiscountLimit extends Model
         'code',
     ];
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Discount\Models\Discount, \Domain\Discount\Models\DiscountLimit> */
     public function discount(): BelongsTo
     {
         return $this->belongsTo(Discount::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Domain\Customer\Models\Customer, \Domain\Discount\Models\DiscountLimit> */
     public function customer(): MorphTo
     {
-        return $this->morphTo();
+        return $this->morphTo(Customer::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Domain\Order\Models\Order, \Domain\Discount\Models\DiscountLimit>*/
     public function order(): MorphTo
     {
-        return $this->morphTo();
+        return $this->morphTo(Order::class);
     }
+
+
 }
