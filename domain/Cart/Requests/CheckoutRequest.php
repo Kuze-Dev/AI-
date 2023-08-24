@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Requests;
 
-use Domain\Cart\Actions\PurchasableCheckerAction;
+use Domain\Cart\Actions\CartPurchasableValidatorAction;
+use Domain\Cart\Exceptions\InvalidPurchasableException;
 use Illuminate\Foundation\Http\FormRequest;
+use Throwable;
 
 class CheckoutRequest extends FormRequest
 {
@@ -18,15 +20,21 @@ class CheckoutRequest extends FormRequest
                 function ($attribute, $value, $fail) {
 
                     //auth check
-                    $checkAuth = app(PurchasableCheckerAction::class)->checkAuth($value);
+                    $checkAuth = app(CartPurchasableValidatorAction::class)->validateAuth($value);
                     if ($checkAuth !== count($value)) {
                         $fail('Invalid cart line IDs.');
                     }
 
-                    //stock check
-                    $checkStocks = app(PurchasableCheckerAction::class)->checkStock($value);
-                    if ($checkStocks !== count($value)) {
-                        $fail('Invalid stocks');
+                    try {
+                        //stock check
+                        $checkStocks = app(CartPurchasableValidatorAction::class)->validateCheckout($value);
+                        if ($checkStocks !== count($value)) {
+                            $fail('Invalid stocks');
+                        }
+                    } catch (Throwable $th) {
+                        if ($th instanceof InvalidPurchasableException) {
+                            $fail($th->getMessage());
+                        }
                     }
                 },
             ],

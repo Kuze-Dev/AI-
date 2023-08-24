@@ -15,7 +15,9 @@ use Domain\Order\Requests\PlaceOrderRequest;
 use Domain\Order\Requests\UpdateOrderRequest;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
+use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
@@ -50,33 +52,41 @@ class OrderController extends Controller
     {
         $validatedData = $request->validated();
 
-        $result = app(PlaceOrderAction::class)
-            ->execute(PlaceOrderData::fromArray($validatedData));
+        try {
+            $result = app(PlaceOrderAction::class)
+                ->execute(PlaceOrderData::fromArray($validatedData));
 
-        if ($result instanceof USPSServiceNotFoundException) {
-            return response()->json([
-                'service_id' => 'Shipping method service id is required',
-            ], 404);
-        }
+            if ($result instanceof USPSServiceNotFoundException) {
+                return response()->json([
+                    'service_id' => 'Shipping method service id is required',
+                ], 404);
+            }
 
-        if ($result instanceof HttpException) {
-            return response()->json([
-                'message' => $result->getMessage(),
-            ], 422);
-        }
+            if ($result instanceof HttpException) {
+                return response()->json([
+                    'message' => $result->getMessage(),
+                ], 422);
+            }
 
-        /** @phpstan-ignore-next-line */
-        if ( ! $result['order'] instanceof Order) {
+            /** @phpstan-ignore-next-line */
+            if ( ! $result['order'] instanceof Order) {
+                return response()->json([
+                    'message' => 'Order failed to be created',
+                ], 400);
+            }
+
+            return response()
+                ->json([
+                    'message' => 'Order placed successfully',
+                    'data' => $result,
+                ]);
+        } catch (Exception $e) {
+            Log::info('OrderController exception ' . $e);
+
             return response()->json([
-                'message' => 'Order failed to be created',
+                'message' => 'Something went wrong',
             ], 400);
         }
-
-        return response()
-            ->json([
-                'message' => 'Order placed successfully',
-                'data' => $result,
-            ]);
     }
 
     public function show(Order $order): OrderResource

@@ -41,7 +41,7 @@ class ProductData
         return new self(
             name: $data['name'],
             meta_data: MetaDataData::fromArray($data['meta_data']),
-            taxonomy_terms: array_map(fn ($termData) => (int)$termData, $data['taxonomy_terms']),
+            taxonomy_terms: array_map(fn ($termData) => (int) $termData, $data['taxonomy_terms']),
             sku: $data['sku'],
             description: $data['description'],
             retail_price: $data['retail_price'],
@@ -65,8 +65,8 @@ class ProductData
             ),
             product_variants: array_map(fn ($variant) => (ProductVariantData::fromArray([
                 ...$variant,
-                'selling_price' => (float)$variant['selling_price'],
-                'retail_price' => (float)$variant['retail_price']
+                'selling_price' => (float) $variant['selling_price'],
+                'retail_price' => (float) $variant['retail_price'],
             ])), $data['product_variants'] ?? []),
         );
     }
