@@ -9,7 +9,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class() extends Migration
+{
     /** Run the migrations. */
     public function up(): void
     {
@@ -22,7 +23,7 @@ return new class () extends Migration {
             $table->decimal('selling_price', 10, 2);
             $table->json('dimension')->nullable();
             $table->decimal('weight')->nullable();
-            $table->unsignedBigInteger('stock')->nullable();
+            $table->unsignedInteger('stock')->nullable();
             $table->mediumText('description')->nullable();
             $table->boolean('status')->default(true);
             $table->boolean('is_digital_product')->default(false);
@@ -30,7 +31,7 @@ return new class () extends Migration {
             $table->boolean('is_special_offer')->default(false);
             $table->boolean('allow_customer_remarks')->default(false);
             $table->boolean('allow_stocks')->default(true);
-            $table->unsignedBigInteger('minimum_order_quantity')->default(1);
+            $table->unsignedInteger('minimum_order_quantity')->default(1);
             $table->timestamps();
         });
 
@@ -47,7 +48,7 @@ return new class () extends Migration {
             $table->json('combination');
             $table->decimal('retail_price', 10, 2);
             $table->decimal('selling_price', 10, 2);
-            $table->unsignedBigInteger('stock')->nullable();
+            $table->unsignedInteger('stock')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
         });
