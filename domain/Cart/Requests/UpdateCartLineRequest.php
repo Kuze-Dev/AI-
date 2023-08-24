@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Requests;
 
+use Domain\Cart\Actions\CartPurchasableValidatorAction;
+use Domain\Cart\Exceptions\InvalidPurchasableException;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Throwable;
 
 class UpdateCartLineRequest extends FormRequest
 {
@@ -30,13 +33,16 @@ class UpdateCartLineRequest extends FormRequest
                 'min:1',
                 function ($attribute, $value, $fail) use ($cartLine) {
 
-                    /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
-                    $purchasable = $cartLine->purchasable;
+                    try {
+                        /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
+                        $purchasable = $cartLine->purchasable;
 
-                    if ($value > $purchasable->stock) {
-                        $fail('Quantity exceeds stock');
-
-                        return;
+                        app(CartPurchasableValidatorAction::class)
+                            ->validatePurchasableUpdate($purchasable, $value);
+                    } catch (Throwable $th) {
+                        if ($th instanceof InvalidPurchasableException) {
+                            $fail($th->getMessage());
+                        }
                     }
                 },
             ],

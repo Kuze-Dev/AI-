@@ -23,10 +23,12 @@ class DiscountController extends Controller
     public function index(): JsonApiResourceCollection
     {
         return DiscountResource::collection(
-            QueryBuilder::for(Discount::query())
+            QueryBuilder::for(Discount::query()
                 ->whereStatus(DiscountStatus::ACTIVE)
-                ->allowedIncludes(['discountCondition', 'discountRequirement'])
-                ->jsonPaginate()
+                ->jsonPaginate())
+                ->allowedIncludes([
+                    'discountCondition',
+                    'discountRequirement'])
         );
     }
 
@@ -34,7 +36,7 @@ class DiscountController extends Controller
     {
         return DiscountResource::make(
             QueryBuilder::for(Discount::whereCode($code)
-                ->whereStatus(DiscountStatus::ACTIVE))
+                ->whereStatus(DiscountStatus::ACTIVE)
                 ->where(function ($query) {
                     $query->where('max_uses', '>', 0)
                         ->orWhereNull('max_uses');
@@ -42,7 +44,7 @@ class DiscountController extends Controller
                 ->where(function ($query) {
                     $query->where('valid_end_at', '>=', now())
                         ->orWhereNull('valid_end_at');
-                })
+                }))
                 ->allowedIncludes(['discountCondition', 'discountRequirement'])
                 ->firstOrFail()
         );

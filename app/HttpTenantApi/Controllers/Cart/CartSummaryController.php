@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Domain\Cart\Actions\CartSummaryAction;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
+use Domain\Cart\Events\SanitizeCartEvent;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
@@ -30,14 +31,22 @@ class CartSummaryController extends Controller
             ->whereNull('checked_out_at')
             ->get();
 
-        if (isset($cartLines)) {
+        if ($cartLines->count()) {
+            $cartLineIdsTobeRemoved = [];
+
             $cartLines = $cartLines->filter(function ($cartLine) use (&$cartLineIdsTobeRemoved) {
-                if (is_null($cartLine->purchasable)) {
+                if ($cartLine->purchasable === null) {
                     $cartLineIdsTobeRemoved[] = $cartLine->uuid;
                 }
 
-                return ! is_null($cartLine->purchasable);
+                return $cartLine->purchasable !== null;
             });
+
+            if ( ! empty($cartLineIdsTobeRemoved)) {
+                event(new SanitizeCartEvent(
+                    $cartLineIdsTobeRemoved,
+                ));
+            }
         }
 
         return response()->json(['cartCount' => $cartLines->count()], 200);
@@ -99,7 +108,7 @@ class CartSummaryController extends Controller
                 'status' => $summary->discountMessages->status ?? null,
                 'message' => $summary->discountMessages->message ?? null,
                 'type' => $summary->discountMessages->amount_type ?? null,
-                'amount' => number_format((float) $summary->discountMessages->amount, 2, '.', ',') ?? null,
+                'amount' => $summary->discountMessages ? number_format((float) $summary->discountMessages->amount, 2, '.', ',') : null,
                 'discount_type' => $summary->discountMessages->discount_type ?? null,
                 'total_savings' => $discount ? number_format((float) $summary->discountTotal, 2, '.', ',') : 0,
             ],

@@ -15,6 +15,7 @@ use Domain\Payments\DataTransferObjects\CreatepaymentData;
 use Domain\Payments\DataTransferObjects\PaymentDetailsData;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\TransactionData;
+use Domain\Payments\Exceptions\PaymentException;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -86,6 +87,10 @@ class SplitOrderAction
         $result = app(CreatePaymentAction::class)
             ->execute($order, $providerData);
 
-        return $result;
+        if ($result->success) {
+            return $result;
+        }
+
+        throw new PaymentException();
     }
 }

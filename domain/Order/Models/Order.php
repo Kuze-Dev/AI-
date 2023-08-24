@@ -34,20 +34,19 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property string $customer_email
  * @property string $currency_code
  * @property string $currency_name
- * @property float $currency_symbol
+ * @property string $currency_symbol
  * @property string $reference
- * @property float $tax_total
- * @property float $tax_percentage
- * @property PriceDisplay $tax_display
+ * @property float|null $tax_total
+ * @property float|null $tax_percentage
+ * @property PriceDisplay|null $tax_display
  * @property float $sub_total
  * @property float $discount_total
  * @property int|null $discount_id
  * @property string|null $discount_code
  * @property float $shipping_total
+ * @property int $shipping_method_id
  * @property float $total
  * @property string|null $notes
- * @property string $shipping_method
- * @property string $shipping_details
  * @property bool $is_paid
  * @property OrderStatuses $status
  * @property string|null $cancelled_reason
@@ -67,6 +66,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Payments\Models\Payment> $payments
  * @property-read int|null $payments_count
  * @property-read \Domain\Order\Models\OrderAddress|null $shippingAddress
+ * @property-read ShippingMethod|null $shippingMethod
  * @method static Builder|Order newModelQuery()
  * @method static Builder|Order newQuery()
  * @method static Builder|Order query()
@@ -74,8 +74,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static Builder|Order whereCancelledReason($value)
  * @method static Builder|Order whereCreatedAt($value)
  * @method static Builder|Order whereCurrencyCode($value)
- * @method static Builder|Order whereCurrencyExchangeRate($value)
  * @method static Builder|Order whereCurrencyName($value)
+ * @method static Builder|Order whereCurrencySymbol($value)
  * @method static Builder|Order whereCustomerEmail($value)
  * @method static Builder|Order whereCustomerFirstName($value)
  * @method static Builder|Order whereCustomerId($value)
@@ -84,13 +84,11 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static Builder|Order whereDiscountCode($value)
  * @method static Builder|Order whereDiscountId($value)
  * @method static Builder|Order whereDiscountTotal($value)
- * @method static Builder|Order whereHasForPayment()
  * @method static Builder|Order whereId($value)
  * @method static Builder|Order whereIsPaid($value)
  * @method static Builder|Order whereNotes($value)
  * @method static Builder|Order whereReference($value)
- * @method static Builder|Order whereShippingDetails($value)
- * @method static Builder|Order whereShippingMethod($value)
+ * @method static Builder|Order whereShippingMethodId($value)
  * @method static Builder|Order whereShippingTotal($value)
  * @method static Builder|Order whereStatus($value)
  * @method static Builder|Order whereSubTotal($value)
@@ -177,6 +175,7 @@ class Order extends Model implements HasMedia, PayableInterface
         return $this->hasOne(OrderAddress::class)->where('type', OrderAddressTypes::BILLING);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ShippingMethod\Models\ShippingMethod, \Domain\Order\Models\Order> */
     public function shippingMethod(): BelongsTo
     {
         return $this->belongsTo(ShippingMethod::class, 'shipping_method_id');

@@ -54,12 +54,11 @@ class OrderPaymentUpdatedListener
 
         Notification::send($customer, new OrderCancelledNotification($order));
 
-        // off muna for now
-        // $customer->notify(new AdminOrderStatusUpdatedMail(
-        //     $order,
-        //     'cancelled',
-        //     ''
-        // ));
+        $customer->notify(new AdminOrderStatusUpdatedMail(
+            $order,
+            'cancelled',
+            ''
+        ));
 
         // back the discount
 

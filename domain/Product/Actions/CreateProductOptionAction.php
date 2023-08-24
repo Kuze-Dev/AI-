@@ -68,11 +68,11 @@ class CreateProductOptionAction
                 $variantCombination = $haystack[$key]->combination[$key2];
 
                 if ($combination->{$field} == $needle) {
-                    if ($field == "option_id") {
+                    if ($field == 'option_id') {
                         array_push($newCombinations, $variantCombination->withOptionId($newValue, $variantCombination));
                     }
 
-                    if ($field == "option_value_id") {
+                    if ($field == 'option_value_id') {
                         array_push($newCombinations, $variantCombination->withOptionValueId($newValue, $variantCombination));
                     }
                 } else {

@@ -180,7 +180,7 @@ class OrderResource extends Resource
                                                 /** @var \Domain\Payments\Models\Payment $payment */
                                                 $payment = $record->payments->first();
 
-                                                return $payment->paymentMethod->title;
+                                                return $payment->paymentMethod?->title ?? '';
                                             }),
                                         Forms\Components\Placeholder::make('shipping_method')
                                             ->label(trans('Shipping Method'))
@@ -245,7 +245,7 @@ class OrderResource extends Resource
                         /** @var \Domain\Payments\Models\Payment $payment */
                         $payment = $record->payments->first();
 
-                        return $payment->paymentMethod->title;
+                        return $payment->paymentMethod?->title ?? '';
                     }),
                 Tables\Columns\TextColumn::make('shipping_method')
                     ->label(trans('Shipping Method'))
@@ -422,7 +422,6 @@ class OrderResource extends Resource
                             ->size('md')
                             ->inline()
                             ->formatStateUsing(function ($state) {
-                                /** @phpstan-ignore-next-line */
                                 $formattedState = Carbon::parse($state)
                                     /** @phpstan-ignore-next-line */
                                     ->setTimezone(Auth::user()?->timezone)
@@ -599,9 +598,10 @@ class OrderResource extends Resource
 
                                 $updateData['cancelled_at'] = now(Auth::user()?->timezone);
 
-                                $test = $record->load('payments');
+                                $order = $record->load('payments');
 
-                                $payment = $test->payments->first();
+                                /** @var \Domain\Payments\Models\Payment $payment */
+                                $payment = $order->payments->first();
 
                                 $payment->update([
                                     'status' => 'cancelled',

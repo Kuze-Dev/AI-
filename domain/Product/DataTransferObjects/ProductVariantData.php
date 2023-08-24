@@ -7,7 +7,7 @@ namespace Domain\Product\DataTransferObjects;
 class ProductVariantData
 {
     public function __construct(
-        public readonly int | string $id,
+        public readonly int|string $id,
         public readonly string $sku,
         public readonly array $combination,
         public readonly float $retail_price,

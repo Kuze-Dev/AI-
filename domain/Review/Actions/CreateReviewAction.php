@@ -21,11 +21,17 @@ class CreateReviewAction
     {
 
         $orderLine = OrderLine::find($createReviewData->order_line_id);
-        $orderLine->reviewed_at = now();
+        if( ! $orderLine) {
+            return new Review();
+        }
 
-        $order_id = $orderLine->order_id;
+        $order_id = $orderLine->order_id ?? null;
         $data = null;
         $product_id = null;
+
+        if( ! $orderLine->purchasable_data) {
+            return new Review();
+        }
 
         if (isset($orderLine->purchasable_data['combination'])) {
             $data = $orderLine->purchasable_data['combination'];

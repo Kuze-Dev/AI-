@@ -91,7 +91,7 @@ class DiscountResource extends Resource
 
                                 return function (string $attribute, mixed $value, Closure $fail) use ($record) {
                                     if ($value < $record?->max_uses) {
-                                        $fail('The maximum usage must not be less than current. Current is: '.$record?->max_uses);
+                                        $fail('The maximum usage must not be less than current. Current is: '.$record->max_uses);
                                     }
                                 };
                             },
@@ -141,7 +141,7 @@ class DiscountResource extends Resource
                             ])
                                 ->required()
                                 ->default('order_sub_total')
-                                ->formatStateUsing(fn ($record) => $record?->discountCondition->discount_type)
+                                ->formatStateUsing(fn ($record) => $record?->discountCondition?->discount_type)
                                 ->label(trans('Discount Type')),
 
                             Radio::make('discountCondition.amount_type')->options([
@@ -152,7 +152,7 @@ class DiscountResource extends Resource
                                 ->required()
                                 ->default('fixed_value')
                                 ->filled()
-                                ->formatStateUsing(fn ($record) => $record?->discountCondition->amount_type)
+                                ->formatStateUsing(fn ($record) => $record?->discountCondition?->amount_type)
                                 ->label(trans('Amount Type')),
 
                             TextInput::make('discountCondition.amount')
@@ -160,7 +160,7 @@ class DiscountResource extends Resource
                                 ->numeric()
                                 ->minValue(1)
                                 ->rules(['max:100'], fn (Closure $get) => $get('discountCondition.amount_type') === 'percentage')
-                                ->formatStateUsing(fn ($record) => $record?->discountCondition->amount)
+                                ->formatStateUsing(fn ($record) => $record?->discountCondition?->amount)
                                 ->label(trans('Discount Amount')),
                         ]),
 
@@ -198,11 +198,17 @@ class DiscountResource extends Resource
                 TextColumn::make('name'),
                 TextColumn::make('discountCondition.amount')
                     ->formatStateUsing(function ($record) {
-                        return $record?->discountCondition?->amount_type === DiscountAmountType::PERCENTAGE
-                            ? (string) $record?->discountCondition?->amount . '%'
-                            : ($record?->discountCondition?->amount_type === DiscountAmountType::FIXED_VALUE
-                                ? Currency::whereEnabled(true)->value('symbol').' '. (string) $record?->discountCondition?->amount
-                                : null);
+                        $discountCondition = $record->discountCondition;
+
+                        if ($discountCondition !== null) {
+                            if ($discountCondition->amount_type === DiscountAmountType::PERCENTAGE) {
+                                return (string) $discountCondition->amount . '%';
+                            } elseif ($discountCondition->amount_type === DiscountAmountType::FIXED_VALUE) {
+                                return Currency::whereEnabled(true)->value('symbol') . ' ' . (string) $discountCondition->amount;
+                            }
+                        }
+
+                        return null;
                     })
                     ->label(trans('Amount')),
                 TextColumn::make('valid_start_at')
@@ -219,8 +225,8 @@ class DiscountResource extends Resource
                 BadgeColumn::make('status')
                     ->colors([
 
-                        'success' => 'active',
-                        'warning' => 'inactive',
+                    'success' => 'active',
+                    'warning' => 'inactive',
 
                     ])->formatStateUsing(fn (string $state): string => __(ucfirst($state)))->weight('bold'),
             ])

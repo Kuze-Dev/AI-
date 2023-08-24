@@ -8,9 +8,9 @@ class VariantCombinationData
 {
     public function __construct(
         public readonly string $option,
-        public readonly int | string $option_id,
+        public readonly int|string $option_id,
         public readonly string $option_value,
-        public readonly int | string $option_value_id,
+        public readonly int|string $option_value_id,
     ) {
     }
 
@@ -24,7 +24,7 @@ class VariantCombinationData
         );
     }
 
-    public static function withOptionId(int | string $optionId, self $data): self
+    public static function withOptionId(int|string $optionId, self $data): self
     {
         return new self(
             option: $data->option,
@@ -34,7 +34,7 @@ class VariantCombinationData
         );
     }
 
-    public static function withOptionValueId(int | string $optionValueId, self $data): self
+    public static function withOptionValueId(int|string $optionValueId, self $data): self
     {
         return new self(
             option: $data->option,

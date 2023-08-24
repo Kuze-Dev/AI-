@@ -29,14 +29,14 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property bool $is_anonymous
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Review\Models\ReviewLike> $ReviewLikes
- * @property-read int|null $review_likes_count
  * @property-read Customer|null $customer
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @property-read Order|null $order
  * @property-read OrderLine|null $order_line
  * @property-read Product|null $product
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Review\Models\ReviewLike> $review_likes
+ * @property-read int|null $review_likes_count
  * @method static \Illuminate\Database\Eloquent\Builder|Review newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Review newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Review query()
@@ -87,26 +87,31 @@ class Review extends Model implements HasMedia
             ->registerMediaConversions($registerMediaConversions);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\Product, \Domain\Review\Models\Review> */
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Review\Models\Review>*/
     public function customer()
     {
         return $this->belongsTo(Customer::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\Order, \Domain\Review\Models\Review> */
     public function order()
     {
         return $this->belongsTo(Order::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\OrderLine, \Domain\Review\Models\Review> */
     public function order_line()
     {
         return $this->belongsTo(OrderLine::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Review\Models\ReviewLike> */
     public function review_likes()
     {
         return $this->hasMany(ReviewLike::class);

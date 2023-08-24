@@ -13,7 +13,7 @@ class EditLikeAction
     public function execute(int $reviewId, Customer $customer): Review
     {
         $review = Review::findOrFail($reviewId);
-        $hasLiked = $review->review_likes->contains('customer_id', $customer->id);
+        $hasLiked = $review->review_likes()->where('customer_id', $customer->id)->exists();
 
         if ($hasLiked) {
             $like = ReviewLike::where('customer_id', $customer->id)->where('review_id', $review->id)->first();

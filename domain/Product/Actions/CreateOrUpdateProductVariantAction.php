@@ -15,8 +15,9 @@ class CreateOrUpdateProductVariantAction
     public function execute(Product $product, ProductData $productData, bool $isCreate = true): void
     {
         /** If met, flush product variants */
-        if (!filled($productData->product_variants)) {
+        if ( ! filled($productData->product_variants)) {
             ProductVariant::whereProductId($product->id)->delete();
+
             return;
         }
 
@@ -25,6 +26,7 @@ class CreateOrUpdateProductVariantAction
             foreach ($productData->product_variants ?? [] as $productVariant) {
                 $this->createProductVariant($product->id, $productVariant);
             }
+
             return;
         }
 
@@ -58,7 +60,7 @@ class CreateOrUpdateProductVariantAction
                 return false;
             });
 
-            if (!$existingItem) {
+            if ( ! $existingItem) {
                 $variant->delete();
             }
         }
