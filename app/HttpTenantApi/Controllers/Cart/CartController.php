@@ -41,13 +41,6 @@ class CartController extends Controller
 
         if ($model && isset($model->cartLines)) {
             $model->cartLines = $model->cartLines->filter(function ($cartLine) {
-
-                if ($cartLine->purchasable !== null) {
-                    if ( ! $cartLine->purchasable->status) {
-                        return false;
-                    }
-                }
-
                 return $cartLine->purchasable !== null;
             });
         }
@@ -69,7 +62,7 @@ class CartController extends Controller
         $result = app(DestroyCartAction::class)
             ->execute($cart);
 
-        if ( ! $result) {
+        if (!$result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);
