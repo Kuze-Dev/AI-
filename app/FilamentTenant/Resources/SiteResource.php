@@ -13,6 +13,8 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use App\Filament\Rules\FullyQualifiedDomainNameRule;
+use App\Filament\Rules\UniqueDomainRule;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -45,6 +47,12 @@ class SiteResource extends Resource
                     Forms\Components\TextInput::make('name')
                         ->required()
                         ->unique(ignoreRecord:true),
+                    Forms\Components\TextInput::make('domain')
+                        ->required()
+                        ->unique(ignoreRecord: true)
+                        ->rules([new FullyQualifiedDomainNameRule(), new UniqueDomainRule('sites')])
+                        ->maxLength(100)
+                        ->label(trans('Frontend Domain')),
                     Forms\Components\TextInput::make('deploy_hook'),
                     Forms\Components\Fieldset::make('Site Managers')
                         ->schema([
@@ -71,6 +79,9 @@ class SiteResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('domain')
                     ->sortable()
                     ->searchable(),
             ])

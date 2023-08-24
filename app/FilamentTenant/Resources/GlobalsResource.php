@@ -14,6 +14,7 @@ use Filament\Resources\Resource;
 use Domain\Globals\Models\Globals;
 use Illuminate\Support\Facades\Auth;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Internationalization\Models\Locale;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\EditGlobals;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\ListGlobals;
@@ -51,6 +52,12 @@ class GlobalsResource extends Resource
                     ->optionsFromModel(Blueprint::class, 'name')
                     ->disabled(fn (?Globals $record) => $record !== null)
                     ->reactive(),
+                Forms\Components\Select::make('locale')
+                    ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                    ->default((string) optional(Locale::where('is_default', true)->first())->code)
+                    ->searchable()
+                    ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->required(),
                 Forms\Components\Card::make([
                     Forms\Components\CheckboxList::make('sites')
                         ->options(

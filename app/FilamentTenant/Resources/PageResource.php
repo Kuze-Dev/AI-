@@ -25,6 +25,7 @@ use Domain\Page\Actions\DeletePageAction;
 use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\MetaDataForm;
 use Illuminate\Database\Eloquent\Collection;
+use Domain\Internationalization\Models\Locale;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
@@ -79,6 +80,18 @@ class PageResource extends Resource
                                 ->maxLength(255),
                             RouteUrlFieldset::make(),
                             // ->disabled(fn (?Page $record) => $record?->isHomePage()),
+                            Forms\Components\Select::make('locale')
+                                ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                                ->default((string) optional(Locale::where('is_default', true)->first())->code)
+                                ->searchable()
+                                ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                                ->reactive()
+                                ->afterStateUpdated(function (Forms\Components\Select $component, Closure $get) {
+                                    $component->getContainer()
+                                        ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
+                                        ?->dispatchEvent('route_url::update');
+                                })
+                                ->required(),
                             Forms\Components\Group::make([
                                 Forms\Components\Toggle::make('published_at')
                                     ->label(trans('Published'))
@@ -98,7 +111,6 @@ class PageResource extends Resource
                                     ->required(),
                             ])
                                 ->columns('grid-cols-[10rem,1fr] items-center'),
-
                             Forms\Components\Hidden::make('author_id')
                                 ->default(Auth::id()),
                         ]),
@@ -211,6 +223,9 @@ class PageResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->truncate('xs', true),
+                Tables\Columns\TextColumn::make('locale')
+                    ->searchable()
+                    ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\BadgeColumn::make('visibility')
                     ->formatStateUsing(fn ($state) => Str::headline($state))
                     ->sortable()
@@ -246,6 +261,8 @@ class PageResource extends Resource
                             ])
                             ->toArray()
                     ),
+                Tables\Filters\SelectFilter::make('locale')
+                    ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray()),
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
                     ->relationship('sites', 'name'),

@@ -32,6 +32,7 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property int $content_id
  * @property string $title
  * @property string $slug
+ * @property string $locale
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property array $data
  * @property int|null $order
@@ -87,6 +88,7 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
         'order',
         'author_id',
         'published_at',
+        'locale',
     ];
 
     /**

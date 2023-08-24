@@ -25,6 +25,7 @@ use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms\Components\Component;
 use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\MetaDataForm;
+use Domain\Internationalization\Models\Locale;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
@@ -119,6 +120,18 @@ class ContentEntryResource extends Resource
                                     ? $model
                                     : tap(new ContentEntry())->setRelation('content', $livewire->ownerRecord);
                             }),
+                        Forms\Components\Select::make('locale')
+                            ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                            ->default((string) optional(Locale::where('is_default', true)->first())->code)
+                            ->searchable()
+                            ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                            ->reactive()
+                            ->afterStateUpdated(function (Forms\Components\Select $component, Closure $get) {
+                                $component->getContainer()
+                                    ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
+                                    ?->dispatchEvent('route_url::update');
+                            })
+                            ->required(),
                         Forms\Components\Hidden::make('author_id')
                             ->default(Auth::id()),
                     ]),
@@ -201,6 +214,9 @@ class ContentEntryResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->truncate('xs', true),
+                Tables\Columns\TextColumn::make('locale')
+                    ->searchable()
+                    ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable(['first_name', 'last_name'])
                     ->searchable(query: function (Builder $query, string $search): Builder {

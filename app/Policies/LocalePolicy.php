@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Features\CMS\CMSBase;
-use App\Policies\Concerns\ChecksWildcardPermissions;
-use Domain\Page\Models\Page;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
-use Illuminate\Support\Facades\Auth;
+use App\Features\CMS\Internationalization;
+use Domain\Internationalization\Models\Locale;
+use App\Policies\Concerns\ChecksWildcardPermissions;
 
-class PagePolicy
+class LocalePolicy
 {
     use ChecksWildcardPermissions;
 
     public function before(): ?Response
     {
-        if ( ! tenancy()->tenant?->features()->active(CMSBase::class)) {
+        if (tenancy()->tenant?->features()->inactive(Internationalization::class)) {
             return Response::denyAsNotFound();
         }
 
@@ -29,7 +28,7 @@ class PagePolicy
         return $this->checkWildcardPermissions($user);
     }
 
-    public function view(User $user, Page $page): bool
+    public function view(User $user, Locale $Locale): bool
     {
         return $this->checkWildcardPermissions($user);
     }
@@ -39,26 +38,13 @@ class PagePolicy
         return $this->checkWildcardPermissions($user);
     }
 
-    public function update(User $user, Page $page): bool
+    public function update(User $user, Locale $Locale): bool
     {
-        // if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
-
-        //     return true;
-        // }
-
-        // if ($page->author_id != $user->id) {
-        //     return false;
-        // }
-
         return $this->checkWildcardPermissions($user);
     }
 
-    public function delete(User $user, Page $page): bool
+    public function delete(User $user, Locale $Locale): bool
     {
-        if ($page->isHomePage()) {
-            return false;
-        }
-
         return $this->checkWildcardPermissions($user);
     }
 
