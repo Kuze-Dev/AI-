@@ -43,7 +43,7 @@ class ReviewController
     }
 
     #[Get('orderline-review/{orderLineId}')]
-    public function showCustomerReview(string $orderLineId)
+    public function showCustomerReview(string $orderLineId): ReviewResource
     {
         $review = QueryBuilder::for(Review::whereOrderLineId($orderLineId))
             ->allowedIncludes([

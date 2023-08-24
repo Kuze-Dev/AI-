@@ -36,8 +36,7 @@ class ReviewShowController
                             match ($value) {
                                 'asc' => $query->orderBy('rating', 'asc'),
                                 'desc' => $query->orderBy('rating', 'desc'),
-                                $value => $query->where('rating', $value),
-                                default => '',
+                                default => $query->where('rating', $value),
                             };
                         }
                     ),

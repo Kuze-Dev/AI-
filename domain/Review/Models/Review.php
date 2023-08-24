@@ -87,26 +87,31 @@ class Review extends Model implements HasMedia
             ->registerMediaConversions($registerMediaConversions);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\Product, \Domain\Review\Models\Review> */
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Review\Models\Review>*/
     public function customer()
     {
         return $this->belongsTo(Customer::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\Order, \Domain\Review\Models\Review> */
     public function order()
     {
         return $this->belongsTo(Order::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\OrderLine, \Domain\Review\Models\Review> */
     public function order_line()
     {
         return $this->belongsTo(OrderLine::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Review\Models\ReviewLike> */
     public function review_likes()
     {
         return $this->hasMany(ReviewLike::class);
