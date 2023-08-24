@@ -20,8 +20,12 @@ class UpdateGlobalsAction
             'data' => $globalData->data,
         ]);
 
-        $globals->sites()
-            ->sync($globalData->sites);
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+
+            $globals->sites()
+                ->sync($globalData->sites);
+
+        }
 
         return $globals;
     }
