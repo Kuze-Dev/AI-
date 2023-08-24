@@ -43,14 +43,11 @@ class BlueprintData extends Model implements HasMedia
         return $this->morphTo();
     }
 
-    public function registerMediaCollections(): void
+    public $registerMediaConversionsUsingModelInstance = true;
+
+    public function registerMediaConversions(Media $media = null): void
     {
-
-        if ( ! $this->blueprint) {
-            return;
-        }
         $config = $this->blueprint->schema;
-
         foreach ($config->sections as $section) {
             foreach ($section->fields as $field) {
                 if ($field->type === FieldType::MEDIA) {
@@ -65,20 +62,14 @@ class BlueprintData extends Model implements HasMedia
                                     $height = $manipulation->params[0];
                                 }
                             }
-                            $registerMediaConversions = function (Media $media) use ($width, $height, $title) {
-                                $this->addMediaConversion($title)
-                                    ->width(12)
-                                    ->height(23);
-                            };
-
-
-                            $mediaCollection = $this->addMediaCollection('blueprint_media');
-                            $mediaCollection->registerMediaConversions($registerMediaConversions);
-                            
+                            $this->addMediaConversion($title)
+                                ->width($width)
+                                ->height($height);
                         }
                     }
                 }
             }
         }
+
     }
 }
