@@ -62,7 +62,6 @@ class Discount extends Model
         'code',
         'status',
         'max_uses',
-        // 'max_uses_per_user',
         'valid_start_at',
         'valid_end_at',
     ];
@@ -71,7 +70,6 @@ class Discount extends Model
         'type' => DiscountConditionType::class,
         'status' => DiscountStatus::class,
         'max_uses' => 'int',
-        // 'max_uses_per_user' => 'int',
         'valid_start_at' => 'datetime',
         'valid_end_at' => 'datetime',
     ];
@@ -80,11 +78,6 @@ class Discount extends Model
     {
         return 'code';
     }
-
-    // public function discountCodes(): HasMany
-    // {
-    //     return $this->hasMany(DiscountCode::class);
-    // }
 
     /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Discount\Models\DiscountCondition> */
     public function discountCondition(): HasOne
@@ -98,6 +91,7 @@ class Discount extends Model
         return $this->hasOne(DiscountRequirement::class);
     }
 
+     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Discount\Models\DiscountLimit> */
     public function discountLimits(): HasMany
     {
         return $this->hasMany(DiscountLimit::class);
