@@ -7,7 +7,6 @@ namespace App\HttpTenantApi\Controllers\Cart;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartResource;
 use Domain\Cart\Actions\DestroyCartAction;
-use Domain\Cart\Events\SanitizeCartEvent;
 use Domain\Cart\Models\Cart;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
@@ -41,21 +40,16 @@ class CartController extends Controller
             ->first();
 
         if ($model && isset($model->cartLines)) {
-            $cartLineIdsTobeRemoved = [];
+            $model->cartLines = $model->cartLines->filter(function ($cartLine) {
 
-            $model->cartLines = $model->cartLines->filter(function ($cartLine) use (&$cartLineIdsTobeRemoved) {
-                if (is_null($cartLine->purchasable)) {
-                    $cartLineIdsTobeRemoved[] = $cartLine->uuid;
+                if ($cartLine->purchasable !== null) {
+                    if ( ! $cartLine->purchasable->status) {
+                        return false;
+                    }
                 }
 
-                return ! is_null($cartLine->purchasable);
+                return $cartLine->purchasable !== null;
             });
-
-            if ( ! empty($cartLineIdsTobeRemoved)) {
-                event(new SanitizeCartEvent(
-                    $cartLineIdsTobeRemoved,
-                ));
-            }
         }
 
         if ($model) {

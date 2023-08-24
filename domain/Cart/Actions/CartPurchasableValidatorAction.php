@@ -58,11 +58,11 @@ class CartPurchasableValidatorAction
             $query->where((new Product())->getRouteKeyName(), $productId);
         })->first();
 
-        if ( ! $productVariant || ! $productVariant->product->status) {
+        if ( ! $productVariant) {
             throw new InvalidPurchasableException('Invalid productVariant.');
         }
 
-        if ( ! $productVariant->product->status) {
+        if ( ! $productVariant->status) {
             throw new InvalidPurchasableException('Inactive productVariant.');
         }
 

@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Domain\Cart\Actions\CartSummaryAction;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
+use Domain\Cart\Events\SanitizeCartEvent;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
@@ -31,13 +32,29 @@ class CartSummaryController extends Controller
             ->get();
 
         if ($cartLines->count()) {
+            $cartLineIdsTobeRemoved = [];
+
             $cartLines = $cartLines->filter(function ($cartLine) use (&$cartLineIdsTobeRemoved) {
                 if ($cartLine->purchasable === null) {
                     $cartLineIdsTobeRemoved[] = $cartLine->uuid;
                 }
 
+                if ($cartLine->purchasable !== null) {
+                    if ( ! $cartLine->purchasable->status) {
+                        $cartLineIdsTobeRemoved[] = $cartLine->uuid;
+
+                        return false;
+                    }
+                }
+
                 return $cartLine->purchasable !== null;
             });
+
+            if ( ! empty($cartLineIdsTobeRemoved)) {
+                event(new SanitizeCartEvent(
+                    $cartLineIdsTobeRemoved,
+                ));
+            }
         }
 
         return response()->json(['cartCount' => $cartLines->count()], 200);
