@@ -34,13 +34,14 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string $selling_price
  * @property array|null $dimension
  * @property string|null $weight
- * @property int $stock
+ * @property int|null $stock
  * @property string|null $description
- * @property int $status
- * @property int $is_digital_product
- * @property int $is_featured
- * @property int $is_special_offer
- * @property int $allow_customer_remarks
+ * @property bool $status
+ * @property bool $is_digital_product
+ * @property bool $is_featured
+ * @property bool $is_special_offer
+ * @property bool $allow_customer_remarks
+ * @property bool $allow_stocks
  * @property int $minimum_order_quantity
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -63,6 +64,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @method static ProductBuilder|Product newQuery()
  * @method static ProductBuilder|Product query()
  * @method static ProductBuilder|Product whereAllowCustomerRemarks($value)
+ * @method static ProductBuilder|Product whereAllowStocks($value)
  * @method static ProductBuilder|Product whereCreatedAt($value)
  * @method static ProductBuilder|Product whereDescription($value)
  * @method static ProductBuilder|Product whereDimension($value)

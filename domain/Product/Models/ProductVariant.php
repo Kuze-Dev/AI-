@@ -17,8 +17,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property array $combination
  * @property string $retail_price
  * @property string $selling_price
- * @property int $stock
- * @property string $status
+ * @property int|null $stock
+ * @property bool $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Domain\Product\Models\Product|null $product

@@ -20,7 +20,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property DiscountAmountType $damount_type
  * @property-read \Domain\Discount\Models\Discount|null $discount
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountRequirement newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountRequirement newQuery()

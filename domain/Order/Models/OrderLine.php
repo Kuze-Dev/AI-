@@ -25,9 +25,9 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property string $name
  * @property float $unit_price
  * @property int $quantity
- * @property float $tax_total
- * @property float $tax_percentage
- * @property PriceDisplay $tax_display
+ * @property float|null $tax_total
+ * @property float|null $tax_percentage
+ * @property PriceDisplay|null $tax_display
  * @property float $sub_total
  * @property float $discount_total
  * @property int|null $discount_id

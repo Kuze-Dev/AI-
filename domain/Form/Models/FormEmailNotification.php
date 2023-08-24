@@ -24,6 +24,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string $template
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property bool $has_attachments
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \Domain\Form\Models\Form|null $form
@@ -34,6 +35,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereCc($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereFormId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereHasAttachments($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereReplyTo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereSenderName($value)
