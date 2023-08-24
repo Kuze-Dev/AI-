@@ -70,14 +70,16 @@ it('can create globals with same name on microsite', function () {
         )
         ->createOne();
 
-    $globals->sites()->sync([1]);
+    $globals->sites()->sync([
+        '1',
+    ]);
 
     livewire(CreateGlobals::class)
         ->fillForm([
             'blueprint_id' => $globals->blueprint_id,
             'name' => 'test',
             'sites' => [
-                2,
+                '2',
             ],
             'data' => ['main' => ['title' => 'Foo']],
         ])->call('create')

@@ -18,8 +18,12 @@ class CreateGlobalsAction
             'data' => $globalData->data,
         ]);
 
-        $globals->sites()
-            ->attach($globalData->sites);
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+
+            $globals->sites()
+                ->attach($globalData->sites);
+
+        }
 
         return $globals;
     }

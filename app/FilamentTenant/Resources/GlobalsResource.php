@@ -44,7 +44,11 @@ class GlobalsResource extends Resource
                     ->unique(
                         callback: function ($livewire, Unique $rule) {
 
-                            return ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class));
+                            if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+                                return false;
+                            }
+
+                            return $rule;
                         },
                         ignoreRecord: true
                     )
