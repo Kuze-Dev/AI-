@@ -43,41 +43,19 @@ class BlueprintData extends Model implements HasMedia
         return $this->morphTo();
     }
 
-    // public function registerMediaCollections(): void
-    // {
-    //     $fieldData = $this->blueprint->findField($this->state_path);
-
-    //     if (! $fieldData instanceof MediaFieldData) {
-    //         return;
-    //     }
-
-    //     $mediaCollection = $this->addMediaCollection('default')
-    //         ->registerMediaConversions(function () {
-    //             foreach($fieldData->conversions as $conversionData) {
-    //                 $conversion = $this->addMediaConversion($conversionData->name);
-
-    //                 foreach ($conversionData->manipulations as $manipulationData) {
-    //                     $conversion->{$manipulationData->type->value}(...$manipulationData->params);
-    //                 }
-    //             }
-    //         });
-
-    //     if(!$fieldData->multiple){
-    //         $mediaCollection->isSingleFile();
-    //     }
-    // }
-
     public function registerMediaCollections(): void
     {
-        $width = null;
-        $height = null;
 
+        if ( ! $this->blueprint) {
+            return;
+        }
         $config = $this->blueprint->schema;
 
         foreach ($config->sections as $section) {
             foreach ($section->fields as $field) {
                 if ($field->type === FieldType::MEDIA) {
                     foreach ($field->conversions as $conversion) {
+                        $title = $conversion->name;
                         if (isset($conversion->manipulations)) {
                             foreach($conversion->manipulations as $manipulation) {
                                 if($manipulation->type == ManipulationType::WIDTH) {
@@ -87,20 +65,20 @@ class BlueprintData extends Model implements HasMedia
                                     $height = $manipulation->params[0];
                                 }
                             }
+                            $registerMediaConversions = function (Media $media) use ($width, $height, $title) {
+                                $this->addMediaConversion($title)
+                                    ->width(12)
+                                    ->height(23);
+                            };
+
+
+                            $mediaCollection = $this->addMediaCollection('blueprint_media');
+                            $mediaCollection->registerMediaConversions($registerMediaConversions);
+                            
                         }
                     }
                 }
             }
         }
-        dd($width, $height);
-        $registerMediaConversions = function (Media $media) {
-
-            $this->addMediaConversion('preview')
-                ->width($this->width)
-                ->height($this->height);
-        };
-
-        $this->addMediaCollection('blueprint_media')
-            ->registerMediaConversions($registerMediaConversions);
     }
 }

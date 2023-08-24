@@ -7,6 +7,7 @@ namespace App\Providers;
 use App\Settings\FormSettings;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Blueprint\Models\BlueprintData;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
 use Domain\Content\Models\Content;
@@ -70,7 +71,8 @@ class AppServiceProvider extends ServiceProvider
             ContentEntry::class,
             Globals::class,
             MetaData::class,
-            BlockContent::class
+            BlockContent::class,
+            BlueprintData::class,
         ]);
 
         Password::defaults(
