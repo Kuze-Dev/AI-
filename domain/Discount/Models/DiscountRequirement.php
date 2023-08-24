@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Discount\Models;
 
-use Domain\Discount\Enums\DiscountAmountType;
 use Domain\Discount\Enums\DiscountRequirementType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

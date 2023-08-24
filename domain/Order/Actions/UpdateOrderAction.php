@@ -12,6 +12,7 @@ use Exception;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Log;
 use Throwable;
+use Illuminate\Support\Facades\DB;
 
 class UpdateOrderAction
 {
@@ -19,57 +20,64 @@ class UpdateOrderAction
         Order $order,
         UpdateOrderData $updateOrderData
     ): Order|string|PaymentAuthorize|BadRequestHttpException {
-        try {
-            /** @var \Domain\Order\Models\Order $orderWithPayment */
-            $orderWithPayment = $order->load('payments');
+        return DB::transaction(function () use ($order, $updateOrderData) {
+            try {
+                DB::beginTransaction();
 
-            if ($updateOrderData->status) {
-                $order = app(UpdateOrderPaymentAction::class)->status(
-                    $orderWithPayment,
-                    $updateOrderData->status,
-                    $updateOrderData->notes
-                );
+                /** @var \Domain\Order\Models\Order $orderWithPayment */
+                $orderWithPayment = $order->load('payments');
 
-                /** @var \Domain\Customer\Models\Customer $customer */
-                $customer = auth()->user();
-
-                event(new OrderStatusUpdatedEvent(
-                    $customer,
-                    $orderWithPayment,
-                    $updateOrderData->status
-                ));
-            }
-
-            if (
-                $updateOrderData->type == 'bank-transfer' &&
-                $updateOrderData->proof_of_payment !== null
-            ) {
-                try {
-                    app(UpdateOrderPaymentAction::class)->bankTransfer(
+                if ($updateOrderData->status) {
+                    $order = app(UpdateOrderPaymentAction::class)->status(
                         $orderWithPayment,
-                        $updateOrderData->proof_of_payment,
+                        $updateOrderData->status,
                         $updateOrderData->notes
                     );
-                } catch (Throwable $e) {
-                    return $e->getMessage();
+
+                    /** @var \Domain\Customer\Models\Customer $customer */
+                    $customer = auth()->user();
+
+                    event(new OrderStatusUpdatedEvent(
+                        $customer,
+                        $orderWithPayment,
+                        $updateOrderData->status
+                    ));
                 }
-            } else {
-                if ($updateOrderData->type != 'status') {
+
+                if (
+                    $updateOrderData->type == 'bank-transfer' &&
+                    $updateOrderData->proof_of_payment !== null
+                ) {
                     try {
-                        return app(UpdateOrderPaymentAction::class)->withGateway(
+                        app(UpdateOrderPaymentAction::class)->bankTransfer(
                             $orderWithPayment,
-                            $updateOrderData->type
+                            $updateOrderData->proof_of_payment,
+                            $updateOrderData->notes
                         );
                     } catch (Throwable $e) {
                         return $e->getMessage();
                     }
+                } else {
+                    if ($updateOrderData->type != 'status') {
+                        try {
+                            return app(UpdateOrderPaymentAction::class)->withGateway(
+                                $orderWithPayment,
+                                $updateOrderData->type
+                            );
+                        } catch (Throwable $e) {
+                            return $e->getMessage();
+                        }
+                    }
                 }
-            }
 
-            return $order;
-        } catch (Exception $e) {
-            // Log::info($e);
-            return 'Something went wrong';
-        }
+                return $order;
+
+                DB::commit();
+            } catch (Exception $e) {
+                DB::rollBack();
+                // Log::info($e);
+                return 'Something went wrong';
+            }
+        });
     }
 }

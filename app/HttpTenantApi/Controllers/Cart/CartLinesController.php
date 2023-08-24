@@ -17,6 +17,8 @@ use Spatie\RouteAttributes\Attributes\Resource;
 use App\Http\Controllers\Controller;
 use Domain\Cart\Actions\CreateCartLineAction;
 use Domain\Cart\Models\Cart;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Throwable;
 
 #[
     Resource('carts/cartlines', apiResource: true, except: ['show', 'index']),
@@ -60,14 +62,22 @@ class CartLinesController extends Controller
 
         $validatedData = $request->validated();
 
-        $result = app(UpdateCartLineAction::class)
-            ->execute($cartline, UpdateCartLineData::fromArray($validatedData));
+        try {
+            $result = app(UpdateCartLineAction::class)
+                ->execute($cartline, UpdateCartLineData::fromArray($validatedData));
 
-        if ($result instanceof CartLine) {
-            return response()
-                ->json([
-                    'message' => 'Cart updated successfully',
-                ]);
+            if ($result instanceof CartLine) {
+                return response()
+                    ->json([
+                        'message' => 'Cart updated successfully',
+                    ]);
+            }
+        } catch (Throwable $th) {
+            if ($th instanceof BadRequestException) {
+                return response()->json([
+                    'message' => $th->getMessage(),
+                ], 400);
+            }
         }
     }
 

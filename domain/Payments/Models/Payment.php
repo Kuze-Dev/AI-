@@ -35,7 +35,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $deleted_at
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
- * @property-read Model|\Eloquent $payable
+ * @property-read Model|Eloquent $payable
  * @property-read PaymentMethod|null $paymentMethod
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Payments\Models\PaymentRefund> $refunds
  * @property-read int|null $refunds_count
