@@ -13,7 +13,7 @@ class MarkAsReadNotificationAction
 {
     public function execute(User $user, DatabaseNotification $databaseNotification): void
     {
-        if ( ! $databaseNotification->notifiable()->is($user)) {
+        if (!$databaseNotification->notifiable()->is($user)) {
             throw new CantReadNotificationException();
         }
 
@@ -24,10 +24,8 @@ class MarkAsReadNotificationAction
 
     public function markAllAsRead(User $user): void
     {
-        $unreadNotifications = $user->unreadNotifications;
-
-        foreach ($unreadNotifications as $notification) {
-            $this->execute($user, $notification);
+        if (isset($user->unreadNotifications)) {
+            $user->unreadNotifications->markAsRead();
         }
     }
 }
