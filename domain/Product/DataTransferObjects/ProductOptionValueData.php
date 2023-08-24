@@ -7,10 +7,10 @@ namespace Domain\Product\DataTransferObjects;
 class ProductOptionValueData
 {
     public function __construct(
-        public readonly int | string $id,
+        public readonly int|string $id,
         public readonly string $name,
         public readonly string $slug,
-        public readonly int | string $product_option_id,
+        public readonly int|string $product_option_id,
     ) {
     }
 

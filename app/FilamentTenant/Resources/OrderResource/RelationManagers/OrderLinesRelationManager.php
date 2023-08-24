@@ -49,13 +49,19 @@ class OrderLinesRelationManager extends RelationManager
                     ->alignLeft(),
                 Tables\Columns\TextColumn::make('unit_price')
                     ->formatStateUsing(function (OrderLine $record) {
-                        return $record->order->currency_symbol . ' ' . number_format($record->unit_price, 2, '.', '');
+                        /** @var \Domain\Order\Models\Order $order */
+                        $order = $record->order;
+
+                        return $order->currency_symbol . ' ' . number_format($record->unit_price, 2, '.', '');
                     })
                     ->label(trans('Unit Price')),
                 Tables\Columns\TextColumn::make('quantity')->label(trans('Quantity')),
                 Tables\Columns\TextColumn::make('sub_total')
                     ->formatStateUsing(function (OrderLine $record) {
-                        return $record->order->currency_symbol . ' ' . number_format($record->sub_total, 2, '.', '');
+                        /** @var \Domain\Order\Models\Order $order */
+                        $order = $record->order;
+
+                        return $order->currency_symbol . ' ' . number_format($record->sub_total, 2, '.', '');
                     })
                     ->label(trans('Amount')),
             ])

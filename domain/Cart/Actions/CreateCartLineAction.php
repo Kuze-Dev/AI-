@@ -76,7 +76,7 @@ class CreateCartLineAction
                     ] : null,
                 ]);
 
-                if ($cartLineData->remarks->medias && count($cartLineData->remarks->medias) > 0) {
+                if ($cartLineData->remarks->medias) {
                     $this->createMediaFromS3UrlAction->execute(
                         $cartLine,
                         $cartLineData->remarks->medias,

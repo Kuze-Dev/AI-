@@ -7,7 +7,7 @@ namespace Domain\Product\DataTransferObjects;
 class ProductOptionData
 {
     public function __construct(
-        public readonly int | string $id,
+        public readonly int|string $id,
         public readonly string $name,
         public readonly string $slug,
         public array $productOptionValues,

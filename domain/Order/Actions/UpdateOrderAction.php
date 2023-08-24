@@ -20,7 +20,7 @@ class UpdateOrderAction
         UpdateOrderData $updateOrderData
     ): Order|string|PaymentAuthorize|BadRequestHttpException {
         try {
-            /** @var \Domain\Order\Models\Order $orderPayment */
+            /** @var \Domain\Order\Models\Order $orderWithPayment */
             $orderWithPayment = $order->load('payments');
 
             if ($updateOrderData->status) {
