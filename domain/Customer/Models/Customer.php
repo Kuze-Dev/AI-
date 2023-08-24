@@ -190,6 +190,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
         $this->notify(new ResetPassword($token));
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Favorite\Models\Favorite> */
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);
