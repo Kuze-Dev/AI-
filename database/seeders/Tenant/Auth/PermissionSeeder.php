@@ -58,7 +58,17 @@ class PermissionSeeder extends BasePermissionSeeder
                     ],
                     hasSoftDeletes: true
                 ),
-                ...$this->generateFilamentResourcePermissions('addresses', ),
+                ...$this->generateFilamentResourcePermissions('addresses'),
+                ...$this->generateFilamentResourcePermissions(
+                    'site',
+                    except: [
+                        'deleteAny',
+                    ],
+                    hasSoftDeletes: true,
+                    customPermissions: [
+                        'siteManager',
+                    ],
+                ),
             ],
         ];
     }

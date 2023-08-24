@@ -13,6 +13,7 @@ class FormData
         public readonly bool $store_submission = false,
         public readonly bool $uses_captcha = false,
         public readonly array $form_email_notifications = [],
+        public readonly array $sites = [],
     ) {
     }
 
@@ -33,9 +34,11 @@ class FormData
                     reply_to: $formEmailNotificationData['reply_to'] ?? [],
                     subject: $formEmailNotificationData['subject'],
                     template: $formEmailNotificationData['template'],
+                    has_attachments: $formEmailNotificationData['has_attachments'],
                 ),
                 $data['form_email_notifications'] ?? []
             ),
+            sites: $data['sites'] ?? []
         );
     }
 }

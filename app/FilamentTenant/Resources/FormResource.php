@@ -4,24 +4,26 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Resources\FormResource\Pages;
-use App\FilamentTenant\Resources\FormResource\RelationManagers\FormSubmissionsRelationManager;
-use App\FilamentTenant\Support\SchemaInterpolations;
+use Closure;
+use Exception;
+use Filament\Forms;
+use Filament\Tables;
+use Illuminate\Support\Str;
+use Domain\Site\Models\Site;
+use Filament\Resources\Form;
+use Filament\Resources\Table;
 use App\Settings\FormSettings;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Form\Models\Form as FormModel;
-use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
-use Illuminate\Support\Facades\Auth;
-use Exception;
+use Domain\Internationalization\Models\Locale;
+use App\FilamentTenant\Resources\FormResource\Pages;
+use App\FilamentTenant\Support\SchemaInterpolations;
 use Filament\Resources\RelationManagers\RelationGroup;
-use Illuminate\Support\Str;
-use Closure;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use App\FilamentTenant\Resources\FormResource\RelationManagers\FormSubmissionsRelationManager;
 
 class FormResource extends Resource
 {
@@ -52,7 +54,36 @@ class FormResource extends Resource
                         ->optionsFromModel(Blueprint::class, 'name')
                         ->disabled(fn (?FormModel $record) => $record !== null)
                         ->reactive(),
+                    Forms\Components\Select::make('locale')
+                        ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                        ->default((string) optional(Locale::where('is_default', true)->first())->code)
+                        ->searchable()
+                        ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                        ->required(),
                     Forms\Components\Toggle::make('store_submission'),
+                    Forms\Components\Card::make([
+                        Forms\Components\CheckboxList::make('sites')
+                            ->options(
+                                fn () => Site::orderBy('name')
+                                    ->pluck('name', 'id')
+                                    ->toArray()
+                            )
+                            ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?FormModel $record): void {
+                                if ( ! $record) {
+                                    $component->state([]);
+
+                                    return;
+                                }
+
+                                $component->state(
+                                    $record->sites->pluck('id')
+                                        ->intersect(array_keys($component->getOptions()))
+                                        ->values()
+                                        ->toArray()
+                                );
+                            }),
+                    ])
+                        ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
                     Forms\Components\Toggle::make('uses_captcha')
                         ->disabled(fn (FormSettings $formSettings) => ! $formSettings->provider)
                         ->helperText(
@@ -160,6 +191,8 @@ class FormResource extends Resource
                                         markdown;
                                 })
                                 ->columnSpanFull(),
+                            Forms\Components\Toggle::make('has_attachments')
+                                ->helperText('If Enabled Uploaded Files will be attach to this email notification'),
                         ])
                         ->columnSpan(['md' => 3]),
                 ])->columns(4),

@@ -238,6 +238,7 @@ class BlueprintResource extends Resource
                 Forms\Components\Toggle::make('multiple')
                     ->reactive(),
                 Forms\Components\Toggle::make('reorder'),
+                Forms\Components\Toggle::make('can_download'),
                 Forms\Components\TextInput::make('accept')
                     ->afterStateHydrated(function (Closure $set, ?array $state): void {
                         $set('accept', implode(',', $state ?? []));
@@ -447,6 +448,45 @@ class BlueprintResource extends Resource
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 self::getFieldsSchema()
                     ->columnSpanFull(),
+            ],
+            FieldType::CHECKBOX => [
+                Forms\Components\Toggle::make('bulk_toggleable')
+                    ->reactive()
+                    ->columnSpanFull(),
+                Forms\Components\Repeater::make('options')
+                    ->collapsible()
+                    ->orderable()
+                    ->itemLabel(fn (array $state) => $state['title'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('value'),
+                        Forms\Components\TextInput::make('label'),
+                    ]),
+            ],
+            FieldType::RADIO => [
+                Forms\Components\Toggle::make('inline')
+                    ->columnSpanFull(),
+                Forms\Components\Repeater::make('options')
+                    ->collapsible()
+                    ->orderable()
+                    ->itemLabel(fn (array $state) => $state['title'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('value'),
+                        Forms\Components\TextInput::make('label'),
+                    ]),
+                Forms\Components\Repeater::make('descriptions')
+                    ->collapsible()
+                    ->orderable()
+                    ->itemLabel(fn (array $state) => $state['title'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('value'),
+                        Forms\Components\TextInput::make('description'),
+                    ]),
             ],
             default => [],
         };

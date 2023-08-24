@@ -17,13 +17,10 @@ environments:
       # - 'npm ci && npm run build && rm -rf node_modules'
     firewall:
       rate-limit: 1000
-      bot-control:
-        - CategorySearchEngine
-        - CategorySocialMedia
-        - CategoryScrapingFramework
   staging:
     domain:
-      - staging.haspcms.net
+      - haspcms-1.com
+      - "*.haspcms-1.com"
     timeout: 30
     warm: 10
     cache: hasp-cache
@@ -36,10 +33,6 @@ environments:
       # - 'npm ci && npm run build && rm -rf node_modules'
     firewall:
       rate-limit: 1000
-      bot-control:
-        - CategorySearchEngine
-        - CategorySocialMedia
-        - CategoryScrapingFramework
 ignore:
   - "node_modules"
   - "public/storage"
