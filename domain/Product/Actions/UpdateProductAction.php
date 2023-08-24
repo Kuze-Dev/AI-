@@ -24,7 +24,7 @@ class UpdateProductAction
     ) {
     }
 
-    public function execute(Product $product, ProductData $productData): Product
+    public function execute(Product $product, ProductData $productData): Product | Exception
     {
         try {
             $product->update($this->getProductAttributes($productData));
@@ -47,7 +47,7 @@ class UpdateProductAction
 
             return $product;
         } catch (Exception $e) {
-            Log::info($e);
+            Log::info('Error on UpdateProductAction->execute() ' . $e);
 
             return $e;
         }

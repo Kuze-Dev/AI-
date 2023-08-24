@@ -14,7 +14,7 @@ class CreateProductOptionAction
     public function execute(Product $product, ProductData $productData): void
     {
         if (filled($productData->product_options)) {
-            foreach ($productData->product_options as $key => $productOption) {
+            foreach ($productData->product_options ?? [] as $key => $productOption) {
                 $newProductOptionModel = ProductOption::create([
                     'product_id' => $product->id,
                     'name' => $productOption->name,
@@ -22,7 +22,7 @@ class CreateProductOptionAction
 
                 $productData->product_variants = $this->searchAndChangeValue(
                     $productOption->id,
-                    $productData->product_variants,
+                    $productData->product_variants ?? [],
                     $newProductOptionModel->id
                 );
 
@@ -46,7 +46,7 @@ class CreateProductOptionAction
 
                     $productData->product_variants = $this->searchAndChangeValue(
                         $proxyOptionValueId,
-                        $productData->product_variants,
+                        $productData->product_variants ?? [],
                         $newOptionValueModel->id,
                         'option_value_id'
                     );
@@ -59,7 +59,7 @@ class CreateProductOptionAction
         }
     }
 
-    protected function searchAndChangeValue($needle, $haystack, $newValue, $field = 'option_id')
+    protected function searchAndChangeValue(string | int $needle, array $haystack, int $newValue, string $field = 'option_id'): array
     {
         $newCombinations = [];
         $newVariants = [];

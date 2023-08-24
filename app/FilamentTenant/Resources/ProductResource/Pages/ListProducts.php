@@ -23,7 +23,7 @@ class ListProducts extends ListRecords
 {
     protected static string $resource = ProductResource::class;
 
-    protected static function generateCombinations($row, $inputArray): array
+    protected static function generateCombinations(array $row, array $inputArray): array
     {
         $outputArray = [];
         foreach ($inputArray[0]['productOptionValues'] as $key => $optionValue1) {

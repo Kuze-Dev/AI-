@@ -406,7 +406,7 @@ class ProductResource extends Resource
                                     Forms\Components\TextInput::make('stock')
                                         ->numeric()
                                         ->dehydrateStateUsing(fn ($state) => (int) $state),
-                                        // ->required(),
+                                    // ->required(),
                                 ])->columns(2),
                             Forms\Components\Section::make('Pricing')
                                 ->schema([
