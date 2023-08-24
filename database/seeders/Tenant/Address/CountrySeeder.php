@@ -21,14 +21,15 @@ class CountrySeeder extends Seeder
             $country = Country::create([
                 'code' => $countryData['iso2'],
                 'name' => $countryData['name'],
-                'capital' => $countryData['capital'],
-                'timezone' => $countryData['timezones'][0]['gmtOffsetName'],
+                'capital' => $countryData['capital'] ?? null,
+                'timezone' => $countryData['timezones'][0]['gmtOffsetName'] ?? null,
                 'active' => false,
             ]);
 
             foreach ($countryData['states'] as $stateData) {
                 $country->states()->create([
                     'name' => $stateData['name'],
+                    'code' => $stateData['state_code'],
                 ]);
             }
 
