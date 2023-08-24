@@ -63,7 +63,7 @@ class SplitOrderAction
         });
     }
 
-    private function proceedPayment(Order $order, PreparedOrderData $preparedOrderData): PaymentAuthorize|Exception
+    private function proceedPayment(Order $order, PreparedOrderData $preparedOrderData): PaymentAuthorize
     {
         $providerData = new CreatepaymentData(
             transactionData: TransactionData::fromArray(

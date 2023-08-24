@@ -11,19 +11,19 @@ use Domain\Product\Models\ProductVariant;
 
 class CartPurchasableValidatorAction
 {
-    public function validateProduct(string $productId, int $quantity)
+    public function validateProduct(string $productId, int $quantity): void
     {
         $product = Product::where((new Product())->getRouteKeyName(), $productId)->first();
 
-        if ( ! $product) {
+        if (!$product) {
             throw new InvalidPurchasableException('Invalid product.');
         }
 
-        if ( ! $product->status) {
+        if (!$product->status) {
             throw new InvalidPurchasableException('Inactive product.');
         }
 
-        if ( ! $product->allow_stocks) {
+        if (!$product->allow_stocks) {
             return;
         }
 
@@ -50,7 +50,7 @@ class CartPurchasableValidatorAction
         string $productId,
         string|int $variantId,
         int $quantity
-    ) {
+    ): void {
         $productVariant = ProductVariant::with('product')->where(
             (new ProductVariant())->getRouteKeyName(),
             $variantId
@@ -58,15 +58,17 @@ class CartPurchasableValidatorAction
             $query->where((new Product())->getRouteKeyName(), $productId);
         })->first();
 
-        if ( ! $productVariant) {
+        if (!$productVariant) {
             throw new InvalidPurchasableException('Invalid productVariant.');
         }
 
-        if ( ! $productVariant->status) {
+        if (!$productVariant->status) {
             throw new InvalidPurchasableException('Inactive productVariant.');
         }
 
-        if ( ! $productVariant->product->allow_stocks) {
+        /** @var \Domain\Product\Models\Product $product */
+        $product = $productVariant->product;
+        if (!$product->allow_stocks) {
             return;
         }
 
@@ -90,22 +92,25 @@ class CartPurchasableValidatorAction
         }
     }
 
-    public function validatePurchasableUpdate(Product|ProductVariant $purchasable, int $quantity)
+    public function validatePurchasableUpdate(Product|ProductVariant $purchasable, int $quantity): void
     {
         if ($purchasable instanceof Product) {
-            if ( ! $purchasable->status) {
+            if (!$purchasable->status) {
                 throw new InvalidPurchasableException('Inactive product.');
             }
 
-            if ( ! $purchasable->allow_stocks) {
+            if (!$purchasable->allow_stocks) {
                 return;
             }
         } elseif ($purchasable instanceof ProductVariant) {
-            if ( ! $purchasable->product->status) {
+            /** @var \Domain\Product\Models\Product $product */
+            $product = $purchasable->product;
+
+            if (!$product->status) {
                 throw new InvalidPurchasableException('Inactive productVariant.');
             }
 
-            if ( ! $purchasable->product->allow_stocks) {
+            if (!$product->allow_stocks) {
                 return;
             }
         }
@@ -128,10 +133,10 @@ class CartPurchasableValidatorAction
 
         foreach ($cartLines as $cartLine) {
             if ($cartLine->purchasable instanceof Product) {
-                if ( ! $cartLine->purchasable->status) {
+                if (!$cartLine->purchasable->status) {
                     throw new InvalidPurchasableException('Inactive product.');
                 }
-                if ( ! $cartLine->purchasable->allow_stocks) {
+                if (!$cartLine->purchasable->allow_stocks) {
                     $count++;
                 } else {
                     if ($cartLine->purchasable->stock >= $cartLine->quantity) {
@@ -139,11 +144,14 @@ class CartPurchasableValidatorAction
                     }
                 }
             } elseif ($cartLine->purchasable instanceof ProductVariant) {
-                if ( ! $cartLine->purchasable->status) {
+                /** @var \Domain\Product\Models\Product $product */
+                $product = $cartLine->purchasable->product;
+
+                if (!$cartLine->purchasable->status) {
                     throw new InvalidPurchasableException('Inactive productVariant.');
                 }
                 if (
-                    ! $cartLine->purchasable->product->allow_stocks
+                    !$product->allow_stocks
                 ) {
                     $count++;
                 } else {
