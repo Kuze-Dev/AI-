@@ -43,6 +43,8 @@ it('can create globals for micro sites  ', function () {
 
     tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
 
+    loginAsSuperAdmin();
+
     $blueprint = BlueprintFactory::new()
         ->addSchemaSection(['title' => 'Main'])
         ->addSchemaField([
