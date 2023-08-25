@@ -21,7 +21,6 @@ use Domain\Product\Models\ProductOption;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\Contracts\HasProductOptions;
@@ -278,7 +277,6 @@ class ProductResource extends Resource
                         });
                     }),
             ])
-            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->authorize('update'),
