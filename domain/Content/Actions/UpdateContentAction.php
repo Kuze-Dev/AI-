@@ -6,6 +6,7 @@ namespace Domain\Content\Actions;
 
 use Domain\Content\DataTransferObjects\ContentData;
 use Domain\Content\Models\Content;
+use Illuminate\Support\Facades\Auth;
 
 class UpdateContentAction
 {
@@ -25,6 +26,15 @@ class UpdateContentAction
 
         $content->taxonomies()
             ->sync($contentData->taxonomies);
+
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+            Auth::user()?->hasRole(config('domain.role.super_admin'))
+        ) {
+
+            $content->sites()
+                ->sync($contentData->sites);
+
+        }
 
         return $content;
     }

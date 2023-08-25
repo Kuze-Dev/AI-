@@ -9,7 +9,6 @@ use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Support\Arr;
-use Domain\Site\Models\Site;
 use Filament\Resources\Form;
 use Filament\Resources\Table;
 use Filament\Facades\Filament;
@@ -139,7 +138,7 @@ class ContentEntryResource extends Resource
                         Forms\Components\CheckboxList::make('sites')
                             ->rule(fn (?ContentEntry $record, Closure $get) => new MicrositeContentEntryUniqueRouteUrlRule($record, $get('route_url')))
                             ->options(
-                                fn () => Site::orderBy('name')
+                                fn ($livewire) => $livewire->ownerRecord->sites
                                     ->pluck('name', 'id')
                                     ->toArray()
                             )
@@ -158,7 +157,7 @@ class ContentEntryResource extends Resource
                                 );
                             }),
                     ])
-                        ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+                        ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
                     Forms\Components\Section::make(trans('Taxonomies'))
                         ->schema([
                             Forms\Components\Group::make()
