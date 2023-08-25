@@ -225,8 +225,8 @@ class DiscountResource extends Resource
                 BadgeColumn::make('status')
                     ->colors([
 
-                    'success' => 'active',
-                    'warning' => 'inactive',
+                        'success' => 'active',
+                        'warning' => 'inactive',
 
                     ])->formatStateUsing(fn (string $state): string => __(ucfirst($state)))->weight('bold'),
             ])

@@ -39,16 +39,3 @@ it('can get subtotal', function () {
 
     expect($subtotal)->toBeFloat();
 });
-
-/** TODO */
-// it('can get shipping fee', function () {
-// });
-
-// it('can get tax', function () {
-// });
-
-// it('can get discount', function () {
-// });
-
-// it('can get cart summary', function () {
-// });
