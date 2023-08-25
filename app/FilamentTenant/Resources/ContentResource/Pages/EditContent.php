@@ -65,6 +65,7 @@ class EditContent extends EditRecord
                     past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
                     future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
                     prefix: $data['prefix'],
+                    sites: $data['sites'] ?? [],
                 ))
         );
     }
