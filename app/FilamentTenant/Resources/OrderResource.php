@@ -424,7 +424,7 @@ class OrderResource extends Resource
                                 $formattedState = Carbon::parse($state)
                                     /** @phpstan-ignore-next-line */
                                     ->setTimezone(Auth::user()?->timezone)
-                                    ->translatedFormat('jS F Y h:i A');
+                                    ->translatedFormat('F d, Y g:i A');
 
                                 return $formattedState;
                             }),
@@ -671,7 +671,7 @@ class OrderResource extends Resource
                     ->size('sm')
                     ->action(function () use ($order, $set) {
 
-                        $isPaid = ! $order->is_paid;
+                        $isPaid = !$order->is_paid;
 
                         $result = $order->update([
                             'is_paid' => $isPaid,
@@ -726,7 +726,7 @@ class OrderResource extends Resource
                         /** @var \Domain\Payments\Models\Payment $payment */
                         $payment = $order->payments->first();
 
-                        if ( ! is_null($payment->remarks)) {
+                        if (!is_null($payment->remarks)) {
                             Notification::make()
                                 ->title(trans('Invalid action.'))
                                 ->warning()
