@@ -9,6 +9,7 @@ use Domain\Discount\Enums\DiscountAmountType;
 use Domain\Discount\Enums\DiscountConditionType;
 use Domain\Discount\Enums\DiscountRequirementType;
 use Domain\Discount\Enums\DiscountStatus;
+use Illuminate\Support\Str;
 
 final class DiscountData
 {
@@ -30,7 +31,7 @@ final class DiscountData
     {
         return new self(
             name: $data['name'],
-            slug: $data['slug'],
+            slug: Str::slug($data['name']),
             description: $data['description'] ?? null,
             code: $data['code'],
             status: DiscountStatus::from($data['status']),
