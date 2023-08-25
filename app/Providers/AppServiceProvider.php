@@ -28,6 +28,7 @@ use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
 use Domain\Globals\Models\Globals;
 use Domain\Order\Models\Order;
+use Domain\Order\Models\OrderAddress;
 use Domain\Order\Models\OrderLine;
 use Domain\Page\Models\Block;
 use Domain\Review\Models\Review;
@@ -67,7 +68,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Model::shouldBeStrict( ! $this->app->isProduction());
+        Model::shouldBeStrict(!$this->app->isProduction());
 
         Model::handleLazyLoadingViolationUsing(Integration::lazyLoadingViolationReporter());
 
@@ -121,6 +122,7 @@ class AppServiceProvider extends ServiceProvider
             Payment::class,
             Order::class,
             OrderLine::class,
+            OrderAddress::class,
             Favorite::class,
             Review::class,
             Shipment::class,
@@ -133,13 +135,13 @@ class AppServiceProvider extends ServiceProvider
             $this->app->environment('local', 'testing')
                 ? Password::min(4)
                 : Password::min(8)
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols()
-                    ->when(
-                        $this->app->isProduction(),
-                        fn (Password $password) => $password->uncompromised()
-                    )
+                ->mixedCase()
+                ->numbers()
+                ->symbols()
+                ->when(
+                    $this->app->isProduction(),
+                    fn (Password $password) => $password->uncompromised()
+                )
         );
 
         Rule::macro(
