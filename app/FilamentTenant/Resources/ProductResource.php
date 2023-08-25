@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\Contracts\HasProductOptions;
 use App\FilamentTenant\Support\Contracts\HasProductVariants;
 use Domain\Product\Actions\DeleteProductAction;
+use Domain\Product\Rules\UniqueProductSkuRule;
 use Support\Common\Rules\MinimumValueRule;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
@@ -399,36 +400,7 @@ class ProductResource extends Resource
                             Forms\Components\Section::make('Inventory')
                                 ->schema([
                                     Forms\Components\TextInput::make('sku')
-                                        ->rules([
-                                            function (HasProductVariants $livewire) {
-                                                return function (string $attribute, $value, Closure $fail) use ($livewire) {
-                                                    $filteredProducts = [];
-                                                    $toArrayVariantStatePath = explode('.', $livewire->activeProductVariantItemStatePath);
-                                                    $productVariants = $livewire->data['product_variants'];
-
-                                                    if (
-                                                        isset($productVariants[end($toArrayVariantStatePath)])
-                                                        && $productVariants[end($toArrayVariantStatePath)]['sku'] === $value
-                                                    ) {
-                                                        return;
-                                                    }
-
-                                                    foreach ($productVariants as $variant) {
-                                                        if (
-                                                            isset($variant['sku'])
-                                                            && ($livewire->data['sku'] === $value
-                                                                || $variant['sku'] === $value)
-                                                        ) {
-                                                            $filteredProducts[] = $variant;
-                                                        }
-                                                    }
-
-                                                    if (count($filteredProducts)) {
-                                                        $fail('SKU is already existing.');
-                                                    }
-                                                };
-                                            },
-                                        ])
+                                        ->rule(fn (HasProductVariants $livewire) => new UniqueProductSkuRule($livewire))
                                         ->required(),
                                     Forms\Components\TextInput::make('stock')
                                         ->numeric()
