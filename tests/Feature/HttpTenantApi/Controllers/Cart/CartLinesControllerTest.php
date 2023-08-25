@@ -16,7 +16,10 @@ use function Pest\Laravel\withHeader;
 beforeEach(function () {
     testInTenantContext();
 
-    $product = ProductFactory::new()->createOne();
+    $product = ProductFactory::new()
+        ->setStatus(true)
+        ->setMinimumOrderQuantity(1)
+        ->createOne();
 
     $product->update([
         'allow_customer_remarks' => true,

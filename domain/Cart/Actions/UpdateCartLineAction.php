@@ -49,9 +49,9 @@ class UpdateCartLineAction
                     }
                 }
 
-                return $cartLine;
-
                 DB::commit();
+
+                return $cartLine;
             } catch (Exception $e) {
                 DB::rollBack();
                 $maxFileSize = File::getHumanReadableSize(config('media-library.max_file_size'));

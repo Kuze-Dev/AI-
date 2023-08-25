@@ -46,7 +46,7 @@ it('can get cart count', function () {
         ->assertOk();
 });
 
-it('can show cart summary w/o discount', function () {
+it('can show cart summary', function () {
     $cartLineIds = $this->cartLines->pluck('uuid')->toArray();
 
     $commaSeparatedIds = implode(',', $cartLineIds);
@@ -72,46 +72,3 @@ it('can show cart summary w/o discount', function () {
         ])
         ->assertOk();
 });
-
-//TODO WAITING FOR DISCOUNT FACTORY RELATIONS
-// it('can show cart summary w/ discount', function () {
-//     $cartLineIds = $this->cartLines->pluck('uuid')->toArray();
-
-//     $commaSeparatedIds = implode(',', $cartLineIds);
-
-//     $discount = DiscountFactory::new()
-//         ->createOne();
-
-//     $response = getJson('api/carts/summary?' . http_build_query([
-//         'cart_line_ids' => $commaSeparatedIds,
-//         'discount_code' => $discount->code
-//     ]));
-
-//     $response->assertValid()
-//         ->assertJsonStructure([
-//             'tax' => [
-//                 'inclusive_sub_total',
-//                 'display',
-//                 'percentage',
-//                 'amount',
-//             ],
-//             'sub_total' => [
-//                 'initial_amount',
-//                 'discounted_amount',
-//             ],
-//             'discount' => [
-//                 'status',
-//                 'message',
-//                 'type',
-//                 'amount',
-//                 'discount_type',
-//                 'total_savings',
-//             ],
-//             'shipping_fee' => [
-//                 'initial_amount',
-//                 'discounted_amount',
-//             ],
-//             'total',
-//         ])
-//         ->assertOk();
-// });

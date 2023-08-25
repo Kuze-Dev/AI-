@@ -21,7 +21,12 @@ beforeEach(function () {
     $customer = CustomerFactory::new()
         ->createOne();
 
-    ProductFactory::new()->times(3)->create();
+    ProductFactory::new()
+        ->times(3)
+        ->create([
+            'status' => true,
+            'minimum_order_quantity' => 1,
+        ]);
 
     $cart = CartFactory::new()->setCustomerId($customer->id)->createOne();
 
@@ -53,6 +58,36 @@ it('can checkout', function () {
             'reference',
         ])
         ->assertOk();
+});
+
+it('cant checkout when product inactive', function () {
+    $inactiveProduct = ProductFactory::new()
+        ->setStatus(false)
+        ->createOne();
+
+    $cartLine = CartLineFactory::new()
+        ->setCartId($this->cart->id)
+        ->setPurchasableId($inactiveProduct->id)
+        ->createOne();
+
+    postJson('api/carts/checkouts', [
+        'cart_line_ids' => [$cartLine->uuid],
+    ])->assertStatus(422);
+});
+
+it('cant checkout when product didnt meet the minimum order quantity', function () {
+    $inactiveProduct = ProductFactory::new()
+        ->setMinimumOrderQuantity(5)
+        ->createOne();
+
+    $cartLine = CartLineFactory::new()
+        ->setCartId($this->cart->id)
+        ->setPurchasableId($inactiveProduct->id)
+        ->createOne();
+
+    postJson('api/carts/checkouts', [
+        'cart_line_ids' => [$cartLine->uuid],
+    ])->assertStatus(422);
 });
 
 it('can show checkout items', function () {
