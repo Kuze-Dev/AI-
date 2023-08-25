@@ -15,6 +15,7 @@ use Domain\Discount\Actions\ForceDeleteDiscountAction;
 use Domain\Discount\Actions\RestoreDiscountAction;
 use Domain\Discount\Actions\SoftDeleteDiscountAction;
 use Domain\Discount\Enums\DiscountAmountType;
+use Domain\Discount\Enums\DiscountConditionType;
 use Domain\Discount\Models\Discount;
 use Domain\Discount\Models\DiscountLimit;
 use Filament\Forms\Components\Actions\Action;
@@ -30,6 +31,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
@@ -41,7 +43,6 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
-use Str;
 use Illuminate\Database\Eloquent\Builder;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
@@ -63,14 +64,7 @@ class DiscountResource extends Resource
             ->schema([
                 Card::make([
                     TextInput::make('name')
-                        ->reactive()
-                        ->required()
-                        ->afterStateUpdated(function (Closure $set, $state) {
-                            $set('slug', Str::slug($state));
-                        }),
-                    TextInput::make('slug')
-                        ->unique(ignoreRecord: true)
-                        ->disabled(),
+                        ->required(),
 
                     RichEditor::make('description')
                         ->translateLabel(),
@@ -141,7 +135,7 @@ class DiscountResource extends Resource
                             ])
                                 ->required()
                                 ->default('order_sub_total')
-                                ->formatStateUsing(fn ($record) => $record?->discountCondition?->discount_type)
+                                ->formatStateUsing(fn ($record) => optional($record->discountCondition()->withTrashed()->first())->discount_type)
                                 ->label(trans('Discount Type')),
 
                             Radio::make('discountCondition.amount_type')->options([
@@ -152,7 +146,7 @@ class DiscountResource extends Resource
                                 ->required()
                                 ->default('fixed_value')
                                 ->filled()
-                                ->formatStateUsing(fn ($record) => $record?->discountCondition?->amount_type)
+                                ->formatStateUsing(fn ($record) => optional($record->discountCondition()->withTrashed()->first())->amount_type)
                                 ->label(trans('Amount Type')),
 
                             TextInput::make('discountCondition.amount')
@@ -160,7 +154,7 @@ class DiscountResource extends Resource
                                 ->numeric()
                                 ->minValue(1)
                                 ->rules(['max:100'], fn (Closure $get) => $get('discountCondition.amount_type') === 'percentage')
-                                ->formatStateUsing(fn ($record) => $record?->discountCondition?->amount)
+                                ->formatStateUsing(fn ($record) => optional($record->discountCondition()->withTrashed()->first())->amount)
                                 ->label(trans('Discount Amount')),
                         ]),
 
@@ -177,8 +171,6 @@ class DiscountResource extends Resource
 
                             TextInput::make('discountRequirement.minimum_amount')
                                 ->label(trans('Minimum purchase amount'))
-                                // ->required(fn (Closure $get) => $get('discountRequirement.requirement_type') != null)
-                                // ->disabled(fn (Closure $get) => $get('discountRequirement.requirement_type') == null)
                                 ->numeric()
                                 ->formatStateUsing(fn ($record) => $record?->discountRequirement?->minimum_amount)
                                 ->helperText(new HtmlString(<<<HTML
@@ -196,16 +188,30 @@ class DiscountResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name'),
+                TextColumn::make('discountCondition.discount_type')
+                    ->label(trans('Discount Type'))
+                    ->formatStateUsing(function ($record) {
+
+                        $discountType = optional($record->discountCondition()->withTrashed()->first())->discount_type;
+
+                        $label = '';
+                        if($discountType === DiscountConditionType::ORDER_SUB_TOTAL) {
+                            $label = trans('Order Sub Total');
+                        }
+
+                        if($discountType === DiscountConditionType::DELIVERY_FEE) {
+                            $label = trans('Shipping Fee');
+                        }
+
+                        return $label;
+                    }),
                 TextColumn::make('discountCondition.amount')
                     ->formatStateUsing(function ($record) {
-                        $discountCondition = $record->discountCondition;
-
-                        if ($discountCondition !== null) {
-                            if ($discountCondition->amount_type === DiscountAmountType::PERCENTAGE) {
-                                return (string) $discountCondition->amount . '%';
-                            } elseif ($discountCondition->amount_type === DiscountAmountType::FIXED_VALUE) {
-                                return Currency::whereEnabled(true)->value('symbol') . ' ' . (string) $discountCondition->amount;
-                            }
+                        $discountCondition = optional($record->discountCondition()->withTrashed()->first());
+                        if ($discountCondition->amount_type === DiscountAmountType::PERCENTAGE) {
+                            return (string) $discountCondition->amount . '%';
+                        } elseif ($discountCondition->amount_type === DiscountAmountType::FIXED_VALUE) {
+                            return Currency::whereEnabled(true)->value('symbol') . ' ' . (string) $discountCondition->amount;
                         }
 
                         return null;
@@ -225,8 +231,8 @@ class DiscountResource extends Resource
                 BadgeColumn::make('status')
                     ->colors([
 
-                    'success' => 'active',
-                    'warning' => 'inactive',
+                        'success' => 'active',
+                        'warning' => 'inactive',
 
                     ])->formatStateUsing(fn (string $state): string => __(ucfirst($state)))->weight('bold'),
             ])
@@ -234,35 +240,36 @@ class DiscountResource extends Resource
                 TrashedFilter::make(),
             ])
             ->actions([
-                EditAction::make(),
-                ForceDeleteAction::make()
-                    ->button()
-                    ->using(function (Discount $record) {
-                        try {
-                            return app(ForceDeleteDiscountAction::class)->execute($record);
-                        } catch (DeleteRestrictedException $e) {
-                            return false;
-                        }
-                    }),
+                ActionGroup::make([
+                    EditAction::make(),
+                    ForceDeleteAction::make()
+                        ->using(function (Discount $record) {
+                            try {
+                                return app(ForceDeleteDiscountAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
 
-                DeleteAction::make()
-                    ->using(function (Discount $record) {
-                        try {
-                            return app(SoftDeleteDiscountAction::class)->execute($record);
-                        } catch (DeleteRestrictedException $e) {
-                            return false;
-                        }
-                    })
-                    ->button(),
+                    DeleteAction::make()
+                        ->using(function (Discount $record) {
+                            try {
+                                return app(SoftDeleteDiscountAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
 
-                RestoreAction::make()
-                    ->using(function (Discount $record) {
-                        try {
-                            return app(RestoreDiscountAction::class)->execute($record);
-                        } catch (DeleteRestrictedException $e) {
-                            return false;
-                        }
-                    })->button(),
+                    RestoreAction::make()
+                        ->using(function (Discount $record) {
+                            try {
+                                return app(RestoreDiscountAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        }),
+                ]),
+
             ])
             ->bulkActions([
                 // Tables\Actions\DeleteBulkAction::make(),
@@ -280,6 +287,7 @@ class DiscountResource extends Resource
     public static function getEloquentQuery(): EloquentBuilder
     {
         return parent::getEloquentQuery()
+            ->with(['discountCondition', 'discountRequirement'])
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
