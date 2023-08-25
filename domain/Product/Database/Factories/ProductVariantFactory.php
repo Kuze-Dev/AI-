@@ -26,7 +26,7 @@ class ProductVariantFactory extends Factory
         ];
     }
 
-    public function setCombination()
+    public function setCombination(): self
     {
         $colors = ['black', 'white', 'red', 'blue', 'green'];
         $sizes = ['small', 'medium', 'large', 'x-large'];
@@ -43,8 +43,8 @@ class ProductVariantFactory extends Factory
             array_push($combinations, [
                 'option' => $option->name,
                 'option_id' => $option->id,
-                'option_value' => $option->productOptionValues()->first()->name,
-                'option_value_id' => $option->productOptionValues()->first()->id,
+                'option_value' => $option->productOptionValues()->first()?->name,
+                'option_value_id' => $option->productOptionValues()->first()?->id,
             ]);
         }
 

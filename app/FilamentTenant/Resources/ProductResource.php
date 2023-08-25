@@ -53,7 +53,7 @@ class ProductResource extends Resource
                         Forms\Components\TextInput::make('name')
                             ->label('Product Name')
                             ->unique(ignoreRecord: true)
-                            ->maxLength(255)
+                            ->maxLength(100)
                             ->required(),
                         Forms\Components\RichEditor::make('description'),
                     ]),
@@ -94,18 +94,21 @@ class ProductResource extends Resource
                                 ->schema([
                                     Forms\Components\TextInput::make('length')
                                         ->numeric()
+                                        ->required()
                                         ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['length'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Length'),
 
                                     Forms\Components\TextInput::make('width')
                                         ->numeric()
+                                        ->required()
                                         ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['width'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Width'),
 
                                     Forms\Components\TextInput::make('height')
                                         ->numeric()
+                                        ->required()
                                         ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['height'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Height'),
@@ -220,7 +223,18 @@ class ProductResource extends Resource
                     ->extraImgAttributes(['class' => 'aspect-[5/3] object-fill']),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
+                    ->limit(50)
+                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (strlen($state) <= $column->getLimit()) {
+                            return null;
+                        }
+
+                        // Only render the tooltip if the column content exceeds the length limit.
+                        return $state;
+                    })
                     ->sortable(),
+
                 Tables\Columns\TextColumn::make('selling_price')
                     ->searchable()
                     ->sortable(),

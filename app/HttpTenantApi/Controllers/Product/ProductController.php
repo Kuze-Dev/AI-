@@ -57,7 +57,7 @@ class ProductController
         );
     }
 
-    public function show(string $product)
+    public function show(string $product): ProductResource
     {
         $product = QueryBuilder::for(
             Product::whereSlug($product)->whereStatus(true)
@@ -71,13 +71,15 @@ class ProductController
             ])
             ->firstOrFail();
 
-        $totalSold = OrderLine::whereHas('order', function (Builder $query) {
-            $query->where('status', OrderStatuses::FULFILLED);
-        })
-            ->where('purchasable_id', $product->id)
-            ->sum('quantity');
+        if ($product instanceof Product) {
+            $totalSold = OrderLine::whereHas('order', function (Builder $query) {
+                $query->where('status', OrderStatuses::FULFILLED);
+            })
+                ->where('purchasable_id', $product->id)
+                ->sum('quantity');
 
-        $product->setAttribute('total_sold', $totalSold);
+            $product->setAttribute('total_sold', $totalSold);
+        }
 
         return ProductResource::make($product);
     }

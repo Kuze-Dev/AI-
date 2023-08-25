@@ -22,10 +22,10 @@ class UpdateProductOptionAction
         }
 
         /** Process Update or Create of Product Options and Option Values */
-        foreach ($productData->product_options as $key => $productOption) {
+        foreach ($productData->product_options ?? [] as $key => $productOption) {
             $productOptionModel = ProductOption::find($productOption->id);
 
-            if ($productOptionModel) {
+            if ($productOptionModel instanceof ProductOption) {
                 $productOptionModel->product_id = $product->id;
                 $productOptionModel->name = $productOption->name;
                 $productOptionModel->save();
@@ -38,7 +38,7 @@ class UpdateProductOptionAction
                 // Update product variant
                 $productData->product_variants = $this->searchAndChangeValue(
                     $productOption->id,
-                    $productData->product_variants,
+                    $productData->product_variants ?? [],
                     $newProductOptionModel->id
                 );
 
@@ -56,7 +56,7 @@ class UpdateProductOptionAction
 
                 $optionValueModel = ProductOptionValue::find($productOptionValue->id);
 
-                if ($optionValueModel) {
+                if ($optionValueModel instanceof ProductOptionValue) {
                     $optionValueModel->name = $productOptionValue->name;
                     $optionValueModel->product_option_id = $productOption->id;
                     $optionValueModel->save();
@@ -71,7 +71,7 @@ class UpdateProductOptionAction
 
                     $productData->product_variants = $this->searchAndChangeValue(
                         $proxyOptionValueId,
-                        $productData->product_variants,
+                        $productData->product_variants ?? [],
                         $newOptionValueModel->id,
                         'option_value_id'
                     );
@@ -93,7 +93,7 @@ class UpdateProductOptionAction
         // Removal of Product Options
         $mappedOptionIds = array_map(function ($item) {
             return $item->id;
-        }, $productData->product_options);
+        }, $productData->product_options ?? []);
 
         if (count($mappedOptionIds)) {
             $toRemoveOptions = ProductOption::where(
@@ -125,7 +125,7 @@ class UpdateProductOptionAction
         }
     }
 
-    protected function searchAndChangeValue($needle, $haystack, $newValue, $field = 'option_id')
+    protected function searchAndChangeValue(string | int $needle, array $haystack, int $newValue, string $field = 'option_id'): array
     {
         $newCombinations = [];
         $newVariants = [];

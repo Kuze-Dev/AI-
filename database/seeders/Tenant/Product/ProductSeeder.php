@@ -44,19 +44,21 @@ class ProductSeeder extends Seeder
                 ->has(MetaDataFactory::new())
                 ->create();
 
-            $product->taxonomyTerms()->attach($taxonomyTermIds);
-            $productOptions = $product->productOptions;
+            if ($product instanceof Product) {
+                $product->taxonomyTerms()->attach($taxonomyTermIds);
+                $productOptions = $product->productOptions;
 
-            ProductVariantFactory::new([
-                'combination' => [
-                    [
-                        'option_id' => $productOptions[0]->id,
-                        'option' => $productOptions[0]->name,
-                        'option_value_id' => $productOptions[0]->productOptionValues[0]->id,
-                        'option_value' => $productOptions[0]->productOptionValues[0]->name,
+                ProductVariantFactory::new([
+                    'combination' => [
+                        [
+                            'option_id' => $productOptions[0]?->id,
+                            'option' => $productOptions[0]?->name,
+                            'option_value_id' => $productOptions[0]?->productOptionValues[0]->id,
+                            'option_value' => $productOptions[0]?->productOptionValues[0]->name,
+                        ],
                     ],
-                ],
-            ])->for($product)->create();
+                ])->for($product)->create();
+            }
 
             $bar->advance();
         }
@@ -70,10 +72,11 @@ class ProductSeeder extends Seeder
     {
         $taxonomies = $this->data()['taxonomies'];
         $blueprintId = null;
-        $blueprintId = Blueprint::whereName($this->data()['blueprint_for_taxonomy']['name'])->pluck('id')->first();
+        $blueprintId = Blueprint::whereName($this->data()['blueprint_for_taxonomy']['name'])->value('id');
 
-        if ( ! $blueprintId) {
-            $blueprintId = BlueprintFactory::new($this->data()['blueprint_for_taxonomy'])->create()->id;
+
+        if (!$blueprintId) {
+            $blueprintId = BlueprintFactory::new($this->data()['blueprint_for_taxonomy'])->create()->id ?? null;
         }
 
         // Seed Brand and Category in Taxonomy
@@ -320,7 +323,7 @@ class ProductSeeder extends Seeder
         ];
     }
 
-    protected function truncateDatabases()
+    protected function truncateDatabases(): void
     {
         ProductOptionValue::truncate();
         ProductOption::truncate();

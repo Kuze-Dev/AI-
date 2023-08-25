@@ -23,16 +23,16 @@ class CreateOrUpdateProductVariantAction
 
         /** If for variant creation */
         if ($isCreate) {
-            foreach ($productData->product_variants as $productVariant) {
+            foreach ($productData->product_variants ?? [] as $productVariant) {
                 $this->createProductVariant($product->id, $productVariant);
             }
 
             return;
         }
 
-        $this->sanitizeVariants($product->id, $productData->product_variants);
+        $this->sanitizeVariants($product->id, $productData->product_variants ?? []);
 
-        $this->createOrUpdateProductVariants($product->id, $productData->product_variants);
+        $this->createOrUpdateProductVariants($product->id, $productData->product_variants ?? []);
     }
 
     protected function createProductVariant(int $productId, ProductVariantData $productVariant): void
