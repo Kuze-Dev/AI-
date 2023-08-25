@@ -242,8 +242,8 @@ class MenuResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
-                ->multiple()
-                ->relationship('sites', 'name'),
+                    ->multiple()
+                    ->relationship('sites', 'name'),
             ])
 
             ->actions([

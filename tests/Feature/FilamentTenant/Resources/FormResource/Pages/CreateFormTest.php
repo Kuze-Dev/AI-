@@ -71,9 +71,9 @@ it('can create form', function () {
 });
 
 it('can create form with same name', function () {
-   
+
     tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
-    
+
     $form = FormFactory::new()
         ->withDummyBlueprint()
         ->storeSubmission()
@@ -87,20 +87,20 @@ it('can create form with same name', function () {
         ->fillForm([
             'name' => $form->name,
             'blueprint_id' => $form->blueprint_id,
-            'sites' => [2]
+            'sites' => [2],
         ])
         ->call('create')
         ->assertHasNoFormErrors()
         ->assertOk();
 
-    assertDatabaseCount(Form::class,2);
-   
+    assertDatabaseCount(Form::class, 2);
+
 });
 
 it('cannot create form with same name in same microsite', function () {
-   
+
     tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
-    
+
     $form = FormFactory::new()
         ->withDummyBlueprint()
         ->storeSubmission()
@@ -114,12 +114,12 @@ it('cannot create form with same name in same microsite', function () {
         ->fillForm([
             'name' => $form->name,
             'blueprint_id' => $form->blueprint_id,
-            'sites' => [1]
+            'sites' => [1],
         ])
         ->call('create');
 
-    assertDatabaseCount(Form::class,1);
-   
+    assertDatabaseCount(Form::class, 1);
+
 });
 
 it('can\'t toggle uses captcha if not set up', function () {
