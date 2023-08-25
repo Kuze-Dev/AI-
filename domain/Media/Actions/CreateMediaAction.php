@@ -25,12 +25,14 @@ class CreateMediaAction
                 if (is_string($media)) {
                     $response = Http::get($media);
                     if ($response->successful()) {
+                        /** @phpstan-ignore-next-line */
                         $model
                             ->addMediaFromUrl($media)
                             ->toMediaCollection($collection);
                     }
                 } else {
                     if ($media instanceof UploadedFile && $mediaString = $media->get()) {
+                        /** @phpstan-ignore-next-line */
                         $model
                             ->addMediaFromString($mediaString)
                             ->usingFileName($media->getClientOriginalName())
@@ -39,7 +41,7 @@ class CreateMediaAction
                     }
                 }
             } catch (Exception $e) {
-                Log::info($e);
+                Log::info('Error on CreateMediaAction->execute() ' . $e);
             }
         }
 

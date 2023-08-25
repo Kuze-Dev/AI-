@@ -125,7 +125,7 @@ class UpdateProductOptionAction
         }
     }
 
-    protected function searchAndChangeValue(string | int $needle, array $haystack, int $newValue, string $field = 'option_id'): array
+    protected function searchAndChangeValue(string|int $needle, array $haystack, int $newValue, string $field = 'option_id'): array
     {
         $newCombinations = [];
         $newVariants = [];

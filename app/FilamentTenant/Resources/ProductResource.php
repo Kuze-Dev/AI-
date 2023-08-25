@@ -331,11 +331,14 @@ class ProductResource extends Resource
                                 return $state;
                             }
 
-                            if (($livewire->data['product_options']) !== null) {
-                                $component->state($livewire->data['product_options']['options']);
+                            /** @phpstan-ignore-next-line https://phpstan.org/blog/solving-phpstan-access-to-undefined-property */
+                            $productOptions = $livewire->data['product_options'];
+                            if (($productOptions) !== null) {
+                                $component->state($productOptions['options']);
 
                                 return;
                             }
+
                             $record->productOptions->load('productOptionValues');
                             $mappedOptions = $record->productOptions->map(function (ProductOption $productOption) {
                                 return [

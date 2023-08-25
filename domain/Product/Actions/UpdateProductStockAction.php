@@ -16,13 +16,13 @@ class UpdateProductStockAction
         if ($purchasableType == Product::class) {
             $model = Product::find($purchasableId);
 
-            if ( ! $model->allow_stocks) {
+            if ( ! $model?->allow_stocks) {
                 return;
             }
         } elseif ($purchasableType == ProductVariant::class) {
             $model = ProductVariant::find($purchasableId);
 
-            if ( ! $model->product->allow_stocks) {
+            if ( ! $model?->product?->allow_stocks) {
                 return;
             }
         }
