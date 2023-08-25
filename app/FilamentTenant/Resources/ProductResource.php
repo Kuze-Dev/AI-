@@ -253,9 +253,6 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('selling_price')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('stock')
-                    ->searchable()
-                    ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive')
                     ->color(fn (Product $record) => $record->status ? 'success' : 'secondary')
