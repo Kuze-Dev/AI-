@@ -87,6 +87,7 @@ class CustomerResource extends Resource
                         ->rule(Rule::email())
                         ->maxLength(255),
                     Forms\Components\TextInput::make('mobile')
+                        ->unique(ignoreRecord: true)
                         ->translateLabel()
                         ->nullable()
                         ->maxLength(255),
