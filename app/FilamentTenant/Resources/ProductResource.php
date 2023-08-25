@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\Contracts\HasProductOptions;
 use App\FilamentTenant\Support\Contracts\HasProductVariants;
 use Domain\Product\Actions\DeleteProductAction;
+use Support\Common\Rules\MinimumValueRule;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class ProductResource extends Resource
@@ -87,6 +88,10 @@ class ProductResource extends Resource
                             Forms\Components\TextInput::make('weight')
                                 ->label('Weight (lbs)')
                                 ->numeric()
+                                ->required()
+                                ->rules([
+                                    new MinimumValueRule(0.1),
+                                ])
                                 ->dehydrateStateUsing(fn ($state) => (float) $state),
 
                             Forms\Components\Fieldset::make('dimension')
@@ -95,6 +100,9 @@ class ProductResource extends Resource
                                     Forms\Components\TextInput::make('length')
                                         ->numeric()
                                         ->required()
+                                        ->rules([
+                                            new MinimumValueRule(1),
+                                        ])
                                         ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['length'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Length'),
@@ -102,6 +110,9 @@ class ProductResource extends Resource
                                     Forms\Components\TextInput::make('width')
                                         ->numeric()
                                         ->required()
+                                        ->rules([
+                                            new MinimumValueRule(1),
+                                        ])
                                         ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['width'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Width'),
@@ -109,6 +120,9 @@ class ProductResource extends Resource
                                     Forms\Components\TextInput::make('height')
                                         ->numeric()
                                         ->required()
+                                        ->rules([
+                                            new MinimumValueRule(1),
+                                        ])
                                         ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['height'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->label('Height'),
