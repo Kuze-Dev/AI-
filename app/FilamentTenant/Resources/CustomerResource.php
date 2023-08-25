@@ -97,7 +97,7 @@ class CustomerResource extends Resource
                         ->before(fn () => now()),
                     Forms\Components\Select::make('tier_id')
                         ->label(trans('Tier'))
-                        ->nullable()
+                        ->required()
                         ->preload()
                         ->optionsFromModel(Tier::class, 'name'),
                     Forms\Components\TextInput::make('password')

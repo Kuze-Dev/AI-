@@ -14,10 +14,12 @@ use Domain\Tier\Models\Tier;
 use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Actions\DeleteAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
@@ -79,6 +81,18 @@ class TierResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
+                        ->before(function (DeleteAction $action, Tier $record) {
+                            if($record->customers()->exists()) {
+                                Notification::make()
+                                    ->warning()
+                                    ->title('Customers exists in this tier!')
+                                    ->body('disassociate first before deleting!')
+                                    ->persistent()
+                                    ->send();
+
+                                $action->cancel();
+                            }
+                        })
                         ->using(function (Tier $record) {
                             try {
                                 return app(DeleteTierAction::class)->execute($record);
