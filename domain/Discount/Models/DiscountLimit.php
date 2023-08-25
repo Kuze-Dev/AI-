@@ -69,6 +69,4 @@ class DiscountLimit extends Model
     {
         return $this->morphTo(Order::class);
     }
-
-
 }

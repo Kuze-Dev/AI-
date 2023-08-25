@@ -17,8 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use Closure;
 use Domain\Customer\Models\Customer;
-use Domain\Discount\Models\Discount;
-use Domain\Discount\Models\DiscountLimit;
+use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Events\AdminOrderBankPaymentEvent;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
@@ -607,16 +606,7 @@ class OrderResource extends Resource
                                     'status' => 'cancelled',
                                 ]);
 
-                                if ($record->discount_code != null) {
-                                    DiscountLimit::whereOrderId($record->id)->delete();
-
-                                    /** @var \Domain\Discount\Models\Discount $discount */
-                                    $discount = Discount::whereCode($record->discount_code)->first();
-
-                                    $discount->update([
-                                        'max_uses' => $discount->max_uses + 1,
-                                    ]);
-                                }
+                                app(DiscountHelperFunctions::class)->resetDiscountUsage($record);
                             }
 
                             $result = $record->update($updateData);

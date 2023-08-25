@@ -10,7 +10,9 @@ use Domain\Discount\Enums\DiscountConditionType;
 use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
 use Domain\Discount\Models\DiscountCondition;
+use Domain\Discount\Models\DiscountLimit;
 use Domain\Discount\Models\DiscountRequirement;
+use Domain\Order\Models\Order;
 
 final class DiscountHelperFunctions
 {
@@ -83,5 +85,19 @@ final class DiscountHelperFunctions
             'amount' => $discountCondition->amount,
             'discount_type' => $discountCondition->discount_type,
         ]);
+    }
+
+    public function resetDiscountUsage(Order $order): void
+    {
+        if ($order->discount_code != null) {
+            DiscountLimit::whereOrderId($order->id)->delete();
+
+            /** @var \Domain\Discount\Models\Discount $discount */
+            $discount = Discount::whereCode($order->discount_code)->first();
+
+            $discount->update([
+                'max_uses' => $discount->max_uses + 1,
+            ]);
+        }
     }
 }
