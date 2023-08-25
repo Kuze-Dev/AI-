@@ -28,6 +28,7 @@ use App\FilamentTenant\Resources\MenuResource\Pages;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use Illuminate\Validation\Rules\Unique;
 
 class MenuResource extends Resource
 {
@@ -74,30 +75,60 @@ class MenuResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->required()
+                        ->unique(
+                            callback: function ($livewire, Unique $rule) {
+
+                                if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+                                    return false;
+                                }
+
+                                return $rule;
+                            },
+                            ignoreRecord: true
+                        )
                         ->string()
                         ->maxLength(255),
                 ]),
                 Forms\Components\Card::make([
                     Forms\Components\CheckboxList::make('sites')
+                        ->rules([
+                            function (?Menu $record, Closure $get) {
+
+                                return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+
+                                    $siteIDs = $value;
+
+                                    if ($record) {
+                                        $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
+
+                                        $menu = Menu::where('name', $get('name'))
+                                            ->where('id', '!=', $record->id)
+                                            ->whereHas(
+                                                'sites',
+                                                fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                            )->count();
+                                    } else {
+                                        $menu = Menu::where('name', $get('name'))->whereHas(
+                                            'sites',
+                                            fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                        )->count();
+
+                                    }
+
+                                    if ($menu > 0) {
+                                        $fail("Menu {$get('name')} is already available in selected sites.");
+                                    }
+
+                                };
+                            },
+                        ])
                         ->options(
                             fn () => Site::orderBy('name')
                                 ->pluck('name', 'id')
                                 ->toArray()
                         )
-                        ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Menu $record): void {
-                            if ( ! $record) {
-                                $component->state([]);
+                        ->formatStateUsing(fn (?Menu $record) => $record ? $record->sites->pluck('id')->toArray() : []),
 
-                                return;
-                            }
-
-                            $component->state(
-                                $record->sites->pluck('id')
-                                    ->intersect(array_keys($component->getOptions()))
-                                    ->values()
-                                    ->toArray()
-                            );
-                        }),
                 ])
                     ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
                 Forms\Components\Select::make('locale')
