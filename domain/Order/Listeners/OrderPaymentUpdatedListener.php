@@ -6,6 +6,7 @@ namespace Domain\Order\Listeners;
 
 use App\Notifications\Order\OrderCancelledNotification;
 use Domain\Customer\Models\Customer;
+use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
 use Domain\Order\Notifications\AdminOrderStatusUpdatedMail;
@@ -60,7 +61,7 @@ class OrderPaymentUpdatedListener
             ''
         ));
 
-        // back the discount
+        app(DiscountHelperFunctions::class)->resetDiscountUsage($order);
 
         // back the product stock
         foreach ($order->orderLines as $orderLine) {
