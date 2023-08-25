@@ -290,6 +290,26 @@ class PageResource extends Resource
             ->defaultSort('updated_at', 'desc');
     }
 
+    /** @return Builder<\Domain\Page\Models\Page> */
+    public static function getEloquentQuery(): Builder
+    {
+        if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+            return static::getModel()::query();
+        }
+
+        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+            Auth::user()?->can('site.siteManager') &&
+            ! (Auth::user()->hasRole(config('domain.role.super_admin')))
+        ) {
+            return static::getModel()::query()->wherehas('sites', function ($q) {
+                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
+            });
+        }
+
+        return static::getModel()::query();
+
+    }
+
     public static function getRelations(): array
     {
         return [

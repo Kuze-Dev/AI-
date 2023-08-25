@@ -16,6 +16,7 @@ use App\Settings\FormSettings;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
 use Domain\Blueprint\Models\Blueprint;
+use Illuminate\Database\Eloquent\Builder;
 use Domain\Form\Models\Form as FormModel;
 use Domain\Internationalization\Models\Locale;
 use App\FilamentTenant\Resources\FormResource\Pages;
@@ -275,6 +276,26 @@ class FormResource extends Resource
                 ]),
             ])
             ->defaultSort('updated_at', 'desc');
+    }
+
+    /** @return Builder<\Domain\Form\Models\Form> */
+    public static function getEloquentQuery(): Builder
+    {
+        if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+            return static::getModel()::query();
+        }
+
+        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+            Auth::user()?->can('site.siteManager') &&
+            ! (Auth::user()->hasRole(config('domain.role.super_admin')))
+        ) {
+            return static::getModel()::query()->wherehas('sites', function ($q) {
+                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
+            });
+        }
+
+        return static::getModel()::query();
+
     }
 
     public static function getRelations(): array

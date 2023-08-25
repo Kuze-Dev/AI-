@@ -14,6 +14,7 @@ use Filament\Resources\Resource;
 use Domain\Globals\Models\Globals;
 use Illuminate\Support\Facades\Auth;
 use Domain\Blueprint\Models\Blueprint;
+use Illuminate\Database\Eloquent\Builder;
 use Domain\Internationalization\Models\Locale;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\EditGlobals;
@@ -153,6 +154,26 @@ class GlobalsResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ])
             ->defaultSort('updated_at', 'desc');
+    }
+
+    /** @return Builder<\Domain\Globals\Models\Globals> */
+    public static function getEloquentQuery(): Builder
+    {
+        if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+            return static::getModel()::query();
+        }
+
+        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+            Auth::user()?->can('site.siteManager') &&
+            ! (Auth::user()->hasRole(config('domain.role.super_admin')))
+        ) {
+            return static::getModel()::query()->wherehas('sites', function ($q) {
+                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
+            });
+        }
+
+        return static::getModel()::query();
+
     }
 
     public static function getRelations(): array
