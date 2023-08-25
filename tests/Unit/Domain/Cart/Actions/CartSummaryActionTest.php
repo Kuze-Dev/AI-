@@ -17,6 +17,8 @@ use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use Laravel\Sanctum\Sanctum;
 use Tests\RequestFactories\AddressRequestFactory;
 
+use function PHPUnit\Framework\assertInstanceOf;
+
 beforeEach(function () {
     testInTenantContext();
 
@@ -92,11 +94,26 @@ beforeEach(function () {
 //     expect($shippingTotal)->toBeFloat();
 // });
 
-// it('can get tax', function () {
-// });
+it('can get tax', function () {
+    $subtotal = app(CartSummaryAction::class)->getSubTotal($this->cartLines);
 
-// it('can get discount', function () {
-// });
+    $tax = app(CartSummaryAction::class)->getTax($this->country->id, $this->state->id);
+
+    expect($tax)->toBeArray()
+        ->toHaveKeys(['taxZone', 'taxDisplay', 'taxPercentage']);
+
+    $taxTotal = $tax['taxPercentage'] ? round($subtotal * $tax['taxPercentage'] / 100, 2) : 0;
+
+    expect($taxTotal)->toBe(0);
+});
+
+it('can get discount', function () {
+    $subtotal = app(CartSummaryAction::class)->getSubTotal($this->cartLines);
+
+    $discountTotal = app(CartSummaryAction::class)->getDiscount(null, $subtotal, 10.00);
+
+    expect($discountTotal)->toBe(0.0);
+});
 
 // it('can get cart summary', function () {
 // });
