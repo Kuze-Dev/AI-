@@ -80,12 +80,21 @@ class GlobalsResource extends Resource
 
                                     if ($record) {
                                         $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
-                                    }
 
-                                    $globals = Globals::where('name', $get('name'))->whereHas(
-                                        'sites',
-                                        fn ($query) => $query->whereIn('site_id', $siteIDs)
-                                    )->count();
+                                        $globals = Globals::where('name', $get('name'))
+                                            ->where('id', '!=', $record->id)
+                                            ->whereHas(
+                                                'sites',
+                                                fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                            )->count();
+
+                                    } else {
+
+                                        $globals = Globals::where('name', $get('name'))->whereHas(
+                                            'sites',
+                                            fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                        )->count();
+                                    }
 
                                     if ($globals > 0) {
                                         $fail("Globals {$get('name')} is already available in selected sites.");
@@ -99,20 +108,8 @@ class GlobalsResource extends Resource
                                 ->pluck('name', 'id')
                                 ->toArray()
                         )
-                        ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Globals $record): void {
-                            if ( ! $record) {
-                                $component->state([]);
+                        ->formatStateUsing(fn (?Globals $record) => $record ? $record->sites->pluck('id')->toArray() : []),
 
-                                return;
-                            }
-
-                            $component->state(
-                                $record->sites->pluck('id')
-                                    ->intersect(array_keys($component->getOptions()))
-                                    ->values()
-                                    ->toArray()
-                            );
-                        }),
                 ])
                     ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
                 SchemaFormBuilder::make('data')
