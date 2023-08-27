@@ -8,6 +8,7 @@ use App\Features\CMS\CMSBase;
 use App\HttpTenantApi\Resources\GlobalsResource;
 use Domain\Globals\Models\Globals;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
@@ -22,7 +23,7 @@ class GlobalsController
     {
         return GlobalsResource::collection(
             QueryBuilder::for(Globals::with('blueprint'))
-                ->allowedFilters(['name', 'slug'])
+                ->allowedFilters(['name', 'slug', AllowedFilter::exact('sites.id')])
                 ->allowedIncludes('blueprint')
                 ->jsonPaginate()
         );

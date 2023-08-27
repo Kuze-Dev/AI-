@@ -54,6 +54,7 @@ class PageController
                             $query->wherePublishedAtYearMonth($year, $month);
                         },
                     ),
+                    AllowedFilter::exact('sites.id'),
                 ])
                 ->allowedIncludes([
                     'blockContents.block',

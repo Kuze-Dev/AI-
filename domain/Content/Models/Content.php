@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace Domain\Content\Models;
 
-use Domain\Blueprint\Models\Blueprint;
-use Domain\Taxonomy\Models\Taxonomy;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Domain\Site\Traits\Sites;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Spatie\Activitylog\LogOptions;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Blueprint\Models\Blueprint;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Models\Activity;
 use Domain\Content\Enums\PublishBehavior;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Domain\Content\Models\Content
@@ -64,6 +65,7 @@ class Content extends Model
     use LogsActivity;
     use HasSlug;
     use ConstraintsRelationships;
+    use Sites;
 
     /**
      * Declare columns

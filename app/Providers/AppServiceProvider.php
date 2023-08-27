@@ -46,6 +46,7 @@ use Domain\Product\Models\ProductVariant;
 use Domain\Payments\Models\PaymentRefund;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Domain\Internationalization\Models\Locale;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -57,6 +58,7 @@ use Sentry\Laravel\Integration;
 use Laravel\Pennant\Feature;
 use Stancl\Tenancy\Database\Models\Tenant;
 use TiMacDonald\JsonApi\JsonApiResource;
+use Domain\Site\Models\Site;
 
 /** @property \Illuminate\Foundation\Application $app */
 class AppServiceProvider extends ServiceProvider
@@ -127,6 +129,8 @@ class AppServiceProvider extends ServiceProvider
             ShippingMethod::class,
             ShippingBox::class,
             PaymentRefund::class,
+            Locale::class,
+            Site::class,
         ]);
 
         Password::defaults(

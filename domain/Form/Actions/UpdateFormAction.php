@@ -39,6 +39,9 @@ class UpdateFormAction
             $this->createFormEmailNotification->execute($form, $formEmailNotificationData);
         }
 
+        $form->sites()
+            ->sync($formData->sites);
+
         return $form;
     }
 }
