@@ -51,6 +51,11 @@ class SiteResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->rules([new FullyQualifiedDomainNameRule()])
                         ->maxLength(100)
+                        ->reactive()
+                        ->formatStateUsing(function (?string $state): ?string {
+                            return $state ? preg_replace('/^(http:\/\/|https:\/\/|www\.)/i', '', $state) : null;
+                        })
+                        ->dehydrateStateUsing(fn ($state) => $state ? preg_replace('/^(http:\/\/|https:\/\/|www\.)/i', '', $state) : null)
                         ->label(trans('Frontend Domain')),
                     Forms\Components\TextInput::make('deploy_hook'),
                     Forms\Components\Fieldset::make('Site Managers')
