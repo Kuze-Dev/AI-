@@ -21,10 +21,8 @@ use Illuminate\Support\Str;
 use Throwable;
 use Exception;
 use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions\Action;
-use Filament\Forms\Components\Actions\Action as FormComponentAction;
 use Illuminate\Support\Facades\URL;
 
 /**
@@ -109,23 +107,15 @@ class EditPage extends EditRecord
                             $modelAction = $livewire->getCachedActions()['preview_microsite_action'];
 
                             $modelAction->modalSubmitAction(function () use ($domain) {
-                                return Action::makeModalAction('preview')->url("https://{$domain}", true);
+
+                                $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$this->record->slug], false), '?');
+
+                                return Action::makeModalAction('preview')->url("https://{$domain}/preview?slug={$this->record->slug}&{$queryString}", true);
                             });
 
                             $set('domain', $domain);
                         }),
-                    TextInput::make('domain')
-                        ->label('Preview Url')
-                        ->reactive()
-                        ->disabled()
-                        ->suffixAction(
-                            fn (?string $state): FormComponentAction => FormComponentAction::make('visit')
-                                ->icon('heroicon-s-external-link')
-                                ->url(
-                                    filled($state) ? "https://{$state}" : null,
-                                    shouldOpenInNewTab: true,
-                                ),
-                        ),
+
                 ]),
             Action::make('clone-page')
                 ->label(__('Clone Page'))
