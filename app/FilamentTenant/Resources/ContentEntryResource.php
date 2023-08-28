@@ -157,7 +157,7 @@ class ContentEntryResource extends Resource
                                 );
                             }),
                     ])
-                        ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) )),
+                        ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))),
                     Forms\Components\Section::make(trans('Taxonomies'))
                         ->schema([
                             Forms\Components\Group::make()
