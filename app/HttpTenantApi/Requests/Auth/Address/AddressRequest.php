@@ -55,7 +55,7 @@ class AddressRequest extends FormRequest
             city: $validated['city'],
             is_default_shipping: ($validated['is_default_shipping'] ?? false) === true || ($address?->is_default_shipping ?? true),
             is_default_billing:  ($validated['is_default_billing'] ?? false) === true || ($address?->is_default_billing ?? true),
-            customer_id: $customer?->getKey() ?? $address?->customer->getKey(),
+            customer_id: ($customer ? $customer->getKey() : null) ?? ($address && $address->customer ? $address->customer->getKey() : null),
         );
     }
 }
