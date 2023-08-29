@@ -18,7 +18,6 @@ use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\Models\Order;
 use Domain\PaymentMethod\Database\Factories\PaymentMethodFactory;
 use Domain\Payments\Contracts\PaymentManagerInterface;
-use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\Providers\OfflinePayment;
 use Domain\Product\Database\Factories\ProductFactory;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
@@ -27,7 +26,9 @@ use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
 
+use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\getJson;
+use function Pest\Laravel\patchJson;
 use function Pest\Laravel\postJson;
 use function PHPUnit\Framework\assertInstanceOf;
 
@@ -85,7 +86,7 @@ beforeEach(function () {
 
     ProductFactory::new()->times(3)->create([
         'status' => true,
-        'minimum_order_quantity' => 1
+        'minimum_order_quantity' => 1,
     ]);
 
     CartFactory::new()->setCustomerId($customer->id)->createOne();
@@ -133,8 +134,7 @@ it('can list orders with include', function (string $include) {
                 ->where('data.0.type', 'orders')
                 ->has(
                     'included',
-                    callback: fn (AssertableJson $json) =>
-                    $json->where('type', "orderLines")
+                    callback: fn (AssertableJson $json) => $json->where('type', 'orderLines')
                         ->where('id', (string) $order->orderLines[0]->id)
                         ->has('attributes')
                         ->etc()
@@ -179,6 +179,47 @@ it('can show order', function () {
         });
 });
 
+it('can update order', function () {
+    $cartLineIds = $this->cartLines->pluck('uuid')->toArray();
+
+    $reference = app(CheckoutAction::class)
+        ->execute(CheckoutData::fromArray(['cart_line_ids' => $cartLineIds]));
+
+    $validatedData = [
+        'addresses' => [
+            'shipping' => $this->address->id,
+            'billing' => $this->address->id,
+        ],
+        'cart_reference' => $reference,
+        'payment_method' => $this->paymentMethod->slug,
+        'shipping_method' => $this->shippingMethod->slug,
+    ];
+
+    $placeOrderData = PlaceOrderData::fromArray($validatedData);
+
+    $result = app(PlaceOrderAction::class)
+        ->execute($placeOrderData);
+
+    $order = $result['order'];
+
+    assertInstanceOf(Order::class, $order);
+
+    patchJson('api/orders/' . $order->getRouteKey(), [
+        'type' => 'status',
+        'status' => 'cancelled',
+        'notes' => 'test cancellation notes',
+    ])
+        ->assertValid()
+        ->assertOk();
+
+    assertDatabaseHas(Order::class, [
+        'id' => $order->id,
+        'status' => 'cancelled',
+        'cancelled_reason' => 'test cancellation notes',
+        'cancelled_at' => now(),
+    ]);
+});
+
 it('can show order with includes', function (string $include) {
     $order = OrderFactory::new()
         ->createOne();
@@ -192,8 +233,7 @@ it('can show order with includes', function (string $include) {
                 ->where('data.attributes.reference', $order->getRouteKey())
                 ->has(
                     'included',
-                    callback: fn (AssertableJson $json) =>
-                    $json->where('type', "orderLines")
+                    callback: fn (AssertableJson $json) => $json->where('type', 'orderLines')
                         ->where('id', (string) $order->orderLines[0]->id)
                         ->has('attributes')
                         ->etc()

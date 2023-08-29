@@ -12,10 +12,10 @@ use Domain\Cart\DataTransferObjects\CheckoutData;
 use Domain\Cart\Models\CartLine;
 use Domain\Currency\Database\Factories\CurrencyFactory;
 use Domain\Customer\Database\Factories\CustomerFactory;
-use Domain\Order\Actions\CreateOrderAction;
-use Domain\Order\Actions\CreateOrderAddressAction;
-use Domain\Order\Actions\PrepareOrderAction;
+use Domain\Order\Actions\PlaceOrderAction;
+use Domain\Order\Actions\UpdateOrderAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
+use Domain\Order\DataTransferObjects\UpdateOrderData;
 use Domain\Order\Models\Order;
 use Domain\PaymentMethod\Database\Factories\PaymentMethodFactory;
 use Domain\Payments\Contracts\PaymentManagerInterface;
@@ -121,19 +121,28 @@ beforeEach(function () {
     $this->placeOrderData = $placeOrderData;
 });
 
-it('can create order addresses', function () {
-    $preparedOrder = app(PrepareOrderAction::class)
+it('can update order', function () {
+
+    $result = app(PlaceOrderAction::class)
         ->execute($this->placeOrderData);
 
-    $order = app(CreateOrderAction::class)
-        ->execute($this->placeOrderData, $preparedOrder);
+    $order = $result['order'];
 
     assertInstanceOf(Order::class, $order);
 
-    app(CreateOrderAddressAction::class)
-        ->execute($order, $this->placeOrderData, $preparedOrder);
+    $updateRequest = [
+        'type' => 'status',
+        'status' => 'cancelled',
+        'notes' => 'test cancellation notes',
+    ];
 
-    assertDatabaseHas(OrderAddress::class, [
-        'order_id' => $order->id,
+    $updatedOrder = app(UpdateOrderAction::class)
+        ->execute($order, UpdateOrderData::fromArray($updateRequest));
+
+    assertDatabaseHas(Order::class, [
+        'id' => $order->id,
+        'status' => $updatedOrder->status,
+        'cancelled_reason' => 'test cancellation notes',
+        'cancelled_at' => now(),
     ]);
 });
