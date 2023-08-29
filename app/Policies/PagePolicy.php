@@ -41,14 +41,28 @@ class PagePolicy
 
     public function update(User $user, Page $page): bool
     {
-        // if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
 
-        //     return true;
-        // }
+            return true;
+        }
 
-        // if ($page->author_id != $user->id) {
-        //     return false;
-        // }
+        if ($user->can('site.siteManager')) {
+
+            /** @var \Domain\Admin\Models\Admin */
+            $admin = $user;
+
+            $pageSites = $page->sites->pluck('id')->toArray();
+            $userSites = $admin->userSite->pluck('id')->toArray();
+
+            $intersection = array_intersect($pageSites, $userSites);
+
+            // dump($pageSites);
+            // $diff = array_diff($pageSites, $userSites);
+
+            // dump($diff);
+
+            return ((count($intersection) === count($pageSites)) && $this->checkWildcardPermissions($user));
+        }
 
         return $this->checkWildcardPermissions($user);
     }
