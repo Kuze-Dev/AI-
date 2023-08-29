@@ -479,7 +479,11 @@ class OrderResource extends Resource
                             ->size('md')
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
-                                return $record->currency_symbol . ' ' . number_format($record->tax_total, 2, '.', ',');
+                                if ($record->tax_total) {
+                                    return $record->currency_symbol . ' ' . number_format($record->tax_total, 2, '.', ',');
+                                }
+
+                                return  $record->currency_symbol . ' ' . '0.00';
                             }),
                     ]),
                 Forms\Components\Grid::make(2)
@@ -495,7 +499,11 @@ class OrderResource extends Resource
                             ->size('md')
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
-                                return $record->currency_symbol . ' ' . number_format($record->discount_total, 2, '.', ',');
+                                if ($record->discount_total) {
+                                    return $record->currency_symbol . ' ' . number_format($record->discount_total, 2, '.', ',');
+                                }
+
+                                return  $record->currency_symbol . ' ' . '0.00';
                             }),
                     ]),
                 Forms\Components\Grid::make(2)
@@ -548,18 +556,25 @@ class OrderResource extends Resource
                     ->form([
                         Forms\Components\Select::make('status_options')
                             ->label('')
-                            ->options([
-                                OrderStatuses::PENDING->value => trans('Pending'),
-                                OrderStatuses::FORPAYMENT->value => trans('For Payment'),
-                                OrderStatuses::FORAPPROVAL->value => trans('For Approval'),
-                                OrderStatuses::PROCESSING->value => trans('Processing'),
-                                OrderStatuses::CANCELLED->value => trans('Cancelled'),
-                                OrderStatuses::REFUNDED->value => trans('Refunded'),
-                                OrderStatuses::PACKED->value => trans('Packed'),
-                                OrderStatuses::SHIPPED->value => trans('Shipped'),
-                                OrderStatuses::DELIVERED->value => trans('Delivered'),
-                                OrderStatuses::FULFILLED->value => trans('Fulfilled'),
-                            ])
+                            ->options(function () use ($record) {
+                                $options = [
+                                    OrderStatuses::PENDING->value => trans('Pending'),
+                                    OrderStatuses::FORPAYMENT->value => trans('For Payment'),
+                                    OrderStatuses::FORAPPROVAL->value => trans('For Approval'),
+                                    OrderStatuses::PROCESSING->value => trans('Processing'),
+                                    OrderStatuses::CANCELLED->value => trans('Cancelled'),
+                                    OrderStatuses::REFUNDED->value => trans('Refunded'),
+                                    OrderStatuses::PACKED->value => trans('Packed'),
+                                    OrderStatuses::SHIPPED->value => trans('Shipped'),
+                                    OrderStatuses::DELIVERED->value => trans('Delivered'),
+                                ];
+
+                                if ($record->is_paid) {
+                                    $options[OrderStatuses::FULFILLED->value] = trans('Fulfilled');
+                                }
+
+                                return $options;
+                            })
                             ->disablePlaceholderSelection()
                             ->formatStateUsing(function () use ($record) {
                                 return $record->status;
@@ -671,7 +686,7 @@ class OrderResource extends Resource
                     ->size('sm')
                     ->action(function () use ($order, $set) {
 
-                        $isPaid = ! $order->is_paid;
+                        $isPaid = !$order->is_paid;
 
                         $result = $order->update([
                             'is_paid' => $isPaid,
@@ -712,151 +727,18 @@ class OrderResource extends Resource
         return Support\ButtonAction::make('proof_of_payment')
             ->disableLabel()
             ->execute(function (Order $record, Closure $set) {
+                $footerActions = self::showProofOfPaymentActions($record, $set);
+
                 $order = $record->load('payments');
 
-                return Forms\Components\Actions\Action::make('proof_of_payment')
-                    ->color('secondary')
-                    ->label(trans('View Proof of payment'))
-                    ->size('sm')
-                    ->action(function (array $data) use ($order, $set) {
-                        // TODO update message and approval here
-                        $paymentRemarks = $data['payment_remarks'];
-                        $message = $data['message'];
+                /** @var \Domain\Payments\Models\Payment $payment */
+                $payment = $order->payments->first();
 
-                        /** @var \Domain\Payments\Models\Payment $payment */
-                        $payment = $order->payments->first();
+                if (!is_null($payment->remarks)) {
+                    return $footerActions->modalActions([])->disableForm();
+                }
 
-                        if ( ! is_null($payment->remarks)) {
-                            Notification::make()
-                                ->title(trans('Invalid action.'))
-                                ->warning()
-                                ->send();
-
-                            return;
-                        }
-
-                        $result = $payment->update([
-                            'remarks' => $paymentRemarks,
-                            'admin_message' => $message,
-                        ]);
-
-                        if ($result) {
-                            $isPaid = $paymentRemarks == 'approved' ? true : false;
-
-                            $order->update([
-                                'is_paid' => $isPaid,
-                            ]);
-
-                            if ($isPaid) {
-                                $payment->update([
-                                    'status' => 'paid',
-                                ]);
-
-                                $order->update([
-                                    'status' => OrderStatuses::PROCESSING,
-                                ]);
-
-                                $set('status', ucfirst(OrderStatuses::PROCESSING->value));
-                            } else {
-                                $payment->update([
-                                    'status' => 'cancelled',
-                                ]);
-
-                                $order->update([
-                                    'status' => OrderStatuses::CANCELLED,
-                                ]);
-
-                                $set('status', ucfirst(OrderStatuses::CANCELLED->value));
-                            }
-
-                            Notification::make()
-                                ->title(trans('Proof of payment updated successfully'))
-                                ->success()
-                                ->send();
-
-                            $customer = Customer::where('id', $order->customer_id)->first();
-
-                            if ($customer) {
-                                event(new AdminOrderBankPaymentEvent(
-                                    $customer,
-                                    $order,
-                                    $paymentRemarks,
-                                ));
-                            }
-                        }
-                    })
-                    ->modalHeading(trans('Proof of Payment'))
-                    ->modalWidth('lg')
-                    ->form([
-                        Forms\Components\Textarea::make('customer_message')
-                            ->label(trans('Customer Message'))
-                            ->formatStateUsing(function () use ($order) {
-                                /** @var \Domain\Payments\Models\Payment $payment */
-                                $payment = $order->payments->first();
-
-                                return $payment->customer_message;
-                            })
-                            ->disabled(),
-
-                        Forms\Components\FileUpload::make('bank_proof_image')
-                            ->label(trans('Customer Upload'))
-                            ->formatStateUsing(function () use ($order) {
-                                return $order->payments->first()?->getMedia('image')
-                                    ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                                    ->toArray() ?? [];
-                            })
-                            ->hidden(function () use ($order) {
-                                return (bool) (empty($order->payments->first()?->getFirstMediaUrl('image')));
-                            })
-                            ->image()
-                            ->getUploadedFileUrlUsing(static function (
-                                Forms\Components\FileUpload $component,
-                                string $file
-                            ): ?string {
-                                $mediaClass = config('media-library.media_model', Media::class);
-
-                                /** @var ?Media $media */
-                                $media = $mediaClass::findByUuid($file);
-
-                                if ($component->getVisibility() === 'private') {
-                                    try {
-                                        return $media?->getTemporaryUrl(now()->addMinutes(5));
-                                    } catch (Throwable $exception) {
-                                    }
-                                }
-
-                                return $media?->getUrl();
-                            })
-                            ->disabled(),
-                        Forms\Components\Select::make('payment_remarks')
-                            ->label('')
-                            ->options([
-                                'approved' => 'Approved',
-                                'declined' => 'Declined',
-                            ])
-                            ->disablePlaceholderSelection(function () use ($order) {
-                                /** @var \Domain\Payments\Models\Payment $payment */
-                                $payment = $order->payments->first();
-
-                                return in_array($payment->remarks, ['approved', 'declined']);
-                            })
-                            ->formatStateUsing(function () use ($order) {
-                                /** @var \Domain\Payments\Models\Payment $payment */
-                                $payment = $order->payments->first();
-
-                                return $payment->remarks;
-                            }),
-                        Forms\Components\Textarea::make('message')
-                            ->label(trans('Message'))
-                            ->formatStateUsing(function () use ($order) {
-                                /** @var \Domain\Payments\Models\Payment $payment */
-                                $payment = $order->payments->first();
-
-                                return $payment->admin_message;
-                            }),
-                    ])
-                    ->slideOver()
-                    ->icon('heroicon-s-eye');
+                return $footerActions;
             })
             ->fullWidth()
             ->size('md')
@@ -872,5 +754,153 @@ class OrderResource extends Resource
 
                 return true;
             });
+    }
+
+    private static function showProofOfPaymentActions(Order $record, Closure $set): Forms\Components\Actions\Action
+    {
+        $order = $record->load('payments');
+
+        return Forms\Components\Actions\Action::make('proof_of_payment')
+            ->color('secondary')
+            ->label(trans('View Proof of payment'))
+            ->size('sm')
+            ->action(function (array $data) use ($order, $set) {
+                $paymentRemarks = $data['payment_remarks'];
+                $message = $data['message'];
+
+                /** @var \Domain\Payments\Models\Payment $payment */
+                $payment = $order->payments->first();
+
+                if (!is_null($payment->remarks)) {
+                    Notification::make()
+                        ->title(trans('Invalid action.'))
+                        ->warning()
+                        ->send();
+
+                    return;
+                }
+
+                $result = $payment->update([
+                    'remarks' => $paymentRemarks,
+                    'admin_message' => $message,
+                ]);
+
+                if ($result) {
+                    $isPaid = $paymentRemarks == 'approved' ? true : false;
+
+                    $order->update([
+                        'is_paid' => $isPaid,
+                    ]);
+
+                    if ($isPaid) {
+                        $payment->update([
+                            'status' => 'paid',
+                        ]);
+
+                        $order->update([
+                            'status' => OrderStatuses::PROCESSING,
+                        ]);
+
+                        $set('status', ucfirst(OrderStatuses::PROCESSING->value));
+                    } else {
+                        $payment->update([
+                            'status' => 'cancelled',
+                        ]);
+
+                        $order->update([
+                            'status' => OrderStatuses::CANCELLED,
+                        ]);
+
+                        $set('status', ucfirst(OrderStatuses::CANCELLED->value));
+                    }
+
+                    Notification::make()
+                        ->title(trans('Proof of payment updated successfully'))
+                        ->success()
+                        ->send();
+
+                    $customer = Customer::where('id', $order->customer_id)->first();
+
+                    if ($customer) {
+                        event(new AdminOrderBankPaymentEvent(
+                            $customer,
+                            $order,
+                            $paymentRemarks,
+                        ));
+                    }
+                }
+            })
+            ->modalHeading(trans('Proof of Payment'))
+            ->modalWidth('lg')
+            ->form([
+                Forms\Components\Textarea::make('customer_message')
+                    ->label(trans('Customer Message'))
+                    ->formatStateUsing(function () use ($order) {
+                        /** @var \Domain\Payments\Models\Payment $payment */
+                        $payment = $order->payments->first();
+
+                        return $payment->customer_message;
+                    })
+                    ->disabled(),
+
+                Forms\Components\FileUpload::make('bank_proof_image')
+                    ->label(trans('Customer Upload'))
+                    ->formatStateUsing(function () use ($order) {
+                        return $order->payments->first()?->getMedia('image')
+                            ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                            ->toArray() ?? [];
+                    })
+                    ->hidden(function () use ($order) {
+                        return (bool) (empty($order->payments->first()?->getFirstMediaUrl('image')));
+                    })
+                    ->image()
+                    ->getUploadedFileUrlUsing(static function (
+                        Forms\Components\FileUpload $component,
+                        string $file
+                    ): ?string {
+                        $mediaClass = config('media-library.media_model', Media::class);
+
+                        /** @var ?Media $media */
+                        $media = $mediaClass::findByUuid($file);
+
+                        if ($component->getVisibility() === 'private') {
+                            try {
+                                return $media?->getTemporaryUrl(now()->addMinutes(5));
+                            } catch (Throwable $exception) {
+                            }
+                        }
+
+                        return $media?->getUrl();
+                    })
+                    ->disabled(),
+                Forms\Components\Select::make('payment_remarks')
+                    ->label('Status')
+                    ->options([
+                        'approved' => 'Approved',
+                        'declined' => 'Declined',
+                    ])
+                    ->disablePlaceholderSelection(function () use ($order) {
+                        /** @var \Domain\Payments\Models\Payment $payment */
+                        $payment = $order->payments->first();
+
+                        return in_array($payment->remarks, ['approved', 'declined']);
+                    })
+                    ->formatStateUsing(function () use ($order) {
+                        /** @var \Domain\Payments\Models\Payment $payment */
+                        $payment = $order->payments->first();
+
+                        return $payment->remarks;
+                    }),
+                Forms\Components\Textarea::make('message')
+                    ->label(trans('Admin Message'))
+                    ->formatStateUsing(function () use ($order) {
+                        /** @var \Domain\Payments\Models\Payment $payment */
+                        $payment = $order->payments->first();
+
+                        return $payment->admin_message;
+                    }),
+            ])
+            ->slideOver()
+            ->icon('heroicon-s-eye');
     }
 }
