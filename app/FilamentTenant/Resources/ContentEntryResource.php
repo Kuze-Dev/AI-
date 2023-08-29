@@ -123,7 +123,7 @@ class ContentEntryResource extends Resource
                             ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                             ->default((string) optional(Locale::where('is_default', true)->first())->code)
                             ->searchable()
-                            ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                             ->reactive()
                             ->afterStateUpdated(function (Forms\Components\Select $component, Closure $get) {
                                 $component->getContainer()
@@ -215,7 +215,7 @@ class ContentEntryResource extends Resource
                     ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable(['first_name', 'last_name'])
                     ->searchable(query: function (Builder $query, string $search): Builder {

@@ -135,7 +135,7 @@ class MenuResource extends Resource
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                     ->default((string) optional(Locale::where('is_default', true)->first())->code)
                     ->searchable()
-                    ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->required(),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([

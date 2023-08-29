@@ -25,7 +25,7 @@ class FormController extends Controller
         return FormResource::collection(
             QueryBuilder::for(Form::query())
                 ->allowedIncludes('blueprint')
-                ->allowedFilters(['name', AllowedFilter::exact('sites.id')])
+                ->allowedFilters(['name', AllowedFilter::exact('locale'), AllowedFilter::exact('sites.id')])
                 ->jsonPaginate()
         );
     }
