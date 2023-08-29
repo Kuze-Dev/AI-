@@ -14,6 +14,8 @@ use function Pest\Laravel\assertNotSoftDeleted;
 use function Pest\Laravel\assertSoftDeleted;
 use function Pest\Livewire\livewire;
 
+uses()->group('customer');
+
 beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');

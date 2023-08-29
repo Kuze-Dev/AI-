@@ -33,7 +33,7 @@ class CustomerRegisterRequest extends FormRequest
                     ->where('register_status', RegisterStatus::REGISTERED),
                 'max:255',
             ],
-            'mobile' => 'required|string|max:255',
+            'mobile' => 'required|string|max:255|unique:customers,mobile',
             'gender' => ['required', Rule::enum(Gender::class)],
             'birth_date' => 'required|date',
             'password' => ['required', 'confirmed', Password::default()],
