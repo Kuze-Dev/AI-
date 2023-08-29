@@ -13,6 +13,8 @@ use Illuminate\Support\Arr;
 use Domain\Discount\Actions\AutoGenerateCode;
 use Domain\Order\Enums\OrderAddressTypes;
 use Domain\Order\Enums\OrderStatuses;
+use Domain\Product\Database\Factories\ProductFactory;
+use Domain\Product\Models\Product;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Order\Models\Order>
@@ -78,9 +80,7 @@ class OrderFactory extends Factory
                 'discount_total' => 0,
                 'total' => $this->faker->randomFloat(2, 0, 100),
                 'remarks_data' => null,
-                'purchasable_data' => [
-                    'dummy' => 'data',
-                ],
+                'purchasable_data' => ProductFactory::new()->createOne(),
             ]);
 
             $order->shippingAddress()->create([

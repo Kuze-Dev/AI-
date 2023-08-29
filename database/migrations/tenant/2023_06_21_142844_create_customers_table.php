@@ -33,7 +33,7 @@ return new class () extends Migration {
             $table->string('password')->nullable();
             $table->string('first_name')->index();
             $table->string('last_name')->index();
-            $table->string('mobile')->nullable();
+            $table->string('mobile')->unique()->nullable();
             $table->string('gender')->nullable();
             $table->string('status')->default(Status::ACTIVE->value)->index()->nullable();
             $table->string('register_status')->default(RegisterStatus::REGISTERED->value)->index();

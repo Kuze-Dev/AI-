@@ -6,6 +6,8 @@ use App\FilamentTenant\Resources\TierResource;
 use Domain\Tier\Database\Factories\TierFactory;
 use Filament\Facades\Filament;
 
+uses()->group('customer');
+
 beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');

@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\CustomerResource\RelationManagers\AddressesRelationManager;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Closure;
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
@@ -73,10 +74,28 @@ class CustomerResource extends Resource
                         ->translateLabel()
                         ->required()
                         ->string()
+                        ->rules([
+                            function ($record) {
+                                return function (string $attribute, mixed $value, Closure $fail) {
+                                    if (preg_match('/[^a-zA-Z\s]/', $value)) {
+                                        $fail('Input must only contain letters!');
+                                    }
+                                };
+                            },
+                        ])
                         ->maxLength(255),
                     Forms\Components\TextInput::make('last_name')
                         ->translateLabel()
                         ->required()
+                        ->rules([
+                            function ($record) {
+                                return function (string $attribute, mixed $value, Closure $fail) {
+                                    if (preg_match('/[^a-zA-Z\s]/', $value)) {
+                                        $fail('Input must only contain letters!');
+                                    }
+                                };
+                            },
+                        ])
                         ->string()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('email')
@@ -87,7 +106,8 @@ class CustomerResource extends Resource
                         ->rule(Rule::email())
                         ->maxLength(255),
                     Forms\Components\TextInput::make('mobile')
-                        ->translateLabel()
+                        ->unique(ignoreRecord: true)
+                        ->label(trans('Mobile Number'))
                         ->nullable()
                         ->maxLength(255),
                     Forms\Components\DatePicker::make('birth_date')
@@ -96,7 +116,7 @@ class CustomerResource extends Resource
                         ->before(fn () => now()),
                     Forms\Components\Select::make('tier_id')
                         ->label(trans('Tier'))
-                        ->nullable()
+                        ->required()
                         ->preload()
                         ->optionsFromModel(Tier::class, 'name'),
                     Forms\Components\TextInput::make('password')

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\TierResource\RelationManagers;
 
+use Domain\Tier\Models\Tier;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
@@ -27,7 +28,16 @@ class CustomersRelationManager extends RelationManager
                     ->recordSelectSearchColumns(['first_name', 'last_name']),
             ])
             ->actions([
-                Tables\Actions\DissociateAction::make(),
+                Tables\Actions\DissociateAction::make()
+                    ->after(function ($record) {
+
+                        /** @var \Domain\Tier\Models\Tier $tier */
+                        $tier = Tier::whereName(config('domain.tier.default'))->first();
+
+                        $record->update([
+                            'tier_id' => $tier->getKey(),
+                        ]);
+                    }),
             ]);
     }
 }

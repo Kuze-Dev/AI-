@@ -10,6 +10,8 @@ use Filament\Facades\Filament;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
+uses()->group('customer');
+
 beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');

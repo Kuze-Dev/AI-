@@ -17,7 +17,10 @@ beforeEach(function () {
     $customer = CustomerFactory::new()
         ->createOne();
 
-    ProductFactory::new()->times(3)->create();
+    ProductFactory::new()->times(3)->create([
+        'status' => true,
+        'minimum_order_quantity' => 1,
+    ]);
 
     $cart = CartFactory::new()->setCustomerId($customer->id)->createOne();
 
@@ -33,8 +36,6 @@ beforeEach(function () {
 
     $this->cart = $cart;
     $this->cartLines = $cartLines;
-
-    return compact('cart', 'cartLines');
 });
 
 it('can get cart count', function () {
