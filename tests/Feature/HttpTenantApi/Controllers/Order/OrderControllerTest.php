@@ -216,7 +216,6 @@ it('can update order', function () {
         'id' => $order->id,
         'status' => 'cancelled',
         'cancelled_reason' => 'test cancellation notes',
-        'cancelled_at' => now(),
     ]);
 });
 

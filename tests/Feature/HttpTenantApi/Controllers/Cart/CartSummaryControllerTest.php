@@ -36,8 +36,6 @@ beforeEach(function () {
 
     $this->cart = $cart;
     $this->cartLines = $cartLines;
-
-    return compact('cart', 'cartLines');
 });
 
 it('can get cart count', function () {

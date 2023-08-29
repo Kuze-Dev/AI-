@@ -28,8 +28,6 @@ beforeEach(function () {
     $this->favorite = $favorite;
     $this->customer = $customer;
     $this->product = $product;
-
-    return compact('favorite');
 });
 
 it('can show favorite with includes', function (string $include) {

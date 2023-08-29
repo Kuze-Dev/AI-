@@ -131,9 +131,9 @@ it('can create order addresses', function () {
     assertInstanceOf(Order::class, $order);
 
     app(CreateOrderAddressAction::class)
-        ->execute($order, $this->placeOrderData, $preparedOrder);
+        ->execute($order, $preparedOrder);
 
-    assertDatabaseHas(OrderAddress::class, [
+    assertDatabaseHas('order_addresses', [
         'order_id' => $order->id,
     ]);
 });

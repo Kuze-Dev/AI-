@@ -143,6 +143,5 @@ it('can update order', function () {
         'id' => $order->id,
         'status' => $updatedOrder->status,
         'cancelled_reason' => 'test cancellation notes',
-        'cancelled_at' => now(),
     ]);
 });

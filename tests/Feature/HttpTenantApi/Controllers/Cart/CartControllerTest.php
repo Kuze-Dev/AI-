@@ -28,8 +28,6 @@ beforeEach(function () {
         ->plainTextToken);
 
     $this->cart = $cart;
-
-    return compact('cart');
 });
 
 it('can show cart', function () {
