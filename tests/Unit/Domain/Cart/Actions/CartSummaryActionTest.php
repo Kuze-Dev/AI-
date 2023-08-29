@@ -10,12 +10,16 @@ use Domain\Address\Models\State;
 use Domain\Cart\Actions\CartSummaryAction;
 use Domain\Cart\Database\Factories\CartFactory;
 use Domain\Cart\Database\Factories\CartLineFactory;
+use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
+use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
+use Domain\Cart\DataTransferObjects\SummaryData;
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Product\Database\Factories\ProductFactory;
+use Domain\Shipment\Contracts\ShippingManagerInterface;
+use Domain\Shipment\Drivers\StorePickupDriver;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use Laravel\Sanctum\Sanctum;
-use Tests\RequestFactories\AddressRequestFactory;
 
 use function PHPUnit\Framework\assertInstanceOf;
 
@@ -49,6 +53,15 @@ beforeEach(function () {
         'is_default_billing' => true,
     ]);
 
+    $shippingMethod = ShippingMethodFactory::new()->createOne();
+
+    app(ShippingManagerInterface::class)->extend($shippingMethod->driver->value, fn () => new StorePickupDriver());
+
+    $shippingMethod->update([
+        'shipper_country_id' => $country->id,
+        'shipper_state_id' => $state->id,
+    ]);
+
     Sanctum::actingAs($customer);
 
     ProductFactory::new()->times(3)->create();
@@ -61,38 +74,32 @@ beforeEach(function () {
             $cartLine->save();
         })->create();
 
-    $this->cartLines = $cartLines;
-    $this->customer = $customer;
 
     $this->country = $country;
     $this->state = $state;
+    $this->customer = $customer;
     $this->address = $address;
+    $this->shippingMethod = $shippingMethod;
+    $this->cartLines = $cartLines;
 });
 
-// it('can get subtotal', function () {
-//     $subtotal = app(CartSummaryAction::class)->getSubTotal($this->cartLines);
+it('can get subtotal', function () {
+    $subtotal = app(CartSummaryAction::class)->getSubTotal($this->cartLines);
 
-//     expect($subtotal)->toBeFloat();
-// });
+    expect($subtotal)->toBeFloat();
+});
 
-// it('can get shipping fee', function () {
-//     $shippingMethod = ShippingMethodFactory::new()->createOne();
+it('can get shipping fee', function () {
+    $shippingTotal = app(CartSummaryAction::class)->getShippingFee(
+        $this->cartLines,
+        $this->customer,
+        $this->address,
+        $this->shippingMethod,
+        null,
+    );
 
-//     $shippingMethod->update([
-//         'shipper_country_id' => $this->country->id,
-//         'shipper_state_id' => $this->state->id,
-//     ]);
-
-//     $shippingTotal = app(CartSummaryAction::class)->getShippingFee(
-//         $this->cartLines,
-//         $this->customer,
-//         $this->address,
-//         $shippingMethod,
-//         null,
-//     );
-
-//     expect($shippingTotal)->toBeFloat();
-// });
+    expect($shippingTotal)->toBeFloat();
+});
 
 it('can get tax', function () {
     $subtotal = app(CartSummaryAction::class)->getSubTotal($this->cartLines);
@@ -115,5 +122,18 @@ it('can get discount', function () {
     expect($discountTotal)->toBe(0.0);
 });
 
-// it('can get cart summary', function () {
-// });
+it('can get cart summary', function () {
+    $summary = app(CartSummaryAction::class)->getSummary(
+        $this->cartLines,
+        new CartSummaryTaxData($this->country->id, $this->state->id),
+        new CartSummaryShippingData(
+            $this->customer,
+            $this->address,
+            $this->shippingMethod
+        ),
+        null,
+        null
+    );
+
+    assertInstanceOf(SummaryData::class, $summary);
+});
