@@ -135,7 +135,7 @@ class DiscountResource extends Resource
                             ])
                                 ->required()
                                 ->default('order_sub_total')
-                                ->formatStateUsing(fn ($record) => optional($record->discountCondition()->withTrashed()->first())->discount_type)
+                                ->formatStateUsing(fn ($record) => optional($record?->discountCondition()->withTrashed()->first())->discount_type)
                                 ->label(trans('Discount Type')),
 
                             Radio::make('discountCondition.amount_type')->options([
@@ -146,7 +146,7 @@ class DiscountResource extends Resource
                                 ->required()
                                 ->default('fixed_value')
                                 ->filled()
-                                ->formatStateUsing(fn ($record) => optional($record->discountCondition()->withTrashed()->first())->amount_type)
+                                ->formatStateUsing(fn ($record) => optional($record?->discountCondition()->withTrashed()->first())->amount_type)
                                 ->label(trans('Amount Type')),
 
                             TextInput::make('discountCondition.amount')
@@ -154,7 +154,7 @@ class DiscountResource extends Resource
                                 ->numeric()
                                 ->minValue(1)
                                 ->rules(['max:100'], fn (Closure $get) => $get('discountCondition.amount_type') === 'percentage')
-                                ->formatStateUsing(fn ($record) => optional($record->discountCondition()->withTrashed()->first())->amount)
+                                ->formatStateUsing(fn ($record) => optional($record?->discountCondition()->withTrashed()->first())->amount)
                                 ->label(trans('Discount Amount')),
                         ]),
 
@@ -192,7 +192,7 @@ class DiscountResource extends Resource
                     ->label(trans('Discount Type'))
                     ->formatStateUsing(function ($record) {
 
-                        $discountType = optional($record->discountCondition()->withTrashed()->first())->discount_type;
+                        $discountType = optional($record?->discountCondition()->withTrashed()->first())->discount_type;
 
                         $label = '';
                         if($discountType === DiscountConditionType::ORDER_SUB_TOTAL) {
@@ -207,7 +207,7 @@ class DiscountResource extends Resource
                     }),
                 TextColumn::make('discountCondition.amount')
                     ->formatStateUsing(function ($record) {
-                        $discountCondition = optional($record->discountCondition()->withTrashed()->first());
+                        $discountCondition = optional($record?->discountCondition()->withTrashed()->first());
                         if ($discountCondition->amount_type === DiscountAmountType::PERCENTAGE) {
                             return (string) $discountCondition->amount . '%';
                         } elseif ($discountCondition->amount_type === DiscountAmountType::FIXED_VALUE) {
