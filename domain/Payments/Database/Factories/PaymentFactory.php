@@ -19,7 +19,7 @@ class PaymentFactory extends Factory
     public function definition(): array
     {
         return [
-            'payable_type' => 'order',
+            'payable_type' => 'orders',
             'payable_id' => 1,
             'payment_method_id' => '',
             'gateway' => 'paypal',

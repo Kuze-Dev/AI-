@@ -39,4 +39,14 @@ class ProductFactory extends Factory
             'minimum_order_quantity' => $this->faker->numberBetween(0, 10),
         ];
     }
+
+    public function setStatus(bool $status): self
+    {
+        return $this->state(['status' => $status]);
+    }
+
+    public function setMinimumOrderQuantity(int $quantity): self
+    {
+        return $this->state(['minimum_order_quantity' => $quantity]);
+    }
 }

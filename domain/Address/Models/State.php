@@ -33,6 +33,7 @@ class State extends Model
     protected $fillable = [
         'name',
         'country_id',
+        'code',
     ];
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\Country, State>*/
