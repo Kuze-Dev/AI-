@@ -107,7 +107,7 @@ class CustomerResource extends Resource
                         ->maxLength(255),
                     Forms\Components\TextInput::make('mobile')
                         ->unique(ignoreRecord: true)
-                        ->translateLabel()
+                        ->label(trans('Mobile Number'))
                         ->nullable()
                         ->maxLength(255),
                     Forms\Components\DatePicker::make('birth_date')
