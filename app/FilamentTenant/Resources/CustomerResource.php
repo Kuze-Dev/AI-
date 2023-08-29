@@ -77,8 +77,8 @@ class CustomerResource extends Resource
                         ->rules([
                             function ($record) {
                                 return function (string $attribute, mixed $value, Closure $fail) {
-                                    if (preg_match('/[0-9]/', $value)) {
-                                        $fail('Input must not contain a number!');
+                                    if (preg_match('/[^a-zA-Z\s]/', $value)) {
+                                        $fail('Input must only contain letters!');
                                     }
                                 };
                             },
@@ -90,8 +90,8 @@ class CustomerResource extends Resource
                         ->rules([
                             function ($record) {
                                 return function (string $attribute, mixed $value, Closure $fail) {
-                                    if (preg_match('/[0-9]/', $value)) {
-                                        $fail('Input must not contain a number!');
+                                    if (preg_match('/[^a-zA-Z\s]/', $value)) {
+                                        $fail('Input must only contain letters!');
                                     }
                                 };
                             },
