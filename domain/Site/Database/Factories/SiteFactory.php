@@ -20,6 +20,7 @@ class SiteFactory extends Factory
 
         return [
             'name' => $name,
+            'domain' => $this->faker->url(),
         ];
     }
 }

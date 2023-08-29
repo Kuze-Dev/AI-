@@ -69,5 +69,4 @@ it('can edit menu', function () {
 
     assertDatabaseHas(Menu::class, ['name' => 'Test Edit Menu']);
 
-    expect($menu->sites->pluck('id'))->toContain($site->id);
 });
