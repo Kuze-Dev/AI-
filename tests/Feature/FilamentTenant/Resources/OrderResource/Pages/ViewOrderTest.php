@@ -47,7 +47,6 @@ it('can render view order page', function () {
         ->assertFormExists()
         ->assertSuccessful()
         ->assertFormSet([
-            //todo placeholder testing
             //summary card
             'status' => trans(ucfirst($order->status->value)),
             'created_at' => $orderDate,
@@ -58,5 +57,24 @@ it('can render view order page', function () {
             'discount_code' => $order->discount_code,
             'total' => $order->currency_symbol . ' ' . number_format($order->total, 2, '.', ','),
         ])
-        ->assertOk();
+        ->assertOk()
+        ->assertSee([
+            //placeholder testing
+            $order->customer_first_name,
+            $order->customer_last_name,
+            $order->customer_email,
+            $order->customer_mobile,
+            $order->shippingAddress->address_line_1,
+            $order->shippingAddress->country,
+            $order->shippingAddress->state,
+            $order->shippingAddress->city,
+            $order->shippingAddress->zip_code,
+            $order->billingAddress->address_line_1,
+            $order->billingAddress->country,
+            $order->billingAddress->state,
+            $order->billingAddress->city,
+            $order->billingAddress->zip_code,
+            $order->payments->first()->paymentMethod?->title,
+            $order->shippingMethod->title,
+        ]);
 });

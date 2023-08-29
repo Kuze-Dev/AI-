@@ -41,7 +41,6 @@ it('can render view order details page', function () {
         ->assertFormExists()
         ->assertSuccessful()
         ->assertFormSet([
-            //todo placeholder testing
             //summary card
             'status' => trans(ucfirst($order->status->value)),
             'created_at' => $orderDate,
@@ -52,5 +51,11 @@ it('can render view order details page', function () {
             'discount_code' => $order->discount_code,
             'total' => $order->currency_symbol . ' ' . number_format($order->total, 2, '.', ','),
         ])
-        ->assertOk();
+        ->assertOk()
+        ->assertSee([
+            //placeholder testing
+            $order->orderLines[0]->name,
+            $order->orderLines[0]->quantity,
+            $order->currency_symbol . ' ' . number_format($order->sub_total, 2, '.', ','),
+        ]);
 });
