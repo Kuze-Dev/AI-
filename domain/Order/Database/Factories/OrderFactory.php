@@ -36,7 +36,7 @@ class OrderFactory extends Factory
             'currency_symbol' => $this->faker->unique()->name(),
 
             'reference' => $this->faker->unique()->randomElement([
-                Str::upper(Str::random(12))
+                Str::upper(Str::random(12)),
             ]),
 
             'tax_total' => $this->faker->randomFloat(2, 0, 10),
@@ -49,7 +49,7 @@ class OrderFactory extends Factory
             'discount_id' => $this->faker->unique()->numberBetween(1, 5),
             'discount_code' => new AutoGenerateCode(),
 
-            'shipping_total' =>  $this->faker->randomFloat(2, 0, 10),
+            'shipping_total' => $this->faker->randomFloat(2, 0, 10),
             'shipping_method_id' => 1,
 
             'total' => $this->faker->randomFloat(2, 0, 100),
@@ -73,37 +73,37 @@ class OrderFactory extends Factory
                 'unit_price' => $this->faker->randomFloat(2, 0, 100),
                 'quantity' => $this->faker->numberBetween(1, 5),
                 'tax_total' => $this->faker->randomFloat(2, 0, 10),
-                'tax_display' =>  Arr::random(PriceDisplay::cases()),
+                'tax_display' => Arr::random(PriceDisplay::cases()),
                 'tax_percentage' => $this->faker->randomFloat(2, 0, 100),
                 'sub_total' => $this->faker->randomFloat(2, 0, 100),
                 'discount_total' => 0,
                 'total' => $this->faker->randomFloat(2, 0, 100),
                 'remarks_data' => null,
                 'purchasable_data' => [
-                    "dummy" => "data"
+                    'dummy' => 'data',
                 ],
             ]);
 
             $order->shippingAddress()->create([
                 'order_id' => $order->id,
-                'country' => "Philippines",
-                'state' => "Pampanga",
+                'country' => 'Philippines',
+                'state' => 'Pampanga',
                 'type' => OrderAddressTypes::SHIPPING,
                 'label_as' => AddressLabelAs::HOME,
-                'address_line_1' => "855 Proper San Jose",
-                'zip_code' => "2014",
-                'city' => "San Luis",
+                'address_line_1' => '855 Proper San Jose',
+                'zip_code' => '2014',
+                'city' => 'San Luis',
             ]);
 
             $order->billingAddress()->create([
                 'order_id' => $order->id,
-                'country' => "Philippines",
-                'state' => "Pampanga",
+                'country' => 'Philippines',
+                'state' => 'Pampanga',
                 'type' => OrderAddressTypes::BILLING,
                 'label_as' => AddressLabelAs::HOME,
-                'address_line_1' => "855 Proper San Jose",
-                'zip_code' => "2014",
-                'city' => "San Luis",
+                'address_line_1' => '855 Proper San Jose',
+                'zip_code' => '2014',
+                'city' => 'San Luis',
             ]);
         });
     }
