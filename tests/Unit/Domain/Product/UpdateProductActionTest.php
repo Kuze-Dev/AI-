@@ -84,10 +84,12 @@ it('can update product', function () {
                         [
                             'id' => $productOption->id,
                             'name' => 'size',
+                            'slug' => 'size',
                             'productOptionValues' => [
                                 [
                                     'id' => $optionValue->id,
                                     'name' => 'small',
+                                    'slug' => 'small',
                                     'product_option_id' => $productOption->id,
                                 ],
                             ],
@@ -108,7 +110,7 @@ it('can update product', function () {
                         'selling_price' => '58.45',
                         'retail_price' => '90.95',
                         'stock' => 11,
-                        'status' => 1,
+                        'status' => true,
                         'sku' => 'SKU4300',
                     ],
                 ],

@@ -41,6 +41,10 @@ it('can create product', function () {
             'selling_price' => 29.99,
             'stock' => 50,
             'images.0' => $productImage,
+            'weight' => 1,
+            'length' => 10,
+            'height' => 10,
+            'width' => 3,
             'taxonomy_terms.0' => $taxonomyTerm->id,
         ])
         ->call('create')
@@ -100,6 +104,10 @@ it('can create product with metadata', function () {
             'retail_price' => 24.99,
             'selling_price' => 29.99,
             'stock' => 50,
+            'weight' => 15,
+            'length' => 20,
+            'width' => 15,
+            'height' => 15,
             'images.0' => $imageFaker,
             'taxonomy_terms.0' => $taxonomyTerm->id,
             'meta_data' => $metaData,
