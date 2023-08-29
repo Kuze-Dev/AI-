@@ -19,6 +19,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Domain\Page\Models\Builders\PageBuilder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
@@ -126,6 +127,12 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<self> */
+    public function pageDraft(): HasOne
+    {
+        return $this->hasOne(Page::class,'draftable_id');
     }
 
     public function getSlugOptions(): SlugOptions

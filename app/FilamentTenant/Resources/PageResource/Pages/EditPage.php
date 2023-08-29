@@ -24,6 +24,7 @@ use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions\Action;
 use Illuminate\Support\Facades\URL;
+use Filament\Pages\Actions\ActionGroup;
 
 /**
  * @property \Domain\Page\Models\Page $record
@@ -38,6 +39,18 @@ class EditPage extends EditRecord
     protected function getActions(): array
     {
         return [
+            ActionGroup::make([
+                Action::make('publish')
+                    ->label(__('Published'))
+                    ->action('published'),
+                Action::make('draft')
+                    ->label(__('Draft'))
+                    ->action('draft'),
+                Action::make('save')
+                    ->label(__('Save and Continue Editing'))
+                    ->action('save')
+                    ->keyBindings(['mod+s']),
+            ]),
             Action::make('save')
                 ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
@@ -142,10 +155,10 @@ class EditPage extends EditRecord
 
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
+    // protected function getFormActions(): array
+    // {
+    //     return $this->getCachedActions();
+    // }
 
     /**
      * @param \Domain\Page\Models\Page $record
