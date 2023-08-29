@@ -27,6 +27,8 @@ it('can create cart lines with product as purchasable', function () {
     $cart = app(CreateCartAction::class)->execute($customer);
 
     $product = ProductFactory::new()
+        ->setStatus(true)
+        ->setMinimumOrderQuantity(1)
         ->createOne();
 
     $payload = [
@@ -50,6 +52,8 @@ it('can create cart lines with product_variant as purchasable', function () {
     $cart = app(CreateCartAction::class)->execute($customer);
 
     $product = ProductFactory::new()
+        ->setStatus(true)
+        ->setMinimumOrderQuantity(1)
         ->createOne();
 
     $productVariant = ProductVariantFactory::new()->setProductId($product->id)
@@ -77,6 +81,8 @@ it('can create cart lines with remarks', function () {
     $cart = app(CreateCartAction::class)->execute($customer);
 
     $product = ProductFactory::new()
+        ->setStatus(true)
+        ->setMinimumOrderQuantity(1)
         ->createOne();
 
     $payload = [

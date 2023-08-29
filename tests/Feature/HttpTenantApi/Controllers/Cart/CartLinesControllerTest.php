@@ -35,8 +35,6 @@ beforeEach(function () {
         ->plainTextToken);
 
     $this->product = $product;
-
-    return compact('product');
 });
 
 it('can add to cart a purchasable product', function () {

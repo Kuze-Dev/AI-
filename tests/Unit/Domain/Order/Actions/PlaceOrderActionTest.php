@@ -5,14 +5,20 @@ declare(strict_types=1);
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
-use Domain\Cart\Actions\CartSummaryAction;
+use Domain\Cart\Actions\CheckoutAction;
 use Domain\Cart\Database\Factories\CartFactory;
 use Domain\Cart\Database\Factories\CartLineFactory;
-use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
-use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
-use Domain\Cart\DataTransferObjects\SummaryData;
+use Domain\Cart\DataTransferObjects\CheckoutData;
 use Domain\Cart\Models\CartLine;
+use Domain\Currency\Database\Factories\CurrencyFactory;
 use Domain\Customer\Database\Factories\CustomerFactory;
+use Domain\Order\Actions\PlaceOrderAction;
+use Domain\Order\DataTransferObjects\PlaceOrderData;
+use Domain\Order\Models\Order;
+use Domain\PaymentMethod\Database\Factories\PaymentMethodFactory;
+use Domain\Payments\Contracts\PaymentManagerInterface;
+use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
+use Domain\Payments\Providers\OfflinePayment;
 use Domain\Product\Database\Factories\ProductFactory;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\Drivers\StorePickupDriver;
@@ -23,6 +29,13 @@ use function PHPUnit\Framework\assertInstanceOf;
 
 beforeEach(function () {
     testInTenantContext();
+
+    CurrencyFactory::new()->createOne([
+        'code' => 'USD',
+        'name' => 'US Dollar',
+        'symbol' => '$',
+        'enabled' => true,
+    ]);
 
     $country = Country::create([
         'code' => 'US',
@@ -51,7 +64,7 @@ beforeEach(function () {
         'is_default_billing' => true,
     ]);
 
-    $shippingMethod = ShippingMethodFactory::new()->createOne();
+    $shippingMethod = ShippingMethodFactory::new()->createOne(['title' => 'Store Pickup']);
 
     app(ShippingManagerInterface::class)->extend($shippingMethod->driver->value, fn () => new StorePickupDriver());
 
@@ -59,6 +72,10 @@ beforeEach(function () {
         'shipper_country_id' => $country->id,
         'shipper_state_id' => $state->id,
     ]);
+
+    $paymentMethod = PaymentMethodFactory::new()->createOne(['title' => 'Cod']);
+
+    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new OfflinePayment());
 
     Sanctum::actingAs($customer);
 
@@ -80,60 +97,35 @@ beforeEach(function () {
     $this->customer = $customer;
     $this->address = $address;
     $this->shippingMethod = $shippingMethod;
+    $this->paymentMethod = $paymentMethod;
     $this->cartLines = $cartLines;
 });
 
-it('can get subtotal', function () {
-    $subtotal = app(CartSummaryAction::class)->getSubTotal($this->cartLines);
+it('can place order', function () {
+    $cartLineIds = $this->cartLines->pluck('uuid')->toArray();
 
-    expect($subtotal)->toBeFloat();
-});
+    $reference = app(CheckoutAction::class)
+        ->execute(CheckoutData::fromArray(['cart_line_ids' => $cartLineIds]));
 
-it('can get shipping fee', function () {
-    $shippingTotal = app(CartSummaryAction::class)->getShippingFee(
-        $this->cartLines,
-        $this->customer,
-        $this->address,
-        $this->shippingMethod,
-        null,
-    );
+    $validatedData = [
+        'addresses' => [
+            'shipping' => $this->address->id,
+            'billing' => $this->address->id,
+        ],
+        'cart_reference' => $reference,
+        'payment_method' => $this->paymentMethod->slug,
+        'shipping_method' => $this->shippingMethod->slug,
+    ];
 
-    expect($shippingTotal)->toBeFloat();
-});
+    $result = app(PlaceOrderAction::class)
+        ->execute(PlaceOrderData::fromArray($validatedData));
 
-it('can get tax', function () {
-    $subtotal = app(CartSummaryAction::class)->getSubTotal($this->cartLines);
+    expect($result)->toHaveKey('order');
+    expect($result)->toHaveKey('payment');
 
-    $tax = app(CartSummaryAction::class)->getTax($this->country->id, $this->state->id);
+    $order = $result['order'];
+    $payment = $result['payment'];
 
-    expect($tax)->toBeArray()
-        ->toHaveKeys(['taxZone', 'taxDisplay', 'taxPercentage']);
-
-    $taxTotal = $tax['taxPercentage'] ? round($subtotal * $tax['taxPercentage'] / 100, 2) : 0;
-
-    expect($taxTotal)->toBe(0);
-});
-
-it('can get discount', function () {
-    $subtotal = app(CartSummaryAction::class)->getSubTotal($this->cartLines);
-
-    $discountTotal = app(CartSummaryAction::class)->getDiscount(null, $subtotal, 10.00);
-
-    expect($discountTotal)->toBe(0.0);
-});
-
-it('can get cart summary', function () {
-    $summary = app(CartSummaryAction::class)->getSummary(
-        $this->cartLines,
-        new CartSummaryTaxData($this->country->id, $this->state->id),
-        new CartSummaryShippingData(
-            $this->customer,
-            $this->address,
-            $this->shippingMethod
-        ),
-        null,
-        null
-    );
-
-    assertInstanceOf(SummaryData::class, $summary);
+    assertInstanceOf(Order::class, $order);
+    assertInstanceOf(PaymentAuthorize::class, $payment);
 });
