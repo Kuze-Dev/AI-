@@ -19,8 +19,9 @@ class UniqueProductSkuRule implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $filteredProducts = [];
+        /** @phpstan-ignore-next-line https://phpstan.org/blog/solving-phpstan-access-to-undefined-property */
         $toArrayVariantStatePath = explode('.', $this->livewire->activeProductVariantItemStatePath);
-        $productVariants = $this->livewire->data['product_variants'];
+        $productVariants = $this->livewire->data['product_variants']; /** @phpstan-ignore-line */
 
         if (
             isset($productVariants[end($toArrayVariantStatePath)])
@@ -32,7 +33,7 @@ class UniqueProductSkuRule implements ValidationRule
         foreach ($productVariants as $variant) {
             if (
                 isset($variant['sku'])
-                && ($this->livewire->data['sku'] === $value
+                && ($this->livewire->data['sku'] === $value /** @phpstan-ignore-line */
                     || $variant['sku'] === $value)
             ) {
                 $filteredProducts[] = $variant;

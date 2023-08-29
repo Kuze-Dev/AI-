@@ -424,7 +424,7 @@ class OrderResource extends Resource
                                 $formattedState = Carbon::parse($state)
                                     /** @phpstan-ignore-next-line */
                                     ->setTimezone(Auth::user()?->timezone)
-                                    ->translatedFormat('jS F Y h:i A');
+                                    ->translatedFormat('F d, Y g:i A');
 
                                 return $formattedState;
                             }),

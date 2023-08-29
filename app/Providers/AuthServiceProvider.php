@@ -58,6 +58,8 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Order\Models\Order::class => \App\Policies\ReportPolicy::class,
         \Domain\Discount\Models\Discount::class => \App\Policies\DiscountPolicy::class,
         \Domain\Taxation\Models\TaxZone::class => \App\Policies\TaxZonePolicy::class,
+        \Domain\Internationalization\Models\Locale::class => \App\Policies\LocalePolicy::class,
+        \Domain\Site\Models\Site::class => \App\Policies\SitePolicy::class,
     ];
 
     /** Register any authentication / authorization services. */

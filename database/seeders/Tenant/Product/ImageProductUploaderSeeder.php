@@ -31,6 +31,8 @@ class ImageProductUploaderSeeder extends Seeder
                 }
 
                 try {
+                    $product->clearMediaCollection('image');
+
                     $product
                         ->addMediaFromUrl($data['image_url'])
                         ->toMediaCollection('image');

@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace Domain\Page\Models;
 
-use Domain\Page\Models\Builders\PageBuilder;
+use Illuminate\Support\Str;
+use Domain\Site\Traits\Sites;
+use Spatie\Sluggable\HasSlug;
 use Domain\Admin\Models\Admin;
 use Domain\Page\Enums\Visibility;
+use Spatie\Sluggable\SlugOptions;
 use Support\MetaData\HasMetaData;
-use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
-use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
 use Support\RouteUrl\HasRouteUrl;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
+use Domain\Page\Models\Builders\PageBuilder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
 use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 
 /**
@@ -29,6 +30,7 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property int $id
  * @property int|null $author_id
  * @property string $name
+ * @property string $locale
  * @property string $slug
  * @property Visibility $visibility
  * @property \Illuminate\Support\Carbon|null $published_at
@@ -43,6 +45,8 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property-read \Support\MetaData\Models\MetaData|null $metaData
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Support\RouteUrl\Models\RouteUrl> $routeUrls
  * @property-read int|null $route_urls_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Site\Models\Site> $sites
+ * @property-read int|null $sites_count
  * @method static PageBuilder|Page newModelQuery()
  * @method static PageBuilder|Page newQuery()
  * @method static PageBuilder|Page query()
@@ -67,12 +71,14 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
     use HasRouteUrl;
     use HasMetaData;
     use ConstraintsRelationships;
+    use Sites;
 
     protected $fillable = [
         'author_id',
         'name',
         'visibility',
         'published_at',
+        'locale',
     ];
 
     /**

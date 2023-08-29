@@ -34,7 +34,7 @@ class ProductOptionFormAction extends Action
         $this->slideOver(true);
 
         $this->mountUsing(function (HasProductOptions $livewire, ComponentContainer $form) {
-            if (!$activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
+            if ( ! $activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
                 return;
             }
 
@@ -52,7 +52,7 @@ class ProductOptionFormAction extends Action
             /** @phpstan-ignore-next-line  */
             $updatedVariants = $this->updatingProductVariants($livewire->record, $productVariants);
 
-            if (!$activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
+            if ( ! $activeProductOptionStatePath = $livewire->getActiveProductOptionItemStatePath()) {
                 return;
             }
 
@@ -116,22 +116,22 @@ class ProductOptionFormAction extends Action
     private function assignProxiesToProductOption(array $options): array
     {
         foreach ($options as &$option) {
-            if (!isset($option['id'])) {
+            if ( ! isset($option['id'])) {
                 $option['id'] = uniqid();
             }
 
-            if (!isset($option['slug'])) {
+            if ( ! isset($option['slug'])) {
                 $option['slug'] = $option['name'];
             }
 
             foreach ($option['productOptionValues'] as &$value) {
-                if (!isset($value['id'])) {
+                if ( ! isset($value['id'])) {
                     $value['id'] = uniqid();
                 }
-                if (!isset($value['slug'])) {
+                if ( ! isset($value['slug'])) {
                     $value['slug'] = $value['name'];
                 }
-                if (!isset($value['product_option_id'])) {
+                if ( ! isset($value['product_option_id'])) {
                     $value['product_option_id'] = $option['id'];
                 }
             }
@@ -151,7 +151,7 @@ class ProductOptionFormAction extends Action
                     break;
                 }
             }
-            if (!$matched) {
+            if ( ! $matched) {
                 return false;
             }
         }
@@ -175,7 +175,7 @@ class ProductOptionFormAction extends Action
                 }
             }
 
-            if (!$hasMerged) {
+            if ( ! $hasMerged) {
                 $mergedCombination[] = $item1;
             }
         }
@@ -189,7 +189,7 @@ class ProductOptionFormAction extends Action
             while ($hasMatched) {
                 $generatedSku = $record->sku . rand(1000, 9999);
 
-                if (!in_array($generatedSku, array_map(fn ($item) => $item['sku'], array_values($result)))) {
+                if ( ! in_array($generatedSku, array_map(fn ($item) => $item['sku'], array_values($result)))) {
                     $combination['sku'] = $generatedSku;
                     $hasMatched = false;
                 }

@@ -21,7 +21,6 @@ use Domain\Product\Models\ProductOption;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\Contracts\HasProductOptions;
@@ -253,9 +252,6 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('selling_price')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('stock')
-                    ->searchable()
-                    ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive')
                     ->color(fn (Product $record) => $record->status ? 'success' : 'secondary')
@@ -281,7 +277,6 @@ class ProductResource extends Resource
                         });
                     }),
             ])
-            ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->authorize('update'),
@@ -331,11 +326,14 @@ class ProductResource extends Resource
                                 return $state;
                             }
 
-                            if (($livewire->data['product_options']) !== null) {
-                                $component->state($livewire->data['product_options']['options']);
+                            /** @phpstan-ignore-next-line https://phpstan.org/blog/solving-phpstan-access-to-undefined-property */
+                            $productOptions = $livewire->data['product_options'];
+                            if (($productOptions) !== null) {
+                                $component->state($productOptions['options']);
 
                                 return;
                             }
+
                             $record->productOptions->load('productOptionValues');
                             $mappedOptions = $record->productOptions->map(function (ProductOption $productOption) {
                                 return [

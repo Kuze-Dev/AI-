@@ -28,6 +28,7 @@ use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
 use Domain\Globals\Models\Globals;
 use Domain\Order\Models\Order;
+use Domain\Order\Models\OrderAddress;
 use Domain\Order\Models\OrderLine;
 use Domain\Page\Models\Block;
 use Domain\Review\Models\Review;
@@ -46,6 +47,7 @@ use Domain\Product\Models\ProductVariant;
 use Domain\Payments\Models\PaymentRefund;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Domain\Internationalization\Models\Locale;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -57,6 +59,7 @@ use Sentry\Laravel\Integration;
 use Laravel\Pennant\Feature;
 use Stancl\Tenancy\Database\Models\Tenant;
 use TiMacDonald\JsonApi\JsonApiResource;
+use Domain\Site\Models\Site;
 
 /** @property \Illuminate\Foundation\Application $app */
 class AppServiceProvider extends ServiceProvider
@@ -121,12 +124,15 @@ class AppServiceProvider extends ServiceProvider
             Payment::class,
             Order::class,
             OrderLine::class,
+            OrderAddress::class,
             Favorite::class,
             Review::class,
             Shipment::class,
             ShippingMethod::class,
             ShippingBox::class,
             PaymentRefund::class,
+            Locale::class,
+            Site::class,
         ]);
 
         Password::defaults(
