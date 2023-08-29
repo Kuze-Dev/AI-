@@ -43,8 +43,6 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Address\Models\Country::class => \App\Policies\CountryPolicy::class,
         \Domain\Currency\Models\Currency::class => \App\Policies\CurrencyPolicy::class,
         \Domain\Product\Models\Product::class => \App\Policies\ProductPolicy::class,
-        \Domain\Customer\Models\Customer::class => \App\Policies\CustomerPolicy::class,
-        \Domain\Tier\Models\Tier::class => \App\Policies\TierPolicy::class,
         \Domain\Address\Models\Address::class => \App\Policies\AddressPolicy::class,
         \Domain\PaymentMethod\Models\PaymentMethod::class => \App\Policies\PaymentMethodPolicy::class,
         \Domain\Cart\Models\Cart::class => \App\Policies\CartPolicy::class,
