@@ -13,6 +13,7 @@ use Illuminate\Support\Arr;
 use Domain\Discount\Actions\AutoGenerateCode;
 use Domain\Order\Enums\OrderAddressTypes;
 use Domain\Order\Enums\OrderStatuses;
+use Domain\Product\Models\Product;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Order\Models\Order>

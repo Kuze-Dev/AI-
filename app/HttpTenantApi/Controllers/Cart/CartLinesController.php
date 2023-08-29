@@ -79,6 +79,10 @@ class CartLinesController extends Controller
                 ], 400);
             }
         }
+
+        return response()->json([
+            'message' => 'Something went wrong',
+        ], 400);
     }
 
     public function destroy(CartLine $cartline): mixed
