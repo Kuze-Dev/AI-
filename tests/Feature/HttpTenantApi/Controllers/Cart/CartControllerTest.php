@@ -17,7 +17,9 @@ beforeEach(function () {
     $customer = CustomerFactory::new()
         ->createOne();
 
-    $product = ProductFactory::new()->createOne();
+    $product = ProductFactory::new()->setStatus(true)
+        ->setMinimumOrderQuantity(1)
+        ->createOne();
 
     $cart = CartFactory::new()->setCustomerId($customer->id)->createOne();
 

@@ -24,7 +24,10 @@ it('can checkout cart lines', function () {
 
     Sanctum::actingAs($customer);
 
-    ProductFactory::new()->times(3)->create();
+    ProductFactory::new()->times(3)->create([
+        'status' => true,
+        'minimum_order_quantity' => 1
+    ]);
 
     CartFactory::new()->setCustomerId($customer->id)->createOne();
 

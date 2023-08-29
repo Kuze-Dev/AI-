@@ -13,6 +13,7 @@ use Domain\Cart\Models\CartLine;
 use Domain\Currency\Database\Factories\CurrencyFactory;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Order\Actions\PlaceOrderAction;
+use Domain\Order\Database\Factories\OrderFactory;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\Models\Order;
 use Domain\PaymentMethod\Database\Factories\PaymentMethodFactory;
@@ -23,8 +24,11 @@ use Domain\Product\Database\Factories\ProductFactory;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\Drivers\StorePickupDriver;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
 
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
 use function PHPUnit\Framework\assertInstanceOf;
 
 beforeEach(function () {
@@ -101,13 +105,53 @@ beforeEach(function () {
     $this->cartLines = $cartLines;
 });
 
-it('can place order', function () {
+it('can list orders', function () {
+    $order = OrderFactory::new()
+        ->createOne();
+
+    getJson('api/orders')
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) use ($order) {
+            $json
+                ->count('data', 1)
+                ->where('data.0.id', $order->getRouteKey())
+                ->where('data.0.type', 'orders')
+                ->etc();
+        });
+});
+
+it('can list orders with include', function (string $include) {
+    $order = OrderFactory::new()
+        ->createOne();
+
+    getJson('api/orders?' . http_build_query(['include' => $include]))
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) use ($order) {
+            $json
+                ->count('data', 1)
+                ->where('data.0.id', $order->getRouteKey())
+                ->where('data.0.type', 'orders')
+                ->has(
+                    'included',
+                    callback: fn (AssertableJson $json) =>
+                    $json->where('type', "orderLines")
+                        ->where('id', (string) $order->orderLines[0]->id)
+                        ->has('attributes')
+                        ->etc()
+                )
+                ->etc();
+        });
+})->with([
+    'orderLines',
+]);
+
+it('can store order', function () {
     $cartLineIds = $this->cartLines->pluck('uuid')->toArray();
 
     $reference = app(CheckoutAction::class)
         ->execute(CheckoutData::fromArray(['cart_line_ids' => $cartLineIds]));
 
-    $validatedData = [
+    postJson('api/orders', [
         'addresses' => [
             'shipping' => $this->address->id,
             'billing' => $this->address->id,
@@ -115,17 +159,47 @@ it('can place order', function () {
         'cart_reference' => $reference,
         'payment_method' => $this->paymentMethod->slug,
         'shipping_method' => $this->shippingMethod->slug,
-    ];
-
-    $result = app(PlaceOrderAction::class)
-        ->execute(PlaceOrderData::fromArray($validatedData));
-
-    expect($result)->toHaveKey('order');
-    expect($result)->toHaveKey('payment');
-
-    $order = $result['order'];
-    $payment = $result['payment'];
-
-    assertInstanceOf(Order::class, $order);
-    assertInstanceOf(PaymentAuthorize::class, $payment);
+    ])
+        ->assertValid()
+        ->assertOk();
 });
+
+it('can show order', function () {
+    $order = OrderFactory::new()
+        ->createOne();
+
+    getJson('api/orders/' . $order->getRouteKey())
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) use ($order) {
+            $json
+                ->where('data.type', 'orders')
+                ->where('data.id', $order->getRouteKey())
+                ->where('data.attributes.reference', $order->getRouteKey())
+                ->etc();
+        });
+});
+
+it('can show order with includes', function (string $include) {
+    $order = OrderFactory::new()
+        ->createOne();
+
+    getJson("api/orders/{$order->getRouteKey()}?" . http_build_query(['include' => $include]))
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) use ($order) {
+            $json
+                ->where('data.type', 'orders')
+                ->where('data.id', $order->getRouteKey())
+                ->where('data.attributes.reference', $order->getRouteKey())
+                ->has(
+                    'included',
+                    callback: fn (AssertableJson $json) =>
+                    $json->where('type', "orderLines")
+                        ->where('id', (string) $order->orderLines[0]->id)
+                        ->has('attributes')
+                        ->etc()
+                )
+                ->etc();
+        });
+})->with([
+    'orderLines',
+]);
