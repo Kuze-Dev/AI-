@@ -2,15 +2,9 @@
 
 declare(strict_types=1);
 
-use App\FilamentTenant\Resources\OrderResource\Pages\ListOrders;
 use App\FilamentTenant\Resources\OrderResource\Pages\ViewOrder;
-use Domain\Order\Database\Factories\OrderAddressFactory;
 use Domain\Order\Database\Factories\OrderFactory;
-use Domain\Order\Database\Factories\OrderLineFactory;
-use Domain\Order\Database\Factories\ShippingAddressFactory;
-use Domain\Order\Enums\OrderAddressTypes;
 use Domain\PaymentMethod\Database\Factories\PaymentMethodFactory;
-use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Contracts\PaymentManagerInterface;
 use Domain\Payments\Database\Factories\PaymentFactory;
 use Domain\Payments\Providers\OfflinePayment;

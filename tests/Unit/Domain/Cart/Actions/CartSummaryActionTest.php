@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Domain\Address\Database\Factories\StateFactory;
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
@@ -15,24 +14,21 @@ use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Product\Database\Factories\ProductFactory;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use Laravel\Sanctum\Sanctum;
-use Tests\RequestFactories\AddressRequestFactory;
-
-use function PHPUnit\Framework\assertInstanceOf;
 
 beforeEach(function () {
     testInTenantContext();
 
     $country = Country::create([
-        'code' => "US",
-        "name" => "United States",
-        "capital" => "Washington",
-        "timezone" => "UTC-10:00",
-        "active" => true
+        'code' => 'US',
+        'name' => 'United States',
+        'capital' => 'Washington',
+        'timezone' => 'UTC-10:00',
+        'active' => true,
     ]);
 
     $state = $country->states()->create([
-        'name' => "CA",
-        'code' => "BH",
+        'name' => 'CA',
+        'code' => 'BH',
     ]);
 
     $customer = CustomerFactory::new()
