@@ -17,7 +17,7 @@ return new class () extends Migration {
             $table->morphs('model');
 
             $table->string('state_path')->index();
-            $table->string('value');
+            $table->string('value')->nullable();
             $table->string('type')->index();
 
             $table->timestamps();

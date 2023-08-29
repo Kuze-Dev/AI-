@@ -8,6 +8,7 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\PageResource;
 use App\Settings\CMSSettings;
 use App\Settings\SiteSettings;
+use Domain\Page\Actions\DeletePageAction;
 use Domain\Page\Actions\UpdatePageAction;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
@@ -20,6 +21,7 @@ use Throwable;
 use Exception;
 use Filament\Pages\Actions\Action;
 use Illuminate\Support\Facades\URL;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 /**
  * @property \Domain\Page\Models\Page $record
@@ -38,7 +40,13 @@ class EditPage extends EditRecord
                 ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()->using(function (Page $record) {
+                try {
+                    return app(DeletePageAction::class)->execute($record);
+                } catch (DeleteRestrictedException $e) {
+                    return false;
+                }
+            }),
             Action::make('preview')
                 ->color('secondary')
                 ->label(__('Preview Page'))

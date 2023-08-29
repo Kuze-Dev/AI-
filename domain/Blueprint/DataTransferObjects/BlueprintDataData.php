@@ -14,7 +14,7 @@ class BlueprintDataData
         public readonly int $model_id,
         public readonly string $model_type,
         public readonly string $state_path,
-        public readonly string $value,
+        public readonly ?string $value,
         public readonly FieldType $type,
     ) {
     }
@@ -26,14 +26,14 @@ class BlueprintDataData
         $data = $block_content->data;
 
         $keys = explode('.', $state_path);
-    
+
         foreach ($keys as $key) {
-            if (!isset($data[$key])) {
+            if ( ! isset($data[$key])) {
             }
-    
+
             $data = $data[$key];
         }
-    
+
         $value = is_array($data) ? end($data) : $data;
         // dd($block_content->data, $value, $field_type, $state_path);
 
