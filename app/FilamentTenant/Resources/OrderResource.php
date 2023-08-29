@@ -595,7 +595,7 @@ class OrderResource extends Resource
                                     return;
                                 }
 
-                                $updateData['cancelled_at'] = now(Auth::user()?->timezone);
+                                $updateData['cancelled_at'] = now();
 
                                 $order = $record->load('payments');
 

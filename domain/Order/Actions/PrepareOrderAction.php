@@ -59,7 +59,7 @@ class PrepareOrderAction
         return PreparedOrderData::fromArray($orderData);
     }
 
-    private function prepareAddress(PlaceOrderData $placeOrderData): array
+    public function prepareAddress(PlaceOrderData $placeOrderData): array
     {
         $shippingAddress = Address::with('state.country')->find($placeOrderData->addresses->shipping);
 
@@ -71,7 +71,7 @@ class PrepareOrderAction
         ];
     }
 
-    private function prepareCurrency(): Currency
+    public function prepareCurrency(): Currency
     {
         $currency = Currency::where('enabled', true)->first();
 
@@ -87,7 +87,7 @@ class PrepareOrderAction
      * @param PlaceOrderData $placeOrderData
      * @return Collection<int, CartLine>
      */
-    private function prepareCartLines(PlaceOrderData $placeOrderData): Collection
+    public function prepareCartLines(PlaceOrderData $placeOrderData): Collection
     {
         return CartLine::with(['purchasable' => function (MorphTo $query) {
             $query->morphWith([
@@ -98,7 +98,7 @@ class PrepareOrderAction
             ->get();
     }
 
-    private function prepareTax(PlaceOrderData $placeOrderData): ?TaxZone
+    public function prepareTax(PlaceOrderData $placeOrderData): ?TaxZone
     {
         $billingAddressId = $placeOrderData->addresses->billing;
 
@@ -122,7 +122,7 @@ class PrepareOrderAction
         return $taxZone;
     }
 
-    private function prepareDiscount(PlaceOrderData $placeOrderData): ?Discount
+    public function prepareDiscount(PlaceOrderData $placeOrderData): ?Discount
     {
         if ($placeOrderData->discountCode) {
             $discount = Discount::whereCode($placeOrderData->discountCode)
@@ -143,12 +143,12 @@ class PrepareOrderAction
         return null;
     }
 
-    private function prepareShippingMethod(PlaceOrderData $placeOrderData): ?ShippingMethod
+    public function prepareShippingMethod(PlaceOrderData $placeOrderData): ?ShippingMethod
     {
         return ShippingMethod::where((new ShippingMethod())->getRouteKeyName(), $placeOrderData->shipping_method)->first() ?? null;
     }
 
-    private function preparePaymentMethod(PlaceOrderData $placeOrderData): PaymentMethod
+    public function preparePaymentMethod(PlaceOrderData $placeOrderData): PaymentMethod
     {
         $paymentMethod = PaymentMethod::whereSlug($placeOrderData->payment_method)->first();
 

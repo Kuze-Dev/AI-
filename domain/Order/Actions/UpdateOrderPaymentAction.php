@@ -31,6 +31,7 @@ class UpdateOrderPaymentAction
 
         if ($status == OrderStatuses::CANCELLED->value) {
             $orderData['cancelled_reason'] = $notes;
+            $orderData['cancelled_at'] = now();
 
             /** @var \Domain\Payments\Models\Payment $payment */
             $payment = $order->payments->first();

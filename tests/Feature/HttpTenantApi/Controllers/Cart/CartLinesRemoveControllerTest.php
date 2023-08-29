@@ -24,8 +24,6 @@ beforeEach(function () {
         ->plainTextToken);
 
     $this->cart = $cart;
-
-    return compact('cart');
 });
 
 it('can bulk delete cartlines', function () {

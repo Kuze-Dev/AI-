@@ -70,9 +70,9 @@ class UpdateOrderAction
                     }
                 }
 
-                return $order;
-
                 DB::commit();
+
+                return $order;
             } catch (Exception $e) {
                 DB::rollBack();
                 // Log::info($e);
