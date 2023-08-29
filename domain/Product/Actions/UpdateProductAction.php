@@ -10,8 +10,6 @@ use Domain\Product\Models\Product;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\MetaData\Actions\UpdateMetaDataAction;
 use Illuminate\Support\Arr;
-use Exception;
-use Log;
 
 class UpdateProductAction
 {
@@ -24,33 +22,28 @@ class UpdateProductAction
     ) {
     }
 
-    public function execute(Product $product, ProductData $productData): Product|Exception
+    /** @param \Domain\Product\Models\Product $product */
+    public function execute(Product $product, ProductData $productData): Product
     {
-        try {
-            $product->update($this->getProductAttributes($productData));
+        $product->update($this->getProductAttributes($productData));
 
-            $product->metaData()->exists()
-                ? $this->updateMetaData->execute($product, $productData->meta_data)
-                : $this->createMetaData->execute($product, $productData->meta_data);
+        $product->metaData()->exists()
+            ? $this->updateMetaData->execute($product, $productData->meta_data)
+            : $this->createMetaData->execute($product, $productData->meta_data);
 
-            $this->updateProductOptionAction->execute($product, $productData);
+        $this->updateProductOptionAction->execute($product, $productData);
 
-            $this->createOrUpdateProductVariantAction->execute($product, $productData, false);
+        $this->createOrUpdateProductVariantAction->execute($product, $productData, false);
 
-            if (filled($productData->images)) {
-                $this->createMediaAction->execute($product, Arr::wrap($productData->images), 'image', false);
-            }
-
-            $this->createMediaAction->execute($product, Arr::wrap($productData->videos), 'video', false);
-
-            $product->taxonomyTerms()->sync($productData->taxonomy_terms);
-
-            return $product;
-        } catch (Exception $e) {
-            Log::info('Error on UpdateProductAction->execute() ' . $e);
-
-            return $e;
+        if (filled($productData->images)) {
+            $this->createMediaAction->execute($product, Arr::wrap($productData->images), 'image', false);
         }
+
+        $this->createMediaAction->execute($product, Arr::wrap($productData->videos), 'video', false);
+
+        $product->taxonomyTerms()->sync($productData->taxonomy_terms);
+
+        return $product;
     }
 
     protected function getProductAttributes(ProductData $productData): array
