@@ -56,11 +56,6 @@ class PagePolicy
 
             $intersection = array_intersect($pageSites, $userSites);
 
-            // dump($pageSites);
-            // $diff = array_diff($pageSites, $userSites);
-
-            // dump($diff);
-
             return ((count($intersection) === count($pageSites)) && $this->checkWildcardPermissions($user));
         }
 

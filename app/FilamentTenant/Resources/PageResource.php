@@ -31,6 +31,7 @@ use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use Illuminate\Database\Eloquent\Model;
 use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
 use Illuminate\Validation\Rules\Unique;
 
@@ -308,6 +309,27 @@ class PageResource extends Resource
 
         return static::getModel()::query();
 
+    }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+
+        $status = '';
+        
+        if ($record) {
+
+            $model = $record;
+            $status = $model->draftable_id? ' ( Draft )' : '';
+        }
+
+        /** @var string */
+        $attribute = static::$recordTitleAttribute;
+        $recordTitle = $record?->getAttribute($attribute) ?? '';
+
+        $maxLength = 60; // Maximum length for the title before truncating
+        $truncatedTitle = Str::limit($recordTitle, $maxLength, '...');
+
+        return $truncatedTitle . ''. $status;
     }
 
     public static function getRelations(): array
