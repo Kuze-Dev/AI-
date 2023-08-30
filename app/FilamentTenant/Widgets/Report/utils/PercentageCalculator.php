@@ -6,7 +6,7 @@ namespace App\FilamentTenant\Widgets\Report\utils;
 
 class PercentageCalculator
 {
-    public static function calculatePercentages($products)
+    public static function calculatePercentages(array $products): array
     {
         $productCounts = collect($products)->pluck('count')->toArray();
         $total = array_sum($productCounts);
@@ -20,7 +20,7 @@ class PercentageCalculator
         return $percentages;
     }
 
-    public static function formatProductNamesWithPercentages($products, $percentages)
+    public static function formatProductNamesWithPercentages(array $products, array $percentages): array
     {
         $productNames = collect($products)->pluck('name')->toArray();
         $formattedProductNames = [];

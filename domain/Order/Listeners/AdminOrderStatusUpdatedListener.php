@@ -70,9 +70,9 @@ class AdminOrderStatusUpdatedListener
                 break;
         }
 
-        //comment when the env and mail is not set
-        if ($event->shouldSendEmail) {
-            $customer->notify(new AdminOrderStatusUpdatedMail($order, $event->status, $event->emailRemarks));
-        }
+        // //comment when the env and mail is not set
+        // if ($event->shouldSendEmail) {
+        //     $customer->notify(new AdminOrderStatusUpdatedMail($order, $event->status, $event->emailRemarks));
+        // }
     }
 }

@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Widgets\Report\utils;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class DateRangeCalculator
 {
-    public static function calculateDateRange(string $activeFilter): array
+    public static function calculateDateRange(string|null $activeFilter): array
     {
         $startDate = null;
         $endDate = null;
@@ -30,8 +31,10 @@ class DateRangeCalculator
         ];
     }
 
-    public static function pieDateRange(Builder $query, string|null $activeFilter): Builder
+    /** @return Builder<Model> */
+    public static function pieDateRange(Builder $query, string|null $activeFilter): Builder // @phpstan-ignore-line
     {
+
         if ($activeFilter === 'thisYear') {
             return $query->whereBetween('created_at', [now()->startOfYear(), now()]);
         } elseif ($activeFilter === 'thisMonth') {
