@@ -78,7 +78,7 @@ class CustomerResource extends Resource
                             function ($record) {
                                 return function (string $attribute, mixed $value, Closure $fail) {
                                     if (preg_match('/[^a-zA-Z\s]/', $value)) {
-                                        $fail('Input must only contain letters!');
+                                        $fail('Input must not contain numerical characters.');
                                     }
                                 };
                             },
@@ -91,7 +91,7 @@ class CustomerResource extends Resource
                             function ($record) {
                                 return function (string $attribute, mixed $value, Closure $fail) {
                                     if (preg_match('/[^a-zA-Z\s]/', $value)) {
-                                        $fail('Input must only contain letters!');
+                                        $fail('Input must not contain numerical characters.');
                                     }
                                 };
                             },
@@ -99,7 +99,7 @@ class CustomerResource extends Resource
                         ->string()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('email')
-                        ->translateLabel()
+                        ->label(trans('Email Address'))
                         ->required()
                         ->unique(ignoreRecord: true)
                         ->email()
@@ -284,12 +284,10 @@ class CustomerResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('full_name')
                     ->translateLabel()
-                    ->searchable(['first_name', 'last_name'], isIndividual: true)
                     ->sortable(['first_name', 'last_name'])
                     ->wrap(),
                 Tables\Columns\TextColumn::make('email')
                     ->translateLabel()
-                    ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\IconColumn::make('email_verified_at')
                     ->label(trans('Verified'))

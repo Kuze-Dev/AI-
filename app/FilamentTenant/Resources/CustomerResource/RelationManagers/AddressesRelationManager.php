@@ -47,7 +47,7 @@ class AddressesRelationManager extends RelationManager
                     ->label(trans('Country'))
                     ->required()
                     ->preload()
-                    ->optionsFromModel(Country::class, 'name')
+                    ->optionsFromModel(Country::class, 'name', fn (Builder $query) => $query->where('active', true))
                     ->reactive()
                     ->afterStateUpdated(function (callable $set) {
                         $set('state_id', null);
