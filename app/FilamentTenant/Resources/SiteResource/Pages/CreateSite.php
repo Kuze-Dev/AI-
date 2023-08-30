@@ -9,16 +9,23 @@ use Domain\Site\Actions\CreateSiteAction;
 use Domain\Site\DataTransferObjects\SiteData;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Pages\Actions\Action;
 use Illuminate\Support\Facades\DB;
 
 class CreateSite extends CreateRecord
 {
     protected static string $resource = SiteResource::class;
 
-    /**
-     * Execute database transaction
-     * for creating collections.
-     */
+    protected function getActions(): array
+    {
+        return [
+            Action::make('create')
+                ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
+                ->action('create')
+                ->keyBindings(['mod+s']),
+        ];
+    }
+
     protected function handleRecordCreation(array $data): Model
     {
 
@@ -26,5 +33,10 @@ class CreateSite extends CreateRecord
             fn () => app(CreateSiteAction::class)
                 ->execute(SiteData::fromArray($data))
         );
+    }
+
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
     }
 }
