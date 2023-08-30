@@ -12,6 +12,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Eloquent;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * Domain\Cart\Models\CartLine
@@ -51,6 +53,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 class CartLine extends Model implements HasMedia
 {
+    use LogsActivity;
     use HasFactory;
     use InteractsWithMedia;
 
@@ -97,5 +100,13 @@ class CartLine extends Model implements HasMedia
         $this->addMediaCollection('cart_line_notes')
             ->onlyKeepLatest(5)
             ->registerMediaConversions($registerMediaConversions);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

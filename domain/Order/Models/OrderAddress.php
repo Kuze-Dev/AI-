@@ -45,6 +45,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class OrderAddress extends Model
 {
     use LogsActivity;
+
     protected $fillable = [
         'order_id',
         'type',
