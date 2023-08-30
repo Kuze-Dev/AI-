@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-use Domain\Page\Actions\UpdatePageAction;
-use Domain\Page\Database\Factories\PageFactory;
-use Domain\Page\Database\Factories\BlockFactory;
-use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\BlockContent;
 use Support\MetaData\Models\MetaData;
+use Domain\Page\Actions\UpdatePageAction;
+use Domain\Page\DataTransferObjects\PageData;
+use Domain\Page\Database\Factories\PageFactory;
+
+use Domain\Site\Database\Factories\SiteFactory;
+use Domain\Page\Database\Factories\BlockFactory;
 
 use function Pest\Laravel\assertDatabaseHas;
 
@@ -17,6 +19,9 @@ beforeEach(fn () => testInTenantContext());
 it('can update page', function () {
     $page = PageFactory::new()
         ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->createOne();
+
+    $site = SiteFactory::new()
         ->createOne();
 
     $metaDataData = [
@@ -50,6 +55,7 @@ it('can update page', function () {
                     'keywords' => 'foo keywords updated',
                     'description' => 'foo description updated',
                 ],
+                'sites' => [$site->id],
             ])
         );
 
@@ -70,4 +76,6 @@ it('can update page', function () {
             'model_id' => $page->getKey(),
         ]
     );
+
+    expect($page->sites->pluck('id'))->toContain($site->id);
 });

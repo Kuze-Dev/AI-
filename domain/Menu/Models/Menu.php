@@ -13,6 +13,7 @@ use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Domain\Site\Traits\Sites;
 
 /**
  * Domain\Menu\Models\Menu
@@ -44,6 +45,7 @@ class Menu extends Model
     use HasSlug;
     use LogsActivity;
     use ConstraintsRelationships;
+    use Sites;
 
     protected $fillable = [
         'name',

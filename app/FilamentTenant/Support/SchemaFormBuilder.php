@@ -11,6 +11,7 @@ use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\FileFieldData;
 use Domain\Blueprint\DataTransferObjects\MarkdownFieldData;
 use Domain\Blueprint\DataTransferObjects\MediaFieldData;
+use Domain\Blueprint\DataTransferObjects\RadioFieldData;
 use Domain\Blueprint\DataTransferObjects\RelatedResourceFieldData;
 use Domain\Blueprint\DataTransferObjects\RepeaterFieldData;
 use Domain\Blueprint\DataTransferObjects\RichtextFieldData;
@@ -29,6 +30,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
@@ -111,6 +113,10 @@ class SchemaFormBuilder extends Component
             CheckBoxFieldData::class => CheckboxList::make($field->state_name)
                 ->options(Arr::pluck($field->options, 'label', 'value'))
                 ->bulkToggleable($field->bulk_toggleable),
+            RadioFieldData::class => Radio::make($field->state_name)
+                ->options(Arr::pluck($field->options, 'label', 'value'))
+                ->inline($field->inline)
+                ->descriptions(Arr::pluck($field->descriptions, 'description', 'value')),
             TextareaFieldData::class => $this->makeTextAreaComponent($field),
             TextFieldData::class => $this->makeTextInputComponent($field),
             ToggleFieldData::class => Toggle::make($field->state_name),
@@ -154,6 +160,10 @@ class SchemaFormBuilder extends Component
                 ->maxFiles($fileFieldData->max_files)
                 ->panelLayout('grid')
                 ->imagePreviewHeight('256');
+        }
+
+        if ($fileFieldData->can_download) {
+            $fileUpload->enableDownload($fileFieldData->can_download);
         }
 
         if ($fileFieldData->reorder) {

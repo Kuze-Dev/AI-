@@ -10,12 +10,14 @@ use Domain\Auth\Contracts\HasActiveState as HasActiveStateContract;
 use Domain\Auth\Contracts\TwoFactorAuthenticatable as TwoFactorAuthenticatableContract;
 use Domain\Auth\HasActiveState;
 use Domain\Auth\TwoFactorAuthenticatable;
+use Domain\Site\Models\Site;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -137,6 +139,20 @@ class Admin extends Authenticatable implements MustVerifyEmail, HasName, TwoFact
         return Attribute::get(
             fn ($value) => "{$this->first_name} {$this->last_name}"
         );
+    }
+
+    /** @return Attribute<string, never> */
+    protected function siteLabel(): Attribute
+    {
+        return Attribute::get(
+            fn ($value) => "{$this->first_name} {$this->last_name} | {$this->email}"
+        );
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Site\Models\Site> */
+    public function userSite(): BelongsToMany
+    {
+        return $this->belongsToMany(Site::class);
     }
 
     public function getFilamentName(): string

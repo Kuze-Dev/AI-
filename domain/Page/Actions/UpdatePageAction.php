@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Domain\Page\Actions;
 
 use Domain\Page\DataTransferObjects\PageData;
+use Illuminate\Support\Arr;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\BlockContent;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\MetaData\Actions\UpdateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
-use Illuminate\Support\Arr;
+use Domain\Internationalization\Models\Locale;
 
 class UpdatePageAction
 {
@@ -31,6 +32,7 @@ class UpdatePageAction
             'name' => $pageData->name,
             'visibility' => $pageData->visibility,
             'published_at' => $pageData->published_at,
+            'locale' => $pageData->locale ?? Locale::where('is_default', true)->first()?->code,
         ]);
 
         $page->metaData()->exists()
@@ -51,6 +53,9 @@ class UpdatePageAction
         BlockContent::setNewOrder($blockContentIds);
 
         $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url_data);
+
+        $page->sites()
+            ->sync($pageData->sites);
 
         return $page;
     }
