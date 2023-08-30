@@ -22,7 +22,7 @@ class VerifyProofOfPaymentAction
 
         $model->update([
             'remarks' => $verifyProofOfPaymentData->remarks,
-            'message' => $verifyProofOfPaymentData->message,
+            'admin_message' => $verifyProofOfPaymentData->message,
         ]);
 
         $this->syncMediaCollectionAction->execute(
