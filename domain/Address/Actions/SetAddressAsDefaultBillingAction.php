@@ -14,8 +14,8 @@ class SetAddressAsDefaultBillingAction
             'is_default_billing' => true,
         ]);
 
-        Address::whereKeyNot($address)
-            ->whereBelongsTo($address->customer)
+        Address::where('customer_id', $address->customer?->getKey())
+            ->whereKeyNot($address)
             ->update([
                 'is_default_billing' => false,
             ]);

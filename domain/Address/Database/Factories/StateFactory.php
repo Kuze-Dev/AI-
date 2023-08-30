@@ -18,7 +18,6 @@ class StateFactory extends Factory
     {
         return [
             'country_id' => CountryFactory::new(),
-            'code' => $this->faker->name(),
             'name' => $this->faker->name(),
         ];
     }
