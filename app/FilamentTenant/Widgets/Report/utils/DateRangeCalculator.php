@@ -30,7 +30,7 @@ class DateRangeCalculator
         ];
     }
 
-    public static function pieDateRange(Builder $query, string $activeFilter): Builder
+    public static function pieDateRange(Builder $query, string|null $activeFilter): Builder
     {
         if ($activeFilter === 'thisYear') {
             return $query->whereBetween('created_at', [now()->startOfYear(), now()]);

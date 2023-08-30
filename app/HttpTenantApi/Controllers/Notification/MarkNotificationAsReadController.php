@@ -36,6 +36,7 @@ class MarkNotificationAsReadController
     public function markAllAsRead(): JsonResponse
     {
         app(MarkAsReadNotificationAction::class)
+            /** @phpstan-ignore-next-line  */
             ->markAllAsRead(Auth::user());
 
         return response()

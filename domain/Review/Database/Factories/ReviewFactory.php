@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Review\Database\Factories;
 
+use Domain\Order\Database\Factories\OrderFactory;
 use Domain\Review\Models\Review;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -16,34 +17,18 @@ class ReviewFactory extends Factory
 
     public function definition(): array
     {
+        $order = OrderFactory::new()->create();
+        $orderId = isset($order->id) && $order->id;
+        $orderLineId = isset($order->orderLines) && $order->orderLines->first()->id;
+
         return [
             'customer_id' => 1,
             'product_id' => 1,
-            'order_id' => 1,
-            'order_line_id' => 1,
+            'order_id' => $orderId,
+            'order_line_id' => $orderLineId,
             'rating' => $this->faker->numberBetween(1, 5),
-            'comment' => $this->faker->numberBetween(1, 5),
+            'comment' => $this->faker->name(),
             'is_anonymous' => true,
         ];
-    }
-
-    public function setCustomerId(int $id): self
-    {
-        return $this->state(['customer_id' => $id]);
-    }
-
-    public function setProductId(int $id): self
-    {
-        return $this->state(['product_id' => $id]);
-    }
-
-    public function setOrderId(int $id): self
-    {
-        return $this->state(['order_id' => $id]);
-    }
-
-    public function setOrderLineId(int $id): self
-    {
-        return $this->state(['order_line_id' => $id]);
     }
 }

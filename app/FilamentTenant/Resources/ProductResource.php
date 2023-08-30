@@ -347,10 +347,12 @@ class ProductResource extends Resource
                         })
                         ->schema([
                             Forms\Components\TextInput::make('name')
+                                ->maxLength(100)
                                 ->required(),
                             Forms\Components\Repeater::make('productOptionValues')
                                 ->schema([
                                     Forms\Components\TextInput::make('name')
+                                        ->maxLength(100)
                                         ->label('')
                                         ->lazy()
                                         ->required(),
