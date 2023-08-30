@@ -6,6 +6,7 @@ namespace Domain\Globals\Actions;
 
 use Domain\Globals\DataTransferObjects\GlobalsData;
 use Domain\Globals\Models\Globals;
+use Illuminate\Support\Facades\Auth;
 
 class UpdateGlobalsAction
 {
@@ -19,6 +20,15 @@ class UpdateGlobalsAction
             'name' => $globalData->name,
             'data' => $globalData->data,
         ]);
+
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+            Auth::user()?->hasRole(config('domain.role.super_admin'))
+        ) {
+
+            $globals->sites()
+                ->sync($globalData->sites);
+
+        }
 
         return $globals;
     }

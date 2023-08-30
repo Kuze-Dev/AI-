@@ -9,6 +9,7 @@ use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Page\Models\Page;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Facades\Auth;
 
 class PagePolicy
 {
@@ -40,6 +41,24 @@ class PagePolicy
 
     public function update(User $user, Page $page): bool
     {
+        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+
+            return true;
+        }
+
+        if ($user->can('site.siteManager')) {
+
+            /** @var \Domain\Admin\Models\Admin */
+            $admin = $user;
+
+            $pageSites = $page->sites->pluck('id')->toArray();
+            $userSites = $admin->userSite->pluck('id')->toArray();
+
+            $intersection = array_intersect($pageSites, $userSites);
+
+            return ((count($intersection) === count($pageSites)) && $this->checkWildcardPermissions($user));
+        }
+
         return $this->checkWildcardPermissions($user);
     }
 

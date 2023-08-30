@@ -64,6 +64,7 @@ class ContentEntryController
                             }
                         }
                     ),
+                    AllowedFilter::exact('sites.id'),
                 ])
                 ->allowedSorts([
                     'order',

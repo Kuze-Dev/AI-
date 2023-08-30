@@ -8,6 +8,7 @@ use App\Features\CMS\CMSBase;
 use App\HttpTenantApi\Resources\MenuResource;
 use Domain\Menu\Models\Menu;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
@@ -25,6 +26,8 @@ class MenuController
                 ->allowedFilters([
                     'name',
                     'slug',
+                    AllowedFilter::exact('locale'),
+                    AllowedFilter::exact('sites.id'),
                 ])
                 ->allowedIncludes([
                     'nodes.children',
