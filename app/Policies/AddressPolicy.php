@@ -25,7 +25,7 @@ class AddressPolicy
             $user instanceof Customer &&
             $address instanceof Address
         ) {
-            return $address->customer->is($user)
+            return $address->customer?->is($user)
                 ? Response::allow()
                 : Response::denyAsNotFound();
         }
