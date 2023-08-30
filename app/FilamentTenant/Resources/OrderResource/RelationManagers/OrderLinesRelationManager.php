@@ -19,8 +19,10 @@ class OrderLinesRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'label';
 
+
     public static function table(Table $table): Table
     {
+
         return $table
             ->columns([
                 SpatieMediaLibraryImageColumn::make('image')
@@ -48,18 +50,18 @@ class OrderLinesRelationManager extends RelationManager
                     })
                     ->alignLeft(),
                 Tables\Columns\TextColumn::make('unit_price')
-                    ->formatStateUsing(function (OrderLine $record) {
+                    ->formatStateUsing(function (self $livewire, OrderLine $record) {
                         /** @var \Domain\Order\Models\Order $order */
-                        $order = $record->order;
+                        $order = $livewire->getOwnerRecord();
 
                         return $order->currency_symbol . ' ' . number_format($record->unit_price, 2, '.', '');
                     })
                     ->label(trans('Unit Price')),
                 Tables\Columns\TextColumn::make('quantity')->label(trans('Quantity')),
                 Tables\Columns\TextColumn::make('sub_total')
-                    ->formatStateUsing(function (OrderLine $record) {
+                    ->formatStateUsing(function (self $livewire, OrderLine $record) {
                         /** @var \Domain\Order\Models\Order $order */
-                        $order = $record->order;
+                        $order = $livewire->getOwnerRecord();
 
                         return $order->currency_symbol . ' ' . number_format($record->sub_total, 2, '.', '');
                     })
@@ -77,6 +79,7 @@ class OrderLinesRelationManager extends RelationManager
 
     protected function getTableContentFooter(): ?View
     {
+
         return view('filament.tables.order.order-lines-footer');
     }
 }
