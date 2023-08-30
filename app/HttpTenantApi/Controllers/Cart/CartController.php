@@ -34,7 +34,7 @@ class CartController extends Controller
                         ProductVariant::class => ['product.media'],
                     ]);
                 },
-                'cartLines.media'
+                'cartLines.media',
             ])
                 ->whereBelongsTo($customer)
         )->allowedIncludes(['cartLines.media'])
@@ -63,7 +63,7 @@ class CartController extends Controller
         $result = app(DestroyCartAction::class)
             ->execute($cart);
 
-        if (!$result) {
+        if ( ! $result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);
