@@ -152,10 +152,6 @@ class ContentEntryResource extends Resource
                                     ->pluck('name', 'id')
                                     ->toArray();
                             })
-                            //     fn ($livewire) => $livewire->ownerRecord->sites
-                            //         ->pluck('name', 'id')
-                            //         ->toArray()
-                            // )
                             ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?ContentEntry $record): void {
                                 if ( ! $record) {
                                     $component->state([]);
@@ -242,6 +238,8 @@ class ContentEntryResource extends Resource
                 Tables\Columns\TagsColumn::make('taxonomyTerms.name')
                     ->limit()
                     ->searchable(),
+                Tables\Columns\TagsColumn::make('sites.name')
+                    ->toggleable(isToggledHiddenByDefault:true),
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable()
