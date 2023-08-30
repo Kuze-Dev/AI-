@@ -24,6 +24,7 @@ use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
 use Filament\Notifications\Notification;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
+use Illuminate\Support\Str;
 
 class OrderResource extends Resource
 {
@@ -217,12 +218,12 @@ class OrderResource extends Resource
                             ->orderBy('customer_first_name', $direction);
                     })
                     ->formatStateUsing(function ($record) {
-                        return $record->customer_first_name . ' ' . $record->customer_last_name;
+                        return Str::limit($record->customer_first_name . ' ' . $record->customer_last_name, 30);
                     })
                     ->searchable(query: function (Builder $query, string $search) {
                         $query->where('customer_first_name', 'like', "%{$search}%")
                             ->orWhere('customer_last_name', 'like', "%{$search}%");
-                    }),
+                    })->wrap(),
                 Tables\Columns\TextColumn::make('tax_total')
                     ->alignRight()
                     ->label(trans('Tax Total'))
@@ -244,7 +245,7 @@ class OrderResource extends Resource
                         /** @var \Domain\Payments\Models\Payment $payment */
                         $payment = $record->payments->first();
 
-                        return $payment->paymentMethod?->title ?? '';
+                        return Str::limit($payment->paymentMethod?->title, 30) ?? '';
                     }),
                 Tables\Columns\TextColumn::make('shipping_method')
                     ->label(trans('Shipping Method'))
@@ -254,7 +255,7 @@ class OrderResource extends Resource
                             /** @var \Domain\ShippingMethod\Models\ShippingMethod $shippingMethod */
                             $shippingMethod = $record->shippingMethod;
 
-                            return $shippingMethod->title;
+                            return Str::limit($shippingMethod?->title, 30);
                         }
 
                         return '';

@@ -12,6 +12,7 @@ use Filament\Resources\Table;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Str;
 
 class OrderLinesRelationManager extends RelationManager
 {
@@ -33,6 +34,7 @@ class OrderLinesRelationManager extends RelationManager
                     )->square(),
                 Tables\Columns\TextColumn::make('name')
                     ->label(trans('Product Name'))
+                    ->formatStateUsing(fn (string $state) => Str::limit($state, 30))
                     ->description(function (OrderLine $record) {
                         if ($record->purchasable_type == ProductVariant::class) {
                             /** @var \Domain\Product\Models\ProductVariant $productVariant */
@@ -42,7 +44,7 @@ class OrderLinesRelationManager extends RelationManager
                             $optionValues = array_column($combinations, 'option_value');
                             $variantString = implode(' / ', array_map('ucfirst', $optionValues));
 
-                            return $variantString;
+                            return Str::limit($variantString, 30);
                         }
 
                         return '';
