@@ -23,6 +23,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Mailer\Exception\TransportException;
 
 #[
     Resource('orders', apiResource: true, except: 'destroy'),
@@ -57,6 +58,12 @@ class OrderController extends Controller
             $result = app(PlaceOrderAction::class)
                 ->execute(PlaceOrderData::fromArray($validatedData));
 
+            if ($result instanceof TransportException) {
+                return response()->json([
+                    'mail' => 'Something wrong with mailer',
+                ], 404);
+            }
+
             if ($result instanceof USPSServiceNotFoundException) {
                 return response()->json([
                     'service_id' => 'Shipping method service id is required',
@@ -76,7 +83,7 @@ class OrderController extends Controller
             }
 
             /** @phpstan-ignore-next-line */
-            if ( ! $result['order'] instanceof Order) {
+            if (!$result['order'] instanceof Order) {
                 return response()->json([
                     'message' => 'Order failed to be created',
                 ], 400);
