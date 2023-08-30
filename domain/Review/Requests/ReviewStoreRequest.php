@@ -39,9 +39,12 @@ class ReviewStoreRequest extends FormRequest
                     $orderLineId = $this->input('order_line_id');
                     $review = Review::where('order_line_id', $orderLineId);
                     $orderLine = OrderLine::find($orderLineId);
-                    if($orderLine->order->status != OrderStatuses::FULFILLED) {
-                        $fail('You cannot review this item; the product hasn\'t been fulfilled yet.');
+                    if($orderLine && isset($orderLine->order)) {
+                        if($orderLine->order->status != OrderStatuses::FULFILLED) {
+                            $fail('You cannot review this item; the product hasn\'t been fulfilled yet.');
+                        }
                     }
+
                     if($review->exists()) {
                         $fail('You already review this product');
                     }
