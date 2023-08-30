@@ -8,10 +8,10 @@ class CreateReviewData
 {
     public function __construct(
         public readonly int $rating,
-        public readonly string $comment,
         public readonly int $order_line_id,
         public readonly bool $is_anonymous,
-        public readonly array $media,
+        public readonly ?string $comment,
+        public readonly ?array $media,
     ) {
     }
 
@@ -19,9 +19,9 @@ class CreateReviewData
     {
         return new self(
             rating: (int) $data['rating'],
-            comment: $data['comment'],
             order_line_id: (int) $data['order_line_id'],
             is_anonymous: (bool) $data['is_anonymous'],
+            comment: $data['comment'] ?? null,
             media: $data['media'] ?? [],
         );
     }
