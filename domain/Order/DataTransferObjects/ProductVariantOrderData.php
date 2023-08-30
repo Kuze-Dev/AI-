@@ -13,9 +13,9 @@ class ProductVariantOrderData
         public readonly array $combination,
         public readonly float|string $retail_price,
         public readonly float|string $selling_price,
-        public readonly ?int $stock,
         public readonly bool $status,
-        public readonly ProductOrderData $product
+        public readonly ProductOrderData $product,
+        public readonly ?int $stock,
     ) {
     }
 
@@ -34,9 +34,9 @@ class ProductVariantOrderData
             combination: $combinations,
             retail_price: number_format((float) $data['retail_price'], 2, '.', ','),
             selling_price: number_format((float) $data['selling_price'], 2, '.', ','),
-            stock: $data['stock'] ?? null,
             status: $data['status'],
             product: ProductOrderData::fromArray($data['product']),
+            stock: $data['stock'] ?? null,
         );
     }
 
@@ -58,9 +58,9 @@ class ProductVariantOrderData
             combination: $combinations,
             retail_price: number_format((float) $productVariant->retail_price, 2, '.', ','),
             selling_price: number_format((float) $productVariant->selling_price, 2, '.', ','),
-            stock: $productVariant->stock ?? null,
             status: (bool) $productVariant->status,
             product: ProductOrderData::fromProduct($product),
+            stock: $productVariant->stock ?? null,
         );
     }
 }
