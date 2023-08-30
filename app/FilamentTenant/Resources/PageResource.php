@@ -117,6 +117,7 @@ class PageResource extends Resource
                         Forms\Components\Card::make([
                             Forms\Components\CheckboxList::make('sites')
                                 ->reactive()
+                                ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                                 ->rule(fn (?Page $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
                                 ->options(function () {
 

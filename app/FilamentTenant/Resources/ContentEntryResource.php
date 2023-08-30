@@ -136,6 +136,7 @@ class ContentEntryResource extends Resource
                     ]),
                     Forms\Components\Card::make([
                         Forms\Components\CheckboxList::make('sites')
+                            ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                             ->rule(fn (?ContentEntry $record, Closure $get) => new MicrositeContentEntryUniqueRouteUrlRule($record, $get('route_url')))
                             ->options(function ($livewire) {
 

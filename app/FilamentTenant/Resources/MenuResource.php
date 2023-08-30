@@ -91,6 +91,7 @@ class MenuResource extends Resource
                 ]),
                 Forms\Components\Card::make([
                     Forms\Components\CheckboxList::make('sites')
+                        ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                         ->rules([
                             function (?Menu $record, Closure $get) {
 
