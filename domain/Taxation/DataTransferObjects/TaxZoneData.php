@@ -35,7 +35,7 @@ class TaxZoneData
                 ? TaxZoneType::from($data['type'])
                 : $data['type'],
             percentage: $data['percentage'],
-            countries: Arr::wrap($data['countries']) ?? [],
+            countries: $data['countries'] ?? [],
             states: $data['states'] ?? [],
         );
     }
