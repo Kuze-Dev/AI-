@@ -51,7 +51,7 @@ class GetShippingRateAction
             'name' => 'United States', // TODO: handle this properly
             'code' => 'US',
         ])
-            ->first();
+            ->firstorFail();
 
         return $address->state->country->is($countryModel);
     }

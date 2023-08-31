@@ -39,12 +39,12 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
- * @property-read Country|null $country
+ * @property-read Country $country
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Shipment> $shipments
  * @property-read int|null $shipments_count
- * @property-read State|null $state
+ * @property-read State $state
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod query()

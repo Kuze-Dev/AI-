@@ -27,8 +27,6 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 /**
  * Domain\Content\Models\ContentEntry
  *
- * <<<<<<< .merge_file_ckTEN1
- *
  * @property int $id
  * @property int|null $author_id
  * @property int $content_id
@@ -44,7 +42,7 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Admin|null $author
- * @property-read \Domain\Content\Models\Content|null $content
+ * @property-read \Domain\Content\Models\Content $content
  * @property-read \Support\MetaData\Models\MetaData|null $metaData
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Support\RouteUrl\Models\RouteUrl> $routeUrls
  * @property-read int|null $route_urls_count
