@@ -7,6 +7,7 @@ use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Form\Database\Factories\FormFactory;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
+use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Site\Database\Factories\SiteFactory;
 use Support\Captcha\CaptchaProvider;
 use Filament\Facades\Filament;
@@ -20,6 +21,7 @@ beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
+    LocaleFactory::createDefault();
 });
 
 it('can render page', function () {
