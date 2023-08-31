@@ -34,8 +34,8 @@ it('can filter globals', function ($attribute) {
         ->withDummyBlueprint()
         ->count(2)
         ->sequence(
-            ['name' => 'Foo', 'locale' => 'jp'],
-            ['name' => 'Bar', 'locale' => 'de'],
+            ['name' => 'Foo'],
+            ['name' => 'Bar'],
         )
         ->create();
 
@@ -51,7 +51,7 @@ it('can filter globals', function ($attribute) {
                     ->etc();
             });
     }
-})->with(['name', 'slug', 'locale']);
+})->with(['name', 'slug']);
 
 it('can list globals of specific site', function () {
     $site = SiteFactory::new()->createOne();

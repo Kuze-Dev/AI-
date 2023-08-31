@@ -13,7 +13,6 @@ use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Support\MetaData\Database\Factories\MetaDataFactory;
-use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Support\MetaData\Models\MetaData;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
@@ -28,8 +27,6 @@ beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
-
-    LocaleFactory::createDefault();
 });
 
 it('can render content entry', function () {

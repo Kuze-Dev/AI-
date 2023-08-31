@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\PageResource\Pages\EditPage;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
-use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
 use Domain\Page\Enums\Visibility;
@@ -26,7 +25,6 @@ beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
-    LocaleFactory::createDefault();
 });
 
 it('can render page', function () {

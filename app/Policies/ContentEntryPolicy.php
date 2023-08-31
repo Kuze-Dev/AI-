@@ -40,25 +40,6 @@ class ContentEntryPolicy
 
     public function update(User $user, ContentEntry $contentEntry): bool
     {
-
-        /** @var \Domain\Admin\Models\Admin */
-        $admin = $user;
-
-        if ($admin->hasRole(config('domain.role.super_admin'))) {
-
-            return true;
-        }
-
-        if ($admin->can('site.siteManager')) {
-
-            $contentEntrySites = $contentEntry->sites->pluck('id')->toArray();
-            $userSites = $admin->userSite->pluck('id')->toArray();
-
-            $intersection = array_intersect($contentEntrySites, $userSites);
-
-            return ((count($intersection) === count($contentEntrySites)) && $this->checkWildcardPermissions($user));
-        }
-
         return $this->checkWildcardPermissions($user);
     }
 

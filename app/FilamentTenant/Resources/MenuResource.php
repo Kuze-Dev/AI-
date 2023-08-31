@@ -91,7 +91,6 @@ class MenuResource extends Resource
                 ]),
                 Forms\Components\Card::make([
                     Forms\Components\CheckboxList::make('sites')
-                        ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                         ->rules([
                             function (?Menu $record, Closure $get) {
 
@@ -136,7 +135,7 @@ class MenuResource extends Resource
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                     ->default((string) optional(Locale::where('is_default', true)->first())->code)
                     ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->required(),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([

@@ -41,9 +41,9 @@ it('can filter pages', function ($attribute) {
         ->published()
         ->count(2)
         ->sequence(
-            ['name' => 'Foo', 'visibility' => 'authenticated', 'locale' => 'jp'],
-            ['name' => 'Bar', 'visibility' => 'guest', 'locale' => 'fr'],
-            ['name' => 'Example', 'visibility' => 'public', 'locale' => 'de']
+            ['name' => 'Foo', 'visibility' => 'authenticated'],
+            ['name' => 'Bar', 'visibility' => 'guest'],
+            ['name' => 'Example', 'visibility' => 'public']
         )
         ->create();
 
@@ -59,7 +59,7 @@ it('can filter pages', function ($attribute) {
                     ->etc();
             });
     }
-})->with(['name', 'slug', 'visibility', 'locale']);
+})->with(['name', 'slug', 'visibility']);
 
 it('can show a page with includes', function (string $include) {
     $page = PageFactory::new()

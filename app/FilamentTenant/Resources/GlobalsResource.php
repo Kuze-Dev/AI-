@@ -68,11 +68,10 @@ class GlobalsResource extends Resource
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                     ->default((string) optional(Locale::where('is_default', true)->first())->code)
                     ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->required(),
                 Forms\Components\Card::make([
                     Forms\Components\CheckboxList::make('sites')
-                        ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                         ->rules([
                             function (?Globals $record, Closure $get) {
 
@@ -129,9 +128,6 @@ class GlobalsResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
-                Tables\Columns\TextColumn::make('locale')
-                    ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\TagsColumn::make('sites.name')
                     ->toggleable(isToggledHiddenByDefault:true),
                 Tables\Columns\TextColumn::make('updated_at')

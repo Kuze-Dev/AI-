@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\MenuResource\Pages\EditMenu;
-use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Menu\Database\Factories\MenuFactory;
 use Domain\Menu\Database\Factories\NodeFactory;
 use Domain\Site\Database\Factories\SiteFactory;
@@ -20,8 +19,6 @@ beforeEach(function () {
     Filament::setContext('filament-tenant');
     tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
     loginAsSuperAdmin();
-
-    LocaleFactory::createDefault();
 });
 
 it('can render page', function () {

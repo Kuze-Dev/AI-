@@ -142,7 +142,6 @@ class ContentResource extends Resource
 
                     Forms\Components\Card::make([
                         Forms\Components\CheckboxList::make('sites')
-                            ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                             ->rules([
                                 function (?Content $record, Closure $get) {
 
