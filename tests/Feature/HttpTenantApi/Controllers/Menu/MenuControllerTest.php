@@ -42,8 +42,8 @@ it('can filter pages', function ($attribute) {
         )
         ->count(2)
         ->sequence(
-            ['name' => 'Foo'],
-            ['name' => 'Bar'],
+            ['name' => 'Foo', 'locale' => 'de'],
+            ['name' => 'Bar', 'locale' => 'fr'],
         )
         ->create();
 
@@ -59,7 +59,7 @@ it('can filter pages', function ($attribute) {
                     ->etc();
             });
     }
-})->with(['name', 'slug']);
+})->with(['name', 'slug', 'locale']);
 
 it('can show menu', function () {
     $menu = MenuFactory::new()
