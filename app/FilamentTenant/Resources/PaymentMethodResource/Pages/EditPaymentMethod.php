@@ -25,10 +25,12 @@ class EditPaymentMethod extends EditRecord
 
     protected function getActions(): array
     {
+        /** @var PaymentMethod */
+        $record = $this->record;
 
         $drivers = app(GetAvailablePaymentDriverAction::class)->execute();
 
-        if (array_key_exists($this->record->gateway, $drivers)) {
+        if (array_key_exists($record->gateway, $drivers)) {
             return [
                 Action::make('save')
                     ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
@@ -38,7 +40,7 @@ class EditPaymentMethod extends EditRecord
             ];
         }
 
-        $this->notify('warning', 'Payment Gateway ['.$this->record->gateway.'] is currently Disabled please inform your service provider if you wish to Re Enabled this feature');
+        $this->notify('warning', 'Payment Gateway ['.$record->gateway.'] is currently Disabled please inform your service provider if you wish to Re Enabled this feature');
 
         return [];
     }

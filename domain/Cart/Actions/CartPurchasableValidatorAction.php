@@ -118,6 +118,8 @@ class CartPurchasableValidatorAction
                     }
                 }
             } elseif ($cartLine->purchasable instanceof ProductVariant) {
+                $cartLine->purchasable->load('product');
+
                 /** @var \Domain\Product\Models\Product $product */
                 $product = $cartLine->purchasable->product;
 

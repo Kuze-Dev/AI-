@@ -209,6 +209,8 @@ class CartSummaryAction
                 $product = $collection->purchasable;
 
                 if ($collection->purchasable instanceof ProductVariant) {
+                    $collection->purchasable->load('product');
+
                     /** @var \Domain\Product\Models\Product $product */
                     $product = $collection->purchasable->product;
                 }
