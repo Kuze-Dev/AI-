@@ -21,7 +21,7 @@ uses()->group('customer');
 
 beforeEach(function () {
     testInTenantContext();
-    if(! Tier::whereName(config('domain.tier.default'))->first()){
+    if( ! Tier::whereName(config('domain.tier.default'))->first()) {
         TierFactory::createDefault();
     }
 });
