@@ -19,7 +19,6 @@ class OrderLinesRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'label';
 
-
     public static function table(Table $table): Table
     {
 

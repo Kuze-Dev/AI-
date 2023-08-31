@@ -4,14 +4,8 @@ declare(strict_types=1);
 
 use Domain\Review\Database\Factories\ReviewFactory;
 use Domain\Customer\Database\Factories\CustomerFactory;
-use Domain\Order\Database\Factories\OrderFactory;
-use Domain\Order\Enums\OrderStatuses;
-use Domain\Product\Database\Factories\ProductFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Laravel\Sanctum\Sanctum;
 
-use function Pest\Laravel\deleteJson;
-use function Pest\Laravel\getJson;
 use function Pest\Laravel\withHeader;
 
 beforeEach(function () {
@@ -58,4 +52,3 @@ it('can list reviews ratings', function () {
                 ->etc();
         });
 });
-

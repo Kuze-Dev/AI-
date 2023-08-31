@@ -11,7 +11,6 @@ use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\deleteJson;
-use function Pest\Laravel\getJson;
 use function Pest\Laravel\withHeader;
 
 beforeEach(function () {
@@ -49,7 +48,7 @@ it('can store review', function () {
         'rating' => 4,
         'comment' => 'sample comment',
         'order_line_id' => $order->orderLines->first()->id,
-        'is_anonymous' => false
+        'is_anonymous' => false,
 
     ]);
 
@@ -59,7 +58,7 @@ it('can store review', function () {
 
 it('can delete review', function () {
     $review = ReviewFactory::new()
-    ->createOne();
+        ->createOne();
 
     deleteJson('api/reviews/' . $review->product_id)
         ->assertValid();

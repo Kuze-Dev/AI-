@@ -30,7 +30,7 @@ use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
- * @property-read Blueprint|null $blueprint
+ * @property-read Blueprint $blueprint
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Form\Models\FormEmailNotification> $formEmailNotifications
  * @property-read int|null $form_email_notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Form\Models\FormSubmission> $formSubmissions

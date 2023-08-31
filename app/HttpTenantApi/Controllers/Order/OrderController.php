@@ -83,7 +83,7 @@ class OrderController extends Controller
             }
 
             /** @phpstan-ignore-next-line */
-            if (!$result['order'] instanceof Order) {
+            if ( ! $result['order'] instanceof Order) {
                 return response()->json([
                     'message' => 'Order failed to be created',
                 ], 400);
