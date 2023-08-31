@@ -24,11 +24,11 @@ class DiscountController extends Controller
     {
         return DiscountResource::collection(
             QueryBuilder::for(Discount::query()
-                ->whereStatus(DiscountStatus::ACTIVE)
-                ->jsonPaginate())
+                ->whereStatus(DiscountStatus::ACTIVE))
                 ->allowedIncludes([
                     'discountCondition',
                     'discountRequirement'])
+                ->jsonPaginate()
         );
     }
 

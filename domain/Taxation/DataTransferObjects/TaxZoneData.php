@@ -6,7 +6,6 @@ namespace Domain\Taxation\DataTransferObjects;
 
 use Domain\Taxation\Enums\PriceDisplay;
 use Domain\Taxation\Enums\TaxZoneType;
-use Illuminate\Support\Arr;
 
 class TaxZoneData
 {
@@ -35,7 +34,7 @@ class TaxZoneData
                 ? TaxZoneType::from($data['type'])
                 : $data['type'],
             percentage: $data['percentage'],
-            countries: Arr::wrap($data['countries']) ?? [],
+            countries: $data['countries'] ?? [],
             states: $data['states'] ?? [],
         );
     }

@@ -123,7 +123,7 @@ class ContentEntryResource extends Resource
                             ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                             ->default((string) optional(Locale::where('is_default', true)->first())->code)
                             ->searchable()
-                            ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                             ->reactive()
                             ->afterStateUpdated(function (Forms\Components\Select $component, Closure $get) {
                                 $component->getContainer()
@@ -136,12 +136,23 @@ class ContentEntryResource extends Resource
                     ]),
                     Forms\Components\Card::make([
                         Forms\Components\CheckboxList::make('sites')
+                            ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                             ->rule(fn (?ContentEntry $record, Closure $get) => new MicrositeContentEntryUniqueRouteUrlRule($record, $get('route_url')))
-                            ->options(
-                                fn ($livewire) => $livewire->ownerRecord->sites
+                            ->options(function ($livewire) {
+
+                                /** @var \Domain\Admin\Models\Admin */
+                                $user = Auth::user();
+
+                                if ($user->hasRole(config('domain.role.super_admin'))) {
+                                    return $livewire->ownerRecord->sites->pluck('name', 'id')
+                                        ->toArray();
+                                }
+
+                                return $livewire->ownerRecord->sites
+                                    ->whereIN('id', $user->userSite->pluck('id')->toArray())
                                     ->pluck('name', 'id')
-                                    ->toArray()
-                            )
+                                    ->toArray();
+                            })
                             ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?ContentEntry $record): void {
                                 if ( ! $record) {
                                     $component->state([]);
@@ -215,7 +226,7 @@ class ContentEntryResource extends Resource
                     ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable(['first_name', 'last_name'])
                     ->searchable(query: function (Builder $query, string $search): Builder {
@@ -228,6 +239,8 @@ class ContentEntryResource extends Resource
                 Tables\Columns\TagsColumn::make('taxonomyTerms.name')
                     ->limit()
                     ->searchable(),
+                Tables\Columns\TagsColumn::make('sites.name')
+                    ->toggleable(isToggledHiddenByDefault:true),
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable()

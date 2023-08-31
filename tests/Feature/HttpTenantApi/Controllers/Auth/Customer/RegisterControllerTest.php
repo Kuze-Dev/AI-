@@ -7,6 +7,8 @@ use Domain\Address\Models\Address;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
+use Domain\Tier\Database\Factories\TierFactory;
+use Domain\Tier\Models\Tier;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\RequestFactories\CustomerRegistrationRequestFactory;
@@ -19,6 +21,9 @@ uses()->group('customer');
 
 beforeEach(function () {
     testInTenantContext();
+    if( ! Tier::whereName(config('domain.tier.default'))->first()) {
+        TierFactory::createDefault();
+    }
 });
 
 it('register', function () {

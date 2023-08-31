@@ -26,6 +26,7 @@ class MenuController
                 ->allowedFilters([
                     'name',
                     'slug',
+                    AllowedFilter::exact('locale'),
                     AllowedFilter::exact('sites.id'),
                 ])
                 ->allowedIncludes([

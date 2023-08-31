@@ -29,7 +29,7 @@ class OrderPlacedListener
         $discount = $event->preparedOrderData->discount;
         Notification::send($customer, new OrderPlacedNotification($order));
 
-        // $customer->notify(new OrderPlacedMail($order, $shippingAddress, $shippingMethod));
+        $customer->notify(new OrderPlacedMail($order, $shippingAddress, $shippingMethod));
 
         // minus the discount
         if ( ! is_null($discount)) {
