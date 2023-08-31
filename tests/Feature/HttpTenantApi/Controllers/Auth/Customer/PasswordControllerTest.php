@@ -68,7 +68,7 @@ it('can reset password', function () {
     assertNotSame('old-remember_token', $customer->getRememberToken());
 
     Event::assertDispatched(PasswordReset::class);
-})->only();
+});
 
 it('can not update password', function () {
     $customer = CustomerFactory::new()
