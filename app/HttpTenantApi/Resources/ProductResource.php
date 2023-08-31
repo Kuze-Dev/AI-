@@ -23,7 +23,7 @@ class ProductResource extends JsonApiResource
             'retail_price' => number_format((float) $this->retail_price, 2, '.', ','),
             'selling_price' => number_format((float) $this->selling_price, 2, '.', ','),
             'stock' => $this->stock,
-            'status' => $this->status, // TODO: use enum, to clarify what is available as valid
+            'status' => $this->status,
             'is_digital_product' => $this->is_digital_product,
             'is_featured' => $this->is_featured,
             'is_favorite' => $this->isFavorite(), // TODO: do not make resource as getter
