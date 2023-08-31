@@ -204,7 +204,7 @@ class ProductResource extends Resource
                         ->schema([
                             Forms\Components\Toggle::make('status')
                                 ->label(
-                                    fn ($state) => $state ? ucFirst(trans(Status::ACTIVE->value)) : ucFirst(trans(Status::INACTIVE->value))
+                                    fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value))
                                 )
                                 ->helperText('This product will be hidden from all sales channels.'),
                         ]),
