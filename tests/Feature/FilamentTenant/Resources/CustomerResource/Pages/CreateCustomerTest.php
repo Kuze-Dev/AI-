@@ -6,6 +6,7 @@ use App\FilamentTenant\Resources\CustomerResource\Pages\CreateCustomer;
 use Domain\Address\Database\Factories\StateFactory;
 use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
+use Domain\Tier\Database\Factories\TierFactory;
 use Domain\Tier\Models\Tier;
 use Filament\Facades\Filament;
 
@@ -20,6 +21,9 @@ uses()->group('customer');
 beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
+    if( ! Tier::whereName(config('domain.tier.default'))->first()) {
+        TierFactory::createDefault();
+    }
     loginAsSuperAdmin();
 });
 
