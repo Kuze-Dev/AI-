@@ -38,8 +38,21 @@ class CreateBlueprintDataAction
 
     public function execute(BlockContent $blockContent): BlueprintData
     {
+
+        $sections = $blockContent->block->blueprint->schema->sections;
+        $stateNames = $this->extractStateNames($sections);
+        $originalArray = $blockContent->data;
+
+        $rearrangedArray = [];
+
+        foreach ($originalArray as $key => $innerArray) {
+            if (is_array($innerArray)) {
+                $rearrangedArray[$key] = $this->rearrangeInnerArray($innerArray, $stateNames);
+            }
+        }
+
         $blueprintfieldtype = $blockContent->block->blueprint->schema;
-        $statePaths = $this->extractDataAction->extractStatePath($blockContent->data);
+        $statePaths = $this->extractDataAction->extractStatePath($rearrangedArray);
         $fieldTypes = $this->extractDataAction->extractFieldType($blueprintfieldtype);
 
         foreach (array_combine($statePaths, $fieldTypes) as $statePath => $fieldType) {
@@ -47,5 +60,31 @@ class CreateBlueprintDataAction
         }
 
         return new BlueprintData();
+    }
+
+    // Function to extract state names from sections and fields
+    private function extractStateNames(array $sections)
+    {
+        $stateNames = [];
+        foreach ($sections as $section) {
+            foreach ($section->fields as $field) {
+                $stateNames[] = $field->state_name;
+            }
+        }
+
+        return $stateNames;
+    }
+
+    // Function to rearrange the inner array based on state names
+    private function rearrangeInnerArray(array $innerArray, array $stateNames)
+    {
+        $rearrangedInnerArray = [];
+        foreach ($stateNames as $stateName) {
+            if (array_key_exists($stateName, $innerArray)) {
+                $rearrangedInnerArray[$stateName] = $innerArray[$stateName];
+            }
+        }
+
+        return $rearrangedInnerArray;
     }
 }

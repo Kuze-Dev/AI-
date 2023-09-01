@@ -541,7 +541,7 @@ class BlueprintResource extends Resource
                     ])
                     ->columnSpanFull(),
 
-            ], 
+            ],
             FieldType::RADIO => [
                 Forms\Components\Toggle::make('inline')
                     ->columnSpanFull(),

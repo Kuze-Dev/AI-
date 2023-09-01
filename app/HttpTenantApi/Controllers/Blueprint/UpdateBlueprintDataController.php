@@ -28,18 +28,18 @@ class UpdateBlueprintDataController
     public function __invoke(): JsonResponse
     {
         $blockContents = BlockContent::all();
-        foreach($blockContents as $blockContent){
+        foreach($blockContents as $blockContent) {
             $blockContent->load('block.blueprint');
             $blueprintData = BlueprintData::where('model_id', $blockContent->id)->first();
-            if(!$blueprintData){
+            if( ! $blueprintData) {
                 $this->createBlueprintDataAction->execute($blockContent);
             }
         }
 
         return response()
-        ->json([
-            'message' => 'Blueprint_data table has been updated!',
-        ]);
+            ->json([
+                'message' => 'Blueprint_data table has been updated!',
+            ]);
 
     }
 }
