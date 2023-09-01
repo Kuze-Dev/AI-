@@ -44,7 +44,7 @@ final class DiscountData
                 amount: (int) ($data['discountCondition']['amount'] ?? 0)
             ),
             discountRequirementData: new DiscountRequirementData(
-                discount_requirement_type: null,
+                discount_requirement_type: ! empty($data['discountRequirement']['minimum_amount']) ? DiscountRequirementType::MINIMUM_ORDER_AMOUNT : null,
                 // discount_requirement_type: isset($data['discountRequirement']['requirement_type'])
                 //     ? DiscountRequirementType::tryFrom($data['discountRequirement']['requirement_type'])
                 //     : null,
