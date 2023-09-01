@@ -132,7 +132,7 @@ class CartPurchasableValidatorAction
                 ) {
                     $count++;
                 } else {
-                    if ($product->stock >= $cartLine->quantity) {
+                    if ($cartLine->purchasable->stock >= $cartLine->quantity) {
                         $count++;
                     }
                 }
