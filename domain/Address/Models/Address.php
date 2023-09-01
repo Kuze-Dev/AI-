@@ -75,8 +75,8 @@ class Address extends Model
             fn ($value): string => Arr::join(
                 array_filter([
                     $this->address_line_1,
-                    $this->state?->country?->name,
-                    $this->state?->name,
+                    $this->state->country->name,
+                    $this->state->name,
                     $this->zip_code,
                     $this->city,
                 ]),

@@ -66,7 +66,7 @@ it('can create discount', function () {
 
     assertDatabaseHas(DiscountRequirement::class, [
         'discount_id' => Discount::first()->getKey(),
-        'requirement_type' => null,
+        'requirement_type' => 'minimum_order_amount',
         'minimum_amount' => 1000,
     ]);
 

@@ -245,7 +245,7 @@ class OrderResource extends Resource
                         /** @var \Domain\Payments\Models\Payment $payment */
                         $payment = $record->payments->first();
 
-                        return Str::limit($payment->paymentMethod?->title, 30) ?? '';
+                        return Str::limit($payment->paymentMethod?->title, 30);
                     }),
                 Tables\Columns\TextColumn::make('shipping_method')
                     ->label(trans('Shipping Method'))

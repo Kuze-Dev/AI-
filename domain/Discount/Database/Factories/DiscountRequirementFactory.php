@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Discount\Database\Factories;
 
+use Domain\Discount\Enums\DiscountRequirementType;
 use Domain\Discount\Models\DiscountRequirement;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -17,7 +18,7 @@ class DiscountRequirementFactory extends Factory
     public function definition(): array
     {
         return [
-            'requirement_type' => null,
+            'requirement_type' => DiscountRequirementType::MINIMUM_ORDER_AMOUNT,
             'minimum_amount' => fake()->numberBetween(100, 1000),
         ];
     }
