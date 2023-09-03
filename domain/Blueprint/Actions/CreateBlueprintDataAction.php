@@ -41,13 +41,13 @@ class CreateBlueprintDataAction
 
         $sections = $blockContent->block->blueprint->schema->sections;
         $stateNames = $this->extractStateNames($sections);
-        $originalArray = $blockContent->data;
+        $blockContentArray = $blockContent->data;
 
         $rearrangedArray = [];
 
-        foreach ($originalArray as $key => $innerArray) {
-            if (is_array($innerArray)) {
-                $rearrangedArray[$key] = $this->rearrangeInnerArray($innerArray, $stateNames);
+        foreach ($blockContentArray as $key => $blockContentinnerArray) {
+            if (is_array($blockContentinnerArray)) {
+                $rearrangedArray[$key] = $this->rearrangeBlockContentInnerArray($blockContentinnerArray, $stateNames);
             }
         }
 
@@ -76,15 +76,15 @@ class CreateBlueprintDataAction
     }
 
     // Function to rearrange the inner array based on state names
-    private function rearrangeInnerArray(array $innerArray, array $stateNames)
+    private function rearrangeBlockContentInnerArray(array $innerArray, array $stateNames)
     {
-        $rearrangedInnerArray = [];
+        $rearrangedBlockContentInnerArray = [];
         foreach ($stateNames as $stateName) {
             if (array_key_exists($stateName, $innerArray)) {
-                $rearrangedInnerArray[$stateName] = $innerArray[$stateName];
+                $rearrangedBlockContentInnerArray[$stateName] = $innerArray[$stateName];
             }
         }
 
-        return $rearrangedInnerArray;
+        return $rearrangedBlockContentInnerArray;
     }
 }
