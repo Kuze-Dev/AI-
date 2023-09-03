@@ -138,10 +138,13 @@ class FeatureSelector extends Field
                             );
                         }
 
+                        /** @var array */
+                        $checkboxExtras = is_array($get($statePath . '_extras')) ? $get($statePath . '_extras') : ($get($statePath . '_extras') ? [$get($statePath . '_extras')] : []);
+
                         return array_merge(
                             $state,
                             $get($statePath)
-                                ? [$key, ...(is_array($get($statePath . '_extras')) ? $get($statePath . '_extras') : ($get($statePath . '_extras') !== false ? [$get($statePath . '_extras')] : $get($statePath . '_extras')))]
+                                ? [$key, ...$checkboxExtras]
                                 : []
                         );
                     },
