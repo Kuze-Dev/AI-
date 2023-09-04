@@ -43,6 +43,22 @@ class RouteUrlFieldset extends Group
                     });
                 },
             ],
+            'route_url::input' => [
+                function (self $component): void {
+                    $component->evaluate(function (HasRouteUrl|string $model, Closure $get, Closure $set) {
+                        if ((bool) $get('is_override')) {
+                            return;
+                        }
+                        $locale = $get('locale');
+                        $defaultLocale = Locale::where('is_default', true)->first()?->code;
+
+                        $inputUrl = $get('route_url.url');
+                        $inputUrl = stripos($inputUrl[0], '/', ) !== false ? $inputUrl : '/' . $inputUrl; //checks if input has slash at first character
+                        $newUrl = $locale !== $defaultLocale ? "/$locale$inputUrl" : $inputUrl;
+
+                        $set('route_url.url', $newUrl);
+                    });
+                }],
         ]);
 
         $this->columns('grid-cols-[10rem,1fr] items-center');
@@ -63,10 +79,11 @@ class RouteUrlFieldset extends Group
                 ->maxLength(255)
                 ->startsWith('/')
                 ->rule(
-                    fn (?HasRouteUrl $record, Closure $get) => tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class) ?
-                    new UniqueActiveRouteUrlRule($record) : null
+                    fn (?HasRouteUrl $record, Closure $get) => tenancy()->tenant?->features()->inactive(SitesManagement::class) ?
+                        new UniqueActiveRouteUrlRule($record) : null
                     // new MicroSiteUniqueRouteUrlRule($record, $get('sites'))
-                ),
+                )
+                ->afterStateUpdated(fn () => $this->dispatchEvent('route_url::input')),
         ]);
 
         $this->generateModelForRouteUrlUsing(function (HasRouteUrl|string $model) {
