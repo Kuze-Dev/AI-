@@ -37,7 +37,7 @@ class OrderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
-    protected static ?string $recordTitleAttribute = "reference";
+    protected static ?string $recordTitleAttribute = 'reference';
 
     protected static function getNavigationBadge(): ?string
     {
@@ -612,7 +612,7 @@ class OrderResource extends Resource
                             $updateData = ['status' => $status];
 
                             if ($status == OrderStatuses::CANCELLED->value) {
-                                if (!in_array($record->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])) {
+                                if ( ! in_array($record->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])) {
                                     Notification::make()
                                         ->title(trans("You can't cancel this order."))
                                         ->warning()
@@ -697,7 +697,7 @@ class OrderResource extends Resource
                     ->size('sm')
                     ->action(function () use ($order, $set) {
 
-                        $isPaid = !$order->is_paid;
+                        $isPaid = ! $order->is_paid;
 
                         $result = $order->update([
                             'is_paid' => $isPaid,
@@ -746,7 +746,7 @@ class OrderResource extends Resource
                 /** @var \Domain\Payments\Models\Payment $payment */
                 $payment = $order->payments->first();
 
-                if (!is_null($payment->remarks)) {
+                if ( ! is_null($payment->remarks)) {
                     return $footerActions->modalActions([])->disableForm();
                 }
 
@@ -783,7 +783,7 @@ class OrderResource extends Resource
                 /** @var \Domain\Payments\Models\Payment $payment */
                 $payment = $order->payments->first();
 
-                if (!is_null($payment->remarks)) {
+                if ( ! is_null($payment->remarks)) {
                     Notification::make()
                         ->title(trans('Invalid action.'))
                         ->warning()

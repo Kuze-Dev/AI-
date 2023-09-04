@@ -25,8 +25,6 @@ use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Builder;
-use App\FilamentTenant\Support\Contracts\HasProductOptions;
-use App\FilamentTenant\Support\Contracts\HasProductVariants;
 use Domain\Product\Actions\DeleteProductAction;
 use Domain\Product\Enums\Status;
 use Domain\Product\Enums\Taxonomy as EnumsTaxonomy;
@@ -122,7 +120,7 @@ class ProductResource extends Resource
                                         ->rules([
                                             new MinimumValueRule(1),
                                         ])
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['length'] ?? 0))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['length'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state),
 
                                     Forms\Components\TextInput::make('width')
@@ -132,7 +130,7 @@ class ProductResource extends Resource
                                         ->rules([
                                             new MinimumValueRule(1),
                                         ])
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['width'] ?? 0))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['width'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state),
 
                                     Forms\Components\TextInput::make('height')
@@ -142,7 +140,7 @@ class ProductResource extends Resource
                                         ->rules([
                                             new MinimumValueRule(1),
                                         ])
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['height'] ?? 0))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['height'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state),
                                 ])->columns(3),
                         ]),
@@ -174,7 +172,7 @@ class ProductResource extends Resource
                                 ->numeric()
                                 ->minValue(0)
                                 ->dehydrateStateUsing(fn ($state) => (int) $state)
-                                ->hidden(fn (Closure $get) => !$get('allow_stocks'))
+                                ->hidden(fn (Closure $get) => ! $get('allow_stocks'))
                                 ->required(fn (Closure $get) => $get('allow_stocks')),
                         ])->columns(2),
                     Forms\Components\Section::make('Pricing')
@@ -264,7 +262,7 @@ class ProductResource extends Resource
                                     Forms\Components\Hidden::make('taxonomy_terms')
                                         ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                                 ])
-                                ->when(fn () => !empty($taxonomies->toArray())),
+                                ->when(fn () => ! empty($taxonomies->toArray())),
                         ]),
                     MetaDataForm::make('Meta Data'),
                 ])->columnSpan(1),
@@ -381,7 +379,7 @@ class ProductResource extends Resource
                     Forms\Components\Repeater::make('options')
                         ->translateLabel()
                         ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, EditProduct $livewire) {
-                            if (!$record) {
+                            if ( ! $record) {
                                 return $state;
                             }
 
@@ -430,7 +428,7 @@ class ProductResource extends Resource
                 ->itemLabel(fn (array $state) => $state['name'] ?? null)
                 ->formatStateUsing(
                     function (?Product $record) {
-                        if (!$record) {
+                        if ( ! $record) {
                             return [];
                         }
 
@@ -452,9 +450,9 @@ class ProductResource extends Resource
                                     foreach ($state['combination'] as $key => $combination) {
                                         $schemaArray[$key] =
                                             Forms\Components\TextInput::make("combination[{$key}].option_value")
-                                            ->formatStateUsing(fn () => ucfirst($combination['option_value']))
-                                            ->label(trans(ucfirst($combination['option'])))
-                                            ->disabled();
+                                                ->formatStateUsing(fn () => ucfirst($combination['option_value']))
+                                                ->label(trans(ucfirst($combination['option'])))
+                                                ->disabled();
                                     }
 
                                     return $schemaArray;
