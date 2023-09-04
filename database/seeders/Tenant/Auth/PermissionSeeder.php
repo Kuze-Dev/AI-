@@ -63,7 +63,7 @@ class PermissionSeeder extends BasePermissionSeeder
                     ],
                     hasSoftDeletes: true
                 ),
-                ...$this->generateFilamentResourcePermissions('addresses', ),
+                ...$this->generateFilamentResourcePermissions('addresses',),
                 ...$this->generateFilamentResourcePermissions('paymentMethod', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('shippingMethod', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions(
@@ -76,6 +76,7 @@ class PermissionSeeder extends BasePermissionSeeder
                         'siteManager',
                     ]
                 ),
+                ...$this->generateFilamentResourcePermissions('order', only: ['viewAny', 'update']),
             ],
         ];
     }
