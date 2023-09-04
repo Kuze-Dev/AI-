@@ -72,7 +72,7 @@ class UpdateOrderRequest extends FormRequest
                 'nullable',
                 'string',
                 'min:1',
-                'max:500',
+                'max:255',
             ],
             'proof_of_payment' => 'nullable|string',
         ];
