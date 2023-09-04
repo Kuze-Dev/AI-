@@ -52,7 +52,7 @@ class UpdatePageAction
 
         BlockContent::setNewOrder($blockContentIds);
 
-        $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url_data, $pageData->locale ?? Locale::where('is_default', true)->first()?->code);
+        $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url_data);
 
         $page->sites()
             ->sync($pageData->sites);
