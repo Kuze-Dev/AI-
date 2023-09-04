@@ -16,13 +16,13 @@ final class DiscountData
     public function __construct(
         public readonly string $name,
         public readonly string $slug,
-        public readonly ?string $description = null,
         public readonly string $code,
         public readonly DiscountStatus $status,
-        public readonly ?int $max_uses = null,
         public readonly Carbon $valid_start_at,
-        public readonly ?Carbon $valid_end_at = null,
         public readonly DiscountConditionData $discountConditionData,
+        public readonly ?int $max_uses = null,
+        public readonly ?Carbon $valid_end_at = null,
+        public readonly ?string $description = null,
         public readonly ?DiscountRequirementData $discountRequirementData = null,
     ) {
     }

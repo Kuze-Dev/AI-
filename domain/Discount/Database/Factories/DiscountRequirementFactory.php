@@ -18,7 +18,7 @@ class DiscountRequirementFactory extends Factory
     public function definition(): array
     {
         return [
-            'requirement_type' => DiscountRequirementType::MINIMUM_ORDER_AMOUNT,
+            'requirement_type' => DiscountRequirementType::MINIMUM_ORDER_AMOUNT->value,
             'minimum_amount' => fake()->numberBetween(100, 1000),
         ];
     }

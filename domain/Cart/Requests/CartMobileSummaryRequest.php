@@ -25,6 +25,10 @@ class CartMobileSummaryRequest extends FormRequest
 
     public function rules(): array
     {
+
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = auth()->user();
+
         return [
             'reference' => [
                 'required',
@@ -59,8 +63,7 @@ class CartMobileSummaryRequest extends FormRequest
             'billing_address_id' => [
                 'nullable',
                 Rule::exists(Address::class, (new Address())->getRouteKeyName())
-                    /** @phpstan-ignore-next-line */
-                    ->where('customer_id', auth()->user()->id),
+                    ->where('customer_id', $customer->id),
             ],
             'shipping_method_id' => [
                 'nullable',
@@ -69,8 +72,7 @@ class CartMobileSummaryRequest extends FormRequest
             'shipping_address_id' => [
                 'nullable',
                 Rule::exists(Address::class, (new Address())->getRouteKeyName())
-                    /** @phpstan-ignore-next-line */
-                    ->where('customer_id', auth()->user()->id),
+                    ->where('customer_id', $customer->id),
             ],
             'service_id' => [
                 'nullable',
