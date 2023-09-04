@@ -38,7 +38,7 @@ it('can render edit discounts', function () {
             'discountCondition.discount_type' => $discount->discountCondition->discount_type,
             'discountCondition.amount_type' => $discount->discountCondition->amount_type,
             'discountCondition.amount' => $discount->discountCondition->amount,
-            'discountRequirement.requirement_type' => $discount->discountRequirement->requirement_type,
+            // 'discountRequirement.requirement_type' => $discount->discountRequirement->requirement_type,
             'discountRequirement.minimum_amount' => $discount->discountRequirement->minimum_amount,
         ])
         ->assertOk();

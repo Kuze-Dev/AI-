@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use App\FilamentTenant\Resources\DiscountResource\Pages\CreateDiscount;
 use App\FilamentTenant\Resources\DiscountResource\Pages\EditDiscount;
@@ -300,7 +301,7 @@ class DiscountResource extends Resource
     public static function getRelations(): array
     {
         return [
-
+            ActivitiesRelationManager::class,
         ];
     }
 

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\DiscountResource\Pages\CreateDiscount;
+use Domain\Discount\Enums\DiscountRequirementType;
 use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
 use Domain\Discount\Models\DiscountCondition;
@@ -39,7 +40,7 @@ it('can create discount', function () {
             'discountCondition.discount_type' => 'order_sub_total',
             'discountCondition.amount_type' => 'percentage',
             'discountCondition.amount' => 50,
-            'discountRequirement.requirement_type' => null,
+            'discountRequirement.requirement_type' => DiscountRequirementType::MINIMUM_ORDER_AMOUNT,
             'discountRequirement.minimum_amount' => 1000,
         ])
         ->call('create')
