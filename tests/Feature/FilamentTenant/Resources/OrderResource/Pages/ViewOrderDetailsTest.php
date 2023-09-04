@@ -33,7 +33,6 @@ it('can render view order details page', function () {
     $order = OrderFactory::new()->createOne();
 
     $orderDate = Carbon::parse($order->created_at)
-        /** @phpstan-ignore-next-line */
         ->setTimezone(Auth::user()?->timezone)
         ->translatedFormat('F d, Y g:i A');
 
