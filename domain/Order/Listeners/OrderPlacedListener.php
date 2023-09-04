@@ -39,7 +39,6 @@ class OrderPlacedListener
 
         app(EarnPointAction::class)->execute($customer, $order);
 
-
         foreach ($order->orderLines as $orderLine) {
             app(UpdateProductStockAction::class)->execute($orderLine->purchasable_type, $orderLine->purchasable_id, $orderLine->quantity, false);
         }
