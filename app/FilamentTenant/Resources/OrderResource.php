@@ -506,7 +506,9 @@ class OrderResource extends Resource
 
                                 return  $record->currency_symbol . ' ' . '0.00';
                             }),
-                    ]),
+                    ])->hidden(function (Order $record) {
+                        return (bool) ($record->discount_total == 0);
+                    }),
                 Forms\Components\Grid::make(2)
                     ->schema([
                         Support\TextLabel::make('')
