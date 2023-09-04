@@ -43,6 +43,13 @@ class OrderResource extends Resource
         return strval(static::$model::whereIn('status', [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])->count());
     }
 
+    /** @return Builder<\Domain\Order\Models\Order> */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['payments.paymentMethod', 'shippingMethod']);
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -176,8 +183,6 @@ class OrderResource extends Resource
                                         Forms\Components\Placeholder::make('payment_method')
                                             ->label(trans('Payment Method'))
                                             ->content(function (Order $record): string {
-                                                $record->load('payments.paymentMethod');
-
                                                 /** @var \Domain\Payments\Models\Payment $payment */
                                                 $payment = $record->payments->first();
 
@@ -187,8 +192,6 @@ class OrderResource extends Resource
                                             ->label(trans('Shipping Method'))
                                             ->content(function (Order $record): string {
                                                 if ($record->shipping_method_id) {
-                                                    $record->load('shippingMethod');
-
                                                     /** @var \Domain\ShippingMethod\Models\ShippingMethod $shippingMethod */
                                                     $shippingMethod = $record->shippingMethod;
 
@@ -607,7 +610,7 @@ class OrderResource extends Resource
                             $updateData = ['status' => $status];
 
                             if ($status == OrderStatuses::CANCELLED->value) {
-                                if ( ! in_array($record->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])) {
+                                if (!in_array($record->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])) {
                                     Notification::make()
                                         ->title(trans("You can't cancel this order."))
                                         ->warning()
@@ -618,7 +621,7 @@ class OrderResource extends Resource
 
                                 $updateData['cancelled_at'] = now();
 
-                                $order = $record->load('payments');
+                                $order = $record;
 
                                 /** @var \Domain\Payments\Models\Payment $payment */
                                 $payment = $order->payments->first();
@@ -672,7 +675,7 @@ class OrderResource extends Resource
         return Support\ButtonAction::make(trans('mark_as_paid'))
             ->disableLabel()
             ->execute(function (Order $record, Closure $set) {
-                $order = $record->load('payments');
+                $order = $record;
 
                 return Forms\Components\Actions\Action::make('mark_as_paid')
                     ->color(function () use ($order) {
@@ -692,7 +695,7 @@ class OrderResource extends Resource
                     ->size('sm')
                     ->action(function () use ($order, $set) {
 
-                        $isPaid = ! $order->is_paid;
+                        $isPaid = !$order->is_paid;
 
                         $result = $order->update([
                             'is_paid' => $isPaid,
@@ -701,6 +704,7 @@ class OrderResource extends Resource
                         if ($result) {
                             /** @var \Domain\Payments\Models\Payment $payment */
                             $payment = $order->payments->first();
+
                             if ($order->is_paid) {
                                 $payment->update([
                                     'status' => 'paid',
@@ -735,12 +739,12 @@ class OrderResource extends Resource
             ->execute(function (Order $record, Closure $set) {
                 $footerActions = self::showProofOfPaymentActions($record, $set);
 
-                $order = $record->load('payments');
+                $order = $record;
 
                 /** @var \Domain\Payments\Models\Payment $payment */
                 $payment = $order->payments->first();
 
-                if ( ! is_null($payment->remarks)) {
+                if (!is_null($payment->remarks)) {
                     return $footerActions->modalActions([])->disableForm();
                 }
 
@@ -749,7 +753,7 @@ class OrderResource extends Resource
             ->fullWidth()
             ->size('md')
             ->hidden(function (Order $record) {
-                $order = $record->load('payments');
+                $order = $record;
 
                 /** @var \Domain\Payments\Models\Payment $payment */
                 $payment = $order->payments->first();
@@ -764,7 +768,7 @@ class OrderResource extends Resource
 
     private static function showProofOfPaymentActions(Order $record, Closure $set): Forms\Components\Actions\Action
     {
-        $order = $record->load('payments');
+        $order = $record;
 
         return Forms\Components\Actions\Action::make('proof_of_payment')
             ->color('secondary')
@@ -777,7 +781,7 @@ class OrderResource extends Resource
                 /** @var \Domain\Payments\Models\Payment $payment */
                 $payment = $order->payments->first();
 
-                if ( ! is_null($payment->remarks)) {
+                if (!is_null($payment->remarks)) {
                     Notification::make()
                         ->title(trans('Invalid action.'))
                         ->warning()
