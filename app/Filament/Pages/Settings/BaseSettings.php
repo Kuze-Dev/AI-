@@ -10,6 +10,7 @@ use Filament\Pages\SettingsPage;
 use Illuminate\Support\Facades\Route;
 use Closure;
 use Filament\Pages\Actions\Action;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
@@ -27,7 +28,7 @@ abstract class BaseSettings extends SettingsPage
 
     public function mount(): void
     {
-        abort_unless(self::authorizeAccess(), 403);
+        abort_unless(static::authorizeAccess(), 403);
 
         parent::mount();
     }
@@ -49,7 +50,7 @@ abstract class BaseSettings extends SettingsPage
 
     public static function shouldShowSettingsCard(): bool
     {
-        return self::authorizeAccess();
+        return static::authorizeAccess();
     }
 
     protected static function authorizeAccess(): bool
@@ -79,7 +80,7 @@ abstract class BaseSettings extends SettingsPage
         return 'filament.pages.settings.'.self::getSlug();
     }
 
-    protected function getBreadcrumb(): string
+    protected function getBreadcrumb(): Htmlable|string
     {
         return static::$breadcrumb ?? static::getTitle();
     }

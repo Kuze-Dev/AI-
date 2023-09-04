@@ -9,7 +9,6 @@ use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Filament\Facades\Filament;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -42,9 +41,6 @@ it('can edit form', function () {
         ->storeSubmission()
         ->createOne();
 
-    assertDatabaseCount(Form::class, 1);
-    assertDatabaseCount(FormEmailNotification::class, 0);
-
     livewire(EditForm::class, ['record' => $form->getRouteKey()])
         ->fillForm([
             'name' => 'Foo',
@@ -52,9 +48,10 @@ it('can edit form', function () {
             'form_email_notifications' => [
                 [
                     'to' => ['test@user'],
-                    'sender' => 'test@user',
+                    'sender_name' => 'test user',
                     'subject' => 'Foo Subject',
                     'template' => 'Foo Template',
+                    'has_attachments' => false,
                 ],
             ],
         ])
@@ -70,7 +67,7 @@ it('can edit form', function () {
     assertDatabaseHas(FormEmailNotification::class,  [
         'form_id' => $form->id,
         'to' => ['test@user'],
-        'sender' => 'test@user',
+        'sender_name' => 'test user',
         'subject' => 'Foo Subject',
         'template' => 'Foo Template',
     ]);

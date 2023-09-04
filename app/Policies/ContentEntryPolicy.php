@@ -4,72 +4,69 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Features\CMS\CMSBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Content\Models\ContentEntry;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
 
 class ContentEntryPolicy
 {
     use ChecksWildcardPermissions;
 
-    /**
-     * @param User $user
-     *
-     * @return bool
-     */
+    public function before(): ?Response
+    {
+        if ( ! tenancy()->tenant?->features()->active(CMSBase::class)) {
+            return Response::denyAsNotFound();
+        }
+
+        return null;
+    }
+
     public function viewAny(User $user): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    /**
-     * @param User $user
-     * @param ContentEntry $contentEntry
-     *
-     * @return bool
-     */
     public function view(User $user, ContentEntry $contentEntry): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    /**
-     * @param User $user
-     *
-     * @return bool
-     */
     public function create(User $user): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    /**
-     * @param User $user
-     * @param ContentEntry $contentEntry
-     *
-     * @return bool
-     */
     public function update(User $user, ContentEntry $contentEntry): bool
     {
+
+        /** @var \Domain\Admin\Models\Admin */
+        $admin = $user;
+
+        if ($admin->hasRole(config('domain.role.super_admin'))) {
+
+            return true;
+        }
+
+        if ($admin->can('site.siteManager')) {
+
+            $contentEntrySites = $contentEntry->sites->pluck('id')->toArray();
+            $userSites = $admin->userSite->pluck('id')->toArray();
+
+            $intersection = array_intersect($contentEntrySites, $userSites);
+
+            return ((count($intersection) === count($contentEntrySites)) && $this->checkWildcardPermissions($user));
+        }
+
         return $this->checkWildcardPermissions($user);
     }
 
-    /**
-     * @param User $user
-     * @param ContentEntry $contentEntry
-     *
-     * @return bool
-     */
     public function delete(User $user, ContentEntry $contentEntry): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    /**
-     * @param User $user
-     *
-     * @return bool
-     */
     public function deleteAny(User $user): bool
     {
         return $this->checkWildcardPermissions($user);

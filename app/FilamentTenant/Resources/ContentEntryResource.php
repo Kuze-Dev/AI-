@@ -4,32 +4,33 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Resources;
-use App\FilamentTenant\Support\RouteUrlFieldset;
-use App\FilamentTenant\Support\SchemaFormBuilder;
-use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
-use Filament\Tables\Filters\Layout;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Carbon\Carbon;
 use Closure;
-use Domain\Content\Models\ContentEntry;
-use App\FilamentTenant\Support\MetaDataForm;
-use Domain\Content\Models\Builders\ContentEntryBuilder;
-use Domain\Taxonomy\Models\Taxonomy;
-use Domain\Taxonomy\Models\TaxonomyTerm;
-use Filament\Facades\Filament;
-use Filament\Forms\Components\Component;
+use Carbon\Carbon;
+use Filament\Forms;
+use Filament\Tables;
 use Illuminate\Support\Arr;
+use Filament\Resources\Form;
+use Filament\Resources\Table;
+use Filament\Facades\Filament;
+use Filament\Resources\Resource;
+use App\FilamentTenant\Resources;
+use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Validation\Rules\Unique;
+use Domain\Content\Models\ContentEntry;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\Rules\Unique;
+use Domain\Taxonomy\Models\TaxonomyTerm;
+use Filament\Forms\Components\Component;
 use Illuminate\Database\Eloquent\Builder;
+use App\FilamentTenant\Support\MetaDataForm;
+use Domain\Internationalization\Models\Locale;
+use App\FilamentTenant\Support\RouteUrlFieldset;
+use App\FilamentTenant\Support\SchemaFormBuilder;
+use Domain\Content\Models\Builders\ContentEntryBuilder;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Support\RouteUrl\Rules\MicrositeContentEntryUniqueRouteUrlRule;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class ContentEntryResource extends Resource
 {
@@ -92,7 +93,15 @@ class ContentEntryResource extends Resource
                     Forms\Components\Card::make([
                         Forms\Components\TextInput::make('title')
                             ->unique(
-                                callback: fn ($livewire, Unique $rule) => $rule->where('content_id', $livewire->ownerRecord->id),
+                                callback: function ($livewire, Unique $rule) {
+
+                                    if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+
+                                        return false;
+                                    }
+
+                                    return $rule->where('content_id', $livewire->ownerRecord->id);
+                                },
                                 ignoreRecord: true
                             )
                             ->lazy()
@@ -101,16 +110,65 @@ class ContentEntryResource extends Resource
                                     ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
                                     ?->dispatchEvent('route_url::update');
                             })
-                            ->required(),
+                            ->required()
+                            ->string()
+                            ->maxLength(255),
                         RouteUrlFieldset::make()
                             ->generateModelForRouteUrlUsing(function ($livewire, ContentEntry|string $model) {
                                 return $model instanceof ContentEntry
                                     ? $model
                                     : tap(new ContentEntry())->setRelation('content', $livewire->ownerRecord);
                             }),
+                        Forms\Components\Select::make('locale')
+                            ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                            ->default((string) optional(Locale::where('is_default', true)->first())->code)
+                            ->searchable()
+                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                            ->reactive()
+                            ->afterStateUpdated(function (Forms\Components\Select $component, Closure $get) {
+                                $component->getContainer()
+                                    ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
+                                    ?->dispatchEvent('route_url::update');
+                            })
+                            ->required(),
                         Forms\Components\Hidden::make('author_id')
                             ->default(Auth::id()),
                     ]),
+                    Forms\Components\Card::make([
+                        Forms\Components\CheckboxList::make('sites')
+                            ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                            ->rule(fn (?ContentEntry $record, Closure $get) => new MicrositeContentEntryUniqueRouteUrlRule($record, $get('route_url')))
+                            ->options(function ($livewire) {
+
+                                /** @var \Domain\Admin\Models\Admin */
+                                $user = Auth::user();
+
+                                if ($user->hasRole(config('domain.role.super_admin'))) {
+                                    return $livewire->ownerRecord->sites->pluck('name', 'id')
+                                        ->toArray();
+                                }
+
+                                return $livewire->ownerRecord->sites
+                                    ->whereIN('id', $user->userSite->pluck('id')->toArray())
+                                    ->pluck('name', 'id')
+                                    ->toArray();
+                            })
+                            ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?ContentEntry $record): void {
+                                if ( ! $record) {
+                                    $component->state([]);
+
+                                    return;
+                                }
+
+                                $component->state(
+                                    $record->sites->pluck('id')
+                                        ->intersect(array_keys($component->getOptions()))
+                                        ->values()
+                                        ->toArray()
+                                );
+                            }),
+                    ])
+                        ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))),
                     Forms\Components\Section::make(trans('Taxonomies'))
                         ->schema([
                             Forms\Components\Group::make()
@@ -159,16 +217,16 @@ class ContentEntryResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('activeRouteUrl.url')
                     ->label('URL')
                     ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->sortable()
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->searchable(),
+                    ->truncate('xs', true),
+                Tables\Columns\TextColumn::make('locale')
+                    ->searchable()
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable(['first_name', 'last_name'])
                     ->searchable(query: function (Builder $query, string $search): Builder {
@@ -181,6 +239,8 @@ class ContentEntryResource extends Resource
                 Tables\Columns\TagsColumn::make('taxonomyTerms.name')
                     ->limit()
                     ->searchable(),
+                Tables\Columns\TagsColumn::make('sites.name')
+                    ->toggleable(isToggledHiddenByDefault:true),
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable()
@@ -188,11 +248,6 @@ class ContentEntryResource extends Resource
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->sortable()
-                    ->toggleable()
-                    ->toggledHiddenByDefault(),
             ])
             ->filters([
                 Tables\Filters\Filter::make('taxonomies')
@@ -250,7 +305,7 @@ class ContentEntryResource extends Resource
                     ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
             ])
             ->reorderable('order')
-            ->filtersLayout(Layout::AboveContent)
+
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->url(fn ($livewire, ContentEntry $record) => self::getUrl('edit', [$livewire->ownerRecord, $record])),

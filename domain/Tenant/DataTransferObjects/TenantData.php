@@ -11,11 +11,13 @@ class TenantData
         public readonly string $name,
         public readonly ?DatabaseData $database = null,
         public readonly array $domains = [],
+        public readonly array $features = [],
     ) {
     }
 
     public static function fromArray(array $data): self
     {
+
         return new self(
             name: $data['name'],
             database: filled($data['database'] ?? null)
@@ -33,7 +35,18 @@ class TenantData
                     domain: $data['domain'],
                 ),
                 $data['domains']
-            )
+            ),
+            features: isset($data['features']) ? array_filter($data['features']) : []
+        );
+    }
+
+    public function getNormalizedFeatureNames(): array
+    {
+        return array_map(
+            fn (string $feature) => class_exists($feature) && (method_exists($feature, 'resolve') || method_exists($feature, '__invoke'))
+                ? app($feature)->name ?? $feature
+                : $feature,
+            $this->features,
         );
     }
 }

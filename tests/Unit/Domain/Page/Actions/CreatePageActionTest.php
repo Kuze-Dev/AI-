@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-use Domain\Page\Actions\CreatePageAction;
-use Domain\Page\Database\Factories\BlockFactory;
-use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\BlockContent;
-use Domain\Support\MetaData\Models\MetaData;
+use Support\MetaData\Models\MetaData;
+use Domain\Page\Actions\CreatePageAction;
+use Domain\Page\DataTransferObjects\PageData;
+use Domain\Site\Database\Factories\SiteFactory;
 
-use function Pest\Laravel\assertDatabaseCount;
+use Domain\Page\Database\Factories\BlockFactory;
+
 use function Pest\Laravel\assertDatabaseHas;
 
 beforeEach(fn () => testInTenantContext());
@@ -19,6 +20,9 @@ it('can create page', function () {
         ->withDummyBlueprint()
         ->createOne()
         ->getKey();
+
+    $site = SiteFactory::new()
+        ->createOne();
 
     $page = app(CreatePageAction::class)
         ->execute(PageData::fromArray([
@@ -39,10 +43,15 @@ it('can create page', function () {
                 'keywords' => '',
                 'description' => '',
             ],
+            'sites' => [$site->id],
         ]));
 
-    assertDatabaseCount(Page::class, 1);
-    assertDatabaseCount(BlockContent::class, 1);
+    assertDatabaseHas(Page::class, ['name' => 'Foo']);
+    assertDatabaseHas(BlockContent::class, [
+        'page_id' => $page->id,
+        'block_id' => $blockId,
+        'data' => json_encode(['name' => 'foo']),
+    ]);
     assertDatabaseHas(
         MetaData::class,
         [
@@ -51,13 +60,9 @@ it('can create page', function () {
             'keywords' => '',
             'description' => '',
             'model_type' => $page->getMorphClass(),
-            'model_id' => $page->id,
+            'model_id' => $page->getKey(),
         ]
     );
-    assertDatabaseHas(Page::class, ['name' => 'Foo']);
-    assertDatabaseHas(BlockContent::class, [
-        'page_id' => $page->id,
-        'block_id' => $blockId,
-        'data' => json_encode(['name' => 'foo']),
-    ]);
+
+    expect($page->sites->pluck('id'))->toContain($site->id);
 });

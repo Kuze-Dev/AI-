@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\FilamentTenant\Livewire\Auth;
 use App\FilamentTenant\Middleware\Authenticate;
+use App\FilamentTenant\Pages\Auth\Account;
 use Artificertech\FilamentMultiContext\ContextServiceProvider;
 use Artificertech\FilamentMultiContext\Http\Middleware\ApplyContext;
 use Filament\Facades\Filament;
@@ -27,6 +28,15 @@ class FilamentTenantServiceProvider extends ContextServiceProvider
             if (Filament::currentContext() !== static::$name) {
                 return;
             }
+
+            Filament::registerUserMenuItems([
+                'account' => UserMenuItem::make()
+                    ->url(
+                        Filament::auth()->user()?->isZeroDayAdmin()
+                            ? null
+                            : Account::getUrl()
+                    ),
+            ]);
 
             Filament::registerNavigationGroups([
                 NavigationGroup::make('CMS')

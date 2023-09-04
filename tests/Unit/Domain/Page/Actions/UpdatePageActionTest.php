@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-use Domain\Page\Actions\UpdatePageAction;
-use Domain\Page\Database\Factories\PageFactory;
-use Domain\Page\Database\Factories\BlockFactory;
-use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\BlockContent;
-use Domain\Support\MetaData\Models\MetaData;
+use Support\MetaData\Models\MetaData;
+use Domain\Page\Actions\UpdatePageAction;
+use Domain\Page\DataTransferObjects\PageData;
+use Domain\Page\Database\Factories\PageFactory;
 
-use function Pest\Laravel\assertDatabaseCount;
+use Domain\Site\Database\Factories\SiteFactory;
+use Domain\Page\Database\Factories\BlockFactory;
+
 use function Pest\Laravel\assertDatabaseHas;
 
 beforeEach(fn () => testInTenantContext());
@@ -18,6 +19,9 @@ beforeEach(fn () => testInTenantContext());
 it('can update page', function () {
     $page = PageFactory::new()
         ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->createOne();
+
+    $site = SiteFactory::new()
         ->createOne();
 
     $metaDataData = [
@@ -51,11 +55,16 @@ it('can update page', function () {
                     'keywords' => 'foo keywords updated',
                     'description' => 'foo description updated',
                 ],
+                'sites' => [$site->id],
             ])
         );
 
-    assertDatabaseCount(Page::class, 1);
-    assertDatabaseCount(BlockContent::class, 1);
+    assertDatabaseHas(Page::class, ['name' => 'Foo']);
+    assertDatabaseHas(BlockContent::class, [
+        'page_id' => $page->id,
+        'block_id' => $page->blockContents->first()->block_id,
+        'data' => json_encode(['name' => 'foo']),
+    ]);
     assertDatabaseHas(
         MetaData::class,
         [
@@ -64,13 +73,9 @@ it('can update page', function () {
             'keywords' => 'foo keywords updated',
             'description' => 'foo description updated',
             'model_type' => $page->getMorphClass(),
-            'model_id' => $page->id,
+            'model_id' => $page->getKey(),
         ]
     );
-    assertDatabaseHas(Page::class, ['name' => 'Foo']);
-    assertDatabaseHas(BlockContent::class, [
-        'page_id' => $page->id,
-        'block_id' => $page->blockContents->first()->block_id,
-        'data' => json_encode(['name' => 'foo']),
-    ]);
+
+    expect($page->sites->pluck('id'))->toContain($site->id);
 });

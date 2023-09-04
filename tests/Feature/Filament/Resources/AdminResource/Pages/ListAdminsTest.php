@@ -5,18 +5,26 @@ declare(strict_types=1);
 use App\Filament\Resources\AdminResource\Pages\ListAdmins;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Notifications\ResetPassword;
+use Domain\Role\Models\Role;
 use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 use Filament\Pages\Actions\ForceDeleteAction;
 use Filament\Pages\Actions\RestoreAction;
 use Filament\Tables\Filters\TrashedFilter;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 use STS\FilamentImpersonate\Impersonate;
+use Support\Excel\Actions\ExportAction;
+use Support\Excel\Actions\ExportBulkAction;
+use Support\Excel\Actions\ImportAction;
+use Support\Excel\Export\DefaultExport;
+use Support\Excel\Import\DefaultImport;
 
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Laravel\assertNotSoftDeleted;
 use function Pest\Laravel\assertSoftDeleted;
 use function Pest\Livewire\livewire;
+use function PHPUnit\Framework\assertCount;
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertNotEquals;
 
@@ -141,5 +149,105 @@ it('can impersonate', function () {
         event: 'impersonated',
         causedBy: $initialAuthenticatedAdmin,
         subject: $admin
+    );
+});
+
+it('can bulk export', function () {
+    $admins = AdminFactory::new()->count(3)->create();
+
+    Excel::fake();
+
+    livewire(ListAdmins::class)
+        ->callTableBulkAction(
+            ExportBulkAction::class,
+            $admins,
+            ['writer_type' => \Maatwebsite\Excel\Excel::XLSX]
+        );
+
+    Excel::matchByRegex();
+    Excel::assertQueued(
+        '/filament-excel\/exports\/admins-.*\.xlsx/',
+        config('support.excel.temporary_files.disk'),
+        function (DefaultExport $excelExport) use ($admins) {
+            assertCount(count($admins), $excelExport->query()->get());
+
+            return true;
+        }
+    );
+
+    assertActivityLogged(
+        logName: 'admin',
+        event: 'bulk-exported',
+        description: 'Bulk Exported Admin',
+        properties: ['selected_record_ids' => $admins->modelKeys(), ],
+        causedBy: Filament::auth()->user(),
+    );
+});
+
+it('can export', function () {
+    AdminFactory::new()->count(3)->create();
+
+    Excel::fake();
+
+    livewire(ListAdmins::class)
+        ->callPageAction(
+            ExportAction::class,
+            ['writer_type' => \Maatwebsite\Excel\Excel::XLSX]
+        );
+
+    Excel::matchByRegex();
+    Excel::assertQueued(
+        '/filament-excel\/exports\/admins-.*\.xlsx/',
+        config('support.excel.temporary_files.disk'),
+        function (DefaultExport $excelExport) {
+            assertCount(3, $excelExport->query()->get());
+
+            return true;
+        }
+    );
+
+    assertActivityLogged(
+        logName: 'admin',
+        event: 'exported',
+        description: 'Exported Admin',
+        causedBy: Filament::auth()->user(),
+    );
+});
+
+it('can import', function () {
+    $file = csvFiles(fn () => [
+        fake()->unique()->safeEmail(),
+        fake()->firstName(),
+        fake()->lastName(),
+        fake()->boolean() ? 'Yes' : 'No',
+        Role::inRandomOrder()
+            ->take(Arr::random(range(1, Role::count())))
+            ->pluck('name')
+            ->implode(', '),
+        fake()->timezone(),
+    ], 4);
+
+    Excel::fake();
+
+    livewire(ListAdmins::class)
+        ->callPageAction(
+            ImportAction::class,
+            ['file' => [$file->store('tmp')]]
+        );
+
+    Excel::matchByRegex();
+    Excel::assertImported(
+        '/\w{40}\.csv/', // sample: N3AeJTyAYpDzW9OrcHxU7zMboUxgT35cQXbemcmZ.csv
+        config('support.excel.temporary_files.disk'),
+        function (DefaultImport $import) {
+            return true;
+        }
+    );
+
+    assertActivityLogged(
+        logName:'admin',
+        event:'imported',
+        description: 'Imported Admin',
+        causedBy: Filament::auth()->user(),
     );
 });

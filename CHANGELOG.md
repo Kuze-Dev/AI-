@@ -1,6 +1,63 @@
 # Release Notes
+## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.7)
 
-## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.2)
+## [v0.2.7](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.7)
+
+### Added
+
+- Add `protected function buildMailMessage($url)` on `Domain\Admin\Notifications\VerifyEmail`.
+ overide buildMailMessage added custom message. 
+### Changed
+
+- Updated `self::authorizeAccess()` to ` static::authorizeAccess()` implementation on BaseSettings
+
+
+## [0.2.6](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.5)
+### Fixed
+
+- Fixed various redirects.
+- Fix `ExportFinished:class()` static analysis.
+- Fix `FilamentServiceProvider` fix format.
+
+## [0.2.5](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.2.5%0Dv0.2.4)
+
+### Added
+
+- Check for resource permission when rendering url for subject in `ActivityResource`.
+- Add `TextColumn::truncate()` macro.
+
+### Fixed
+
+- Fixed various redirects.
+- Fix `Select::optionsFromModel()` searchability.
+- Fix `SendImportFailedNotification` execution.
+
+## [0.2.4](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/0.2.4%0Dv0.2.3)
+
+### Added
+
+- Evaluatable parameters for `Select::optionsFromModel()` macro.
+- Added `wrap()` on table `TextColumns`.
+- Added ellipsis for long titles and breadcrumbs.
+- Added `Rule::email()` macro.
+- Added export and import actions.
+
+### Changed
+
+- Updated `sortable()` and `searchable()` implementation on Filament Table columns.
+
+## [v0.2.3](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.2.3%0Dv0.2.2)
+
+## Added
+
+- Add ability to update account of current logged-in admin.
+- Improved `LogsFormActivity` extensibility.
+- Add `Select::optionsFromModel()` macro.
+
+## Changed
+
+- `LogsFormActivity` will only log if the form was modified.
+- `PermissionSeeder` will now update or create permissions then delete everything else that wasn't defined in the `permissionsByGuard()` method.
 
 ## [v0.2.2](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.2.2%0Dv0.2.1)
 
@@ -22,8 +79,6 @@
 - Remove bulk actions for `ActivityResource` table.
 - `AdminResource` email field must be unique.
 - Should not be able to impersonate a deleted `Admin`.
-
-- Fix proper redirects for logged in Admin.
 
 ## [v0.2.1](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/v0.2.1%0Dv0.2.0)
 

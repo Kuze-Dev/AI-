@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-use Domain\Content\Database\Factories\ContentFactory;
-use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Domain\Site\Database\Factories\SiteFactory;
+use Domain\Content\Database\Factories\ContentFactory;
+
+use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 
 use function Pest\Laravel\getJson;
 
@@ -70,3 +72,31 @@ it('can show a content with includes', function (string $include) {
 })->with([
     'taxonomies',
 ]);
+
+it('can list contents of specific site', function () {
+    ContentFactory::new()
+        ->withDummyBlueprint()
+        ->count(1)
+        ->create();
+
+    $site = SiteFactory::new()
+        ->createOne();
+
+    ContentFactory::new()
+        ->withDummyBlueprint()
+        ->hasAttached(
+            $site
+        )
+        ->count(1)
+        ->create();
+
+    getJson("api/contents?filter[sites.id]={$site->id}")
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) {
+            $json
+                ->count('data', 1)
+                ->where('data.0.type', 'contents')
+                ->whereType('data.0.attributes.name', 'string')
+                ->etc();
+        });
+});

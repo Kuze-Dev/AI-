@@ -7,8 +7,9 @@ namespace Domain\Content\Actions;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
-use Domain\Support\MetaData\Actions\CreateMetaDataAction;
-use Domain\Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
+use Support\MetaData\Actions\CreateMetaDataAction;
+use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
+use Domain\Internationalization\Models\Locale;
 
 class CreateContentEntryAction
 {
@@ -28,6 +29,7 @@ class CreateContentEntryAction
                 'data' => $contentEntryData->data,
                 'published_at' => $contentEntryData->published_at,
                 'author_id' => $contentEntryData->author_id,
+                'locale' => $contentEntryData->locale ?? Locale::where('is_default', true)->first()?->code,
             ]);
 
         $this->createMetaData->execute($contentEntry, $contentEntryData->meta_data);
@@ -36,6 +38,11 @@ class CreateContentEntryAction
             ->attach($contentEntryData->taxonomy_terms);
 
         $this->createOrUpdateRouteUrl->execute($contentEntry, $contentEntryData->route_url_data);
+
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+
+            $contentEntry->sites()->sync($contentEntryData->sites);
+        }
 
         return $contentEntry;
     }

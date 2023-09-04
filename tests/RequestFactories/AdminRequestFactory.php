@@ -25,7 +25,6 @@ class AdminRequestFactory extends RequestFactory
             'active' => true,
             'roles' => [],
             'permissions' => [],
-
         ];
     }
 

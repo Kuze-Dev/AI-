@@ -27,7 +27,6 @@ class CreateContent extends CreateRecord
                 ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
-            $this->getCreateAnotherFormAction(),
         ];
     }
 
@@ -52,6 +51,7 @@ class CreateContent extends CreateRecord
                     past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
                     future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
                     prefix: $data['prefix'],
+                    sites: $data['sites'] ?? [],
                 ))
         );
     }

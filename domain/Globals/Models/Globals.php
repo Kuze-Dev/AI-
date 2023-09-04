@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Domain\Globals\Models;
 
-use Domain\Blueprint\Models\Blueprint;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Domain\Site\Traits\Sites;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
-use Domain\Support\ConstraintsRelationships\ConstraintsRelationships;
+use Spatie\Activitylog\LogOptions;
+use Domain\Blueprint\Models\Blueprint;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Globals\Models\Globals
@@ -44,6 +45,7 @@ class Globals extends Model
     use LogsActivity;
     use HasSlug;
     use ConstraintsRelationships;
+    use Sites;
 
     protected $table = 'globals';
     /**
@@ -55,7 +57,6 @@ class Globals extends Model
         'blueprint_id',
         'slug',
         'data',
-
     ];
 
     protected $casts = [

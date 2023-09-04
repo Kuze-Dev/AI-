@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Content;
 
+use App\Features\CMS\CMSBase;
 use App\HttpTenantApi\Resources\ContentEntryResource;
 use Carbon\Carbon;
 use Domain\Content\Enums\PublishBehavior;
@@ -14,9 +15,13 @@ use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
-#[ApiResource('contents.entries', only: ['index', 'show'], parameters: ['entries' => 'contentEntry'])]
+#[
+    ApiResource('contents.entries', only: ['index', 'show'], parameters: ['entries' => 'contentEntry']),
+    Middleware('feature.tenant:' . CMSBase::class)
+]
 class ContentEntryController
 {
     public function index(Content $content): JsonApiResourceCollection
@@ -59,6 +64,7 @@ class ContentEntryController
                             }
                         }
                     ),
+                    AllowedFilter::exact('sites.id'),
                 ])
                 ->allowedSorts([
                     'order',

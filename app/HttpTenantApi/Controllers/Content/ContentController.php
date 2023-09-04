@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Content;
 
-use App\HttpTenantApi\Resources\ContentResource;
+use App\Features\CMS\CMSBase;
 use Domain\Content\Models\Content;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
+use App\HttpTenantApi\Resources\ContentResource;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
-#[ApiResource('contents', only: ['index', 'show'])]
+#[
+    ApiResource('contents', only: ['index', 'show']),
+    Middleware('feature.tenant:' . CMSBase::class)
+]
 class ContentController
 {
     public function index(): JsonApiResourceCollection
@@ -20,7 +26,7 @@ class ContentController
                 ->allowedIncludes([
                     'taxonomies',
                 ])
-                ->allowedFilters(['name', 'slug', 'prefix'])
+                ->allowedFilters(['name', 'slug', 'prefix', AllowedFilter::exact('sites.id')])
                 ->jsonPaginate()
         );
     }

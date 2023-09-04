@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Pages\Settings;
 
+use App\Filament\Rules\FullyQualifiedDomainNameRule;
 use App\FilamentTenant\Widgets\DeployStaticSite;
 use App\Settings\CMSSettings as SettingsCMSSettings;
 use Filament\Forms\Components\Card;
@@ -31,6 +32,13 @@ class CMSSettings extends TenantBaseSettings
                 TextInput::make('deploy_hook')
                     ->required()
                     ->url()
+                    ->columnSpan('full'),
+            ]),
+            Card::make([
+                TextInput::make('front_end_domain')
+                    ->nullable()
+                    ->rules([new FullyQualifiedDomainNameRule()])
+                    ->maxLength(100)
                     ->columnSpan('full'),
             ]),
         ];

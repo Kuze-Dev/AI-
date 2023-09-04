@@ -6,24 +6,31 @@ namespace App\FilamentTenant\Resources\PageResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\PageResource;
+use App\Settings\CMSSettings;
+use App\Settings\SiteSettings;
+use Closure;
 use Domain\Page\Actions\UpdatePageAction;
 use Domain\Page\DataTransferObjects\PageData;
+use Domain\Page\Models\Page;
+use Domain\Site\Models\Site;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Throwable;
 use Exception;
+use Filament\Forms\Components\Radio;
+use Filament\Notifications\Notification;
 use Filament\Pages\Actions\Action;
+use Illuminate\Support\Facades\URL;
 
 /**
  * @property \Domain\Page\Models\Page $record
  */
 class EditPage extends EditRecord
 {
-    use LogsFormActivity {
-        afterSave as protected afterSaveOverride;
-    }
+    use LogsFormActivity;
 
     protected static string $resource = PageResource::class;
 
@@ -36,7 +43,103 @@ class EditPage extends EditRecord
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
+            Action::make('preview')
+                ->color('secondary')
+                ->hidden((bool) tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                ->label(__('Preview Page'))
+                ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
+                    $domain = $siteSettings->front_end_domain ?? $cmsSettings->front_end_domain;
+
+                    if ( ! $domain) {
+                        return null;
+                    }
+
+                    $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$this->record->slug], false), '?');
+
+                    return "https://{$domain}/preview?slug={$this->record->slug}&{$queryString}";
+                }, true),
+            Action::make('preview_microsite_action')
+                ->label('Preview Microsite')
+                ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class))
+                ->color('secondary')
+                ->record($this->getRecord())
+                ->modalHeading('Preview Microsite')
+                ->slideOver(true)
+                ->action(function (Page $record, Action $action, array $data): void {
+
+                    /** @var Site */
+                    $site = Site::find($data['preview_microsite']);
+
+                    if ($site->domain == null) {
+
+                        Notification::make()
+                            ->danger()
+                            ->title(trans('No Domain Set'))
+                            ->body(trans('Please set a domain for :value to preview.', ['value' => $site->name]))
+                            ->send();
+                    }
+                })
+                ->form([
+                    Radio::make('preview_microsite')
+                        ->required()
+                        ->options(function () {
+
+                            /** @var Page */
+                            $site = $this->getRecord();
+
+                            return $site->sites()->orderby('name')->pluck('name', 'id')->toArray();
+                        })
+                        ->descriptions(function () {
+
+                            /** @var Page */
+                            $site = $this->getRecord();
+
+                            return $site->sites()->orderby('name')->pluck('domain', 'id')->toArray();
+                        })
+                        ->reactive()
+                        ->afterStateUpdated(function (Closure $set, $state, $livewire) {
+
+                            /** @var Site */
+                            $site = Site::find($state);
+
+                            $domain = $site->domain;
+
+                            $modelAction = $livewire->getCachedActions()['preview_microsite_action'];
+
+                            $modelAction->modalSubmitAction(function () use ($domain) {
+
+                                $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$this->record->slug], false), '?');
+
+                                return Action::makeModalAction('preview')->url("https://{$domain}/preview?slug={$this->record->slug}&{$queryString}", true);
+                            });
+
+                            $set('domain', $domain);
+                        }),
+
+                ]),
+            Action::make('clone-page')
+                ->label(__('Clone Page'))
+                ->color('secondary')
+                ->record($this->getRecord())
+                ->url(fn (Page $record) => PageResource::getUrl('create', ['clone' => $record->slug])),
         ];
+    }
+
+    public function micrositePreview(array $data): void
+    {
+        /** @var Site */
+        $site = Site::find($data['preview_microsite']);
+
+        if ($site->domain == null) {
+
+            Notification::make()
+                ->danger()
+                ->title(trans('No Domain Set'))
+                ->body(trans('Please set a domain for :value to preview.', ['value' => $site->name]))
+                ->send();
+
+        }
+
     }
 
     protected function getFormActions(): array
@@ -55,8 +158,6 @@ class EditPage extends EditRecord
 
     protected function afterSave(): void
     {
-        $this->afterSaveOverride();
-
         $this->record->refresh();
         $this->hasCachedForms = false;
 

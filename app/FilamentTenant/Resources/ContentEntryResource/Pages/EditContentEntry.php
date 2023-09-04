@@ -83,7 +83,7 @@ class EditContentEntry extends EditRecord
         $action
             ->authorize($resource::canDelete($this->getRecord()))
             ->record($this->getRecord())
-            ->recordTitle($this->getRecordTitle())
+            ->recordTitle($this->getRecord()->getAttribute($this->getResource()::getRecordTitleAttribute()))
             ->successRedirectUrl(static::getResource()::getUrl('index', [$this->ownerRecord]));
     }
 
