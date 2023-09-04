@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Domain\Product\Rules;
 
+use App\FilamentTenant\Resources\ProductResource\Pages\EditProduct;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Closure;
-use App\FilamentTenant\Support\Contracts\HasProductVariants;
 
 class UniqueProductSkuRule implements ValidationRule
 {
     public function __construct(
-        protected readonly HasProductVariants $livewire
+        protected readonly EditProduct $livewire
     ) {
     }
 
@@ -19,9 +19,14 @@ class UniqueProductSkuRule implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $filteredProducts = [];
-        /** @phpstan-ignore-next-line https://phpstan.org/blog/solving-phpstan-access-to-undefined-property */
+        if (is_null($this->livewire->activeProductVariantItemStatePath)) {
+            return;
+        }
+
         $toArrayVariantStatePath = explode('.', $this->livewire->activeProductVariantItemStatePath);
-        $productVariants = $this->livewire->data['product_variants']; /** @phpstan-ignore-line */
+
+        /** @var array */
+        $productVariants = $this->livewire->data['product_variants'];
 
         if (
             isset($productVariants[end($toArrayVariantStatePath)])
@@ -33,7 +38,7 @@ class UniqueProductSkuRule implements ValidationRule
         foreach ($productVariants as $variant) {
             if (
                 isset($variant['sku'])
-                && ($this->livewire->data['sku'] === $value /** @phpstan-ignore-line */
+                && ($this->livewire->data['sku'] === $value
                     || $variant['sku'] === $value)
             ) {
                 $filteredProducts[] = $variant;
