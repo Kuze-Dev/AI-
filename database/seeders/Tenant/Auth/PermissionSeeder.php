@@ -43,6 +43,7 @@ class PermissionSeeder extends BasePermissionSeeder
                 ...$this->generateFilamentResourcePermissions('country', only: ['viewAny', 'update']),
                 ...$this->generateFilamentResourcePermissions('currency', only: ['viewAny', 'update']),
                 ...$this->generateFilamentResourcePermissions('product', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('discount', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('paymentMethod', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions(
                     'customers',

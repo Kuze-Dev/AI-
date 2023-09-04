@@ -48,7 +48,6 @@ class DiscountLimit extends Model
         'customer_type',
         'order_type',
         'order_id',
-        'times_used',
         'code',
     ];
 

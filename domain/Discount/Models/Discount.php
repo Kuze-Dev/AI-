@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * Domain\Discount\Models\Discount
@@ -54,6 +56,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Discount extends Model
 {
     use SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
         'name',
@@ -77,6 +80,15 @@ class Discount extends Model
     public function getRouteKeyName(): string
     {
         return 'code';
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->logExcept(['password'])
+            ->dontSubmitEmptyLogs();
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Discount\Models\DiscountCondition> */
