@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Support;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Order\Models\Order;
@@ -362,6 +363,7 @@ class OrderResource extends Resource
     {
         return [
             OrderResource\RelationManagers\OrderLinesRelationManager::class,
+            ActivitiesRelationManager::class,
         ];
     }
 
