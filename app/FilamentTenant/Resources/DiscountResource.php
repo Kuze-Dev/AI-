@@ -17,6 +17,7 @@ use Domain\Discount\Actions\RestoreDiscountAction;
 use Domain\Discount\Actions\SoftDeleteDiscountAction;
 use Domain\Discount\Enums\DiscountAmountType;
 use Domain\Discount\Enums\DiscountConditionType;
+use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
 use Domain\Discount\Models\DiscountLimit;
 use Filament\Forms\Components\Actions\Action;
@@ -242,8 +243,8 @@ class DiscountResource extends Resource
                 BadgeColumn::make('status')
                     ->colors([
 
-                        'success' => 'active',
-                        'warning' => 'inactive',
+                        'success' => DiscountStatus::ACTIVE->value,
+                        'warning' => DiscountStatus::INACTIVE->value,
 
                     ])->formatStateUsing(fn (string $state): string => __(ucfirst($state)))->weight('bold'),
             ])
@@ -253,8 +254,8 @@ class DiscountResource extends Resource
                 SelectFilter::make('status')
                     ->label(trans('Status'))
                     ->options([
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
+                        DiscountStatus::ACTIVE->value => 'Active',
+                        DiscountStatus::INACTIVE->value => 'Inactive',
                     ]),
             ])
             ->actions([
