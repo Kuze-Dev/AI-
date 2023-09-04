@@ -172,7 +172,7 @@ class AddressesRelationManager extends RelationManager
                 Tables\Actions\EditAction::make()
                     ->translateLabel()
                     ->mutateRecordDataUsing(function (array $data, Address $record): array {
-                        $data['country_id'] = $record->state?->country_id;
+                        $data['country_id'] = $record->state->country_id;
 
                         return $data;
                     })

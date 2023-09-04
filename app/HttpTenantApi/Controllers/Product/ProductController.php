@@ -57,10 +57,10 @@ class ProductController
         );
     }
 
-    public function show(string $product): ProductResource
+    public function show(Product $product): ProductResource
     {
-        $product = QueryBuilder::for(
-            Product::whereSlug($product)->whereStatus(true)
+        $model = QueryBuilder::for(
+            $product->whereStatus(true)
         )
             ->allowedIncludes([
                 'taxonomyTerms',
@@ -70,17 +70,16 @@ class ProductController
                 'metaData',
             ])
             ->firstOrFail();
-
-        if ($product instanceof Product) {
+        if ($model instanceof Product) {
             $totalSold = OrderLine::whereHas('order', function (Builder $query) {
                 $query->where('status', OrderStatuses::FULFILLED);
             })
-                ->where('purchasable_id', $product->id)
+                ->where('purchasable_id', $model->id)
                 ->sum('quantity');
 
-            $product->setAttribute('total_sold', $totalSold);
+            $model->setAttribute('total_sold', $totalSold);
         }
 
-        return ProductResource::make($product);
+        return ProductResource::make($model);
     }
 }

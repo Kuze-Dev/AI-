@@ -38,6 +38,7 @@ use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -64,19 +65,25 @@ class DiscountResource extends Resource
             ->schema([
                 Card::make([
                     TextInput::make('name')
-                        ->required(),
+                        ->label(trans('Name'))
+                        ->required()
+                        ->maxLength(255),
 
                     RichEditor::make('description')
-                        ->translateLabel(),
+                        ->label(trans('Description'))
+                        ->translateLabel()
+                        ->maxLength(255),
 
                     TextInput::make('code')
+                        ->label(trans('Code'))
                         ->suffixAction(
                             fn (?string $state): Action => Action::make('code')
                                 ->icon('heroicon-o-cog')
                                 ->action(fn (TextInput $component) => $component->state((new AutoGenerateCode())()))
                                 ->tooltip(trans('auto generate code')),
                         )->unique(ignoreRecord: true)
-                        ->required(),
+                        ->required()
+                        ->maxLength(255),
 
                     TextInput::make('max_uses')
                         ->numeric()
@@ -187,7 +194,10 @@ class DiscountResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
+                TextColumn::make('name')
+                    ->sortable()
+                    ->searchable()
+                    ->label(trans('Name')),
                 TextColumn::make('discountCondition.discount_type')
                     ->label(trans('Discount Type'))
                     ->formatStateUsing(function ($record) {
@@ -237,11 +247,19 @@ class DiscountResource extends Resource
                     ])->formatStateUsing(fn (string $state): string => __(ucfirst($state)))->weight('bold'),
             ])
             ->filters([
-                TrashedFilter::make(),
+                TrashedFilter::make()
+                    ->label(trans('Deleted Records')),
+                SelectFilter::make('status')
+                    ->label(trans('Status'))
+                    ->options([
+                        'active' => 'Active',
+                        'inactive' => 'Inactive',
+                    ]),
             ])
             ->actions([
                 ActionGroup::make([
-                    EditAction::make(),
+                    EditAction::make()
+                        ->authorize('update'),
                     ForceDeleteAction::make()
                         ->using(function (Discount $record) {
                             try {
@@ -249,7 +267,8 @@ class DiscountResource extends Resource
                             } catch (DeleteRestrictedException $e) {
                                 return false;
                             }
-                        }),
+                        })
+                        ->authorize('forceDelete'),
 
                     DeleteAction::make()
                         ->using(function (Discount $record) {
@@ -258,7 +277,8 @@ class DiscountResource extends Resource
                             } catch (DeleteRestrictedException $e) {
                                 return false;
                             }
-                        }),
+                        })
+                        ->authorize('delete'),
 
                     RestoreAction::make()
                         ->using(function (Discount $record) {
@@ -267,7 +287,8 @@ class DiscountResource extends Resource
                             } catch (DeleteRestrictedException $e) {
                                 return false;
                             }
-                        }),
+                        })
+                        ->authorize('restore'),
                 ]),
 
             ])

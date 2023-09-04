@@ -317,7 +317,8 @@ class ProductResource extends Resource
                             } catch (DeleteRestrictedException $e) {
                                 return false;
                             }
-                        }),
+                        })
+                        ->authorize('delete'),
                 ]),
             ])
             ->bulkActions([

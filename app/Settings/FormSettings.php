@@ -25,7 +25,7 @@ class FormSettings extends Settings
     public static function encrypted(): array
     {
         return [
-            'site_key',
+            // 'site_key', # uncomment if you want to encrypt this field
             'secret_key',
         ];
     }

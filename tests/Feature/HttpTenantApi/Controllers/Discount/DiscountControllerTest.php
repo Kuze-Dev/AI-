@@ -40,7 +40,7 @@ it('can list all available discounts', function () {
                 ->whereType('included.0.attributes.discount_type', 'string')
                 ->whereType('included.0.attributes.amount_type', 'string')
                 ->whereType('included.0.attributes.amount', 'integer')
-                ->whereType('included.1.attributes.requirement_type', 'string')
+                ->whereType('included.1.attributes.requirement_type', 'string|null')
                 ->whereType('included.1.attributes.minimum_amount', 'integer')
                 ->etc();
         });
@@ -72,7 +72,7 @@ it('can show discount', function () {
                 ->whereType('included.0.attributes.discount_type', 'string')
                 ->whereType('included.0.attributes.amount_type', 'string')
                 ->whereType('included.0.attributes.amount', 'integer')
-                ->whereType('included.1.attributes.requirement_type', 'string')
+                ->whereType('included.1.attributes.requirement_type', 'string|null')
                 ->whereType('included.1.attributes.minimum_amount', 'integer')
                 ->etc();
         });

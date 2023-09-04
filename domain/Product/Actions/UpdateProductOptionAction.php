@@ -82,74 +82,70 @@ class UpdateProductOptionAction
 
             $productData->product_options[$key] = $productOption;
 
-            $this->sanitizeOptionValues($productOption);
+            $this->sanitizeOptions($productOption);
         }
 
         $this->sanitizeOptions($productData, $product->id);
     }
 
-    protected function sanitizeOptions(ProductData $productData, int $productId): void
+    protected function sanitizeOptions(ProductData|ProductOptionData $dtoData, ?int $productId = null): void
     {
-        // Removal of Product Options
-        $mappedOptionIds = array_map(function ($item) {
-            return $item->id;
-        }, $productData->product_options ?? []);
+        $arrayForMapping = [];
 
-        if (count($mappedOptionIds)) {
-            $toRemoveOptions = ProductOption::where(
-                'product_id',
-                $productId
-            )->whereNotIn('id', $mappedOptionIds)->get();
-            foreach ($toRemoveOptions as $option) {
-                $option->delete();
-            }
+        if ($dtoData instanceof ProductData && $productId) {
+            $arrayForMapping = $dtoData->product_options;
         }
-    }
 
-    protected function sanitizeOptionValues(ProductOptionData $productOption): void
-    {
-        // Removal of Product Option Values
-        $mappedOptionValueIds = array_map(function ($item) {
-            return $item->id;
-        }, $productOption->productOptionValues);
+        if ($dtoData instanceof ProductOptionData) {
+            $arrayForMapping = $dtoData->productOptionValues;
+        }
 
-        if (count($mappedOptionValueIds)) {
-            $toRemoveOptionValues = ProductOptionValue::where(
-                'product_option_id',
-                $productOption->id
-            )->whereNotIn('id', $mappedOptionValueIds)->get();
+        // Removal of Product Options
+        $mappedIds = collect($arrayForMapping)
+            ->pluck('id')
+            ->toArray();
 
-            foreach ($toRemoveOptionValues as $optionValue) {
-                $optionValue->delete();
+        if (count($mappedIds)) {
+            if ($dtoData instanceof ProductData && $productId) {
+                ProductOption::where('product_id', $productId)
+                    ->whereNotIn('id', $mappedIds)
+                    ->get()
+                    ->each(function ($option) {
+                        $option->delete();
+                    });
+            }
+
+            if ($dtoData instanceof ProductOptionData) {
+                ProductOptionValue::where('product_option_id', $dtoData->id)
+                    ->whereNotIn('id', $mappedIds)
+                    ->get()
+                    ->each(function ($optionValue) {
+                        $optionValue->delete();
+                    });
             }
         }
     }
 
     protected function searchAndChangeValue(string|int $needle, array $haystack, int $newValue, string $field = 'option_id'): array
     {
-        $newCombinations = [];
-        $newVariants = [];
-        foreach ($haystack as $key => $variant) {
-            foreach ($variant->combination as $key2 => $combination) {
-                $variantCombination = $haystack[$key]->combination[$key2];
-
+        return collect($haystack)->map(function ($variant) use ($needle, $newValue, $field) {
+            /** @var array<int, \Domain\Product\DataTransferObjects\VariantCombinationData> $variantCombination */
+            $variantCombination = $variant->combination;
+            $newCombinations = collect($variantCombination)->map(function ($combination) use ($needle, $newValue, $field) {
                 if ($combination->{$field} == $needle) {
                     if ($field == 'option_id') {
-                        array_push($newCombinations, $variantCombination->withOptionId($newValue, $variantCombination));
+                        return $combination->withOptionId($newValue, $combination);
                     }
 
                     if ($field == 'option_value_id') {
-                        array_push($newCombinations, $variantCombination->withOptionValueId($newValue, $variantCombination));
+                        return $combination->withOptionValueId($newValue, $combination);
                     }
-                } else {
-                    array_push($newCombinations, $variantCombination);
                 }
-            }
 
-            array_push($newVariants, $variant->withCombination($newCombinations, $variant));
-            $newCombinations = [];
-        }
+                return $combination;
+            });
 
-        return $newVariants;
+            return $variant->withCombination($newCombinations->toArray(), $variant);
+        })->toArray();
     }
 }

@@ -123,6 +123,9 @@ class CartPurchasableValidatorAction
                 /** @var \Domain\Product\Models\Product $product */
                 $product = $cartLine->purchasable->product;
 
+                /** @var \Domain\Product\Models\ProductVariant $productVariant */
+                $productVariant = $cartLine->purchasable;
+
                 $this->validatePurchasable($product);
 
                 $this->validateMinimumQuantity($product, 0, $cartLine);
@@ -132,7 +135,7 @@ class CartPurchasableValidatorAction
                 ) {
                     $count++;
                 } else {
-                    if ($product->stock >= $cartLine->quantity) {
+                    if ($productVariant->stock >= $cartLine->quantity) {
                         $count++;
                     }
                 }

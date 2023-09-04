@@ -245,7 +245,7 @@ class OrderResource extends Resource
                         /** @var \Domain\Payments\Models\Payment $payment */
                         $payment = $record->payments->first();
 
-                        return Str::limit($payment->paymentMethod?->title, 30) ?? '';
+                        return Str::limit($payment->paymentMethod->title ?? '', 30);
                     }),
                 Tables\Columns\TextColumn::make('shipping_method')
                     ->label(trans('Shipping Method'))
@@ -255,7 +255,7 @@ class OrderResource extends Resource
                             /** @var \Domain\ShippingMethod\Models\ShippingMethod $shippingMethod */
                             $shippingMethod = $record->shippingMethod;
 
-                            return Str::limit($shippingMethod?->title, 30);
+                            return Str::limit($shippingMethod->title, 30);
                         }
 
                         return '';
@@ -506,7 +506,9 @@ class OrderResource extends Resource
 
                                 return  $record->currency_symbol . ' ' . '0.00';
                             }),
-                    ]),
+                    ])->hidden(function (Order $record) {
+                        return (bool) ($record->discount_total == 0);
+                    }),
                 Forms\Components\Grid::make(2)
                     ->schema([
                         Support\TextLabel::make('')
@@ -602,7 +604,7 @@ class OrderResource extends Resource
                             $updateData = ['status' => $status];
 
                             if ($status == OrderStatuses::CANCELLED->value) {
-                                if ($record->status != OrderStatuses::PENDING) {
+                                if ( ! in_array($record->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])) {
                                     Notification::make()
                                         ->title(trans("You can't cancel this order."))
                                         ->warning()

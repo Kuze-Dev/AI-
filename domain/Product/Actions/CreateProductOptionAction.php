@@ -61,29 +61,24 @@ class CreateProductOptionAction
 
     protected function searchAndChangeValue(string|int $needle, array $haystack, int $newValue, string $field = 'option_id'): array
     {
-        $newCombinations = [];
-        $newVariants = [];
-        foreach ($haystack as $key => $variant) {
-            foreach ($variant->combination as $key2 => $combination) {
-                $variantCombination = $haystack[$key]->combination[$key2];
-
+        return collect($haystack)->map(function ($variant) use ($needle, $newValue, $field) {
+            /** @var array<int, \Domain\Product\DataTransferObjects\VariantCombinationData> $variantCombination */
+            $variantCombination = $variant->combination;
+            $newCombinations = collect($variantCombination)->map(function ($combination) use ($needle, $newValue, $field) {
                 if ($combination->{$field} == $needle) {
                     if ($field == 'option_id') {
-                        array_push($newCombinations, $variantCombination->withOptionId($newValue, $variantCombination));
+                        return $combination->withOptionId($newValue, $combination);
                     }
 
                     if ($field == 'option_value_id') {
-                        array_push($newCombinations, $variantCombination->withOptionValueId($newValue, $variantCombination));
+                        return $combination->withOptionValueId($newValue, $combination);
                     }
-                } else {
-                    array_push($newCombinations, $variantCombination);
                 }
-            }
 
-            array_push($newVariants, $variant->withCombination($newCombinations, $variant));
-            $newCombinations = [];
-        }
+                return $combination;
+            });
 
-        return $newVariants;
+            return $variant->withCombination($newCombinations->toArray(), $variant);
+        })->toArray();
     }
 }

@@ -8,7 +8,6 @@ use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\DataTransferObjects\ProductVariantData;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
-use Illuminate\Support\Arr;
 
 class CreateOrUpdateProductVariantAction
 {
@@ -45,33 +44,40 @@ class CreateOrUpdateProductVariantAction
     protected function sanitizeVariants(int $productId, array $productVariants): void
     {
         $variants = ProductVariant::where('product_id', $productId)->get();
-        foreach ($variants as $variant) {
-            $existingItem = Arr::where($productVariants, function (ProductVariantData $value) use ($variant) {
-                if (count($variant->combination) !== count($value->combination)) {
-                    return false;
-                }
 
-                if ($variant->combination[0]['option_value_id'] === $value->combination[0]->option_value_id) {
-                    return (isset($variant->combination[1])
-                        ? ($variant->combination[1]['option_value_id'] === $value->combination[1]->option_value_id)
-                        : true);
-                }
+        $variants->each(function ($variant) use ($productVariants) {
+            $found = collect($productVariants)->first(function ($value) use ($variant) {
+                /** @var array<int, \Domain\Product\DataTransferObjects\VariantCombinationData> $valueCombination */
+                $valueCombination = $value->combination;
 
-                return false;
+                return count($variant->combination) === count($valueCombination) &&
+                    collect($variant->combination)
+                        ->pluck('option_value_id')
+                        ->diff(
+                            collect($valueCombination)->pluck('option_value_id')
+                        )->isEmpty();
             });
 
-            if ( ! $existingItem) {
+            if ( ! $found) {
                 $variant->delete();
             }
-        }
+        });
     }
 
     protected function createOrUpdateProductVariants(int $productId, array $productVariants): void
     {
         foreach ($productVariants as $productVariant) {
-            $variant = ProductVariant::where('combination', 'LIKE', '%"option_value_id": ' . $productVariant->combination[0]->option_value_id . '%')
+            $variant = ProductVariant::where(
+                'combination',
+                'LIKE',
+                '%"option_value_id": ' . $productVariant->combination[0]->option_value_id . '%'
+            )
                 ->when(isset($productVariant->combination[1]), function ($query) use ($productVariant) {
-                    return $query->where('combination', 'LIKE', '%"option_value_id": ' . $productVariant->combination[1]->option_value_id . '%');
+                    return $query->where(
+                        'combination',
+                        'LIKE',
+                        '%"option_value_id": ' . $productVariant->combination[1]->option_value_id . '%'
+                    );
                 })
                 ->where('product_id', $productId)
                 ->first();
