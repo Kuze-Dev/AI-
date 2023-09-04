@@ -604,7 +604,7 @@ class OrderResource extends Resource
                             $updateData = ['status' => $status];
 
                             if ($status == OrderStatuses::CANCELLED->value) {
-                                if ($record->status != OrderStatuses::PENDING) {
+                                if ( ! in_array($record->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])) {
                                     Notification::make()
                                         ->title(trans("You can't cancel this order."))
                                         ->warning()
