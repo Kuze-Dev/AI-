@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Support;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Order\Models\Order;
@@ -362,6 +363,7 @@ class OrderResource extends Resource
     {
         return [
             OrderResource\RelationManagers\OrderLinesRelationManager::class,
+            ActivitiesRelationManager::class,
         ];
     }
 
@@ -587,6 +589,7 @@ class OrderResource extends Resource
                             ->default(false)
                             ->reactive(),
                         Forms\Components\Textarea::make('email_remarks')
+                            ->maxLength(255)
                             ->label(trans('Remarks'))
                             ->visible(fn (Closure $get) => $get('send_email') == true)
                             ->dehydrateStateUsing(function (string|null $state) use ($get) {
@@ -895,6 +898,7 @@ class OrderResource extends Resource
                         return $payment->remarks;
                     }),
                 Forms\Components\Textarea::make('message')
+                    ->maxLength(255)
                     ->label(trans('Admin Message'))
                     ->formatStateUsing(function () use ($order) {
                         /** @var \Domain\Payments\Models\Payment $payment */
