@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use App\FilamentTenant\Resources\ProductResource\Pages\EditProduct;
 use App\FilamentTenant\Resources\ReviewResource\RelationManagers\ReviewRelationManager;
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\ProductOption as ProductOptionSupport;
@@ -24,8 +25,6 @@ use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Builder;
-use App\FilamentTenant\Support\Contracts\HasProductOptions;
-use App\FilamentTenant\Support\Contracts\HasProductVariants;
 use Domain\Product\Actions\DeleteProductAction;
 use Domain\Product\Enums\Status;
 use Domain\Product\Enums\Taxonomy as EnumsTaxonomy;
@@ -63,7 +62,9 @@ class ProductResource extends Resource
                             ->unique(ignoreRecord: true)
                             ->maxLength(100)
                             ->required(),
-                        Forms\Components\RichEditor::make('description'),
+                        Forms\Components\RichEditor::make('description')
+                            ->translateLabel()
+                            ->maxLength(255),
                     ]),
                     Forms\Components\Section::make('Media')
                         ->translateLabel()
@@ -159,6 +160,7 @@ class ProductResource extends Resource
                                 ->dehydrateStateUsing(fn ($state) => (int) $state),
                             Forms\Components\TextInput::make('sku')
                                 ->unique(ignoreRecord: true)
+                                ->maxLength(100)
                                 ->required(),
                             Forms\Components\Toggle::make('allow_stocks')
                                 ->label(trans('Allow stock control'))
@@ -168,6 +170,7 @@ class ProductResource extends Resource
                             Forms\Components\TextInput::make('stock')
                                 ->translateLabel()
                                 ->numeric()
+                                ->minValue(0)
                                 ->dehydrateStateUsing(fn ($state) => (int) $state)
                                 ->hidden(fn (Closure $get) => ! $get('allow_stocks'))
                                 ->required(fn (Closure $get) => $get('allow_stocks')),
@@ -183,6 +186,16 @@ class ProductResource extends Resource
                                     decimalPlaces: 2,
                                     isSigned: false
                                 ))
+                                ->rules([
+                                    function () {
+                                        return function (string $attribute, mixed $value, Closure $fail) {
+                                            if ($value <= 0) {
+                                                $attributeName = ucfirst(explode('.', $attribute)[1]);
+                                                $fail("{$attributeName} must be above zero.");
+                                            }
+                                        };
+                                    },
+                                ])
                                 ->dehydrateStateUsing(fn ($state) => (float) $state)
                                 ->required(),
 
@@ -194,6 +207,16 @@ class ProductResource extends Resource
                                     decimalPlaces: 2,
                                     isSigned: false
                                 ))
+                                ->rules([
+                                    function () {
+                                        return function (string $attribute, mixed $value, Closure $fail) {
+                                            if ($value <= 0) {
+                                                $attributeName = ucfirst(explode('.', $attribute)[1]);
+                                                $fail("{$attributeName} must be above zero.");
+                                            }
+                                        };
+                                    },
+                                ])
                                 ->dehydrateStateUsing(fn ($state) => (float) $state)
                                 ->required(),
                         ])->columns(2),
@@ -355,12 +378,11 @@ class ProductResource extends Resource
                 ->schema([
                     Forms\Components\Repeater::make('options')
                         ->translateLabel()
-                        ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, HasProductOptions $livewire) {
+                        ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, EditProduct $livewire) {
                             if ( ! $record) {
                                 return $state;
                             }
 
-                            /** @phpstan-ignore-next-line https://phpstan.org/blog/solving-phpstan-access-to-undefined-property */
                             $productOptions = $livewire->data['product_options'];
                             if (($productOptions) !== null) {
                                 $component->state($productOptions['options']);
@@ -439,11 +461,16 @@ class ProductResource extends Resource
                                 ->translateLabel()
                                 ->schema([
                                     Forms\Components\TextInput::make('sku')
-                                        ->rule(fn (HasProductVariants $livewire) => new UniqueProductSkuRule($livewire))
+                                        ->maxLength(100)
+                                        // ->rule(function(EditProduct $livewire) {
+                                        //     dump(func_get_args());
+                                        // })
+                                        ->rule(fn (EditProduct $livewire) => new UniqueProductSkuRule($livewire))
                                         ->required(),
                                     Forms\Components\TextInput::make('stock')
                                         ->translateLabel()
                                         ->numeric()
+                                        ->minValue(0)
                                         ->dehydrateStateUsing(fn ($state) => (int) $state),
                                 ])->columns(2),
                             Forms\Components\Section::make('Pricing')
@@ -451,23 +478,44 @@ class ProductResource extends Resource
                                 ->schema([
                                     Forms\Components\TextInput::make('retail_price')
                                         ->translateLabel()
+                                        // Put custom rule to validate minimum value
                                         ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
                                             prefix: '$',
                                             thousandsSeparator: ',',
                                             decimalPlaces: 2,
                                             isSigned: false
                                         ))
+                                        ->rules([
+                                            function () {
+                                                return function (string $attribute, mixed $value, Closure $fail) {
+                                                    if ($value <= 0) {
+                                                        $fail("{$attribute} must be above zero.");
+                                                    }
+                                                };
+                                            },
+                                        ])
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->required(),
 
                                     Forms\Components\TextInput::make('selling_price')
                                         ->translateLabel()
+                                        // Put custom rule to validate minimum value
                                         ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
                                             prefix: '$',
                                             thousandsSeparator: ',',
                                             decimalPlaces: 2,
                                             isSigned: false
                                         ))
+                                        ->rules([
+                                            function () {
+                                                return function (string $attribute, mixed $value, Closure $fail) {
+                                                    if ($value <= 0) {
+                                                        $attributeName = ucfirst(explode('.', $attribute)[1]);
+                                                        $fail("{$attributeName} must be above zero.");
+                                                    }
+                                                };
+                                            },
+                                        ])
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->required(),
                                 ])->columns(2),

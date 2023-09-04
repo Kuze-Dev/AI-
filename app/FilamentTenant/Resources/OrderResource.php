@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Support;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Order\Models\Order;
@@ -36,10 +37,19 @@ class OrderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
+    protected static ?string $recordTitleAttribute = 'reference';
+
     protected static function getNavigationBadge(): ?string
     {
         /** @phpstan-ignore-next-line https://filamentphp.com/docs/2.x/admin/navigation#navigation-item-badges */
         return strval(static::$model::whereIn('status', [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])->count());
+    }
+
+    /** @return Builder<\Domain\Order\Models\Order> */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['payments.paymentMethod', 'shippingMethod']);
     }
 
     public static function form(Form $form): Form
@@ -175,8 +185,6 @@ class OrderResource extends Resource
                                         Forms\Components\Placeholder::make('payment_method')
                                             ->label(trans('Payment Method'))
                                             ->content(function (Order $record): string {
-                                                $record->load('payments.paymentMethod');
-
                                                 /** @var \Domain\Payments\Models\Payment $payment */
                                                 $payment = $record->payments->first();
 
@@ -186,8 +194,6 @@ class OrderResource extends Resource
                                             ->label(trans('Shipping Method'))
                                             ->content(function (Order $record): string {
                                                 if ($record->shipping_method_id) {
-                                                    $record->load('shippingMethod');
-
                                                     /** @var \Domain\ShippingMethod\Models\ShippingMethod $shippingMethod */
                                                     $shippingMethod = $record->shippingMethod;
 
@@ -362,6 +368,7 @@ class OrderResource extends Resource
     {
         return [
             OrderResource\RelationManagers\OrderLinesRelationManager::class,
+            ActivitiesRelationManager::class,
         ];
     }
 
@@ -587,6 +594,7 @@ class OrderResource extends Resource
                             ->default(false)
                             ->reactive(),
                         Forms\Components\Textarea::make('email_remarks')
+                            ->maxLength(255)
                             ->label(trans('Remarks'))
                             ->visible(fn (Closure $get) => $get('send_email') == true)
                             ->dehydrateStateUsing(function (string|null $state) use ($get) {
@@ -615,7 +623,7 @@ class OrderResource extends Resource
 
                                 $updateData['cancelled_at'] = now();
 
-                                $order = $record->load('payments');
+                                $order = $record;
 
                                 /** @var \Domain\Payments\Models\Payment $payment */
                                 $payment = $order->payments->first();
@@ -669,7 +677,7 @@ class OrderResource extends Resource
         return Support\ButtonAction::make(trans('mark_as_paid'))
             ->disableLabel()
             ->execute(function (Order $record, Closure $set) {
-                $order = $record->load('payments');
+                $order = $record;
 
                 return Forms\Components\Actions\Action::make('mark_as_paid')
                     ->color(function () use ($order) {
@@ -698,6 +706,7 @@ class OrderResource extends Resource
                         if ($result) {
                             /** @var \Domain\Payments\Models\Payment $payment */
                             $payment = $order->payments->first();
+
                             if ($order->is_paid) {
                                 $payment->update([
                                     'status' => 'paid',
@@ -732,7 +741,7 @@ class OrderResource extends Resource
             ->execute(function (Order $record, Closure $set) {
                 $footerActions = self::showProofOfPaymentActions($record, $set);
 
-                $order = $record->load('payments');
+                $order = $record;
 
                 /** @var \Domain\Payments\Models\Payment $payment */
                 $payment = $order->payments->first();
@@ -746,7 +755,7 @@ class OrderResource extends Resource
             ->fullWidth()
             ->size('md')
             ->hidden(function (Order $record) {
-                $order = $record->load('payments');
+                $order = $record;
 
                 /** @var \Domain\Payments\Models\Payment $payment */
                 $payment = $order->payments->first();
@@ -761,7 +770,7 @@ class OrderResource extends Resource
 
     private static function showProofOfPaymentActions(Order $record, Closure $set): Forms\Components\Actions\Action
     {
-        $order = $record->load('payments');
+        $order = $record;
 
         return Forms\Components\Actions\Action::make('proof_of_payment')
             ->color('secondary')
@@ -895,6 +904,7 @@ class OrderResource extends Resource
                         return $payment->remarks;
                     }),
                 Forms\Components\Textarea::make('message')
+                    ->maxLength(255)
                     ->label(trans('Admin Message'))
                     ->formatStateUsing(function () use ($order) {
                         /** @var \Domain\Payments\Models\Payment $payment */

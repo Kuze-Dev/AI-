@@ -77,6 +77,7 @@ class PermissionSeeder extends BasePermissionSeeder
                         'siteManager',
                     ]
                 ),
+                ...$this->generateFilamentResourcePermissions('order', only: ['viewAny', 'update']),
             ],
         ];
     }
