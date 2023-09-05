@@ -6,9 +6,11 @@ namespace Domain\Order\Listeners;
 
 use App\Notifications\Order\OrderCancelledNotification;
 use App\Notifications\Order\OrderFulfilledNotification;
+use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Events\OrderStatusUpdatedEvent;
 use Domain\Product\Actions\UpdateProductStockAction;
+use Domain\RewardPoint\Actions\EarnPointAction;
 use Illuminate\Support\Facades\Notification;
 
 class OrderStatusUpdatedListener
@@ -27,6 +29,9 @@ class OrderStatusUpdatedListener
 
         switch ($status) {
             case OrderStatuses::CANCELLED->value:
+
+                app(DiscountHelperFunctions::class)->resetDiscountUsage($order);
+
                 foreach ($order->orderLines as $orderLine) {
                     app(UpdateProductStockAction::class)->execute($orderLine->purchasable_type, $orderLine->purchasable_id, $orderLine->quantity, true);
                 }

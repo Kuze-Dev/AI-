@@ -10,10 +10,12 @@ use App\Notifications\Order\OrderFulfilledNotification;
 use App\Notifications\Order\OrderPackedNotification;
 use App\Notifications\Order\OrderRefundedNotification;
 use App\Notifications\Order\OrderShippedNotification;
+use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
 use Domain\Order\Notifications\AdminOrderStatusUpdatedMail;
 use Domain\Product\Actions\UpdateProductStockAction;
+use Domain\RewardPoint\Actions\EarnPointAction;
 use Illuminate\Support\Facades\Notification;
 
 class AdminOrderStatusUpdatedListener
@@ -32,6 +34,7 @@ class AdminOrderStatusUpdatedListener
         switch ($event->status) {
             case OrderStatuses::CANCELLED->value:
                 // back the discount
+                app(DiscountHelperFunctions::class)->resetDiscountUsage($order);
 
                 // back the product stock
                 foreach ($order->orderLines as $orderLine) {
@@ -43,6 +46,7 @@ class AdminOrderStatusUpdatedListener
                 break;
             case OrderStatuses::REFUNDED->value:
                 // back the discount
+                app(DiscountHelperFunctions::class)->resetDiscountUsage($order);
 
                 // back the product stock
                 foreach ($order->orderLines as $orderLine) {

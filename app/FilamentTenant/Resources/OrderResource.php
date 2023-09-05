@@ -18,7 +18,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use Closure;
 use Domain\Customer\Models\Customer;
-use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Events\AdminOrderBankPaymentEvent;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
@@ -634,7 +633,6 @@ class OrderResource extends Resource
                                     'status' => 'cancelled',
                                 ]);
 
-                                app(DiscountHelperFunctions::class)->resetDiscountUsage($record);
                             }
 
                             $result = $record->update($updateData);
