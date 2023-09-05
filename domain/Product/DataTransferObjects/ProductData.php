@@ -33,6 +33,7 @@ class ProductData
         public readonly ?string $description = null,
         public readonly UploadedFile|string|null|array $images = null,
         public readonly UploadedFile|string|null|array $videos = null,
+        public readonly array $media_collection = [],
     ) {
     }
 
@@ -59,6 +60,10 @@ class ProductData
             allow_stocks: $data['allow_stocks'],
             images: $data['images'],
             videos: $data['videos'],
+            media_collection: [
+                ['collection' => 'image', 'materials' => $data['images']],
+                ['collection' => 'video', 'materials' => $data['videos']],
+            ],
             product_options: array_map(
                 fn ($option) => (ProductOptionData::fromArray($option)),
                 $data['product_options'][0] ?? []
