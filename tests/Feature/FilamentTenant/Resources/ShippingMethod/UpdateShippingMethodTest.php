@@ -6,6 +6,8 @@ use App\FilamentTenant\Resources\ShippingmethodResource\Pages\EditShippingmethod
 use Domain\Address\Database\Factories\StateFactory;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use Domain\ShippingMethod\Models\ShippingMethod;
+use App\Features\ECommerce\ECommerceBase;
+use App\Features\ECommerce\ShippingStorePickup;
 use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -15,6 +17,9 @@ beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
+
+    tenancy()->tenant->features()->activate(ECommerceBase::class);
+    tenancy()->tenant->features()->activate(ShippingStorePickup::class);
 });
 
 it('can render edit shipping method', function () {
@@ -28,7 +33,12 @@ it('can render edit shipping method', function () {
 
 it('can edit shipping method', function () {
 
-    $record = ShippingMethodFactory::new()->createOne();
+    $state = StateFactory::new()->createOne();
+
+    $record = ShippingMethodFactory::new()->createOne([
+        'shipper_country_id' => $state->id,
+        'shipper_state_id' => $state->id,
+    ]);
 
     livewire(EditShippingmethod::class, ['record' => $record->getRouteKey()])
         ->fillForm([
@@ -45,9 +55,7 @@ it('can edit shipping method', function () {
             ],
         ])->call('save')
         ->assertHasNoFormErrors()
-        ->assertOk()
-        ->instance()
-        ->record;
+        ->assertOk();
 
     assertDatabaseHas(ShippingMethod::class, [
         'title' => 'Store Pickup',
@@ -58,7 +66,7 @@ it('can edit shipping method', function () {
 
 it('can edit update shipping method status', function () {
 
-    StateFactory::new();
+    StateFactory::new()->createOne();
 
     $record = ShippingMethodFactory::new()->createOne();
 
