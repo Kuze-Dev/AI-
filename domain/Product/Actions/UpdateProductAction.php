@@ -36,7 +36,7 @@ class UpdateProductAction
 
         $this->createOrUpdateProductVariant->execute($product, $productData, false);
 
-        $this->uploadingMediaMaterials(
+        $this->uploadMediaMaterials(
             $product,
             $productData->media_collection,
         );
@@ -46,7 +46,7 @@ class UpdateProductAction
         return $product;
     }
 
-    protected function uploadingMediaMaterials(Product $product, array $mediaCollection): void
+    protected function uploadMediaMaterials(Product $product, array $mediaCollection): void
     {
         collect($mediaCollection)->each(function ($media, $key) use ($product) {
             /** @var array<int, array> $mediaMaterials */

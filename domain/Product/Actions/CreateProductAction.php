@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\Product\Actions;
 
-use Domain\Media\Actions\CreateMediaAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
-use Illuminate\Support\Arr;
+use Support\Common\Actions\SyncMediaCollectionAction;
+use Support\Common\DataTransferObjects\MediaCollectionData;
+use Support\Common\DataTransferObjects\MediaData;
 
 class CreateProductAction
 {
@@ -18,7 +19,7 @@ class CreateProductAction
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
         protected CreateProductOptionAction $createProductOptionAction,
         protected CreateOrUpdateProductVariantAction $createOrUpdateProductVariantAction,
-        protected CreateMediaAction $createMediaAction,
+        protected SyncMediaCollectionAction $syncMediaCollection,
     ) {
     }
 
@@ -32,18 +33,35 @@ class CreateProductAction
 
         $this->createOrUpdateProductVariantAction->execute($product, $productData, false);
 
-        if (filled($productData->images)) {
-            $this->createMediaAction->execute($product, Arr::wrap($productData->images), 'image');
-        }
-
-        if (filled($productData->videos)) {
-            $this->createMediaAction->execute($product, Arr::wrap($productData->videos), 'video');
-        }
+        $this->uploadMediaMaterials(
+            $product,
+            $productData->media_collection,
+        );
 
         $product->taxonomyTerms()
             ->attach($productData->taxonomy_terms);
 
         return $product;
+    }
+
+    protected function uploadMediaMaterials(Product $product, array $mediaCollection): void
+    {
+        collect($mediaCollection)->each(function ($media) use ($product) {
+            if (filled($media['materials'])) {
+                /** @var array<int, array> $mediaMaterials */
+                $mediaMaterials = $media['materials'];
+
+                $mediaData = collect($mediaMaterials)->map(function ($material) {
+                    /** @var \Illuminate\Http\UploadedFile|string $material */
+                    return new MediaData(media: $material);
+                })->toArray();
+
+                $this->syncMediaCollection->execute($product, new MediaCollectionData(
+                    collection: $media['collection'],
+                    media: $mediaData,
+                ));
+            }
+        });
     }
 
     protected function getProductAttributes(ProductData $productData): array

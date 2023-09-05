@@ -6,6 +6,7 @@ namespace Domain\Product\DataTransferObjects;
 
 use Support\MetaData\DataTransferObjects\MetaDataData;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 
 class ProductData
 {
@@ -62,7 +63,7 @@ class ProductData
             videos: $data['videos'],
             media_collection: [
                 ['collection' => 'image', 'materials' => $data['images']],
-                ['collection' => 'video', 'materials' => $data['videos']],
+                ['collection' => 'video', 'materials' => Arr::wrap($data['videos'])],
             ],
             product_options: array_map(
                 fn ($option) => (ProductOptionData::fromArray($option)),
@@ -78,7 +79,6 @@ class ProductData
 
     public static function fromCsv(array $data): self
     {
-
         return new self(
             name: $data['name'],
             meta_data: MetaDataData::fromArray($data['meta_data']),
@@ -92,6 +92,9 @@ class ProductData
             weight: $data['weight'],
             stock: $data['stock'] ?? null,
             images: $data['images'],
+            media_collection: [
+                ['collection' => 'image', 'materials' => $data['images']],
+            ],
             product_options: array_map(
                 fn ($option) => (ProductOptionData::fromArray($option)),
                 $data['product_options'] ?? []
