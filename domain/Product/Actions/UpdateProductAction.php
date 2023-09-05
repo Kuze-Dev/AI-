@@ -58,7 +58,7 @@ class UpdateProductAction
             foreach ($productData->videos as $video) {
                 $mediaData[] = new MediaData(media: $video);
             }
-            
+
             $this->syncMediaCollection->execute($product, new MediaCollectionData(
                 collection: 'video',
                 media: $mediaData,
