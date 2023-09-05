@@ -36,6 +36,10 @@ class OrderStatusUpdatedListener
                 break;
             case OrderStatuses::FULFILLED->value:
                 Notification::send($customer, new OrderFulfilledNotification($order));
+                // if ( tenancy()->tenant?->features()->active(RewardPoints::class)) {
+                app(EarnPointAction::class)->execute($customer, $order);
+
+                // }
 
                 break;
         }

@@ -9,7 +9,6 @@ use Domain\Discount\Actions\CreateDiscountLimitAction;
 use Domain\Order\Events\OrderPlacedEvent;
 use Domain\Order\Notifications\OrderPlacedMail;
 use Domain\Product\Actions\UpdateProductStockAction;
-use Domain\RewardPoint\Actions\EarnPointAction;
 use Illuminate\Support\Facades\Notification;
 
 class OrderPlacedListener
@@ -36,11 +35,6 @@ class OrderPlacedListener
         if ( ! is_null($discount)) {
             app(CreateDiscountLimitAction::class)->execute($discount, $order, $customer);
         }
-
-        // if ( tenancy()->tenant?->features()->active(RewardPoints::class)) {
-        app(EarnPointAction::class)->execute($customer, $order);
-
-        // }
 
         foreach ($order->orderLines as $orderLine) {
             app(UpdateProductStockAction::class)->execute($orderLine->purchasable_type, $orderLine->purchasable_id, $orderLine->quantity, false);
