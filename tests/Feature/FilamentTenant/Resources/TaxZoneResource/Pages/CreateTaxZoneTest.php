@@ -79,7 +79,7 @@ it('can create tax zone by state', function () {
         ->assertFormFieldIsVisible('countries')
         ->assertFormFieldIsVisible('states')
         ->fillForm([
-            'countries' => $selectedCountry->getKey(),
+            'countries' => [$selectedCountry->getKey()],
             'states' => $selectedStates->modelKeys(),
         ])
         ->call('create')
