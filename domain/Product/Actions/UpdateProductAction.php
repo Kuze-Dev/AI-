@@ -10,15 +10,19 @@ use Domain\Product\Models\Product;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\MetaData\Actions\UpdateMetaDataAction;
 use Illuminate\Support\Arr;
+use Support\Common\Actions\SyncMediaCollectionAction;
+use Support\Common\DataTransferObjects\MediaCollectionData;
+use Support\Common\DataTransferObjects\MediaData;
 
 class UpdateProductAction
 {
     public function __construct(
         protected CreateMetaDataAction $createMetaData,
         protected UpdateMetaDataAction $updateMetaData,
-        protected UpdateProductOptionAction $updateProductOptionAction,
-        protected CreateOrUpdateProductVariantAction $createOrUpdateProductVariantAction,
-        protected CreateMediaAction $createMediaAction
+        protected UpdateProductOptionAction $updateProductOption,
+        protected CreateOrUpdateProductVariantAction $createOrUpdateProductVariant,
+        protected CreateMediaAction $createMedia,
+        protected SyncMediaCollectionAction $syncMediaCollection,
     ) {
     }
 
@@ -31,15 +35,36 @@ class UpdateProductAction
             ? $this->updateMetaData->execute($product, $productData->meta_data)
             : $this->createMetaData->execute($product, $productData->meta_data);
 
-        $this->updateProductOptionAction->execute($product, $productData);
+        $this->updateProductOption->execute($product, $productData);
 
-        $this->createOrUpdateProductVariantAction->execute($product, $productData, false);
+        $this->createOrUpdateProductVariant->execute($product, $productData, false);
 
         if (filled($productData->images)) {
-            $this->createMediaAction->execute($product, Arr::wrap($productData->images), 'image', false);
+            $mediaData = [];
+            foreach ($productData->images as $image) {
+                $mediaData[] = new MediaData(media: $image);
+            }
+
+            $this->syncMediaCollection->execute($product, new MediaCollectionData(
+                collection: 'image',
+                media: $mediaData,
+            ));
+
+            // $this->createMedia->execute($product, Arr::wrap($productData->images), 'image', false);
         }
 
-        $this->createMediaAction->execute($product, Arr::wrap($productData->videos), 'video', false);
+        if (filled($productData->videos)) {
+            $mediaData = [];
+            foreach ($productData->videos as $video) {
+                $mediaData[] = new MediaData(media: $video);
+            }
+            
+            $this->syncMediaCollection->execute($product, new MediaCollectionData(
+                collection: 'video',
+                media: $mediaData,
+            ));
+        }
+        // $this->createMedia->execute($product, Arr::wrap($productData->videos), 'video', false);
 
         $product->taxonomyTerms()->sync($productData->taxonomy_terms);
 
