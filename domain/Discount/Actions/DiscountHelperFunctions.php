@@ -26,7 +26,7 @@ final class DiscountHelperFunctions
         if (
             $subTotal >= ($discountRequirement?->minimum_amount ?? 0) &&
             ($discountCondition?->discount_type === DiscountConditionType::ORDER_SUB_TOTAL ||
-            $discountCondition?->discount_type === DiscountConditionType::DELIVERY_FEE)
+                $discountCondition?->discount_type === DiscountConditionType::DELIVERY_FEE)
         ) {
             if ($discountCondition->amount_type === DiscountAmountType::FIXED_VALUE) {
                 $deductable = $discountCondition->amount;
@@ -63,7 +63,7 @@ final class DiscountHelperFunctions
                 'message' => 'This discount code is invalid.',
             ],
             'max_uses' => [
-                'condition' => $discount->max_uses == 0 && $discount->max_uses != null,
+                'condition' => $discount->max_uses == 0 || $discount->max_uses == null,
                 'message' => 'This discount code max usage limit has been reached.',
             ],
             'grandTotal' => [

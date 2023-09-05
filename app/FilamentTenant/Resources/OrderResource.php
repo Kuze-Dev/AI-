@@ -429,9 +429,11 @@ class OrderResource extends Resource
                             ->size('md')
                             ->inline()
                             ->formatStateUsing(function ($state) {
+                                /** @var string */
+                                $timeZone = Auth::user()?->timezone;
+
                                 $formattedState = Carbon::parse($state)
-                                    /** @phpstan-ignore-next-line */
-                                    ->setTimezone(Auth::user()?->timezone)
+                                    ->setTimezone($timeZone)
                                     ->translatedFormat('F d, Y g:i A');
 
                                 return $formattedState;
