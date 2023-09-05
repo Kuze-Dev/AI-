@@ -82,17 +82,17 @@ class OrderController extends Controller
                 ], 422);
             }
 
-            if (is_array($result) && ! $result['order'] instanceof Order) {
-                return response()->json([
-                    'message' => 'Order failed to be created',
-                ], 400);
+            if (is_array($result) && $result['order'] instanceof Order) {
+                return response()
+                    ->json([
+                        'message' => 'Order placed successfully',
+                        'data' => $result,
+                    ]);
             }
 
-            return response()
-                ->json([
-                    'message' => 'Order placed successfully',
-                    'data' => $result,
-                ]);
+            return response()->json([
+                'message' => 'Order failed to be created',
+            ], 400);
         } catch (Exception $e) {
             Log::info('OrderController exception ' . $e);
 
