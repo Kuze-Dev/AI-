@@ -6,7 +6,6 @@ namespace App\FilamentTenant\Pages\Settings;
 
 use App\Features\ECommerce\RewardPoints;
 use App\Settings\RewardPointsSettings as SettingsRewardPointsSettings;
-use Closure;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\TextInput;
 
@@ -23,29 +22,12 @@ class RewardPointsSettings extends TenantBaseSettings
                 TextInput::make('minimum_amount')
                     ->label(trans('Minimum amount to spend'))
                     ->minValue(1)
-                    ->rules([
-                        function () {
-                            return function (string $attribute, mixed $value, Closure $fail) {
-                                if (preg_match('/^0\d*$/', $value)) {
-                                    $fail('The ' . $attribute . ' must not start with a number 0.');
-                                }
-                            };
-                        },
-                    ])
                     ->numeric()
                     ->required(),
 
                 TextInput::make('equivalent_point')
-                    ->rules([
-                        function () {
-                            return function (string $attribute, mixed $value, Closure $fail) {
-                                if (preg_match('/^0\d*$/', $value)) {
-                                    $fail('The ' . $attribute . ' must not start with a number 0.');
-                                }
-                            };
-                        },
-                    ])
                     ->numeric()
+                    ->minValue(1)
                     ->required(),
             ])->columns(2),
 
