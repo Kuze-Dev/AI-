@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Features\ECommerce\RewardPoints;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\CustomerResource\RelationManagers\AddressesRelationManager;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
@@ -19,6 +20,7 @@ use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
+use Domain\RewardPoint\Models\PointEarning;
 use Domain\Tier\Models\Tier;
 use Exception;
 use Filament\Facades\Filament;
@@ -154,6 +156,10 @@ class CustomerResource extends Resource
                                 ->toArray()
                         )
                         ->enum(Status::class),
+                    Forms\Components\Placeholder::make('earned_points')
+                        ->label(trans('Earned points from orders: '))
+                        ->content(fn ($record) => PointEarning::whereCustomerId($record?->getKey())->first()?->earned_points ?? 0)
+                        ->hidden(fn () => ! tenancy()->tenant?->features()->active(RewardPoints::class) ? true : false),
                 ])
                     ->columns(2),
                 //                Forms\Components\Fieldset::make(trans('Address'))
