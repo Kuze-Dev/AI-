@@ -28,7 +28,7 @@ class PageController
     {
         return PageResource::collection(
             QueryBuilder::for(
-                Page::with('activeRouteUrl')
+                Page::with(['activeRouteUrl'])
                     ->whereNotNull('published_at')
             )
                 ->allowedFilters([
@@ -59,6 +59,7 @@ class PageController
                 ])
                 ->allowedIncludes([
                     'blockContents.block',
+                    'blockContents.blueprintData',
                     'routeUrls',
                     'metaData',
                 ])

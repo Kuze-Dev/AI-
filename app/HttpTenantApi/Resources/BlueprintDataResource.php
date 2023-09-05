@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
+use Domain\Blueprint\Enums\FieldType;
 use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
@@ -12,10 +13,20 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class BlueprintDataResource extends JsonApiResource
 {
-    public function toRelationships(Request $request): array
+    public function toAttributes(Request $request): array
     {
-        return [
-            'media' => fn () => MediaResource::make($this->media),
+        $this->load('media');
+
+        $data = [
+            'value' => $this->value,
+            'state_path' => $this->state_path,
+            'type' => $this->type,
         ];
+
+        if ($this->type == FieldType::MEDIA->value) {
+            $data['media'] = MediaResource::collection($this->media);
+        }
+
+        return $data;
     }
 }

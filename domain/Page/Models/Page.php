@@ -30,12 +30,12 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property int $id
  * @property int|null $author_id
  * @property string $name
- * @property string $locale
  * @property string $slug
  * @property Visibility $visibility
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string $locale
  * @property-read \Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
@@ -53,6 +53,7 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @method static PageBuilder|Page whereAuthorId($value)
  * @method static PageBuilder|Page whereCreatedAt($value)
  * @method static PageBuilder|Page whereId($value)
+ * @method static PageBuilder|Page whereLocale($value)
  * @method static PageBuilder|Page whereName($value)
  * @method static PageBuilder|Page wherePublishedAt($value)
  * @method static PageBuilder|Page wherePublishedAtRange(?\Carbon\Carbon $publishedAtStart = null, ?\Carbon\Carbon $publishedAtEnd = null)
