@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace Domain\Product\Actions;
 
-use Domain\Media\Actions\CreateMediaAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\MetaData\Actions\UpdateMetaDataAction;
-use Illuminate\Support\Arr;
+use Support\Common\Actions\SyncMediaCollectionAction;
+use Support\Common\DataTransferObjects\MediaCollectionData;
+use Support\Common\DataTransferObjects\MediaData;
 
 class UpdateProductAction
 {
     public function __construct(
         protected CreateMetaDataAction $createMetaData,
         protected UpdateMetaDataAction $updateMetaData,
-        protected UpdateProductOptionAction $updateProductOptionAction,
-        protected CreateOrUpdateProductVariantAction $createOrUpdateProductVariantAction,
-        protected CreateMediaAction $createMediaAction
+        protected UpdateProductOptionAction $updateProductOption,
+        protected CreateOrUpdateProductVariantAction $createOrUpdateProductVariant,
+        protected SyncMediaCollectionAction $syncMediaCollection,
     ) {
     }
 
@@ -31,19 +32,36 @@ class UpdateProductAction
             ? $this->updateMetaData->execute($product, $productData->meta_data)
             : $this->createMetaData->execute($product, $productData->meta_data);
 
-        $this->updateProductOptionAction->execute($product, $productData);
+        $this->updateProductOption->execute($product, $productData);
 
-        $this->createOrUpdateProductVariantAction->execute($product, $productData, false);
+        $this->createOrUpdateProductVariant->execute($product, $productData, false);
 
-        if (filled($productData->images)) {
-            $this->createMediaAction->execute($product, Arr::wrap($productData->images), 'image', false);
-        }
-
-        $this->createMediaAction->execute($product, Arr::wrap($productData->videos), 'video', false);
+        $this->uploadingMediaMaterials(
+            $product,
+            $productData->media_collection,
+        );
 
         $product->taxonomyTerms()->sync($productData->taxonomy_terms);
 
         return $product;
+    }
+
+    protected function uploadingMediaMaterials(Product $product, array $mediaCollection): void
+    {
+        collect($mediaCollection)->each(function ($media, $key) use ($product) {
+            /** @var array<int, array> $mediaMaterials */
+            $mediaMaterials = $media['materials'];
+
+            $mediaData = collect($mediaMaterials)->map(function ($material) {
+                /** @var \Illuminate\Http\UploadedFile|string $material */
+                return new MediaData(media: $material);
+            })->toArray();
+
+            $this->syncMediaCollection->execute($product, new MediaCollectionData(
+                collection: $media['collection'],
+                media: $mediaData,
+            ));
+        });
     }
 
     protected function getProductAttributes(ProductData $productData): array
