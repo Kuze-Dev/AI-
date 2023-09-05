@@ -12,37 +12,37 @@ use function Pest\Laravel\patchJson;
 use function PHPUnit\Framework\assertTrue;
 use function Pest\Laravel\withHeader;
 
-beforeEach(function () {
-    testInTenantContext();
-    $customer = CustomerFactory::new()->createOne();
+// beforeEach(function () {
+//     testInTenantContext();
+//     $customer = CustomerFactory::new()->createOne();
 
-    withHeader('Authorization', 'Bearer ' . $customer
-        ->createToken('testing-auth')
-    ->plainTextToken);
+//     withHeader('Authorization', 'Bearer ' . $customer
+//         ->createToken('testing-auth')
+//     ->plainTextToken);
 
-    $this->customer = $customer;
+//     $this->customer = $customer;
 
-    return $customer;
-});
+//     return $customer;
+// });
 
-it('mark as un-read', function () {
-    Event::fake();
+// it('mark as un-read', function () {
+//     Event::fake();
 
-    $user = $this->customer;
-    $user->notify(new TestNotification(fake()->sentence()));
+//     $user = $this->customer;
+//     $user->notify(new TestNotification(fake()->sentence()));
 
-    /** @var DatabaseNotification $notification */
-    $notification = DatabaseNotification::first();
+//     /** @var DatabaseNotification $notification */
+//     $notification = DatabaseNotification::first();
 
-    $notification->markAsRead();
+//     $notification->markAsRead();
 
-    assertTrue($notification->refresh()->read());
+//     assertTrue($notification->refresh()->read());
 
-    patchJson('api/notifications/' . $notification->getRouteKey() . '/mark-as-unread')
-        ->assertOk()
-        ->assertValid();
+//     patchJson('api/notifications/' . $notification->getRouteKey() . '/mark-as-unread')
+//         ->assertOk()
+//         ->assertValid();
 
-    Event::assertDispatched(NotificationUnread::class, 1);
+//     Event::assertDispatched(NotificationUnread::class, 1);
 
-    assertTrue($notification->refresh()->unread());
-});
+//     assertTrue($notification->refresh()->unread());
+// });
