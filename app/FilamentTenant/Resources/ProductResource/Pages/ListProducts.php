@@ -17,7 +17,6 @@ use Filament\Resources\Pages\ListRecords;
 use Support\Excel\Actions\ExportAction;
 use Support\Excel\Actions\ImportAction;
 use Illuminate\Database\Eloquent\Builder;
-use Support\MetaData\DataTransferObjects\MetaDataData;
 
 class ListProducts extends ListRecords
 {
@@ -60,6 +59,7 @@ class ListProducts extends ListRecords
                         'retail_price' => $row['retail_price'],
                         'stock' => $row['stock'],
                         'sku' => $row['sku'] . $key1 . $key2,
+                        'status' => true,
                     ];
                 });
             } else {
@@ -79,6 +79,7 @@ class ListProducts extends ListRecords
                     'retail_price' => $row['retail_price'],
                     'stock' => $row['stock'],
                     'sku' => $row['sku'] . $key1,
+                    'status' => true,
                 ];
             }
         });
@@ -174,8 +175,8 @@ class ListProducts extends ListRecords
 
                         unset($row, $data['categories'], $data['brand']);
 
-                        $data['meta_data'] = new MetaDataData($data['name']);
-                        $product = app(CreateProductAction::class)->execute(new ProductData(...$data));
+                        $data['meta_data'] = ['title' => $data['name']];
+                        $product = app(CreateProductAction::class)->execute(ProductData::fromCsv($data));
 
                         return $product;
                     }
