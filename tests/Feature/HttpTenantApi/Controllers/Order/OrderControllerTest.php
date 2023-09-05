@@ -15,6 +15,7 @@ use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Order\Actions\PlaceOrderAction;
 use Domain\Order\Database\Factories\OrderFactory;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
+use Domain\Order\Events\OrderPlacedEvent;
 use Domain\Order\Models\Order;
 use Domain\PaymentMethod\Database\Factories\PaymentMethodFactory;
 use Domain\Payments\Contracts\PaymentManagerInterface;
@@ -23,6 +24,7 @@ use Domain\Product\Database\Factories\ProductFactory;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\Drivers\StorePickupDriver;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
 
@@ -151,6 +153,8 @@ it('can store order', function () {
     $reference = app(CheckoutAction::class)
         ->execute(CheckoutData::fromArray(['cart_line_ids' => $cartLineIds]));
 
+    Event::fake(OrderPlacedEvent::class);
+
     postJson('api/orders', [
         'addresses' => [
             'shipping' => $this->address->id,
@@ -162,6 +166,8 @@ it('can store order', function () {
     ])
         ->assertValid()
         ->assertOk();
+
+    Event::assertDispatched(OrderPlacedEvent::class);
 });
 
 it('can show order', function () {
