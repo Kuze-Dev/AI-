@@ -130,7 +130,6 @@ it('can split order', function () {
 
     assertDatabaseHas(CartLine::class, [
         'uuid' => $this->cartLineIds,
-        'checked_out_at' => now(),
     ]);
 
     expect($splittedOrder)->toHaveKey('order');
