@@ -23,7 +23,7 @@ class GlobalsController
     {
         return GlobalsResource::collection(
             QueryBuilder::for(Globals::with('blueprint'))
-                ->allowedFilters(['name', 'slug', AllowedFilter::exact('sites.id')])
+                ->allowedFilters(['name', 'slug', AllowedFilter::exact('locale'), AllowedFilter::exact('sites.id')])
                 ->allowedIncludes('blueprint')
                 ->jsonPaginate()
         );
