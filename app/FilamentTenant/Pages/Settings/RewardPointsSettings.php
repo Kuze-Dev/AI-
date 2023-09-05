@@ -54,6 +54,6 @@ class RewardPointsSettings extends TenantBaseSettings
 
     protected static function authorizeAccess(): bool
     {
-        return parent::authorizeAccess() && tenancy()->tenant->features()->active(RewardPoints::class);
+        return parent::authorizeAccess() && tenancy()->tenant?->features()->active(RewardPoints::class);
     }
 }

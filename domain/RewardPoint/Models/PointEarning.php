@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\RewardPoint\Models;
 
+use Domain\Customer\Models\Customer;
+use Domain\Order\Models\Order;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Eloquent;
 
@@ -49,22 +50,19 @@ class PointEarning extends Model
     ];
 
     protected $casts = [
-        'earned_points' => 'integer',
+        'earned_points' => 'float',
         'date_earned' => 'datetime',
     ];
 
-    public function rewardPoint(): BelongsTo
-    {
-        return $this->belongsTo(RewardPoint::class);
-    }
-
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Domain\Customer\Models\Customer, \Domain\RewardPoint\Models\PointEarning>*/
     public function customer(): MorphTo
     {
-        return $this->morphTo();
+        return $this->morphTo(Customer::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Domain\Order\Models\Order, \Domain\RewardPoint\Models\PointEarning>*/
     public function order(): MorphTo
     {
-        return $this->morphTo();
+        return $this->morphTo(Order::class);
     }
 }

@@ -8,9 +8,9 @@ use Spatie\LaravelSettings\Settings;
 
 class RewardPointsSettings extends Settings
 {
-    public ?int $minimum_amount = 0;
+    public ?int $minimum_amount = 100;
 
-    public ?int $equivalent_point = 0;
+    public ?int $equivalent_point = 1;
 
     public static function group(): string
     {

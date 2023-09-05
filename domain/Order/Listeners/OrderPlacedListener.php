@@ -37,7 +37,10 @@ class OrderPlacedListener
             app(CreateDiscountLimitAction::class)->execute($discount, $order, $customer);
         }
 
+        // if ( tenancy()->tenant?->features()->active(RewardPoints::class)) {
         app(EarnPointAction::class)->execute($customer, $order);
+
+        // }
 
         foreach ($order->orderLines as $orderLine) {
             app(UpdateProductStockAction::class)->execute($orderLine->purchasable_type, $orderLine->purchasable_id, $orderLine->quantity, false);
