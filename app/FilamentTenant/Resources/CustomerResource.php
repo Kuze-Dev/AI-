@@ -158,7 +158,7 @@ class CustomerResource extends Resource
                         ->enum(Status::class),
                     Forms\Components\Placeholder::make('earned_points')
                         ->label(trans('Earned points from orders: '))
-                        ->content(fn ($record) => PointEarning::whereCustomerId($record?->getKey())->first()?->earned_points ?? 0)
+                        ->content(fn ($record) => PointEarning::whereCustomerId($record?->getKey())->sum('earned_points') ?? 0)
                         ->hidden(fn () => ! tenancy()->tenant?->features()->active(RewardPoints::class) ? true : false),
                 ])
                     ->columns(2),
