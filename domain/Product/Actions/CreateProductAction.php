@@ -7,7 +7,6 @@ namespace Domain\Product\Actions;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
 use Support\MetaData\Actions\CreateMetaDataAction;
-use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 use Support\Common\Actions\SyncMediaCollectionAction;
 use Support\Common\DataTransferObjects\MediaCollectionData;
 use Support\Common\DataTransferObjects\MediaData;
@@ -15,10 +14,9 @@ use Support\Common\DataTransferObjects\MediaData;
 class CreateProductAction
 {
     public function __construct(
-        protected CreateMetaDataAction $createMetaTags,
-        protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
-        protected CreateProductOptionAction $createProductOptionAction,
-        protected CreateOrUpdateProductVariantAction $createOrUpdateProductVariantAction,
+        protected CreateMetaDataAction $createMetaData,
+        protected CreateProductOptionAction $createProductOption,
+        protected CreateOrUpdateProductVariantAction $createOrUpdateProductVariant,
         protected SyncMediaCollectionAction $syncMediaCollection,
     ) {
     }
@@ -27,11 +25,11 @@ class CreateProductAction
     {
         $product = Product::create($this->getProductAttributes($productData));
 
-        $this->createMetaTags->execute($product, $productData->meta_data);
+        $this->createMetaData->execute($product, $productData->meta_data);
 
-        $this->createProductOptionAction->execute($product, $productData);
+        $this->createProductOption->execute($product, $productData);
 
-        $this->createOrUpdateProductVariantAction->execute($product, $productData, false);
+        $this->createOrUpdateProductVariant->execute($product, $productData, false);
 
         $this->uploadMediaMaterials(
             $product,
