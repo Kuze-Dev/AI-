@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Livewire\Actions;
 
 use Filament\Pages\Actions\ActionGroup as BasePageActionGroup;

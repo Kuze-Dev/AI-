@@ -43,7 +43,7 @@ class RouteUrlController
         }
 
         $queryRouteUrl->whereHas('model', function ($query) {
-            return $query->where('draftable_id',null);
+            return $query->where('draftable_id', null);
         });
 
         $routeUrl = $queryRouteUrl->firstOrFail();

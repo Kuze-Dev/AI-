@@ -19,7 +19,7 @@ class CreatePageDraftAction
     ) {
     }
 
-    public function execute(Page $page,PageData $pageData): Page
+    public function execute(Page $page, PageData $pageData): Page
     {
         /** @var Page */
         $pageDraft = $page->pageDraft()->create([

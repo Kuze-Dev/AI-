@@ -28,7 +28,7 @@ class PublishedPageDraftAction
 
     public function execute(Page $page, Page $pageDraft, PageData $pageData): Page
     {
-       
+
         $page->update([
             'author_id' => $pageData->author_id,
             'name' => $pageData->name,
@@ -57,7 +57,7 @@ class PublishedPageDraftAction
         $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url_data);
 
         $this->deletePage->execute($pageDraft);
-        
+
         $page->sites()
             ->sync($pageData->sites);
 

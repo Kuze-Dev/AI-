@@ -180,17 +180,17 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
         return Str::start($model->content->prefix, '/') . Str::of($attributes['title'])->slug()->start('/');
     }
 
-      /** @return \Illuminate\Database\Eloquent\Relations\HasOne<self> */
-      public function pageDraft(): HasOne
-      {
-          return $this->hasOne(ContentEntry::class,'draftable_id');
-      }
-  
-      /** @return BelongsTo<self, ContentEntry> */
-      public function parentPage(): BelongsTo
-      {
-          return $this->belongsTo(ContentEntry::class, 'draftable_id');
-      }
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<self> */
+    public function pageDraft(): HasOne
+    {
+        return $this->hasOne(ContentEntry::class, 'draftable_id');
+    }
+
+    /** @return BelongsTo<self, ContentEntry> */
+    public function parentPage(): BelongsTo
+    {
+        return $this->belongsTo(ContentEntry::class, 'draftable_id');
+    }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Admin, ContentEntry> */
     public function author(): BelongsTo

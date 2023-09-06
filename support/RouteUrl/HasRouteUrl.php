@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Support\RouteUrl;
 
 use Support\RouteUrl\Models\RouteUrl;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 trait HasRouteUrl

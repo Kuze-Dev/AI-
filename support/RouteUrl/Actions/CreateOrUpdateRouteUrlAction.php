@@ -17,14 +17,14 @@ class CreateOrUpdateRouteUrlAction
         $url = $routeUrlData->is_override
             ? $routeUrlData->url
             : $model::generateRouteUrl($model, $model->getAttributes());
-      
+
         $url = Str::of($url)->trim('/')->prepend('/');
-      
+
         /** @var ?RouteUrl $routeUrl */
         $routeUrl = RouteUrl::whereModelType($model->getMorphClass())
             ->where('model_id', $model->id)
             ->first();
-       
+
         if ( ! $routeUrl) {
 
             return $model->routeUrls()
@@ -32,8 +32,8 @@ class CreateOrUpdateRouteUrlAction
                     'url' => $url,
                     'is_override' => $routeUrlData->is_override,
                 ]);
-        }else {
-            
+        } else {
+
             $routeUrl->update([
                 'url' => $url,
                 'is_override' => $routeUrlData->is_override,

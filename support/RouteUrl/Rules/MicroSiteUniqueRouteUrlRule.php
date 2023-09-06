@@ -35,9 +35,7 @@ class MicroSiteUniqueRouteUrlRule implements ValidationRule
             return $q->whereIn('site_id', $value);
         })->pluck('id')->toArray();
 
-
         $pagesIds = array_merge($pages, $contentEntriesIds);
-
 
         $query = RouteUrl::whereUrl($this->route_url['url'])
             ->whereIn(
@@ -53,15 +51,14 @@ class MicroSiteUniqueRouteUrlRule implements ValidationRule
             );
 
         $query->whereIN('model_id', $pagesIds)
-                ->where('url', $this->route_url['url']);
-            
-                
+            ->where('url', $this->route_url['url']);
+
         if ($this->ignoreModel) {
-          
+
             if ($this->ignoreModel instanceof Page) {
-                
+
                 if ($this->ignoreModel->parentPage) {
-                    
+
                     $ignoreModelIds = [
                         $this->ignoreModel->getKey(),
                         $this->ignoreModel->parentPage->getKey(),
@@ -70,22 +67,21 @@ class MicroSiteUniqueRouteUrlRule implements ValidationRule
                     $query->whereNot(fn (EloquentBuilder $query) => $query
                         ->where('model_type',  $this->ignoreModel->getMorphClass())
                         ->whereIn('model_id', $ignoreModelIds));
-                }else{
+                } else {
 
                     $query->whereNot(fn (EloquentBuilder $query) => $query
-                    ->where('model_type',  $this->ignoreModel->getMorphClass())
-                    ->where('model_id',  $this->ignoreModel->getKey()));
+                        ->where('model_type',  $this->ignoreModel->getMorphClass())
+                        ->where('model_id',  $this->ignoreModel->getKey()));
                 }
-    
-            }else{
+
+            } else {
                 $query->whereNot(fn (EloquentBuilder $query) => $query
                     ->where('model_type',  $this->ignoreModel->getMorphClass())
                     ->where('model_id',  $this->ignoreModel->getKey()));
             }
-          
+
         }
 
-         
         if ($query->exists()) {
             $fail(trans('The :value is already been used.', ['value' => $this->route_url['url']]));
         }

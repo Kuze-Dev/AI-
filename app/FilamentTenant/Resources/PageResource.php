@@ -316,11 +316,11 @@ class PageResource extends Resource
     {
 
         $status = '';
-        
+
         if ($record) {
 
             $model = $record;
-            $status = $model->draftable_id? ' ( Draft )' : '';
+            $status = $model->draftable_id ? ' ( Draft )' : '';
         }
 
         /** @var string */

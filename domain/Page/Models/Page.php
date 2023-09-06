@@ -93,7 +93,7 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
     ];
 
     protected $with = [
-       'pageDraft',
+        'pageDraft',
     ];
 
     /**
@@ -137,7 +137,7 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
     /** @return \Illuminate\Database\Eloquent\Relations\HasOne<self> */
     public function pageDraft(): HasOne
     {
-        return $this->hasOne(Page::class,'draftable_id');
+        return $this->hasOne(Page::class, 'draftable_id');
     }
 
     /** @return BelongsTo<self, Page> */
