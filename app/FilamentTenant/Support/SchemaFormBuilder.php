@@ -40,6 +40,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class SchemaFormBuilder extends Component
 {
@@ -201,6 +202,22 @@ class SchemaFormBuilder extends Component
         if ($mediaFieldData->reorder) {
             $media->enableReordering($mediaFieldData->reorder);
         }
+
+        $media->formatStateUsing(function ($state) {
+
+            $media = Media::where('file_name', $state)->where('collection_name', 'blueprint_media')->first();
+
+            return [$media->uuid];
+        })
+            ->beforeStateDehydrated(null)
+            ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null);
+
+        $media->getUploadedFileUrlUsing(function ($file) {
+
+            $media = Media::where('uuid', $file)->first();
+
+            return $media->getUrl();
+        });
 
         if ( ! empty($mediaFieldData->accept)) {
             $media->acceptedFileTypes($mediaFieldData->accept);
