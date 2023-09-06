@@ -17,9 +17,10 @@ beforeEach(function () {
     testInTenantContext();
 
     $product = ProductFactory::new()
-        ->setStatus(true)
-        ->setMinimumOrderQuantity(1)
-        ->createOne();
+        ->createOne([
+            'status' => true,
+            'minimum_order_quantity' => 1,
+        ]);
 
     $product->update([
         'allow_customer_remarks' => true,

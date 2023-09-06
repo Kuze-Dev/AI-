@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use Domain\Address\Database\Factories\AddressFactory;
+use Domain\Address\Database\Factories\CountryFactory;
 use Domain\Address\Enums\AddressLabelAs;
-use Domain\Address\Models\Address;
-use Domain\Address\Models\Country;
 use Domain\Cart\Actions\CheckoutAction;
 use Domain\Cart\Database\Factories\CartFactory;
 use Domain\Cart\Database\Factories\CartLineFactory;
@@ -37,7 +37,7 @@ beforeEach(function () {
         'enabled' => true,
     ]);
 
-    $country = Country::create([
+    $country = CountryFactory::new()->createOne([
         'code' => 'US',
         'name' => 'United States',
         'capital' => 'Washington',
@@ -53,7 +53,7 @@ beforeEach(function () {
     $customer = CustomerFactory::new()
         ->createOne();
 
-    $address = Address::create([
+    $address = AddressFactory::new()->createOne([
         'customer_id' => $customer->id,
         'state_id' => $state->id,
         'label_as' => AddressLabelAs::HOME,
