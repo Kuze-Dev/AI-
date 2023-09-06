@@ -192,6 +192,9 @@ class FormResource extends Resource
                                             : ($state ?? [])),
                                 ])
                                 ->columns(3),
+                            Forms\Components\TextInput::make('sender')
+                                ->default(app(FormSettings::class)->sender_email)
+                                ->required(),
                             Forms\Components\TextInput::make('sender_name')
                                 ->required(),
                             Forms\Components\TextInput::make('reply_to')
