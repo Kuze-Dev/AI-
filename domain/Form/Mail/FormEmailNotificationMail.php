@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Form\Mail;
 
-use App\Settings\FormSettings;
 use Domain\Form\Models\FormEmailNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
