@@ -40,7 +40,7 @@ class RouteUrlFieldset extends Group
 
                         if ($eventParameters && $eventParameters[0] === 'input') {
                             $inputUrl = $get('route_url.url');
-                            $inputUrl = Str::startsWith($inputUrl, '/', ) ?
+                            $inputUrl = Str::startsWith($inputUrl, '/') ?
                                 Str::contains($inputUrl, "/$locale") ? Str::replace("/$locale", '', $inputUrl) : $inputUrl
                                 : '/' . $inputUrl;
 

@@ -95,7 +95,7 @@ class ContentEntryResource extends Resource
                             ->unique(
                                 callback: function ($livewire, Unique $rule) {
 
-                                    if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+                                    if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
 
                                         return false;
                                     }

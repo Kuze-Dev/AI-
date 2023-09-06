@@ -34,6 +34,7 @@ class CreateOrUpdateRouteUrlAction
                     'is_override' => $routeUrlData->is_override,
                 ]);
         }
+
         if ($model->activeRouteUrl()->is($routeUrl)) {
             return $routeUrl;
         }
