@@ -10,15 +10,15 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 trait HasRouteUrl
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Support\RouteUrl\Models\RouteUrl> */
-    public function routeUrls(): MorphMany
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Support\RouteUrl\Models\RouteUrl> */
+    public function routeUrls(): MorphOne
     {
-        return $this->morphMany(RouteUrl::class, 'model');
+        return $this->morphOne(RouteUrl::class, 'model');
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Support\RouteUrl\Models\RouteUrl> */
     public function activeRouteUrl(): MorphOne
     {
-        return $this->routeUrls()->one()->latestOfMany('updated_at');
+        return $this->routeUrls()->latestOfMany('updated_at');
     }
 }

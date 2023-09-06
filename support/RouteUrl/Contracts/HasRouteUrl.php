@@ -17,8 +17,8 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  */
 interface HasRouteUrl
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Support\RouteUrl\Models\RouteUrl> */
-    public function routeUrls(): MorphMany;
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Support\RouteUrl\Models\RouteUrl> */
+    public function routeUrls(): MorphOne;
 
     /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Support\RouteUrl\Models\RouteUrl> */
     public function activeRouteUrl(): MorphOne;

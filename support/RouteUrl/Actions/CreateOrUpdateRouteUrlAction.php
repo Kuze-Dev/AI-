@@ -17,30 +17,37 @@ class CreateOrUpdateRouteUrlAction
         $url = $routeUrlData->is_override
             ? $routeUrlData->url
             : $model::generateRouteUrl($model, $model->getAttributes());
-
+      
         $url = Str::of($url)->trim('/')->prepend('/');
-
+      
         /** @var ?RouteUrl $routeUrl */
-        $routeUrl = RouteUrl::whereUrl($url)
+        $routeUrl = RouteUrl::whereModelType($model->getMorphClass())
             ->where('model_id', $model->id)
             ->first();
-    
+       
         if ( ! $routeUrl) {
+
             return $model->routeUrls()
                 ->create([
                     'url' => $url,
                     'is_override' => $routeUrlData->is_override,
                 ]);
+        }else {
+            
+            $routeUrl->update([
+                'url' => $url,
+                'is_override' => $routeUrlData->is_override,
+            ]);
         }
 
-        if ($model->activeRouteUrl()->is($routeUrl)) {
-            return $routeUrl;
-        }
+        // if ($model->activeRouteUrl()->is($routeUrl)) {
+        //     return $routeUrl;
+        // }
 
-        $routeUrl->model()
-            ->associate($model)
-            ->fill(['is_override' => $routeUrlData->is_override])
-            ->touch();
+        // $routeUrl->model()
+        //     ->associate($model)
+        //     ->fill(['is_override' => $routeUrlData->is_override])
+        //     ->touch();
 
         return $routeUrl;
     }

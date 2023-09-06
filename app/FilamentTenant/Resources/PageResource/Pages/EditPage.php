@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\PageResource\Pages;
 
+use App\Filament\Livewire\Actions\CustomPageActionGroup;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\PageResource;
 use App\Settings\CMSSettings;
 use App\Settings\SiteSettings;
 use Closure;
 use Domain\Page\Actions\CreatePageDraftAction;
+use Domain\Page\Actions\PublishedPageDraftAction;
 use Domain\Page\Actions\UpdatePageAction;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
@@ -35,13 +37,15 @@ class EditPage extends EditRecord
 {
     use LogsFormActivity;
 
+    protected bool $publish_draft = false;
+
     protected static string $resource = PageResource::class;
 
     /** @throws Exception */
     protected function getActions(): array
     {
         return [
-            ActionGroup::make([
+            'page_actions' => CustomPageActionGroup::make([
                 Action::make('published')
                     ->label(__('Published Draft'))
                     ->action('published')
@@ -52,7 +56,12 @@ class EditPage extends EditRecord
                     ->label(__('Save As Draft'))
                     ->action('draft')
                     ->hidden( function() {  
-                        return ($this->record->draftable_id == null && $this->record->pageDraft->count() > 0) ? true : false;
+
+                        if($this->record->draftable_id != null){
+                            return true;
+                        }
+
+                        return ($this->record->draftable_id == null && $this->record->pageDraft) ? true : false;
                     }),
                 Action::make('overwriteDraft')
                     ->label(__('Save As Draft'))
@@ -67,13 +76,16 @@ class EditPage extends EditRecord
                         ->url(PageResource::getUrl('edit', ['record' => $this->record->pageDraft]));
                     })
                     ->hidden( function() {  
-                        return ($this->record->draftable_id == null && $this->record->pageDraft->count() == 0) ? true : false;
+
+                        return ($this->record->pageDraft && $this->record->draftable_id == null)? false : true;
                     }),
                 Action::make('save')
                     ->label(__('Save and Continue Editing'))
                     ->action('save')
                     ->keyBindings(['mod+s']),
-            ])->view('filament.pages.actions.custom-action-group.index')
+            ])
+            ->view('filament.pages.actions.custom-action-group.index')
+            ->setName('page_draft_actions')
             ->label(__('filament::resources/pages/edit-record.form.actions.save.label')),
             // Action::make('save')
             //     ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
@@ -179,10 +191,10 @@ class EditPage extends EditRecord
 
     }
 
-    // protected function getFormActions(): array
-    // {
-    //     return $this->getCachedActions();
-    // }
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
+    }
 
     /**
      * @param \Domain\Page\Models\Page $record
@@ -190,6 +202,7 @@ class EditPage extends EditRecord
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
+
         return DB::transaction(fn () => app(UpdatePageAction::class)->execute($record, PageData::fromArray($data)));
     }
 
@@ -203,7 +216,45 @@ class EditPage extends EditRecord
 
     public function overwriteDraft()
     {
-        dump(1123);
+        $data = $this->form->getState();
+
+        $record = $this->record;
+
+        $record->pageDraft->delete();
+
+        $pageData = PageData::fromArray($data);
+
+        $draftpage = app(CreatePageDraftAction::class)->execute($record,$pageData);
+
+        Notification::make()
+        ->success()
+        ->title(trans('Overwritten Draft'))
+        ->body(trans('Page Draft has been overwritten'))
+        ->send();
+        
+        return redirect(PageResource::getUrl('edit', ['record' => $draftpage]));
+    }
+
+    public function published()
+    {
+        $data = $this->form->getState();
+
+        $pageDraft = $this->record;
+
+        $parentPage = $pageDraft->parentPage;
+
+        $data['published_draft'] = true;
+        $data['published_at'] = now();
+
+        $pageData = PageData::fromArray($data);
+
+        $page = DB::transaction(fn () => app(PublishedPageDraftAction::class)->execute(
+            $parentPage,
+            $pageDraft,
+            $pageData)
+        );
+
+        return redirect(PageResource::getUrl('edit', ['record' => $page]));
     }
 
     public function draft()
