@@ -76,13 +76,14 @@ class BlueprintData extends Model implements HasMedia
 
     public $registerMediaConversionsUsingModelInstance = true;
 
-    public function registerMediaCollections(): void
+    public function registerMediaConversions(Media $media = null): void
     {
-        $registerMediaConversions = function (Media $media) {
-            $config = $this->blueprint->schema;
-            foreach ($config->sections as $section) {
-                foreach ($section->fields as $field) {
-                    if ($field->type === FieldType::MEDIA) {
+        $config = $this->blueprint->schema;
+        foreach ($config->sections as $section) {
+            foreach ($section->fields as $field) {
+                if ($field->type === FieldType::MEDIA) {
+                    $statePath = $section->state_name . '.' . $field->state_name;
+                    if ($statePath === $this->state_path) {
                         foreach ($field->conversions as $conversion) {
                             $title = $conversion->name;
                             if (isset($conversion->manipulations)) {
@@ -102,9 +103,7 @@ class BlueprintData extends Model implements HasMedia
                     }
                 }
             }
-        };
+        }
 
-        $this->addMediaCollection('blueprint_media')
-            ->registerMediaConversions($registerMediaConversions);
     }
 }

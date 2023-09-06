@@ -18,6 +18,7 @@ class CreateBlueprintDataAction
 
     private function storeBlueprintData(BlueprintDataData $blueprintDataData): BlueprintData
     {
+
         $blueprintData = BlueprintData::create([
             'blueprint_id' => $blueprintDataData->blueprint_id,
             'model_id' => $blueprintDataData->model_id,
@@ -27,7 +28,7 @@ class CreateBlueprintDataAction
             'type' => $blueprintDataData->type,
         ]);
 
-        if($blueprintData->type === FieldType::MEDIA) {
+        if($blueprintData->type == FieldType::MEDIA) {
             $blueprintData->addMediaFromDisk($blueprintData->value, 's3')
                 ->toMediaCollection('blueprint_media');
         }
@@ -37,52 +38,13 @@ class CreateBlueprintDataAction
 
     public function execute(BlockContent $blockContent): BlueprintData
     {
-
-        $sections = $blockContent->block->blueprint->schema->sections;
-        $stateNames = $this->extractStateNames($sections);
-        $blockContentArray = $blockContent->data;
-
-        $rearrangedArray = [];
-
-        foreach ($blockContentArray as $key => $blockContentinnerArray) {
-            if (is_array($blockContentinnerArray)) {
-                $rearrangedArray[$key] = $this->rearrangeBlockContentInnerArray($blockContentinnerArray, $stateNames);
-            }
-        }
-
         $blueprintfieldtype = $blockContent->block->blueprint->schema;
-        $statePaths = $this->extractDataAction->extractStatePath($rearrangedArray);
-        $fieldTypes = $this->extractDataAction->extractFieldType($blueprintfieldtype);
+        $statePaths = $this->extractDataAction->extractStatePath($blockContent->data);
+        $fieldTypes = $this->extractDataAction->extractFieldType($blueprintfieldtype, $statePaths);
         foreach (array_combine($statePaths, $fieldTypes) as $statePath => $fieldType) {
             $this->storeBlueprintData(BlueprintDataData::fromArray($blockContent, $statePath, $fieldType));
         }
 
         return new BlueprintData();
-    }
-
-    // Function to extract state names from sections and fields
-    private function extractStateNames(array $sections)
-    {
-        $stateNames = [];
-        foreach ($sections as $section) {
-            foreach ($section->fields as $field) {
-                $stateNames[] = $field->state_name;
-            }
-        }
-
-        return $stateNames;
-    }
-
-    // Function to rearrange the inner array based on state names
-    private function rearrangeBlockContentInnerArray(array $innerArray, array $stateNames)
-    {
-        $rearrangedBlockContentInnerArray = [];
-        foreach ($stateNames as $stateName) {
-            if (array_key_exists($stateName, $innerArray)) {
-                $rearrangedBlockContentInnerArray[$stateName] = $innerArray[$stateName];
-            }
-        }
-
-        return $rearrangedBlockContentInnerArray;
     }
 }

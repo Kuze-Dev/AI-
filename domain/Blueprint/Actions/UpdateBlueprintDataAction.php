@@ -29,14 +29,14 @@ class UpdateBlueprintDataAction
                 ->toMediaCollection('blueprint_media');
         }
 
-        return new BlueprintData();
+        return $blueprintData;
     }
 
     public function execute(BlockContent $blockContent): BlueprintData
     {
         $blueprintfieldtype = $blockContent->block->blueprint->schema;
         $statePaths = $this->extractDataAction->extractStatePath($blockContent->data);
-        $fieldTypes = $this->extractDataAction->extractFieldType($blueprintfieldtype);
+        $fieldTypes = $this->extractDataAction->extractFieldType($blueprintfieldtype, $statePaths);
 
         foreach (array_combine($statePaths, $fieldTypes) as $statePath => $fieldType) {
 

@@ -25,14 +25,19 @@ class ExtractDataAction
         return $statePaths;
     }
 
-    public function extractFieldType(SchemaData $blueprintfieldtype): array
+    public function extractFieldType(SchemaData $blueprintfieldtype, array $statePaths): array
     {
         $fieldTypes = [];
 
-        foreach ($blueprintfieldtype->sections as $section) {
-            foreach ($section->fields as $field) {
-                if (isset($field->type)) {
-                    $fieldTypes[] = $field->type;
+        for ($i = 0; $i < count($statePaths); $i++) {
+            $statePath = $statePaths[$i];
+
+            foreach ($blueprintfieldtype->sections as $section) {
+                foreach ($section->fields as $field) {
+                    $currentPath = $section->state_name . '.' . $field->state_name;
+                    if ($currentPath === $statePath && isset($field->type)) {
+                        $fieldTypes[] = $field->type;
+                    }
                 }
             }
         }
