@@ -70,7 +70,7 @@ class ProductController
                 'metaData',
             ])
             ->firstOrFail();
-            
+
         if ($product instanceof Product) {
             $totalSold = OrderLine::whereHas('order', function (Builder $query) {
                 $query->where('status', OrderStatuses::FULFILLED);
