@@ -31,7 +31,7 @@ class RouteUrlFieldset extends Group
             'route_url::update' => [
                 function (self $component, ...$eventParameters): void {
                     $component->evaluate(function (HasRouteUrl|string $model, Closure $get, Closure $set, array $state) use ($eventParameters) {
-                        if ((bool)$get('is_override')) {
+                        if ((bool) $get('is_override')) {
                             return;
                         }
 
@@ -40,7 +40,7 @@ class RouteUrlFieldset extends Group
 
                         if ($eventParameters && $eventParameters[0] === 'input') {
                             $inputUrl = $get('route_url.url');
-                            $inputUrl = Str::startsWith($inputUrl, '/',) ?
+                            $inputUrl = Str::startsWith($inputUrl, '/', ) ?
                                 Str::contains($inputUrl, "/$locale") ? Str::replace("/$locale", '', $inputUrl) : $inputUrl
                                 : '/' . $inputUrl;
 
@@ -65,25 +65,25 @@ class RouteUrlFieldset extends Group
 
         $this->schema([
             Forms\Components\Toggle::make('is_override')
-                ->formatStateUsing(fn(?HasRouteUrl $record) => $record?->activeRouteUrl?->is_override)
+                ->formatStateUsing(fn (?HasRouteUrl $record) => $record?->activeRouteUrl?->is_override)
                 ->label(trans('Custom URL'))
                 ->reactive()
-                ->afterStateUpdated(fn() => $this->dispatchEvent('route_url::update')),
+                ->afterStateUpdated(fn () => $this->dispatchEvent('route_url::update')),
             Forms\Components\TextInput::make('url')
                 ->label(trans('URL'))
-                ->disabled(fn(Closure $get) => !(bool)$get('is_override'))
-                ->formatStateUsing(fn(?HasRouteUrl $record) => $record?->activeRouteUrl?->url)
+                ->disabled(fn (Closure $get) => ! (bool) $get('is_override'))
+                ->formatStateUsing(fn (?HasRouteUrl $record) => $record?->activeRouteUrl?->url)
                 ->lazy()
                 ->required()
                 ->string()
                 ->maxLength(255)
                 ->startsWith('/')
                 ->rule(
-                    fn(?HasRouteUrl $record, Closure $get) => tenancy()->tenant?->features()->inactive(SitesManagement::class) ?
+                    fn (?HasRouteUrl $record, Closure $get) => tenancy()->tenant?->features()->inactive(SitesManagement::class) ?
                         new UniqueActiveRouteUrlRule($record) : null
-                // new MicroSiteUniqueRouteUrlRule($record, $get('sites'))
+                    // new MicroSiteUniqueRouteUrlRule($record, $get('sites'))
                 )
-                ->afterStateUpdated(fn() => $this->dispatchEvent('route_url::update', 'input')),
+                ->afterStateUpdated(fn () => $this->dispatchEvent('route_url::update', 'input')),
         ]);
 
         $this->generateModelForRouteUrlUsing(function (HasRouteUrl|string $model) {
