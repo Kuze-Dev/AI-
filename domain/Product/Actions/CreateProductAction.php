@@ -27,9 +27,9 @@ class CreateProductAction
 
         $this->createMetaData->execute($product, $productData->meta_data);
 
-        $this->createProductOption->execute($product, $productData);
+        $newProductVariants = $this->createProductOption->execute($product, $productData);
 
-        $this->createOrUpdateProductVariant->execute($product, $productData, false);
+        $this->createOrUpdateProductVariant->execute($product, $newProductVariants, false);
 
         $this->uploadMediaMaterials(
             $product,

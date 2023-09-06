@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Domain\Product\Actions;
 
-use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\DataTransferObjects\ProductVariantData;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 
 class CreateOrUpdateProductVariantAction
 {
-    public function execute(Product $product, ProductData $productData, bool $isCreate = true): void
+    public function execute(Product $product, array $productVariants, bool $isCreate = true): void
     {
         /** If met, flush product variants */
-        if ( ! filled($productData->product_variants)) {
+        if ( ! filled($productVariants)) {
             ProductVariant::whereProductId($product->id)->delete();
 
             return;
@@ -22,16 +21,16 @@ class CreateOrUpdateProductVariantAction
 
         /** If for variant creation */
         if ($isCreate) {
-            foreach ($productData->product_variants ?? [] as $productVariant) {
+            foreach ($productVariants as $productVariant) {
                 $this->createProductVariant($product->id, $productVariant);
             }
 
             return;
         }
 
-        $this->sanitizeVariants($product->id, $productData->product_variants ?? []);
+        $this->sanitizeVariants($product->id, $productVariants);
 
-        $this->createOrUpdateProductVariants($product->id, $productData->product_variants ?? []);
+        $this->createOrUpdateProductVariants($product->id, $productVariants);
     }
 
     protected function createProductVariant(int $productId, ProductVariantData $productVariant): void
