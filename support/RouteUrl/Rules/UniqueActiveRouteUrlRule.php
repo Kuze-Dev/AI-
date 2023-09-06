@@ -7,6 +7,7 @@ namespace Support\RouteUrl\Rules;
 use Support\RouteUrl\Contracts\HasRouteUrl;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Closure;
+use Domain\Page\Models\Page;
 use Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -36,9 +37,34 @@ class UniqueActiveRouteUrlRule implements ValidationRule
             );
 
         if ($this->ignoreModel) {
-            $query->whereNot(fn (EloquentBuilder $query) => $query
+
+            if ($this->ignoreModel instanceof Page) {
+                
+                if ($this->ignoreModel->parentPage) {
+                    
+                    $ignoreModelIds = [
+                        $this->ignoreModel->getKey(),
+                        $this->ignoreModel->parentPage->getKey(),
+                    ];
+
+                }else{
+
+                    $ignoreModelIds = [
+                        $this->ignoreModel->getKey(),
+                        $this->ignoreModel->pageDraft->getKey(),
+                    ];
+                   
+                }
+
+                $query->whereNot(fn (EloquentBuilder $query) => $query
                 ->where('model_type',  $this->ignoreModel->getMorphClass())
-                ->where('model_id',  $this->ignoreModel->getKey()));
+                ->whereIn('model_id', $ignoreModelIds));
+    
+            }else{
+                $query->whereNot(fn (EloquentBuilder $query) => $query
+                    ->where('model_type',  $this->ignoreModel->getMorphClass())
+                    ->where('model_id',  $this->ignoreModel->getKey()));
+            }
         }
 
         if ($query->exists()) {

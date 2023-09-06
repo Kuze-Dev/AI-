@@ -19,6 +19,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
@@ -178,6 +179,18 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
     {
         return Str::start($model->content->prefix, '/') . Str::of($attributes['title'])->slug()->start('/');
     }
+
+      /** @return \Illuminate\Database\Eloquent\Relations\HasOne<self> */
+      public function pageDraft(): HasOne
+      {
+          return $this->hasOne(ContentEntry::class,'draftable_id');
+      }
+  
+      /** @return BelongsTo<self, ContentEntry> */
+      public function parentPage(): BelongsTo
+      {
+          return $this->belongsTo(ContentEntry::class, 'draftable_id');
+      }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Admin, ContentEntry> */
     public function author(): BelongsTo
