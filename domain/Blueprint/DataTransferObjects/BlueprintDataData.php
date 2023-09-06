@@ -22,7 +22,6 @@ class BlueprintDataData
     public static function fromArray(BlockContent $block_content, string $state_path, FieldType $field_type): self
     {
 
-        // dd($block_content->data);
         $data = $block_content->data;
 
         $keys = explode('.', $state_path);
@@ -35,7 +34,6 @@ class BlueprintDataData
         }
 
         $value = is_array($data) ? end($data) : $data;
-        // dd($block_content->data, $value, $field_type, $state_path);
 
         return new self(
             blueprint_id: $block_content->block?->blueprint?->getKey(),

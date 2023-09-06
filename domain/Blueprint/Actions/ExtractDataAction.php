@@ -8,7 +8,7 @@ use Domain\Blueprint\DataTransferObjects\SchemaData;
 
 class ExtractDataAction
 {
-    public function extractStatePath(array $data, $parentKey = ''): array
+    public function extractStatePath(array $data, string $parentKey = ''): array
     {
         $statePaths = [];
 
@@ -25,7 +25,7 @@ class ExtractDataAction
         return $statePaths;
     }
 
-    public function extractFieldType(SchemaData $blueprintfieldtype, $parentKey = ''): array
+    public function extractFieldType(SchemaData $blueprintfieldtype): array
     {
         $fieldTypes = [];
 

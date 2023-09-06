@@ -18,7 +18,6 @@ class CreateBlueprintDataAction
 
     private function storeBlueprintData(BlueprintDataData $blueprintDataData): BlueprintData
     {
-
         $blueprintData = BlueprintData::create([
             'blueprint_id' => $blueprintDataData->blueprint_id,
             'model_id' => $blueprintDataData->model_id,
@@ -28,7 +27,7 @@ class CreateBlueprintDataAction
             'type' => $blueprintDataData->type,
         ]);
 
-        if($blueprintData->type == FieldType::MEDIA) {
+        if($blueprintData->type === FieldType::MEDIA) {
             $blueprintData->addMediaFromDisk($blueprintData->value, 's3')
                 ->toMediaCollection('blueprint_media');
         }
@@ -54,7 +53,6 @@ class CreateBlueprintDataAction
         $blueprintfieldtype = $blockContent->block->blueprint->schema;
         $statePaths = $this->extractDataAction->extractStatePath($rearrangedArray);
         $fieldTypes = $this->extractDataAction->extractFieldType($blueprintfieldtype);
-
         foreach (array_combine($statePaths, $fieldTypes) as $statePath => $fieldType) {
             $this->storeBlueprintData(BlueprintDataData::fromArray($blockContent, $statePath, $fieldType));
         }

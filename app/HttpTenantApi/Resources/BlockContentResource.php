@@ -30,6 +30,7 @@ class BlockContentResource extends JsonApiResource
     {
         return [
             'block' => fn () => BlockResource::make($this->block),
+            'blueprintData' => fn () => BlueprintDataResource::collection($this->blueprintData),
         ];
     }
 
