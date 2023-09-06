@@ -10,7 +10,7 @@ class ProductOptionData
         public readonly int|string $id,
         public readonly string $name,
         public readonly string $slug,
-        public array $productOptionValues,
+        public readonly array $productOptionValues,
     ) {
     }
 
@@ -34,6 +34,16 @@ class ProductOptionData
             name: $data->name,
             slug: $data->slug,
             productOptionValues: $data->productOptionValues,
+        );
+    }
+
+    public static function withProductOptionValues(array $productOptionValues, self $data): self
+    {
+        return new self(
+            id: $data->id,
+            name: $data->name,
+            slug: $data->slug,
+            productOptionValues: $productOptionValues,
         );
     }
 }

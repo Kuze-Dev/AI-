@@ -11,52 +11,56 @@ use Domain\Product\Models\ProductOptionValue;
 
 class CreateProductOptionAction
 {
-    public function execute(Product $product, ProductData $productData): void
+    public function execute(Product $product, ProductData $productData): array
     {
-        if (filled($productData->product_options)) {
-            foreach ($productData->product_options ?? [] as $key => $productOption) {
-                $newProductOptionModel = ProductOption::create([
+        $mutableVariants = $productData->product_variants ?? [];
+        $mutableOptions = $productData->product_options;
+
+        if (filled($mutableOptions)) {
+            foreach ($mutableOptions ?? [] as $key => $productOption) {
+                $optionModel = ProductOption::create([
                     'product_id' => $product->id,
                     'name' => $productOption->name,
                 ]);
 
-                $productData->product_variants = $this->searchAndChangeValue(
+                $mutableVariants = $this->searchAndChangeValue(
                     $productOption->id,
-                    $productData->product_variants ?? [],
-                    $newProductOptionModel->id
+                    $mutableVariants,
+                    $optionModel->id
                 );
 
-                $productOption = $productOption
-                    ->withId(
-                        $newProductOptionModel->id,
-                        $productOption
-                    );
+                $productOption = $productOption->withId($optionModel->id, $productOption);
+                $mutableOptionValues = $productOption->productOptionValues;
 
-                foreach ($productOption->productOptionValues as $key2 => $productOptionValue) {
-                    $productOptionValue = $productOptionValue->withOptionId($productOption->id, $productOptionValue);
-                    $proxyOptionValueId = $productOptionValue->id;
+                foreach ($mutableOptionValues as $key2 => $optionValue) {
+                    $optionValue = $optionValue->withOptionId($productOption->id, $optionValue);
 
-                    $newOptionValueModel = ProductOptionValue::create([
-                        'name' => $productOptionValue->name,
+                    $proxyOptionValueId = $optionValue->id;
+
+                    $optionValueModel = ProductOptionValue::create([
+                        'name' => $optionValue->name,
                         'product_option_id' => $productOption->id,
                     ]);
 
-                    $productOptionValue = $productOptionValue
-                        ->withId($newOptionValueModel->id, $productOptionValue);
+                    $optionValue = $optionValue->withId($optionValueModel->id, $optionValue);
 
-                    $productData->product_variants = $this->searchAndChangeValue(
+                    $mutableVariants = $this->searchAndChangeValue(
                         $proxyOptionValueId,
-                        $productData->product_variants ?? [],
-                        $newOptionValueModel->id,
+                        $mutableVariants,
+                        $optionValueModel->id,
                         'option_value_id'
                     );
 
-                    $productOption->productOptionValues[$key2] = $productOptionValue;
+                    $mutableOptionValues[$key2] = $optionValue;
                 }
 
-                $productData->product_options[$key] = $productOption;
+                $productOption = $productOption->withProductOptionValues($mutableOptionValues, $productOption);
+
+                $mutableOptions[$key] = $productOption;
             }
         }
+
+        return $mutableVariants;
     }
 
     protected function searchAndChangeValue(string|int $needle, array $haystack, int $newValue, string $field = 'option_id'): array
