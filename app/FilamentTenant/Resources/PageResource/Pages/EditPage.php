@@ -27,6 +27,7 @@ use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions\Action;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Http\RedirectResponse;
 
 /**
  * @property \Domain\Page\Models\Page $record
@@ -85,10 +86,6 @@ class EditPage extends EditRecord
                 ->view('filament.pages.actions.custom-action-group.index')
                 ->setName('page_draft_actions')
                 ->label(__('filament::resources/pages/edit-record.form.actions.save.label')),
-            // Action::make('save')
-            //     ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
-            //     ->action('save')
-            //     ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
             Action::make('preview')
                 ->color('secondary')
@@ -212,13 +209,13 @@ class EditPage extends EditRecord
         $this->fillForm();
     }
 
-    public function overwriteDraft()
+    public function overwriteDraft(): RedirectResponse
     {
         $data = $this->form->getState();
 
         $record = $this->record;
 
-        $record->pageDraft->delete();
+        $record->pageDraft?->delete();
 
         $pageData = PageData::fromArray($data);
 
@@ -233,12 +230,13 @@ class EditPage extends EditRecord
         return redirect(PageResource::getUrl('edit', ['record' => $draftpage]));
     }
 
-    public function published()
+    public function published(): RedirectResponse
     {
         $data = $this->form->getState();
 
         $pageDraft = $this->record;
 
+        /** @var Page */
         $parentPage = $pageDraft->parentPage;
 
         $data['published_draft'] = true;
@@ -257,7 +255,7 @@ class EditPage extends EditRecord
         return redirect(PageResource::getUrl('edit', ['record' => $page]));
     }
 
-    public function draft()
+    public function draft(): RedirectResponse|false
     {
         $data = $this->form->getState();
 
@@ -275,7 +273,7 @@ class EditPage extends EditRecord
                 ->body(trans('Page :title has a existing draft', ['title' => $record->name]))
                 ->send();
 
-            return;
+            return false;
         }
 
         $draftpage = app(CreatePageDraftAction::class)->execute($record, $pageData);

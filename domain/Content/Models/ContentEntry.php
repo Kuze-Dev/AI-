@@ -49,6 +49,7 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property-read int|null $route_urls_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
+ * @property-read ContentEntry|null $pageDraft
  * @method static ContentEntryBuilder|ContentEntry newModelQuery()
  * @method static ContentEntryBuilder|ContentEntry newQuery()
  * @method static ContentEntryBuilder|ContentEntry query()

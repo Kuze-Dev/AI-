@@ -34,6 +34,7 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property string $locale
  * @property string $slug
  * @property Visibility $visibility
+ * @property string|null $draftable_id
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -81,6 +82,7 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
         'visibility',
         'published_at',
         'locale',
+        'draftable_id',
     ];
 
     /**

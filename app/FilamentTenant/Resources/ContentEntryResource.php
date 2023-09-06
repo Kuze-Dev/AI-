@@ -11,6 +11,7 @@ use Filament\Tables;
 use Illuminate\Support\Arr;
 use Filament\Resources\Form;
 use Filament\Resources\Table;
+use Illuminate\Support\Str;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use App\FilamentTenant\Resources;
@@ -29,7 +30,7 @@ use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Support\RouteUrl\Rules\MicrositeContentEntryUniqueRouteUrlRule;
+use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class ContentEntryResource extends Resource
@@ -137,7 +138,7 @@ class ContentEntryResource extends Resource
                     Forms\Components\Card::make([
                         Forms\Components\CheckboxList::make('sites')
                             ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
-                            ->rule(fn (?ContentEntry $record, Closure $get) => new MicrositeContentEntryUniqueRouteUrlRule($record, $get('route_url')))
+                            ->rule(fn (?ContentEntry $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
                             ->options(function ($livewire) {
 
                                 /** @var \Domain\Admin\Models\Admin */
@@ -318,6 +319,27 @@ class ContentEntryResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ])
             ->defaultSort('order');
+    }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+
+        $status = '';
+
+        if ($record) {
+            /** @var ContentEntry */
+            $model = $record;
+            $status = $model->draftable_id ? ' ( Draft )' : '';
+        }
+
+        /** @var string */
+        $attribute = static::$recordTitleAttribute;
+        $recordTitle = $record?->getAttribute($attribute) ?? '';
+
+        $maxLength = 60; // Maximum length for the title before truncating
+        $truncatedTitle = Str::limit($recordTitle, $maxLength, '...');
+
+        return $truncatedTitle . ''. $status;
     }
 
     /** @return array */

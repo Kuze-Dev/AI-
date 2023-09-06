@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace Support\RouteUrl\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
+use Domain\Content\Models\ContentEntry;
+use Domain\Page\Models\Page;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
  * @property-read int $id
  * @property-read \Illuminate\Database\Eloquent\Collection|\Support\RouteUrl\Models\RouteUrl[] $routeUrls
  * @property-read \Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
+ * @property-read ContentEntry|Page|null $pageDraft
+ * @property-read ContentEntry|Page|null $parentPage.
  *
  * @mixin \Illuminate\Database\Eloquent\Model
  */

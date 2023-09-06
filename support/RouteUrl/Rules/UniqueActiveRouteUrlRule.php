@@ -51,14 +51,14 @@ class UniqueActiveRouteUrlRule implements ValidationRule
 
                     $ignoreModelIds = [
                         $this->ignoreModel->getKey(),
-                        $this->ignoreModel->pageDraft->getKey(),
+                        $this->ignoreModel->pageDraft?->getKey() ?: null,
                     ];
 
                 }
 
                 $query->whereNot(fn (EloquentBuilder $query) => $query
                     ->where('model_type',  $this->ignoreModel->getMorphClass())
-                    ->whereIn('model_id', $ignoreModelIds));
+                    ->whereIn('model_id', array_filter($ignoreModelIds)));
 
             } else {
                 $query->whereNot(fn (EloquentBuilder $query) => $query

@@ -40,15 +40,6 @@ class CreateOrUpdateRouteUrlAction
             ]);
         }
 
-        // if ($model->activeRouteUrl()->is($routeUrl)) {
-        //     return $routeUrl;
-        // }
-
-        // $routeUrl->model()
-        //     ->associate($model)
-        //     ->fill(['is_override' => $routeUrlData->is_override])
-        //     ->touch();
-
         return $routeUrl;
     }
 }

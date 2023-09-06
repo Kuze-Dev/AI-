@@ -318,7 +318,7 @@ class PageResource extends Resource
         $status = '';
 
         if ($record) {
-
+            /** @var Page */
             $model = $record;
             $status = $model->draftable_id ? ' ( Draft )' : '';
         }
