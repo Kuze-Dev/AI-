@@ -14,7 +14,9 @@ use Illuminate\Support\Facades\DB;
 use App\FilamentTenant\Resources\ContentEntryResource;
 use App\FilamentTenant\Resources\ContentResource;
 use Domain\Content\Actions\CreateContentEntryDraftAction;
+use Domain\Content\Actions\PublishedContentEntryDraftAction;
 use Domain\Content\Actions\UpdateContentEntryAction;
+use Filament\Notifications\Notification;
 use Domain\Content\Models\Content;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
@@ -146,6 +148,51 @@ class EditContentEntry extends EditRecord
         $draftpage = app(CreateContentEntryDraftAction::class)->execute($record, $pageData);
 
         return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $draftpage]));
+    }
+
+    public function overwriteDraft(): RedirectResponse|Redirector
+    {
+        $data = $this->form->getState();
+
+        $record = $this->record;
+
+        $record->pageDraft?->delete();
+
+        $pageData = ContentEntryData::fromArray($data);
+
+        $draftpage = app(CreateContentEntryDraftAction::class)->execute($record, $pageData);
+
+        Notification::make()
+            ->success()
+            ->title(trans('Overwritten Draft'))
+            ->body(trans('Content Entry Draft has been overwritten'))
+            ->send();
+
+            return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $draftpage]));
+    }
+
+    public function published(): RedirectResponse|Redirector
+    {
+        $data = $this->form->getState();
+
+        $pageDraft = $this->record;
+
+        /** @var \Domain\Content\Models\ContentEntry */
+        $parentPage = $pageDraft->parentPage;
+
+        $data['published_draft'] = true;
+
+        $contentEntryData = ContentEntryData::fromArray($data);
+
+        $contentEntry = DB::transaction(
+            fn () => app(PublishedContentEntryDraftAction::class)->execute(
+                $parentPage,
+                $pageDraft,
+                $contentEntryData
+            )
+        );
+        
+        return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $contentEntry]));
     }
 
     protected function configureDeleteAction(DeleteAction $action): void
