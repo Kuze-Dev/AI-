@@ -62,7 +62,7 @@ class PageResource extends Resource
                                     ignoreRecord: true,
                                     callback: function (Unique $rule) {
 
-                                        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+                                        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
                                             return false;
                                         }
 
@@ -117,6 +117,7 @@ class PageResource extends Resource
                         Forms\Components\Card::make([
                             Forms\Components\CheckboxList::make('sites')
                                 ->reactive()
+                                ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                                 ->rule(fn (?Page $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
                                 ->options(function () {
 

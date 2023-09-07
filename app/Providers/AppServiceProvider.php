@@ -5,22 +5,48 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Settings\FormSettings;
+use Domain\Address\Models\Country;
+use Domain\Address\Models\State;
+use Domain\Currency\Models\Currency;
+use Domain\Address\Models\Address;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Models\BlueprintData;
+use Domain\Cart\Models\Cart;
+use Domain\Cart\Models\CartLine;
+use Domain\Customer\Models\Customer;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
+use Domain\Discount\Models\Discount;
+use Domain\Discount\Models\DiscountCondition;
+use Domain\Discount\Models\DiscountRequirement;
+use Domain\Discount\Models\DiscountLimit;
+use Domain\Favorite\Models\Favorite;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Form\Models\FormSubmission;
 use Domain\Globals\Models\Globals;
-use Domain\Page\Models\Page;
+use Domain\Order\Models\Order;
+use Domain\Order\Models\OrderAddress;
+use Domain\Order\Models\OrderLine;
 use Domain\Page\Models\Block;
 use Domain\Page\Models\BlockContent;
+use Domain\Review\Models\Review;
+use Domain\Taxation\Models\TaxZone;
+use Domain\Page\Models\Page;
+use Domain\Shipment\Models\Shipment;
+use Domain\Shipment\Models\ShippingBox;
+use Domain\ShippingMethod\Models\ShippingMethod;
+use Domain\Tier\Models\Tier;
+use Domain\PaymentMethod\Models\PaymentMethod;
 use Support\Captcha\CaptchaManager;
 use Support\MetaData\Models\MetaData;
+use Domain\Product\Models\Product;
+use Domain\Payments\Models\Payment;
+use Domain\Product\Models\ProductVariant;
+use Domain\Payments\Models\PaymentRefund;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Internationalization\Models\Locale;
@@ -31,6 +57,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
+use Sentry\Laravel\Integration;
 use Laravel\Pennant\Feature;
 use Stancl\Tenancy\Database\Models\Tenant;
 use TiMacDonald\JsonApi\JsonApiResource;
@@ -46,6 +73,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::shouldBeStrict( ! $this->app->isProduction());
+
+        Model::handleLazyLoadingViolationUsing(Integration::lazyLoadingViolationReporter());
 
         Model::handleMissingAttributeViolationUsing(function (Model $model, string $key) {
             if ($model instanceof Tenant && Str::startsWith($key, Tenant::internalPrefix())) {
@@ -67,6 +96,8 @@ class AppServiceProvider extends ServiceProvider
             Form::class,
             FormSubmission::class,
             FormEmailNotification::class,
+            Product::class,
+            ProductVariant::class,
             Taxonomy::class,
             TaxonomyTerm::class,
             Content::class,
@@ -75,6 +106,35 @@ class AppServiceProvider extends ServiceProvider
             MetaData::class,
             BlockContent::class,
             BlueprintData::class,
+            Discount::class,
+            DiscountRequirement::class,
+            DiscountCondition::class,
+            DiscountLimit::class,
+            TaxZone::class,
+            PaymentMethod::class,
+            Payment::class,
+            Tier::class,
+            Customer::class,
+            Address::class,
+            Country::class,
+            State::class,
+            Currency::class,
+            Tier::class,
+            Customer::class,
+            Address::class,
+            Cart::class,
+            CartLine::class,
+            PaymentMethod::class,
+            Payment::class,
+            Order::class,
+            OrderLine::class,
+            OrderAddress::class,
+            Favorite::class,
+            Review::class,
+            Shipment::class,
+            ShippingMethod::class,
+            ShippingBox::class,
+            PaymentRefund::class,
             Locale::class,
             Site::class,
         ]);

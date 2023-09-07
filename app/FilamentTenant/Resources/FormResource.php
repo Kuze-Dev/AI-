@@ -75,6 +75,7 @@ class FormResource extends Resource
                     Forms\Components\Toggle::make('store_submission'),
                     Forms\Components\Card::make([
                         Forms\Components\CheckboxList::make('sites')
+                            ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                             ->rules([
                                 function (?FormModel $record, Closure $get) {
 
@@ -191,6 +192,9 @@ class FormResource extends Resource
                                             : ($state ?? [])),
                                 ])
                                 ->columns(3),
+                            Forms\Components\TextInput::make('sender')
+                                ->default(app(FormSettings::class)->sender_email)
+                                ->required(),
                             Forms\Components\TextInput::make('sender_name')
                                 ->required(),
                             Forms\Components\TextInput::make('reply_to')

@@ -13,6 +13,8 @@ use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
  * @mixin \Domain\Page\Models\BlockContent
+ * @property-read \Domain\Page\Models\Block $block
+ * @property-read \Domain\Blueprint\Models\Blueprint $blueprint
  */
 class BlockContentResource extends JsonApiResource
 {
