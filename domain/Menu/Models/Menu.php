@@ -51,7 +51,7 @@ class Menu extends Model
     protected $fillable = [
         'name',
         'slug',
-        'locale'
+        'locale',
     ];
 
     public function getActivitylogOptions(): LogOptions
