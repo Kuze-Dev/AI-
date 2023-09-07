@@ -530,6 +530,7 @@ class BlueprintResource extends Resource
                                                 ->minValue(0)
                                                 ->required()
                                                 ->formatStateUsing(fn () => $stateData($manipulationType)),
+                                            /** @phpstan-ignore-next-line */
                                             default => throw new ErrorException(
                                                 ManipulationType::class.'::'.Str::upper($manipulationType->value) . ' field not setup for conversion manipulation.'
                                             )

@@ -57,6 +57,7 @@ class BlockContent extends Model implements Sortable
         return $this->belongsTo(Block::class);
     }
 
+    /** @return MorphMany<BlueprintData> */
     public function blueprintData(): MorphMany
     {
         return $this->morphMany(BlueprintData::class,  'model');

@@ -36,7 +36,7 @@ class BlueprintDataData
         $value = is_array($data) ? end($data) : $data;
 
         return new self(
-            blueprint_id: $block_content->block?->blueprint?->getKey(),
+            blueprint_id: $block_content->block->blueprint->getKey(),
             model_id: $block_content->getKey(),
             model_type: $block_content->getMorphClass(),
             state_path: $state_path,

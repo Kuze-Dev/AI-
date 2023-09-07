@@ -64,28 +64,37 @@ class BlueprintData extends Model implements HasMedia
         // 'value' => MediaFieldData::class, // TODO: DTO
     ];
 
+    /** @return BelongsTo<Blueprint, BlueprintData> */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
     }
 
+    /** @return MorphTo<Model, self> */
     public function model(): MorphTo
     {
         return $this->morphTo();
     }
 
+    /** @var bool */
     public $registerMediaConversionsUsingModelInstance = true;
 
     public function registerMediaConversions(Media $media = null): void
     {
-        $config = $this->blueprint->schema;
-        foreach ($config->sections as $section) {
+        $blueprint = $this->blueprint;
+        if( ! $blueprint) {
+            return;
+        }
+        $schema = $blueprint->schema;
+        foreach ($schema->sections as $section) {
             foreach ($section->fields as $field) {
                 if ($field->type === FieldType::MEDIA) {
                     $statePath = $section->state_name . '.' . $field->state_name;
                     if ($statePath === $this->state_path) {
-                        foreach ($field->conversions as $conversion) {
+                        foreach ($field->conversions ?? [] as $conversion) {
                             $title = $conversion->name;
+                            $width = null;
+                            $height = null;
                             if (isset($conversion->manipulations)) {
                                 foreach($conversion->manipulations as $manipulation) {
                                     if($manipulation->type == ManipulationType::WIDTH) {
@@ -95,9 +104,11 @@ class BlueprintData extends Model implements HasMedia
                                         $height = $manipulation->params[0];
                                     }
                                 }
+                                /** @phpstan-ignore-next-line */
                                 $this->addMediaConversion($title)
                                     ->width($width)
-                                    ->height($height)->keepOriginalImageFormat();
+                                    ->height($height)
+                                    ->keepOriginalImageFormat();
                             }
                         }
                     }

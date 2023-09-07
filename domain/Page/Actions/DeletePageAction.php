@@ -20,7 +20,10 @@ class DeletePageAction
             throw new CantDeleteHomePageException();
         }
 
-        $this->deleteBlockContentAction->execute($page->blockContents->first());
+        $blockContent = $page->blockContents->first();
+        if ($blockContent) {
+            $this->deleteBlockContentAction->execute($blockContent);
+        }
 
         return $page->delete();
     }
