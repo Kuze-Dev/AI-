@@ -34,6 +34,7 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property string $title
  * @property string $slug
  * @property string $locale
+ * @property string|null $draftable_id
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property array $data
  * @property int|null $order

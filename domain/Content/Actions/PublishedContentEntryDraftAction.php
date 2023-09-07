@@ -10,7 +10,6 @@ use Domain\Content\Models\ContentEntry;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 use Domain\Internationalization\Models\Locale;
-use Spatie\RouteAttributes\Attributes\Delete;
 use Support\MetaData\Actions\UpdateMetaDataAction;
 
 class PublishedContentEntryDraftAction

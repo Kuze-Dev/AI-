@@ -28,6 +28,7 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Actions\Action;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Http\RedirectResponse;
+use Livewire\Redirector;
 
 /**
  * @property \Domain\Page\Models\Page $record
@@ -209,7 +210,7 @@ class EditPage extends EditRecord
         $this->fillForm();
     }
 
-    public function overwriteDraft(): RedirectResponse
+    public function overwriteDraft(): RedirectResponse|Redirector
     {
         $data = $this->form->getState();
 

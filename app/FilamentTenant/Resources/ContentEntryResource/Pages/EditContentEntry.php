@@ -24,7 +24,10 @@ use Filament\Pages\Actions\DeleteAction;
 use Illuminate\Http\RedirectResponse;
 use Livewire\Redirector;
 
-/** @method class-string<\Illuminate\Database\Eloquent\Model> getModel() */
+/** @method class-string<\Illuminate\Database\Eloquent\Model> getModel()
+ *
+ * @property \Domain\Content\Models\ContentEntry $record
+ */
 class EditContentEntry extends EditRecord
 {
     use LogsFormActivity;
@@ -139,7 +142,7 @@ class EditContentEntry extends EditRecord
             Notification::make()
                 ->danger()
                 ->title(trans('Has Draft'))
-                ->body(trans('Page :title has a existing draft', ['title' => $record->name]))
+                ->body(trans('Page :title has a existing draft', ['title' => $record->title]))
                 ->send();
 
             return false;
@@ -168,7 +171,7 @@ class EditContentEntry extends EditRecord
             ->body(trans('Content Entry Draft has been overwritten'))
             ->send();
 
-            return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $draftpage]));
+        return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $draftpage]));
     }
 
     public function published(): RedirectResponse|Redirector
@@ -191,7 +194,7 @@ class EditContentEntry extends EditRecord
                 $contentEntryData
             )
         );
-        
+
         return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $contentEntry]));
     }
 
