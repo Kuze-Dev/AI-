@@ -26,6 +26,10 @@ class SyncMediaCollectionAction
                     return $this->addMedia($model, $mediaCollectionData->collection, $mediaData->media, $mediaData->custom_properties);
                 }
 
+                if (Str::isUrl($mediaData->media)) {
+                    return $this->addMediaFromUrl($model, $mediaCollectionData->collection, $mediaData->media);
+                }
+
                 if ( ! Str::isUuid($mediaData->media)) {
                     throw new InvalidArgumentException();
                 }
@@ -57,6 +61,17 @@ class SyncMediaCollectionAction
             ->usingFileName($media->getClientOriginalName())
             ->usingName(pathinfo($media->getClientOriginalName(), PATHINFO_FILENAME))
             ->withCustomProperties($customProperties)
+            ->toMediaCollection($collection);
+    }
+
+    protected function addMediaFromUrl(Model&HasMedia $model, string $collection, string $media): Media
+    {
+        if ( ! method_exists($model, 'addMediaFromUrl')) {
+            throw new InvalidArgumentException();
+        }
+
+        return $model
+            ->addMediaFromUrl($media)
             ->toMediaCollection($collection);
     }
 

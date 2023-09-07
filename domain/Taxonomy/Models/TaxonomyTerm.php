@@ -6,8 +6,10 @@ namespace Domain\Taxonomy\Models;
 
 use Domain\Content\Models\ContentEntry;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
+use Domain\Product\Models\Product;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -33,7 +35,9 @@ use Illuminate\Database\Eloquent\Builder;
  * @property-read int|null $children_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ContentEntry> $contentEntries
  * @property-read int|null $content_entries_count
- * @property-read \Domain\Taxonomy\Models\Taxonomy $taxonomy
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
+ * @property-read int|null $products_count
+ * @property-read \Domain\Taxonomy\Models\Taxonomy|null $taxonomy
  * @method static Builder|TaxonomyTerm newModelQuery()
  * @method static Builder|TaxonomyTerm newQuery()
  * @method static Builder|TaxonomyTerm ordered(string $direction = 'asc')
@@ -49,7 +53,10 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder|TaxonomyTerm whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-#[OnDeleteCascade(['contentEntries', 'children'])]
+#[
+    OnDeleteCascade(['contentEntries', 'children']),
+    OnDeleteRestrict(['products'])
+]
 class TaxonomyTerm extends Model implements Sortable
 {
     use HasSlug;
@@ -88,6 +95,17 @@ class TaxonomyTerm extends Model implements Sortable
     public function contentEntries(): BelongsToMany
     {
         return $this->belongsToMany(ContentEntry::class);
+    }
+
+    /**
+     * Declare relationship of
+     * current model to products.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Product\Models\Product>
+     */
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class);
     }
 
     public function getRouteKeyName(): string
