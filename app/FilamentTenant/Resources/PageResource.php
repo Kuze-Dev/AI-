@@ -63,7 +63,7 @@ class PageResource extends Resource
                                     ignoreRecord: true,
                                     callback: function (Unique $rule) {
 
-                                        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+                                        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
                                             return false;
                                         }
 
