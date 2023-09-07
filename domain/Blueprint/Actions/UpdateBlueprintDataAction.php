@@ -23,8 +23,9 @@ class UpdateBlueprintDataAction
             'model_id' => $blueprintDataData->model_id,
             'value' => $blueprintDataData->value,
         ]);
+        if($blueprintData->type == FieldType::MEDIA->value) {
 
-        if($blueprintData->type == FieldType::MEDIA) {
+            $blueprintData->clearMediaCollection('blueprint_media');
             $blueprintData->addMediaFromDisk($blueprintData->value, 's3')
                 ->toMediaCollection('blueprint_media');
         }
@@ -32,17 +33,15 @@ class UpdateBlueprintDataAction
         return $blueprintData;
     }
 
-    public function execute(BlockContent $blockContent): BlueprintData
+    public function execute(BlockContent $blockContent): void
     {
         $blueprintfieldtype = $blockContent->block->blueprint->schema;
         $statePaths = $this->extractDataAction->extractStatePath($blockContent->data);
         $fieldTypes = $this->extractDataAction->extractFieldType($blueprintfieldtype, $statePaths);
-
         foreach (array_combine($statePaths, $fieldTypes) as $statePath => $fieldType) {
 
             $this->updateBlueprintData(BlueprintDataData::fromArray($blockContent, $statePath, $fieldType));
         }
 
-        return new BlueprintData();
     }
 }

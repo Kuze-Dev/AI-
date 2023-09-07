@@ -21,7 +21,6 @@ class UpdateBlockContentAction
             'block_id' => $blockContentData->block_id,
             'data' => $blockContentData->data,
         ]);
-
         $this->updateBlueprintDataAction->execute($blockContent);
 
         return $blockContent;

@@ -204,19 +204,17 @@ class SchemaFormBuilder extends Component
         }
 
         $media->formatStateUsing(function ($state) {
-
             $media = Media::where('file_name', $state)->where('collection_name', 'blueprint_media')->first();
-
-            return [$media->uuid];
-        })
-            ->beforeStateDehydrated(null)
-            ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null);
+            if ($media) {
+                return [$media->uuid];
+            }
+        });
 
         $media->getUploadedFileUrlUsing(function ($file) {
-
             $media = Media::where('uuid', $file)->first();
-
-            return $media->getUrl();
+            if ($media) {
+                return $media->getUrl();
+            }
         });
 
         if ( ! empty($mediaFieldData->accept)) {
