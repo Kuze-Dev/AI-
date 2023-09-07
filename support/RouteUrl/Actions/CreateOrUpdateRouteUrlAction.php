@@ -4,19 +4,21 @@ declare(strict_types=1);
 
 namespace Support\RouteUrl\Actions;
 
+use App\Features\CMS\Internationalization;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Support\RouteUrl\Contracts\HasRouteUrl;
 use Support\RouteUrl\DataTransferObjects\RouteUrlData;
 use Support\RouteUrl\Models\RouteUrl;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class CreateOrUpdateRouteUrlAction
 {
     public function execute(Model&HasRouteUrl $model, RouteUrlData $routeUrlData): RouteUrl
     {
-        $url = $routeUrlData->is_override
-            ? $routeUrlData->url
-            : $model::generateRouteUrl($model, $model->getAttributes());
+
+        $url = $routeUrlData->is_override || tenancy()->tenant?->features()->active(Internationalization::class) ?
+            $routeUrlData->url :
+            $model::generateRouteUrl($model, $model->getAttributes());
 
         $url = Str::of($url)->trim('/')->prepend('/');
 
