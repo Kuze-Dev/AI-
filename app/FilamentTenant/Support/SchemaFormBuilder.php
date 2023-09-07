@@ -204,7 +204,7 @@ class SchemaFormBuilder extends Component
         }
 
         $media->formatStateUsing(function ($state) {
-            $media = Media::where('file_name', $state)->where('collection_name', 'blueprint_media')->first();
+            $media = Media::where('file_name', $state)->orWhere('uuid', $state)->where('collection_name', 'blueprint_media')->first();
             if ($media) {
                 return [$media->uuid];
             }
