@@ -33,10 +33,10 @@ class CreateBlueprintDataAction
                 ->toMediaCollection('blueprint_media');
         }
 
-        return new BlueprintData();
+        return $blueprintData;
     }
 
-    public function execute(BlockContent $blockContent): BlueprintData
+    public function execute(BlockContent $blockContent): void
     {
         $blueprintfieldtype = $blockContent->block->blueprint->schema;
         $statePaths = $this->extractDataAction->extractStatePath($blockContent->data);
@@ -45,6 +45,5 @@ class CreateBlueprintDataAction
             $this->storeBlueprintData(BlueprintDataData::fromArray($blockContent, $statePath, $fieldType));
         }
 
-        return new BlueprintData();
     }
 }

@@ -19,15 +19,29 @@ class UpdateBlueprintDataAction
     private function updateBlueprintData(BlueprintDataData $blueprintDataData): BlueprintData
     {
         $blueprintData = BlueprintData::where('model_id', $blueprintDataData->model_id)->where('state_path', $blueprintDataData->state_path)->first();
-        $blueprintData->update([
-            'model_id' => $blueprintDataData->model_id,
-            'value' => $blueprintDataData->value,
-        ]);
-        if($blueprintData->type == FieldType::MEDIA->value) {
 
-            $blueprintData->clearMediaCollection('blueprint_media');
-            $blueprintData->addMediaFromDisk($blueprintData->value, 's3')
-                ->toMediaCollection('blueprint_media');
+        if ($blueprintData->type == FieldType::MEDIA->value) {
+            if( ! $blueprintDataData->value) {
+                return $blueprintData;
+            }
+            $pathInfo = pathinfo($blueprintDataData->value);
+
+            if (isset($pathInfo['extension']) && $pathInfo['extension'] !== '') {
+                $blueprintData->update([
+                    'model_id' => $blueprintDataData->model_id,
+                    'value' => $blueprintDataData->value,
+                ]);
+
+                $blueprintData->clearMediaCollection('blueprint_media');
+                $blueprintData->addMediaFromDisk($blueprintData->value, 's3')
+                    ->toMediaCollection('blueprint_media');
+            } else {
+            }
+        } else {
+            $blueprintData->update([
+                'model_id' => $blueprintDataData->model_id,
+                'value' => $blueprintDataData->value,
+            ]);
         }
 
         return $blueprintData;
@@ -39,7 +53,6 @@ class UpdateBlueprintDataAction
         $statePaths = $this->extractDataAction->extractStatePath($blockContent->data);
         $fieldTypes = $this->extractDataAction->extractFieldType($blueprintfieldtype, $statePaths);
         foreach (array_combine($statePaths, $fieldTypes) as $statePath => $fieldType) {
-
             $this->updateBlueprintData(BlueprintDataData::fromArray($blockContent, $statePath, $fieldType));
         }
 
