@@ -25,7 +25,7 @@ use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
  * @property string $name
  * @property string $slug
  * @property bool $store_submission
- * @property int $uses_captcha
+ * @property bool $uses_captcha
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities

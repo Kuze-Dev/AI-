@@ -21,4 +21,11 @@ class MarkAsReadNotificationAction
 
         event(new NotificationRead());
     }
+
+    public function markAllAsRead(User $user): void
+    {
+        if (isset($user->unreadNotifications)) {
+            $user->unreadNotifications->markAsRead();
+        }
+    }
 }

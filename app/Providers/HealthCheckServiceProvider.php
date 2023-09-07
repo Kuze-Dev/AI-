@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Lloricode\SpatieImageOptimizerHealthCheck\ImageOptimizerCheck;
 use Spatie\Health\Checks\Checks\CacheCheck;
 use Spatie\Health\Checks\Checks\DatabaseCheck;
 use Spatie\Health\Checks\Checks\DatabaseConnectionCountCheck;
@@ -40,6 +41,11 @@ class HealthCheckServiceProvider extends ServiceProvider
             OptimizedAppCheck::new(),
             DatabaseConnectionCountCheck::new(),
             QueueCheck::new(),
+            // https://github.com/spatie/image-optimizer#optimization-tools
+            ImageOptimizerCheck::new()
+                ->checkJPEGOPTIM()
+                ->checkOPTIPNG()
+                ->checkPNGQUANT(),
         ]);
     }
 }

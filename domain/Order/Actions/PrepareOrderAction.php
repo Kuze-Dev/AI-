@@ -1,0 +1,162 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Domain\Order\Actions;
+
+use Domain\Address\Models\Address;
+use Domain\Cart\Models\CartLine;
+use Domain\Currency\Models\Currency;
+use Domain\Discount\Enums\DiscountStatus;
+use Domain\Discount\Models\Discount;
+use Domain\Order\DataTransferObjects\PlaceOrderData;
+use Domain\Order\DataTransferObjects\PreparedOrderData;
+use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\Product\Models\ProductVariant;
+use Domain\ShippingMethod\Models\ShippingMethod;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Domain\Taxation\Facades\Taxation;
+use Domain\Taxation\Models\TaxZone;
+use Illuminate\Database\Eloquent\Collection;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Log;
+
+class PrepareOrderAction
+{
+    public function execute(PlaceOrderData $placeOrderData): PreparedOrderData
+    {
+        $customer = auth()->user();
+
+        $addresses = $this->prepareAddress($placeOrderData);
+
+        $currency = $this->prepareCurrency();
+
+        $cartLines = $this->prepareCartLines($placeOrderData);
+
+        $taxZone = $this->prepareTax($placeOrderData);
+
+        $discount = $this->prepareDiscount($placeOrderData);
+
+        $paymentMethod = $this->preparePaymentMethod($placeOrderData);
+
+        $shippingMethod = $this->prepareShippingMethod($placeOrderData);
+
+        $notes = $placeOrderData->notes;
+
+        $orderData = [
+            'customer' => $customer,
+            'shippingAddress' => $addresses['shippingAddress'],
+            'billingAddress' => $addresses['billingAddress'],
+            'currency' => $currency,
+            'cartLine' => $cartLines,
+            'notes' => $notes,
+            'taxZone' => $taxZone,
+            'discount' => $discount,
+            'shippingMethod' => $shippingMethod,
+            'paymentMethod' => $paymentMethod,
+        ];
+
+        return PreparedOrderData::fromArray($orderData);
+    }
+
+    public function prepareAddress(PlaceOrderData $placeOrderData): array
+    {
+        $shippingAddress = Address::with('state.country')->find($placeOrderData->addresses->shipping);
+
+        $billingAddress = Address::with('state.country')->find($placeOrderData->addresses->billing);
+
+        return [
+            'shippingAddress' => $shippingAddress,
+            'billingAddress' => $billingAddress,
+        ];
+    }
+
+    public function prepareCurrency(): Currency
+    {
+        $currency = Currency::where('enabled', true)->first();
+
+        if ( ! $currency instanceof Currency) {
+
+            throw new BadRequestHttpException('No currency found');
+        }
+
+        return $currency;
+    }
+
+    /**
+     * @param PlaceOrderData $placeOrderData
+     * @return Collection<int, CartLine>
+     */
+    public function prepareCartLines(PlaceOrderData $placeOrderData): Collection
+    {
+        return CartLine::with(['purchasable' => function (MorphTo $query) {
+            $query->morphWith([
+                ProductVariant::class => ['product'],
+            ]);
+        }, ])
+            ->whereCheckoutReference($placeOrderData->cart_reference)
+            ->get();
+    }
+
+    public function prepareTax(PlaceOrderData $placeOrderData): ?TaxZone
+    {
+        $billingAddressId = $placeOrderData->addresses->billing;
+
+        /** @var \Domain\Address\Models\Address $address */
+        $address = Address::with('state.country')->where('id', $billingAddressId)->first();
+
+        /** @var \Domain\Address\Models\State $state */
+        $state = $address->state;
+
+        /** @var \Domain\Address\Models\Country $country */
+        $country = $state->country;
+
+        $taxZone = Taxation::getTaxZone($country->id, $state->id);
+
+        if ( ! $taxZone instanceof TaxZone) {
+            // Log::info('No tax zone found');
+            return null;
+            // throw new BadRequestHttpException('No tax zone found');
+        }
+
+        return $taxZone;
+    }
+
+    public function prepareDiscount(PlaceOrderData $placeOrderData): ?Discount
+    {
+        if ($placeOrderData->discountCode) {
+            $discount = Discount::whereCode($placeOrderData->discountCode)
+                ->whereStatus(DiscountStatus::ACTIVE)
+                ->where(function ($query) {
+                    $query->where('max_uses', '>', 0)
+                        ->orWhereNull('max_uses');
+                })
+                ->where(function ($query) {
+                    $query->where('valid_end_at', '>=', now())
+                        ->orWhereNull('valid_end_at');
+                })
+                ->first();
+
+            return $discount ?? null;
+        }
+
+        return null;
+    }
+
+    public function prepareShippingMethod(PlaceOrderData $placeOrderData): ?ShippingMethod
+    {
+        return ShippingMethod::where((new ShippingMethod())->getRouteKeyName(), $placeOrderData->shipping_method)->first() ?? null;
+    }
+
+    public function preparePaymentMethod(PlaceOrderData $placeOrderData): PaymentMethod
+    {
+        $paymentMethod = PaymentMethod::whereSlug($placeOrderData->payment_method)->first();
+
+        if ( ! $paymentMethod instanceof PaymentMethod) {
+
+            throw new BadRequestHttpException('No paymentMethod found');
+        }
+
+        return $paymentMethod;
+    }
+}

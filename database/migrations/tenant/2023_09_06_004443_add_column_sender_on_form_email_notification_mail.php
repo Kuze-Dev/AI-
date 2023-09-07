@@ -11,7 +11,7 @@ return new class () extends Migration {
     public function up(): void
     {
         Schema::table('form_email_notifications', function (Blueprint $table) {
-            $table->string('sender')->after('bcc');
+            $table->string('sender')->nullable()->after('bcc');
         });
     }
 
