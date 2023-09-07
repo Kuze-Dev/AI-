@@ -26,4 +26,9 @@ class TaxonomyFactory extends Factory
     {
         return $this->for(BlueprintFactory::new()->withDummySchema());
     }
+
+    public function setBlueprintId(string $id): self
+    {
+        return $this->state(['blueprint_id' => $id]);
+    }
 }
