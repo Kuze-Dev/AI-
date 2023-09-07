@@ -50,6 +50,7 @@ it('can edit form', function () {
             'form_email_notifications' => [
                 [
                     'to' => ['test@user'],
+                    'sender' => 'test@user',
                     'sender_name' => 'test user',
                     'subject' => 'Foo Subject',
                     'template' => 'Foo Template',
@@ -69,6 +70,7 @@ it('can edit form', function () {
     assertDatabaseHas(FormEmailNotification::class,  [
         'form_id' => $form->id,
         'to' => ['test@user'],
+        'sender' => 'test@user',
         'sender_name' => 'test user',
         'subject' => 'Foo Subject',
         'template' => 'Foo Template',

@@ -54,6 +54,7 @@ class FormEmailNotification extends Model
         'to',
         'cc',
         'bcc',
+        'sender',
         'sender_name',
         'reply_to',
         'subject',
