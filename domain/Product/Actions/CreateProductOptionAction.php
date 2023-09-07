@@ -19,6 +19,7 @@ class CreateProductOptionAction
         $mutableOptions = $productData->product_options;
 
         if (filled($mutableOptions)) {
+            // Create product options & update mutable variants for variant insertion
             collect($mutableOptions)->map(function (ProductOptionData $productOption) use ($product, $mutableVariants) {
                 $optionModel = $this->createOption($product, $productOption);
 
@@ -28,6 +29,7 @@ class CreateProductOptionAction
 
                 $mutableOptionValues = $productOption->productOptionValues;
 
+                // Create product option values
                 $collectedOptionValues = collect($mutableOptionValues)
                     ->map(function (ProductOptionValueData $optionValue) use ($productOption, $mutableVariants) {
                         $productOptionId = $productOption->id;
