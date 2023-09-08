@@ -19,6 +19,7 @@ use Illuminate\Http\UploadedFile;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
@@ -228,5 +229,279 @@ it('page block with default value column data must be dehydrated', function () {
     assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
         'data' => null,
+    ]);
+});
+
+it('can create page draft', function () {
+    $page = PageFactory::new()
+        ->addBlockContent(
+            BlockFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+                ),
+            ['data' => ['main' => ['header' => 'Foo']]]
+        )
+        ->has(MetaDataFactory::new([
+            'title' => 'Foo title',
+            'description' => 'Foo description',
+            'author' => 'Foo author',
+            'keywords' => 'Foo keywords',
+        ]))
+        ->createOne([
+            'visibility' => 'public',
+        ]);
+
+    $metaData = [
+        'title' => 'Foo title updated',
+        'description' => 'Foo description updated',
+        'author' => 'Foo author updated',
+        'keywords' => 'Foo keywords updated',
+    ];
+    $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
+
+    livewire(EditPage::class, ['record' => $page->getRouteKey()])
+        ->fillForm([
+            'name' => 'Test',
+            'block_contents.record-1.data.main.header' => 'Bar',
+            'meta_data' => $metaData,
+            'visibility' => 'authenticated',
+            'meta_data.image.0' => $metaDataImage,
+        ])
+        ->call('draft')
+        ->assertHasNoFormErrors()
+        ->assertOk();
+
+    $pageDraft = $page->pageDraft;
+
+    assertDatabaseHas(Page::class, [
+        'name' => 'Test',
+        'visibility' => Visibility::AUTHENTICATED->value,
+        'draftable_id' => $page->id,
+    ]);
+
+    assertDatabaseHas(
+        MetaData::class,
+        array_merge(
+            $metaData,
+            [
+                'model_type' => $pageDraft->getMorphClass(),
+                'model_id' => $pageDraft->getKey(),
+            ]
+        )
+    );
+
+    assertDatabaseHas(Media::class, [
+        'file_name' => $metaDataImage->getClientOriginalName(),
+        'mime_type' => $metaDataImage->getMimeType(),
+    ]);
+
+    assertDatabaseHas(BlockContent::class, [
+        'page_id' => $pageDraft->id,
+        'block_id' => $pageDraft->blockContents->first()->block_id,
+        'data' => json_encode(['main' => ['header' => 'Bar']]),
+    ]);
+
+    assertDatabaseHas(RouteUrl::class, [
+        'model_type' => $pageDraft->getMorphClass(),
+        'model_id' => $pageDraft->getKey(),
+        'url' => Page::generateRouteUrl($pageDraft, $pageDraft->toArray()),
+        'is_override' => false,
+    ]);
+});
+
+it('can overwrite page draft', function () {
+    $page = PageFactory::new()
+        ->addBlockContent(
+            BlockFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+                ),
+            ['data' => ['main' => ['header' => 'Foo']]]
+        )
+        ->has(MetaDataFactory::new([
+            'title' => 'Foo title',
+            'description' => 'Foo description',
+            'author' => 'Foo author',
+            'keywords' => 'Foo keywords',
+        ]))
+        ->createOne([
+            'visibility' => 'public',
+        ]);
+
+    $metaData = [
+        'title' => 'Foo title updated',
+        'description' => 'Foo description updated',
+        'author' => 'Foo author updated',
+        'keywords' => 'Foo keywords updated',
+    ];
+    $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
+
+    $initialDraft = $page->pageDraft()->create([
+        'name' => $page->name.'v2',
+        'visibility' => Visibility::AUTHENTICATED->value,
+    ]);
+
+    livewire(EditPage::class, ['record' => $page->getRouteKey()])
+        ->fillForm([
+            'name' => 'overwrite draft v2',
+            'block_contents.record-1.data.main.header' => 'Bar',
+            'meta_data' => $metaData,
+            'visibility' => 'authenticated',
+            'meta_data.image.0' => $metaDataImage,
+        ])
+        ->call('overwriteDraft')
+        ->assertHasNoFormErrors()
+        ->assertOk();
+
+    $pageDraft = $page->pageDraft;
+
+    assertDatabaseMissing(Page::class, [
+        'name' => $initialDraft->name,
+        'visibility' => Visibility::AUTHENTICATED->value,
+        'draftable_id' => $page->id,
+    ]);
+
+    assertDatabaseHas(Page::class, [
+        'name' => 'overwrite draft v2',
+        'visibility' => Visibility::AUTHENTICATED->value,
+        'draftable_id' => $page->id,
+    ]);
+
+    assertDatabaseHas(
+        MetaData::class,
+        array_merge(
+            $metaData,
+            [
+                'model_type' => $pageDraft->getMorphClass(),
+                'model_id' => $pageDraft->getKey(),
+            ]
+        )
+    );
+
+    assertDatabaseHas(Media::class, [
+        'file_name' => $metaDataImage->getClientOriginalName(),
+        'mime_type' => $metaDataImage->getMimeType(),
+    ]);
+
+    assertDatabaseHas(BlockContent::class, [
+        'page_id' => $pageDraft->id,
+        'block_id' => $pageDraft->blockContents->first()->block_id,
+        'data' => json_encode(['main' => ['header' => 'Bar']]),
+    ]);
+
+    assertDatabaseHas(RouteUrl::class, [
+        'model_type' => $pageDraft->getMorphClass(),
+        'model_id' => $pageDraft->getKey(),
+        'url' => Page::generateRouteUrl($pageDraft, $pageDraft->toArray()),
+        'is_override' => false,
+    ]);
+});
+
+it('can published page draft', function () {
+    $page = PageFactory::new()
+        ->addBlockContent(
+            BlockFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+                ),
+            ['data' => ['main' => ['header' => 'Foo']]]
+        )
+        ->has(MetaDataFactory::new([
+            'title' => 'Foo title',
+            'description' => 'Foo description',
+            'author' => 'Foo author',
+            'keywords' => 'Foo keywords',
+        ]))
+        ->createOne([
+            'visibility' => 'public',
+        ]);
+
+    $initialDraft = PageFactory::new([])
+        ->addBlockContent(
+            BlockFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+                ),
+            ['data' => ['main' => ['header' => 'Foo']]]
+        )
+        ->has(MetaDataFactory::new([
+            'title' => 'Foo title',
+            'description' => 'Foo description',
+            'author' => 'Foo author',
+            'keywords' => 'Foo keywords',
+        ]))
+        ->createOne([
+            'draftable_id' => $page->id,
+            'visibility' => 'public',
+        ]);
+
+    $metaData = [
+        'title' => 'Foo title updated',
+        'description' => 'Foo description updated',
+        'author' => 'Foo author updated',
+        'keywords' => 'Foo keywords updated',
+    ];
+    $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
+
+    livewire(EditPage::class, ['record' => $initialDraft->getRouteKey()])
+        ->fillForm([
+            'name' => 'published draft',
+            'block_contents.record-2.data.main.header' => 'Bar',
+            'meta_data' => $metaData,
+            'visibility' => 'authenticated',
+            'meta_data.image.0' => $metaDataImage,
+        ])
+        ->call('published')
+        ->assertHasNoFormErrors()
+        ->assertOk();
+
+    $page->refresh();
+
+    assertDatabaseMissing(Page::class, [
+        'name' => $initialDraft->name,
+        'visibility' => Visibility::AUTHENTICATED->value,
+        'draftable_id' => $page->id,
+    ]);
+
+    assertDatabaseHas(Page::class, [
+        'name' => 'published draft',
+        'visibility' => Visibility::AUTHENTICATED->value,
+    ]);
+
+    assertDatabaseHas(
+        MetaData::class,
+        array_merge(
+            $metaData,
+            [
+                'model_type' => $page->getMorphClass(),
+                'model_id' => $page->getKey(),
+            ]
+        )
+    );
+
+    assertDatabaseHas(Media::class, [
+        'file_name' => $metaDataImage->getClientOriginalName(),
+        'mime_type' => $metaDataImage->getMimeType(),
+    ]);
+
+    assertDatabaseHas(BlockContent::class, [
+        'page_id' => $page->id,
+        'block_id' => $page->blockContents->first()->block_id,
+        'data' => json_encode(['main' => ['header' => 'Bar']]),
+    ]);
+
+    assertDatabaseHas(RouteUrl::class, [
+        'model_type' => $page->getMorphClass(),
+        'model_id' => $page->getKey(),
+        'url' => Page::generateRouteUrl($page, $page->toArray()),
+        'is_override' => false,
     ]);
 });
