@@ -231,7 +231,7 @@ class EditPage extends EditRecord
         return redirect(PageResource::getUrl('edit', ['record' => $draftpage]));
     }
 
-    public function published(): Redirector
+    public function published(): RedirectResponse|Redirector
     {
         $data = $this->form->getState();
 
@@ -256,7 +256,7 @@ class EditPage extends EditRecord
         return redirect(PageResource::getUrl('edit', ['record' => $page]));
     }
 
-    public function draft(): Redirector|false
+    public function draft(): RedirectResponse|Redirector|false
     {
         $data = $this->form->getState();
 

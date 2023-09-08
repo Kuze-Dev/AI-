@@ -381,7 +381,7 @@ it('can create content entry draft', function () {
         ->instance()
         ->record;
 
-        $contentEntryDraft = $contentEntry->pageDraft;
+    $contentEntryDraft = $contentEntry->pageDraft;
 
     assertDatabaseHas(ContentEntry::class, [
         'title' => 'New Foo',
@@ -415,7 +415,6 @@ it('can create content entry draft', function () {
         'is_override' => false,
     ]);
 });
-
 
 it('can overwrite content entry existing draft', function () {
     $content = ContentFactory::new()
@@ -460,16 +459,16 @@ it('can overwrite content entry existing draft', function () {
         )
         ->has(MetaDataFactory::new(['title' => 'Foo']))
         ->createOne([
-            'title' => 'Foo',
+            'title' => 'initial Foo',
             'draftable_id' => $contentEntry->getKey(),
             'data' => ['main' => ['header' => 'Foo']],
         ]);
 
     $dateTime = Carbon::now();
 
-    $updatedContentEntry = livewire(EditContentEntry::class, ['ownerRecord' => $content->getRouteKey(), 'record' => $initialContentEntryDraft->getRouteKey()])
+    livewire(EditContentEntry::class, ['ownerRecord' => $content->getRouteKey(), 'record' => $contentEntry->getRouteKey()])
         ->fillForm([
-            'title' => 'New Foo',
+            'title' => 'New Foo v2',
             'published_at' => $publishedAt = now(Auth::user()?->timezone)->toImmutable(),
             'data' => ['main' => ['header' => 'Foo updated']],
             'taxonomies' => [
@@ -484,11 +483,9 @@ it('can overwrite content entry existing draft', function () {
         ])
         ->call('overwriteDraft')
         ->assertOk()
-        ->assertHasNoFormErrors()
-        ->instance()
-        ->record;
+        ->assertHasNoFormErrors();
 
-        $contentEntryDraft = $contentEntry->pageDraft;
+    $contentEntryDraft = $contentEntry->pageDraft;
 
     assertDatabaseMissing(ContentEntry::class, [
         'name' => $initialContentEntryDraft->name,
@@ -496,7 +493,7 @@ it('can overwrite content entry existing draft', function () {
     ]);
 
     assertDatabaseHas(ContentEntry::class, [
-        'title' => 'New Foo',
+        'title' => 'New Foo v2',
         'published_at' => $publishedAt,
         'data' => json_encode(['main' => ['header' => 'Foo updated']]),
     ]);
@@ -504,7 +501,7 @@ it('can overwrite content entry existing draft', function () {
     assertDatabaseHas(
         MetaData::class,
         [
-            'title' => 'New Foo',
+            'title' => 'New Foo v2',
             'description' => null,
             'author' => null,
             'keywords' => null,
@@ -526,5 +523,113 @@ it('can overwrite content entry existing draft', function () {
         'url' => ContentEntry::generateRouteUrl($contentEntryDraft, $contentEntryDraft->toArray()),
         'is_override' => false,
     ]);
-})->only();
+});
 
+it('can published existing content entry draft', function () {
+    $content = ContentFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
+        )
+        ->has(
+            TaxonomyFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+                )
+        )
+        ->createOne([
+            'name' => 'Test Content',
+            'future_publish_date_behavior' => 'public',
+            'past_publish_date_behavior' => 'unlisted',
+        ]);
+
+    $contentEntry = ContentEntryFactory::new()
+        ->for($content)
+        ->has(
+            TaxonomyTermFactory::new(['data' => ['description' => 'test']])
+                ->for($content->taxonomies->first())
+                ->count(2)
+        )
+        ->has(MetaDataFactory::new(['title' => 'Foo']))
+        ->createOne([
+            'title' => 'Foo',
+            'data' => ['main' => ['header' => 'Foo']],
+        ]);
+
+    $initialContentEntryDraft = ContentEntryFactory::new()
+        ->for($content)
+        ->has(
+            TaxonomyTermFactory::new(['data' => ['description' => 'test']])
+                ->for($content->taxonomies->first())
+                ->count(2)
+        )
+        ->has(MetaDataFactory::new(['title' => 'Foo']))
+        ->createOne([
+            'title' => 'initial Foo',
+            'draftable_id' => $contentEntry->getKey(),
+            'data' => ['main' => ['header' => 'Foo']],
+        ]);
+
+    $dateTime = Carbon::now();
+
+    livewire(EditContentEntry::class, ['ownerRecord' => $content->getRouteKey(), 'record' => $initialContentEntryDraft->getRouteKey()])
+        ->fillForm([
+            'title' => 'New Foo v2',
+            'published_at' => $publishedAt = now(Auth::user()?->timezone)->toImmutable(),
+            'data' => ['main' => ['header' => 'Foo updated']],
+            'taxonomies' => [
+                $content->taxonomies->first()->id => $contentEntry->taxonomyTerms->pluck('id'),
+            ],
+            'meta_data' => [
+                'title' => '',
+                'description' => '',
+                'author' => '',
+                'keywords' => '',
+            ],
+        ])
+        ->call('published')
+        ->assertOk()
+        ->assertHasNoFormErrors();
+
+    $contentEntry->refresh();
+
+    assertDatabaseMissing(ContentEntry::class, [
+        'name' => $initialContentEntryDraft->name,
+        'draftable_id' => $contentEntry->id,
+    ]);
+
+    assertDatabaseHas(ContentEntry::class, [
+        'title' => 'New Foo v2',
+        'published_at' => $publishedAt,
+        'data' => json_encode(['main' => ['header' => 'Foo updated']]),
+    ]);
+
+    assertDatabaseHas(
+        MetaData::class,
+        [
+            'title' => 'New Foo v2',
+            'description' => null,
+            'author' => null,
+            'keywords' => null,
+            'model_type' => $contentEntry->getMorphClass(),
+            'model_id' => $contentEntry->getKey(),
+        ]
+    );
+
+    foreach ($contentEntry->taxonomyTerms as $taxonomyTerm) {
+        assertDatabaseHas('content_entry_taxonomy_term', [
+            'taxonomy_term_id' => $taxonomyTerm->getKey(),
+            'content_entry_id' => $contentEntry->getKey(),
+        ]);
+    }
+
+    assertDatabaseHas(RouteUrl::class, [
+        'model_type' => $contentEntry->getMorphClass(),
+        'model_id' => $contentEntry->getKey(),
+        'url' => ContentEntry::generateRouteUrl($contentEntry, $contentEntry->toArray()),
+        'is_override' => false,
+    ]);
+});
