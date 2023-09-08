@@ -10,6 +10,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use App\Settings\OrderSettings;
+use Illuminate\Support\Str;
 
 class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
 {
@@ -21,6 +23,9 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
     private string $logo;
     private string $title;
     private string $description;
+    private string $from;
+    private array $replyTo;
+    private ?string $footer = null;
 
     /** Create a new notification instance. */
     public function __construct(Order $order, string $status, ?string $remarks)
@@ -32,6 +37,15 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
         $this->logo = app(SiteSettings::class)->getLogoUrl();
         $this->title = app(SiteSettings::class)->name;
         $this->description = app(SiteSettings::class)->description;
+
+        /** @phpstan-ignore-next-line */
+        $tenantName = Str::slug(tenancy()->tenant?->name);
+        $this->from = app(OrderSettings::class)->email_sender_name ?? "noreply@{$tenantName}.com";
+
+        $sanitizedReplyToEmails = $this->sanitizeEmailArray(app(OrderSettings::class)->email_reply_to ?? []);
+        $this->replyTo = $sanitizedReplyToEmails;
+
+        $this->footer = app(OrderSettings::class)->email_footer;
     }
 
     /**
@@ -47,10 +61,10 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
     /** Get the mail representation of the notification. */
     public function toMail(object $notifiable): MailMessage
     {
-
         return (new MailMessage())
             ->subject('Order ' .  $this->order->reference . ' has been ' . $this->status)
-            ->from('tenantone@example.com')
+            ->replyTo($this->replyTo)
+            ->from($this->from)
             ->view('filament.emails.order.updated', [
                 'logo' => $this->logo,
                 'title' => $this->title,
@@ -59,6 +73,7 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
                 'remarks' => $this->remarks,
                 'order' => $this->order,
                 'customer' => $notifiable,
+                'footer' => $this->footer,
             ]);
     }
 
@@ -70,5 +85,20 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [];
+    }
+
+    private function sanitizeEmailArray(array $emailArray): array
+    {
+        $sanitizedEmails = [];
+
+        foreach ($emailArray as $email) {
+            $email = trim($email);
+
+            if ( ! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $sanitizedEmails[] = $email;
+            }
+        }
+
+        return $sanitizedEmails;
     }
 }
