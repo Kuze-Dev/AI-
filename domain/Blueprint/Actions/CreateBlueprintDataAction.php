@@ -27,8 +27,8 @@ class CreateBlueprintDataAction
             'value' => $blueprintDataData->value,
             'type' => $blueprintDataData->type,
         ]);
-
-        if($blueprintData->type == FieldType::MEDIA) {
+        /** @phpstan-ignore-next-line */
+        if($blueprintData->type == FieldType::MEDIA && $blueprintData->value) {
             $blueprintData->addMediaFromDisk($blueprintData->value, 's3')
                 ->toMediaCollection('blueprint_media');
         }
@@ -38,6 +38,9 @@ class CreateBlueprintDataAction
 
     public function execute(BlockContent $blockContent): void
     {
+        if( ! $blockContent->data) {
+            return;
+        }
         $blueprintfieldtype = $blockContent->block->blueprint->schema;
         $statePaths = $this->extractDataAction->extractStatePath($blockContent->data);
         $fieldTypes = $this->extractDataAction->extractFieldType($blueprintfieldtype, $statePaths);
