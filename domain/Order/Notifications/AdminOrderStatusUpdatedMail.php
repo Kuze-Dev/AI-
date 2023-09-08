@@ -12,6 +12,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Settings\OrderSettings;
 use Illuminate\Support\Str;
+use Domain\Tenant\Models\Tenant;
 
 class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
 {
@@ -38,8 +39,10 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
         $this->title = app(SiteSettings::class)->name;
         $this->description = app(SiteSettings::class)->description;
 
-        /** @phpstan-ignore-next-line */
-        $tenantName = Str::slug(tenancy()->tenant?->name);
+        /** @var Tenant $tenant */
+        $tenant = tenancy()->tenant;
+
+        $tenantName = Str::slug($tenant->name);
         $this->from = app(OrderSettings::class)->email_sender_name ?? "noreply@{$tenantName}.com";
 
         $sanitizedReplyToEmails = $this->sanitizeEmailArray(app(OrderSettings::class)->email_reply_to ?? []);
@@ -94,7 +97,7 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
         foreach ($emailArray as $email) {
             $email = trim($email);
 
-            if ( ! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $sanitizedEmails[] = $email;
             }
         }
