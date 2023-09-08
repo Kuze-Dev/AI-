@@ -71,4 +71,18 @@ class BlueprintFactory extends Factory
             return $definition;
         });
     }
+    public function addMediaSchemaField(array $attributes = []): self
+    {
+        return $this->state(function (array $definition) use ($attributes) {
+            $definition['schema']['sections'][count($definition['schema']['sections']) - 1]['fields'][] = array_merge(
+                [
+                    'title' => fake()->word(),
+                    'type' => FieldType::MEDIA,
+                ],
+                $attributes
+            );
+
+            return $definition;
+        });
+    }
 }

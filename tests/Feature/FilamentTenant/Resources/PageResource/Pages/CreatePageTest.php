@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\PageResource\Pages\CreatePage;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
+use Domain\Blueprint\Models\BlueprintData;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
@@ -16,6 +17,7 @@ use Support\MetaData\Models\MetaData;
 use Support\RouteUrl\Models\RouteUrl;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -283,3 +285,114 @@ it('can create page with custom url', function () {
         'is_override' => true,
     ]);
 });
+
+it('can create page with media uploaded', function(){
+    $block = BlockFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'main'])
+                ->addMediaSchemaField([
+                    'title' => 'image',
+                    'type' => FieldType::MEDIA,
+                    'conversions' => [
+                        [
+                            'name' => 'desktop',
+                            'manipulations' => [
+                                'width' => 200,
+                                'height' => 200
+                            ]
+                        ]
+                    ]
+                ])
+                ->createOne()
+        )
+        ->createOne();
+    // Set up fake S3 storage
+
+    Storage::fake('s3');
+
+
+    $file_name = 'fake_image.png';
+    // Create a fake file to upload
+    $file = UploadedFile::fake()->create($file_name, 200, 'image/png');
+
+
+
+    // Perform the upload to S3
+    Storage::disk('s3')->put('/',$file);
+
+    Storage::disk('s3')->assertExists('/');
+
+
+    $page = livewire(CreatePage::class)
+        ->fillForm([
+            'name' => 'Test',
+            'block_contents' => [
+                [
+                    'block_id' => $block->getKey(),
+                    'data' => ['main' => ['image' => [$file->hashName()] ]],
+                ],
+            ],
+            'visibility' => 'public',
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+        ->record;
+
+
+
+    // assertDatabaseHas(Page::class, [
+    //     'author_id' => auth()->user()->id,
+    //     'name' => 'Test',
+    //     'visibility' => Visibility::PUBLIC->value,
+    // ]);
+
+    // assertDatabaseHas(BlockContent::class, [
+    //     'page_id' => $page->id,
+    //     'block_id' => $block->getKey(),
+    //     'data' => json_encode($block->blockContents->first()->data),
+    // ]);
+
+    // assertDatabaseHas(
+    //     MetaData::class,
+    //     [
+    //         'title' => $page->name,
+    //         'model_type' => $page->getMorphClass(),
+    //         'model_id' => $page->getKey(),
+    //     ]
+    // );
+    // assertDatabaseHas(RouteUrl::class, [
+    //     'model_type' => $page->getMorphClass(),
+    //     'model_id' => $page->getKey(),
+    //     'url' => Page::generateRouteUrl($page, $page->toArray()),
+    //     'is_override' => false,
+    // ]);
+
+
+
+    // $blueprintData = BlueprintData::create([
+    //     'blueprint_id' => $block->blueprint->getKey(),
+    //     'model_id' => $block->blockContents->getKey(),
+    //     'model_type'=> $block->blockContents->getMorphClass(),
+    //     'state_path' => 'Header.media',
+    //     'value' => $file->name,
+    //     'type' => FieldType::MEDIA->value
+    // ]);
+
+    // $blueprintData->addMedia($file)->toMediaCollection('blueprint_media');
+
+    // assertDatabaseHas(BlueprintData::class, [
+    //     'blueprint_id' => $blueprintData->blueprint_id ,
+    //     'model_id' => $blueprintData->model_id,
+    //     'model_type'=> $blueprintData->model_type,
+    //     'state_path' => $blueprintData->state_path,
+    //     'value' => $blueprintData->value,
+    //     'type' => $blueprintData->type,
+    // ]);
+
+    // assertDatabaseHas(Media::class, [
+    //     'file_name' => $blueprintData->value
+    // ]);
+})->only();
