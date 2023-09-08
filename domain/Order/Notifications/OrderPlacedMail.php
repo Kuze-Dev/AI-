@@ -121,7 +121,7 @@ class OrderPlacedMail extends Notification implements ShouldQueue
         foreach ($emailArray as $email) {
             $email = trim($email);
 
-            if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            if ( ! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $sanitizedEmails[] = $email;
             }
         }
