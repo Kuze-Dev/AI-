@@ -76,10 +76,15 @@ class MenuResource extends Resource
                     Forms\Components\TextInput::make('name')
                         ->required()
                         ->unique(
-                            callback: function ($livewire, Unique $rule) {
-
+                            callback: function ($livewire, Unique $rule, $state, Closure $get, $record) {
                                 if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
                                     return false;
+                                }
+                                if (tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+                                    $exist = Menu::whereName($state)->whereLocale($get('locale'))->whereNot('id', $record?->id)->count();
+                                    if ( ! $exist) {
+                                        return false;
+                                    }
                                 }
 
                                 return $rule;
@@ -235,6 +240,9 @@ class MenuResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->truncate('max-w-xs lg:max-w-md 2xl:max-w-3xl', true),
+                Tables\Columns\TextColumn::make('locale')
+                    ->searchable()
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\TagsColumn::make('sites.name')
                     ->toggleable(isToggledHiddenByDefault:true),
                 Tables\Columns\TextColumn::make('updated_at')
