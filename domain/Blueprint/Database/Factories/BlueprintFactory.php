@@ -71,6 +71,7 @@ class BlueprintFactory extends Factory
             return $definition;
         });
     }
+
     public function addMediaSchemaField(array $attributes = []): self
     {
         return $this->state(function (array $definition) use ($attributes) {
