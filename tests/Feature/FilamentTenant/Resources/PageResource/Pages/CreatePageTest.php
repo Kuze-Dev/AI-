@@ -372,4 +372,4 @@ it('can create page with media uploaded', function () {
 
     ]);
 
-})->only();
+});
