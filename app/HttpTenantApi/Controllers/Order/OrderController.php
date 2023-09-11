@@ -90,8 +90,9 @@ class OrderController extends Controller
                     ]);
             }
 
-            /** @phpstan-ignore-next-line */
-            Log::info('OrderController exception ' . $result);
+            if ( ! $result instanceof Exception) {
+                Log::info($result);
+            }
 
             return response()->json([
                 'message' => 'Order failed to be created',
