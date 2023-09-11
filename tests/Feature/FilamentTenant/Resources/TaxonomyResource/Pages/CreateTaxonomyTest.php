@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\FilamentTenant\Resources\TaxonomyResource\Pages\CreateTaxonomy;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Taxonomy\Models\Taxonomy;
 use Filament\Facades\Filament;
 
@@ -14,6 +15,7 @@ beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
+    LocaleFactory::createDefault();
 });
 
 it('can render page', function () {

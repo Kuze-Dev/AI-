@@ -78,19 +78,20 @@ class LocaleResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('code'),
                 Tables\Columns\CheckboxColumn::make('is_default')->label('Default')->disabled(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime(timezone: Auth::user()?->timezone),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
-                    ->toggleable()
-                    ->toggledHiddenByDefault(),
             ])
             ->filtersLayout(Layout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->hidden(fn ($record) => $record->is_default),
-                Tables\Actions\DeleteAction::make()
-                    ->hidden(fn ($record) => $record->is_default),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make()
+                        ->hidden(fn ($record) => $record->is_default),
+                ]),
+
             ])
             ->defaultSort('is_default', 'desc');
     }

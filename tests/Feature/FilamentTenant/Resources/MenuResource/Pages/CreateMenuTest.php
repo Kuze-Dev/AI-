@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\MenuResource\Pages\CreateMenu;
+use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Menu\Database\Factories\MenuFactory;
 use Domain\Menu\Enums\NodeType;
 use Domain\Menu\Enums\Target;
@@ -17,6 +18,8 @@ beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
+
+    LocaleFactory::createDefault();
 });
 
 it('can render page', function () {

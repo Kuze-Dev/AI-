@@ -26,6 +26,7 @@ class ContentEntryResource extends JsonApiResource
             'order' => $this->order,
             'published_at' => $this->published_at,
             'route_url' => $this->activeRouteUrl?->url,
+            'locale' => $this->locale,
         ];
     }
 

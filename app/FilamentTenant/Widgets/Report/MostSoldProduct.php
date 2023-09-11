@@ -1,0 +1,61 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\FilamentTenant\Widgets\Report;
+
+use App\FilamentTenant\Widgets\Report\utils\ChartColor;
+use App\FilamentTenant\Widgets\Report\utils\DateRangeCalculator;
+use App\FilamentTenant\Widgets\Report\utils\PercentageCalculator;
+use Domain\Order\Enums\OrderStatuses;
+use Domain\Order\Models\OrderLine;
+use Filament\Widgets\PieChartWidget;
+
+class MostSoldProduct extends PieChartWidget
+{
+    protected static ?string $heading = 'Most Sold Product';
+    protected static ?string $pollingInterval = null;
+    public ?string $filter = 'allTime';
+
+    protected function getFilters(): ?array
+    {
+        return [
+            'allTime' => 'All Time',
+            'thisYear' => 'This Year',
+            'thisMonth' => 'This Month',
+            'thisDay' => 'This Day',
+        ];
+    }
+
+    protected function getData(): array
+    {
+        $activeFilter = $this->filter;
+
+        $query = OrderLine::whereHas('order', function ($query) {
+            $query->where('status', OrderStatuses::FULFILLED);
+        });
+
+        $query = DateRangeCalculator::pieDateRange($query, $activeFilter);
+
+        $products = $query
+            ->selectRaw('name, COUNT(*) as count')
+            ->groupBy('name')->limit(10)->orderByDesc('count')
+            ->get()->toArray();
+
+        $productCounts = collect($products)->pluck('count')->toArray();
+        $percentages = PercentageCalculator::calculatePercentages($products);
+        $productNames = PercentageCalculator::formatProductNamesWithPercentages($products, $percentages);
+
+        return [
+            'datasets' => [
+                [
+                    'label' => 'Most Sold Product',
+                    'data' => $productCounts,
+                    'borderColor' => ChartColor::$PIECHART,
+                    'backgroundColor' => ChartColor::$PIECHART,
+                ],
+            ],
+            'labels' => $productNames,
+        ];
+    }
+}

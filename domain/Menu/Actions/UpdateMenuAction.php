@@ -19,6 +19,7 @@ class UpdateMenuAction
     {
         $menu->update([
             'name' => $menuData->name,
+            'locale' => $menuData->locale,
         ]);
 
         $this->syncNodeAction->execute($menu, $menuData->nodes);
