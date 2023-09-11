@@ -29,6 +29,14 @@ class CreateTaxZone extends CreateRecord
         ];
     }
 
+    protected function getBreadcrumbs(): array
+    {
+        return [
+            url()->current() => trans('Taxation'),
+            'Create',
+        ];
+    }
+
     protected function getFormActions(): array
     {
         return $this->getCachedActions();
