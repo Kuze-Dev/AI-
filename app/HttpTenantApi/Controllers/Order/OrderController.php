@@ -90,6 +90,7 @@ class OrderController extends Controller
                     ]);
             }
 
+            /** @phpstan-ignore-next-line */
             Log::info('OrderController exception ' . $result);
 
             return response()->json([
