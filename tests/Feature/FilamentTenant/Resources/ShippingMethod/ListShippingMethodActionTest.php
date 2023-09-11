@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\ShippingmethodResource\Pages\ListShippingmethods;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use Filament\Pages\Actions\DeleteAction;
+use App\Features\ECommerce\ECommerceBase;
+use App\Features\ECommerce\ShippingStorePickup;
 use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertModelMissing;
@@ -14,6 +16,9 @@ beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
+
+    tenancy()->tenant->features()->activate(ECommerceBase::class);
+    tenancy()->tenant->features()->activate(ShippingStorePickup::class);
 });
 
 it('can render Shipping Method', function () {
