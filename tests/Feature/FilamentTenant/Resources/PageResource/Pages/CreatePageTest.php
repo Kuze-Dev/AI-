@@ -350,11 +350,10 @@ it('can create page with media uploaded', function () {
         'blueprint_id' => $block_content->block->blueprint->getKey(),
         'model_id' => $block_content->getKey(),
         'model_type' => $block_content->getMorphClass(),
-        'state_path' => 'some state path',
+        'state_path' => 'main.image',
         'value' => $file->hashName(),
         'type' => 'media',
     ]);
-
     $blueprintData->addMediaFromDisk($blueprintData->value, 's3')
         ->toMediaCollection('blueprint_media');
 
