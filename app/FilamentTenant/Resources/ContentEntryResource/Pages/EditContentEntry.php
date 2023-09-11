@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ContentEntryResource\Pages;
 
+use App\Filament\Livewire\Actions\CustomPageActionGroup;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Filament\Resources\Pages\EditRecord;
@@ -12,13 +13,21 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use App\FilamentTenant\Resources\ContentEntryResource;
 use App\FilamentTenant\Resources\ContentResource;
+use Domain\Content\Actions\CreateContentEntryDraftAction;
+use Domain\Content\Actions\PublishedContentEntryDraftAction;
 use Domain\Content\Actions\UpdateContentEntryAction;
+use Filament\Notifications\Notification;
 use Domain\Content\Models\Content;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Pages\Actions\DeleteAction;
+use Illuminate\Http\RedirectResponse;
+use Livewire\Redirector;
 
-/** @method class-string<\Illuminate\Database\Eloquent\Model> getModel() */
+/** @method class-string<\Illuminate\Database\Eloquent\Model> getModel()
+ *
+ * @property \Domain\Content\Models\ContentEntry $record
+ */
 class EditContentEntry extends EditRecord
 {
     use LogsFormActivity;
@@ -63,10 +72,52 @@ class EditContentEntry extends EditRecord
     protected function getActions(): array
     {
         return [
-            Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
-                ->action('save')
-                ->keyBindings(['mod+s']),
+            'content_entries_group_actions' => CustomPageActionGroup::make([
+                Action::make('published')
+                    ->label(__('Published Draft'))
+                    ->action('published')
+                    ->hidden(function () {
+                        return $this->record->draftable_id == null ? true : false;
+                    }),
+                Action::make('draft')
+                    ->label(__('Save As Draft'))
+                    ->action('draft')
+                    ->hidden(function () {
+
+                        if($this->record->draftable_id != null) {
+                            return true;
+                        }
+
+                        return ($this->record->draftable_id == null && $this->record->pageDraft) ? true : false;
+                    }),
+                Action::make('overwriteDraft')
+                    ->label(__('Save As Draft'))
+                    ->action('overwriteDraft')
+                    ->requiresConfirmation()
+                    ->modalHeading('you have existing draft')
+                    ->modalSubheading('You have existing draft for this page want to overwrite existing draft?')
+                    ->modalCancelAction(function () {
+                        return Action::makeModalAction('redirect')
+                            ->label(__('Edit Existing Draft'))
+                            ->color('secondary')
+                            ->url(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $this->record->pageDraft]));
+                    })
+                    ->hidden(function () {
+
+                        return ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true;
+                    }),
+                Action::make('save')
+                    ->label(__('Save and Continue Editing'))
+                    ->action('save')
+                    ->keyBindings(['mod+s']),
+            ])
+                ->view('filament.pages.actions.custom-action-group.index')
+                ->setName('page_draft_actions')
+                ->label(__('filament::resources/pages/edit-record.form.actions.save.label')),
+            // Action::make('save')
+            //     ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+            //     ->action('save')
+            //     ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
         ];
     }
@@ -74,6 +125,77 @@ class EditContentEntry extends EditRecord
     protected function getFormActions(): array
     {
         return $this->getCachedActions();
+    }
+
+    public function draft(): RedirectResponse|Redirector|false
+    {
+        $data = $this->form->getState();
+
+        $record = $this->record;
+
+        $pageData = ContentEntryData::fromArray($data);
+
+        #check if page has existing draft
+
+        if( ! is_null($record->pageDraft)) {
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Has Draft'))
+                ->body(trans('Page :title has a existing draft', ['title' => $record->title]))
+                ->send();
+
+            return false;
+        }
+
+        $draftpage = app(CreateContentEntryDraftAction::class)->execute($record, $pageData);
+
+        return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $draftpage]));
+    }
+
+    public function overwriteDraft(): RedirectResponse|Redirector
+    {
+        $data = $this->form->getState();
+
+        $record = $this->record;
+
+        $record->pageDraft?->delete();
+
+        $pageData = ContentEntryData::fromArray($data);
+
+        $draftpage = app(CreateContentEntryDraftAction::class)->execute($record, $pageData);
+
+        Notification::make()
+            ->success()
+            ->title(trans('Overwritten Draft'))
+            ->body(trans('Content Entry Draft has been overwritten'))
+            ->send();
+
+        return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $draftpage]));
+    }
+
+    public function published(): RedirectResponse|Redirector
+    {
+        $data = $this->form->getState();
+
+        $pageDraft = $this->record;
+
+        /** @var \Domain\Content\Models\ContentEntry */
+        $parentPage = $pageDraft->parentPage;
+
+        $data['published_draft'] = true;
+
+        $contentEntryData = ContentEntryData::fromArray($data);
+
+        $contentEntry = DB::transaction(
+            fn () => app(PublishedContentEntryDraftAction::class)->execute(
+                $parentPage,
+                $pageDraft,
+                $contentEntryData
+            )
+        );
+
+        return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $contentEntry]));
     }
 
     protected function configureDeleteAction(DeleteAction $action): void

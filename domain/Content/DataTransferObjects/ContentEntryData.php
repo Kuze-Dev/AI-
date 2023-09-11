@@ -16,6 +16,7 @@ class ContentEntryData
         public readonly MetaDataData $meta_data,
         public readonly RouteUrlData $route_url_data,
         public readonly array $taxonomy_terms = [],
+        public readonly bool $published_draft = false,
         public readonly ?Carbon $published_at = null,
         public readonly array $data = [],
         public readonly ?int $author_id = null,
@@ -34,6 +35,7 @@ class ContentEntryData
             data: $data['data'],
             author_id: $data['author_id'] ?? null,
             meta_data: MetaDataData::fromArray($data['meta_data']),
+            published_draft: $data['published_draft'] ?? false,
             sites: $data['sites'] ?? [],
         );
     }

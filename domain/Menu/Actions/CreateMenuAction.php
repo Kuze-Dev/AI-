@@ -14,6 +14,7 @@ class CreateMenuAction
     {
         $menu = Menu::create([
             'name' => $menuData->name,
+            'locale' => $menuData->locale,
         ]);
 
         if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&

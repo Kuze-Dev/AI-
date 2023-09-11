@@ -16,6 +16,7 @@ class MenuResource extends JsonApiResource
     {
         return  [
             'name' => $this->name,
+            'locale' => $this->locale,
         ];
     }
 
