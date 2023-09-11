@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Features\CMS\CMSBase;
+use App\Features\ECommerce\ShippingStorePickup;
+use App\Features\ECommerce\ShippingUps;
+use App\Features\ECommerce\ShippingUsps;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Auth\Access\Response;
@@ -16,7 +18,11 @@ class ShippingMethodPolicy
 
     public function before(): ?Response
     {
-        if ( ! tenancy()->tenant?->features()->active(CMSBase::class)) {
+        if ( ! tenancy()->tenant?->features()->someAreActive([
+            ShippingUsps::class,
+            ShippingUps::class,
+            ShippingStorePickup::class,
+        ])) {
             return Response::denyAsNotFound();
         }
 
