@@ -15,6 +15,9 @@ use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @property TaxZone $record
+ */
 class EditTaxZone extends EditRecord
 {
     use LogsFormActivity;
@@ -29,6 +32,15 @@ class EditTaxZone extends EditRecord
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
+        ];
+    }
+
+    protected function getBreadcrumbs(): array
+    {
+        return [
+            TaxZoneResource::getUrl('index') => trans('Taxation'),
+            url()->current() => $this->record->name,
+            'Edit',
         ];
     }
 
