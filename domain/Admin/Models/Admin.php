@@ -31,12 +31,11 @@ use Spatie\Permission\Traits\HasRoles;
  * Domain\Admin\Models\Admin
  *
  * @property int $id
- * @property-read string $full_name
  * @property string $first_name
  * @property string $last_name
  * @property string $email
  * @property \Illuminate\Support\Carbon|null $email_verified_at
- * @property string $password
+ * @property mixed $password
  * @property \Illuminate\Support\Carbon|null $password_changed_at
  * @property bool $active
  * @property string $timezone

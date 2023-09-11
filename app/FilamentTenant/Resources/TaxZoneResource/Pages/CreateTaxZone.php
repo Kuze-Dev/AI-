@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\FilamentTenant\Resources\TaxZoneResource\Pages;
+
+use App\Filament\Pages\Concerns\LogsFormActivity;
+use App\FilamentTenant\Resources\TaxZoneResource;
+use Domain\Taxation\Actions\CreateTaxZoneAction;
+use Domain\Taxation\DataTransferObjects\TaxZoneData;
+use Filament\Resources\Pages\CreateRecord;
+use Filament\Pages\Actions\Action;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+
+class CreateTaxZone extends CreateRecord
+{
+    use LogsFormActivity;
+
+    protected static string $resource = TaxZoneResource::class;
+
+    protected function getActions(): array
+    {
+        return [
+            Action::make('create')
+                ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
+                ->action('create')
+                ->keyBindings(['mod+s']),
+        ];
+    }
+
+    protected function getBreadcrumbs(): array
+    {
+        return [
+            url()->current() => trans('Taxation'),
+            'Create',
+        ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
+    }
+
+    protected function handleRecordCreation(array $data): Model
+    {
+        return DB::transaction(fn () => app(CreateTaxZoneAction::class)->execute(TaxZoneData::formArray($data)));
+    }
+}
