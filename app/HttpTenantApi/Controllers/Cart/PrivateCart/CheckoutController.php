@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Cart;
+namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
 use App\HttpTenantApi\Resources\CartLineResource;
 use Domain\Cart\Actions\CheckoutAction;

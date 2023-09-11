@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Cart;
+namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
 use App\Http\Controllers\Controller;
 use Domain\Cart\Actions\CartSummaryAction;
@@ -42,7 +42,7 @@ class CartSummaryController extends Controller
                 return $cartLine->purchasable !== null;
             });
 
-            if ( ! empty($cartLineIdsTobeRemoved)) {
+            if (!empty($cartLineIdsTobeRemoved)) {
                 event(new SanitizeCartEvent(
                     $cartLineIdsTobeRemoved,
                 ));
@@ -114,7 +114,7 @@ class CartSummaryController extends Controller
             ],
         ];
 
-        if ( ! $discountCode) {
+        if (!$discountCode) {
             unset($responseArray['discount']);
         }
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Cart;
+namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartResource;
@@ -63,7 +63,7 @@ class CartController extends Controller
         $result = app(DestroyCartAction::class)
             ->execute($cart);
 
-        if ( ! $result) {
+        if (!$result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

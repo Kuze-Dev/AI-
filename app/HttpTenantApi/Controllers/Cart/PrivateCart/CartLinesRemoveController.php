@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Cart;
+namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
 use Domain\Cart\Actions\BulkDestroyCartLineAction;
 use Domain\Cart\Requests\BulkRemoveRequest;
@@ -24,7 +24,7 @@ class CartLinesRemoveController
         $result = app(BulkDestroyCartLineAction::class)
             ->execute($cartLineIds);
 
-        if ( ! $result) {
+        if (!$result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Cart;
+namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
 use Domain\Cart\Actions\DestroyCartLineAction;
 use Domain\Cart\Actions\UpdateCartLineAction;
@@ -35,7 +35,7 @@ class CartLinesController extends Controller
 
         $cart = app(CreateCartAction::class)->execute($customer);
 
-        if ( ! $cart instanceof Cart) {
+        if (!$cart instanceof Cart) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);
@@ -44,7 +44,7 @@ class CartLinesController extends Controller
         $cartline = app(CreateCartLineAction::class)
             ->execute($cart, CreateCartData::fromArray($validatedData));
 
-        if ( ! $cartline instanceof CartLine) {
+        if (!$cartline instanceof CartLine) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);
@@ -92,7 +92,7 @@ class CartLinesController extends Controller
         $result = app(DestroyCartLineAction::class)
             ->execute($cartline);
 
-        if ( ! $result) {
+        if (!$result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

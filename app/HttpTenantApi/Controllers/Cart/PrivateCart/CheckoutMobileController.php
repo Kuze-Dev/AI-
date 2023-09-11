@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Cart;
+namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartLineResource;
@@ -99,7 +99,7 @@ class CheckoutMobileController extends Controller
             'reference' => $reference,
         ];
 
-        if ( ! $discountCode) {
+        if (!$discountCode) {
             unset($responseArray['summary']['discount']);
         }
 
