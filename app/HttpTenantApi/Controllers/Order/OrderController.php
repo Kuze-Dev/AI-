@@ -91,14 +91,14 @@ class OrderController extends Controller
             }
 
             if ( ! $result instanceof Exception) {
-                Log::info($result);
+                Log::error($result);
             }
 
             return response()->json([
                 'message' => 'Order failed to be created',
             ], 400);
         } catch (Exception $e) {
-            Log::info('OrderController exception ' . $e);
+            Log::error('OrderController exception ' . $e);
 
             return response()->json([
                 'message' => 'Something went wrong',
