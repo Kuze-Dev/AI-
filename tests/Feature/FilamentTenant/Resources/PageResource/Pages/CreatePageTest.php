@@ -358,6 +358,7 @@ it('can create page with media uploaded', function () {
     $blueprintData->addMediaFromDisk($blueprintData->value, 's3')
         ->toMediaCollection('blueprint_media');
 
+    dd(Media::all());
     assertDatabaseHas(BlueprintData::class, [
         'blueprint_id' => $blueprintData->blueprint_id,
         'model_id' => $blueprintData->model_id,
@@ -367,9 +368,15 @@ it('can create page with media uploaded', function () {
         'type' => $blueprintData->type,
     ]);
 
+    $blueprint = $block_content->block->blueprint->first();
+
+    $schema = $blueprint->schema;
+    $conversions = $schema->sections[0]->fields[0]->conversions;
+
     assertDatabaseHas(Media::class, [
         'file_name' => $blueprintData->value,
+        'generated_conversions' => $conversions[0]->name,
 
     ]);
 
-});
+})->only();
