@@ -88,7 +88,8 @@ class EditPage extends EditRecord
                 ->setName('page_draft_actions')
                 ->label(__('filament::resources/pages/edit-record.form.actions.save.label')),
             Actions\DeleteAction::make(),
-            Action::make('preview')
+            'other_page_actions' => CustomPageActionGroup::make([
+                Action::make('preview')
                 ->color('secondary')
                 ->hidden((bool) tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                 ->label(__('Preview Page'))
@@ -167,6 +168,11 @@ class EditPage extends EditRecord
                 ->color('secondary')
                 ->record($this->getRecord())
                 ->url(fn (Page $record) => PageResource::getUrl('create', ['clone' => $record->slug])),
+            ])->view('filament.pages.actions.custom-action-group.index')
+            ->setName('other_page_draft')
+            ->color('secondary')
+            ->label(trans('More Actions')),
+            
         ];
     }
 
