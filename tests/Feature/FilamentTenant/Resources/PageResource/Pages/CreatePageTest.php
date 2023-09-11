@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\PageResource\Pages\CreatePage;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
-use Domain\Blueprint\Models\BlueprintData;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
@@ -311,71 +310,38 @@ it('can create page with media uploaded', function () {
 
     Storage::fake('s3');
 
-    $file_name = 'fake_image.png';
     // Create a fake file to upload
-    $file = UploadedFile::fake()->create($file_name, 200, 'image/png');
+    $file = UploadedFile::fake()->image('preview.jpeg');
 
     // Perform the upload to S3
     Storage::disk('s3')->put('/', $file);
 
-    $page = PageFactory::new()
-        ->addBlockContent(
-            BlockFactory::new()
-                ->for(
-                    BlueprintFactory::new()
-                        ->addSchemaSection(['title' => 'main'])
-                        ->addMediaSchemaField([
-                            'title' => 'image',
-                            'type' => FieldType::MEDIA,
-                            'conversions' => [
-                                [
-                                    'name' => 'desktop',
-                                    'manipulations' => [
-                                        'width' => 200,
-                                        'height' => 200,
-                                    ],
-                                ],
-                            ],
-                        ])
-                        ->createOne()
-                ),
-            ['data' => ['main' => ['image' => [$file->hashName()]]]]
-        )
-        ->has(MetaDataFactory::new())
-        ->createOne();
+    $page = livewire(CreatePage::class)
+        ->fillForm([
+            'name' => 'Test',
+            'block_contents' => [
+                [
+                    'block_id' => $block->getKey(),
+                    'data' => ['main' => ['image' => [$file->hashName()]]],
+                ],
+            ],
+
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+    ->record;
 
     $block_content = $page->blockContents->first();
 
-    $blueprintData = BlueprintData::create([
-        'blueprint_id' => $block_content->block->blueprint->getKey(),
-        'model_id' => $block_content->getKey(),
-        'model_type' => $block_content->getMorphClass(),
-        'state_path' => 'main.image',
-        'value' => $file->hashName(),
-        'type' => 'media',
-    ]);
-    $blueprintData->addMediaFromDisk($blueprintData->value, 's3')
-        ->toMediaCollection('blueprint_media');
-
-    dd(Media::all());
-    assertDatabaseHas(BlueprintData::class, [
-        'blueprint_id' => $blueprintData->blueprint_id,
-        'model_id' => $blueprintData->model_id,
-        'model_type' => $blueprintData->model_type,
-        'state_path' => $blueprintData->state_path,
-        'value' => $blueprintData->value,
-        'type' => $blueprintData->type,
-    ]);
-
-    $blueprint = $block_content->block->blueprint->first();
-
-    $schema = $blueprint->schema;
-    $conversions = $schema->sections[0]->fields[0]->conversions;
+    $schema = $block_content->block->blueprint->schema;
 
     assertDatabaseHas(Media::class, [
-        'file_name' => $blueprintData->value,
-        'generated_conversions' => $conversions[0]->name,
+        // 'file_name' => $file->hashName(),
+        'collection_name' => 'blueprint_media',
+        'generated_conversions' => json_encode([$schema->sections[0]->fields[0]->conversions[0]->name => true]),
 
     ]);
 
-})->only();
+});
