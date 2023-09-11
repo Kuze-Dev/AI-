@@ -26,6 +26,7 @@ class ContentEntryResource extends JsonApiResource
             'order' => $this->order,
             'published_at' => $this->published_at,
             'route_url' => $this->activeRouteUrl?->url,
+            'locale' => $this->locale,
         ];
     }
 
@@ -34,7 +35,7 @@ class ContentEntryResource extends JsonApiResource
     {
         return [
             'taxonomyTerms' => fn () => TaxonomyTermResource::collection($this->taxonomyTerms),
-            'routeUrls' => fn () => RouteUrlResource::collection($this->routeUrls),
+            'routeUrls' => fn () => RouteUrlResource::make($this->routeUrls),
             'metaData' => fn () => MetaDataResource::make($this->metaData),
             'content' => fn () => ContentResource::make($this->content),
         ];

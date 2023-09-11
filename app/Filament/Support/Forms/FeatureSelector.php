@@ -118,7 +118,8 @@ class FeatureSelector extends Field
                         $mutateState = [];
 
                         foreach ($data['extras'] as $xkey => $value) {
-                            if (is_array($value)) {
+                            if (is_array($value) && $get($statePath)) {
+
                                 /** @var array */
                                 $checkboxState = is_array($get($statePath . '_'.$xkey.'_extras')) ? $get($statePath . '_'.$xkey.'_extras') : ($get($statePath . '_'.$xkey.'_extras') ? [$get($statePath . '_'.$xkey.'_extras')] : []);
 

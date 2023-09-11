@@ -235,6 +235,8 @@ it('can show content entry with includes', function (string $include) {
         'keywords' => 'Foo keywords',
     ]);
 
+    // dd($contentEntry->routeUrls);
+
     getJson("api/contents/{$content->getRouteKey()}/entries/{$contentEntry->getRouteKey()}?" . http_build_query(['include' => $include]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($contentEntry, $include) {

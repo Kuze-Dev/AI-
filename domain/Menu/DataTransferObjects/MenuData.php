@@ -11,6 +11,7 @@ class MenuData
         public readonly string $name,
         public readonly array $nodes = [],
         public readonly array $sites = [],
+        public readonly ?string $locale = 'en',
     ) {
     }
 
@@ -20,6 +21,7 @@ class MenuData
             name: $data['name'],
             nodes: array_map(fn (array $nodeData) => NodeData::fromArray($nodeData), $data['nodes'] ?? []),
             sites: $data['sites'] ?? [],
+            locale: $data['locale'] ?? 'en',
         );
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Features\ECommerce\BankTransfer;
 use App\Features\ECommerce\OfflineGateway;
 use App\Features\ECommerce\PaypalGateway;
 use App\Features\ECommerce\StripeGateway;
@@ -22,6 +23,7 @@ class PaymentMethodPolicy
             PaypalGateway::class,
             OfflineGateway::class,
             StripeGateway::class,
+            BankTransfer::class,
         ])) {
             return Response::denyAsNotFound();
         }
