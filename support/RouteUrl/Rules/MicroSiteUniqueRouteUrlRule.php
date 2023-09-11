@@ -7,6 +7,7 @@ namespace Support\RouteUrl\Rules;
 use Support\RouteUrl\Contracts\HasRouteUrl;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Closure;
+use Domain\Content\Models\ContentEntry;
 use Domain\Page\Models\Page;
 use Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
@@ -19,7 +20,6 @@ class MicroSiteUniqueRouteUrlRule implements ValidationRule
         protected readonly ?HasRouteUrl $ignoreModel = null,
         protected readonly array $route_url,
     ) {
-
     }
 
     /** @param  Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail */
@@ -29,6 +29,12 @@ class MicroSiteUniqueRouteUrlRule implements ValidationRule
         $pages = Page::select('id')->wherehas('sites', function ($q) use ($value) {
             return $q->whereIn('site_id', $value);
         })->pluck('id')->toArray();
+
+        $contentEntriesIds = ContentEntry::select('id')->wherehas('sites', function ($q) use ($value) {
+            return $q->whereIn('site_id', $value);
+        })->pluck('id')->toArray();
+
+        $pagesIds = array_merge($pages, $contentEntriesIds);
 
         $query = RouteUrl::whereUrl($this->route_url['url'])
             ->whereIn(
@@ -43,12 +49,31 @@ class MicroSiteUniqueRouteUrlRule implements ValidationRule
                     )
             );
 
-        $query->whereIN('model_id', $pages)->where('url', $this->route_url['url']);
+        $query->whereIN('model_id', $pagesIds)
+            ->where('url', $this->route_url['url']);
 
         if ($this->ignoreModel) {
+
+            if ($this->ignoreModel->parentPage) {
+
+                $ignoreModelIds = [
+                    $this->ignoreModel->getKey(),
+                    $this->ignoreModel->parentPage->getKey(),
+                ];
+
+            } else {
+
+                $ignoreModelIds = [
+                    $this->ignoreModel->getKey(),
+                    $this->ignoreModel->pageDraft?->getKey() ?: null,
+                ];
+
+            }
+
             $query->whereNot(fn (EloquentBuilder $query) => $query
                 ->where('model_type',  $this->ignoreModel->getMorphClass())
-                ->where('model_id',  $this->ignoreModel->getKey()));
+                ->whereIn('model_id', array_filter($ignoreModelIds)));
+
         }
 
         if ($query->exists()) {

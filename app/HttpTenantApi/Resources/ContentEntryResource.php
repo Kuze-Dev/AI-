@@ -35,7 +35,7 @@ class ContentEntryResource extends JsonApiResource
     {
         return [
             'taxonomyTerms' => fn () => TaxonomyTermResource::collection($this->taxonomyTerms),
-            'routeUrls' => fn () => RouteUrlResource::collection($this->routeUrls),
+            'routeUrls' => fn () => RouteUrlResource::make($this->routeUrls),
             'metaData' => fn () => MetaDataResource::make($this->metaData),
             'content' => fn () => ContentResource::make($this->content),
         ];
