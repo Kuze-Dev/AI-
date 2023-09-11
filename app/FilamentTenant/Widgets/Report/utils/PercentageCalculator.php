@@ -11,12 +11,12 @@ class PercentageCalculator
         $productCounts = collect($products)->pluck('count')->toArray();
         $total = array_sum($productCounts);
         $percentages = [];
-    
+
         foreach ($productCounts as $value) {
             $percentage = number_format(($value / $total) * 100, 2);
             $percentages[] = $percentage;
         }
-    
+
         return $percentages;
     }
 
