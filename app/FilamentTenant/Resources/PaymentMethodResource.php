@@ -123,16 +123,16 @@ class PaymentMethodResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\RestoreAction::make(),
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make()
-                        ->using(function (PaymentMethod $record) {
-                            try {
-                                return app(DeletePaymentMethodAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
-                                return false;
-                            }
-                        }),
-                ]),
+                // Tables\Actions\ActionGroup::make([
+                //     Tables\Actions\DeleteAction::make()
+                //         ->using(function (PaymentMethod $record) {
+                //             try {
+                //                 return app(DeletePaymentMethodAction::class)->execute($record);
+                //             } catch (DeleteRestrictedException $e) {
+                //                 return false;
+                //             }
+                //         }),
+                // ]),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
