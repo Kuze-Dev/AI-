@@ -18,6 +18,12 @@ class GuestCartLinesRemoveController
     #[Post('/guest/carts/cartlines/bulk-remove', name: 'carts.bulk-remove')]
     public function __invoke(GuestBulkRemoveRequest $request): mixed
     {
+        $sessionId = $request->bearerToken();
+
+        if (is_null($sessionId)) {
+            abort(403);
+        }
+
         $validated = $request->validated();
 
         $cartLineIds = $validated['cart_line_ids'];
