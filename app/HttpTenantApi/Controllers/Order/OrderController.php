@@ -51,7 +51,7 @@ class OrderController extends Controller
         );
     }
 
-    public function store(PlaceOrderRequest $request): JsonResponse
+    public function store(PlaceOrderRequest $request): mixed
     {
         $validatedData = $request->validated();
 
@@ -94,9 +94,7 @@ class OrderController extends Controller
                 'line' => $e->getLine(),
             ]);
 
-            return response()->json([
-                'message' => 'Something went wrong',
-            ], 400);
+            throw $e;
         }
     }
 
