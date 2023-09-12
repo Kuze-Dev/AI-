@@ -99,7 +99,7 @@ class CheckoutMobileController extends Controller
             'reference' => $reference,
         ];
 
-        if (!$discountCode) {
+        if ( ! $discountCode) {
             unset($responseArray['summary']['discount']);
         }
 
