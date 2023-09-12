@@ -141,7 +141,7 @@ class EditContentEntry extends EditRecord
 
                         $queryString = Str::after(URL::temporarySignedRoute('tenant.api.contents.entries.show', now()->addMinutes(15), [$this->ownerRecord, $this->record], false), '?');
 
-                        return "https://{$domain}/preview?slug={$this->record->slug}&{$queryString}";
+                        return "https://{$domain}/preview?contents={$this->ownerRecord->slug}&slug={$this->record->slug}&{$queryString}";
                     }, true),
                 Action::make('preview_microsite_action')
                     ->label('Preview Microsite')
