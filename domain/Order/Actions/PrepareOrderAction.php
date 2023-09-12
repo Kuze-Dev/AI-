@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Order\Actions;
 
+use App\Settings\OrderSettings;
 use Domain\Address\Models\Address;
 use Domain\Cart\Models\CartLine;
 use Domain\Currency\Models\Currency;
@@ -26,6 +27,8 @@ class PrepareOrderAction
     public function execute(PlaceOrderData $placeOrderData): PreparedOrderData
     {
         $customer = auth()->user();
+
+        $this->prepareEmailSettings();
 
         $addresses = $this->prepareAddress($placeOrderData);
 
@@ -57,6 +60,15 @@ class PrepareOrderAction
         ];
 
         return PreparedOrderData::fromArray($orderData);
+    }
+
+    public function prepareEmailSettings(): void
+    {
+        $fromEmail = app(OrderSettings::class)->email_sender_name;
+
+        if (empty($fromEmail)) {
+            throw new BadRequestHttpException('No email sender found');
+        }
     }
 
     public function prepareAddress(PlaceOrderData $placeOrderData): array

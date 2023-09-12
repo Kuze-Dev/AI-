@@ -16,51 +16,35 @@ use Domain\Payments\DataTransferObjects\PaymentDetailsData;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\TransactionData;
 use Domain\Payments\Exceptions\PaymentException;
-use Exception;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class SplitOrderAction
 {
-    public function execute(PreparedOrderData $preparedOrderData, PlaceOrderData $placeOrderData): array|Exception
+    public function execute(PreparedOrderData $preparedOrderData, PlaceOrderData $placeOrderData): array
     {
-        return DB::transaction(function () use ($preparedOrderData, $placeOrderData) {
-            try {
-                DB::beginTransaction();
+        $order = app(CreateOrderAction::class)
+            ->execute($placeOrderData, $preparedOrderData);
 
-                $order = app(CreateOrderAction::class)
-                    ->execute($placeOrderData, $preparedOrderData);
+        app(CreateOrderLineAction::class)
+            ->execute($order, $placeOrderData, $preparedOrderData);
 
-                app(CreateOrderLineAction::class)
-                    ->execute($order, $placeOrderData, $preparedOrderData);
+        app(CreateOrderAddressAction::class)
+            ->execute($order, $preparedOrderData);
 
-                app(CreateOrderAddressAction::class)
-                    ->execute($order, $preparedOrderData);
+        CartLine::whereCheckoutReference($placeOrderData->cart_reference)
+            ->update(['checked_out_at' => now()]);
 
-                CartLine::whereCheckoutReference($placeOrderData->cart_reference)
-                    ->update(['checked_out_at' => now()]);
+        $payment = $this->proceedPayment($order, $preparedOrderData);
 
-                $payment = $this->proceedPayment($order, $preparedOrderData);
+        event(new OrderPlacedEvent(
+            $order,
+            $preparedOrderData,
+            $placeOrderData
+        ));
 
-                event(new OrderPlacedEvent(
-                    $order,
-                    $preparedOrderData,
-                    $placeOrderData
-                ));
-
-                DB::commit();
-
-                return [
-                    'order' => $order,
-                    'payment' => $payment,
-                ];
-            } catch (Exception $e) {
-                DB::rollBack();
-                Log::info('Error on SplitOrderAction->execute() ' . $e);
-
-                return $e;
-            }
-        });
+        return [
+            'order' => $order,
+            'payment' => $payment,
+        ];
     }
 
     private function proceedPayment(Order $order, PreparedOrderData $preparedOrderData): PaymentAuthorize

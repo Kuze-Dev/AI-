@@ -22,8 +22,9 @@ use Illuminate\Support\Facades\Log;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Mailer\Exception\TransportException;
+use Illuminate\Support\Facades\DB;
 
 #[
     Resource('orders', apiResource: true, except: 'destroy'),
@@ -55,46 +56,43 @@ class OrderController extends Controller
         $validatedData = $request->validated();
 
         try {
-            $result = app(PlaceOrderAction::class)
-                ->execute(PlaceOrderData::fromArray($validatedData));
+            $result = DB::transaction(function () use ($validatedData) {
+                $order = app(PlaceOrderAction::class)
+                    ->execute(PlaceOrderData::fromArray($validatedData));
 
-            if ($result instanceof TransportException) {
-                return response()->json([
-                    'mail' => 'Something wrong with mailer',
-                ], 404);
-            }
+                if (is_array($order) && $order['order'] instanceof Order) {
 
-            if ($result instanceof USPSServiceNotFoundException) {
-                return response()->json([
-                    'service_id' => 'Shipping method service id is required',
-                ], 404);
-            }
-
-            if ($result instanceof PaymentException) {
-                return response()->json([
-                    'payment' => 'Invalid Payment Credentials',
-                ], 404);
-            }
-
-            if ($result instanceof HttpException) {
-                return response()->json([
-                    'message' => $result->getMessage(),
-                ], 422);
-            }
-
-            if (is_array($result) && $result['order'] instanceof Order) {
-                return response()
-                    ->json([
+                    return [
                         'message' => 'Order placed successfully',
-                        'data' => $result,
-                    ]);
-            }
+                        'data' => $order,
+                    ];
+                }
+            });
 
+            return response()->json($result);
+        } catch (TransportException) {
             return response()->json([
-                'message' => 'Order failed to be created',
-            ], 400);
+                'mail' => 'Something wrong with mailer',
+            ], 404);
+        } catch (USPSServiceNotFoundException) {
+            return response()->json([
+                'service_id' => 'Shipping method service id is required',
+            ], 404);
+        } catch (PaymentException) {
+            return response()->json([
+                'payment' => 'Invalid Payment Credentials',
+            ], 404);
+        } catch (BadRequestHttpException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 404);
         } catch (Exception $e) {
-            Log::info('OrderController exception ' . $e);
+            Log::error([
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
 
             return response()->json([
                 'message' => 'Something went wrong',

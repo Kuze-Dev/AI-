@@ -11,8 +11,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Settings\OrderSettings;
-use Illuminate\Support\Str;
-use Domain\Tenant\Models\Tenant;
 
 class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
 {
@@ -39,11 +37,7 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
         $this->title = app(SiteSettings::class)->name;
         $this->description = app(SiteSettings::class)->description;
 
-        /** @var Tenant $tenant */
-        $tenant = tenancy()->tenant;
-
-        $tenantName = Str::slug($tenant->name);
-        $this->from = app(OrderSettings::class)->email_sender_name ?? "noreply@{$tenantName}.com";
+        $this->from = app(OrderSettings::class)->email_sender_name;
 
         $sanitizedReplyToEmails = $this->sanitizeEmailArray(app(OrderSettings::class)->email_reply_to ?? []);
         $this->replyTo = $sanitizedReplyToEmails;
