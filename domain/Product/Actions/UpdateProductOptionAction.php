@@ -12,85 +12,80 @@ use Domain\Product\Models\ProductOptionValue;
 
 class UpdateProductOptionAction
 {
-    public function execute(Product $product, ProductData $productData): array
+    public function execute(Product $product, ProductData $productData): void
     {
-        $mutableVariants = $productData->product_variants ?? [];
-        $mutableOptions = $productData->product_options;
-
-        // Flush Product Option
-        if ( ! filled($mutableOptions) && ! filled($mutableVariants)) {
+        /** Flush Product Option */
+        if ( ! filled($productData->product_options) && ! filled($productData->product_variants)) {
             ProductOption::whereProductId($product->id)->delete();
 
-            return [];
+            return;
         }
 
-        // Process Create or Update of Product Options and Option Values
-        foreach ($mutableOptions ?? [] as $key => $productOption) {
-            $optionModel = ProductOption::find($productOption->id);
+        /** Process Update or Create of Product Options and Option Values */
+        foreach ($productData->product_options ?? [] as $key => $productOption) {
+            $productOptionModel = ProductOption::find($productOption->id);
 
-            if ($optionModel instanceof ProductOption) {
-                $optionModel->product_id = $product->id;
-                $optionModel->name = $productOption->name;
-
-                $optionModel->save();
+            if ($productOptionModel instanceof ProductOption) {
+                $productOptionModel->product_id = $product->id;
+                $productOptionModel->name = $productOption->name;
+                $productOptionModel->save();
             } else {
-                $newOptionModel = ProductOption::create([
+                $newProductOptionModel = ProductOption::create([
                     'product_id' => $product->id,
                     'name' => $productOption->name,
                 ]);
 
-                $mutableVariants = $this->searchAndChangeValue(
+                // Update product variant
+                $productData->product_variants = $this->searchAndChangeValue(
                     $productOption->id,
-                    $mutableVariants,
-                    $newOptionModel->id
+                    $productData->product_variants ?? [],
+                    $newProductOptionModel->id
                 );
 
-                $productOption = $productOption->withId($newOptionModel->id, $productOption);
+                $productOption = $productOption
+                    ->withId(
+                        $newProductOptionModel->id,
+                        $productOption
+                    );
             }
 
-            $mutableOptionValues = $productOption->productOptionValues;
+            // Process Update or Create of Product Option Value
+            foreach ($productOption->productOptionValues as $key2 => $productOptionValue) {
+                $productOptionValue = $productOptionValue->withOptionId($productOption->id, $productOptionValue);
+                $proxyOptionValueId = $productOptionValue->id;
 
-            // Process Create or Update of Product Option Value
-            foreach ($mutableOptionValues as $key2 => $optionValue) {
-                $optionValue = $optionValue->withOptionId($productOption->id, $optionValue);
-                $proxyOptionValueId = $optionValue->id;
-
-                $optionValueModel = ProductOptionValue::find($optionValue->id);
+                $optionValueModel = ProductOptionValue::find($productOptionValue->id);
 
                 if ($optionValueModel instanceof ProductOptionValue) {
-                    $optionValueModel->name = $optionValue->name;
+                    $optionValueModel->name = $productOptionValue->name;
                     $optionValueModel->product_option_id = $productOption->id;
-
                     $optionValueModel->save();
                 } else {
                     $newOptionValueModel = ProductOptionValue::create([
-                        'name' => $optionValue->name,
+                        'name' => $productOptionValue->name,
                         'product_option_id' => $productOption->id,
                     ]);
 
-                    $optionValue = $optionValue->withId($newOptionValueModel->id, $optionValue);
+                    $productOptionValue = $productOptionValue
+                        ->withId($newOptionValueModel->id, $productOptionValue);
 
-                    $mutableVariants = $this->searchAndChangeValue(
+                    $productData->product_variants = $this->searchAndChangeValue(
                         $proxyOptionValueId,
-                        $mutableVariants,
+                        $productData->product_variants ?? [],
                         $newOptionValueModel->id,
                         'option_value_id'
                     );
                 }
 
-                $mutableOptionValues[$key2] = $optionValue;
+                $productOption->productOptionValues[$key2] = $productOptionValue;
             }
 
-            $productOption = $productOption->withProductOptionValues($mutableOptionValues, $productOption);
-
-            $mutableOptions[$key] = $productOption;
+            $productData->product_options[$key] = $productOption;
 
             $this->sanitizeOptions($productOption);
         }
 
         $this->sanitizeOptions($productData, $product->id);
-
-        return $mutableVariants;
     }
 
     protected function sanitizeOptions(ProductData|ProductOptionData $dtoData, ?int $productId = null): void
@@ -136,7 +131,6 @@ class UpdateProductOptionAction
         return collect($haystack)->map(function ($variant) use ($needle, $newValue, $field) {
             /** @var array<int, \Domain\Product\DataTransferObjects\VariantCombinationData> $variantCombination */
             $variantCombination = $variant->combination;
-
             $newCombinations = collect($variantCombination)->map(function ($combination) use ($needle, $newValue, $field) {
                 if ($combination->{$field} == $needle) {
                     if ($field == 'option_id') {
