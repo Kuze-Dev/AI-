@@ -90,9 +90,8 @@ class OrderController extends Controller
                     ]);
             }
 
-           
             Log::error($result);
-        
+
             return response()->json([
                 'message' => 'Order failed to be created',
             ], 400);
