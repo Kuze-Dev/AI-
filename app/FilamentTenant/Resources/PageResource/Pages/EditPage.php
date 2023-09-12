@@ -150,7 +150,10 @@ class EditPage extends EditRecord
 
                                 $domain = $site->domain;
 
-                                $modelAction = $livewire->getCachedActions()['preview_microsite_action'];
+                                /** @var CustomPageActionGroup */
+                                $other_page_actions = $livewire->getCachedActions()['other_page_actions'];
+
+                                $modelAction = $other_page_actions->getActions()['preview_microsite_action'];
 
                                 $modelAction->modalSubmitAction(function () use ($domain) {
 
