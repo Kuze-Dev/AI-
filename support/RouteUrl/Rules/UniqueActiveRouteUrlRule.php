@@ -7,7 +7,6 @@ namespace Support\RouteUrl\Rules;
 use Support\RouteUrl\Contracts\HasRouteUrl;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Closure;
-use Domain\Page\Models\Page;
 use Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -38,33 +37,26 @@ class UniqueActiveRouteUrlRule implements ValidationRule
 
         if ($this->ignoreModel) {
 
-            if ($this->ignoreModel instanceof Page) {
+            if ($this->ignoreModel->parentPage) {
 
-                if ($this->ignoreModel->parentPage) {
-
-                    $ignoreModelIds = [
-                        $this->ignoreModel->getKey(),
-                        $this->ignoreModel->parentPage->getKey(),
-                    ];
-
-                } else {
-
-                    $ignoreModelIds = [
-                        $this->ignoreModel->getKey(),
-                        $this->ignoreModel->pageDraft?->getKey() ?: null,
-                    ];
-
-                }
-
-                $query->whereNot(fn (EloquentBuilder $query) => $query
-                    ->where('model_type',  $this->ignoreModel->getMorphClass())
-                    ->whereIn('model_id', array_filter($ignoreModelIds)));
+                $ignoreModelIds = [
+                    $this->ignoreModel->getKey(),
+                    $this->ignoreModel->parentPage->getKey(),
+                ];
 
             } else {
-                $query->whereNot(fn (EloquentBuilder $query) => $query
-                    ->where('model_type',  $this->ignoreModel->getMorphClass())
-                    ->where('model_id',  $this->ignoreModel->getKey()));
+
+                $ignoreModelIds = [
+                    $this->ignoreModel->getKey(),
+                    $this->ignoreModel->pageDraft?->getKey() ?: null,
+                ];
+
             }
+
+            $query->whereNot(fn (EloquentBuilder $query) => $query
+                ->where('model_type',  $this->ignoreModel->getMorphClass())
+                ->whereIn('model_id', array_filter($ignoreModelIds)));
+
         }
 
         if ($query->exists()) {
