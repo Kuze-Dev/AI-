@@ -7,21 +7,21 @@ namespace Domain\Cart\Actions\PublicCart;
 use Domain\Cart\Models\Cart;
 use Illuminate\Support\Str;
 
-class CreateGuestCartAction
+class GuestCreateCartAction
 {
     public function execute(?string $sessionId): Cart
     {
-        $cart = Cart::where([
-            'session_id' => $sessionId,
-        ])->first();
+        if ($sessionId) {
+            $cart = Cart::where([
+                'session_id' => $sessionId,
+            ])->first();
 
-        if ($cart) {
-            return $cart;
+            if ($cart) {
+                return $cart;
+            }
         }
 
         $generatedId = $this->generateUniqueSessionId();
-
-        dd($generatedId);
 
         $newCart = Cart::firstOrCreate([
             'uuid' => (string) Str::uuid(),
@@ -35,9 +35,7 @@ class CreateGuestCartAction
     {
         $uuid = uuid_create(UUID_TYPE_RANDOM);
 
-        $timestamp = time();
-
-        $sessionId = $uuid . $timestamp;
+        $sessionId = time() . $uuid;
 
         return $sessionId;
     }

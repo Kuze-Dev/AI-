@@ -16,8 +16,9 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
 use App\Http\Controllers\Controller;
 use Domain\Cart\Actions\CreateCartLineAction;
+use Domain\Cart\Actions\PublicCart\GuestCreateCartAction;
 use Domain\Cart\Models\Cart;
-use Domain\Cart\Requests\PublicCart\CreateGuestCartLineRequest;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Throwable;
 
@@ -26,16 +27,12 @@ use Throwable;
 ]
 class GuestCartLinesController extends Controller
 {
-    public function store(CreateGuestCartLineRequest $request): mixed
+    public function store(CreateCartLineRequest $request): mixed
     {
         $validatedData = $request->validated();
+        $sessionId = $request->bearerToken() ?? null;
 
-        dd($validatedData);
-
-        // /** @var \Domain\Customer\Models\Customer $customer */
-        // $customer = auth()->user();
-
-        $cart = app(CreateCartAction::class)->execute($customer);
+        $cart = app(GuestCreateCartAction::class)->execute($sessionId);
 
         if (!$cart instanceof Cart) {
             return response()->json([
@@ -55,6 +52,7 @@ class GuestCartLinesController extends Controller
         return response()
             ->json([
                 'message' => 'Successfully Added to Cart',
+                'session_id' => $cart->session_id
             ]);
     }
 
@@ -87,9 +85,11 @@ class GuestCartLinesController extends Controller
         ], 400);
     }
 
-    public function destroy(CartLine $cartline): mixed
+    public function destroy(Request $request, CartLine $cartline): mixed
     {
-        $this->authorize('delete', $cartline);
+        $cartline->load('cart');
+        $sessionId = $request->bearerToken();
+        dd($cartline->cart->session_id = $sessionId);
 
         $result = app(DestroyCartLineAction::class)
             ->execute($cartline);
