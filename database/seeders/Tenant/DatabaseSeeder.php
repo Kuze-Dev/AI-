@@ -29,10 +29,10 @@ class DatabaseSeeder extends Seeder
                 Address\CountrySeeder::class,
                 DiscountSeeder::class,
                 Product\ProductSeeder::class,
-                ImageProductUploaderSeeder::class,
+                // ImageProductUploaderSeeder::class,
                 Currency\CurrencySeeder::class,
                 Customer\CustomerSeeder::class,
-                ShippingMethod\ShippingMethodSeeder::class,
+                // ShippingMethod\ShippingMethodSeeder::class,
                 ShippingMethod\ShippingBoxSeeder::class,
             ]);
         }
