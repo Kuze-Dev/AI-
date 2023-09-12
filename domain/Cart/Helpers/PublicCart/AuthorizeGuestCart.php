@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Helpers\PublicCart;
 
+use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,6 +21,10 @@ class AuthorizeGuestCart
             $cart = $model->cart;
 
             return $cart->session_id === $sessionId;
+        }
+
+        if ($model instanceof Cart) {
+            return $model->session_id === $sessionId;
         }
 
         return false;
