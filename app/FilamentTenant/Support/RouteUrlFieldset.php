@@ -13,6 +13,7 @@ use Filament\Forms\Components\Group;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Support\RouteUrl\Contracts\HasRouteUrl;
+use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
 use Support\RouteUrl\Rules\UniqueActiveRouteUrlRule;
 
 class RouteUrlFieldset extends Group
@@ -80,8 +81,7 @@ class RouteUrlFieldset extends Group
                 ->startsWith('/')
                 ->rule(
                     fn (?HasRouteUrl $record, Closure $get) => tenancy()->tenant?->features()->inactive(SitesManagement::class) ?
-                        new UniqueActiveRouteUrlRule($record) : null
-                    // new MicroSiteUniqueRouteUrlRule($record, $get('sites'))
+                        new UniqueActiveRouteUrlRule($record) : new MicroSiteUniqueRouteUrlRule($record, $get('sites'))
                 )
                 ->afterStateUpdated(fn () => $this->dispatchEvent('route_url::update', 'input')),
         ]);

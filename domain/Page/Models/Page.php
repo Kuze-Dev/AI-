@@ -117,7 +117,6 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
         return $this->draftable_id ? $this->name.' (Draft)' : $this->name;
     }
 
-
     /** @return PageBuilder<self> */
     public function newEloquentBuilder($query): PageBuilder
     {
