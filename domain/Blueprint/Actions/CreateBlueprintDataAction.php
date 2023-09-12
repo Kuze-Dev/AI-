@@ -27,8 +27,8 @@ class CreateBlueprintDataAction
             'value' => $blueprintDataData->value,
             'type' => $blueprintDataData->type,
         ]);
-        /** @phpstan-ignore-next-line */
-        if($blueprintData->type == FieldType::MEDIA && $blueprintData->value) {
+
+        if($blueprintDataData->type == FieldType::MEDIA && $blueprintData->value) {
             $blueprintData->addMediaFromDisk($blueprintData->value, 's3')
                 ->toMediaCollection('blueprint_media');
         }

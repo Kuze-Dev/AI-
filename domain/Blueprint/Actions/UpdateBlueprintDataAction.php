@@ -16,6 +16,20 @@ class UpdateBlueprintDataAction
     ) {
     }
 
+    public function execute(BlockContent $blockContent): void
+    {
+        $blueprintfieldtype = $blockContent->block->blueprint->schema;
+        if( ! $blockContent->data) {
+            return;
+        }
+        $statePaths = $this->extractDataAction->extractStatePath($blockContent->data);
+        $fieldTypes = $this->extractDataAction->extractFieldType($blueprintfieldtype, $statePaths);
+        foreach (array_combine($statePaths, $fieldTypes) as $statePath => $fieldType) {
+            $this->updateBlueprintData(BlueprintDataData::fromArray($blockContent, $statePath, $fieldType));
+        }
+
+    }
+
     private function updateBlueprintData(BlueprintDataData $blueprintDataData): BlueprintData
     {
         $blueprintData = BlueprintData::where('model_id', $blueprintDataData->model_id)->where('state_path', $blueprintDataData->state_path)->first();
@@ -49,19 +63,5 @@ class UpdateBlueprintDataAction
         }
 
         return $blueprintData;
-    }
-
-    public function execute(BlockContent $blockContent): void
-    {
-        $blueprintfieldtype = $blockContent->block->blueprint->schema;
-        if( ! $blockContent->data) {
-            return;
-        }
-        $statePaths = $this->extractDataAction->extractStatePath($blockContent->data);
-        $fieldTypes = $this->extractDataAction->extractFieldType($blueprintfieldtype, $statePaths);
-        foreach (array_combine($statePaths, $fieldTypes) as $statePath => $fieldType) {
-            $this->updateBlueprintData(BlueprintDataData::fromArray($blockContent, $statePath, $fieldType));
-        }
-
     }
 }
