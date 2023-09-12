@@ -94,8 +94,8 @@ class EditContentEntry extends EditRecord
                     ->label(__('Save As Draft'))
                     ->action('overwriteDraft')
                     ->requiresConfirmation()
-                    ->modalHeading('you have existing draft')
-                    ->modalSubheading('You have existing draft for this page want to overwrite existing draft?')
+                    ->modalHeading('Draft for this content already exists')
+                    ->modalSubheading('You have an existing draft for this content. Do you want to overwrite the existing draft?')
                     ->modalCancelAction(function () {
                         return Action::makeModalAction('redirect')
                             ->label(__('Edit Existing Draft'))
