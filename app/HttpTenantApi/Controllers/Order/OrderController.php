@@ -10,6 +10,7 @@ use Domain\Order\Actions\PlaceOrderAction;
 use Domain\Order\Actions\UpdateOrderAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\UpdateOrderData;
+use Domain\Order\Exceptions\OrderEmailSettingsException;
 use Domain\Order\Models\Order;
 use Domain\Order\Requests\PlaceOrderRequest;
 use Domain\Order\Requests\UpdateOrderRequest;
@@ -25,6 +26,7 @@ use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 
 #[
     Resource('orders', apiResource: true, except: 'destroy'),
@@ -82,11 +84,21 @@ class OrderController extends Controller
             return response()->json([
                 'payment' => 'Invalid Payment Credentials',
             ], 404);
+        } catch (OrderEmailSettingsException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 404);
         } catch (BadRequestHttpException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
             ], 404);
         } catch (Exception $e) {
+            //site settings logo
+            if ($e instanceof InvalidArgumentException && $e->getCode() === 0 && $e->getLine() == 65) {
+                return response()->json([
+                    'message' => "Invalid logo for site settings",
+                ], 404);
+            }
             Log::error([
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),

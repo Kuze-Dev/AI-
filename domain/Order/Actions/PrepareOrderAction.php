@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Order\Actions;
 
 use App\Settings\OrderSettings;
+use App\Settings\SiteSettings;
 use Domain\Address\Models\Address;
 use Domain\Cart\Models\CartLine;
 use Domain\Currency\Models\Currency;
@@ -12,6 +13,8 @@ use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
+use Domain\Order\Exceptions\OrderEmailSettingsException;
+use Domain\Order\Exceptions\OrderEmailSiteSettingsException;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Product\Models\ProductVariant;
 use Domain\ShippingMethod\Models\ShippingMethod;
@@ -27,6 +30,8 @@ class PrepareOrderAction
     public function execute(PlaceOrderData $placeOrderData): PreparedOrderData
     {
         $customer = auth()->user();
+
+        $this->prepareSiteSettings();
 
         $this->prepareEmailSettings();
 
@@ -67,8 +72,13 @@ class PrepareOrderAction
         $fromEmail = app(OrderSettings::class)->email_sender_name;
 
         if (empty($fromEmail)) {
-            throw new BadRequestHttpException('No email sender found');
+            throw new OrderEmailSettingsException('No email sender found');
         }
+    }
+
+    public function prepareSiteSettings(): void
+    {
+        app(SiteSettings::class)->getLogoUrl();
     }
 
     public function prepareAddress(PlaceOrderData $placeOrderData): array
@@ -87,7 +97,7 @@ class PrepareOrderAction
     {
         $currency = Currency::where('enabled', true)->first();
 
-        if ( ! $currency instanceof Currency) {
+        if (!$currency instanceof Currency) {
 
             throw new BadRequestHttpException('No currency found');
         }
@@ -105,7 +115,7 @@ class PrepareOrderAction
             $query->morphWith([
                 ProductVariant::class => ['product'],
             ]);
-        }, ])
+        },])
             ->whereCheckoutReference($placeOrderData->cart_reference)
             ->get();
     }
@@ -125,7 +135,7 @@ class PrepareOrderAction
 
         $taxZone = Taxation::getTaxZone($country->id, $state->id);
 
-        if ( ! $taxZone instanceof TaxZone) {
+        if (!$taxZone instanceof TaxZone) {
             // Log::info('No tax zone found');
             return null;
             // throw new BadRequestHttpException('No tax zone found');
@@ -164,7 +174,7 @@ class PrepareOrderAction
     {
         $paymentMethod = PaymentMethod::whereSlug($placeOrderData->payment_method)->first();
 
-        if ( ! $paymentMethod instanceof PaymentMethod) {
+        if (!$paymentMethod instanceof PaymentMethod) {
 
             throw new BadRequestHttpException('No paymentMethod found');
         }
