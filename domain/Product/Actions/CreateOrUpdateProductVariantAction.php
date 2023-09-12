@@ -4,72 +4,41 @@ declare(strict_types=1);
 
 namespace Domain\Product\Actions;
 
+use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\DataTransferObjects\ProductVariantData;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 
 class CreateOrUpdateProductVariantAction
 {
-    public function execute(Product $product, array $productVariants, bool $isCreate = true): void
+    public function execute(Product $product, ProductData $productData, bool $isCreate = true): void
     {
-        // If met, flush product variants
-        if ( ! filled($productVariants)) {
+        /** If met, flush product variants */
+        if ( ! filled($productData->product_variants)) {
             ProductVariant::whereProductId($product->id)->delete();
 
             return;
         }
 
-        // For variants creation
+        /** If for variant creation */
         if ($isCreate) {
-            foreach ($productVariants as $productVariant) {
+            foreach ($productData->product_variants ?? [] as $productVariant) {
                 $this->createProductVariant($product->id, $productVariant);
             }
 
             return;
         }
 
-        $this->sanitizeVariants($product->id, $productVariants);
+        $this->sanitizeVariants($product->id, $productData->product_variants ?? []);
 
-        // For create or update of variants
-        $this->createOrUpdateProductVariants($product->id, $productVariants);
+        $this->createOrUpdateProductVariants($product->id, $productData->product_variants ?? []);
     }
 
-    protected function createOrUpdateProductVariants(int $productId, array $productVariants): void
+    protected function createProductVariant(int $productId, ProductVariantData $productVariant): void
     {
-        collect($productVariants)->each(function ($productVariant) use ($productId) {
-            $variant = ProductVariant::where(
-                'combination',
-                'LIKE',
-                '%"option_value_id": ' . $productVariant->combination[0]->option_value_id . '%'
-            )
-                ->when(isset($productVariant->combination[1]), function ($query) use ($productVariant) {
-                    return $query->where(
-                        'combination',
-                        'LIKE',
-                        '%"option_value_id": ' . $productVariant->combination[1]->option_value_id . '%'
-                    );
-                })
-                ->where('product_id', $productId)
-                ->first();
-
-            $variant
-                ? $this->updateProductVariant($variant, $productVariant)
-                : $this->createProductVariant($productId, $productVariant);
-        });
-    }
-
-    protected function createProductVariant(int $productId, ProductVariantData $variantData): ProductVariant
-    {
-        return ProductVariant::create(
-            array_merge(['product_id' => $productId], $this->prepareVariantData($variantData))
+        ProductVariant::create(
+            array_merge(['product_id' => $productId], $this->prepareVariantData($productVariant))
         );
-    }
-
-    protected function updateProductVariant(ProductVariant $variant, ProductVariantData $variantData): ProductVariant
-    {
-        $variant->update($this->prepareVariantData($variantData));
-
-        return $variant;
     }
 
     protected function sanitizeVariants(int $productId, array $productVariants): void
@@ -93,6 +62,30 @@ class CreateOrUpdateProductVariantAction
                 $variant->delete();
             }
         });
+    }
+
+    protected function createOrUpdateProductVariants(int $productId, array $productVariants): void
+    {
+        foreach ($productVariants as $productVariant) {
+            $variant = ProductVariant::where(
+                'combination',
+                'LIKE',
+                '%"option_value_id": ' . $productVariant->combination[0]->option_value_id . '%'
+            )
+                ->when(isset($productVariant->combination[1]), function ($query) use ($productVariant) {
+                    return $query->where(
+                        'combination',
+                        'LIKE',
+                        '%"option_value_id": ' . $productVariant->combination[1]->option_value_id . '%'
+                    );
+                })
+                ->where('product_id', $productId)
+                ->first();
+
+            $variant
+                ? $variant->update($this->prepareVariantData($productVariant))
+                : $this->createProductVariant($productId, $productVariant);
+        }
     }
 
     protected function prepareVariantData(ProductVariantData $productVariant): array
