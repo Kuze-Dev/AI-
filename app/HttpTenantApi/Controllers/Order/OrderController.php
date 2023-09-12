@@ -11,7 +11,9 @@ use Domain\Order\Actions\UpdateOrderAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\UpdateOrderData;
 use Domain\Order\Exceptions\OrderEmailSettingsException;
+use Domain\Order\Exceptions\OrderEmailSiteSettingsException;
 use Domain\Order\Models\Order;
+use Domain\Order\Notifications\OrderFailedNotifyAdmin;
 use Domain\Order\Requests\PlaceOrderRequest;
 use Domain\Order\Requests\UpdateOrderRequest;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
@@ -26,7 +28,6 @@ use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Illuminate\Support\Facades\DB;
-use InvalidArgumentException;
 
 #[
     Resource('orders', apiResource: true, except: 'destroy'),
@@ -34,6 +35,11 @@ use InvalidArgumentException;
 ]
 class OrderController extends Controller
 {
+    public function __construct(
+        private readonly OrderFailedNotifyAdmin $notifyAdmin
+    ) {
+    }
+
     public function index(): mixed
     {
         /** @var \Domain\Customer\Models\Customer $customer */
@@ -81,10 +87,23 @@ class OrderController extends Controller
                 'service_id' => 'Shipping method service id is required',
             ], 404);
         } catch (PaymentException) {
+            $this->notifyAdmin->execute('This error is occurring due to an issue with the payment credentials on your website.
+            Please ensure that your payment settings are configured correctly.');
+
             return response()->json([
                 'payment' => 'Invalid Payment Credentials',
             ], 404);
         } catch (OrderEmailSettingsException $e) {
+            $this->notifyAdmin->execute('This error is occurring due to an issue with the email sender on your website.
+            Please ensure that your order settings are configured correctly.');
+
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 404);
+        } catch (OrderEmailSiteSettingsException $e) {
+            $this->notifyAdmin->execute('This error is occurring due to an issue with the logo on your website.
+            Please ensure that your site settings are configured correctly.');
+
             return response()->json([
                 'message' => $e->getMessage(),
             ], 404);
@@ -93,12 +112,6 @@ class OrderController extends Controller
                 'message' => $e->getMessage(),
             ], 404);
         } catch (Exception $e) {
-            //site settings logo
-            if ($e instanceof InvalidArgumentException && $e->getCode() === 0 && $e->getLine() == 65) {
-                return response()->json([
-                    'message' => "Invalid logo for site settings",
-                ], 404);
-            }
             Log::error([
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),

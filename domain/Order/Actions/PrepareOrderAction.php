@@ -21,6 +21,7 @@ use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Log;
@@ -78,7 +79,11 @@ class PrepareOrderAction
 
     public function prepareSiteSettings(): void
     {
-        app(SiteSettings::class)->getLogoUrl();
+        try {
+            app(SiteSettings::class)->getLogoUrl();
+        } catch (Exception) {
+            throw new OrderEmailSiteSettingsException('No logo for site settings found');
+        }
     }
 
     public function prepareAddress(PlaceOrderData $placeOrderData): array
@@ -97,7 +102,7 @@ class PrepareOrderAction
     {
         $currency = Currency::where('enabled', true)->first();
 
-        if (!$currency instanceof Currency) {
+        if ( ! $currency instanceof Currency) {
 
             throw new BadRequestHttpException('No currency found');
         }
@@ -115,7 +120,7 @@ class PrepareOrderAction
             $query->morphWith([
                 ProductVariant::class => ['product'],
             ]);
-        },])
+        }, ])
             ->whereCheckoutReference($placeOrderData->cart_reference)
             ->get();
     }
@@ -135,7 +140,7 @@ class PrepareOrderAction
 
         $taxZone = Taxation::getTaxZone($country->id, $state->id);
 
-        if (!$taxZone instanceof TaxZone) {
+        if ( ! $taxZone instanceof TaxZone) {
             // Log::info('No tax zone found');
             return null;
             // throw new BadRequestHttpException('No tax zone found');
@@ -174,7 +179,7 @@ class PrepareOrderAction
     {
         $paymentMethod = PaymentMethod::whereSlug($placeOrderData->payment_method)->first();
 
-        if (!$paymentMethod instanceof PaymentMethod) {
+        if ( ! $paymentMethod instanceof PaymentMethod) {
 
             throw new BadRequestHttpException('No paymentMethod found');
         }
