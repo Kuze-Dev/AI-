@@ -70,6 +70,10 @@ class ShippingSettings extends TenantBaseSettings
 
     protected static function authorizeAccess(): bool
     {
-        return tenancy()->tenant?->features()->active(ECommerceBase::class) ?? false;
+        /** @var \Domain\Admin\Models\Admin $user */
+        $user = auth()->user();
+
+        return tenancy()->tenant?->features()->active(ECommerceBase::class) &&
+            $user->can('ecommerceSettings.shipping');
     }
 }

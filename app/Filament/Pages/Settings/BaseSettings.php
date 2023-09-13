@@ -57,7 +57,7 @@ abstract class BaseSettings extends SettingsPage
     {
         $settingsPermissions = app(PermissionRegistrar::class)
             ->getPermissions()
-            ->filter(fn (Permission $permission) => Str::startsWith($permission->name, 'settings'));
+            ->filter(fn (Permission $permission) => Str::startsWith($permission->name, 'cmsSettings'));
 
         if ($settingsPermissions->isEmpty()) {
             return true;
@@ -67,7 +67,7 @@ abstract class BaseSettings extends SettingsPage
             return true;
         }
 
-        return Auth::user()?->can('settings.' . self::getSlug()) ?? false;
+        return Auth::user()?->can('cmsSettings.' . self::getSlug()) ?? false;
     }
 
     public static function getSlug(): string
@@ -77,7 +77,7 @@ abstract class BaseSettings extends SettingsPage
 
     public static function getRouteName(): string
     {
-        return 'filament.pages.settings.'.self::getSlug();
+        return 'filament.pages.settings.' . self::getSlug();
     }
 
     protected function getBreadcrumb(): Htmlable|string
@@ -100,9 +100,9 @@ abstract class BaseSettings extends SettingsPage
         return function () {
             $slug = self::getSlug();
 
-            Route::get('settings/'.$slug, static::class)
+            Route::get('settings/' . $slug, static::class)
                 ->middleware(static::getMiddlewares())
-                ->name('settings.'.$slug);
+                ->name('settings.' . $slug);
         };
     }
 }
