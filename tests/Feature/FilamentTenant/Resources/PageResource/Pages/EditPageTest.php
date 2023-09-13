@@ -588,4 +588,4 @@ it('can edit page with media uploaded', function () {
 
     ]);
 
-})->only();
+});
