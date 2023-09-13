@@ -129,6 +129,12 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
         ];
     }
 
+    #create a name Attribute For title field if draftable_id is not null add (Draft) to the end of the title
+    public function getNameAttribute(): string
+    {
+        return $this->draftable_id ? $this->title.' (Draft)' : $this->title;
+    }
+
     /**
      * Declare relationship of
      * current model to contents.

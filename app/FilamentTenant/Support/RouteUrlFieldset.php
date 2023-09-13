@@ -79,7 +79,7 @@ class RouteUrlFieldset extends Group
                 ->maxLength(255)
                 ->startsWith('/')
                 ->rule(
-                    fn (?HasRouteUrl $record, Closure $get) => tenancy()->tenant?->features()->inactive(SitesManagement::class) ?
+                    fn (?HasRouteUrl $record) => tenancy()->tenant?->features()->inactive(SitesManagement::class) ?
                         new UniqueActiveRouteUrlRule($record) : null
                     // new MicroSiteUniqueRouteUrlRule($record, $get('sites'))
                 )
