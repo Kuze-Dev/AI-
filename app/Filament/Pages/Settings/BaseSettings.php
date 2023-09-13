@@ -57,17 +57,17 @@ abstract class BaseSettings extends SettingsPage
     {
         $settingsPermissions = app(PermissionRegistrar::class)
             ->getPermissions()
-            ->filter(fn (Permission $permission) => Str::startsWith($permission->name, 'cmsSettings'));
+            ->filter(fn (Permission $permission) => Str::startsWith($permission->name, 'settings'));
 
         if ($settingsPermissions->isEmpty()) {
             return true;
         }
 
-        if ( ! PermissionGroup::make($settingsPermissions)->getParts()->contains(self::getSlug())) {
+        if (!PermissionGroup::make($settingsPermissions)->getParts()->contains(self::getSlug())) {
             return true;
         }
 
-        return Auth::user()?->can('cmsSettings.' . self::getSlug()) ?? false;
+        return Auth::user()?->can('settings.' . self::getSlug()) ?? false;
     }
 
     public static function getSlug(): string
