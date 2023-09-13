@@ -510,14 +510,6 @@ it('can published page draft', function () {
 });
 
 it('can edit page with media uploaded', function () {
-    Storage::fake('s3');
-
-    // Create a fake file to upload
-    $first_image = UploadedFile::fake()->image('preview-1.jpeg');
-
-    // Perform the upload to S3
-    Storage::disk('s3')->put('/', $first_image);
-
     $block = BlockFactory::new()
         ->for(
             BlueprintFactory::new()
@@ -538,14 +530,25 @@ it('can edit page with media uploaded', function () {
                 ->createOne()
         )
         ->createOne();
+    // Set up fake S3 storage
 
-    $page1 = livewire(CreatePage::class)
+    Storage::fake('s3');
+
+    // Create a fake file to upload
+    $file = UploadedFile::fake()->image('preview.jpeg');
+
+    // Perform the upload to S3
+    Storage::disk('s3')->put('/', $file);
+
+    $page = livewire(CreatePage::class)
         ->fillForm([
             'name' => 'Test',
             'block_contents' => [
-                'block_id' => $block->getKey(),
-                'data' => ['main' => ['image' => [$first_image->hashName()]]],
-            ]
+                [
+                    'block_id' => $block->getKey(),
+                    'data' => ['main' => ['image' => [$file->hashName()]]],
+                ],
+            ],
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -553,46 +556,36 @@ it('can edit page with media uploaded', function () {
         ->instance()
         ->record;
 
-    dd($page1);
+    $file2 = UploadedFile::fake()->image('preview-2.jpeg');
 
-    // $second_image = UploadedFile::fake()->image('preview-2.jpeg');
-    // Storage::disk('s3')->put('/', $second_image);
+    // Perform the upload to S3
+    Storage::disk('s3')->put('/', $file2);
+    $updatedPage = livewire(EditPage::class, ['record' => $page->getRouteKey()])
+        ->fillForm([
+            'name' => 'Test',
+            'published_at' => true,
+            'block_contents' => [
+                [
+                    'block_id' => $block->getKey(),
+                    'data' => ['main' => ['image' => [$file2->hashName()]]],
+                ],
+            ],
 
-    // $updatedPage = livewire(EditPage::class, ['record' => $page1->getRouteKey()])
-    //     ->fillForm([
-    //         'name' => 'Test',
-    //         'published_at' => true,
-    //         'block_contents' => [
-    //             [
-    //                 'block_id' => $block->getKey(),
-    //                 'data' => ['main' => ['image' => [$second_image->hashName()]]],
-    //             ],
-    //         ],
-    //     ])
-    //     ->call('save')
-    //     ->assertHasNoFormErrors()
-    //     ->assertOk()
-    //     ->instance()
-    //     ->record;
+            'visibility' => 'authenticated',
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+    ->record;
+    $block_content = $updatedPage->blockContents->first();
+    $schema = $block_content->block->blueprint->schema;
 
-    // assertDatabaseHas(Page::class, [
-    //     'name' => 'Test',
-    //     'published_at' => $updatedPage->published_at,
-    // ]);
+    assertDatabaseHas(Media::class, [
+        'file_name' => $file2->hashName(),
+        'collection_name' => 'blueprint_media',
+        'generated_conversions' => json_encode([$schema->sections[0]->fields[0]->conversions[0]->name => true]),
 
-    // $block_content = $page1->blockContents->first();
-    // $schema = $block_content->block->blueprint->schema;
-
-    // assertDatabaseHas(Media::class, [
-    //     'file_name' => $second_image->hashName(),
-    //     'collection_name' => 'blueprint_media',
-    //     'generated_conversions' => json_encode([$schema->sections[0]->fields[0]->conversions[0]->name => true]),
-    // ]);
-
-    // assertDatabaseHas(BlockContent::class, [
-    //     'page_id' => $page1->id,
-    //     'block_id' => $page1->blockContents->first()->block_id,
-    //     'data' => json_encode(['main' => ['image' => $second_image->hashName()]]),
-    // ]);
+    ]);
 
 })->only();
