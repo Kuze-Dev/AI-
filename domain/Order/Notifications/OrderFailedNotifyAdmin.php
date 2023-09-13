@@ -4,21 +4,15 @@ declare(strict_types=1);
 
 namespace Domain\Order\Notifications;
 
-use Domain\Admin\Models\Admin;
-use Filament\Notifications\Notification;
+use Domain\Order\Events\AdminOrderFailedNotificationEvent;
 
 class OrderFailedNotifyAdmin
 {
-    public function execute(string $body): void
+    public function execute(string $body, string $permission): void
     {
-        /** @var Admin $admin */
-        $admin = Admin::first();
-
-        $admin->notify(
-            Notification::make()
-                ->title("Customer can't placed an order")
-                ->body($body)
-                ->toDatabase(),
-        );
+        event(new AdminOrderFailedNotificationEvent(
+            $body,
+            $permission
+        ));
     }
 }
