@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Pages\Settings;
 
+use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
 use App\Settings\ShippingSettings as SettingsShippingSettings;
 use Filament\Forms;
-use App\Features\ECommerce\ECommerceBase;
 
 class ShippingSettings extends TenantBaseSettings
 {
+    use AuthorizeEcommerceSettings;
+
     protected static string $settings = SettingsShippingSettings::class;
 
     protected static ?string $navigationIcon = 'heroicon-s-truck';
@@ -38,7 +40,7 @@ class ShippingSettings extends TenantBaseSettings
                             )
                             ->reactive(),
                     ])->hidden(
-                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\ShippingUsps::class)
+                        fn () => !tenancy()->tenant?->features()->active(\App\Features\ECommerce\ShippingUsps::class)
                     ),
                 Forms\Components\Section::make(trans('Ups Shipping'))
                     ->collapsible()
@@ -60,20 +62,11 @@ class ShippingSettings extends TenantBaseSettings
                             )
                             ->reactive(),
                     ])->hidden(
-                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\ShippingUps::class)
+                        fn () => !tenancy()->tenant?->features()->active(\App\Features\ECommerce\ShippingUps::class)
                     ),
 
             ]),
 
         ];
-    }
-
-    protected static function authorizeAccess(): bool
-    {
-        /** @var \Domain\Admin\Models\Admin $user */
-        $user = auth()->user();
-
-        return tenancy()->tenant?->features()->active(ECommerceBase::class) &&
-            $user->can('ecommerceSettings.shipping');
     }
 }

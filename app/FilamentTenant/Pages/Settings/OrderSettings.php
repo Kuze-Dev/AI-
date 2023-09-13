@@ -7,10 +7,12 @@ namespace App\FilamentTenant\Pages\Settings;
 use App\Settings\OrderSettings as SettingsOrderSettings;
 use Filament\Forms;
 use Illuminate\Support\Str;
-use App\Features\ECommerce\ECommerceBase;
+use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
 
 class OrderSettings extends TenantBaseSettings
 {
+    use AuthorizeEcommerceSettings;
+
     protected static string $settings = SettingsOrderSettings::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
@@ -34,9 +36,9 @@ class OrderSettings extends TenantBaseSettings
                         })
                         ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
                             ? Str::of($state)
-                                ->split('/\,/')
-                                ->map(fn (string $rule) => trim($rule))
-                                ->toArray()
+                            ->split('/\,/')
+                            ->map(fn (string $rule) => trim($rule))
+                            ->toArray()
                             : ($state ?? [])),
                     Forms\Components\RichEditor::make('email_footer')
                         ->label(trans('Email Footer'))
@@ -49,14 +51,5 @@ class OrderSettings extends TenantBaseSettings
                         ->columnSpanFull(),
                 ]),
         ];
-    }
-
-    protected static function authorizeAccess(): bool
-    {
-        /** @var \Domain\Admin\Models\Admin $user */
-        $user = auth()->user();
-
-        return tenancy()->tenant?->features()->active(ECommerceBase::class) &&
-            $user->can('ecommerceSettings.order');
     }
 }

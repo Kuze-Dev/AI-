@@ -8,10 +8,12 @@ use App\Filament\Rules\FullyQualifiedDomainNameRule;
 use App\Settings\ECommerceSettings as SettingsECommerceSettings;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\TextInput;
-use App\Features\ECommerce\ECommerceBase;
+use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
 
 class ECommerceSettings extends TenantBaseSettings
 {
+    use AuthorizeEcommerceSettings;
+
     protected static string $settings = SettingsECommerceSettings::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
@@ -30,14 +32,5 @@ class ECommerceSettings extends TenantBaseSettings
             ])
                 ->columns(2),
         ];
-    }
-
-    protected static function authorizeAccess(): bool
-    {
-        /** @var \Domain\Admin\Models\Admin $user */
-        $user = auth()->user();
-
-        return tenancy()->tenant?->features()->active(ECommerceBase::class) &&
-            $user->can('ecommerceSettings.ecommerce');
     }
 }
