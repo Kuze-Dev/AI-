@@ -8,6 +8,7 @@ use App\Filament\Rules\FullyQualifiedDomainNameRule;
 use App\Settings\ECommerceSettings as SettingsECommerceSettings;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\TextInput;
+use App\Features\ECommerce\ECommerceBase;
 
 class ECommerceSettings extends TenantBaseSettings
 {
@@ -29,5 +30,10 @@ class ECommerceSettings extends TenantBaseSettings
             ])
                 ->columns(2),
         ];
+    }
+
+    protected static function authorizeAccess(): bool
+    {
+        return tenancy()->tenant?->features()->active(ECommerceBase::class) ?? false;
     }
 }

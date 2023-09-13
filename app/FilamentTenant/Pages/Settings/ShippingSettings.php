@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Pages\Settings;
 
 use App\Settings\ShippingSettings as SettingsShippingSettings;
 use Filament\Forms;
+use App\Features\ECommerce\ECommerceBase;
 
 class ShippingSettings extends TenantBaseSettings
 {
@@ -31,8 +32,8 @@ class ShippingSettings extends TenantBaseSettings
                             ->label(fn ($state) => trans('Usps (:value)', ['value' => $state ? 'Live' : 'Sandbox']))
                             ->helperText(
                                 trans(
-                                    'If the feature is activated, it is necessary to provide production keys. '.
-                                    'However, if the feature is deactivated, payment processing will occur in sandbox mode'
+                                    'If the feature is activated, it is necessary to provide production keys. ' .
+                                        'However, if the feature is deactivated, payment processing will occur in sandbox mode'
                                 )
                             )
                             ->reactive(),
@@ -53,8 +54,8 @@ class ShippingSettings extends TenantBaseSettings
                             ->label(fn ($state) => trans('Usps (:value)', ['value' => $state ? 'Live' : 'Sandbox']))
                             ->helperText(
                                 trans(
-                                    'If the feature is activated, it is necessary to provide production keys. '.
-                                    'However, if the feature is deactivated, payment processing will occur in sandbox mode'
+                                    'If the feature is activated, it is necessary to provide production keys. ' .
+                                        'However, if the feature is deactivated, payment processing will occur in sandbox mode'
                                 )
                             )
                             ->reactive(),
@@ -65,5 +66,10 @@ class ShippingSettings extends TenantBaseSettings
             ]),
 
         ];
+    }
+
+    protected static function authorizeAccess(): bool
+    {
+        return tenancy()->tenant?->features()->active(ECommerceBase::class) ?? false;
     }
 }
