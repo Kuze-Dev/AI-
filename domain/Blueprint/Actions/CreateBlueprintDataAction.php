@@ -7,7 +7,9 @@ namespace Domain\Blueprint\Actions;
 use Domain\Blueprint\DataTransferObjects\BlueprintDataData;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Models\BlueprintData;
+use Domain\Content\Models\ContentEntry;
 use Domain\Page\Models\BlockContent;
+use Illuminate\Database\Eloquent\Model;
 
 class CreateBlueprintDataAction
 {
@@ -36,16 +38,26 @@ class CreateBlueprintDataAction
         return $blueprintData;
     }
 
-    public function execute(BlockContent $blockContent): void
+    public function execute(Model $model): void
     {
-        if( ! $blockContent->data) {
+        $blueprintfieldtype = null;
+
+        if ($model instanceof ContentEntry) {
+            $blueprintfieldtype = $model->content->blueprint->schema;
+        } elseif ($model instanceof BlockContent) {
+            $blueprintfieldtype = $model->block->blueprint->schema;
+        } else {
             return;
         }
-        $blueprintfieldtype = $blockContent->block->blueprint->schema;
-        $statePaths = $this->extractDataAction->extractStatePath($blockContent->data);
+
+        if( ! $model->data) {
+            return;
+        }
+
+        $statePaths = $this->extractDataAction->extractStatePath($model->data);
         $fieldTypes = $this->extractDataAction->extractFieldType($blueprintfieldtype, $statePaths);
         foreach (array_combine($statePaths, $fieldTypes) as $statePath => $fieldType) {
-            $this->storeBlueprintData(BlueprintDataData::fromArray($blockContent, $statePath, $fieldType));
+            $this->storeBlueprintData(BlueprintDataData::fromArray($model, $statePath, $fieldType));
         }
 
     }
