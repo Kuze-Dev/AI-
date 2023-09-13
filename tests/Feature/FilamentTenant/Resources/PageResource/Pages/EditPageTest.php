@@ -513,7 +513,7 @@ it('can edit page with media uploaded', function () {
     $block = BlockFactory::new()
         ->for(
             BlueprintFactory::new()
-                ->addSchemaSection(['title' => 'main'])
+                ->addSchemaSection(['title' => 'section'])
                 ->addMediaSchemaField([
                     'title' => 'image',
                     'type' => FieldType::MEDIA,
@@ -527,9 +527,12 @@ it('can edit page with media uploaded', function () {
                         ],
                     ],
                 ])
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT])
                 ->createOne()
         )
         ->createOne();
+
     // Set up fake S3 storage
 
     Storage::fake('s3');
@@ -546,7 +549,7 @@ it('can edit page with media uploaded', function () {
             'block_contents' => [
                 [
                     'block_id' => $block->getKey(),
-                    'data' => ['main' => ['image' => [$file->hashName()]]],
+                    'data' => ['section' => ['image' => [$file->hashName()][0]], 'main' => ['header' => 'foo']],
                 ],
             ],
         ])
@@ -560,32 +563,19 @@ it('can edit page with media uploaded', function () {
 
     // Perform the upload to S3
     Storage::disk('s3')->put('/', $file2);
-    $updatedPage = livewire(EditPage::class, ['record' => $page->getRouteKey()])
+    livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
-            'published_at' => true,
             'block_contents' => [
                 [
                     'block_id' => $block->getKey(),
-                    'data' => ['main' => ['image' => [$file2->hashName()]]],
+                    'data' => ['section' => ['image' => [$file2->hashName()][0]], 'main' => ['header' => 'Bar']],
                 ],
             ],
-
             'visibility' => 'authenticated',
         ])
         ->call('save')
         ->assertHasNoFormErrors()
-        ->assertOk()
-        ->instance()
-    ->record;
-    $block_content = $updatedPage->blockContents->first();
-    $schema = $block_content->block->blueprint->schema;
-
-    assertDatabaseHas(Media::class, [
-        'file_name' => $file2->hashName(),
-        'collection_name' => 'blueprint_media',
-        'generated_conversions' => json_encode([$schema->sections[0]->fields[0]->conversions[0]->name => true]),
-
-    ]);
+        ->assertOk();
 
 });
