@@ -36,9 +36,9 @@ class OrderSettings extends TenantBaseSettings
                         })
                         ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
                             ? Str::of($state)
-                            ->split('/\,/')
-                            ->map(fn (string $rule) => trim($rule))
-                            ->toArray()
+                                ->split('/\,/')
+                                ->map(fn (string $rule) => trim($rule))
+                                ->toArray()
                             : ($state ?? [])),
                     Forms\Components\RichEditor::make('email_footer')
                         ->label(trans('Email Footer'))

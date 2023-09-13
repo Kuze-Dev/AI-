@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Support\Concerns;
 
-use App\Features\ECommerce\ECommerceBase;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 use App\Filament\Resources\RoleResource\Support\PermissionGroup;
+use Illuminate\Support\Facades\Auth;
 
 trait AuthorizeCMSSettings
 {
-
     protected static function authorizeAccess(): bool
     {
         $settingsPermissions = app(PermissionRegistrar::class)
@@ -23,13 +22,10 @@ trait AuthorizeCMSSettings
             return true;
         }
 
-        if (!PermissionGroup::make($settingsPermissions)->getParts()->contains(self::getSlug())) {
+        if ( ! PermissionGroup::make($settingsPermissions)->getParts()->contains(self::getSlug())) {
             return true;
         }
 
-        /** @var \Domain\Admin\Models\Admin $user */
-        $user = auth()->user();
-
-        return $user?->can('cmsSettings.' . self::getSlug()) ?? false;
+        return Auth::user()?->can('cmsSettings.' . self::getSlug()) ?? false;
     }
 }

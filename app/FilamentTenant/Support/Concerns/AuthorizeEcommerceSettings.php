@@ -9,12 +9,16 @@ use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 use App\Filament\Resources\RoleResource\Support\PermissionGroup;
+use Illuminate\Support\Facades\Auth;
 
 trait AuthorizeEcommerceSettings
 {
-
     protected static function authorizeAccess(): bool
     {
+        if (tenancy()->tenant?->features()->inactive(ECommerceBase::class)) {
+            return false;
+        }
+
         $settingsPermissions = app(PermissionRegistrar::class)
             ->getPermissions()
             ->filter(fn (Permission $permission) => Str::startsWith($permission->name, 'ecommerceSettings'));
@@ -23,13 +27,10 @@ trait AuthorizeEcommerceSettings
             return true;
         }
 
-        if (!PermissionGroup::make($settingsPermissions)->getParts()->contains(self::getSlug())) {
+        if ( ! PermissionGroup::make($settingsPermissions)->getParts()->contains(self::getSlug())) {
             return true;
         }
 
-        /** @var \Domain\Admin\Models\Admin $user */
-        $user = auth()->user();
-
-        return $user?->can('ecommerceSettings.' . self::getSlug()) ?? false;
+        return Auth::user()?->can('ecommerceSettings.' . self::getSlug()) ?? false;
     }
 }
