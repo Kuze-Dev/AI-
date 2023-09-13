@@ -29,9 +29,9 @@ class RouteServiceProvider extends ServiceProvider
     protected function configureRateLimiting(): void
     {
         RateLimiter::for('api', function (Request $request) {
-            if ($request->hasHeader('x-rate-limit')) {
+            if ($request->hasHeader('x-rate-key')) {
 
-                $ratekey = $request->header('x-rate-limit');
+                $ratekey = $request->header('x-rate-key');
 
                 if ($ratekey == env('RATE_LIMIT_KEY')) {
 
