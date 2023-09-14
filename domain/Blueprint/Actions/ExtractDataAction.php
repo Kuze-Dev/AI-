@@ -13,7 +13,13 @@ class ExtractDataAction
         $statePaths = [];
 
         foreach ($data as $key => $value) {
-            $currentPath = ($parentKey !== '') ? $parentKey . '.' . $key : $key;
+
+            if (is_numeric($key)) {
+                $currentPath = $parentKey;
+            } else {
+                $currentPath = ($parentKey !== '') ? $parentKey . '.' . $key : $key;
+            }
+
             if (is_array($value)) {
                 $nestedPaths = $this->extractStatePath($value, $currentPath);
                 $statePaths = array_merge($statePaths, $nestedPaths);
@@ -34,6 +40,8 @@ class ExtractDataAction
 
             foreach ($blueprintfieldtype->sections as $section) {
                 foreach ($section->fields as $field) {
+                    $parts = explode('.', $statePath);
+                    $statePath = $parts[0] . '.' . $parts[1];
                     $currentPath = $section->state_name . '.' . $field->state_name;
                     if ($currentPath === $statePath && isset($field->type)) {
                         $fieldTypes[] = $field->type;

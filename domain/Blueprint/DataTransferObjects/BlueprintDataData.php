@@ -17,7 +17,7 @@ class BlueprintDataData
         public readonly int $model_id,
         public readonly string $model_type,
         public readonly string $state_path,
-        public readonly ?string $value,
+        public readonly null|string|array $value,
         public readonly FieldType $type,
     ) {
     }
@@ -38,14 +38,7 @@ class BlueprintDataData
 
         $keys = explode('.', $state_path);
 
-        foreach ($keys as $key) {
-            if ( ! isset($data[$key])) {
-            }
-
-            $data = $data[$key];
-        }
-
-        $value = is_array($data) ? end($data) : $data;
+        $value = $data[$keys[0]][$keys[1]] ?? null;
 
         return new self(
             blueprint_id: $blueprintId,

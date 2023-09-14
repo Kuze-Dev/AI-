@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Blueprint\Models;
 
-use Domain\Blueprint\DataTransferObjects\MediaFieldData;
 use Domain\Blueprint\Enums\BlueprintDataType;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\ManipulationType;
@@ -61,7 +60,7 @@ class BlueprintData extends Model implements HasMedia
 
     protected $casts = [
         // 'type' => BlueprintDataType::class,
-        // 'value' => MediaFieldData::class, // TODO: DTO
+        'value' => 'array',
     ];
 
     /** @return BelongsTo<Blueprint, BlueprintData> */

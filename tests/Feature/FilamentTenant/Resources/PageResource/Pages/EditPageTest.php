@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\FilamentTenant\Resources\PageResource\Pages\CreatePage;
 use App\FilamentTenant\Resources\PageResource\Pages\EditPage;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
@@ -518,67 +517,59 @@ it('can edit page with media uploaded', function () {
     // Perform the upload to S3
     Storage::disk('s3')->put('/', $first_image);
 
-    $block = BlockFactory::new()
-        ->for(
-            BlueprintFactory::new()
-                ->addSchemaSection(['title' => 'main'])
-                ->addMediaSchemaField([
-                    'title' => 'image',
-                    'type' => FieldType::MEDIA,
-                    'conversions' => [
-                        [
-                            'name' => 'desktop',
-                            'manipulations' => [
-                                'width' => 200,
-                                'height' => 200,
-                            ],
-                        ],
-                    ],
-                ])
-                ->createOne()
+    $page1 = PageFactory::new()
+        ->addBlockContent(
+            BlockFactory::new()
+                ->for(
+                    BlueprintFactory::new(['name' => 'imagex'])
+                        ->addSchemaSection(['title' => 'main'])
+                        ->addMediaSchemaField(
+                            [
+                                'title' => 'header',
+                                'type' => FieldType::MEDIA,
+                                'conversions' => [
+                                    [
+                                        'name' => 'desktop',
+                                        'manipulations' => [
+                                            'width' => 200,
+                                            'height' => 200,
+                                        ],
+                                    ],
+                                ],
+                            ]
+                        )
+                ),
+            ['data' => ['main' => ['header' => [$first_image->hashName()]]]]
         )
-        ->createOne();
+        ->has(MetaDataFactory::new([
+            'title' => 'Foo title',
+            'description' => 'Foo description',
+            'author' => 'Foo author',
+            'keywords' => 'Foo keywords',
+        ]))
+        ->createOne([
+            'visibility' => 'public',
+        ]);
 
-    $page1 = livewire(CreatePage::class)
+    $second_image = UploadedFile::fake()->image('preview-2.jpeg');
+    Storage::disk('s3')->put('/', $second_image);
+
+    $updatedPage = livewire(EditPage::class, ['record' => $page1->getRouteKey()])
         ->fillForm([
-            'name' => 'Test',
-            'block_contents' => [
-                'block_id' => $block->getKey(),
-                'data' => ['main' => ['image' => [$first_image->hashName()]]],
-            ]
+            'name' => 'Testxxx',
+            'published_at' => true,
+            'block_contents.record-1.data.main.header' => [$second_image->hashName()],
         ])
-        ->call('create')
+        ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk()
         ->instance()
         ->record;
 
-    dd($page1);
-
-    // $second_image = UploadedFile::fake()->image('preview-2.jpeg');
-    // Storage::disk('s3')->put('/', $second_image);
-
-    // $updatedPage = livewire(EditPage::class, ['record' => $page1->getRouteKey()])
-    //     ->fillForm([
-    //         'name' => 'Test',
-    //         'published_at' => true,
-    //         'block_contents' => [
-    //             [
-    //                 'block_id' => $block->getKey(),
-    //                 'data' => ['main' => ['image' => [$second_image->hashName()]]],
-    //             ],
-    //         ],
-    //     ])
-    //     ->call('save')
-    //     ->assertHasNoFormErrors()
-    //     ->assertOk()
-    //     ->instance()
-    //     ->record;
-
-    // assertDatabaseHas(Page::class, [
-    //     'name' => 'Test',
-    //     'published_at' => $updatedPage->published_at,
-    // ]);
+    assertDatabaseHas(Page::class, [
+        'name' => 'Testxxx',
+        'published_at' => $updatedPage->published_at,
+    ]);
 
     // $block_content = $page1->blockContents->first();
     // $schema = $block_content->block->blueprint->schema;
@@ -592,7 +583,7 @@ it('can edit page with media uploaded', function () {
     // assertDatabaseHas(BlockContent::class, [
     //     'page_id' => $page1->id,
     //     'block_id' => $page1->blockContents->first()->block_id,
-    //     'data' => json_encode(['main' => ['image' => $second_image->hashName()]]),
+    //     'data' => json_encode(['main' => ['header' => $second_image->hashName()]]),
     // ]);
 
-})->only();
+});

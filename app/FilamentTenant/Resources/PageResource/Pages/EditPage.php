@@ -47,17 +47,6 @@ class EditPage extends EditRecord
     protected function getActions(): array
     {
         return [
-            Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
-                ->action('save')
-                ->keyBindings(['mod+s']),
-            Actions\DeleteAction::make()->using(function (Page $record) {
-                try {
-                    return app(DeletePageAction::class)->execute($record);
-                } catch (DeleteRestrictedException $e) {
-                    return false;
-                }
-            }),
             'page_actions' => CustomPageActionGroup::make([
                 Action::make('published')
                     ->label(__('Published Draft'))
@@ -100,6 +89,13 @@ class EditPage extends EditRecord
                 ->view('filament.pages.actions.custom-action-group.index')
                 ->setName('page_draft_actions')
                 ->label(__('filament::resources/pages/edit-record.form.actions.save.label')),
+            Actions\DeleteAction::make()->using(function (Page $record) {
+                try {
+                    return app(DeletePageAction::class)->execute($record);
+                } catch (DeleteRestrictedException $e) {
+                    return false;
+                }
+            }),
             Actions\DeleteAction::make(),
             Action::make('preview')
                 ->color('secondary')
@@ -211,7 +207,6 @@ class EditPage extends EditRecord
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-
         return DB::transaction(fn () => app(UpdatePageAction::class)->execute($record, PageData::fromArray($data)));
     }
 

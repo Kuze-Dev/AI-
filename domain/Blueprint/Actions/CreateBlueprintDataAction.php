@@ -31,8 +31,18 @@ class CreateBlueprintDataAction
         ]);
 
         if($blueprintDataData->type == FieldType::MEDIA && $blueprintData->value) {
-            $blueprintData->addMediaFromDisk($blueprintData->value, 's3')
-                ->toMediaCollection('blueprint_media');
+
+            if(is_array($blueprintData->value)) {
+                foreach($blueprintData->value as $value) {
+                    $blueprintData->addMediaFromDisk($value, 's3')
+                        ->toMediaCollection('blueprint_media');
+                }
+            } else {
+
+                $blueprintData->addMediaFromDisk($blueprintData->value, 's3')
+                    ->toMediaCollection('blueprint_media');
+            }
+
         }
 
         return $blueprintData;
