@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Order;
+namespace App\HttpTenantApi\Controllers\Order\PrivateOrder;
 
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\OrderResource;

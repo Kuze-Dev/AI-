@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Domain\Order\Requests;
+namespace Domain\Order\Requests\PublicOrder;
 
-use Domain\Address\Models\Address;
+use App\HttpTenantApi\Requests\Auth\Address\AddressRequest;
 use Domain\Cart\Actions\CartPurchasableValidatorAction;
 use Domain\Cart\Enums\CartUserType;
 use Domain\Cart\Exceptions\InvalidPurchasableException;
@@ -12,44 +12,46 @@ use Domain\Cart\Models\CartLine;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Validation\Rule;
-use Illuminate\Foundation\Http\FormRequest;
 use Throwable;
 
-class PlaceOrderRequest extends FormRequest
+class GuestPlaceOrderRequest extends AddressRequest
 {
     public function rules(): array
     {
-        return [
-            'addresses.shipping' => [
-                'required',
-                Rule::exists(Address::class, (new Address())->getRouteKeyName())->where(function ($query) {
-                    $customerId = auth()->user()?->id;
 
-                    $query->where('customer_id', $customerId);
-                }),
+        return [
+            'customer.first_name' => 'required|string|max:255',
+            'customer.last_name' => 'required|string|max:255',
+            'customer.email' => [
+                'required',
+                Rule::email(),
+                'max:255',
             ],
+            'customer.mobile' => 'required|string|max:255',
             'addresses.billing' => [
                 'required',
-                Rule::exists(Address::class, (new Address())->getRouteKeyName())->where(function ($query) {
-                    $customerId = auth()->user()?->id;
-
-                    $query->where('customer_id', $customerId);
-                }),
+                parent::rules(),
+            ],
+            'addresses.shipping' => [
+                'required',
+                parent::rules(),
             ],
             'cart_reference' => [
                 'required',
                 function ($attribute, $value, $fail) {
                     $reference = $value;
 
-                    $cartLines = CartLine::whereHas('cart', function ($query) {
-                        $query->whereBelongsTo(auth()->user());
+                    $sessionId = $this->bearerToken();
+
+                    $cartLines = CartLine::whereHas('cart', function ($query) use ($sessionId) {
+                        $query->where('session_id', $sessionId);
                     })
                         ->whereCheckoutReference($reference)
                         ->where('checkout_expiration', '>', now())
                         ->whereNull('checked_out_at')
                         ->count();
 
-                    if (!$cartLines) {
+                    if ( ! $cartLines) {
                         $fail('No cart lines for checkout');
 
                         return;
@@ -59,13 +61,9 @@ class PlaceOrderRequest extends FormRequest
 
                     $cartLineIds = array_values($cartLines->pluck('uuid')->toArray());
 
-                    $type = CartUserType::AUTHENTICATED;
-
-                    /** @var \Domain\Customer\Models\Customer $customer */
-                    $customer = auth()->user();
-
+                    $type = CartUserType::GUEST;
                     /** @var int|string $userId */
-                    $userId = $customer->id;
+                    $userId = $sessionId;
 
                     //auth check
                     $checkAuth = app(CartPurchasableValidatorAction::class)->validateAuth($cartLineIds, $userId, $type);
