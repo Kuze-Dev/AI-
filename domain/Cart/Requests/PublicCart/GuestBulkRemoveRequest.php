@@ -23,7 +23,7 @@ class GuestBulkRemoveRequest extends FormRequest
 
                     $cartLines = CartLine::query()
                         ->whereHas('cart', function ($query) use ($sessionId) {
-                            $query->where("session_id", $sessionId);
+                            $query->where('session_id', $sessionId);
                         })
                         ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
                         ->whereNull('checked_out_at');

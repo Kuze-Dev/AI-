@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Requests\PublicCart;
 
+use App\HttpTenantApi\Requests\Auth\Address\AddressRequest;
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Cart\Models\CartLine;
 use Domain\Discount\Models\Discount;
 use Domain\ShippingMethod\Models\ShippingMethod;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Collection;
 
-class GuestCartSummaryRequest extends FormRequest
+class GuestCartSummaryRequest extends AddressRequest
 {
     /** @var \Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> */
     private Collection $cartLinesCache;
@@ -36,29 +36,25 @@ class GuestCartSummaryRequest extends FormRequest
                     }
                 },
             ],
-            // 'billing_address_id' => [
-            //     'nullable',
-            //     Rule::exists(Address::class, (new Address())->getRouteKeyName())
-            //         ->where('customer_id', $customer->id),
-            // ],
-            // 'shipping_method_id' => [
-            //     'nullable',
-            //     Rule::exists(ShippingMethod::class, (new ShippingMethod())->getRouteKeyName()),
-            // ],
-            // 'shipping_address_id' => [
-            //     'nullable',
-            //     Rule::exists(Address::class, (new Address())->getRouteKeyName())
-            //         ->where('customer_id', $customer->id),
-            // ],
-            // 'service_id' => [
-            //     'nullable',
-            //     'int',
-            // ],
-            // 'discount_code' => [
-            //     'nullable',
-            //     // Rule::exists(Discount::class, (new Discount())->getRouteKeyName()),
-
-            // ],
+            'billing_address' => [
+                'required',
+                parent::rules(),
+            ],
+            'shipping_address' => [
+                'required',
+                parent::rules(),
+            ],
+            'shipping_method_id' => [
+                'nullable',
+                Rule::exists(ShippingMethod::class, (new ShippingMethod())->getRouteKeyName()),
+            ],
+            'service_id' => [
+                'nullable',
+                'int',
+            ],
+            'discount_code' => [
+                'nullable',
+            ],
         ];
     }
 
@@ -66,12 +62,12 @@ class GuestCartSummaryRequest extends FormRequest
     public function getCartLines(): Collection
     {
         if (empty($this->cartLinesCache)) {
-            $cartLineIds =  $this->validated('cart_line_ids');
+            $cartLineIds = $this->validated('cart_line_ids');
 
             $this->cartLinesCache = CartLine::query()
                 ->with('purchasable')
                 ->whereHas('cart', function ($query) {
-                    $query->where("session_id", $this->bearerToken());
+                    $query->where('session_id', $this->bearerToken());
                 })
                 ->whereNull('checked_out_at')
                 ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
@@ -84,18 +80,24 @@ class GuestCartSummaryRequest extends FormRequest
     /** @return \Domain\Address\Models\Country|null */
     public function getCountry(): ?Country
     {
-        if ($id = $this->validated('billing_address_id')) {
-            /** @var \Domain\Address\Models\Address $billingAddress */
-            $billingAddress = Address::with('state.country')
-                ->where((new Address())->getRouteKeyName(), $id)->first();
-
-            /** @var \Domain\Address\Models\State $state */
-            $state = $billingAddress->state;
-
+        if ($id = $this->validated('billing_address')['country_id']) {
             /** @var \Domain\Address\Models\Country $country */
-            $country = $state->country;
+            $country = app(Country::class)->where((new Country())->getRouteKeyName(), $id)->first();
 
             return $country;
+        }
+
+        return null;
+    }
+
+    public function getState(): ?State
+    {
+        if ($id = $this->validated('billing_address')['state_id']) {
+
+            /** @var \Domain\Address\Models\State $state */
+            $state = app(State::class)->where((new State())->getRouteKeyName(), $id)->first();
+
+            return $state;
         }
 
         return null;
@@ -110,30 +112,14 @@ class GuestCartSummaryRequest extends FormRequest
         return null;
     }
 
-    public function getShippingAddress(): ?Address
-    {
-        if ($id = $this->validated('shipping_address_id')) {
-            return app(Address::class)->where((new Address())->getRouteKeyName(), $id)->first();
-        }
+    // public function getShippingAddress(): ?Address
+    // {
+    //     if ($id = $this->validated('shipping_address_id')) {
+    //         return app(Address::class)->where((new Address())->getRouteKeyName(), $id)->first();
+    //     }
 
-        return null;
-    }
-
-    public function getState(): ?State
-    {
-        if ($id = $this->validated('billing_address_id')) {
-            /** @var \Domain\Address\Models\Address $billingAddress */
-            $billingAddress = Address::with('state')
-                ->where((new Address())->getRouteKeyName(), $id)->first();
-
-            /** @var \Domain\Address\Models\State $state */
-            $state = $billingAddress->state;
-
-            return $state;
-        }
-
-        return null;
-    }
+    //     return null;
+    // }
 
     public function getDiscount(): ?Discount
     {
