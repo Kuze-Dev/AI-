@@ -42,7 +42,7 @@ class GuestCartLinesController extends Controller
 
         $cart = $this->createCart->execute($sessionId);
 
-        if ( ! $cart instanceof Cart) {
+        if (!$cart instanceof Cart) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);
@@ -50,7 +50,7 @@ class GuestCartLinesController extends Controller
 
         $cartline = $this->createCartLine->execute($cart, CreateCartData::fromArray($validatedData));
 
-        if ( ! $cartline instanceof CartLine) {
+        if (!$cartline instanceof CartLine) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);
@@ -70,7 +70,7 @@ class GuestCartLinesController extends Controller
 
         $allowed = $this->authorize->execute($cartline, $sessionId);
 
-        if ( ! $allowed) {
+        if (!$allowed) {
             abort(403);
         }
 
@@ -106,13 +106,13 @@ class GuestCartLinesController extends Controller
 
         $allowed = $this->authorize->execute($cartline, $sessionId);
 
-        if ( ! $allowed) {
+        if (!$allowed) {
             abort(403);
         }
 
         $result = $this->destroyCartLine->execute($cartline);
 
-        if ( ! $result) {
+        if (!$result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

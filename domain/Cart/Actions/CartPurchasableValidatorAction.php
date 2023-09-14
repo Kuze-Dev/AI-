@@ -12,14 +12,22 @@ use Domain\Product\Models\ProductVariant;
 
 class CartPurchasableValidatorAction
 {
-    public function validateProduct(string $productId, int $quantity): void
-    {
+    public function validateProduct(
+        string $productId,
+        int $quantity,
+        int|string $userId,
+        CartUserType $type
+    ): void {
         $product = Product::where((new Product())->getRouteKeyName(), $productId)->firstOrFail();
 
         $this->validatePurchasable($product);
 
-        $cartLine = CartLine::whereHas('cart', function ($query) {
-            $query->whereBelongsTo(auth()->user());
+        $cartLine = CartLine::whereHas('cart', function ($query) use ($userId, $type) {
+            if ($type === CartUserType::AUTHENTICATED) {
+                $query->where("customer_id", $userId);
+            } elseif ($type === CartUserType::GUEST) {
+                $query->where("session_id", $userId);
+            }
         })
             ->whereNull('checked_out_at')
             ->where('purchasable_type', Product::class)
@@ -37,7 +45,9 @@ class CartPurchasableValidatorAction
     public function validateProductVariant(
         string $productId,
         string|int $variantId,
-        int $quantity
+        int $quantity,
+        int|string $userId,
+        CartUserType $type
     ): void {
         $productVariant = ProductVariant::with('product')->where(
             (new ProductVariant())->getRouteKeyName(),
@@ -48,8 +58,12 @@ class CartPurchasableValidatorAction
 
         $this->validatePurchasable($productVariant);
 
-        $cartLine = CartLine::whereHas('cart', function ($query) {
-            $query->whereBelongsTo(auth()->user());
+        $cartLine = CartLine::whereHas('cart', function ($query) use ($userId, $type) {
+            if ($type === CartUserType::AUTHENTICATED) {
+                $query->where("customer_id", $userId);
+            } elseif ($type === CartUserType::GUEST) {
+                $query->where("session_id", $userId);
+            }
         })
             ->whereNull('checked_out_at')
             ->where('purchasable_type', ProductVariant::class)
