@@ -211,7 +211,6 @@ class EditPage extends EditRecord
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-
         return DB::transaction(fn () => app(UpdatePageAction::class)->execute($record, PageData::fromArray($data)));
     }
 

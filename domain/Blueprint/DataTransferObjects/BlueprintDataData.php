@@ -14,7 +14,7 @@ class BlueprintDataData
         public readonly int $model_id,
         public readonly string $model_type,
         public readonly string $state_path,
-        public readonly ?string $value,
+        public readonly string|array $value,
         public readonly FieldType $type,
     ) {
     }
@@ -33,14 +33,12 @@ class BlueprintDataData
             $data = $data[$key];
         }
 
-        $value = is_array($data) ? end($data) : $data;
-
         return new self(
             blueprint_id: $block_content->block->blueprint->getKey(),
             model_id: $block_content->getKey(),
             model_type: $block_content->getMorphClass(),
             state_path: $state_path,
-            value: $value,
+            value: $data,
             type: $field_type
         );
     }

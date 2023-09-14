@@ -203,18 +203,37 @@ class SchemaFormBuilder extends Component
             $media->enableReordering($mediaFieldData->reorder);
         }
 
-        $media->formatStateUsing(function ($state) {
-            $media = Media::where('file_name', $state)->orWhere('uuid', $state)->where('collection_name', 'blueprint_media')->first();
-            if ($media) {
-                return [$media->uuid];
+        $media->formatStateUsing(function (?array $state) : array {
+
+            if ($state) {
+               
+                /** @var array */
+                $media = Media::whereIn('uuid', $state)->orwhereIN('file_name',$state)->pluck('uuid')->toArray();
+               
+                if ($media) {
+                    return $media;
+                }
             }
+        
+          
+            return [];
+        });
+
+        $media->dehydrateStateUsing(function (?array $state) {
+            return array_values($state ?? []) ?: null;
         });
 
         $media->getUploadedFileUrlUsing(function ($file) {
-            $media = Media::where('uuid', $file)->first();
-            if ($media) {
-                return $media->getUrl();
+
+            if (!is_null($file)) {
+                $media = Media::where('uuid', $file)->first();
+                if ($media) {
+                    return $media->getUrl();
+                }
             }
+            
+            return [];
+          
         });
 
         if ( ! empty($mediaFieldData->accept)) {

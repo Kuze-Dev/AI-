@@ -11,9 +11,16 @@ class ExtractDataAction
     public function extractStatePath(array $data, string $parentKey = ''): array
     {
         $statePaths = [];
-
+       
         foreach ($data as $key => $value) {
-            $currentPath = ($parentKey !== '') ? $parentKey . '.' . $key : $key;
+            
+            if (is_numeric($key)) {
+                $currentPath = $parentKey;
+             }else{
+                $currentPath = ($parentKey !== '') ? $parentKey . '.' . $key : $key;
+             }
+            
+         
             if (is_array($value)) {
                 $nestedPaths = $this->extractStatePath($value, $currentPath);
                 $statePaths = array_merge($statePaths, $nestedPaths);
