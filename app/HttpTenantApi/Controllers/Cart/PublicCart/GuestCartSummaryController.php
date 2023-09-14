@@ -19,6 +19,11 @@ use Throwable;
 
 class GuestCartSummaryController extends Controller
 {
+    public function __construct(
+        private readonly GuestCartSummaryAction $guestCartSummaryAction,
+    ) {
+    }
+
     #[Get('guest/carts/count', name: 'carts.count')]
     public function count(Request $request): mixed
     {
@@ -46,7 +51,7 @@ class GuestCartSummaryController extends Controller
                 return $cartLine->purchasable !== null;
             });
 
-            if ( ! empty($cartLineIdsTobeRemoved)) {
+            if (!empty($cartLineIdsTobeRemoved)) {
                 event(new SanitizeCartEvent(
                     $cartLineIdsTobeRemoved,
                 ));
@@ -76,7 +81,7 @@ class GuestCartSummaryController extends Controller
         $serviceId = $validated['service_id'] ?? null;
 
         try {
-            $summary = app(GuestCartSummaryAction::class)->execute(
+            $summary = $this->guestCartSummaryAction->execute(
                 $cartLines,
                 new CartSummaryTaxData($country?->id, $state?->id),
                 // new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),
@@ -121,7 +126,7 @@ class GuestCartSummaryController extends Controller
             ],
         ];
 
-        if ( ! $discountCode) {
+        if (!$discountCode) {
             unset($responseArray['discount']);
         }
 

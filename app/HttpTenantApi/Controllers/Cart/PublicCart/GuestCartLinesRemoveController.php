@@ -11,7 +11,7 @@ use Spatie\RouteAttributes\Attributes\Post;
 class GuestCartLinesRemoveController
 {
     public function __construct(
-        private readonly BulkDestroyCartLineAction $bulkDestroyCartLine,
+        private readonly BulkDestroyCartLineAction $bulkDestroyCartLineAction,
     ) {
     }
 
@@ -28,10 +28,10 @@ class GuestCartLinesRemoveController
 
         $cartLineIds = $validated['cart_line_ids'];
 
-        $result = $this->bulkDestroyCartLine
+        $result = $this->bulkDestroyCartLineAction
             ->execute($cartLineIds);
 
-        if ( ! $result) {
+        if (!$result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

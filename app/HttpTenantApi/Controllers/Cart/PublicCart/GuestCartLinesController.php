@@ -28,10 +28,10 @@ class GuestCartLinesController extends Controller
 {
     public function __construct(
         private readonly AuthorizeGuestCart $authorize,
-        private readonly GuestCreateCartAction $createCart,
-        private readonly CreateCartLineAction $createCartLine,
-        private readonly UpdateCartLineAction $updateCartLine,
-        private readonly DestroyCartLineAction $destroyCartLine
+        private readonly GuestCreateCartAction $createCartAction,
+        private readonly CreateCartLineAction $createCartLineAction,
+        private readonly UpdateCartLineAction $updateCartLineAction,
+        private readonly DestroyCartLineAction $destroyCartLineAction
     ) {
     }
 
@@ -40,17 +40,17 @@ class GuestCartLinesController extends Controller
         $validatedData = $request->validated();
         $sessionId = $request->bearerToken() ?? null;
 
-        $cart = $this->createCart->execute($sessionId);
+        $cart = $this->createCartAction->execute($sessionId);
 
-        if ( ! $cart instanceof Cart) {
+        if (!$cart instanceof Cart) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);
         }
 
-        $cartline = $this->createCartLine->execute($cart, CreateCartData::fromArray($validatedData));
+        $cartline = $this->createCartLineAction->execute($cart, CreateCartData::fromArray($validatedData));
 
-        if ( ! $cartline instanceof CartLine) {
+        if (!$cartline instanceof CartLine) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);
@@ -70,14 +70,14 @@ class GuestCartLinesController extends Controller
 
         $allowed = $this->authorize->execute($cartline, $sessionId);
 
-        if ( ! $allowed) {
+        if (!$allowed) {
             abort(403);
         }
 
         $validatedData = $request->validated();
 
         try {
-            $result = $this->updateCartLine
+            $result = $this->updateCartLineAction
                 ->execute($cartline, UpdateCartLineData::fromArray($validatedData));
 
             if ($result instanceof CartLine) {
@@ -106,13 +106,13 @@ class GuestCartLinesController extends Controller
 
         $allowed = $this->authorize->execute($cartline, $sessionId);
 
-        if ( ! $allowed) {
+        if (!$allowed) {
             abort(403);
         }
 
-        $result = $this->destroyCartLine->execute($cartline);
+        $result = $this->destroyCartLineAction->execute($cartline);
 
-        if ( ! $result) {
+        if (!$result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);
