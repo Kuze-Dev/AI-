@@ -21,6 +21,12 @@ use Spatie\RouteAttributes\Attributes\Resource;
 ]
 class GuestCheckoutController
 {
+
+    public function __construct(
+        private readonly CheckoutAction $checkoutAction,
+    ) {
+    }
+
     public function index(Request $request): mixed
     {
         $sessionId = $request->bearerToken();
@@ -76,7 +82,7 @@ class GuestCheckoutController
 
         $validatedData = $request->validated();
 
-        $reference = app(CheckoutAction::class)
+        $reference = $this->checkoutAction
             ->execute(CheckoutData::fromArray($validatedData));
 
         return response()

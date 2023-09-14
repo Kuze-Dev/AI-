@@ -23,7 +23,7 @@ class GuestCartController extends Controller
 {
     public function __construct(
         private readonly AuthorizeGuestCart $authorize,
-        private readonly DestroyCartAction $destroyCart,
+        private readonly DestroyCartAction $destroyCartAction,
     ) {
     }
 
@@ -67,14 +67,14 @@ class GuestCartController extends Controller
 
         $allowed = $this->authorize->execute($cart, $sessionId);
 
-        if ( ! $allowed) {
+        if (!$allowed) {
             abort(403);
         }
 
-        $result = $this->destroyCart
+        $result = $this->destroyCartAction
             ->execute($cart);
 
-        if ( ! $result) {
+        if (!$result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);
