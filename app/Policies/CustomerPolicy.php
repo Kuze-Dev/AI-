@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Features\ECommerce\ECommerceBase;
+use App\Features\Customer\CustomerBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Illuminate\Foundation\Auth\User;
 use Domain\Customer\Models\Customer;
@@ -16,7 +16,7 @@ class CustomerPolicy
 
     public function before(): ?Response
     {
-        if ( ! tenancy()->tenant?->features()->active(ECommerceBase::class)) {
+        if ( ! tenancy()->tenant?->features()->active(CustomerBase::class)) {
             return Response::denyAsNotFound();
         }
 
