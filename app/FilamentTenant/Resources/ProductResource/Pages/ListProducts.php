@@ -87,12 +87,12 @@ class ListProducts extends ListRecords
 
         // Generate combination for variants
         $productVariants = self::generateCombinations($row, $productOptions);
-
         $data = [
             'images' => $row['image_link'],
             'name' => $row['name'],
             'categories' => $row['category'],
             'brand' => $row['brand'],
+            'product_sku' => $row['product_id'] ?? $row['sku'],
             'sku' => $row['sku'],
             'stock' => $row['stock'],
             'retail_price' => $row['retail_price'],
@@ -115,15 +115,70 @@ class ListProducts extends ListRecords
             ->with('productOptions', 'productVariants')
             ->first();
 
-        if ( ! $foundProduct) {
-            return app(CreateProductAction::class)->execute(ProductData::fromCsv($data));
+        if (!$foundProduct instanceof Product) {
+            return app(CreateProductAction::class)->execute(ProductData::fromCsv([
+                ...$data,
+                'sku' => $row['product_id'] ?? $data['sku']
+            ]));
         }
 
         $data['product_options'] = self::mergingProductOptions($foundProduct, $data['product_options']);
-
         $data['product_variants'] = self::mergingProductVariants($foundProduct, $data);
 
-        return app(UpdateProductAction::class)->execute($foundProduct, ProductData::fromCsv($data));
+        return app(UpdateProductAction::class)->execute($foundProduct, ProductData::fromCsv([
+            ...$data,
+            'sku' => $data['product_sku'] ?? $data['sku']
+        ]));
+    }
+
+    protected static function mergingProductOptions(Product $foundProduct, array $csvRowOptions): array
+    {
+        $existingOptions = $foundProduct->productOptions->map(
+            function ($item) {
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'slug' => $item->slug,
+                    'productOptionValues' => $item->productOptionValues->toArray(),
+                ];
+            }
+        )->toArray();
+
+        foreach ($csvRowOptions as $csvRowOption) {
+            $lowerCaseRowOptionName = strtolower($csvRowOption['name']);
+            $hasFound = false;
+
+            foreach ($existingOptions as $index => $existingOption) {
+                if (
+                    isset($existingOption['name'])
+                    && strtolower($existingOption['name']) == $lowerCaseRowOptionName
+                ) {
+                    $collectedCsvRowOptionValues = collect($csvRowOption['productOptionValues'])
+                        ->map(function ($optionValue) use ($existingOption) {
+                            return [
+                                ...$optionValue,
+                                'product_option_id' => $existingOption['id'],
+                            ];
+                        })->toArray();
+
+                    $existingOptions[$index]['productOptionValues'] =
+                        array_merge(
+                            $existingOptions[$index]['productOptionValues'],
+                            $collectedCsvRowOptionValues,
+                        );
+
+                    $hasFound = true;
+
+                    break; // Stop searching once found
+                }
+            }
+
+            if (!$hasFound) {
+                $existingOptions = array_merge($csvRowOptions, $existingOptions);
+            }
+        }
+
+        return $existingOptions;
     }
 
     protected static function mergingProductVariants(Product $foundProduct, array $data): array
@@ -140,54 +195,25 @@ class ListProducts extends ListRecords
             return self::generateCombinations($data, $productOptions);
         }
 
-        return array_merge($productVariants, $foundProduct->productVariants->toArray());
-    }
+        $existingVariants = $foundProduct->productVariants->toArray();
+        // Iterate through $inputVariants and $existingVariants
 
-    protected static function mergingProductOptions(Product $foundProduct, array $dataProductOptions): array
-    {
-        $collectedOptions = $foundProduct->productOptions->map(
-            function ($item) {
-                return [
-                    'id' => $item->id,
-                    'name' => $item->name,
-                    'slug' => $item->slug,
-                    'productOptionValues' => $item->productOptionValues->toArray(),
-                ];
-            }
-        )->toArray();
+        foreach ($productVariants as &$inputVariant) {
+            foreach ($existingVariants as $existingVariant) {
+                foreach ($inputVariant['combination'] as &$inputCombination) {
+                    // Check if the "option" matches
+                    foreach ($existingVariant['combination'] as $existingCombination) {
 
-        foreach ($dataProductOptions as $dataProductOption) {
-            $optionName = strtolower($dataProductOption['name']);
-            $hasFound = false;
-            foreach ($collectedOptions as $index => $item) {
-                if (isset($item['name']) && strtolower($item['name']) == $optionName) {
-                    $mappedDataProductOptionValues = collect($dataProductOption['productOptionValues'])
-                        ->map(function ($optionValue) use ($item) {
-                            return [
-                                ...$optionValue,
-                                'product_option_id' => $item['id'],
-                            ];
-                        })->toArray();
-
-                    $collectedOptions[$index]['productOptionValues'] =
-                        array_merge(
-                            $collectedOptions[$index]['productOptionValues'],
-                            $mappedDataProductOptionValues,
-                        );
-
-                    $hasFound = true;
-
-                    break; // Stop searching once found
+                        if ($inputCombination['option'] == $existingCombination['option']) {
+                            // Update the "option_id" from $existingVariants
+                            $inputCombination['option_id'] = $existingCombination['option_id'];
+                        }
+                    }
                 }
-            }
-
-            if ( ! $hasFound) {
-                dd($dataProductOptions, $collectedOptions);
-                $collectedOptions = array_merge($dataProductOptions, $collectedOptions);
             }
         }
 
-        return $collectedOptions;
+        return array_merge($productVariants, $existingVariants);
     }
 
     protected static function generateCombinations(array $row, array $inputArray): array
@@ -201,8 +227,6 @@ class ListProducts extends ListRecords
 
         /** @var array<int, array> $secondOptionValues */
         $option2Values = collect($secondOptionValues);
-
-        // \Log::info('here: ', [$inputArray]);
 
         $option1Values->each(function ($optionValue1, $key1) use ($option2Values, $row, $inputArray, &$outputArray) {
             if ($option2Values->isNotEmpty()) {
@@ -242,13 +266,14 @@ class ListProducts extends ListRecords
                     ],
                 ];
 
+                $keyOne = $key1 ?: '';
                 $outputArray[] = [
                     'combination' => $combination,
                     'id' => uniqid(),
                     'selling_price' => $row['selling_price'],
                     'retail_price' => $row['retail_price'],
                     'stock' => $row['stock'],
-                    'sku' => $row['sku'] . $key1,
+                    'sku' => $row['sku'] . $keyOne,
                     'status' => true,
                 ];
             }
@@ -304,7 +329,7 @@ class ListProducts extends ListRecords
             if ($taxonomy) {
                 $termModel = TaxonomyTerm::whereName($taxonomyTerm)->first();
 
-                if ( ! $termModel) {
+                if (!$termModel) {
                     $termModel = TaxonomyTerm::create([
                         'name' => $taxonomyTerm,
                         'taxonomy_id' => $taxonomy->id,
