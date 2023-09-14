@@ -577,7 +577,6 @@ it('can edit page with media uploaded', function () {
     // assertDatabaseHas(Media::class, [
     //     'file_name' => $second_image->hashName(),
     //     'collection_name' => 'blueprint_media',
-    //     'generated_conversions' => json_encode([$schema->sections[0]->fields[0]->conversions[0]->name => true]),
     // ]);
 
     // assertDatabaseHas(BlockContent::class, [
