@@ -21,6 +21,7 @@ class CheckoutRequest extends FormRequest
                 function ($attribute, $value, $fail) {
 
                     $type = auth()->user() ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
+                    /** @var int|string $userId */
                     $userId = auth()->user() ? auth()->user()->id : $this->bearerToken();
 
                     //auth check

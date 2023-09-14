@@ -53,6 +53,7 @@ class CreateCartLineRequest extends FormRequest
                     }
 
                     $type = auth()->user() ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
+                    /** @var int|string $userId */
                     $userId = auth()->user() ? auth()->user()->id : $this->bearerToken();
 
                     if (is_null($variantId)) {
