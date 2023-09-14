@@ -10,8 +10,10 @@ use Domain\Cart\Models\CartLine;
 use Domain\Currency\Models\Currency;
 use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
+use Domain\Order\DataTransferObjects\GuestCountriesData;
 use Domain\Order\DataTransferObjects\GuestPlaceOrderData;
 use Domain\Order\DataTransferObjects\GuestPreparedOrderData;
+use Domain\Order\DataTransferObjects\GuestStatesData;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Product\Models\ProductVariant;
 use Domain\ShippingMethod\Models\ShippingMethod;
@@ -33,7 +35,11 @@ class GuestPrepareOrderAction
 
         $cartLines = $this->prepareCartLines($guestPlaceOrderData);
 
-        $taxZone = $this->prepareTax($guestPlaceOrderData);
+        $countries = $this->prepareCountry($guestPlaceOrderData);
+
+        $states = $this->prepareState($guestPlaceOrderData);
+
+        $taxZone = $this->prepareTax($countries->billingCountry, $states->billingState);
 
         $discount = $this->prepareDiscount($guestPlaceOrderData);
 
@@ -54,6 +60,8 @@ class GuestPrepareOrderAction
             'discount' => $discount,
             'shippingMethod' => $shippingMethod,
             'paymentMethod' => $paymentMethod,
+            'countries' => $countries,
+            'states' => $states,
         ];
 
         return GuestPreparedOrderData::fromArray($orderData);
@@ -98,17 +106,8 @@ class GuestPrepareOrderAction
             ->get();
     }
 
-    public function prepareTax(GuestPlaceOrderData $guestPlaceOrderData): ?TaxZone
+    public function prepareTax(Country $country, State $state): ?TaxZone
     {
-        $countryId = $guestPlaceOrderData->addresses->billing->country_id;
-        $stateId = $guestPlaceOrderData->addresses->billing->state_id;
-
-        /** @var \Domain\Address\Models\State $state */
-        $state = app(State::class)->where((new State())->getRouteKeyName(), $stateId)->first();
-
-        /** @var \Domain\Address\Models\Country $country */
-        $country = app(Country::class)->where((new Country())->getRouteKeyName(), $countryId)->first();
-
         $taxZone = Taxation::getTaxZone($country->id, $state->id);
 
         if ( ! $taxZone instanceof TaxZone) {
@@ -154,5 +153,43 @@ class GuestPrepareOrderAction
         }
 
         return $paymentMethod;
+    }
+
+    public function prepareState(GuestPlaceOrderData $guestPlaceOrderData): GuestStatesData
+    {
+        $shippingStateId = $guestPlaceOrderData->addresses->shipping->state_id;
+        $billingStateId = $guestPlaceOrderData->addresses->billing->state_id;
+
+        /** @var \Domain\Address\Models\State $shippingState */
+        $shippingState = app(State::class)->where((new State())->getRouteKeyName(), $shippingStateId)->first();
+
+        /** @var \Domain\Address\Models\State $billingState */
+        $billingState = app(State::class)->where((new State())->getRouteKeyName(), $billingStateId)->first();
+
+        $stateData = [
+            'shippingState' => $shippingState,
+            'billingState' => $billingState,
+        ];
+
+        return GuestStatesData::fromArray($stateData);
+    }
+
+    public function prepareCountry(GuestPlaceOrderData $guestPlaceOrderData): GuestCountriesData
+    {
+        $shippingCountryId = $guestPlaceOrderData->addresses->shipping->country_id;
+        $billingCountryId = $guestPlaceOrderData->addresses->billing->country_id;
+
+        /** @var \Domain\Address\Models\Country $shippingCountry */
+        $shippingCountry = app(Country::class)->where((new Country())->getRouteKeyName(), $shippingCountryId)->first();
+
+        /** @var \Domain\Address\Models\Country $billingCountry */
+        $billingCountry = app(Country::class)->where((new Country())->getRouteKeyName(), $billingCountryId)->first();
+
+        $countryData = [
+            'shippingCountry' => $shippingCountry,
+            'billingCountry' => $billingCountry,
+        ];
+
+        return GuestCountriesData::fromArray($countryData);
     }
 }

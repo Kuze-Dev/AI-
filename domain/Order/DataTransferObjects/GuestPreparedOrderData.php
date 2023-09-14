@@ -20,6 +20,8 @@ class GuestPreparedOrderData
         public readonly ShippingMethod $shippingMethod,
         public readonly PaymentMethod $paymentMethod,
         public readonly mixed $cartLine,
+        public readonly GuestCountriesData $countries,
+        public readonly GuestStatesData $states,
         public readonly ?TaxZone $taxZone,
         public readonly ?string $notes,
         public readonly ?Discount $discount,
@@ -28,7 +30,6 @@ class GuestPreparedOrderData
 
     public static function fromArray(array $data): self
     {
-
         return new self(
             customer: $data['customer'],
             shippingAddress: $data['shippingAddress'],
@@ -38,6 +39,8 @@ class GuestPreparedOrderData
             paymentMethod: $data['paymentMethod'],
             shippingMethod: $data['shippingMethod'],
             cartLine: $data['cartLine'],
+            countries: $data['countries'],
+            states: $data['states'],
             notes: $data['notes'] ?? null,
             discount: $data['discount'] ?? null,
         );

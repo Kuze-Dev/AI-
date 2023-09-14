@@ -29,6 +29,11 @@ use Symfony\Component\Mailer\Exception\TransportException;
 ]
 class GuestOrderController extends Controller
 {
+    public function __construct(
+        private readonly GuestPlaceOrderAction $guestPlaceOrderAction,
+    ) {
+    }
+
     public function index(): mixed
     {
         /** @var \Domain\Customer\Models\Customer $customer */
@@ -59,7 +64,7 @@ class GuestOrderController extends Controller
         $validatedData = $request->validated();
 
         try {
-            $result = app(GuestPlaceOrderAction::class)
+            $result = $this->guestPlaceOrderAction
                 ->execute(GuestPlaceOrderData::fromArray($validatedData));
 
             if ($result instanceof TransportException) {
