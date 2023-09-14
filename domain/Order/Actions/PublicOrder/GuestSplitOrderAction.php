@@ -26,6 +26,7 @@ class GuestSplitOrderAction
         private readonly GuestCreateOrderAction $guestCreateOrderAction,
         private readonly GuestCreateOrderLineAction $guestCreateOrderLineAction,
         private readonly GuestCreateOrderAddressAction $guestCreateOrderAddressAction,
+        private readonly CreatePaymentAction $createPaymentAction,
     ) {
     }
 
@@ -47,7 +48,7 @@ class GuestSplitOrderAction
                 CartLine::whereCheckoutReference($guestPlaceOrderData->cart_reference)
                     ->update(['checked_out_at' => now()]);
 
-                // $payment = $this->proceedPayment($order, $preparedOrderData);
+                $payment = $this->proceedPayment($order, $guestPreparedOrderData);
 
                 // event(new OrderPlacedEvent(
                 //     $order,
@@ -59,7 +60,7 @@ class GuestSplitOrderAction
 
                 return [
                     'order' => $order,
-                    // 'payment' => $payment,
+                    'payment' => $payment,
                 ];
             } catch (Exception $e) {
                 DB::rollBack();
@@ -70,34 +71,34 @@ class GuestSplitOrderAction
         });
     }
 
-    // private function proceedPayment(Order $order, GuestPlaceOrderData $preparedOrderData): PaymentAuthorize
-    // {
-    //     $providerData = new CreatepaymentData(
-    //         transactionData: TransactionData::fromArray(
-    //             [
-    //                 'reference_id' => $order->reference,
-    //                 'amount' => AmountData::fromArray([
-    //                     'currency' => $preparedOrderData->currency->code,
-    //                     'total' => (int) $order->total,
-    //                     'details' => PaymentDetailsData::fromArray(
-    //                         [
-    //                             'subtotal' => strval($order->sub_total - $order->discount_total),
-    //                             'tax' => strval($order->tax_total),
-    //                         ]
-    //                     ),
-    //                 ]),
-    //             ]
-    //         ),
-    //         payment_driver: $preparedOrderData->paymentMethod->slug
-    //     );
+    private function proceedPayment(Order $order, GuestPreparedOrderData $guestPreparedOrderData): PaymentAuthorize
+    {
+        $providerData = new CreatepaymentData(
+            transactionData: TransactionData::fromArray(
+                [
+                    'reference_id' => $order->reference,
+                    'amount' => AmountData::fromArray([
+                        'currency' => $guestPreparedOrderData->currency->code,
+                        'total' => (int) $order->total,
+                        'details' => PaymentDetailsData::fromArray(
+                            [
+                                'subtotal' => strval($order->sub_total - $order->discount_total),
+                                'tax' => strval($order->tax_total),
+                            ]
+                        ),
+                    ]),
+                ]
+            ),
+            payment_driver: $guestPreparedOrderData->paymentMethod->slug
+        );
 
-    //     $result = app(CreatePaymentAction::class)
-    //         ->execute($order, $providerData);
+        $result = $this->createPaymentAction
+            ->execute($order, $providerData);
 
-    //     if ($result->success) {
-    //         return $result;
-    //     }
+        if ($result->success) {
+            return $result;
+        }
 
-    //     throw new PaymentException();
-    // }
+        throw new PaymentException();
+    }
 }
