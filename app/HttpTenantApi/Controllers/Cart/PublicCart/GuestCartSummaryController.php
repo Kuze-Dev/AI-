@@ -46,7 +46,7 @@ class GuestCartSummaryController extends Controller
                 return $cartLine->purchasable !== null;
             });
 
-            if ( ! empty($cartLineIdsTobeRemoved)) {
+            if (!empty($cartLineIdsTobeRemoved)) {
                 event(new SanitizeCartEvent(
                     $cartLineIdsTobeRemoved,
                 ));
@@ -59,6 +59,12 @@ class GuestCartSummaryController extends Controller
     #[Post('guest/carts/summary', name: 'carts.summary')]
     public function summary(GuestCartSummaryRequest $request): mixed
     {
+        $sessionId = $request->bearerToken();
+
+        if (is_null($sessionId)) {
+            abort(403);
+        }
+
         $validated = $request->validated();
         $discountCode = $validated['discount_code'] ?? null;
 
@@ -115,7 +121,7 @@ class GuestCartSummaryController extends Controller
             ],
         ];
 
-        if ( ! $discountCode) {
+        if (!$discountCode) {
             unset($responseArray['discount']);
         }
 
