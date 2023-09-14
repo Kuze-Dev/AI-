@@ -46,9 +46,9 @@ class CreateBlueprintDataAction
         $statePaths = $this->extractDataAction->extractStatePath($blockContent->data);
         $fieldTypes = $this->extractDataAction->extractFieldType($blueprintfieldtype, $statePaths);
 
-        dump($statePaths);
-        dump($fieldTypes);
-        dd('123');
+        // dump($statePaths);
+        // dump($fieldTypes);
+        // dd('123');
 
         foreach (array_combine($statePaths, $fieldTypes) as $statePath => $fieldType) {
             $this->storeBlueprintData(BlueprintDataData::fromArray($blockContent, $statePath, $fieldType));

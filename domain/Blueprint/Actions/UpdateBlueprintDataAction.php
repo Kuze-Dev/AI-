@@ -32,9 +32,9 @@ class UpdateBlueprintDataAction
             // dump($blockContent->data);
             // dump($this->extractDataAction->extractStatePath($blockContent->data));\
             // dump($blueprintfieldtype);
-            dump($statePaths);
-            dump($fieldTypes);
-            dd('x');
+            // dump($statePaths);
+            // dump($fieldTypes);
+            // dd('x');
             // dump( $this->extractDataAction->testState($blockContent->data));
             // dump(  $this->extractDataAction->test($blueprintfieldtype, $statePaths));
             // dd(123);
