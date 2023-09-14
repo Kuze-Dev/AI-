@@ -12,7 +12,6 @@ use Domain\Cart\Requests\CheckoutRequest;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Spatie\RouteAttributes\Attributes\Middleware;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Resource;
@@ -43,7 +42,7 @@ class GuestCheckoutController
             ]);
         }, 'media'])
             ->whereHas('cart', function ($query) use ($sessionId) {
-                $query->where("session_id", $sessionId);
+                $query->where('session_id', $sessionId);
             })
             ->whereCheckoutReference($reference);
 
