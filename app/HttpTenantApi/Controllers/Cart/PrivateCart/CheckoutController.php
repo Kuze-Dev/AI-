@@ -23,6 +23,11 @@ use Spatie\RouteAttributes\Attributes\Resource;
 ]
 class CheckoutController
 {
+    public function __construct(
+        private readonly CheckoutAction $checkoutAction,
+    ) {
+    }
+
     public function index(Request $request): mixed
     {
         $validated = $request->validate([
@@ -66,7 +71,7 @@ class CheckoutController
     {
         $validatedData = $request->validated();
 
-        $reference = app(CheckoutAction::class)
+        $reference = $this->checkoutAction
             ->execute(CheckoutData::fromArray($validatedData));
 
         return response()

@@ -51,7 +51,7 @@ class GuestCartSummaryController extends Controller
                 return $cartLine->purchasable !== null;
             });
 
-            if (!empty($cartLineIdsTobeRemoved)) {
+            if ( ! empty($cartLineIdsTobeRemoved)) {
                 event(new SanitizeCartEvent(
                     $cartLineIdsTobeRemoved,
                 ));
@@ -115,7 +115,7 @@ class GuestCartSummaryController extends Controller
                 ],
             ];
 
-            if (!$discountCode) {
+            if ( ! $discountCode) {
                 unset($responseArray['discount']);
             }
 
