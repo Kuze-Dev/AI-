@@ -7,6 +7,7 @@ namespace Domain\Order\DataTransferObjects;
 class GuestPlaceOrderData
 {
     public function __construct(
+        public readonly string $session_id,
         public readonly GuestCustomerData $customer,
         public readonly GuestPlaceOrderAddressData $addresses,
         public readonly string $cart_reference,
@@ -21,6 +22,7 @@ class GuestPlaceOrderData
     public static function fromArray(array $data): self
     {
         return new self(
+            session_id: $data['session_id'],
             customer: GuestCustomerData::fromArray($data['customer']),
             addresses: new GuestPlaceOrderAddressData(
                 shipping: GuestOrderAddressData::fromArray($data['addresses']['shipping']),

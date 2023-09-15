@@ -108,6 +108,7 @@ class Order extends Model implements HasMedia, PayableInterface
 
     protected $fillable = [
         'customer_id',
+        'session_id',
         'customer_first_name',
         'customer_last_name',
         'customer_mobile',

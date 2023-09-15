@@ -23,6 +23,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Mailer\Exception\TransportException;
+use Illuminate\Http\Request;
 
 #[
     Resource('guest/orders', apiResource: true, except: 'destroy'),
@@ -34,17 +35,20 @@ class GuestOrderController extends Controller
     ) {
     }
 
-    public function index(): mixed
+    public function index(Request $request): mixed
     {
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
+        $sessionId = $request->bearerToken();
+
+        if (is_null($sessionId)) {
+            abort(403);
+        }
 
         return OrderResource::collection(
             QueryBuilder::for(Order::with([
                 'shippingAddress',
                 'billingAddress',
                 'orderLines.media',
-            ])->whereBelongsTo($customer))
+            ])->where("session_id", $sessionId))
                 ->defaultSort('-created_at')
                 ->allowedIncludes(['orderLines', 'orderLines.review.media'])
                 ->allowedFilters(['status', 'reference'])
@@ -62,6 +66,7 @@ class GuestOrderController extends Controller
         }
 
         $validatedData = $request->validated();
+        $validatedData['session_id'] = $sessionId;
 
         try {
             $result = $this->guestPlaceOrderAction
@@ -111,10 +116,13 @@ class GuestOrderController extends Controller
         }
     }
 
-    public function show(Order $order): OrderResource
+    public function show(Request $request, Order $order): OrderResource
     {
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
+        $sessionId = $request->bearerToken();
+
+        if (is_null($sessionId)) {
+            abort(403);
+        }
 
         $model = QueryBuilder::for(
             $order->with([
@@ -123,7 +131,7 @@ class GuestOrderController extends Controller
                 'orderLines.media',
                 'orderLines.review.media',
                 'payments.paymentMethod.media',
-            ])->whereBelongsTo($customer)
+            ])->where("session_id", $sessionId)
                 ->whereReference($order->reference)
         )
             ->allowedIncludes(['orderLines', 'payments.media', 'payments.paymentMethod.media', 'shippingMethod'])->first();
