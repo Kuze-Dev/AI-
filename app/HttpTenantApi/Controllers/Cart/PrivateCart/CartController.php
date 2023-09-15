@@ -21,6 +21,11 @@ use Spatie\RouteAttributes\Attributes\Resource;
 ]
 class CartController extends Controller
 {
+    public function __construct(
+        private readonly DestroyCartAction $destroyCartAction,
+    ) {
+    }
+
     public function index(): mixed
     {
         /** @var \Domain\Customer\Models\Customer $customer */
@@ -60,7 +65,7 @@ class CartController extends Controller
     {
         $this->authorize('delete', $cart);
 
-        $result = app(DestroyCartAction::class)
+        $result = $this->destroyCartAction
             ->execute($cart);
 
         if ( ! $result) {

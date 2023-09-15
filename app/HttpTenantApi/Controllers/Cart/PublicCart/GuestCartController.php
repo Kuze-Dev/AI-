@@ -67,14 +67,14 @@ class GuestCartController extends Controller
 
         $allowed = $this->authorize->execute($cart, $sessionId);
 
-        if (!$allowed) {
+        if ( ! $allowed) {
             abort(403);
         }
 
         $result = $this->destroyCartAction
             ->execute($cart);
 
-        if (!$result) {
+        if ( ! $result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

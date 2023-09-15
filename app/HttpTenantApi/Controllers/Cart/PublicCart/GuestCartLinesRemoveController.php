@@ -31,7 +31,7 @@ class GuestCartLinesRemoveController
         $result = $this->bulkDestroyCartLineAction
             ->execute($cartLineIds);
 
-        if (!$result) {
+        if ( ! $result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

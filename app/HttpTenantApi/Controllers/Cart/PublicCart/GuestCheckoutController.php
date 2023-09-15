@@ -21,7 +21,6 @@ use Spatie\RouteAttributes\Attributes\Resource;
 ]
 class GuestCheckoutController
 {
-
     public function __construct(
         private readonly CheckoutAction $checkoutAction,
     ) {
