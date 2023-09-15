@@ -2,38 +2,37 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
+namespace App\HttpTenantApi\Controllers\Cart\PublicCart;
 
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartLineResource;
-use Domain\Cart\Actions\CartSummaryAction;
+use Domain\Cart\Actions\PublicCart\GuestCartSummaryAction;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
-use Domain\Cart\Requests\CartMobileSummaryRequest;
+use Domain\Cart\Requests\PublicCart\GuestCartMobileSummaryRequest;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
-use Spatie\RouteAttributes\Attributes\Get;
-use Spatie\RouteAttributes\Attributes\Middleware;
+use Spatie\RouteAttributes\Attributes\Post;
 use Throwable;
 
-#[
-    Middleware(['auth:sanctum'])
-]
-class CheckoutMobileController extends Controller
+class GuestCheckoutMobileController extends Controller
 {
     public function __construct(
-        private readonly CartSummaryAction $cartSummaryAction,
+        private readonly GuestCartSummaryAction $guestCartSummaryAction,
     ) {
     }
 
-    #[Get('carts/mobile/summary', name: 'carts.mobile.summary')]
-    public function summary(CartMobileSummaryRequest $request): mixed
+    #[Post('guest/carts/mobile/summary', name: 'carts.mobile.summary')]
+    public function summary(GuestCartMobileSummaryRequest $request): mixed
     {
+        $sessionId = $request->bearerToken();
+
+        if (is_null($sessionId)) {
+            abort(403);
+        }
+
         $validated = $request->validated();
         $discountCode = $validated['discount_code'] ?? null;
         $reference = $validated['reference'];
-
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
 
         $cartLines = $request->getCartLines();
 
@@ -54,10 +53,10 @@ class CheckoutMobileController extends Controller
         $serviceId = $validated['service_id'] ?? null;
 
         try {
-            $summary = $this->cartSummaryAction->execute(
+            $summary = $this->guestCartSummaryAction->execute(
                 $cartLines,
                 new CartSummaryTaxData($country?->id, $state?->id),
-                new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),
+                // new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),
                 $discount,
                 $serviceId ? (int) $serviceId : null
             );
