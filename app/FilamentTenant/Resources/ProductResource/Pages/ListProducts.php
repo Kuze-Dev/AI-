@@ -18,6 +18,8 @@ use Filament\Resources\Pages\ListRecords;
 use Support\Excel\Actions\ExportAction;
 use Support\Excel\Actions\ImportAction;
 use Illuminate\Database\Eloquent\Builder;
+use Support\Common\Rules\MinimumValueRule;
+use Closure;
 
 class ListProducts extends ListRecords
 {
@@ -35,14 +37,17 @@ class ListProducts extends ListRecords
                         'name' => 'required|string|max:100',
                         'category' => 'required|string|max:100',
                         'brand' => 'required|string|max:100',
-                        'sku' => 'required|unique:products|string|max:30',
-                        'stock' => 'required|numeric',
-                        'retail_price' => 'required|numeric',
-                        'selling_price' => 'required|numeric',
-                        'weight' => 'required|numeric',
-                        'length' => 'required|numeric',
-                        'width' => 'required|numeric',
-                        // custom rule for sku
+                        'sku' => 'required|unique:product_variants|string|max:100',
+                        'stock' => ['required', 'numeric', new MinimumValueRule(0)],
+                        'retail_price' => ['required', 'numeric', new MinimumValueRule(0.1)],
+                        'selling_price' => ['required', 'numeric', new MinimumValueRule(0.1)],
+                        'weight' => ['required', 'numeric', new MinimumValueRule(0.1)],
+                        'length' => ['required', 'numeric', new MinimumValueRule(1)],
+                        'width' => ['required', 'numeric', new MinimumValueRule(1)],
+                        'height' => ['nullable', 'numeric', new MinimumValueRule(1)],
+                        // 'product_option_1_name' => [ fn(string $attribute, mixed $value, Closure $fail) => (
+                        //     dd()
+                        // ), ]
                         // custom rule for more than 2 options
                     ],
                 ),
@@ -115,10 +120,10 @@ class ListProducts extends ListRecords
             ->with('productOptions', 'productVariants')
             ->first();
 
-        if (!$foundProduct instanceof Product) {
+        if ( ! $foundProduct instanceof Product) {
             return app(CreateProductAction::class)->execute(ProductData::fromCsv([
                 ...$data,
-                'sku' => $row['product_id'] ?? $data['sku']
+                'sku' => $row['product_id'] ?? $data['sku'],
             ]));
         }
 
@@ -127,7 +132,7 @@ class ListProducts extends ListRecords
 
         return app(UpdateProductAction::class)->execute($foundProduct, ProductData::fromCsv([
             ...$data,
-            'sku' => $data['product_sku'] ?? $data['sku']
+            'sku' => $data['product_sku'] ?? $data['sku'],
         ]));
     }
 
@@ -173,7 +178,7 @@ class ListProducts extends ListRecords
                 }
             }
 
-            if (!$hasFound) {
+            if ( ! $hasFound) {
                 $existingOptions = array_merge($csvRowOptions, $existingOptions);
             }
         }
@@ -329,7 +334,7 @@ class ListProducts extends ListRecords
             if ($taxonomy) {
                 $termModel = TaxonomyTerm::whereName($taxonomyTerm)->first();
 
-                if (!$termModel) {
+                if ( ! $termModel) {
                     $termModel = TaxonomyTerm::create([
                         'name' => $taxonomyTerm,
                         'taxonomy_id' => $taxonomy->id,
