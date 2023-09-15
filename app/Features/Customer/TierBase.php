@@ -8,7 +8,7 @@ use Domain\Tenant\Models\Tenant;
 
 class TierBase
 {
-    public string $name = 'tier.base';
+    public string $name = 'customer.tier-base';
 
     public string $label = 'Tier';
 

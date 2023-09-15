@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
-use App\Features\ECommerce\ECommerceBase;
+use App\Features\Customer\CustomerBase;
 use App\HttpTenantApi\Requests\Auth\Customer\CustomerRegisterRequest;
 use App\HttpTenantApi\Resources\CustomerResource;
 use App\Notifications\Customer\NewRegisterNotification;
@@ -17,7 +17,7 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 use Throwable;
 
-#[Middleware('feature.tenant:' . ECommerceBase::class)]
+#[Middleware('feature.tenant:' . CustomerBase::class)]
 class RegisterController
 {
     /** @throws Throwable */
