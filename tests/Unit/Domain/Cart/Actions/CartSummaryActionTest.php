@@ -123,7 +123,7 @@ it('can get discount', function () {
 });
 
 it('can get cart summary', function () {
-    $summary = app(CartSummaryAction::class)->getSummary(
+    $summary = app(CartSummaryAction::class)->execute(
         $this->cartLines,
         new CartSummaryTaxData($this->country->id, $this->state->id),
         new CartSummaryShippingData(

@@ -28,7 +28,7 @@ class CreateOrderLineAction
             /** @var \Domain\Address\Models\Country $country */
             $country = $state->country;
 
-            $summary = app(CartSummaryAction::class)->getSummary(
+            $summary = app(CartSummaryAction::class)->execute(
                 $cartLine,
                 new CartSummaryTaxData(
                     $country->id,

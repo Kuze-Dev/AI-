@@ -49,7 +49,7 @@ class CheckoutMobileController extends Controller
         $serviceId = $validated['service_id'] ?? null;
 
         try {
-            $summary = app(CartSummaryAction::class)->getSummary(
+            $summary = app(CartSummaryAction::class)->execute(
                 $cartLines,
                 new CartSummaryTaxData($country?->id, $state?->id),
                 new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),
@@ -99,7 +99,7 @@ class CheckoutMobileController extends Controller
             'reference' => $reference,
         ];
 
-        if ( ! $discountCode) {
+        if (!$discountCode) {
             unset($responseArray['summary']['discount']);
         }
 
