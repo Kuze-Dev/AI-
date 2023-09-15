@@ -28,7 +28,7 @@ use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 class CartSummaryAction
 {
     /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
-    public function getSummary(
+    public function execute(
         CartLine|Collection $collections,
         CartSummaryTaxData $cartSummaryTaxData,
         CartSummaryShippingData $cartSummaryShippingData,

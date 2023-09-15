@@ -18,11 +18,16 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
-    Resource('carts/checkouts', apiResource: true, only: ['index', 'store']),
+    Resource('carts/checkouts', apiResource: true, only: ['index', 'store'], names: 'carts.checkouts'),
     Middleware(['auth:sanctum'])
 ]
 class CheckoutController
 {
+    public function __construct(
+        private readonly CheckoutAction $checkoutAction,
+    ) {
+    }
+
     public function index(Request $request): mixed
     {
         $validated = $request->validate([
@@ -66,7 +71,7 @@ class CheckoutController
     {
         $validatedData = $request->validated();
 
-        $reference = app(CheckoutAction::class)
+        $reference = $this->checkoutAction
             ->execute(CheckoutData::fromArray($validatedData));
 
         return response()

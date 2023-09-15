@@ -17,15 +17,27 @@ use Spatie\RouteAttributes\Attributes\Resource;
 use App\Http\Controllers\Controller;
 use Domain\Cart\Actions\CreateCartLineAction;
 use Domain\Cart\Models\Cart;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Throwable;
+use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Spatie\MediaLibrary\Support\File;
+use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 
 #[
-    Resource('carts/cartlines', apiResource: true, except: ['show', 'index']),
+    Resource('carts/cartlines', apiResource: true, except: ['show', 'index'], names: 'carts.cartlines'),
     Middleware(['auth:sanctum'])
 ]
 class CartLinesController extends Controller
 {
+    public function __construct(
+        private readonly CreateCartAction $createCartAction,
+        private readonly CreateCartLineAction $createCartLineAction,
+        private readonly UpdateCartLineAction $updateCartLineAction,
+        private readonly DestroyCartLineAction $destroyCartLineAction
+    ) {
+    }
+
     public function store(CreateCartLineRequest $request): mixed
     {
         $validatedData = $request->validated();
@@ -33,27 +45,40 @@ class CartLinesController extends Controller
         /** @var \Domain\Customer\Models\Customer $customer */
         $customer = auth()->user();
 
-        $cart = app(CreateCartAction::class)->execute($customer);
+        try {
+            $dbResult = DB::transaction(function () use ($validatedData, $customer) {
+                $cart = $this->createCartAction->execute($customer);
 
-        if ( ! $cart instanceof Cart) {
+                if ( ! $cart instanceof Cart) {
+                    return response()->json([
+                        'message' => 'Invalid action',
+                    ], 400);
+                }
+
+                $this->createCartLineAction
+                    ->execute($cart, CreateCartData::fromArray($validatedData));
+
+                return [
+                    'message' => 'Successfully Added to Cart',
+                ];
+            });
+
+            return response()->json($dbResult);
+        } catch (BadRequestHttpException $e) {
             return response()->json([
                 'message' => 'Invalid action',
-            ], 400);
-        }
-
-        $cartline = app(CreateCartLineAction::class)
-            ->execute($cart, CreateCartData::fromArray($validatedData));
-
-        if ( ! $cartline instanceof CartLine) {
-            return response()->json([
-                'message' => 'Invalid action',
-            ], 400);
-        }
-
-        return response()
-            ->json([
-                'message' => 'Successfully Added to Cart',
+                'error' => $e->getMessage(),
+            ], 404);
+        } catch (Exception $e) {
+            Log::error([
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
             ]);
+
+            throw $e;
+        }
     }
 
     public function update(UpdateCartLineRequest $request, CartLine $cartline): mixed
@@ -63,33 +88,42 @@ class CartLinesController extends Controller
         $validatedData = $request->validated();
 
         try {
-            $result = app(UpdateCartLineAction::class)
-                ->execute($cartline, UpdateCartLineData::fromArray($validatedData));
+            $dbResult = DB::transaction(function () use ($validatedData, $cartline) {
+                $result = $this->updateCartLineAction
+                    ->execute($cartline, UpdateCartLineData::fromArray($validatedData));
 
-            if ($result instanceof CartLine) {
-                return response()
-                    ->json([
+                if ($result instanceof CartLine) {
+                    return [
                         'message' => 'Cart updated successfully',
-                    ]);
-            }
-        } catch (Throwable $th) {
-            if ($th instanceof BadRequestException) {
+                    ];
+                }
+            });
+
+            return response()->json($dbResult);
+        } catch (Exception $e) {
+            $maxFileSize = File::getHumanReadableSize(config('media-library.max_file_size'));
+            if ($e instanceof FileIsTooBig) {
                 return response()->json([
-                    'message' => $th->getMessage(),
+                    'message' => "File is too big , please upload file less than $maxFileSize",
                 ], 400);
             }
-        }
 
-        return response()->json([
-            'message' => 'Something went wrong',
-        ], 400);
+            Log::error([
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            throw $e;
+        }
     }
 
     public function destroy(CartLine $cartline): mixed
     {
         $this->authorize('delete', $cartline);
 
-        $result = app(DestroyCartLineAction::class)
+        $result = $this->destroyCartLineAction
             ->execute($cartline);
 
         if ( ! $result) {

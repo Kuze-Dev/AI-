@@ -15,7 +15,7 @@ class GuestCartLinesRemoveController
     ) {
     }
 
-    #[Post('/guest/carts/cartlines/bulk-remove', name: 'carts.bulk-remove')]
+    #[Post('/guest/carts/cartlines/bulk-remove', name: 'guest.carts.cartlines.bulk-remove')]
     public function __invoke(GuestBulkRemoveRequest $request): mixed
     {
         $sessionId = $request->bearerToken();

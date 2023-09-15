@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
-    Resource('guest/carts', apiResource: true, only: ['index', 'destroy']),
+    Resource('guest/carts', apiResource: true, only: ['index', 'destroy'], names: 'guest.carts'),
 ]
 class GuestCartController extends Controller
 {
