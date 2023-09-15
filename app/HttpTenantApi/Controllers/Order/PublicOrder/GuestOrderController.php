@@ -7,7 +7,7 @@ namespace App\HttpTenantApi\Controllers\Order\PublicOrder;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\OrderResource;
 use Domain\Order\Actions\PublicOrder\GuestPlaceOrderAction;
-use Domain\Order\Actions\UpdateOrderAction;
+use Domain\Order\Actions\PublicOrder\GuestUpdateOrderAction;
 use Domain\Order\DataTransferObjects\GuestPlaceOrderData;
 use Domain\Order\DataTransferObjects\UpdateOrderData;
 use Domain\Order\Models\Order;
@@ -24,6 +24,8 @@ use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 #[
     Resource('guest/orders', apiResource: true, except: 'destroy'),
@@ -32,6 +34,7 @@ class GuestOrderController extends Controller
 {
     public function __construct(
         private readonly GuestPlaceOrderAction $guestPlaceOrderAction,
+        private readonly GuestUpdateOrderAction $guestUpdateOrderAction,
     ) {
     }
 
@@ -48,7 +51,7 @@ class GuestOrderController extends Controller
                 'shippingAddress',
                 'billingAddress',
                 'orderLines.media',
-            ])->where("session_id", $sessionId))
+            ])->where('session_id', $sessionId))
                 ->defaultSort('-created_at')
                 ->allowedIncludes(['orderLines', 'orderLines.review.media'])
                 ->allowedFilters(['status', 'reference'])
@@ -131,7 +134,7 @@ class GuestOrderController extends Controller
                 'orderLines.media',
                 'orderLines.review.media',
                 'payments.paymentMethod.media',
-            ])->where("session_id", $sessionId)
+            ])->where('session_id', $sessionId)
                 ->whereReference($order->reference)
         )
             ->allowedIncludes(['orderLines', 'payments.media', 'payments.paymentMethod.media', 'shippingMethod'])->first();
@@ -139,27 +142,45 @@ class GuestOrderController extends Controller
         return OrderResource::make($model);
     }
 
-    public function update(UpdateOrderRequest $request, Order $order): JsonResponse
+    public function update(UpdateOrderRequest $request, Order $order): mixed
     {
+        $sessionId = $request->bearerToken();
+
+        if (is_null($sessionId)) {
+            abort(403);
+        }
+
         $validatedData = $request->validated();
 
-        $result = app(UpdateOrderAction::class)
-            ->execute($order, UpdateOrderData::fromArray($validatedData));
+        try {
+            $dbResult = DB::transaction(function () use ($validatedData, $order) {
+                $result = $this->guestUpdateOrderAction
+                    ->execute($order, UpdateOrderData::fromArray($validatedData));
 
-        if (is_string($result)) {
+                if ($result instanceof PaymentAuthorize) {
+                    return $result;
+                }
+
+                return [
+                    'message' => 'Order updated successfully',
+                ];
+            });
+
+            return response()->json($dbResult);
+        } catch (BadRequestHttpException $e) {
             return response()->json([
                 'message' => 'Order failed to be updated',
-                'error' => $result,
-            ], 400);
-        }
-
-        if ($result instanceof PaymentAuthorize) {
-            return response()->json($result);
-        }
-
-        return response()
-            ->json([
-                'message' => 'Order updated successfully',
+                'error' => $e->getMessage(),
+            ], 404);
+        } catch (Exception $e) {
+            Log::error([
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
             ]);
+
+            throw $e;
+        }
     }
 }

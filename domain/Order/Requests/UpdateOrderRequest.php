@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Order\Requests;
 
+use Domain\Cart\Enums\CartUserType;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Illuminate\Database\Eloquent\Builder;
@@ -30,9 +31,21 @@ class UpdateOrderRequest extends FormRequest
 
                     if ( ! in_array($value, ['status', 'bank-transfer'])) {
 
+                        $type = auth()->user() ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
+                        /** @var int|string $userId */
+                        $userId = auth()->user() ? auth()->user()->id : $this->bearerToken();
+
                         $isValid = $order->whereHas('payments', function (Builder $query) use ($value, $order) {
                             $query->where('gateway', $value)->where('payable_id', $order->id);
-                        })->first();
+                        })
+                            ->where(function ($query) use ($type, $userId) {
+                                if ($type === CartUserType::AUTHENTICATED) {
+                                    $query->where('customer_id', $userId);
+                                } elseif ($type === CartUserType::GUEST) {
+                                    $query->where('session_id', $userId);
+                                }
+                            })
+                            ->first();
 
                         if ( ! $isValid) {
                             $fail('Invalid request');
