@@ -18,7 +18,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
-    Resource('carts/checkouts', apiResource: true, only: ['index', 'store']),
+    Resource('carts/checkouts', apiResource: true, only: ['index', 'store'], names: 'carts.checkouts'),
     Middleware(['auth:sanctum'])
 ]
 class CheckoutController

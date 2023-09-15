@@ -21,7 +21,7 @@ class GuestCheckoutMobileController extends Controller
     ) {
     }
 
-    #[Post('guest/carts/mobile/summary', name: 'carts.mobile.summary')]
+    #[Post('guest/carts/mobile/summary', name: 'guest.carts.mobile.summary')]
     public function summary(GuestCartMobileSummaryRequest $request): mixed
     {
         $sessionId = $request->bearerToken();

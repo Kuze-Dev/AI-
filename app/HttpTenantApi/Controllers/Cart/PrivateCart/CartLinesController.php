@@ -25,7 +25,7 @@ use Spatie\MediaLibrary\Support\File;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 
 #[
-    Resource('carts/cartlines', apiResource: true, except: ['show', 'index']),
+    Resource('carts/cartlines', apiResource: true, except: ['show', 'index'], names: 'carts.cartlines'),
     Middleware(['auth:sanctum'])
 ]
 class CartLinesController extends Controller

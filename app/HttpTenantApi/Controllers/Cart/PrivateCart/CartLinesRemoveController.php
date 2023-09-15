@@ -19,7 +19,7 @@ class CartLinesRemoveController
     ) {
     }
 
-    #[Post('carts/cartlines/bulk-remove', name: 'carts.bulk-remove')]
+    #[Post('carts/cartlines/bulk-remove', name: 'carts.cartlines.bulk-remove')]
     public function __invoke(BulkRemoveRequest $request): mixed
     {
         $validated = $request->validated();

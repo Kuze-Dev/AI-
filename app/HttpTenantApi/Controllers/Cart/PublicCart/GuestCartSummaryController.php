@@ -24,7 +24,7 @@ class GuestCartSummaryController extends Controller
     ) {
     }
 
-    #[Get('guest/carts/count', name: 'carts.count')]
+    #[Get('guest/carts/count', name: 'guest.carts.count')]
     public function count(Request $request): mixed
     {
         $sessionId = $request->bearerToken();
@@ -61,7 +61,7 @@ class GuestCartSummaryController extends Controller
         return response()->json(['cartCount' => $cartLines->count()], 200);
     }
 
-    #[Post('guest/carts/summary', name: 'carts.summary')]
+    #[Post('guest/carts/summary', name: 'guest.carts.summary')]
     public function summary(GuestCartSummaryRequest $request): mixed
     {
         $sessionId = $request->bearerToken();

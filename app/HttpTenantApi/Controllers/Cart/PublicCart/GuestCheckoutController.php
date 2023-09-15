@@ -17,7 +17,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
-    Resource('guest/carts/checkouts', apiResource: true, only: ['index', 'store']),
+    Resource('guest/carts/checkouts', apiResource: true, only: ['index', 'store'], names: 'guest.carts.checkouts'),
 ]
 class GuestCheckoutController
 {
