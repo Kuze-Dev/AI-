@@ -197,10 +197,10 @@ class CartSummaryAction
 
                 $productlist[] = [
                     'product_id' => (string) $purchasableId,
-                    'length' => ceil($length * $cm_to_inches),
-                    'width' => ceil($width * $cm_to_inches),
-                    'height' => ceil($height * $cm_to_inches),
-                    'weight' => (float) $weight,
+                    'length' => ceil($length * $cm_to_inches * $collections->quantity),
+                    'width' => ceil($width * $cm_to_inches * $collections->quantity),
+                    'height' => ceil($height * $cm_to_inches * $collections->quantity),
+                    'weight' => (float) $weight * $collections->quantity,
                 ];
             }
         } else {
@@ -224,10 +224,10 @@ class CartSummaryAction
 
                     $productlist[] = [
                         'product_id' => (string) $purchasableId,
-                        'length' => ceil($length * $cm_to_inches),
-                        'width' => ceil($width * $cm_to_inches),
-                        'height' => ceil($height * $cm_to_inches),
-                        'weight' => (float) $weight,
+                        'length' => ceil($length * $cm_to_inches * $collection->quantity),
+                        'width' => ceil($width * $cm_to_inches * $collection->quantity),
+                        'height' => ceil($height * $cm_to_inches * $collection->quantity),
+                        'weight' => (float) $weight * $collection->quantity,
                     ];
                 }
             }
