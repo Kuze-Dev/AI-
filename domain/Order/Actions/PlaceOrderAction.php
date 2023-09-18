@@ -9,13 +9,19 @@ use Domain\Order\DataTransferObjects\PreparedOrderData;
 
 class PlaceOrderAction
 {
+    public function __construct(
+        private readonly PrepareOrderAction $prepareOrderAction,
+        private readonly SplitOrderAction $splitOrderAction,
+    ) {
+    }
+
     public function execute(PlaceOrderData $placeOrderData): array
     {
-        $payload = app(PrepareOrderAction::class)
+        $payload = $this->prepareOrderAction
             ->execute($placeOrderData);
 
         if ($payload instanceof PreparedOrderData) {
-            $result = app(SplitOrderAction::class)->execute($payload, $placeOrderData);
+            $result = $this->splitOrderAction->execute($payload, $placeOrderData);
 
             return $result;
         }

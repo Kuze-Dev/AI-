@@ -19,15 +19,23 @@ use Domain\Payments\Exceptions\PaymentException;
 
 class SplitOrderAction
 {
+    public function __construct(
+        private readonly CreateOrderAction $createOrderAction,
+        private readonly CreateOrderLineAction $createOrderLineAction,
+        private readonly CreateOrderAddressAction $createOrderAddressAction,
+        private readonly CreatePaymentAction $createPaymentAction,
+    ) {
+    }
+
     public function execute(PreparedOrderData $preparedOrderData, PlaceOrderData $placeOrderData): array
     {
-        $order = app(CreateOrderAction::class)
+        $order = $this->createOrderAction
             ->execute($placeOrderData, $preparedOrderData);
 
-        app(CreateOrderLineAction::class)
+        $this->createOrderLineAction
             ->execute($order, $placeOrderData, $preparedOrderData);
 
-        app(CreateOrderAddressAction::class)
+        $this->createOrderAddressAction
             ->execute($order, $preparedOrderData);
 
         CartLine::whereCheckoutReference($placeOrderData->cart_reference)
@@ -68,7 +76,7 @@ class SplitOrderAction
             payment_driver: $preparedOrderData->paymentMethod->slug
         );
 
-        $result = app(CreatePaymentAction::class)
+        $result = $this->createPaymentAction
             ->execute($order, $providerData);
 
         if ($result->success) {
