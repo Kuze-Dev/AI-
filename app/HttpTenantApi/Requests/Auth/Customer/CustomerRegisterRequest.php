@@ -11,6 +11,7 @@ use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Models\Customer;
+use Domain\Tier\Models\Tier;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -35,6 +36,10 @@ class CustomerRegisterRequest extends FormRequest
             ],
             'mobile' => 'required|string|max:255|unique:customers,mobile',
             'gender' => ['required', Rule::enum(Gender::class)],
+            'tier_id' => [
+                'nullable',
+                Rule::exists(Tier::class, (new Tier())->getRouteKeyName()),
+            ],
             'birth_date' => 'required|date',
             'password' => ['required', 'confirmed', Password::default()],
 

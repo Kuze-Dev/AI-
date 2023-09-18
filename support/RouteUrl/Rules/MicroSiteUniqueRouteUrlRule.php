@@ -11,8 +11,6 @@ use Domain\Content\Models\ContentEntry;
 use Domain\Page\Models\Page;
 use Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Support\Facades\DB;
 
 class MicroSiteUniqueRouteUrlRule implements ValidationRule
 {
@@ -28,29 +26,19 @@ class MicroSiteUniqueRouteUrlRule implements ValidationRule
 
         $pages = Page::select('id')->wherehas('sites', function ($q) use ($value) {
             return $q->whereIn('site_id', $value);
+        })->wherehas('routeUrls', function ($r) {
+            return $r->where('url', $this->route_url['url']);
         })->pluck('id')->toArray();
 
         $contentEntriesIds = ContentEntry::select('id')->wherehas('sites', function ($q) use ($value) {
             return $q->whereIn('site_id', $value);
+        })->wherehas('routeUrls', function ($r) {
+            return $r->where('url', $this->route_url['url']);
         })->pluck('id')->toArray();
 
         $pagesIds = array_merge($pages, $contentEntriesIds);
 
-        $query = RouteUrl::whereUrl($this->route_url['url'])
-            ->whereIn(
-                'id',
-                RouteUrl::select('id')
-                    ->where(
-                        'updated_at',
-                        fn (QueryBuilder $query) => $query->select(DB::raw('MAX(`updated_at`)'))
-                            ->from((new RouteUrl())->getTable(), 'sub_query_table')
-                            ->whereColumn('sub_query_table.model_type', 'route_urls.model_type')
-                            ->whereColumn('sub_query_table.model_id', 'route_urls.model_id')
-                    )
-            );
-
-        $query->whereIN('model_id', $pagesIds)
-            ->where('url', $this->route_url['url']);
+        $query = RouteUrl::whereUrl($this->route_url['url'])->whereIn('model_id', $pagesIds);
 
         if ($this->ignoreModel) {
 
