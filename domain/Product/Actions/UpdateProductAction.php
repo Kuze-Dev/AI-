@@ -32,9 +32,9 @@ class UpdateProductAction
             ? $this->updateMetaData->execute($product, $productData->meta_data)
             : $this->createMetaData->execute($product, $productData->meta_data);
 
-        $mutatedVariants = $this->updateProductOption->execute($product, $productData);
+        $this->updateProductOption->execute($product, $productData);
 
-        $this->createOrUpdateProductVariant->execute($product, $mutatedVariants, false);
+        $this->createOrUpdateProductVariant->execute($product, $productData, false);
 
         $this->uploadMediaMaterials(
             $product,

@@ -10,7 +10,7 @@ class ProductOptionData
         public readonly int|string $id,
         public readonly string $name,
         public readonly string $slug,
-        public readonly array $productOptionValues,
+        public array $productOptionValues,
     ) {
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Features\Customer\TierBase;
 use App\Features\ECommerce\RewardPoints;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\CustomerResource\RelationManagers\AddressesRelationManager;
@@ -118,8 +119,8 @@ class CustomerResource extends Resource
                         ->before(fn () => now()),
                     Forms\Components\Select::make('tier_id')
                         ->label(trans('Tier'))
-                        ->required()
                         ->preload()
+                        ->hidden(fn () => ! tenancy()->tenant?->features()->active(TierBase::class) ? true : false)
                         ->optionsFromModel(Tier::class, 'name'),
                     Forms\Components\TextInput::make('password')
                         ->translateLabel()

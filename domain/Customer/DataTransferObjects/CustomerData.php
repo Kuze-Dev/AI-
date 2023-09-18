@@ -11,7 +11,6 @@ use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
-use Domain\Tier\Models\Tier;
 use Illuminate\Http\UploadedFile;
 
 final class CustomerData
@@ -36,7 +35,6 @@ final class CustomerData
     }
 
     public static function fromRegistrationRequest(
-        Tier $tier,
         CustomerRegisterRequest $request
     ): self {
         $validated = $request->validated();
@@ -50,7 +48,7 @@ final class CustomerData
             gender: Gender::from($validated['gender']),
             birth_date: now()->parse($validated['birth_date']),
             status: Status::ACTIVE,
-            tier_id: $tier->getKey(),
+            tier_id: (int) (isset($validated['tier_id']) ? $validated['tier_id'] : null),
             email: $validated['email'],
             password: $validated['password'],
             image: $validated['profile_image'] ?? null,
