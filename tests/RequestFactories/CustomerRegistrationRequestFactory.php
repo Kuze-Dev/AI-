@@ -7,6 +7,7 @@ namespace Tests\RequestFactories;
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\State;
 use Domain\Customer\Enums\Gender;
+use Domain\Tier\Models\Tier;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Worksome\RequestFactories\RequestFactory;
@@ -28,6 +29,7 @@ class CustomerRegistrationRequestFactory extends RequestFactory
             'password' => 'secret',
             'password_confirmation' => 'secret',
             'mobile' => $this->faker->phoneNumber(),
+            'tier_id' => Tier::whereName(config('domain.tier.default'))->first()->getKey(),
             'birth_date' => now()->subYears($this->faker->randomDigitNotNull())->format('Y-m-d'),
         ];
     }
