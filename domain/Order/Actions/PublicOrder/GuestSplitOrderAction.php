@@ -7,7 +7,7 @@ namespace Domain\Order\Actions\PublicOrder;
 use Domain\Cart\Models\CartLine;
 use Domain\Order\DataTransferObjects\GuestPlaceOrderData;
 use Domain\Order\DataTransferObjects\GuestPreparedOrderData;
-use Domain\Order\Events\OrderPlacedEvent;
+use Domain\Order\Events\PublicOrder\GuestOrderPlacedEvent;
 use Domain\Order\Models\Order;
 use Domain\Payments\Actions\CreatePaymentAction;
 use Domain\Payments\DataTransferObjects\AmountData;
@@ -45,16 +45,16 @@ class GuestSplitOrderAction
                 $this->guestCreateOrderAddressAction
                     ->execute($order, $guestPreparedOrderData);
 
-                CartLine::whereCheckoutReference($guestPlaceOrderData->cart_reference)
-                    ->update(['checked_out_at' => now()]);
+                // CartLine::whereCheckoutReference($guestPlaceOrderData->cart_reference)
+                //     ->update(['checked_out_at' => now()]);
 
                 $payment = $this->proceedPayment($order, $guestPreparedOrderData);
 
-                // event(new OrderPlacedEvent(
-                //     $order,
-                //     $preparedOrderData,
-                //     $placeOrderData
-                // ));
+                event(new GuestOrderPlacedEvent(
+                    $order,
+                    $guestPreparedOrderData,
+                    $guestPlaceOrderData
+                ));
 
                 DB::commit();
 

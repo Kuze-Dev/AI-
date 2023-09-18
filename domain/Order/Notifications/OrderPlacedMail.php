@@ -7,6 +7,7 @@ namespace Domain\Order\Notifications;
 use App\Settings\SiteSettings;
 use Domain\Address\Models\Address;
 use Domain\Admin\Models\Admin;
+use Domain\Order\DataTransferObjects\GuestOrderAddressData;
 use Domain\Order\Models\Order;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Bus\Queueable;
@@ -20,18 +21,18 @@ class OrderPlacedMail extends Notification implements ShouldQueue
     use Queueable;
 
     private Order $order;
-    private Address $shippingAddress;
+    private Address|GuestOrderAddressData $shippingAddress;
     private ShippingMethod $shippingMethod;
     private string $logo;
     private string $title;
     private string $description;
 
     /** Create a new notification instance. */
-    public function __construct(Order $order, Address $shippingAddress, ShippingMethod $shippingMethod)
+    public function __construct(Order $order, Address|GuestOrderAddressData $shippingAddress, ShippingMethod $shippingMethod)
     {
         $this->order = $order;
 
-        /** @var \Domain\Address\Models\Address $shippingAddress */
+        /** @var \Domain\Address\Models\Address|Domain\Order\DataTransferObjects\GuestOrderAddressData $shippingAddress */
         $this->shippingAddress = $shippingAddress;
         $this->shippingMethod = $shippingMethod;
 
