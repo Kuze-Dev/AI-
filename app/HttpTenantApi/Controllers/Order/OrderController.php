@@ -35,11 +35,6 @@ use Illuminate\Support\Facades\DB;
 ]
 class OrderController extends Controller
 {
-    public function __construct(
-        private readonly OrderFailedNotifyAdmin $notifyAdmin
-    ) {
-    }
-
     public function index(): mixed
     {
         /** @var \Domain\Customer\Models\Customer $customer */
@@ -87,21 +82,21 @@ class OrderController extends Controller
                 'service_id' => 'Shipping method service id is required',
             ], 404);
         } catch (PaymentException) {
-            $this->notifyAdmin->execute('This error is occurring due to an issue with the payment credentials on your website.
+            app(OrderFailedNotifyAdmin::class)->execute('This error is occurring due to an issue with the payment credentials on your website.
             Please ensure that your payment settings are configured correctly.', 'ecommerceSettings.payments');
 
             return response()->json([
                 'payment' => 'Invalid Payment Credentials',
             ], 404);
         } catch (OrderEmailSettingsException $e) {
-            $this->notifyAdmin->execute('This error is occurring due to an issue with the email sender on your website.
+            app(OrderFailedNotifyAdmin::class)->execute('This error is occurring due to an issue with the email sender on your website.
             Please ensure that your order settings are configured correctly.', 'ecommerceSettings.order');
 
             return response()->json([
                 'message' => $e->getMessage(),
             ], 404);
         } catch (OrderEmailSiteSettingsException $e) {
-            $this->notifyAdmin->execute('This error is occurring due to an issue with the logo on your website.
+            app(OrderFailedNotifyAdmin::class)->execute('This error is occurring due to an issue with the logo on your website.
             Please ensure that your site settings are configured correctly.', 'cmsSettings.site');
 
             return response()->json([
