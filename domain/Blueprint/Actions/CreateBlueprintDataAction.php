@@ -79,7 +79,7 @@ class CreateBlueprintDataAction
             }
         }
         $flattenData = $this->extractDataAction->flattenArray($data);
-        
+
         foreach($flattenData as $arrayData) {
             $this->storeBlueprintData(BlueprintDataData::fromArray($model, $arrayData));
         }

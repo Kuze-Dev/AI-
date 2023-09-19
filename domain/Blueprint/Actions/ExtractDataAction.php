@@ -14,8 +14,9 @@ class ExtractDataAction
 
         foreach ($data as $section) {
             // dd($section->state_name);
-                $fieldTypes[$section->state_name] = $this->recursivelyExtractFields($section->fields, $section->state_name);
+            $fieldTypes[$section->state_name] = $this->recursivelyExtractFields($section->fields, $section->state_name);
         }
+
         return $fieldTypes;
     }
 
@@ -40,32 +41,31 @@ class ExtractDataAction
     }
 
     public function mergeFields(array $firstField, array|string|null $values): array
-{
-    $mergedFields = [
-        'type' => $firstField['type'],
-        'statepath' => $firstField['statepath'],
-        'value' => $values,
-    ];
+    {
+        $mergedFields = [
+            'type' => $firstField['type'],
+            'statepath' => $firstField['statepath'],
+            'value' => $values,
+        ];
 
-    if ($firstField['type'] == FieldType::REPEATER) {
-        if (is_array($mergedFields['value'])) {
-            foreach ($mergedFields['value'] as $mergedFieldkey => $mergedField) {
-                if (is_array($mergedField)) {
-                    foreach ($mergedField as $repeaterFieldKey => $repeaterField) {
-                        $mergedField[$repeaterFieldKey] = $this->mergeFields(
-                            $firstField[$repeaterFieldKey],
-                            $mergedField[$repeaterFieldKey]
-                        );
-                        $mergedFields['value'][$mergedFieldkey] = $mergedField;
+        if ($firstField['type'] == FieldType::REPEATER) {
+            if (is_array($mergedFields['value'])) {
+                foreach ($mergedFields['value'] as $mergedFieldkey => $mergedField) {
+                    if (is_array($mergedField)) {
+                        foreach ($mergedField as $repeaterFieldKey => $repeaterField) {
+                            $mergedField[$repeaterFieldKey] = $this->mergeFields(
+                                $firstField[$repeaterFieldKey],
+                                $mergedField[$repeaterFieldKey]
+                            );
+                            $mergedFields['value'][$mergedFieldkey] = $mergedField;
+                        }
                     }
                 }
             }
         }
+
+        return $mergedFields;
     }
-
-    return $mergedFields;
-}
-
 
     public function processRepeaterField(array $field): array
     {
@@ -83,18 +83,20 @@ class ExtractDataAction
         return $data;
     }
 
-    public function flattenArray(array $array) : array {
+    public function flattenArray(array $array): array
+    {
         $lastArrays = [];
-    
+
         foreach ($array as $itemKey => $item) {
             if (is_array($item)) {
                 $lastArrays = array_merge($lastArrays, $this->flattenArray($item));
             } else {
-                if($itemKey == "type"){
+                if($itemKey == 'type') {
                     $lastArrays[] = $array;
                 }
             }
-        }  
+        }
+
         return $lastArrays;
     }
 }
