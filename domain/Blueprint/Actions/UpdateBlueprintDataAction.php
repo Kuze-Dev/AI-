@@ -35,11 +35,24 @@ class UpdateBlueprintDataAction
             return;
         }
 
-        $statePaths = $this->extractDataAction->extractStatePath($model->data);
-        $fieldTypes = $this->extractDataAction->extractFieldType($blueprintfieldtype, $statePaths);
+        $extractedDatas = $this->extractDataAction->extractStatePathAndFieldTypes($blueprintfieldtype->sections);
 
-        foreach (array_combine($statePaths, $fieldTypes) as $statePath => $fieldType) {
-            $this->updateBlueprintData(BlueprintDataData::fromArray($model, $statePath, $fieldType));
+        $combinedArray = [];
+        $data = [];
+        foreach ($extractedDatas as $sectionKey => $sectionValue) {
+            foreach ($sectionValue as $fieldKey => $fieldValue) {
+                $combinedArray[$sectionKey][$fieldKey] = $this->extractDataAction->mergeFields($fieldValue, $model->data[$sectionKey][$fieldKey]);
+            }
+        }
+        foreach($combinedArray as $section) {
+            foreach($section as $field) {
+                $data[] = $this->extractDataAction->processRepeaterField($field);
+            }
+        }
+
+        $flattenData = $this->extractDataAction->flattenArray($data);
+        foreach($flattenData as $arrayData) {
+            $this->updateBlueprintData(BlueprintDataData::fromArray($model, $arrayData));
         }
 
     }

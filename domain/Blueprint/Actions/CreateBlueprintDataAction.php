@@ -64,7 +64,7 @@ class CreateBlueprintDataAction
             return;
         }
 
-        $extractedDatas = $this->extractDataAction->extractStatePathAndFieldTypes($blueprintfieldtype);
+        $extractedDatas = $this->extractDataAction->extractStatePathAndFieldTypes($blueprintfieldtype->sections);
 
         $combinedArray = [];
         $data = [];
@@ -76,17 +76,13 @@ class CreateBlueprintDataAction
         foreach($combinedArray as $section) {
             foreach($section as $field) {
                 $data[] = $this->extractDataAction->processRepeaterField($field);
-                foreach($data as $arrayData) {
-                    foreach($arrayData as $newData) {
-                        // $this->storeBlueprintData(BlueprintDataData::fromArray($model, $newData));
-                    }
-
-                }
-
             }
-
         }
-        dd($data);
+        $flattenData = $this->extractDataAction->flattenArray($data);
+        
+        foreach($flattenData as $arrayData) {
+            $this->storeBlueprintData(BlueprintDataData::fromArray($model, $arrayData));
+        }
 
     }
 }

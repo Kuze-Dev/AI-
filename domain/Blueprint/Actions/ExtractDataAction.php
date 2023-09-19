@@ -8,19 +8,18 @@ use Domain\Blueprint\Enums\FieldType;
 
 class ExtractDataAction
 {
-    public function extractStatePathAndFieldTypes($data): array
+    public function extractStatePathAndFieldTypes(array $data): array
     {
         $fieldTypes = [];
-        foreach ($data as $sections) {
-            foreach($sections as $section) {
-                $fieldTypes[$section->state_name] = $this->recursivelyExtractFields($section->fields, $section->state_name);
-            }
-        }
 
+        foreach ($data as $section) {
+            // dd($section->state_name);
+                $fieldTypes[$section->state_name] = $this->recursivelyExtractFields($section->fields, $section->state_name);
+        }
         return $fieldTypes;
     }
 
-    public function recursivelyExtractFields($fields, $currentpath): array
+    public function recursivelyExtractFields(array $fields, string $currentpath): array
     {
         $fieldTypes = [];
         foreach ($fields as $field) {
@@ -40,35 +39,41 @@ class ExtractDataAction
         return $fieldTypes;
     }
 
-    public function mergeFields($firstField, $values)
-    {
-        $mergedFields = [
-            'type' => $firstField['type'],
-            'statepath' => $firstField['statepath'],
-            'value' => $values,
-        ];
-        if($firstField['type'] == FieldType::REPEATER) {
-            foreach($mergedFields['value'] as $mergedFieldkey => $mergedField) {
-                foreach($mergedField as $repeaterFieldKey => $repeaterField) {
-                    $mergedField[$repeaterFieldKey] = $this->mergeFields(
-                        $firstField[$repeaterFieldKey],
-                        $mergedField[$repeaterFieldKey]
-                    );
-                    $mergedFields['value'][$mergedFieldkey] = $mergedField;
+    public function mergeFields(array $firstField, array|string|null $values): array
+{
+    $mergedFields = [
+        'type' => $firstField['type'],
+        'statepath' => $firstField['statepath'],
+        'value' => $values,
+    ];
+
+    if ($firstField['type'] == FieldType::REPEATER) {
+        if (is_array($mergedFields['value'])) {
+            foreach ($mergedFields['value'] as $mergedFieldkey => $mergedField) {
+                if (is_array($mergedField)) {
+                    foreach ($mergedField as $repeaterFieldKey => $repeaterField) {
+                        $mergedField[$repeaterFieldKey] = $this->mergeFields(
+                            $firstField[$repeaterFieldKey],
+                            $mergedField[$repeaterFieldKey]
+                        );
+                        $mergedFields['value'][$mergedFieldkey] = $mergedField;
+                    }
                 }
             }
         }
-
-        return $mergedFields;
     }
 
-    public function processRepeaterField($field): array
+    return $mergedFields;
+}
+
+
+    public function processRepeaterField(array $field): array
     {
         $data = [];
         if($field['type'] == FieldType::REPEATER) {
             foreach($field['value'] as $value) {
                 foreach($value as $repeaterData) {
-                    $data[] = $repeaterData;
+                    $data[] = $this->processRepeaterField($repeaterData);
                 }
             }
         } else {
@@ -76,5 +81,20 @@ class ExtractDataAction
         }
 
         return $data;
+    }
+
+    public function flattenArray(array $array) : array {
+        $lastArrays = [];
+    
+        foreach ($array as $itemKey => $item) {
+            if (is_array($item)) {
+                $lastArrays = array_merge($lastArrays, $this->flattenArray($item));
+            } else {
+                if($itemKey == "type"){
+                    $lastArrays[] = $array;
+                }
+            }
+        }  
+        return $lastArrays;
     }
 }

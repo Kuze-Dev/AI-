@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Blueprint\Models;
 
+use Domain\Blueprint\DataTransferObjects\FieldData;
+use Domain\Blueprint\DataTransferObjects\RepeaterFieldData;
 use Domain\Blueprint\Enums\BlueprintDataType;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\ManipulationType;
@@ -14,6 +16,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Eloquent;
+use Filament\Forms\Components\Field;
 
 /**
  * Domain\Blueprint\Models\BlueprintData
@@ -87,33 +90,46 @@ class BlueprintData extends Model implements HasMedia
         $schema = $blueprint->schema;
         foreach ($schema->sections as $section) {
             foreach ($section->fields as $field) {
-                if ($field->type === FieldType::MEDIA) {
-                    $statePath = $section->state_name . '.' . $field->state_name;
-                    if ($statePath === $this->state_path) {
-                        foreach ($field->conversions ?? [] as $conversion) {
-                            $title = $conversion->name;
-                            $width = null;
-                            $height = null;
-                            if (isset($conversion->manipulations)) {
-                                foreach($conversion->manipulations as $manipulation) {
-                                    if($manipulation->type == ManipulationType::WIDTH) {
-                                        $width = $manipulation->params[0];
-                                    }
-                                    if($manipulation->type == ManipulationType::HEIGHT) {
-                                        $height = $manipulation->params[0];
-                                    }
-                                }
-                                /** @phpstan-ignore-next-line */
-                                $this->addMediaConversion($title)
-                                    ->width($width)
-                                    ->height($height)
-                                    ->keepOriginalImageFormat();
+                $this->processRepeaterField($field, $section->state_name);
+            }
+        }
+
+    }
+
+    protected function processRepeaterField(RepeaterFieldData|FieldData $field, string $currentpath): void
+    {
+        $statePath = $currentpath . '.' . $field->state_name;
+        if($field->type === FieldType::REPEATER) {
+            if (property_exists($field, 'fields') && is_array($field->fields)) {
+                foreach($field->fields as $repeaterFields) {
+                    $this->processRepeaterField($repeaterFields, $statePath);
+                }
+            }
+         
+        }
+        if ($field->type === FieldType::MEDIA) {
+            if ($statePath === $this->state_path) {
+                foreach ($field->conversions ?? [] as $conversion) {
+                    $title = $conversion->name;
+                    $width = null;
+                    $height = null;
+                    if (isset($conversion->manipulations)) {
+                        foreach($conversion->manipulations as $manipulation) {
+                            if($manipulation->type == ManipulationType::WIDTH) {
+                                $width = $manipulation->params[0];
+                            }
+                            if($manipulation->type == ManipulationType::HEIGHT) {
+                                $height = $manipulation->params[0];
                             }
                         }
+                        /** @phpstan-ignore-next-line */
+                        $this->addMediaConversion($title)
+                            ->width($width)
+                            ->height($height)
+                            ->keepOriginalImageFormat();
                     }
                 }
             }
         }
-
     }
 }
