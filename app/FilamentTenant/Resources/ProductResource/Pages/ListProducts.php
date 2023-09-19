@@ -19,7 +19,8 @@ use Support\Excel\Actions\ExportAction;
 use Support\Excel\Actions\ImportAction;
 use Illuminate\Database\Eloquent\Builder;
 use Support\Common\Rules\MinimumValueRule;
-use Closure;
+use Domain\Product\Models\ProductOption;
+use Illuminate\Validation\ValidationException;
 
 class ListProducts extends ListRecords
 {
@@ -33,6 +34,7 @@ class ListProducts extends ListRecords
                 ->processRowsUsing(fn (array $row): Product => self::processProductRows($row))
                 ->withValidation(
                     rules: [
+                        'product_id' => 'required|string|max:100',
                         'image_link' => 'nullable|string',
                         'name' => 'required|string|max:100',
                         'category' => 'required|string|max:100',
@@ -45,10 +47,6 @@ class ListProducts extends ListRecords
                         'length' => ['required', 'numeric', new MinimumValueRule(1)],
                         'width' => ['required', 'numeric', new MinimumValueRule(1)],
                         'height' => ['nullable', 'numeric', new MinimumValueRule(1)],
-                        // 'product_option_1_name' => [ fn(string $attribute, mixed $value, Closure $fail) => (
-                        //     dd()
-                        // ), ]
-                        // custom rule for more than 2 options
                     ],
                 ),
             ExportAction::make()
@@ -87,6 +85,9 @@ class ListProducts extends ListRecords
 
     protected static function processProductRows(array $row): Product
     {
+        // Product must only have a maximum of 2 options
+        self::validateIncomingProductOptions($row);
+
         // Mapping product options and its values
         $productOptions = self::remapProductOptions($row);
 
@@ -123,7 +124,7 @@ class ListProducts extends ListRecords
         if ( ! $foundProduct instanceof Product) {
             return app(CreateProductAction::class)->execute(ProductData::fromCsv([
                 ...$data,
-                'sku' => $row['product_id'] ?? $data['sku'],
+                'sku' => $data['product_sku'] ?? $data['sku'],
             ]));
         }
 
@@ -134,6 +135,31 @@ class ListProducts extends ListRecords
             ...$data,
             'sku' => $data['product_sku'] ?? $data['sku'],
         ]));
+    }
+
+    protected static function validateIncomingProductOptions(array $row): void
+    {
+        $productOptions = ProductOption::select('id', 'name')
+            ->where('product_id', function ($query) use ($row) {
+                $query->select('id')
+                    ->from('products')
+                    ->where('name', $row['name'])
+                    ->first();
+            })
+            ->distinct('name')
+            ->get();
+
+        if ($productOptions->count() > 1) {
+            $foundOption = collect($productOptions)->first(function ($option) use ($row) {
+                return $option['name'] === $row['product_option_1_name'];
+            });
+
+            if ( ! $foundOption) {
+                throw ValidationException::withMessages([
+                    'product_option_1_name' => trans("{$row['name']} must not exceed 2 product options."),
+                ]);
+            }
+        }
     }
 
     protected static function mergingProductOptions(Product $foundProduct, array $csvRowOptions): array
@@ -158,7 +184,10 @@ class ListProducts extends ListRecords
                     isset($existingOption['name'])
                     && strtolower($existingOption['name']) == $lowerCaseRowOptionName
                 ) {
-                    $collectedCsvRowOptionValues = collect($csvRowOption['productOptionValues'])
+                    $csvRowOptionValues = $csvRowOption['productOptionValues'];
+
+                    /** @var array $csvRowOptionValues */
+                    $collectedCsvRowOptionValues = collect($csvRowOptionValues)
                         ->map(function ($optionValue) use ($existingOption) {
                             return [
                                 ...$optionValue,
