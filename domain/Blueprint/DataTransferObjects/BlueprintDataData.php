@@ -22,7 +22,7 @@ class BlueprintDataData
     ) {
     }
 
-    public static function fromArray(Model $model, string $state_path, FieldType $field_type): self
+    public static function fromArray(Model $model, array $data): self
     {
         $blueprintId = null;
 
@@ -34,19 +34,13 @@ class BlueprintDataData
             throw new InvalidArgumentException();
         }
 
-        $data = $model->data;
-
-        $keys = explode('.', $state_path);
-
-        $value = $data[$keys[0]][$keys[1]] ?? null;
-
         return new self(
             blueprint_id: $blueprintId,
             model_id: $model->getKey(),
             model_type: $model->getMorphClass(),
-            state_path: $state_path,
-            value: $value,
-            type: $field_type
+            state_path: $data['statepath'],
+            value: $data['value'],
+            type: $data['type']
         );
     }
 }

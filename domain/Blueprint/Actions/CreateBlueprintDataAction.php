@@ -30,10 +30,11 @@ class CreateBlueprintDataAction
             'type' => $blueprintDataData->type,
         ]);
 
-        if($blueprintDataData->type == FieldType::MEDIA && $blueprintData->value) {
+        if ($blueprintDataData->type == FieldType::MEDIA && $blueprintData->value) {
+            // dd($blueprintData->value);
+            if (is_array($blueprintDataData->value)) {
+                foreach ($blueprintDataData->value as $value) {
 
-            if(is_array($blueprintDataData->value)) {
-                foreach($blueprintDataData->value as $value) {
                     $blueprintData->addMediaFromDisk($value, 's3')
                         ->toMediaCollection('blueprint_media');
                 }
@@ -42,7 +43,6 @@ class CreateBlueprintDataAction
                 $blueprintData->addMediaFromDisk($blueprintData->value, 's3')
                     ->toMediaCollection('blueprint_media');
             }
-
         }
 
         return $blueprintData;
@@ -60,15 +60,33 @@ class CreateBlueprintDataAction
             return;
         }
 
-        if( ! $model->data) {
+        if ( ! $model->data) {
             return;
         }
 
-        $statePaths = $this->extractDataAction->extractStatePath($model->data);
-        $fieldTypes = $this->extractDataAction->extractFieldType($blueprintfieldtype, $statePaths);
-        foreach (array_combine($statePaths, $fieldTypes) as $statePath => $fieldType) {
-            $this->storeBlueprintData(BlueprintDataData::fromArray($model, $statePath, $fieldType));
+        $extractedDatas = $this->extractDataAction->extractStatePathAndFieldTypes($blueprintfieldtype);
+
+        $combinedArray = [];
+        $data = [];
+        foreach ($extractedDatas as $sectionKey => $sectionValue) {
+            foreach ($sectionValue as $fieldKey => $fieldValue) {
+                $combinedArray[$sectionKey][$fieldKey] = $this->extractDataAction->mergeFields($fieldValue, $model->data[$sectionKey][$fieldKey]);
+            }
         }
+        foreach($combinedArray as $section) {
+            foreach($section as $field) {
+                $data[] = $this->extractDataAction->processRepeaterField($field);
+                foreach($data as $arrayData) {
+                    foreach($arrayData as $newData) {
+                        // $this->storeBlueprintData(BlueprintDataData::fromArray($model, $newData));
+                    }
+
+                }
+
+            }
+
+        }
+        dd($data);
 
     }
 }
