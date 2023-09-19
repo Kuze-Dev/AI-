@@ -40,7 +40,7 @@ class DatetimeFieldData extends FieldData
         return new self(
             title: $data['title'],
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
-            rules: $data['rules'] = [],
+            rules: $data['rules'] ?? [],
             min: $data['min'] ?? null,
             max: $data['max'] ?? null,
             format: $data['format'] ?? null,

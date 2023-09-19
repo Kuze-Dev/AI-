@@ -31,6 +31,7 @@ use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use Illuminate\Database\Eloquent\Model;
 use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
 use Illuminate\Validation\Rules\Unique;
 
@@ -62,7 +63,7 @@ class PageResource extends Resource
                                     ignoreRecord: true,
                                     callback: function (Unique $rule) {
 
-                                        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+                                        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
                                             return false;
                                         }
 
@@ -84,7 +85,7 @@ class PageResource extends Resource
                                 ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                                 ->default((string) optional(Locale::where('is_default', true)->first())->code)
                                 ->searchable()
-                                ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                                ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                                 ->reactive()
                                 ->afterStateUpdated(function (Forms\Components\Select $component, Closure $get) {
                                     $component->getContainer()
@@ -117,6 +118,7 @@ class PageResource extends Resource
                         Forms\Components\Card::make([
                             Forms\Components\CheckboxList::make('sites')
                                 ->reactive()
+                                ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                                 ->rule(fn (?Page $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
                                 ->options(function () {
 
@@ -214,8 +216,10 @@ class PageResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('title')
+                    ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('name')
-                    ->sortable()
+                    ->hidden()
                     ->searchable()
                     ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('activeRouteUrl.url')
@@ -225,13 +229,13 @@ class PageResource extends Resource
                     ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\BadgeColumn::make('visibility')
                     ->formatStateUsing(fn ($state) => Str::headline($state))
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TagsColumn::make('sites.name')
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault:true),
                 Tables\Columns\IconColumn::make('published_at')
                     ->label(trans('Published'))
                     ->options([
@@ -288,6 +292,47 @@ class PageResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ])
             ->defaultSort('updated_at', 'desc');
+    }
+
+    /** @return Builder<\Domain\Page\Models\Page> */
+    public static function getEloquentQuery(): Builder
+    {
+        if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+            return static::getModel()::query();
+        }
+
+        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+            Auth::user()?->can('site.siteManager') &&
+            ! (Auth::user()->hasRole(config('domain.role.super_admin')))
+        ) {
+            return static::getModel()::query()->wherehas('sites', function ($q) {
+                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
+            });
+        }
+
+        return static::getModel()::query();
+
+    }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+
+        $status = '';
+
+        if ($record) {
+            /** @var Page */
+            $model = $record;
+            $status = $model->draftable_id ? ' ( Draft )' : '';
+        }
+
+        /** @var string */
+        $attribute = static::$recordTitleAttribute;
+        $recordTitle = $record?->getAttribute($attribute) ?? '';
+
+        $maxLength = 60; // Maximum length for the title before truncating
+        $truncatedTitle = Str::limit($recordTitle, $maxLength, '...');
+
+        return $truncatedTitle . ''. $status;
     }
 
     public static function getRelations(): array

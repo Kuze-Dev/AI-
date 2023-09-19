@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\BlockContent;
 use Support\MetaData\Models\MetaData;
@@ -16,6 +17,9 @@ use function Pest\Laravel\assertDatabaseHas;
 beforeEach(fn () => testInTenantContext());
 
 it('can create page', function () {
+
+    LocaleFactory::createDefault();
+
     $blockId = BlockFactory::new()
         ->withDummyBlueprint()
         ->createOne()

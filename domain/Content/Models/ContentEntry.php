@@ -19,6 +19,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
@@ -33,6 +34,7 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property string $title
  * @property string $slug
  * @property string $locale
+ * @property string|null $draftable_id
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property array $data
  * @property int|null $order
@@ -48,6 +50,7 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property-read int|null $route_urls_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
+ * @property-read ContentEntry|null $pageDraft
  * @method static ContentEntryBuilder|ContentEntry newModelQuery()
  * @method static ContentEntryBuilder|ContentEntry newQuery()
  * @method static ContentEntryBuilder|ContentEntry query()
@@ -126,6 +129,12 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
         ];
     }
 
+    #create a name Attribute For title field if draftable_id is not null add (Draft) to the end of the title
+    public function getNameAttribute(): string
+    {
+        return $this->draftable_id ? $this->title.' (Draft)' : $this->title;
+    }
+
     /**
      * Declare relationship of
      * current model to contents.
@@ -177,6 +186,18 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
     public static function generateRouteUrl(Model $model, array $attributes): string
     {
         return Str::start($model->content->prefix, '/') . Str::of($attributes['title'])->slug()->start('/');
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<self> */
+    public function pageDraft(): HasOne
+    {
+        return $this->hasOne(ContentEntry::class, 'draftable_id');
+    }
+
+    /** @return BelongsTo<self, ContentEntry> */
+    public function parentPage(): BelongsTo
+    {
+        return $this->belongsTo(ContentEntry::class, 'draftable_id');
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Admin, ContentEntry> */

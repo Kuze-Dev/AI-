@@ -86,6 +86,7 @@ it('can get route url but return InvalidArgumentException with error message', f
         ->create((new TestModelForRouteUrl())->getTable(), function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('draftable_id')->nullable();
             $table->timestamps();
         });
 

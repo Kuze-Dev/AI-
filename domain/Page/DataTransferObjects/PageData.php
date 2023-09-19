@@ -19,6 +19,7 @@ class PageData
         public readonly ?int $author_id = null,
         public readonly Visibility $visibility = Visibility::PUBLIC,
         public readonly ?Carbon $published_at = null,
+        public readonly bool $published_draft = false,
         public readonly array $block_contents = [],
         public readonly array $sites = []
     ) {
@@ -44,6 +45,7 @@ class PageData
                 ),
                 $data['block_contents'] ?? [],
             ),
+            published_draft: $data['published_draft'] ?? false,
             sites: $data['sites'] ?? [],
         );
     }

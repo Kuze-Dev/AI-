@@ -19,6 +19,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Domain\Page\Models\Builders\PageBuilder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
@@ -33,6 +34,7 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property string $locale
  * @property string $slug
  * @property Visibility $visibility
+ * @property string|null $draftable_id
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -40,6 +42,7 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Admin|null $author
+ * @property-read Page|null $pageDraft
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Page\Models\BlockContent> $blockContents
  * @property-read int|null $block_contents_count
  * @property-read \Support\MetaData\Models\MetaData|null $metaData
@@ -79,6 +82,7 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
         'visibility',
         'published_at',
         'locale',
+        'draftable_id',
     ];
 
     /**
@@ -88,6 +92,10 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
     protected $casts = [
         'visibility' => Visibility::class,
         'published_at' => 'datetime',
+    ];
+
+    protected $with = [
+        'pageDraft',
     ];
 
     /**
@@ -101,6 +109,12 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
         return [
             'title' => $this->name,
         ];
+    }
+
+    #create a titleAttribute for name field
+    public function getTitleAttribute(): string
+    {
+        return $this->draftable_id ? $this->name.' (Draft)' : $this->name;
     }
 
     /** @return PageBuilder<self> */
@@ -126,6 +140,18 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<self> */
+    public function pageDraft(): HasOne
+    {
+        return $this->hasOne(Page::class, 'draftable_id');
+    }
+
+    /** @return BelongsTo<self, Page> */
+    public function parentPage(): BelongsTo
+    {
+        return $this->belongsTo(Page::class, 'draftable_id');
     }
 
     public function getSlugOptions(): SlugOptions

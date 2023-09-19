@@ -22,4 +22,19 @@ class LocaleFactory extends Factory
             'is_default' => false,
         ];
     }
+
+    public static function createDefault(): Locale
+    {
+        $locale = Locale::whereCode('en')->first();
+
+        if ( ! $locale) {
+            return self::new([
+                'name' => 'English (en)',
+                'code' => 'en',
+                'is_default' => true,
+            ])->createOne();
+        }
+
+        return $locale;
+    }
 }

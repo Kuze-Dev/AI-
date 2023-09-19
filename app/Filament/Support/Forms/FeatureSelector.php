@@ -57,10 +57,14 @@ class FeatureSelector extends Field
                                         ->disableLabel()
                                         ->options($unGroupOptions)
                                         ->formatStateUsing(
-                                            fn (CheckboxList $component, ?Model $record) => collect($component->getOptions())
-                                                ->keys()
-                                                ->filter(fn (string $feature) => $record && Feature::for($record)->active($feature))
-                                                ->toArray()
+                                            function (CheckboxList $component, ?Model $record) {
+                                                $state = collect($component->getOptions())
+                                                    ->keys()
+                                                    ->filter(fn (string $feature) => $record && Feature::for($record)->active($feature))
+                                                    ->toArray();
+
+                                                return array_values($state);
+                                            }
                                         )
                                         ->dehydrated(false);
                                 }
@@ -79,10 +83,14 @@ class FeatureSelector extends Field
                                                     ->bulkToggleable()
                                                     ->options($value)
                                                     ->formatStateUsing(
-                                                        fn (CheckboxList $component, ?Model $record) => collect($component->getOptions())
-                                                            ->keys()
-                                                            ->filter(fn (string $feature) => $record && Feature::for($record)->active($feature))
-                                                            ->toArray()
+                                                        function (CheckboxList $component, ?Model $record) {
+                                                            $state = collect($component->getOptions())
+                                                                ->keys()
+                                                                ->filter(fn (string $feature) => $record && Feature::for($record)->active($feature))
+                                                                ->toArray();
+
+                                                            return array_values($state);
+                                                        }
                                                     )
                                                     ->dehydrated(false),
                                             ]);
@@ -110,7 +118,8 @@ class FeatureSelector extends Field
                         $mutateState = [];
 
                         foreach ($data['extras'] as $xkey => $value) {
-                            if (is_array($value)) {
+                            if (is_array($value) && $get($statePath)) {
+
                                 /** @var array */
                                 $checkboxState = is_array($get($statePath . '_'.$xkey.'_extras')) ? $get($statePath . '_'.$xkey.'_extras') : ($get($statePath . '_'.$xkey.'_extras') ? [$get($statePath . '_'.$xkey.'_extras')] : []);
 
@@ -130,10 +139,13 @@ class FeatureSelector extends Field
                             );
                         }
 
+                        /** @var array */
+                        $checkboxExtras = is_array($get($statePath . '_extras')) ? $get($statePath . '_extras') : ($get($statePath . '_extras') ? [$get($statePath . '_extras')] : []);
+
                         return array_merge(
                             $state,
                             $get($statePath)
-                                ? [$key, ...(is_array($get($statePath . '_extras')) ? $get($statePath . '_extras') : [$get($statePath . '_extras')])]
+                                ? [$key, ...$checkboxExtras]
                                 : []
                         );
                     },

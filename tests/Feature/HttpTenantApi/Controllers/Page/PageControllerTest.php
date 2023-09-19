@@ -28,7 +28,7 @@ it('can list pages', function () {
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json
-                ->count('data', 11)
+                ->count('data', 10)
                 ->where('data.0.type', 'pages')
                 ->whereType('data.0.attributes.name', 'string')
                 ->etc();
@@ -41,9 +41,9 @@ it('can filter pages', function ($attribute) {
         ->published()
         ->count(2)
         ->sequence(
-            ['name' => 'Foo', 'visibility' => 'authenticated'],
-            ['name' => 'Bar', 'visibility' => 'guest'],
-            ['name' => 'Example', 'visibility' => 'public']
+            ['name' => 'Foo', 'visibility' => 'authenticated', 'locale' => 'jp'],
+            ['name' => 'Bar', 'visibility' => 'guest', 'locale' => 'fr'],
+            ['name' => 'Example', 'visibility' => 'public', 'locale' => 'de']
         )
         ->create();
 
@@ -59,7 +59,7 @@ it('can filter pages', function ($attribute) {
                     ->etc();
             });
     }
-})->with(['name', 'slug', 'visibility']);
+})->with(['name', 'slug', 'visibility', 'locale']);
 
 it('can show a page with includes', function (string $include) {
     $page = PageFactory::new()

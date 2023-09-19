@@ -6,6 +6,7 @@ namespace Domain\Menu\Actions;
 
 use Domain\Menu\DataTransferObjects\MenuData;
 use Domain\Menu\Models\Menu;
+use Illuminate\Support\Facades\Auth;
 
 class CreateMenuAction
 {
@@ -13,10 +14,15 @@ class CreateMenuAction
     {
         $menu = Menu::create([
             'name' => $menuData->name,
+            'locale' => $menuData->locale,
         ]);
 
-        $menu->sites()
-            ->attach($menuData->sites);
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+        Auth::user()?->hasRole(config('domain.role.super_admin'))
+        ) {
+            $menu->sites()
+                ->attach($menuData->sites);
+        }
 
         return $menu;
     }

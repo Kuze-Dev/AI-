@@ -9,9 +9,9 @@ use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Support\Arr;
-use Domain\Site\Models\Site;
 use Filament\Resources\Form;
 use Filament\Resources\Table;
+use Illuminate\Support\Str;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use App\FilamentTenant\Resources;
@@ -30,7 +30,7 @@ use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Support\RouteUrl\Rules\MicrositeContentEntryUniqueRouteUrlRule;
+use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class ContentEntryResource extends Resource
@@ -96,7 +96,7 @@ class ContentEntryResource extends Resource
                             ->unique(
                                 callback: function ($livewire, Unique $rule) {
 
-                                    if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+                                    if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
 
                                         return false;
                                     }
@@ -124,7 +124,7 @@ class ContentEntryResource extends Resource
                             ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                             ->default((string) optional(Locale::where('is_default', true)->first())->code)
                             ->searchable()
-                            ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                             ->reactive()
                             ->afterStateUpdated(function (Forms\Components\Select $component, Closure $get) {
                                 $component->getContainer()
@@ -137,12 +137,23 @@ class ContentEntryResource extends Resource
                     ]),
                     Forms\Components\Card::make([
                         Forms\Components\CheckboxList::make('sites')
-                            ->rule(fn (?ContentEntry $record, Closure $get) => new MicrositeContentEntryUniqueRouteUrlRule($record, $get('route_url')))
-                            ->options(
-                                fn () => Site::orderBy('name')
+                            ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                            ->rule(fn (?ContentEntry $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
+                            ->options(function ($livewire) {
+
+                                /** @var \Domain\Admin\Models\Admin */
+                                $user = Auth::user();
+
+                                if ($user->hasRole(config('domain.role.super_admin'))) {
+                                    return $livewire->ownerRecord->sites->pluck('name', 'id')
+                                        ->toArray();
+                                }
+
+                                return $livewire->ownerRecord->sites
+                                    ->whereIN('id', $user->userSite->pluck('id')->toArray())
                                     ->pluck('name', 'id')
-                                    ->toArray()
-                            )
+                                    ->toArray();
+                            })
                             ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?ContentEntry $record): void {
                                 if ( ! $record) {
                                     $component->state([]);
@@ -158,7 +169,7 @@ class ContentEntryResource extends Resource
                                 );
                             }),
                     ])
-                        ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+                        ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))),
                     Forms\Components\Section::make(trans('Taxonomies'))
                         ->schema([
                             Forms\Components\Group::make()
@@ -205,9 +216,14 @@ class ContentEntryResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('name')
+                    ->sortable()
+                    ->label('title')
+                    ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
                     ->searchable()
+                    ->hidden()
                     ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('activeRouteUrl.url')
                     ->label('URL')
@@ -216,7 +232,7 @@ class ContentEntryResource extends Resource
                     ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable(['first_name', 'last_name'])
                     ->searchable(query: function (Builder $query, string $search): Builder {
@@ -229,6 +245,8 @@ class ContentEntryResource extends Resource
                 Tables\Columns\TagsColumn::make('taxonomyTerms.name')
                     ->limit()
                     ->searchable(),
+                Tables\Columns\TagsColumn::make('sites.name')
+                    ->toggleable(isToggledHiddenByDefault:true),
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable()
@@ -306,6 +324,27 @@ class ContentEntryResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ])
             ->defaultSort('order');
+    }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+
+        $status = '';
+
+        if ($record) {
+            /** @var ContentEntry */
+            $model = $record;
+            $status = $model->draftable_id ? ' ( Draft )' : '';
+        }
+
+        /** @var string */
+        $attribute = static::$recordTitleAttribute;
+        $recordTitle = $record?->getAttribute($attribute) ?? '';
+
+        $maxLength = 60; // Maximum length for the title before truncating
+        $truncatedTitle = Str::limit($recordTitle, $maxLength, '...');
+
+        return $truncatedTitle . ''. $status;
     }
 
     /** @return array */

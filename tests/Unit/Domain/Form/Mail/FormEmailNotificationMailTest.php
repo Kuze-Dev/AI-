@@ -23,7 +23,7 @@ it('generate mail', function () {
         ->createOne();
 
     $mailable = new FormEmailNotificationMail($formEmailNotification, []);
-    $mailable->assertFrom(app(FormSettings::class)->sender_email, $formEmailNotification->sender_name);
+    $mailable->assertFrom($formEmailNotification->sender, $formEmailNotification->sender_name);
     $mailable->assertTo($formEmailNotification->to);
     $mailable->assertHasCc($formEmailNotification->cc);
     $mailable->assertHasBcc($formEmailNotification->bcc);

@@ -7,11 +7,10 @@ namespace Support\RouteUrl\Rules;
 use Support\RouteUrl\Contracts\HasRouteUrl;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Closure;
+use Domain\Content\Models\ContentEntry;
 use Domain\Page\Models\Page;
 use Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Support\Facades\DB;
 
 class MicroSiteUniqueRouteUrlRule implements ValidationRule
 {
@@ -19,7 +18,6 @@ class MicroSiteUniqueRouteUrlRule implements ValidationRule
         protected readonly ?HasRouteUrl $ignoreModel = null,
         protected readonly array $route_url,
     ) {
-
     }
 
     /** @param  Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail */
@@ -28,27 +26,42 @@ class MicroSiteUniqueRouteUrlRule implements ValidationRule
 
         $pages = Page::select('id')->wherehas('sites', function ($q) use ($value) {
             return $q->whereIn('site_id', $value);
+        })->wherehas('routeUrls', function ($r) {
+            return $r->where('url', $this->route_url['url']);
         })->pluck('id')->toArray();
 
-        $query = RouteUrl::whereUrl($this->route_url['url'])
-            ->whereIn(
-                'id',
-                RouteUrl::select('id')
-                    ->where(
-                        'updated_at',
-                        fn (QueryBuilder $query) => $query->select(DB::raw('MAX(`updated_at`)'))
-                            ->from((new RouteUrl())->getTable(), 'sub_query_table')
-                            ->whereColumn('sub_query_table.model_type', 'route_urls.model_type')
-                            ->whereColumn('sub_query_table.model_id', 'route_urls.model_id')
-                    )
-            );
+        $contentEntriesIds = ContentEntry::select('id')->wherehas('sites', function ($q) use ($value) {
+            return $q->whereIn('site_id', $value);
+        })->wherehas('routeUrls', function ($r) {
+            return $r->where('url', $this->route_url['url']);
+        })->pluck('id')->toArray();
 
-        $query->whereIN('model_id', $pages)->where('url', $this->route_url['url']);
+        $pagesIds = array_merge($pages, $contentEntriesIds);
+
+        $query = RouteUrl::whereUrl($this->route_url['url'])->whereIn('model_id', $pagesIds);
 
         if ($this->ignoreModel) {
+
+            if ($this->ignoreModel->parentPage) {
+
+                $ignoreModelIds = [
+                    $this->ignoreModel->getKey(),
+                    $this->ignoreModel->parentPage->getKey(),
+                ];
+
+            } else {
+
+                $ignoreModelIds = [
+                    $this->ignoreModel->getKey(),
+                    $this->ignoreModel->pageDraft?->getKey() ?: null,
+                ];
+
+            }
+
             $query->whereNot(fn (EloquentBuilder $query) => $query
                 ->where('model_type',  $this->ignoreModel->getMorphClass())
-                ->where('model_id',  $this->ignoreModel->getKey()));
+                ->whereIn('model_id', array_filter($ignoreModelIds)));
+
         }
 
         if ($query->exists()) {

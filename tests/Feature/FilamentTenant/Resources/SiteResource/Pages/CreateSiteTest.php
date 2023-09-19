@@ -27,6 +27,7 @@ it('can create site', function () {
     $site = livewire(CreateSite::class)
         ->fillForm([
             'name' => 'Test',
+            'domain' => 'https://example.com',
         ])->call('create')
         ->assertHasNoFormErrors()
         ->assertOk()

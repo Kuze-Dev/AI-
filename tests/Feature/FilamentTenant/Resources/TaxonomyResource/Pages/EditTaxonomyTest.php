@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\TaxonomyResource\Pages\EditTaxonomy;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
+use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Models\Taxonomy;
@@ -17,6 +18,7 @@ beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
+    LocaleFactory::createDefault();
 });
 
 it('can render page', function () {

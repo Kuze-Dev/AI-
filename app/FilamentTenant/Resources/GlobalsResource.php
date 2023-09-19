@@ -14,6 +14,7 @@ use Filament\Resources\Resource;
 use Domain\Globals\Models\Globals;
 use Illuminate\Support\Facades\Auth;
 use Domain\Blueprint\Models\Blueprint;
+use Illuminate\Database\Eloquent\Builder;
 use Domain\Internationalization\Models\Locale;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\EditGlobals;
@@ -21,6 +22,7 @@ use App\FilamentTenant\Resources\GlobalsResource\Pages\ListGlobals;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\CreateGlobals;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use Illuminate\Validation\Rules\Unique;
 
 class GlobalsResource extends Resource
 {
@@ -41,7 +43,17 @@ class GlobalsResource extends Resource
         return $form->schema([
             Forms\Components\Card::make([
                 Forms\Components\TextInput::make('name')
-                    ->unique(ignoreRecord: true)
+                    ->unique(
+                        callback: function ($livewire, Unique $rule) {
+
+                            if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+                                return false;
+                            }
+
+                            return $rule;
+                        },
+                        ignoreRecord: true
+                    )
                     ->required()
                     ->string()
                     ->maxLength(255),
@@ -56,31 +68,52 @@ class GlobalsResource extends Resource
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                     ->default((string) optional(Locale::where('is_default', true)->first())->code)
                     ->searchable()
-                    ->hidden(Locale::count() === 1 || (bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->required(),
                 Forms\Components\Card::make([
                     Forms\Components\CheckboxList::make('sites')
+                        ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                        ->rules([
+                            function (?Globals $record, Closure $get) {
+
+                                return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+
+                                    $siteIDs = $value;
+
+                                    if ($record) {
+                                        $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
+
+                                        $globals = Globals::where('name', $get('name'))
+                                            ->where('id', '!=', $record->id)
+                                            ->whereHas(
+                                                'sites',
+                                                fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                            )->count();
+
+                                    } else {
+
+                                        $globals = Globals::where('name', $get('name'))->whereHas(
+                                            'sites',
+                                            fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                        )->count();
+                                    }
+
+                                    if ($globals > 0) {
+                                        $fail("Globals {$get('name')} is already available in selected sites.");
+                                    }
+
+                                };
+                            },
+                        ])
                         ->options(
                             fn () => Site::orderBy('name')
                                 ->pluck('name', 'id')
                                 ->toArray()
                         )
-                        ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Globals $record): void {
-                            if ( ! $record) {
-                                $component->state([]);
+                        ->formatStateUsing(fn (?Globals $record) => $record ? $record->sites->pluck('id')->toArray() : []),
 
-                                return;
-                            }
-
-                            $component->state(
-                                $record->sites->pluck('id')
-                                    ->intersect(array_keys($component->getOptions()))
-                                    ->values()
-                                    ->toArray()
-                            );
-                        }),
                 ])
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
                     ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
@@ -96,11 +129,19 @@ class GlobalsResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
+                Tables\Columns\TextColumn::make('locale')
+                    ->searchable()
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
+                Tables\Columns\TagsColumn::make('sites.name')
+                    ->toggleable(isToggledHiddenByDefault:true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('sites')
+                    ->multiple()
+                    ->relationship('sites', 'name'),
                 Tables\Filters\SelectFilter::make('blueprint')
                     ->relationship('blueprint', 'name')
                     ->searchable()
@@ -117,6 +158,26 @@ class GlobalsResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ])
             ->defaultSort('updated_at', 'desc');
+    }
+
+    /** @return Builder<\Domain\Globals\Models\Globals> */
+    public static function getEloquentQuery(): Builder
+    {
+        if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+            return static::getModel()::query();
+        }
+
+        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+            Auth::user()?->can('site.siteManager') &&
+            ! (Auth::user()->hasRole(config('domain.role.super_admin')))
+        ) {
+            return static::getModel()::query()->wherehas('sites', function ($q) {
+                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
+            });
+        }
+
+        return static::getModel()::query();
+
     }
 
     public static function getRelations(): array

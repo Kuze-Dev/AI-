@@ -36,7 +36,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address(app(FormSettings::class)->sender_email, $this->formEmailNotification->sender_name),
+            from: new Address($this->formEmailNotification->sender ?: app(FormSettings::class)->sender_email, $this->formEmailNotification->sender_name),
             to: array_map($this->interpolateStringWithData(...), $this->formEmailNotification->to ?? []),
             cc: array_map($this->interpolateStringWithData(...), $this->formEmailNotification->cc ?? []),
             bcc: array_map($this->interpolateStringWithData(...), $this->formEmailNotification->bcc ?? []),

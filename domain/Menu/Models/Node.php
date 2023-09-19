@@ -52,7 +52,7 @@ use Eloquent;
  * @method static Builder|Node whereType($value)
  * @method static Builder|Node whereUpdatedAt($value)
  * @method static Builder|Node whereUrl($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 #[OnDeleteCascade(['children'])]
 class Node extends Model implements Sortable
