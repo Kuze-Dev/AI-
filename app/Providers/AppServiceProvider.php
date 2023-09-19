@@ -32,6 +32,7 @@ use Domain\Order\Models\OrderAddress;
 use Domain\Order\Models\OrderLine;
 use Domain\Page\Models\Block;
 use Domain\Review\Models\Review;
+use Domain\Service\Models\Service;
 use Domain\Taxation\Models\TaxZone;
 use Domain\Page\Models\Page;
 use Domain\Shipment\Models\Shipment;
@@ -133,6 +134,7 @@ class AppServiceProvider extends ServiceProvider
             PaymentRefund::class,
             Locale::class,
             Site::class,
+            Service::class
         ]);
 
         Password::defaults(

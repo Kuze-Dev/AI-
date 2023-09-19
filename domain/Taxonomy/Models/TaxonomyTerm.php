@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Taxonomy\Models;
 
 use Domain\Content\Models\ContentEntry;
+use Domain\Service\Models\Service;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -106,6 +107,11 @@ class TaxonomyTerm extends Model implements Sortable
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class);
+    }
+
+    public function services(): BelongsToMany
+    {
+        return $this->belongsToMany(Service::class);
     }
 
     public function getRouteKeyName(): string

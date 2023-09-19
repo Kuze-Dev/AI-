@@ -126,6 +126,10 @@ class TenantResource extends Resource
                                         Features\ECommerce\RewardPoints::class => app(Features\ECommerce\RewardPoints::class)->label,
                                     ],
                                 ],
+                                Features\Service\ServiceBase::class => [
+                                    'label' => trans('Service Management'),
+                                    'extras' => []
+                                ]
                             ]),
                     ]),
             ]);
