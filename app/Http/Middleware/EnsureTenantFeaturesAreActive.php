@@ -13,6 +13,6 @@ class EnsureTenantFeaturesAreActive
     {
         return tenancy()->tenant?->features()->someAreActive($features)
             ? $next($request)
-            : abort(404);
+            : abort(404, 'Some features are not active in this tenant');
     }
 }
