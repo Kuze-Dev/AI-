@@ -23,16 +23,14 @@ class OrderPlacedListener
     {
         $customer = $event->preparedOrderData->customer;
         $order = $event->order;
-        $shippingAddress = $event->preparedOrderData->shippingAddress;
-        $shippingMethod = $event->preparedOrderData->shippingMethod;
 
         $discount = $event->preparedOrderData->discount;
         Notification::send($customer, new OrderPlacedNotification($order));
 
-        $customer->notify(new OrderPlacedMail($order, $shippingAddress, $shippingMethod));
+        $customer->notify(new OrderPlacedMail($order, $event->preparedOrderData));
 
         // minus the discount
-        if (!is_null($discount)) {
+        if ( ! is_null($discount)) {
             app(CreateDiscountLimitAction::class)->execute($discount, $order, $customer);
         }
 

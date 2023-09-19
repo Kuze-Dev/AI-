@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Order\Listeners\PublicOrder;
 
-use App\Notifications\Order\OrderPlacedNotification;
-use Domain\Discount\Actions\CreateDiscountLimitAction;
 use Domain\Order\Events\PublicOrder\GuestOrderPlacedEvent;
 use Domain\Order\Notifications\OrderPlacedMail;
 use Domain\Product\Actions\UpdateProductStockAction;
@@ -21,14 +19,12 @@ class GuestOrderPlacedListener
      */
     public function handle(GuestOrderPlacedEvent $event): void
     {
+        $email = $event->guestPreparedOrderData->customer->email;
         $order = $event->order;
-        $shippingAddress = $event->guestPreparedOrderData->shippingAddress;
-        $shippingMethod = $event->guestPreparedOrderData->shippingMethod;
+        // $shippingAddress = $event->guestPreparedOrderData->shippingAddress;
+        // $shippingMethod = $event->guestPreparedOrderData->shippingMethod;
 
         // $discount = $event->guestPreparedOrderData->discount;
-
-        Notification::route('mail', 'john@doe.com')
-            ->notify(new OrderPlacedMail($order, $shippingAddress, $shippingMethod));
 
         // minus the discount
         // TODO: make this helper accepts null customer
@@ -37,7 +33,15 @@ class GuestOrderPlacedListener
         // }
 
         foreach ($order->orderLines as $orderLine) {
-            app(UpdateProductStockAction::class)->execute($orderLine->purchasable_type, $orderLine->purchasable_id, $orderLine->quantity, false);
+            app(UpdateProductStockAction::class)->execute(
+                $orderLine->purchasable_type,
+                $orderLine->purchasable_id,
+                $orderLine->quantity,
+                false
+            );
         }
+
+        Notification::route('mail', $email)
+            ->notify(new OrderPlacedMail($order, $event->guestPreparedOrderData));
     }
 }

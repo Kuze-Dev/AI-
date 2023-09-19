@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Domain\Order\Notifications;
 
 use App\Settings\SiteSettings;
-use Domain\Address\Models\Address;
 use Domain\Admin\Models\Admin;
-use Domain\Order\DataTransferObjects\GuestOrderAddressData;
+use Domain\Customer\Models\Customer;
+use Domain\Order\DataTransferObjects\GuestCustomerData;
+use Domain\Order\DataTransferObjects\GuestPreparedOrderData;
+use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Models\Order;
+use Domain\Order\Models\OrderAddress;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -21,20 +24,20 @@ class OrderPlacedMail extends Notification implements ShouldQueue
     use Queueable;
 
     private Order $order;
-    private Address|GuestOrderAddressData $shippingAddress;
+    private OrderAddress $shippingAddress;
     private ShippingMethod $shippingMethod;
     private string $logo;
     private string $title;
     private string $description;
 
     /** Create a new notification instance. */
-    public function __construct(Order $order, Address|GuestOrderAddressData $shippingAddress, ShippingMethod $shippingMethod)
+    public function __construct(Order $order, PreparedOrderData|GuestPreparedOrderData $preparedOrderData)
     {
         $this->order = $order;
 
-        /** @var \Domain\Address\Models\Address|Domain\Order\DataTransferObjects\GuestOrderAddressData $shippingAddress */
-        $this->shippingAddress = $shippingAddress;
-        $this->shippingMethod = $shippingMethod;
+        $this->shippingAddress = $order->shippingAddress;
+
+        $this->shippingMethod = $preparedOrderData->shippingMethod;
 
         $this->logo = app(SiteSettings::class)->getLogoUrl();
         $this->title = app(SiteSettings::class)->name;
@@ -56,18 +59,9 @@ class OrderPlacedMail extends Notification implements ShouldQueue
     {
         $admin = Admin::first();
 
-        $this->shippingAddress->load('state.country');
+        $customer = $this->getCustomer($notifiable);
 
-        $address = Arr::join(
-            array_filter([
-                $this->shippingAddress->address_line_1,
-                $this->shippingAddress->state->country->name,
-                $this->shippingAddress->state->name,
-                $this->shippingAddress->zip_code,
-                $this->shippingAddress->city,
-            ]),
-            ', '
-        );
+        $address = $this->getAddress();
 
         return (new MailMessage())
             ->subject('Order Being Placed')
@@ -78,7 +72,7 @@ class OrderPlacedMail extends Notification implements ShouldQueue
                 'description' => $this->description,
                 'timezone' => $admin?->timezone,
                 'order' => $this->order,
-                'customer' => $notifiable,
+                'customer' => $customer,
                 'address' => $address,
                 'paymentMethod' => $this->order->payments->first() ?
                     $this->order->payments->first()->paymentMethod : null,
@@ -94,5 +88,35 @@ class OrderPlacedMail extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [];
+    }
+
+    private function getCustomer(object $notifiable): Customer|GuestCustomerData
+    {
+        if ($notifiable instanceof Customer) {
+            return $notifiable;
+        } else {
+            return new GuestCustomerData(
+                first_name: $this->order->customer_first_name,
+                last_name: $this->order->customer_last_name,
+                mobile: $this->order->customer_mobile,
+                email: $this->order->customer_email,
+            );
+        }
+    }
+
+    private function getAddress(): string
+    {
+        $address = Arr::join(
+            array_filter([
+                $this->shippingAddress->address_line_1,
+                $this->shippingAddress->country,
+                $this->shippingAddress->state,
+                $this->shippingAddress->zip_code,
+                $this->shippingAddress->city,
+            ]),
+            ', '
+        );
+
+        return $address;
     }
 }

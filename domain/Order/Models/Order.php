@@ -55,7 +55,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Domain\Order\Models\OrderAddress|null $billingAddress
+ * @property-read \Domain\Order\Models\OrderAddress $billingAddress
  * @property-read Customer|null $customer
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
@@ -65,7 +65,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read int|null $order_lines_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Payments\Models\Payment> $payments
  * @property-read int|null $payments_count
- * @property-read \Domain\Order\Models\OrderAddress|null $shippingAddress
+ * @property-read \Domain\Order\Models\OrderAddress $shippingAddress
  * @property-read ShippingMethod|null $shippingMethod
  * @method static Builder|Order newModelQuery()
  * @method static Builder|Order newQuery()
