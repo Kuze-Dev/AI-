@@ -19,6 +19,11 @@ use Illuminate\Validation\Rules\Password;
 
 class CustomerRegisterRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        logger('register', $this->all());
+    }
+
     public function rules(): array
     {
         return [
