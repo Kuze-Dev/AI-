@@ -16,19 +16,19 @@ use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Order\Actions\PrepareOrderAction;
 use Domain\Order\Actions\SplitOrderAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
-use Domain\Order\Models\Order;
+use Domain\Order\Events\OrderPlacedEvent;
+use Domain\Order\Notifications\AdminOrderPlacedMail;
+use Domain\Order\Notifications\OrderPlacedMail;
 use Domain\PaymentMethod\Database\Factories\PaymentMethodFactory;
 use Domain\Payments\Contracts\PaymentManagerInterface;
-use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\Providers\OfflinePayment;
 use Domain\Product\Database\Factories\ProductFactory;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\Drivers\StorePickupDriver;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Notifications\AnonymousNotifiable;
 use Laravel\Sanctum\Sanctum;
-
-use function Pest\Laravel\assertDatabaseHas;
-use function PHPUnit\Framework\assertInstanceOf;
 
 beforeEach(function () {
     testInTenantContext();
@@ -113,34 +113,65 @@ beforeEach(function () {
     ];
 
     $placeOrderData = PlaceOrderData::fromArray($validatedData);
+    $preparedOrder = app(PrepareOrderAction::class)
+        ->execute($placeOrderData);
+    $splittedOrder = app(SplitOrderAction::class)->execute($preparedOrder, $placeOrderData);
+    $order = $splittedOrder['order'];
 
-    $this->country = $country;
-    $this->state = $state;
+    $this->order = $order;
     $this->customer = $customer;
-    $this->address = $address;
-    $this->shippingMethod = $shippingMethod;
-    $this->paymentMethod = $paymentMethod;
-    $this->cartLines = $cartLines;
-    $this->cartLineIds = $cartLineIds;
     $this->placeOrderData = $placeOrderData;
+    $this->preparedOrder = $preparedOrder;
 });
 
-it('can split order', function () {
-    $preparedOrder = app(PrepareOrderAction::class)
-        ->execute($this->placeOrderData);
+it('can send order email notification to admin', function () {
+    $orderSettings = app(OrderSettings::class)->fill([
+        'admin_should_receive' => true,
+        'admin_main_receiver' => fake()->safeEmail(),
+    ])->save();
 
-    $splittedOrder = app(SplitOrderAction::class)->execute($preparedOrder, $this->placeOrderData);
+    Notification::fake();
 
-    assertDatabaseHas(CartLine::class, [
-        'uuid' => $this->cartLineIds,
-    ]);
+    $event = new OrderPlacedEvent($this->order, $this->preparedOrder, $this->placeOrderData);
+    event($event);
 
-    expect($splittedOrder)->toHaveKey('order');
-    expect($splittedOrder)->toHaveKey('payment');
+    Notification::assertSentOnDemand(
+        AdminOrderPlacedMail::class,
+        function ($notification, $channels, $notifiable) use ($orderSettings) {
+            return $notifiable->routes['mail'] === $orderSettings->admin_main_receiver;
+        }
+    );
+});
 
-    $order = $splittedOrder['order'];
-    $payment = $splittedOrder['payment'];
+it('cannot send order email notification to admin', function () {
+    $orderSettings = app(OrderSettings::class)->fill([
+        'admin_should_receive' => false,
+        'admin_main_receiver' => fake()->safeEmail(),
+    ])->save();
 
-    assertInstanceOf(Order::class, $order);
-    assertInstanceOf(PaymentAuthorize::class, $payment);
+    Notification::fake();
+
+    $event = new OrderPlacedEvent($this->order, $this->preparedOrder, $this->placeOrderData);
+    event($event);
+
+    Notification::assertNotSentTo(
+        new AnonymousNotifiable(),
+        AdminOrderPlacedMail::class,
+        function ($notification, $channels, $notifiable) use ($orderSettings) {
+            return $notifiable->routes['mail'] === $orderSettings->admin_main_receiver;
+        }
+    );
+});
+
+it('can send order email notification to customer', function () {
+    Notification::fake();
+
+    $event = new OrderPlacedEvent($this->order, $this->preparedOrder, $this->placeOrderData);
+    event($event);
+
+    $customer = $this->customer;
+    Notification::assertSentTo(
+        $customer,
+        OrderPlacedMail::class,
+    );
 });

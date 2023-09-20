@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Pages\Settings;
 
+use App\FilamentTenant\Support\Concerns\AuthorizeCMSSettings;
 use App\Settings\FormSettings as SettingsFormSettings;
 use Closure;
 use Filament\Forms;
@@ -11,6 +12,8 @@ use Support\Captcha\CaptchaProvider;
 
 class FormSettings extends TenantBaseSettings
 {
+    use AuthorizeCMSSettings;
+
     protected static string $settings = SettingsFormSettings::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-newspaper';

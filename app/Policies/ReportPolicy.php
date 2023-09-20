@@ -6,8 +6,8 @@ namespace App\Policies;
 
 use App\Features\ECommerce\ECommerceBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
+use Domain\Admin\Models\Admin;
 use Illuminate\Auth\Access\Response;
-use Illuminate\Foundation\Auth\User;
 
 class ReportPolicy
 {
@@ -22,8 +22,12 @@ class ReportPolicy
         return null;
     }
 
-    public function viewAny(User $user): bool
+    public function viewAny(Admin $admin): bool
     {
-        return $this->checkWildcardPermissions($user);
+        if ($admin->hasAllPermissions(['order.viewAny', 'order.reports'])) {
+            return true;
+        }
+
+        return $this->checkWildcardPermissions($admin);
     }
 }

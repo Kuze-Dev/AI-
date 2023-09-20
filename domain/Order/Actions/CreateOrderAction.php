@@ -15,6 +15,11 @@ use Illuminate\Support\Str;
 
 class CreateOrderAction
 {
+    public function __construct(
+        private readonly CartSummaryAction $cartSummaryAction
+    ) {
+    }
+
     public function execute(PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData): Order
     {
         $referenceNumber = Str::upper(Str::random(12));
@@ -25,7 +30,7 @@ class CreateOrderAction
         /** @var \Domain\Address\Models\Country $country */
         $country = $state->country;
 
-        $summary = app(CartSummaryAction::class)->getSummary(
+        $summary = $this->cartSummaryAction->getSummary(
             $preparedOrderData->cartLine,
             new CartSummaryTaxData(
                 $country->id,
