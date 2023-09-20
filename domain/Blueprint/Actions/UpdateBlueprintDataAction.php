@@ -41,7 +41,7 @@ class UpdateBlueprintDataAction
         $data = [];
         foreach ($extractedDatas as $sectionKey => $sectionValue) {
             foreach ($sectionValue as $fieldKey => $fieldValue) {
-                $combinedArray[$sectionKey][$fieldKey] = $this->extractDataAction->mergeFields($fieldValue, $model->data[$sectionKey][$fieldKey]);
+                $combinedArray[$sectionKey][$fieldKey] = $this->extractDataAction->mergeFields($fieldValue, $model->data[$sectionKey][$fieldKey], $fieldValue['statepath']);
             }
         }
         foreach($combinedArray as $section) {

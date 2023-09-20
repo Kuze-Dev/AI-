@@ -107,7 +107,14 @@ class BlueprintData extends Model implements HasMedia
 
         }
         if ($field->type === FieldType::MEDIA) {
-            if ($statePath === $this->state_path) {
+            $arrayStatepath = explode('.', $this->state_path);
+            foreach($arrayStatepath as $newStatepath) {
+                if(is_numeric($newStatepath)) {
+                    $arrayStatepath = array_diff($arrayStatepath, [$newStatepath]);
+                }
+            }
+            $newStatepath = implode('.', $arrayStatepath);
+            if ($statePath === $newStatepath) {
                 foreach ($field->conversions ?? [] as $conversion) {
                     $title = $conversion->name;
                     $width = null;

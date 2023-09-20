@@ -40,14 +40,14 @@ class ExtractDataAction
         return $fieldTypes;
     }
 
-    public function mergeFields(array $firstField, array|string|null $values): array
+    public function mergeFields(array $firstField, array|string|null $values, string $parentStatepath): array
     {
         $mergedFields = [
             'type' => $firstField['type'],
-            'statepath' => $firstField['statepath'],
+            'statepath' => $parentStatepath,
             'value' => $values,
         ];
-
+        $statepath = $mergedFields['statepath'];
         if ($firstField['type'] == FieldType::REPEATER) {
             if (is_array($mergedFields['value'])) {
                 foreach ($mergedFields['value'] as $mergedFieldkey => $mergedField) {
@@ -55,8 +55,10 @@ class ExtractDataAction
                         foreach ($mergedField as $repeaterFieldKey => $repeaterField) {
                             $mergedField[$repeaterFieldKey] = $this->mergeFields(
                                 $firstField[$repeaterFieldKey],
-                                $mergedField[$repeaterFieldKey]
+                                $mergedField[$repeaterFieldKey],
+                                $statepath . '.' . $mergedFieldkey . '.' . $repeaterFieldKey
                             );
+
                             $mergedFields['value'][$mergedFieldkey] = $mergedField;
                         }
                     }
@@ -70,9 +72,9 @@ class ExtractDataAction
     public function processRepeaterField(array $field): array
     {
         $data = [];
-        if($field['type'] == FieldType::REPEATER) {
-            foreach($field['value'] as $value) {
-                foreach($value as $repeaterData) {
+        if ($field['type'] == FieldType::REPEATER) {
+            foreach ($field['value'] as $value) {
+                foreach ($value as $repeaterData) {
                     $data[] = $this->processRepeaterField($repeaterData);
                 }
             }
@@ -91,7 +93,7 @@ class ExtractDataAction
             if (is_array($item)) {
                 $lastArrays = array_merge($lastArrays, $this->flattenArray($item));
             } else {
-                if($itemKey == 'type') {
+                if ($itemKey == 'type') {
                     $lastArrays[] = $array;
                 }
             }
