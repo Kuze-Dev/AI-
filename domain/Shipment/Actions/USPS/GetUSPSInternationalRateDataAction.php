@@ -31,13 +31,13 @@ class GetUSPSInternationalRateDataAction
             Ounces: (string) $parcelData->ounces,
             MailType: MailType::PACKAGE,
             ValueOfContents: (string) $parcelData->parcel_value,
-            Country: (string) 'Philippines', //TODO
+            Country: (string) $address->state->country->name,
             Width: (string) $parcelData->width,
             Length: (string) $parcelData->length,
             Height: (string) $parcelData->height,
             OriginZip: (string) $parcelData->zip_origin,
             AcceptanceDateTime: (string) Carbon::now()->addDays(2)->setTime(13, 15, 0)->isoFormat('YYYY-MM-DDTHH:mm:ssZ'),
-            DestinationPostalCode: (string) '1603' //TODO
+            DestinationPostalCode: (string) $address->zip_code
         );
 
         return $this->rateClient->getInternationalVersion2($dto);

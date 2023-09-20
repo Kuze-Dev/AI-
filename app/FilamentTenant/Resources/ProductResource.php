@@ -302,7 +302,9 @@ class ProductResource extends Resource
                     ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->translateLabel()
-                    ->formatStateUsing(fn ($state) => $state ? STATUS::ACTIVE->value : STATUS::INACTIVE->value)
+                    ->formatStateUsing(fn ($state) => $state
+                        ? ucfirst(STATUS::ACTIVE->value)
+                        : ucfirst(STATUS::INACTIVE->value))
                     ->color(fn (Product $record) => $record->status ? 'success' : 'secondary')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')

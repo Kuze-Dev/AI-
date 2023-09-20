@@ -13,7 +13,7 @@ class PercentageCalculator
         $percentages = [];
 
         foreach ($productCounts as $value) {
-            $percentage = ($value / $total) * 100;
+            $percentage = number_format(($value / $total) * 100, 2);
             $percentages[] = $percentage;
         }
 

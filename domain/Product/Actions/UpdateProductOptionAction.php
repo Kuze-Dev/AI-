@@ -12,114 +12,80 @@ use Domain\Product\Models\ProductOptionValue;
 
 class UpdateProductOptionAction
 {
-    public function execute(Product $product, ProductData $productData): array
+    public function execute(Product $product, ProductData $productData): void
     {
-        $mutableVariants = $productData->product_variants ?? [];
-        $mutableOptions = $productData->product_options;
-
-        // Flush Product Option
-        if ( ! filled($mutableOptions) && ! filled($mutableVariants)) {
+        /** Flush Product Option */
+        if ( ! filled($productData->product_options) && ! filled($productData->product_variants)) {
             ProductOption::whereProductId($product->id)->delete();
 
-            return [];
+            return;
         }
 
-        // Create or Update product options & update mutable variants for variant insertion
-        collect($mutableOptions)->map(function (ProductOptionData $productOption, int $key) use ($product, $mutableVariants) {
-            $optionModel = ProductOption::find($productOption->id);
+        /** Process Update or Create of Product Options and Option Values */
+        foreach ($productData->product_options ?? [] as $key => $productOption) {
+            $productOptionModel = ProductOption::find($productOption->id);
 
-            $newOptionModel = $this->createOrUpdateOption($optionModel, $product->id, $productOption->name);
+            if ($productOptionModel instanceof ProductOption) {
+                $productOptionModel->product_id = $product->id;
+                $productOptionModel->name = $productOption->name;
+                $productOptionModel->save();
+            } else {
+                $newProductOptionModel = ProductOption::create([
+                    'product_id' => $product->id,
+                    'name' => $productOption->name,
+                ]);
 
-            if ( ! $optionModel instanceof ProductOption) {
-                $mutableVariants = $this->searchAndChangeValue($productOption->id, $mutableVariants, $newOptionModel->id);
+                // Update product variant
+                $productData->product_variants = $this->searchAndChangeValue(
+                    $productOption->id,
+                    $productData->product_variants ?? [],
+                    $newProductOptionModel->id
+                );
 
-                $productOption = $productOption->withId($newOptionModel->id, $productOption);
+                $productOption = $productOption
+                    ->withId(
+                        $newProductOptionModel->id,
+                        $productOption
+                    );
             }
 
-            $mutableOptionValues = $productOption->productOptionValues;
+            // Process Update or Create of Product Option Value
+            foreach ($productOption->productOptionValues as $key2 => $productOptionValue) {
+                $productOptionValue = $productOptionValue->withOptionId($productOption->id, $productOptionValue);
+                $proxyOptionValueId = $productOptionValue->id;
 
-            // Create Or Update of Product Option Value
-            $collectedOptionValues = collect($mutableOptionValues)
-                ->map(function ($optionValue, $key2) use ($productOption, $mutableVariants) {
-                    $optionValue = $optionValue->withOptionId($productOption->id, $optionValue);
+                $optionValueModel = ProductOptionValue::find($productOptionValue->id);
 
-                    $proxyOptionValueId = $optionValue->id;
+                if ($optionValueModel instanceof ProductOptionValue) {
+                    $optionValueModel->name = $productOptionValue->name;
+                    $optionValueModel->product_option_id = $productOption->id;
+                    $optionValueModel->save();
+                } else {
+                    $newOptionValueModel = ProductOptionValue::create([
+                        'name' => $productOptionValue->name,
+                        'product_option_id' => $productOption->id,
+                    ]);
 
-                    $optionValueModel = ProductOptionValue::find($optionValue->id);
+                    $productOptionValue = $productOptionValue
+                        ->withId($newOptionValueModel->id, $productOptionValue);
 
-                    /** @var ProductOptionValue|null $optionValueModel */
-                    $newOptionValueModel = $this->createOrUpdateOptionValue(
-                        $optionValueModel,
-                        (int) $productOption->id,
-                        $optionValue->name
+                    $productData->product_variants = $this->searchAndChangeValue(
+                        $proxyOptionValueId,
+                        $productData->product_variants ?? [],
+                        $newOptionValueModel->id,
+                        'option_value_id'
                     );
+                }
 
-                    if ( ! $optionValueModel instanceof ProductOptionValue) {
-                        $optionValue = $optionValue->withId($newOptionValueModel->id, $optionValue);
+                $productOption->productOptionValues[$key2] = $productOptionValue;
+            }
 
-                        $mutableVariants = $this->searchAndChangeValue(
-                            $proxyOptionValueId,
-                            $mutableVariants,
-                            $newOptionValueModel->id,
-                            'option_value_id'
-                        );
-                    }
-
-                    return $optionValue;
-                })->toArray();
-
-            $productOption = $productOption->withProductOptionValues($collectedOptionValues, $productOption);
-
-            $mutableOptions[$key] = $productOption;
+            $productData->product_options[$key] = $productOption;
 
             $this->sanitizeOptions($productOption);
-        });
+        }
 
         $this->sanitizeOptions($productData, $product->id);
-
-        return $mutableVariants;
-    }
-
-    protected function createOrUpdateOption(
-        ProductOption|null $productOptionModel,
-        int $productId,
-        string $productOptionName,
-    ): ProductOption {
-
-        if ($productOptionModel instanceof ProductOption) {
-            $productOptionModel->product_id = $productId;
-            $productOptionModel->name = $productOptionName;
-
-            $productOptionModel->save();
-        } else {
-            $productOptionModel = ProductOption::create([
-                'product_id' => $productId,
-                'name' => $productOptionName,
-            ]);
-        }
-
-        return $productOptionModel;
-    }
-
-    protected function createOrUpdateOptionValue(
-        ?ProductOptionValue $optionValueModel = null,
-        int $productOptionId,
-        string $optionValueName
-    ): ProductOptionValue {
-
-        if ($optionValueModel instanceof ProductOptionValue) {
-            $optionValueModel->name = $optionValueName;
-            $optionValueModel->product_option_id = $productOptionId;
-
-            $optionValueModel->save();
-        } else {
-            $optionValueModel = ProductOptionValue::create([
-                'name' => $optionValueName,
-                'product_option_id' => $productOptionId,
-            ]);
-        }
-
-        return $optionValueModel;
     }
 
     protected function sanitizeOptions(ProductData|ProductOptionData $dtoData, ?int $productId = null): void
@@ -160,30 +126,24 @@ class UpdateProductOptionAction
         }
     }
 
-    protected function searchAndChangeValue(
-        string|int $needle,
-        array $haystack,
-        int $newValue,
-        string $field = 'option_id'
-    ): array {
+    protected function searchAndChangeValue(string|int $needle, array $haystack, int $newValue, string $field = 'option_id'): array
+    {
         return collect($haystack)->map(function ($variant) use ($needle, $newValue, $field) {
             /** @var array<int, \Domain\Product\DataTransferObjects\VariantCombinationData> $variantCombination */
             $variantCombination = $variant->combination;
-
-            $newCombinations = collect($variantCombination)
-                ->map(function ($combination) use ($needle, $newValue, $field) {
-                    if ($combination->{$field} == $needle) {
-                        if ($field == 'option_id') {
-                            return $combination->withOptionId($newValue, $combination);
-                        }
-
-                        if ($field == 'option_value_id') {
-                            return $combination->withOptionValueId($newValue, $combination);
-                        }
+            $newCombinations = collect($variantCombination)->map(function ($combination) use ($needle, $newValue, $field) {
+                if ($combination->{$field} == $needle) {
+                    if ($field == 'option_id') {
+                        return $combination->withOptionId($newValue, $combination);
                     }
 
-                    return $combination;
-                });
+                    if ($field == 'option_value_id') {
+                        return $combination->withOptionValueId($newValue, $combination);
+                    }
+                }
+
+                return $combination;
+            });
 
             return $variant->withCombination($newCombinations->toArray(), $variant);
         })->toArray();

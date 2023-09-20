@@ -216,8 +216,10 @@ class PageResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('title')
+                    ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('name')
-                    ->sortable()
+                    ->hidden()
                     ->searchable()
                     ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('activeRouteUrl.url')
