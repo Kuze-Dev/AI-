@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\ECommerce\PaypalGateway;
 use App\FilamentTenant\Pages\Settings\PaymentSettings;
 use Domain\PaymentMethod\Database\Factories\PaymentMethodFactory;
 use Domain\PaymentMethod\Models\PaymentMethod;
@@ -23,10 +24,13 @@ beforeEach(function () {
 
     testInTenantContext();
 
+    loginAsSuperAdmin();
+
+    tenancy()->tenant->features()->activate(PaypalGateway::class);
+
     $paymentMethod = PaymentMethodFactory::new()->createOne(['title' => 'Paypal']);
 
     app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new PaypalProvider());
-
 });
 
 it('Paypal payment Gateway must be instance of PaypalProvider  ', function () {
@@ -63,7 +67,7 @@ it('can generate payment authorization dto ', function () {
     $payment = PaymentFactory::new()->setPaymentMethod($paymentMethod->id)->create();
 
     $providerData = new ProviderData(
-        transactionData:  TransactionData::fromArray([
+        transactionData: TransactionData::fromArray([
             'reference_id' => '123',
             'amount' => AmountData::fromArray([
                 'currency' => $payment->currency,
@@ -118,5 +122,4 @@ it('can capture payment', function () {
     ]);
 
     assertInstanceOf(PaymentCapture::class, $result);
-
 });

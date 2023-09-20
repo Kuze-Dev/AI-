@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Pages\Settings;
 
 use App\Filament\Rules\FullyQualifiedDomainNameRule;
+use App\FilamentTenant\Support\Concerns\AuthorizeCMSSettings;
 use App\Settings\SiteSettings as ManageSiteSettings;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\FileUpload;
@@ -14,6 +15,8 @@ use Livewire\TemporaryUploadedFile;
 
 class SiteSettings extends TenantBaseSettings
 {
+    use AuthorizeCMSSettings;
+
     protected static string $settings = ManageSiteSettings::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
@@ -39,7 +42,7 @@ class SiteSettings extends TenantBaseSettings
                     ->maxSize(1_000)
                     ->required()
                     ->getUploadedFileNameForStorageUsing(static function (TemporaryUploadedFile $file) {
-                        return 'logo.'.$file->extension();
+                        return 'logo.' . $file->extension();
                     }),
                 FileUpload::make('favicon')
                     ->acceptedFileTypes(['image/ico', 'image/png', 'image/webp', 'image/jpg', 'image/jpeg'])
@@ -48,7 +51,7 @@ class SiteSettings extends TenantBaseSettings
                     ->maxSize(1_000)
                     ->required()
                     ->getUploadedFileNameForStorageUsing(static function (TemporaryUploadedFile $file) {
-                        return 'favicon.'.$file->extension();
+                        return 'favicon.' . $file->extension();
                     }),
                 TextInput::make('front_end_domain')
                     ->required()
@@ -58,5 +61,10 @@ class SiteSettings extends TenantBaseSettings
             ])
                 ->columns(2),
         ];
+    }
+
+    protected function afterSave(): void
+    {
+        cache()->flush();
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Order\Notifications;
 
+use App\Settings\OrderSettings;
 use App\Settings\SiteSettings;
 use Domain\Address\Models\Address;
 use Domain\Admin\Models\Admin;
@@ -25,6 +26,9 @@ class OrderPlacedMail extends Notification implements ShouldQueue
     private string $logo;
     private string $title;
     private string $description;
+    private string $from;
+    private array $replyTo;
+    private ?string $footer = null;
 
     /** Create a new notification instance. */
     public function __construct(Order $order, Address $shippingAddress, ShippingMethod $shippingMethod)
@@ -38,6 +42,13 @@ class OrderPlacedMail extends Notification implements ShouldQueue
         $this->logo = app(SiteSettings::class)->getLogoUrl();
         $this->title = app(SiteSettings::class)->name;
         $this->description = app(SiteSettings::class)->description;
+
+        $this->from = app(OrderSettings::class)->email_sender_name;
+
+        $sanitizedReplyToEmails = $this->sanitizeEmailArray(app(OrderSettings::class)->email_reply_to ?? []);
+        $this->replyTo = $sanitizedReplyToEmails;
+
+        $this->footer = app(OrderSettings::class)->email_footer;
     }
 
     /**
@@ -70,7 +81,8 @@ class OrderPlacedMail extends Notification implements ShouldQueue
 
         return (new MailMessage())
             ->subject('Order Being Placed')
-            ->from('tenantone@example.com')
+            ->replyTo($this->replyTo)
+            ->from($this->from)
             ->view('filament.emails.order.created', [
                 'logo' => $this->logo,
                 'title' => $this->title,
@@ -82,6 +94,7 @@ class OrderPlacedMail extends Notification implements ShouldQueue
                 'paymentMethod' => $this->order->payments->first() ?
                     $this->order->payments->first()->paymentMethod : null,
                 'shippingMethod' => $this->shippingMethod,
+                'footer' => $this->footer,
             ]);
     }
 
@@ -93,5 +106,20 @@ class OrderPlacedMail extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [];
+    }
+
+    private function sanitizeEmailArray(array $emailArray): array
+    {
+        $sanitizedEmails = [];
+
+        foreach ($emailArray as $email) {
+            $email = trim($email);
+
+            if ( ! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $sanitizedEmails[] = $email;
+            }
+        }
+
+        return $sanitizedEmails;
     }
 }

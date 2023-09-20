@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Features\ECommerce\ECommerceBase;
+use App\Features\Customer\AddressBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
@@ -17,7 +17,7 @@ class AddressPolicy
 
     public function before(?User $user, string $ability, mixed $address = null): ?Response
     {
-        if ( ! tenancy()->tenant?->features()->active(ECommerceBase::class)) {
+        if ( ! tenancy()->tenant?->features()->active(AddressBase::class)) {
             return Response::denyAsNotFound();
         }
 
