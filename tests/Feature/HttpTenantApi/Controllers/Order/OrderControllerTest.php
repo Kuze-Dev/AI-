@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Settings\OrderSettings;
 use Domain\Address\Database\Factories\AddressFactory;
 use Domain\Address\Database\Factories\CountryFactory;
 use Domain\Address\Enums\AddressLabelAs;
@@ -36,6 +37,8 @@ use function PHPUnit\Framework\assertInstanceOf;
 
 beforeEach(function () {
     testInTenantContext();
+
+    app(OrderSettings::class)->fill(['email_sender_name' => fake()->safeEmail()])->save();
 
     CurrencyFactory::new()->createOne([
         'code' => 'USD',

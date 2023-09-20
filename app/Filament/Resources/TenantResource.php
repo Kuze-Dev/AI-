@@ -130,6 +130,7 @@ class TenantResource extends Resource
                                     'label' => trans('Customer'),
                                     'extras' => [
                                         Features\Customer\TierBase::class => app(Features\Customer\TierBase::class)->label,
+                                        Features\Customer\AddressBase::class => app(Features\Customer\AddressBase::class)->label,
                                     ],
                                 ],
                             ]),

@@ -8,9 +8,12 @@ use App\Filament\Rules\FullyQualifiedDomainNameRule;
 use App\Settings\ECommerceSettings as SettingsECommerceSettings;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\TextInput;
+use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
 
 class ECommerceSettings extends TenantBaseSettings
 {
+    use AuthorizeEcommerceSettings;
+
     protected static string $settings = SettingsECommerceSettings::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
