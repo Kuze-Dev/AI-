@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\FilamentTenant\Resources\PageResource\Pages\CreatePage;
 use App\FilamentTenant\Resources\PageResource\Pages\EditPage;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
@@ -585,4 +586,92 @@ it('can edit page with media uploaded', function () {
     //     'data' => json_encode(['main' => ['header' => $second_image->hashName()]]),
     // ]);
 
+});
+
+it('can edit page with media uploaded inside repeater', function () {
+    $block = BlockFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'main'])
+                ->addMediaSchemaField([
+                    'title' => 'repeater',
+                    'type' => FieldType::REPEATER,
+                    'fields' => [
+                        [
+                            'title' => 'image',
+                            'type' => FieldType::MEDIA,
+                            'conversions' => [
+                                [
+                                    'name' => 'desktop',
+                                    'manipulations' => [
+                                        'width' => 200,
+                                        'height' => 200,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ])
+                ->createOne()
+        )
+        ->createOne();
+
+    Storage::fake('s3');
+    $file = UploadedFile::fake()->image('preview.jpeg');
+    Storage::disk('s3')->put('/', $file);
+
+    $page = livewire(CreatePage::class)
+        ->fillForm([
+            'name' => 'Test',
+            'block_contents' => [
+                [
+                    'block_id' => $block->getKey(),
+                    'data' => ['main' => ['repeater' => [['image' => [$file->hashName()][0]]]]],
+                ],
+            ],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+        ->record;
+
+    $block_content = $page->blockContents->first();
+    $schema = $block_content->block->blueprint->schema;
+
+    assertDatabaseHas(Media::class, [
+        'collection_name' => 'blueprint_media',
+        'generated_conversions' => json_encode([$schema->sections[0]->fields[0]->fields[0]->conversions[0]->name => true]),
+
+    ]);
+
+    Storage::fake('s3');
+
+    $file2 = UploadedFile::fake()->image('preview.jpeg');
+
+    Storage::disk('s3')->put('/', $file2);
+    $updatedPage = livewire(EditPage::class, ['record' => $page->getRouteKey()])
+        ->fillForm([
+            'name' => 'Test',
+            'block_contents' => [
+                [
+                    'block_id' => $block->getKey(),
+                    'data' => ['main' => ['repeater' => [['image' => [$file2->hashName()][0]]]]],
+                ],
+            ],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+    ->record;
+
+    assertDatabaseHas(Page::class, [
+        'name' => 'Test',
+        'published_at' => $updatedPage->published_at,
+    ]);
+
+    assertDatabaseHas(Media::class, [
+        'file_name' => $file2->hashName(),
+    ]);
 });

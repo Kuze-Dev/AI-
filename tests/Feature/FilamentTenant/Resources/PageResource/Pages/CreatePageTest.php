@@ -313,7 +313,6 @@ it('can create page with custom url', function () {
         'url' => '/some/custom/url',
         'is_override' => true,
     ]);
-
 });
 
 it('can create page with media uploaded', function () {
@@ -371,5 +370,67 @@ it('can create page with media uploaded', function () {
         'generated_conversions' => json_encode([$schema->sections[0]->fields[0]->conversions[0]->name => true]),
 
     ]);
+});
 
+it('can create page with media uploaded inside repeater', function () {
+    $block = BlockFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'main'])
+                ->addMediaSchemaField([
+                    'title' => 'repeater',
+                    'type' => FieldType::REPEATER,
+                    'fields' => [
+                        [
+                            'title' => 'image',
+                            'type' => FieldType::MEDIA,
+                            'conversions' => [
+                                [
+                                    'name' => 'desktop',
+                                    'manipulations' => [
+                                        'width' => 200,
+                                        'height' => 200,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ])
+                ->createOne()
+        )
+        ->createOne();
+    // Set up fake S3 storage
+
+    Storage::fake('s3');
+
+    // Create a fake file to upload
+    $file = UploadedFile::fake()->image('preview.jpeg');
+
+    // Perform the upload to S3
+    Storage::disk('s3')->put('/', $file);
+
+    $page = livewire(CreatePage::class)
+        ->fillForm([
+            'name' => 'Test',
+            'block_contents' => [
+                [
+                    'block_id' => $block->getKey(),
+                    'data' => ['main' => ['repeater' => [['image' => [$file->hashName()][0]]]]],
+                ],
+            ],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+        ->record;
+
+    $block_content = $page->blockContents->first();
+    $schema = $block_content->block->blueprint->schema;
+
+    assertDatabaseHas(Media::class, [
+        'collection_name' => 'blueprint_media',
+        'generated_conversions' => json_encode([$schema->sections[0]->fields[0]->fields[0]->conversions[0]->name => true]),
+
+    ]);
 });
