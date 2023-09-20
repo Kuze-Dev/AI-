@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Support;
+use App\Settings\OrderSettings;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Order\Models\Order;
 use Filament\Resources\Resource;
@@ -609,6 +610,22 @@ class OrderResource extends Resource
                     ->action(
                         function (array $data, $livewire) use ($record, $set) {
 
+                            $shouldSendEmail = $livewire->mountedFormComponentActionData['send_email'];
+                            $emailRemarks = $livewire->mountedFormComponentActionData['email_remarks'];
+
+                            if ($shouldSendEmail) {
+                                $fromEmail = app(OrderSettings::class)->email_sender_name;
+
+                                if (empty($fromEmail)) {
+                                    Notification::make()
+                                        ->title(trans('Email sender not found, please update your order settings.'))
+                                        ->warning()
+                                        ->send();
+
+                                    return;
+                                }
+                            }
+
                             $status = $data['status_options'];
                             $updateData = ['status' => $status];
 
@@ -632,7 +649,6 @@ class OrderResource extends Resource
                                 $payment->update([
                                     'status' => 'cancelled',
                                 ]);
-
                             }
 
                             $result = $record->update($updateData);
@@ -644,9 +660,6 @@ class OrderResource extends Resource
                                     ->success()
                                     ->send();
                             }
-
-                            $shouldSendEmail = $livewire->mountedFormComponentActionData['send_email'];
-                            $emailRemarks = $livewire->mountedFormComponentActionData['email_remarks'];
 
                             $customer = Customer::where('id', $record->customer_id)->first();
 

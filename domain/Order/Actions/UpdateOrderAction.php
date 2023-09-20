@@ -16,6 +16,11 @@ use Illuminate\Support\Facades\DB;
 
 class UpdateOrderAction
 {
+    public function __construct(
+        private readonly UpdateOrderPaymentAction $updateOrderPaymentAction,
+    ) {
+    }
+
     public function execute(
         Order $order,
         UpdateOrderData $updateOrderData
@@ -28,7 +33,7 @@ class UpdateOrderAction
                 $orderWithPayment = $order->load('payments');
 
                 if ($updateOrderData->status) {
-                    $order = app(UpdateOrderPaymentAction::class)->status(
+                    $order = $this->updateOrderPaymentAction->status(
                         $orderWithPayment,
                         $updateOrderData->status,
                         $updateOrderData->notes
@@ -49,7 +54,7 @@ class UpdateOrderAction
                     $updateOrderData->proof_of_payment !== null
                 ) {
                     try {
-                        app(UpdateOrderPaymentAction::class)->bankTransfer(
+                        $this->updateOrderPaymentAction->bankTransfer(
                             $orderWithPayment,
                             $updateOrderData->proof_of_payment,
                             $updateOrderData->notes
@@ -60,7 +65,7 @@ class UpdateOrderAction
                 } else {
                     if ($updateOrderData->type != 'status') {
                         try {
-                            return app(UpdateOrderPaymentAction::class)->withGateway(
+                            return $this->updateOrderPaymentAction->withGateway(
                                 $orderWithPayment,
                                 $updateOrderData->type
                             );

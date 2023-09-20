@@ -6,18 +6,22 @@ namespace Domain\Order\Actions;
 
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
-use Exception;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PlaceOrderAction
 {
-    public function execute(PlaceOrderData $placeOrderData): array|Exception|HttpException
+    public function __construct(
+        private readonly PrepareOrderAction $prepareOrderAction,
+        private readonly SplitOrderAction $splitOrderAction,
+    ) {
+    }
+
+    public function execute(PlaceOrderData $placeOrderData): array
     {
-        $payload = app(PrepareOrderAction::class)
+        $payload = $this->prepareOrderAction
             ->execute($placeOrderData);
 
         if ($payload instanceof PreparedOrderData) {
-            $result = app(SplitOrderAction::class)->execute($payload, $placeOrderData);
+            $result = $this->splitOrderAction->execute($payload, $placeOrderData);
 
             return $result;
         }

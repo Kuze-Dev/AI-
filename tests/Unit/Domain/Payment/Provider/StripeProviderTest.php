@@ -23,10 +23,11 @@ beforeEach(function () {
 
     testInTenantContext();
 
+    loginAsSuperAdmin();
+
     $paymentMethod = PaymentMethodFactory::new()->createOne(['title' => 'Stripe']);
 
     app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new StripeProvider());
-
 });
 
 it('Stripe payment Gateway must be instance of StripeProvider  ', function () {
@@ -63,7 +64,7 @@ it('can generate payment authorization dto ', function () {
     $payment = PaymentFactory::new()->setPaymentMethod($paymentMethod->id)->create();
 
     $providerData = new ProviderData(
-        transactionData:  TransactionData::fromArray([
+        transactionData: TransactionData::fromArray([
             'reference_id' => '123',
             'amount' => AmountData::fromArray([
                 'currency' => $payment->currency,
@@ -116,5 +117,4 @@ it('can capture payment', function () {
     ]);
 
     assertInstanceOf(PaymentCapture::class, $result);
-
 });
