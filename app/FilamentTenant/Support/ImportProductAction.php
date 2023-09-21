@@ -23,7 +23,7 @@ class ImportProductAction
             ->processRowsUsing(fn (array $row): Product => self::processProductUpload($row))
             ->withValidation(
                 rules: [
-                    'product_id' => 'required|unique:products|string|max:100',
+                    'product_id' => 'required|string|max:100',
                     'image_link' => 'nullable|string',
                     'name' => 'required|string|max:100',
                     'category' => 'required|string|max:100',
