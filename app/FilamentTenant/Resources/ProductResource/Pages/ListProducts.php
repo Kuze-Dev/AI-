@@ -46,6 +46,7 @@ class ListProducts extends ListRecords
                         $product->is_special_offer ? Decision::YES->value : Decision::NO->value,
                         $product->allow_customer_remarks ? Decision::YES->value : Decision::NO->value,
                         $product->allow_stocks ? Decision::YES->value : Decision::NO->value,
+                        $product->allow_guest_purchase ? Decision::YES->value : Decision::NO->value,
                         $product->weight,
                         $product->dimension,
                         $product->minimum_order_quantity,

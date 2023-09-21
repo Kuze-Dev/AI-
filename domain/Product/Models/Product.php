@@ -107,6 +107,7 @@ class Product extends Model implements HasMetaDataContract, HasMedia
         'is_special_offer',
         'allow_customer_remarks',
         'allow_stocks',
+        'allow_guest_purchase',
         'weight',
         'dimension',
         'minimum_order_quantity',
@@ -124,6 +125,7 @@ class Product extends Model implements HasMetaDataContract, HasMedia
         'is_special_offer' => 'boolean',
         'allow_customer_remarks' => 'boolean',
         'allow_stocks' => 'boolean',
+        'allow_guest_purchase' => 'boolean',
     ];
 
     /**

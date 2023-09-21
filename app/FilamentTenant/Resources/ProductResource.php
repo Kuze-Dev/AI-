@@ -230,6 +230,10 @@ class ProductResource extends Resource
                                     fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value))
                                 )
                                 ->helperText('This product will be hidden from all sales channels.'),
+                            Forms\Components\Toggle::make('allow_guest_purchase')
+                                ->helperText('Item can be purchased by guests.')
+                                ->default(false)
+                                ->columnSpan(2),
                         ]),
                     Forms\Components\Section::make('Associations')
                         ->translateLabel()
