@@ -16,6 +16,7 @@ use Support\MetaData\Models\MetaData;
 use Support\RouteUrl\Models\RouteUrl;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -25,7 +26,6 @@ beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
-
     LocaleFactory::createDefault();
 });
 
@@ -37,7 +37,15 @@ it('can render page', function () {
 
 it('can create page', function () {
     $block = BlockFactory::new()
-        ->withDummyBlueprint()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'main'])
+                ->addSchemaField([
+                    'title' => 'text',
+                    'type' => FieldType::TEXT,
+                ])
+                ->createOne()
+        )
         ->createOne();
 
     $page = livewire(CreatePage::class)
@@ -46,7 +54,7 @@ it('can create page', function () {
             'block_contents' => [
                 [
                     'block_id' => $block->getKey(),
-                    'data' => ['name' => 'foo'],
+                    'data' => ['main' => ['text' => 'foo']],
                 ],
             ],
             'visibility' => 'public',
@@ -84,7 +92,6 @@ it('can create page', function () {
         'is_override' => false,
     ]);
 });
-
 it('can not create page with same name', function () {
     $blockId = BlockFactory::new()
         ->withDummyBlueprint()
@@ -100,7 +107,7 @@ it('can not create page with same name', function () {
             'block_contents' => [
                 [
                     'block_id' => $blockId,
-                    'data' => ['name' => 'foo'],
+                    'data' => ['name' => 'foobaroo'],
                 ],
             ],
             'visibility' => 'public',
@@ -165,7 +172,15 @@ it('can clone page', function () {
 
 it('can create page with meta data', function () {
     $blockId = BlockFactory::new()
-        ->withDummyBlueprint()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'main'])
+                ->addSchemaField([
+                    'title' => 'text',
+                    'type' => FieldType::TEXT,
+                ])
+                ->createOne()
+        )
         ->createOne()
         ->getKey();
 
@@ -183,7 +198,7 @@ it('can create page with meta data', function () {
             'block_contents' => [
                 [
                     'block_id' => $blockId,
-                    'data' => ['name' => 'foo'],
+                    'data' => ['main' => ['text' => 'foo']],
                 ],
             ],
             'meta_data' => $metaData,
@@ -199,7 +214,7 @@ it('can create page with meta data', function () {
     assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
         'block_id' => $blockId,
-        'data' => json_encode(['name' => 'foo']),
+        'data' => json_encode($page->blockContents->first()->data),
     ]);
     assertDatabaseHas(
         MetaData::class,
@@ -219,7 +234,15 @@ it('can create page with meta data', function () {
 
 it('can create page with published at date', function () {
     $blockId = BlockFactory::new()
-        ->withDummyBlueprint()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'main'])
+                ->addSchemaField([
+                    'title' => 'text',
+                    'type' => FieldType::TEXT,
+                ])
+                ->createOne()
+        )
         ->createOne()
         ->getKey();
 
@@ -231,7 +254,7 @@ it('can create page with published at date', function () {
             'block_contents' => [
                 [
                     'block_id' => $blockId,
-                    'data' => ['name' => 'foo'],
+                    'data' => ['main' => ['text' => 'foo']],
                 ],
             ],
         ])
@@ -252,7 +275,15 @@ it('can create page with published at date', function () {
 
 it('can create page with custom url', function () {
     $blockId = BlockFactory::new()
-        ->withDummyBlueprint()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'section'])
+                ->addSchemaField([
+                    'title' => 'text',
+                    'type' => FieldType::TEXT,
+                ])
+                ->createOne()
+        )
         ->createOne()
         ->getKey();
 
@@ -266,7 +297,7 @@ it('can create page with custom url', function () {
             'block_contents' => [
                 [
                     'block_id' => $blockId,
-                    'data' => ['name' => 'foo'],
+                    'data' => ['section' => ['text' => 'foo']],
                 ],
             ],
         ])
@@ -281,5 +312,125 @@ it('can create page with custom url', function () {
         'model_id' => $page->getKey(),
         'url' => '/some/custom/url',
         'is_override' => true,
+    ]);
+});
+
+it('can create page with media uploaded', function () {
+    $block = BlockFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'main'])
+                ->addMediaSchemaField([
+                    'title' => 'image',
+                    'type' => FieldType::MEDIA,
+                    'conversions' => [
+                        [
+                            'name' => 'desktop',
+                            'manipulations' => [
+                                'width' => 200,
+                                'height' => 200,
+                            ],
+                        ],
+                    ],
+                ])
+                ->createOne()
+        )
+        ->createOne();
+    // Set up fake S3 storage
+
+    Storage::fake('s3');
+
+    // Create a fake file to upload
+    $file = UploadedFile::fake()->image('preview.jpeg');
+
+    // Perform the upload to S3
+    Storage::disk('s3')->put('/', $file);
+
+    $page = livewire(CreatePage::class)
+        ->fillForm([
+            'name' => 'Test',
+            'block_contents' => [
+                [
+                    'block_id' => $block->getKey(),
+                    'data' => ['main' => ['image' => [$file->hashName()][0]]],
+                ],
+            ],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+        ->record;
+
+    $block_content = $page->blockContents->first();
+    $schema = $block_content->block->blueprint->schema;
+
+    assertDatabaseHas(Media::class, [
+        'collection_name' => 'blueprint_media',
+        'generated_conversions' => json_encode([$schema->sections[0]->fields[0]->conversions[0]->name => true]),
+
+    ]);
+});
+
+it('can create page with media uploaded inside repeater', function () {
+    $block = BlockFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'main'])
+                ->addMediaSchemaField([
+                    'title' => 'repeater',
+                    'type' => FieldType::REPEATER,
+                    'fields' => [
+                        [
+                            'title' => 'image',
+                            'type' => FieldType::MEDIA,
+                            'conversions' => [
+                                [
+                                    'name' => 'desktop',
+                                    'manipulations' => [
+                                        'width' => 200,
+                                        'height' => 200,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ])
+                ->createOne()
+        )
+        ->createOne();
+    // Set up fake S3 storage
+
+    Storage::fake('s3');
+
+    // Create a fake file to upload
+    $file = UploadedFile::fake()->image('preview.jpeg');
+
+    // Perform the upload to S3
+    Storage::disk('s3')->put('/', $file);
+
+    $page = livewire(CreatePage::class)
+        ->fillForm([
+            'name' => 'Test',
+            'block_contents' => [
+                [
+                    'block_id' => $block->getKey(),
+                    'data' => ['main' => ['repeater' => [['image' => [$file->hashName()][0]]]]],
+                ],
+            ],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+        ->record;
+
+    $blockContent = $page->blockContents->first();
+    $schema = $blockContent->block->blueprint->schema;
+
+    assertDatabaseHas(Media::class, [
+        'collection_name' => 'blueprint_media',
+        'generated_conversions' => json_encode([$schema->sections[0]->fields[0]->fields[0]->conversions[0]->name => true]),
+
     ]);
 });
