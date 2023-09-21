@@ -620,8 +620,8 @@ it('can edit page with media uploaded inside repeater', function () {
         ->instance()
         ->record;
 
-    $block_content = $page->blockContents->first();
-    $schema = $block_content->block->blueprint->schema;
+    $blockContent = $page->blockContents->first();
+    $schema = $blockContent->block->blueprint->schema;
 
     assertDatabaseHas(Media::class, [
         'collection_name' => 'blueprint_media',
