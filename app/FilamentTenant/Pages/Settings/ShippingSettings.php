@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Pages\Settings;
 
+use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
 use App\Settings\ShippingSettings as SettingsShippingSettings;
 use Filament\Forms;
 
 class ShippingSettings extends TenantBaseSettings
 {
+    use AuthorizeEcommerceSettings;
+
     protected static string $settings = SettingsShippingSettings::class;
 
     protected static ?string $navigationIcon = 'heroicon-s-truck';
@@ -31,8 +34,8 @@ class ShippingSettings extends TenantBaseSettings
                             ->label(fn ($state) => trans('Usps (:value)', ['value' => $state ? 'Live' : 'Sandbox']))
                             ->helperText(
                                 trans(
-                                    'If the feature is activated, it is necessary to provide production keys. '.
-                                    'However, if the feature is deactivated, payment processing will occur in sandbox mode'
+                                    'If the feature is activated, it is necessary to provide production keys. ' .
+                                        'However, if the feature is deactivated, payment processing will occur in sandbox mode'
                                 )
                             )
                             ->reactive(),
@@ -53,8 +56,8 @@ class ShippingSettings extends TenantBaseSettings
                             ->label(fn ($state) => trans('Usps (:value)', ['value' => $state ? 'Live' : 'Sandbox']))
                             ->helperText(
                                 trans(
-                                    'If the feature is activated, it is necessary to provide production keys. '.
-                                    'However, if the feature is deactivated, payment processing will occur in sandbox mode'
+                                    'If the feature is activated, it is necessary to provide production keys. ' .
+                                        'However, if the feature is deactivated, payment processing will occur in sandbox mode'
                                 )
                             )
                             ->reactive(),

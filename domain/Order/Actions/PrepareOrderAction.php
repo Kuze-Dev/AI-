@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Order\Actions;
 
+use App\Settings\OrderSettings;
+use App\Settings\SiteSettings;
 use Domain\Address\Models\Address;
 use Domain\Cart\Models\CartLine;
 use Domain\Currency\Models\Currency;
@@ -11,12 +13,15 @@ use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
+use Domain\Order\Exceptions\OrderEmailSettingsException;
+use Domain\Order\Exceptions\OrderEmailSiteSettingsException;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Product\Models\ProductVariant;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Log;
@@ -26,6 +31,10 @@ class PrepareOrderAction
     public function execute(PlaceOrderData $placeOrderData): PreparedOrderData
     {
         $customer = auth()->user();
+
+        $this->prepareSiteSettings();
+
+        $this->prepareEmailSettings();
 
         $addresses = $this->prepareAddress($placeOrderData);
 
@@ -57,6 +66,24 @@ class PrepareOrderAction
         ];
 
         return PreparedOrderData::fromArray($orderData);
+    }
+
+    public function prepareEmailSettings(): void
+    {
+        $fromEmail = app(OrderSettings::class)->email_sender_name;
+
+        if (empty($fromEmail)) {
+            throw new OrderEmailSettingsException('No email sender found');
+        }
+    }
+
+    public function prepareSiteSettings(): void
+    {
+        try {
+            app(SiteSettings::class)->getLogoUrl();
+        } catch (Exception) {
+            throw new OrderEmailSiteSettingsException('No logo for site settings found');
+        }
     }
 
     public function prepareAddress(PlaceOrderData $placeOrderData): array
