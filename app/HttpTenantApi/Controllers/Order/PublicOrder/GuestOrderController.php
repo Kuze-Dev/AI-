@@ -32,12 +32,6 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 ]
 class GuestOrderController extends Controller
 {
-    public function __construct(
-        private readonly GuestPlaceOrderAction $guestPlaceOrderAction,
-        private readonly GuestUpdateOrderAction $guestUpdateOrderAction,
-    ) {
-    }
-
     public function index(Request $request): mixed
     {
         $sessionId = $request->bearerToken();
@@ -72,7 +66,7 @@ class GuestOrderController extends Controller
         $validatedData['session_id'] = $sessionId;
 
         try {
-            $result = $this->guestPlaceOrderAction
+            $result = app(GuestPlaceOrderAction::class)
                 ->execute(GuestPlaceOrderData::fromArray($validatedData));
 
             if ($result instanceof TransportException) {
@@ -154,7 +148,7 @@ class GuestOrderController extends Controller
 
         try {
             $dbResult = DB::transaction(function () use ($validatedData, $order) {
-                $result = $this->guestUpdateOrderAction
+                $result = app(GuestUpdateOrderAction::class)
                     ->execute($order, UpdateOrderData::fromArray($validatedData));
 
                 if ($result instanceof PaymentAuthorize) {

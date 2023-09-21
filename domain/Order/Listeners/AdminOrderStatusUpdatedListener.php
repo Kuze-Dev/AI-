@@ -29,6 +29,19 @@ class AdminOrderStatusUpdatedListener
     public function handle(AdminOrderStatusUpdatedEvent $event): void
     {
         $customer = $event->customer;
+        // $order = $event->order;
+
+        if ($customer) {
+            $this->notifyRegisteredCustomer($event);
+        } else {
+            $this->notifyGuestCustomer($event);
+        }
+    }
+
+    private function notifyRegisteredCustomer(AdminOrderStatusUpdatedEvent $event): void
+    {
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = $event->customer;
         $order = $event->order;
 
         switch ($event->status) {
@@ -81,6 +94,18 @@ class AdminOrderStatusUpdatedListener
         //comment when the env and mail is not set
         if ($event->shouldSendEmail) {
             $customer->notify(new AdminOrderStatusUpdatedMail($order, $event->status, $event->emailRemarks));
+        }
+    }
+
+    private function notifyGuestCustomer(AdminOrderStatusUpdatedEvent $event): void
+    {
+        $customerEmail = $event->order->customer_email;
+        $order = $event->order;
+
+        if ($event->shouldSendEmail) {
+            Notification::route('mail', $customerEmail)
+                ->notify(new AdminOrderStatusUpdatedMail($order, $event->status, $event->emailRemarks));
+            // $customer->notify(new AdminOrderStatusUpdatedMail($order, $event->status, $event->emailRemarks));
         }
     }
 }
