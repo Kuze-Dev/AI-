@@ -123,6 +123,7 @@ class TenantResource extends Resource
                                             Features\ECommerce\ShippingUsps::class => app(Features\ECommerce\ShippingUsps::class)->label,
                                             Features\ECommerce\ShippingUps::class => app(Features\ECommerce\ShippingUps::class)->label,
                                         ],
+                                        Features\ECommerce\GuestOrder::class => 'Allow Guest Orders',
                                         Features\ECommerce\RewardPoints::class => app(Features\ECommerce\RewardPoints::class)->label,
                                     ],
                                 ],

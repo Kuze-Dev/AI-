@@ -20,6 +20,7 @@ use Carbon\Carbon;
 use Closure;
 use Domain\Customer\Models\Customer;
 use Domain\Order\Enums\OrderStatuses;
+use Domain\Order\Enums\OrderUserType;
 use Domain\Order\Events\AdminOrderBankPaymentEvent;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
 use Filament\Notifications\Notification;
@@ -59,7 +60,13 @@ class OrderResource extends Resource
             ->schema([
                 Forms\Components\Group::make()
                     ->schema([
-                        Forms\Components\Section::make(trans('Customer'))
+                        Forms\Components\Section::make(function (Order $record) {
+                            if (tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\GuestOrder::class)) {
+                                return 'Customer';
+                            }
+
+                            return $record->customer_id ? 'Customer (Registered)' : 'Customer (Guest)';
+                        })
                             ->schema([
                                 Forms\Components\Grid::make(2)
                                     ->schema([
@@ -218,6 +225,16 @@ class OrderResource extends Resource
                     ->label(trans('Order ID'))
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('customer_id')
+                    ->hidden(function () {
+                        return ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\GuestOrder::class);
+                    })
+                    ->alignLeft()
+                    ->label(trans('Customer Type'))
+                    ->formatStateUsing(function (string|null $state) {
+                        return $state ? 'Registered'
+                            : 'Guest';
+                    }),
                 Tables\Columns\TextColumn::make('customer_name')
                     ->label(trans('Customer'))
                     ->sortable(query: function (Builder $query, string $direction): Builder {
@@ -347,6 +364,24 @@ class OrderResource extends Resource
                         OrderStatuses::FULFILLED->value => trans('Fulfilled'),
                     ])
                     ->attribute('status'),
+                Tables\Filters\SelectFilter::make('customer_id')->label(trans('Customer Type'))
+                    ->hidden(function () {
+                        return ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\GuestOrder::class);
+                    })
+                    ->options([
+                        OrderUserType::REGISTERED->value => trans('Registered'),
+                        OrderUserType::GUEST->value => trans('Guest'),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        $query->when(filled($data['value']), function (Builder $query) use ($data) {
+                            if ($data['value'] === OrderUserType::REGISTERED->value) {
+                                $query->whereNotNull('customer_id');
+
+                                return;
+                            }
+                            $query->whereNull('customer_id');
+                        });
+                    }),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkAction::make('export')
