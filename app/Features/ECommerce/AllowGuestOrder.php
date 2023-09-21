@@ -6,7 +6,7 @@ namespace App\Features\ECommerce;
 
 use Domain\Tenant\Models\Tenant;
 
-class GuestOrder
+class AllowGuestOrder
 {
     public string $name = 'ecommerce.guest-order';
 

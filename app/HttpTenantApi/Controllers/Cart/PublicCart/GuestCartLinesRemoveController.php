@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart\PublicCart;
 
+use App\Features\ECommerce\AllowGuestOrder;
 use Domain\Cart\Actions\BulkDestroyCartLineAction;
 use Domain\Cart\Requests\PublicCart\GuestBulkRemoveRequest;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 
+#[
+    Middleware(['feature.tenant:' . AllowGuestOrder::class])
+]
 class GuestCartLinesRemoveController
 {
     #[Post('/guest/carts/cartlines/bulk-remove', name: 'guest.carts.cartlines.bulk-remove')]

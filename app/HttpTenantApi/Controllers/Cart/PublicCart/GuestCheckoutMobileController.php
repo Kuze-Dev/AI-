@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart\PublicCart;
 
+use App\Features\ECommerce\AllowGuestOrder;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartLineResource;
 use Domain\Cart\Actions\PublicCart\GuestCartSummaryAction;
@@ -11,9 +12,13 @@ use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\Requests\PublicCart\GuestCartMobileSummaryRequest;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 use Throwable;
 
+#[
+    Middleware(['feature.tenant:' . AllowGuestOrder::class])
+]
 class GuestCheckoutMobileController extends Controller
 {
     // public function __construct(

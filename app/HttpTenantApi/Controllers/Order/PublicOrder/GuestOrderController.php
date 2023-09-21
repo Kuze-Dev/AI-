@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Order\PublicOrder;
 
+use App\Features\ECommerce\AllowGuestOrder;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\OrderResource;
 use Domain\Order\Actions\PublicOrder\GuestPlaceOrderAction;
@@ -25,10 +26,12 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 #[
     Resource('guest/orders', apiResource: true, except: 'destroy'),
+    Middleware(['feature.tenant:' . AllowGuestOrder::class])
 ]
 class GuestOrderController extends Controller
 {

@@ -61,7 +61,7 @@ class OrderResource extends Resource
                 Forms\Components\Group::make()
                     ->schema([
                         Forms\Components\Section::make(function (Order $record) {
-                            if (tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\GuestOrder::class)) {
+                            if (tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\AllowGuestOrder::class)) {
                                 return 'Customer';
                             }
 
@@ -227,7 +227,7 @@ class OrderResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('customer_id')
                     ->hidden(function () {
-                        return ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\GuestOrder::class);
+                        return ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\AllowGuestOrder::class);
                     })
                     ->alignLeft()
                     ->label(trans('Customer Type'))
@@ -366,7 +366,7 @@ class OrderResource extends Resource
                     ->attribute('status'),
                 Tables\Filters\SelectFilter::make('customer_id')->label(trans('Customer Type'))
                     ->hidden(function () {
-                        return ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\GuestOrder::class);
+                        return ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\AllowGuestOrder::class);
                     })
                     ->options([
                         OrderUserType::REGISTERED->value => trans('Registered'),

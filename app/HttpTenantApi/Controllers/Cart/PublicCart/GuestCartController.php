@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart\PublicCart;
 
+use App\Features\ECommerce\AllowGuestOrder;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartResource;
 use Domain\Cart\Actions\DestroyCartAction;
@@ -14,10 +15,12 @@ use Domain\Product\Models\ProductVariant;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
     Resource('guest/carts', apiResource: true, only: ['index', 'destroy'], names: 'guest.carts'),
+    Middleware(['feature.tenant:' . AllowGuestOrder::class])
 ]
 class GuestCartController extends Controller
 {

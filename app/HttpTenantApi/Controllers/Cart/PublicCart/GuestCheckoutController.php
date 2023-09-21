@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart\PublicCart;
 
+use App\Features\ECommerce\AllowGuestOrder;
 use App\HttpTenantApi\Resources\CartLineResource;
 use Domain\Cart\Actions\CheckoutAction;
 use Domain\Cart\DataTransferObjects\CheckoutData;
@@ -14,10 +15,12 @@ use Domain\Product\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
     Resource('guest/carts/checkouts', apiResource: true, only: ['index', 'store'], names: 'guest.carts.checkouts'),
+    Middleware(['feature.tenant:' . AllowGuestOrder::class])
 ]
 class GuestCheckoutController
 {

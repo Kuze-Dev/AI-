@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart\PublicCart;
 
+use App\Features\ECommerce\AllowGuestOrder;
 use Domain\Cart\Actions\UpdateCartLineAction;
 use Domain\Cart\DataTransferObjects\UpdateCartLineData;
 use Domain\Cart\DataTransferObjects\CreateCartData;
@@ -24,9 +25,11 @@ use Exception;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Spatie\MediaLibrary\Support\File;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
+use Spatie\RouteAttributes\Attributes\Middleware;
 
 #[
     Resource('guest/carts/cartlines', apiResource: true, except: ['show', 'index'], names: 'guest.carts.cartlines'),
+    Middleware(['feature.tenant:' . AllowGuestOrder::class])
 ]
 class GuestCartLinesController extends Controller
 {
