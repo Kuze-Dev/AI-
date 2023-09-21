@@ -18,6 +18,11 @@ use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 
 class CreateOrderLineAction
 {
+    public function __construct(
+        private readonly CartSummaryAction $cartSummaryAction
+    ) {
+    }
+
     public function execute(Order $order,  PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData): void
     {
         foreach ($preparedOrderData->cartLine as $cartLine) {
@@ -28,7 +33,7 @@ class CreateOrderLineAction
             /** @var \Domain\Address\Models\Country $country */
             $country = $state->country;
 
-            $summary = app(CartSummaryAction::class)->execute(
+            $summary = $this->cartSummaryAction->execute(
                 $cartLine,
                 new CartSummaryTaxData(
                     $country->id,

@@ -16,10 +16,10 @@ use Throwable;
 
 class GuestCheckoutMobileController extends Controller
 {
-    public function __construct(
-        private readonly GuestCartSummaryAction $guestCartSummaryAction,
-    ) {
-    }
+    // public function __construct(
+    //     private readonly GuestCartSummaryAction $guestCartSummaryAction,
+    // ) {
+    // }
 
     #[Post('guest/carts/mobile/summary', name: 'guest.carts.mobile.summary')]
     public function summary(GuestCartMobileSummaryRequest $request): mixed
@@ -53,7 +53,7 @@ class GuestCheckoutMobileController extends Controller
         $serviceId = $validated['service_id'] ?? null;
 
         try {
-            $summary = $this->guestCartSummaryAction->execute(
+            $summary = app(GuestCartSummaryAction::class)->execute(
                 $cartLines,
                 new CartSummaryTaxData($country?->id, $state?->id),
                 // new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),

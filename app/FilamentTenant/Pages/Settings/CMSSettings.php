@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Pages\Settings;
 
 use App\Filament\Rules\FullyQualifiedDomainNameRule;
+use App\FilamentTenant\Support\Concerns\AuthorizeCMSSettings;
 use App\FilamentTenant\Widgets\DeployStaticSite;
 use App\Settings\CMSSettings as SettingsCMSSettings;
 use Filament\Forms\Components\Card;
@@ -12,6 +13,8 @@ use Filament\Forms\Components\TextInput;
 
 class CMSSettings extends TenantBaseSettings
 {
+    use AuthorizeCMSSettings;
+
     protected static string $settings = SettingsCMSSettings::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';

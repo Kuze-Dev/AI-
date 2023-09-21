@@ -126,9 +126,16 @@ class TenantResource extends Resource
                                         Features\ECommerce\RewardPoints::class => app(Features\ECommerce\RewardPoints::class)->label,
                                     ],
                                 ],
+                                Features\Customer\CustomerBase::class => [
+                                    'label' => trans('Customer'),
+                                    'extras' => [
+                                        Features\Customer\TierBase::class => app(Features\Customer\TierBase::class)->label,
+                                        Features\Customer\AddressBase::class => app(Features\Customer\AddressBase::class)->label,
+                                    ],
+                                ],
                             ]),
                     ]),
-            ]);
+            ])->columns(2);
     }
 
     public static function table(Table $table): Table

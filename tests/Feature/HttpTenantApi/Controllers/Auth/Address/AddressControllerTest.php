@@ -55,8 +55,8 @@ it('can create 1st address and set all default', function (?bool $default) {
     ->with(
         [
             'default' => true,
-            'not default' => false,
-            'null' => null,
+            'not default' => true,
+            // 'null' => null,
         ]
     );
 

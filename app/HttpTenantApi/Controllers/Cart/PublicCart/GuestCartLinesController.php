@@ -30,15 +30,6 @@ use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 ]
 class GuestCartLinesController extends Controller
 {
-    public function __construct(
-        private readonly AuthorizeGuestCart $authorize,
-        private readonly GuestCreateCartAction $createCartAction,
-        private readonly CreateCartLineAction $createCartLineAction,
-        private readonly UpdateCartLineAction $updateCartLineAction,
-        private readonly DestroyCartLineAction $destroyCartLineAction
-    ) {
-    }
-
     public function store(CreateCartLineRequest $request): mixed
     {
         $validatedData = $request->validated();
@@ -46,7 +37,7 @@ class GuestCartLinesController extends Controller
 
         try {
             $dbResult = DB::transaction(function () use ($validatedData, $sessionId) {
-                $cart = $this->createCartAction->execute($sessionId);
+                $cart = app(GuestCreateCartAction::class)->execute($sessionId);
 
                 if ( ! $cart instanceof Cart) {
                     return response()->json([
@@ -54,7 +45,7 @@ class GuestCartLinesController extends Controller
                     ], 400);
                 }
 
-                $this->createCartLineAction
+                app(CreateCartLineAction::class)
                     ->execute($cart, CreateCartData::fromArray($validatedData));
 
                 return [
@@ -86,7 +77,7 @@ class GuestCartLinesController extends Controller
         $cartline->load('cart');
         $sessionId = $request->bearerToken();
 
-        $allowed = $this->authorize->execute($cartline, $sessionId);
+        $allowed = app(AuthorizeGuestCart::class)->execute($cartline, $sessionId);
 
         if ( ! $allowed) {
             abort(403);
@@ -96,7 +87,7 @@ class GuestCartLinesController extends Controller
 
         try {
             $dbResult = DB::transaction(function () use ($validatedData, $cartline) {
-                $result = $this->updateCartLineAction
+                $result = app(UpdateCartLineAction::class)
                     ->execute($cartline, UpdateCartLineData::fromArray($validatedData));
 
                 if ($result instanceof CartLine) {
@@ -131,13 +122,13 @@ class GuestCartLinesController extends Controller
         $cartline->load('cart');
         $sessionId = $request->bearerToken();
 
-        $allowed = $this->authorize->execute($cartline, $sessionId);
+        $allowed = app(AuthorizeGuestCart::class)->execute($cartline, $sessionId);
 
         if ( ! $allowed) {
             abort(403);
         }
 
-        $result = $this->destroyCartLineAction->execute($cartline);
+        $result = app(DestroyCartLineAction::class)->execute($cartline);
 
         if ( ! $result) {
             return response()->json([

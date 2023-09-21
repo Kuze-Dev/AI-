@@ -18,11 +18,19 @@ use Domain\Content\Actions\PublishedContentEntryDraftAction;
 use Domain\Content\Actions\UpdateContentEntryAction;
 use Filament\Notifications\Notification;
 use Domain\Content\Models\Content;
+use App\Settings\CMSSettings;
+use App\Settings\SiteSettings;
 use Filament\Pages\Actions;
+use Domain\Site\Models\Site;
 use Filament\Pages\Actions\Action;
+use Domain\Content\Models\ContentEntry;
+use Filament\Forms\Components\Radio;
 use Filament\Pages\Actions\DeleteAction;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use Livewire\Redirector;
+use Closure;
 
 /** @method class-string<\Illuminate\Database\Eloquent\Model> getModel()
  *
@@ -94,8 +102,8 @@ class EditContentEntry extends EditRecord
                     ->label(__('Save As Draft'))
                     ->action('overwriteDraft')
                     ->requiresConfirmation()
-                    ->modalHeading('you have existing draft')
-                    ->modalSubheading('You have existing draft for this page want to overwrite existing draft?')
+                    ->modalHeading('Draft for this content already exists')
+                    ->modalSubheading('You have an existing draft for this content. Do you want to overwrite the existing draft?')
                     ->modalCancelAction(function () {
                         return Action::makeModalAction('redirect')
                             ->label(__('Edit Existing Draft'))
@@ -119,6 +127,89 @@ class EditContentEntry extends EditRecord
             //     ->action('save')
             //     ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
+            'other_page_actions' => CustomPageActionGroup::make([
+                Action::make('preview')
+                    ->color('secondary')
+                    ->hidden((bool) tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                    ->label(__('Preview Page'))
+                    ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
+                        $domain = $siteSettings->front_end_domain ?? $cmsSettings->front_end_domain;
+
+                        if ( ! $domain) {
+                            return null;
+                        }
+
+                        $queryString = Str::after(URL::temporarySignedRoute('tenant.api.contents.entries.show', now()->addMinutes(15), [$this->ownerRecord, $this->record], false), '?');
+
+                        return "https://{$domain}/preview?contents={$this->ownerRecord->slug}&slug={$this->record->slug}&{$queryString}";
+                    }, true),
+                Action::make('preview_microsite_action')
+                    ->label('Preview Microsite')
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class))
+                    ->color('secondary')
+                    ->record($this->getRecord())
+                    ->modalHeading('Preview Microsite')
+                    ->slideOver(true)
+                    ->action(function (ContentEntry $record, Action $action, array $data): void {
+
+                        /** @var Site */
+                        $site = Site::find($data['preview_microsite']);
+
+                        if ($site->domain == null) {
+
+                            Notification::make()
+                                ->danger()
+                                ->title(trans('No Domain Set'))
+                                ->body(trans('Please set a domain for :value to preview.', ['value' => $site->name]))
+                                ->send();
+                        }
+                    })
+                    ->form([
+                        Radio::make('preview_microsite')
+                            ->required()
+                            ->options(function () {
+
+                                /** @var ContentEntry */
+                                $site = $this->getRecord();
+
+                                return $site->sites()->orderby('name')->pluck('name', 'id')->toArray();
+                            })
+                            ->descriptions(function () {
+
+                                /** @var ContentEntry */
+                                $site = $this->getRecord();
+
+                                return $site->sites()->orderby('name')->pluck('domain', 'id')->toArray();
+                            })
+                            ->reactive()
+                            ->afterStateUpdated(function (Closure $set, $state, $livewire) {
+
+                                /** @var Site */
+                                $site = Site::find($state);
+
+                                $domain = $site->domain;
+
+                                /** @var CustomPageActionGroup */
+                                $other_page_actions = $livewire->getCachedActions()['other_page_actions'];
+
+                                $modelAction = $other_page_actions->getActions()['preview_microsite_action'];
+
+                                $modelAction->modalSubmitAction(function () use ($domain) {
+
+                                    $queryString = Str::after(URL::temporarySignedRoute('tenant.api.contents.entries.show', now()->addMinutes(15), [$this->ownerRecord, $this->record], false), '?');
+
+                                    return Action::makeModalAction('preview')->url("https://{$domain}/preview?contents={$this->ownerRecord->slug}&slug={$this->record->slug}&{$queryString}", true);
+                                });
+
+                                $set('domain', $domain);
+                            }),
+
+                    ]),
+
+            ])->view('filament.pages.actions.custom-action-group.index')
+                ->setName('other_page_draft')
+                ->color('secondary')
+                ->label(trans('More Actions')),
         ];
     }
 

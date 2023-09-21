@@ -11,7 +11,6 @@ use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
-use Domain\Tier\Models\Tier;
 use Illuminate\Http\UploadedFile;
 
 final class CustomerData
@@ -36,7 +35,6 @@ final class CustomerData
     }
 
     public static function fromRegistrationRequest(
-        Tier $tier,
         CustomerRegisterRequest $request
     ): self {
         $validated = $request->validated();
@@ -50,11 +48,12 @@ final class CustomerData
             gender: Gender::from($validated['gender']),
             birth_date: now()->parse($validated['birth_date']),
             status: Status::ACTIVE,
-            tier_id: $tier->getKey(),
+            tier_id: (int) (isset($validated['tier_id']) ? $validated['tier_id'] : null),
             email: $validated['email'],
             password: $validated['password'],
             image: $validated['profile_image'] ?? null,
-            shipping_address_data: new AddressData(
+            shipping_address_data: isset($validated['shipping'])
+            ? new AddressData(
                 state_id: (int) $validated['shipping']['state_id'],
                 label_as: $validated['shipping']['label_as'],
                 address_line_1: $validated['shipping']['address_line_1'],
@@ -62,18 +61,17 @@ final class CustomerData
                 city: $validated['shipping']['city'],
                 is_default_shipping: true,
                 is_default_billing: $sameAsShipping,
-            ),
-            billing_address_data: $sameAsShipping
-                ? null
-                : new AddressData(
-                    state_id: (int) $validated['billing']['state_id'],
-                    label_as: $validated['billing']['label_as'],
-                    address_line_1: $validated['billing']['address_line_1'],
-                    zip_code: $validated['billing']['zip_code'],
-                    city: $validated['billing']['city'],
-                    is_default_shipping: false,
-                    is_default_billing: true,
-                ),
+            ) : null,
+            billing_address_data: ! $sameAsShipping && isset($validated['billing'])
+            ? new AddressData(
+                state_id: (int) $validated['billing']['state_id'],
+                label_as: $validated['billing']['label_as'],
+                address_line_1: $validated['billing']['address_line_1'],
+                zip_code: $validated['billing']['zip_code'],
+                city: $validated['billing']['city'],
+                is_default_shipping: false,
+                is_default_billing: true,
+            ) : null,
             email_verification_type: isset($validated['email_verification_type'])
                 ? EmailVerificationType::from($validated['email_verification_type'])
                 : EmailVerificationType::LINK,

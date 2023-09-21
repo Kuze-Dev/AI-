@@ -21,11 +21,6 @@ use Throwable;
 ]
 class CartSummaryController extends Controller
 {
-    public function __construct(
-        private readonly CartSummaryAction $cartSummaryAction,
-    ) {
-    }
-
     #[Get('carts/count', name: 'carts.count')]
     public function count(): mixed
     {
@@ -74,7 +69,7 @@ class CartSummaryController extends Controller
         $serviceId = $validated['service_id'] ?? null;
 
         try {
-            $summary = $this->cartSummaryAction->execute(
+            $summary = app(CartSummaryAction::class)->execute(
                 $cartLines,
                 new CartSummaryTaxData($country?->id, $state?->id),
                 new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),

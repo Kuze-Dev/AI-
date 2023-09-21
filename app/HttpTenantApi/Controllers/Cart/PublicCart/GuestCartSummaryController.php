@@ -19,11 +19,6 @@ use Throwable;
 
 class GuestCartSummaryController extends Controller
 {
-    public function __construct(
-        private readonly GuestCartSummaryAction $guestCartSummaryAction,
-    ) {
-    }
-
     #[Get('guest/carts/count', name: 'guest.carts.count')]
     public function count(Request $request): mixed
     {
@@ -81,7 +76,7 @@ class GuestCartSummaryController extends Controller
         $serviceId = $validated['service_id'] ?? null;
 
         try {
-            $summary = $this->guestCartSummaryAction->execute(
+            $summary = app(GuestCartSummaryAction::class)->execute(
                 $cartLines,
                 new CartSummaryTaxData($country?->id, $state?->id),
                 // new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),

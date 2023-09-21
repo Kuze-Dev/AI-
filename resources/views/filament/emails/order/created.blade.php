@@ -5,6 +5,7 @@
         padding-left: 16em;
         padding-right: 16em;
         font-size: medium;
+        font-family: 'Arial', 'Helvetica', 'Impact', 'Haettenschweiler', 'Arial Narrow Bold', sans-serif;
     }
 
     .header {
@@ -14,6 +15,7 @@
         justify-content: center;
         border-bottom: 1.3px solid #e5e7eb;
         padding-bottom: 1em;
+        font-family: 'Arial', 'Helvetica', 'Impact', 'Haettenschweiler', 'Arial Narrow Bold', sans-serif;
     }
 
     .header img {
@@ -84,6 +86,21 @@
         object-fit: cover
     }
 
+    .footer {
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        border-top: 1px solid #e5e7eb;
+        padding-top: 15px;
+    }
+
+    .footer p {
+        margin: 0;
+        padding: 0;
+    }
+
     @media (max-width: 1024px) and (min-width: 769px) {
         .main-container {
             padding-left: 8em;
@@ -146,7 +163,7 @@
     }
 </style>
 
-<div style="width: 100%; font-family: Arial, Helvetica, Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif">
+<div style="width: 100%;">
 
     <div class="header">
         @if ($logo)
@@ -172,7 +189,7 @@
         <p style="line-height: 1.5em">
             Thank you for placing an order with us! Your order number is
             #{{ $order->reference }}, and we received it on
-            {{ \Carbon\Carbon::parse($order->created_at)->timezone($timezone)->format('jS F Y \a\t h:i A') }}. You
+            {{ \Carbon\Carbon::parse($order->created_at)->timezone('UTC')->format('F d, Y g:i A') }} (UTC). You
             have
             chosen {{ $paymentMethod->title }} as your payment method. Our team is currently
             preparing your order, and we'll notify you once it's on the way. We
@@ -291,5 +308,12 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="footer">
+        @php
+            $htmlFooter = $footer;
+        @endphp
+        {!! $htmlFooter !!}
     </div>
 </div>

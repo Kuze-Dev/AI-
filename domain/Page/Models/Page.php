@@ -111,6 +111,12 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
         ];
     }
 
+    #create a titleAttribute for name field
+    public function getTitleAttribute(): string
+    {
+        return $this->draftable_id ? $this->name.' (Draft)' : $this->name;
+    }
+
     /** @return PageBuilder<self> */
     public function newEloquentBuilder($query): PageBuilder
     {
