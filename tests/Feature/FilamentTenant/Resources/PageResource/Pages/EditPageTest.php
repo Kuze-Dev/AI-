@@ -512,10 +512,8 @@ it('can published page draft', function () {
 it('can edit page with media uploaded', function () {
     Storage::fake('s3');
 
-    // Create a fake file to upload
     $firstImage = UploadedFile::fake()->image('preview-1.jpeg');
 
-    // Perform the upload to S3
     Storage::disk('s3')->put('/', $firstImage);
 
     $page1 = PageFactory::new()
@@ -603,8 +601,8 @@ it('can edit page with media uploaded inside repeater', function () {
         ->createOne();
 
     Storage::fake('s3');
-    $file = UploadedFile::fake()->image('preview.jpeg');
-    Storage::disk('s3')->put('/', $file);
+    $firstImage = UploadedFile::fake()->image('preview.jpeg');
+    Storage::disk('s3')->put('/', $firstImage);
 
     $page = livewire(CreatePage::class)
         ->fillForm([
@@ -612,7 +610,7 @@ it('can edit page with media uploaded inside repeater', function () {
             'block_contents' => [
                 [
                     'block_id' => $block->getKey(),
-                    'data' => ['main' => ['repeater' => [['image' => [$file->hashName()][0]]]]],
+                    'data' => ['main' => ['repeater' => [['image' => [$firstImage->hashName()][0]]]]],
                 ],
             ],
         ])
@@ -633,16 +631,16 @@ it('can edit page with media uploaded inside repeater', function () {
 
     Storage::fake('s3');
 
-    $file2 = UploadedFile::fake()->image('preview.jpeg');
+    $secondImage = UploadedFile::fake()->image('preview.jpeg');
 
-    Storage::disk('s3')->put('/', $file2);
+    Storage::disk('s3')->put('/', $secondImage);
     $updatedPage = livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
             'block_contents' => [
                 [
                     'block_id' => $block->getKey(),
-                    'data' => ['main' => ['repeater' => [['image' => [$file2->hashName()][0]]]]],
+                    'data' => ['main' => ['repeater' => [['image' => [$secondImage->hashName()][0]]]]],
                 ],
             ],
         ])
@@ -658,6 +656,6 @@ it('can edit page with media uploaded inside repeater', function () {
     ]);
 
     assertDatabaseHas(Media::class, [
-        'file_name' => $file2->hashName(),
+        'file_name' => $secondImage->hashName(),
     ]);
 });
