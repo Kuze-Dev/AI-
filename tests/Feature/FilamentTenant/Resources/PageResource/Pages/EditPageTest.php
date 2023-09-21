@@ -513,10 +513,10 @@ it('can edit page with media uploaded', function () {
     Storage::fake('s3');
 
     // Create a fake file to upload
-    $first_image = UploadedFile::fake()->image('preview-1.jpeg');
+    $firstImage = UploadedFile::fake()->image('preview-1.jpeg');
 
     // Perform the upload to S3
-    Storage::disk('s3')->put('/', $first_image);
+    Storage::disk('s3')->put('/', $firstImage);
 
     $page1 = PageFactory::new()
         ->addBlockContent(
@@ -540,7 +540,7 @@ it('can edit page with media uploaded', function () {
                             ]
                         )
                 ),
-            ['data' => ['main' => ['header' => [$first_image->hashName()]]]]
+            ['data' => ['main' => ['header' => [$firstImage->hashName()]]]]
         )
         ->has(MetaDataFactory::new([
             'title' => 'Foo title',
@@ -552,14 +552,14 @@ it('can edit page with media uploaded', function () {
             'visibility' => 'public',
         ]);
 
-    $second_image = UploadedFile::fake()->image('preview-2.jpeg');
-    Storage::disk('s3')->put('/', $second_image);
+    $secondImage = UploadedFile::fake()->image('preview-2.jpeg');
+    Storage::disk('s3')->put('/', $secondImage);
 
     $updatedPage = livewire(EditPage::class, ['record' => $page1->getRouteKey()])
         ->fillForm([
             'name' => 'Testxxx',
             'published_at' => true,
-            'block_contents.record-1.data.main.header' => [$second_image->hashName()],
+            'block_contents.record-1.data.main.header' => [$secondImage->hashName()],
         ])
         ->call('save')
         ->assertHasNoFormErrors()
@@ -571,20 +571,6 @@ it('can edit page with media uploaded', function () {
         'name' => 'Testxxx',
         'published_at' => $updatedPage->published_at,
     ]);
-
-    // $block_content = $page1->blockContents->first();
-    // $schema = $block_content->block->blueprint->schema;
-
-    // assertDatabaseHas(Media::class, [
-    //     'file_name' => $second_image->hashName(),
-    //     'collection_name' => 'blueprint_media',
-    // ]);
-
-    // assertDatabaseHas(BlockContent::class, [
-    //     'page_id' => $page1->id,
-    //     'block_id' => $page1->blockContents->first()->block_id,
-    //     'data' => json_encode(['main' => ['header' => $second_image->hashName()]]),
-    // ]);
 
 });
 
