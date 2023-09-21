@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Blueprint\Enums\FieldType;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\BlockContent;
@@ -22,7 +24,17 @@ it('can update page', function () {
     LocaleFactory::createDefault();
 
     $page = PageFactory::new()
-        ->addBlockContent(BlockFactory::new()->withDummyBlueprint())
+        ->addBlockContent(BlockFactory::new()
+            ->for(
+                BlueprintFactory::new()
+                    ->addSchemaSection(['title' => 'main'])
+                    ->addSchemaField([
+                        'title' => 'text',
+                        'type' => FieldType::TEXT,
+                    ])
+                    ->createOne()
+            )
+            ->createOne())
         ->createOne();
 
     $site = SiteFactory::new()
@@ -50,7 +62,7 @@ it('can update page', function () {
                 'block_contents' => [
                     [
                         'block_id' => $page->blockContents->first()->block_id,
-                        'data' => ['name' => 'foo'],
+                        'data' => ['main' => ['text' => 'foo']],
                     ],
                 ],
                 'meta_data' => [
@@ -67,7 +79,7 @@ it('can update page', function () {
     assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
         'block_id' => $page->blockContents->first()->block_id,
-        'data' => json_encode(['name' => 'foo']),
+        'data' => json_encode(['main' => ['text' => 'foo']]),
     ]);
     assertDatabaseHas(
         MetaData::class,

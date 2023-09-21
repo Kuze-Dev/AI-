@@ -193,4 +193,11 @@ it('can show field options', function (FieldType $fieldType, array $fieldOptions
             'max_length',
         ],
     ],
+    'media field' => [
+        'type' => FieldType::MEDIA,
+        'field_options' => [
+            'min_size',
+            'max_size',
+        ],
+    ],
 ]);
