@@ -28,10 +28,12 @@ class BlockContentResource extends JsonApiResource
         ];
     }
 
+    /** @return array<string, callable> */
     public function toRelationships(Request $request): array
     {
         return [
             'block' => fn () => BlockResource::make($this->block),
+            'blueprintData' => fn () => BlueprintDataResource::collection($this->blueprintData),
         ];
     }
 
