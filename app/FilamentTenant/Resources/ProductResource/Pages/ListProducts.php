@@ -6,22 +6,13 @@ namespace App\FilamentTenant\Resources\ProductResource\Pages;
 
 use App\FilamentTenant\Resources\ProductResource;
 use App\FilamentTenant\Support\ImportProductAction;
-use Domain\Product\Actions\CreateProductAction;
-use Domain\Product\Actions\UpdateProductAction;
-use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Enums\Decision;
 use Domain\Product\Enums\Status;
 use Domain\Product\Models\Product;
-use Domain\Taxonomy\Models\Taxonomy;
-use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Support\Excel\Actions\ExportAction;
-use Support\Excel\Actions\ImportAction;
 use Illuminate\Database\Eloquent\Builder;
-use Support\Common\Rules\MinimumValueRule;
-use Domain\Product\Models\ProductOption;
-use Illuminate\Validation\ValidationException;
 
 class ListProducts extends ListRecords
 {
@@ -30,7 +21,7 @@ class ListProducts extends ListRecords
     protected function getActions(): array
     {
         return [
-            ImportProductAction::processProducts(),
+            ImportProductAction::proceed(),
             ExportAction::make()
                 ->model(Product::class)
                 ->queue()
