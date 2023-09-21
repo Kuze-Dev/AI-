@@ -7,6 +7,7 @@ namespace Domain\Shipment\Actions;
 use Domain\Address\Models\Address;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxResponseData;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\Shipment\Enums\UnitEnum;
 use Domain\Shipment\Exceptions\ShippingException;
 use Domain\Shipment\Models\ShippingBox;
@@ -17,7 +18,7 @@ class GetBoxAction
 {
     public function execute(
         ShippingMethod $shippingMethod,
-        Address $address,
+        ShippingAddressData $addressDTO,
         BoxData $boxData
     ): BoxResponseData {
 
@@ -60,7 +61,7 @@ class GetBoxAction
 
         if (is_null($fit)) {
 
-            if ($shippingMethod->driver === Driver::USPS && $address->state->country->code != 'US') {
+            if ($shippingMethod->driver === Driver::USPS && $addressDTO->country->code != 'US') {
 
                 throw new ShippingException(' Unabled to ship products please choose other alternative shipping method');
             }

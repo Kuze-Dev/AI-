@@ -11,6 +11,7 @@ use Domain\Shipment\API\USPS\Contracts\RateResponse;
 use Domain\Shipment\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\DataTransferObjects\ParcelData;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 
 class GetShippingRateAction
@@ -23,7 +24,7 @@ class GetShippingRateAction
         Customer $customer,
         ParcelData $parcelData,
         ShippingMethod $shippingMethod,
-        Address $address
+        ShippingAddressData $address
     ): RateResponse {
 
         $shippingDriver = $this->shippingManager->driver($shippingMethod->driver->value);
@@ -45,14 +46,8 @@ class GetShippingRateAction
         );
     }
 
-    protected function isDomesticInUnitedStates(Address $address): bool
+    protected function isDomesticInUnitedStates(ShippingAddressData $address): bool
     {
-        $countryModel = Country::where([
-            'name' => 'United States', // TODO: handle this properly
-            'code' => 'US',
-        ])
-            ->firstorFail();
-
-        return $address->state->country->is($countryModel);
+        return $address->country->code == 'US';
     }
 }

@@ -15,6 +15,7 @@ use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\Actions\GetShippingRateAction;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 use Domain\Shipment\DataTransferObjects\ShipFromAddressData;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Support\Facades\Auth;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -55,9 +56,11 @@ class RateController extends Controller
 
             $subTotal = app(CartSummaryAction::class)->getSubTotal($cartLines);
 
+            $customerAddress = ShippingAddressData::fromAddressModel($address);
+
             $boxData = app(GetBoxAction::class)->execute(
                 $shippingMethod,
-                $address,
+                $customerAddress,
                 BoxData::fromArray($productlist)
             );
 
@@ -84,7 +87,7 @@ class RateController extends Controller
                             ),
                         ),
                         shippingMethod: $shippingMethod,
-                        address: $address
+                        address: $customerAddress
                     )->getRateResponseAPI()
             );
         } catch (Throwable $th) {
