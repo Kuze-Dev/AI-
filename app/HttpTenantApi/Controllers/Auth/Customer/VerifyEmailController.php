@@ -45,7 +45,6 @@ class VerifyEmailController extends Controller
 
         $baseUrl = app(ECommerceSettings::class)->domainWithScheme()
             ?? app(SiteSettings::class)->domainWithScheme();
-        // $baseUrl = app(SiteSettings::class)->domainWithScheme();
 
         return redirect($baseUrl.'/account/verify?'.$params);
     }
