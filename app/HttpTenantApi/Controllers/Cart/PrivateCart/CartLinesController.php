@@ -30,14 +30,6 @@ use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 ]
 class CartLinesController extends Controller
 {
-    public function __construct(
-        private readonly CreateCartAction $createCartAction,
-        private readonly CreateCartLineAction $createCartLineAction,
-        private readonly UpdateCartLineAction $updateCartLineAction,
-        private readonly DestroyCartLineAction $destroyCartLineAction
-    ) {
-    }
-
     public function store(CreateCartLineRequest $request): mixed
     {
         $validatedData = $request->validated();
@@ -47,7 +39,7 @@ class CartLinesController extends Controller
 
         try {
             $dbResult = DB::transaction(function () use ($validatedData, $customer) {
-                $cart = $this->createCartAction->execute($customer);
+                $cart = app(CreateCartAction::class)->execute($customer);
 
                 if ( ! $cart instanceof Cart) {
                     return response()->json([
@@ -55,7 +47,7 @@ class CartLinesController extends Controller
                     ], 400);
                 }
 
-                $this->createCartLineAction
+                app(CreateCartLineAction::class)
                     ->execute($cart, CreateCartData::fromArray($validatedData));
 
                 return [
@@ -89,7 +81,7 @@ class CartLinesController extends Controller
 
         try {
             $dbResult = DB::transaction(function () use ($validatedData, $cartline) {
-                $result = $this->updateCartLineAction
+                $result = app(UpdateCartLineAction::class)
                     ->execute($cartline, UpdateCartLineData::fromArray($validatedData));
 
                 if ($result instanceof CartLine) {
@@ -123,7 +115,7 @@ class CartLinesController extends Controller
     {
         $this->authorize('delete', $cartline);
 
-        $result = $this->destroyCartLineAction
+        $result = app(DestroyCartLineAction::class)
             ->execute($cartline);
 
         if ( ! $result) {

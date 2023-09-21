@@ -20,11 +20,6 @@ use Throwable;
 ]
 class CheckoutMobileController extends Controller
 {
-    public function __construct(
-        private readonly CartSummaryAction $cartSummaryAction,
-    ) {
-    }
-
     #[Get('carts/mobile/summary', name: 'carts.mobile.summary')]
     public function summary(CartMobileSummaryRequest $request): mixed
     {
@@ -54,7 +49,7 @@ class CheckoutMobileController extends Controller
         $serviceId = $validated['service_id'] ?? null;
 
         try {
-            $summary = $this->cartSummaryAction->execute(
+            $summary = app(CartSummaryAction::class)->execute(
                 $cartLines,
                 new CartSummaryTaxData($country?->id, $state?->id),
                 new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),

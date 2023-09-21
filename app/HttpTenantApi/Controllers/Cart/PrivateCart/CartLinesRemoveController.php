@@ -14,11 +14,6 @@ use Spatie\RouteAttributes\Attributes\Post;
 ]
 class CartLinesRemoveController
 {
-    public function __construct(
-        private readonly BulkDestroyCartLineAction $bulkDestroyCartLineAction,
-    ) {
-    }
-
     #[Post('carts/cartlines/bulk-remove', name: 'carts.cartlines.bulk-remove')]
     public function __invoke(BulkRemoveRequest $request): mixed
     {
@@ -26,7 +21,7 @@ class CartLinesRemoveController
 
         $cartLineIds = $validated['cart_line_ids'];
 
-        $result = $this->bulkDestroyCartLineAction
+        $result = app(BulkDestroyCartLineAction::class)
             ->execute($cartLineIds);
 
         if ( ! $result) {

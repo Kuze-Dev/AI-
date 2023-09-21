@@ -21,12 +21,6 @@ use Spatie\RouteAttributes\Attributes\Resource;
 ]
 class GuestCartController extends Controller
 {
-    public function __construct(
-        private readonly AuthorizeGuestCart $authorize,
-        private readonly DestroyCartAction $destroyCartAction,
-    ) {
-    }
-
     public function index(Request $request): mixed
     {
         $sessionId = $request->bearerToken();
@@ -65,13 +59,13 @@ class GuestCartController extends Controller
     {
         $sessionId = $request->bearerToken();
 
-        $allowed = $this->authorize->execute($cart, $sessionId);
+        $allowed = app(AuthorizeGuestCart::class)->execute($cart, $sessionId);
 
         if ( ! $allowed) {
             abort(403);
         }
 
-        $result = $this->destroyCartAction
+        $result = app(DestroyCartAction::class)
             ->execute($cart);
 
         if ( ! $result) {
