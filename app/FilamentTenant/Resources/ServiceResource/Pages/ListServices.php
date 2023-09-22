@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Resources\ServiceResource\Pages;
 
 use App\FilamentTenant\Resources\ServiceResource;

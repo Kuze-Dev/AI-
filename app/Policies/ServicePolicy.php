@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Features\Service\ServiceBase;
@@ -10,7 +12,6 @@ use Illuminate\Auth\Access\Response;
 
 class ServicePolicy
 {
-
     use ChecksWildcardPermissions;
 
     public function before(): ?Response

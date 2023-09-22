@@ -134,7 +134,7 @@ class AppServiceProvider extends ServiceProvider
             PaymentRefund::class,
             Locale::class,
             Site::class,
-            Service::class
+            Service::class,
         ]);
 
         Password::defaults(

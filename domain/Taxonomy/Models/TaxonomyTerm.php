@@ -109,9 +109,10 @@ class TaxonomyTerm extends Model implements Sortable
         return $this->belongsToMany(Product::class);
     }
 
+    /** @return BelongsToMany<Service> */
     public function services(): BelongsToMany
     {
-        return $this->belongsToMany(Service::class);
+        return $this->belongsToMany(Service::class, 'service_taxonomy_terms');
     }
 
     public function getRouteKeyName(): string

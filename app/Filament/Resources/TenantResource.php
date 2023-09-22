@@ -128,8 +128,8 @@ class TenantResource extends Resource
                                 ],
                                 Features\Service\ServiceBase::class => [
                                     'label' => trans('Service Management'),
-                                    'extras' => []
-                                ]
+                                    'extras' => [],
+                                ],
                             ]),
                     ]),
             ]);

@@ -1,25 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Resources\ServiceResource\Pages;
-use App\Filament\Resources\ServiceResource\RelationManagers;
 use App\FilamentTenant\Resources\ServiceResource\Pages\CreateService;
 use App\FilamentTenant\Resources\ServiceResource\Pages\EditService;
 use App\FilamentTenant\Resources\ServiceResource\Pages\ListServices;
 use App\FilamentTenant\Support\MetaDataForm;
+use App\FilamentTenant\Support\SchemaFormBuilder;
+use App\Settings\ServiceSettings;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
-use Domain\Service\Enums\Taxonomy as ServiceTaxonomy;
+use Domain\Blueprint\Models\Blueprint;
+use Domain\Service\Enums\Status;
 use Domain\Service\Models\Service;
-use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Forms;
-use Illuminate\Support\Arr;
 
 class ServiceResource extends Resource
 {
@@ -33,11 +34,8 @@ class ServiceResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $taxonomies = Taxonomy::with('taxonomyTerms')
-            ->whereIn(
-                'slug',
-                [ServiceTaxonomy::SERVICES->value]
-            )->get();
+        $categories = TaxonomyTerm::where('taxonomy_id', app(ServiceSettings::class)->service_category)->get();
+
         return $form
             ->schema([
                 Forms\Components\Group::make()
@@ -51,31 +49,38 @@ class ServiceResource extends Resource
                             Forms\Components\RichEditor::make('description')
                                 ->translateLabel()
                                 ->maxLength(255),
+                            Forms\Components\Select::make('blueprint_id')
+                                ->label(trans('Blueprint'))
+                                ->required()
+                                ->preload()
+                                ->optionsFromModel(Blueprint::class, 'name')
+                                ->disabled(fn (?Service $record) => $record !== null)
+                                ->reactive(),
+                            Forms\Components\Select::make('taxonomyTerms')
+                                ->statePath('taxonomy_term_id')
+                                ->label(trans('Service Category'))
+                                ->options(
+                                    $categories->sortBy('name')
+                                        ->mapWithKeys(fn ($categories) => [$categories->id => $categories->name])
+                                        ->toArray()
+                                )
+                                ->formatStateUsing(
+                                    fn (?Service $record) => $record?->taxonomyTerms->first()->id ?? null
+                                )
+                                ->required()
+                                ->when(fn () => ! empty($categories->toArray())),
+                            Forms\Components\FileUpload::make('images')
+                                ->translateLabel()
+                                ->mediaLibraryCollection('image')
+                                ->image()
+                                ->multiple(),
                         ]),
-                        Forms\Components\Section::make('Media')
+                        Forms\Components\Section::make('Service Price')
                             ->translateLabel()
                             ->schema([
-                                Forms\Components\FileUpload::make('images')
-                                    ->translateLabel()
-                                    ->mediaLibraryCollection('image')
-                                    ->image()
-                                    ->multiple()
-                                    ->required(),
-                                Forms\Components\FileUpload::make('videos')
-                                    ->translateLabel()
-                                    ->mediaLibraryCollection('video')
-                                    ->acceptedFileTypes([
-                                        'video/*',
-                                    ])
-                                    ->maxSize(25000),
-                            ]),
-                        Forms\Components\Section::make('Pricing')
-                            ->translateLabel()
-                            ->schema([
-
                                 Forms\Components\TextInput::make('price')
                                     ->translateLabel()
-                                    ->mask(fn(Forms\Components\TextInput\Mask $mask) => $mask->money(
+                                    ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
                                         prefix: '$',
                                         thousandsSeparator: ',',
                                         decimalPlaces: 2,
@@ -91,42 +96,18 @@ class ServiceResource extends Resource
                                             };
                                         },
                                     ])
-                                    ->dehydrateStateUsing(fn($state) => (float)$state)
+                                    ->dehydrateStateUsing(fn ($state) => (float) $state)
                                     ->required(),
                             ]),
-                        Forms\Components\Section::make('Associations')
-//                            ->translateLabel()
+                        Forms\Components\Section::make('Section Display')
+                            ->translateLabel()
                             ->schema([
-                                Forms\Components\Group::make()
-                                    ->schema([
-                                        Forms\Components\Group::make()
-                                            ->statePath('taxonomies')
-                                            ->schema(
-                                                fn() => $taxonomies->map(
-                                                    fn(Taxonomy $taxonomy) => Forms\Components\Select::make($taxonomy->name)
-                                                        ->statePath((string)$taxonomy->id)
-                                                        ->multiple(
-                                                            fn() => $taxonomy->slug === ServiceTaxonomy::SERVICES->value ? false : true
-                                                        )
-                                                        ->options(
-                                                            $taxonomy->taxonomyTerms->sortBy('name')
-                                                                ->mapWithKeys(fn(TaxonomyTerm $term) => [$term->id => $term->name])
-                                                                ->toArray()
-                                                        )
-                                                        ->formatStateUsing(
-                                                            fn(?Service $record) => $record?->taxonomyTerms->where('taxonomy_id', $taxonomy->id)
-                                                                ->pluck('id')
-                                                                ->toArray() ?? []
-                                                        )
-                                                        ->required()
-                                                )->toArray()
-                                            )
-                                            ->dehydrated(false),
-                                        Forms\Components\Hidden::make('taxonomy_terms')
-                                            ->dehydrateStateUsing(fn(Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
-                                    ])
-                                    ->when(fn() => !empty($taxonomies->toArray())),
-                            ]),
+                                Forms\Components\Toggle::make('is_special_offer')
+                                    ->label(trans('Special Offer')),
+                                Forms\Components\Toggle::make('is_featured')
+                                    ->label(trans('Featured Service')),
+                            ])
+                            ->columns(2),
                     ])->columnSpan(2),
                 Forms\Components\Group::make()->schema([
                     Forms\Components\Section::make('Status')
@@ -134,12 +115,20 @@ class ServiceResource extends Resource
                         ->schema([
                             Forms\Components\Toggle::make('status')
                                 ->label(
-                                    fn($state) => $state ? ucfirst(trans(\Domain\Service\Enums\Status::ACTIVE->value)) : ucfirst(trans(\Domain\Service\Enums\Status::INACTIVE->value))
-                                )
-//                                ->helperText('This product will be hidden from all sales channels.'),
+                                    fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value))
+                                ),
+                            Forms\Components\Toggle::make('is_subscription')
+                                ->label(trans('Subscription Based')),
                         ]),
                     MetaDataForm::make('Meta Data'),
                 ])->columnSpan(1),
+                Forms\Components\Section::make('Dynamic Form Builder')
+                    ->schema([
+                        SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)
+                            ->schemaData(fn (Closure $get) => Blueprint::query()->firstWhere('id', $get('blueprint_id'))?->schema),
+                    ])
+                    ->hidden(fn (Closure $get) => $get('blueprint_id') === null)
+                    ->columnSpan(2),
             ])
             ->columns(3);
     }
@@ -148,10 +137,10 @@ class ServiceResource extends Resource
     {
         return $table
             ->columns([
-                //
+
             ])
             ->filters([
-                //
+
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -164,7 +153,7 @@ class ServiceResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+
         ];
     }
 
