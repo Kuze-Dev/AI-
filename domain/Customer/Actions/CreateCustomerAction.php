@@ -85,6 +85,7 @@ class CreateCustomerAction
             'password' => $customerData->password,
             'email_verification_type' => $customerData->email_verification_type,
             'register_status' => $customerData->register_status,
+            'tier_approval_status' => $customerData->tier_approval_status,
         ]);
     }
 

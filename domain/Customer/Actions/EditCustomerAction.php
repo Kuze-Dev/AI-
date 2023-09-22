@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Customer\Actions;
 
 use Domain\Customer\DataTransferObjects\CustomerData;
+use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Models\Customer;
 use Support\Common\Actions\SyncMediaCollectionAction;
 use Support\Common\DataTransferObjects\MediaCollectionData;
@@ -16,7 +17,7 @@ class EditCustomerAction
     {
     }
 
-    public function execute(Customer $customer, CustomerData $customerData): Customer
+    public function execute(Customer $customer, CustomerData $customerData): mixed
     {
         $customer->update(array_filter([
             'tier_id' => $customerData->tier_id,
@@ -28,6 +29,8 @@ class EditCustomerAction
             'gender' => $customerData->gender,
             'birth_date' => $customerData->birth_date,
             'password' => $customerData->password,
+            'tier_approval_status' => $customerData->tier_approval_status,
+            'register_status' => $customerData->register_status,
         ]));
 
         if ($customerData->image !== null) {
@@ -44,6 +47,9 @@ class EditCustomerAction
                 ->save();
 
             $customer->sendEmailVerificationNotification();
+        }
+        if($customer->register_status == RegisterStatus::REJECTED) {
+            app(SendRejectedEmailAction::class)->execute($customer);
         }
 
         return $customer;

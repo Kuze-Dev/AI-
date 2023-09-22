@@ -9,4 +9,5 @@ enum RegisterStatus: string
     case UNREGISTERED = 'unregistered';
     case INVITED = 'invited';
     case REGISTERED = 'registered';
+    case REJECTED = 'rejected';
 }

@@ -46,6 +46,11 @@ class Tier extends Model
     protected $fillable = [
         'name',
         'description',
+        'has_approval',
+    ];
+
+    protected $casts = [
+        'has_approval' => 'boolean',
     ];
 
     public function getActivitylogOptions(): LogOptions

@@ -52,6 +52,7 @@ class TierResource extends Resource
                         ->translateLabel()
                         ->required()
                         ->string(),
+                    Forms\Components\Toggle::make('has_approval'),
                 ]),
             ]);
     }
