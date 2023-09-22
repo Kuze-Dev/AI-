@@ -14,7 +14,7 @@ use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\Actions\GetShippingRateAction;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
-use Domain\Shipment\DataTransferObjects\ShipFromAddressData;
+// use Domain\Shipment\DataTransferObjects\ShipFromAddressData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Support\Facades\Auth;
@@ -77,7 +77,7 @@ class RateController extends Controller
                             width: (string) $boxData->width,
                             length: (string) $boxData->length,
                             boxData: $boxData->boxData,
-                            ship_from_address: new ShipFromAddressData(
+                            ship_from_address: new ShippingAddressData(
                                 address: $shippingMethod->shipper_address,
                                 city: $shippingMethod->shipper_city,
                                 state: $shippingMethod->state,

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\Actions;
 
-use Domain\Address\Models\Address;
-use Domain\Address\Models\Country;
 use Domain\Customer\Models\Customer;
 use Domain\Shipment\API\USPS\Contracts\RateResponse;
 use Domain\Shipment\DataTransferObjects\AddressValidateRequestData;
