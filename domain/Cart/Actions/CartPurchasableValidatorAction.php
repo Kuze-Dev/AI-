@@ -35,10 +35,16 @@ class CartPurchasableValidatorAction
 
         // $this->validateMinimumQuantity($product, $quantity, $cartLine);
 
+        if ($type === CartUserType::GUEST) {
+            //purchasable by guest
+            $this->validatePurchasableByGuest($product);
+        }
+
         //stock control
         if ( ! $product->allow_stocks) {
             return;
         }
+
         $this->validateStockControl($product,  $quantity, $cartLine);
     }
 
@@ -73,6 +79,11 @@ class CartPurchasableValidatorAction
         $product = $productVariant->product;
 
         // $this->validateMinimumQuantity($product, $quantity, $cartLine);
+
+        if ($type === CartUserType::GUEST) {
+            //purchasable by guest
+            $this->validatePurchasableByGuest($product);
+        }
 
         //stock control
         if ( ! $product->allow_stocks) {
@@ -129,6 +140,11 @@ class CartPurchasableValidatorAction
 
                 $this->validateMinimumQuantity($product, 0, $cartLine);
 
+                if ($type === CartUserType::GUEST) {
+                    //purchasable by guest
+                    $this->validatePurchasableByGuest($product);
+                }
+
                 if ( ! $product->allow_stocks) {
                     $count++;
                 } else {
@@ -148,6 +164,11 @@ class CartPurchasableValidatorAction
                 $this->validatePurchasable($product);
 
                 $this->validateMinimumQuantity($product, 0, $cartLine);
+
+                if ($type === CartUserType::GUEST) {
+                    //purchasable by guest
+                    $this->validatePurchasableByGuest($product);
+                }
 
                 if (
                     ! $product->allow_stocks
@@ -213,5 +234,12 @@ class CartPurchasableValidatorAction
             })
             ->whereNull('checked_out_at')
             ->count();
+    }
+
+    public function validatePurchasableByGuest(Product $product): void
+    {
+        if ( ! $product->allow_guest_purchase) {
+            throw new InvalidPurchasableException("This product can't be purchased by guests.");
+        }
     }
 }
