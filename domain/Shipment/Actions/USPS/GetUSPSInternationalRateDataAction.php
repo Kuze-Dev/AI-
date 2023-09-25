@@ -11,6 +11,7 @@ use Domain\Shipment\API\USPS\DataTransferObjects\InternationalResponse\IntlRateV
 use Domain\Shipment\API\USPS\DataTransferObjects\Ratev2InternationalRequestData;
 use Domain\Shipment\API\USPS\Enums\MailType;
 use Domain\Shipment\DataTransferObjects\ParcelData;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Illuminate\Support\Carbon;
 
 class GetUSPSInternationalRateDataAction
@@ -23,7 +24,7 @@ class GetUSPSInternationalRateDataAction
     public function execute(
         Customer $customer,
         ParcelData $parcelData,
-        Address $address
+        ShippingAddressData $address
     ): IntlRateV2ResponseData {
 
         $dto = new Ratev2InternationalRequestData(
@@ -31,13 +32,13 @@ class GetUSPSInternationalRateDataAction
             Ounces: (string) $parcelData->ounces,
             MailType: MailType::PACKAGE,
             ValueOfContents: (string) $parcelData->parcel_value,
-            Country: (string) $address->state->country->name,
+            Country: (string) $address->country->name,
             Width: (string) $parcelData->width,
             Length: (string) $parcelData->length,
             Height: (string) $parcelData->height,
             OriginZip: (string) $parcelData->zip_origin,
             AcceptanceDateTime: (string) Carbon::now()->addDays(2)->setTime(13, 15, 0)->isoFormat('YYYY-MM-DDTHH:mm:ssZ'),
-            DestinationPostalCode: (string) $address->zip_code
+            DestinationPostalCode: (string) $address->zipcode
         );
 
         return $this->rateClient->getInternationalVersion2($dto);
