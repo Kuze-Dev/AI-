@@ -9,10 +9,20 @@ use Domain\Page\Models\Page;
 
 class DeletePageAction
 {
+    public function __construct(
+        protected DeleteBlockContentAction $deleteBlockContentAction,
+    ) {
+    }
+
     public function execute(Page $page): ?bool
     {
         if ($page->isHomePage()) {
             throw new CantDeleteHomePageException();
+        }
+
+        $blockContent = $page->blockContents->first();
+        if ($blockContent) {
+            $this->deleteBlockContentAction->execute($blockContent);
         }
 
         return $page->delete();

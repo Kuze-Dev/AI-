@@ -17,9 +17,10 @@ use Support\Excel\Actions\ImportAction;
 
 class ImportProductAction
 {
-    public static function processProducts(): ImportAction
+    public static function proceed(): ImportAction
     {
-        return ImportAction::make()->processRowsUsing(fn (array $row): Product => self::processProductRows($row))
+        return ImportAction::make()
+            ->processRowsUsing(fn (array $row): Product => self::processProductUpload($row))
             ->withValidation(
                 rules: [
                     'product_id' => 'required|string|max:100',
@@ -39,7 +40,7 @@ class ImportProductAction
             );
     }
 
-    public static function processProductRows(array $row): Product
+    public static function processProductUpload(array $row): Product
     {
         // Validate that the product has a maximum of 2 options
         self::validateIncomingProductOptions($row);

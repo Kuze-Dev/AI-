@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Domain\Page\Models;
 
+use Domain\Blueprint\Models\BlueprintData;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 
@@ -53,6 +55,12 @@ class BlockContent extends Model implements Sortable
     public function block(): BelongsTo
     {
         return $this->belongsTo(Block::class);
+    }
+
+    /** @return MorphMany<BlueprintData> */
+    public function blueprintData(): MorphMany
+    {
+        return $this->morphMany(BlueprintData::class,  'model');
     }
 
     /** @return Builder<BlockContent> */

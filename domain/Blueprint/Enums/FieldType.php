@@ -8,6 +8,7 @@ use Domain\Blueprint\DataTransferObjects\CheckBoxFieldData;
 use Domain\Blueprint\DataTransferObjects\DatetimeFieldData;
 use Domain\Blueprint\DataTransferObjects\FileFieldData;
 use Domain\Blueprint\DataTransferObjects\MarkdownFieldData;
+use Domain\Blueprint\DataTransferObjects\MediaFieldData;
 use Domain\Blueprint\DataTransferObjects\RadioFieldData;
 use Domain\Blueprint\DataTransferObjects\RelatedResourceFieldData;
 use Domain\Blueprint\DataTransferObjects\RepeaterFieldData;
@@ -34,6 +35,7 @@ enum FieldType: string
     case TOGGLE = 'toggle';
     case RELATED_RESOURCE = 'related_resource';
     case REPEATER = 'repeater';
+    case MEDIA = 'media';
     case CHECKBOX = 'checkbox';
     case RADIO = 'radio';
 
@@ -55,6 +57,7 @@ enum FieldType: string
             self::TOGGLE => ToggleFieldData::class,
             self::RELATED_RESOURCE => RelatedResourceFieldData::class,
             self::REPEATER => RepeaterFieldData::class,
+            self::MEDIA => MediaFieldData::class,
             self::CHECKBOX => CheckBoxFieldData::class,
             self::RADIO => RadioFieldData::class,
         };
