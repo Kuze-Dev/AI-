@@ -35,6 +35,7 @@ class ProductController
                     'is_special_offer',
                     'is_featured',
                     'status',
+                    'allow_guest_purchase',
                     AllowedFilter::callback(
                         'taxonomies',
                         function (ProductBuilder $query, array $value) {

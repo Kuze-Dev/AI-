@@ -12,6 +12,14 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class FavoriteResource extends JsonApiResource
 {
+    public function toAttributes(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'product_id' => $this->product_id,
+        ];
+    }
+
     /** @return array<string, callable> */
     public function toRelationships(Request $request): array
     {

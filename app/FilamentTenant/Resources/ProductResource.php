@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\ProductResource\Pages\EditProduct;
+use App\FilamentTenant\Resources\ProductResource\RelationManagers\TiersRelationManager;
 use App\FilamentTenant\Resources\ReviewResource\RelationManagers\ReviewRelationManager;
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\ProductOption as ProductOptionSupport;
@@ -230,6 +231,10 @@ class ProductResource extends Resource
                                     fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value))
                                 )
                                 ->helperText('This product will be hidden from all sales channels.'),
+                            Forms\Components\Toggle::make('allow_guest_purchase')
+                                ->helperText('Item can be purchased by guests.')
+                                ->default(false)
+                                ->columnSpan(2),
                         ]),
                     Forms\Components\Section::make('Associations')
                         ->translateLabel()
@@ -358,6 +363,7 @@ class ProductResource extends Resource
         return [
             ReviewRelationManager::class,
             ActivitiesRelationManager::class,
+            TiersRelationManager::class,
         ];
     }
 

@@ -30,6 +30,7 @@ class ProductFactory extends Factory
             'is_special_offer' => $this->faker->boolean(),
             'allow_customer_remarks' => $this->faker->boolean(),
             'allow_stocks' => $this->faker->boolean(),
+            'allow_guest_purchase' => $this->faker->boolean(),
             'weight' => $this->faker->numberBetween(0, 100),
             'dimension' => [
                 'length' => $this->faker->numberBetween(0, 100),
