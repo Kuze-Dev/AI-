@@ -15,6 +15,7 @@ use Domain\Cart\Models\CartLine;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Product\Database\Factories\ProductFactory;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\Shipment\Drivers\StorePickupDriver;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use Laravel\Sanctum\Sanctum;
@@ -93,7 +94,7 @@ it('can get shipping fee', function () {
     $shippingTotal = app(CartSummaryAction::class)->getShippingFee(
         $this->cartLines,
         $this->customer,
-        $this->address,
+        ShippingAddressData::fromAddressModel($this->address),
         $this->shippingMethod,
         null,
     );
