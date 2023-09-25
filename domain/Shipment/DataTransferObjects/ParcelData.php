@@ -9,7 +9,7 @@ use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 class ParcelData
 {
     public function __construct(
-        public readonly ShipFromAddressData $ship_from_address,
+        public readonly ShippingAddressData $ship_from_address,
         public readonly string $pounds,
         public readonly string $ounces,
         public readonly string $zip_origin,

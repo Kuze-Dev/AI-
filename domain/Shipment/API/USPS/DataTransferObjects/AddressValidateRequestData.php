@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Shipment\API\USPS\DataTransferObjects;
 
 use Domain\Address\Models\Address;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 
 class AddressValidateRequestData
 {
@@ -26,6 +27,18 @@ class AddressValidateRequestData
             City: $address->city,
             State: $address->state->name,
             Zip5: $address->zip_code,
+            Zip4: '',
+        );
+    }
+
+    public static function fromShippingDataDTO(ShippingAddressData $addressDTO): self
+    {
+        return new self(
+            Address1: '',
+            Address2: $addressDTO->address,
+            City: $addressDTO->city,
+            State: $addressDTO->state->name,
+            Zip5: $addressDTO->zipcode,
             Zip4: '',
         );
     }
