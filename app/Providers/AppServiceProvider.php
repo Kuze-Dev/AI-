@@ -11,6 +11,7 @@ use Domain\Currency\Models\Currency;
 use Domain\Address\Models\Address;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Blueprint\Models\BlueprintData;
 use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
@@ -31,6 +32,7 @@ use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderAddress;
 use Domain\Order\Models\OrderLine;
 use Domain\Page\Models\Block;
+use Domain\Page\Models\BlockContent;
 use Domain\Review\Models\Review;
 use Domain\Service\Models\Service;
 use Domain\Taxation\Models\TaxZone;
@@ -103,6 +105,8 @@ class AppServiceProvider extends ServiceProvider
             ContentEntry::class,
             Globals::class,
             MetaData::class,
+            BlockContent::class,
+            BlueprintData::class,
             Discount::class,
             DiscountRequirement::class,
             DiscountCondition::class,
@@ -173,5 +177,6 @@ class AppServiceProvider extends ServiceProvider
 
         Feature::discover('App\\Features\\CMS', app_path('Features/CMS'));
         Feature::discover('App\\Features\\ECommerce', app_path('Features/ECommerce'));
+        Feature::discover('App\\Features\\Customer', app_path('Features/Customer'));
     }
 }

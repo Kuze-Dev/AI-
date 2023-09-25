@@ -22,6 +22,7 @@ class CustomerResource extends JsonApiResource
             'mobile' => $this->mobile,
             'gender' => $this->gender,
             'status' => $this->status,
+            'tier_id' => $this->tier_id,
             'birth_date' => $this->birth_date?->toDateString(),
             'is_verified' => $this->hasVerifiedEmail(),
         ];

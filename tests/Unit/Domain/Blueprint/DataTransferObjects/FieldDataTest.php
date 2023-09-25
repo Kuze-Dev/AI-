@@ -149,4 +149,14 @@ it('can parse array to SchemaData', function (FieldType $type, array $data) {
             'rules' => ['required'],
         ],
     ],
+    'media field' => [
+        'type' => FieldType::MEDIA,
+        'data' => [
+            'title' => 'Foo',
+            'type' => 'media',
+            'rules' => ['required'],
+            'min_size' => 1,
+            'max_size' => 100,
+        ],
+    ],
 ]);

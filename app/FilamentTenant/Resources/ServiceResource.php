@@ -57,7 +57,6 @@ class ServiceResource extends Resource
                                 ->disabled(fn (?Service $record) => $record !== null)
                                 ->reactive(),
                             Forms\Components\Select::make('taxonomyTerms')
-                                ->statePath('taxonomy_term_id')
                                 ->label(trans('Service Category'))
                                 ->options(
                                     $categories->sortBy('name')
@@ -67,6 +66,7 @@ class ServiceResource extends Resource
                                 ->formatStateUsing(
                                     fn (?Service $record) => $record?->taxonomyTerms->first()->id ?? null
                                 )
+                                ->statePath('taxonomy_term_id')
                                 ->required()
                                 ->when(fn () => ! empty($categories->toArray())),
                             Forms\Components\FileUpload::make('images')
