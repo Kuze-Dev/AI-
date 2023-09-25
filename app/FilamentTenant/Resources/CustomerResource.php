@@ -130,22 +130,28 @@ class CustomerResource extends Resource
                             TierApprovalStatus::REJECTED->value => 'Rejected',
                         ])
                         ->hidden(function ($record, $context) {
+                            /** @var \Domain\Tier\Models\Tier $wholesaler_domestic */
                             $wholesaler_domestic = Tier::whereName(config('domain.tier.wholesaler-domestic'))->first();
+
+                            /** @var \Domain\Tier\Models\Tier $wholesaler_international */
                             $wholesaler_international = Tier::whereName(config('domain.tier.wholesaler-international'))->first();
+
                             /** @var \Domain\Tier\Models\Tier $tier */
                             $tier = Tier::whereName(config('domain.tier.default'))->first();
 
-                            if($record?->tier_approval_status === TierApprovalStatus::APPROVED || $record?->tier_id == $tier->getKey() || $context == 'create') {
+                            if($context == 'create') {
                                 return true;
                             }
 
-                            if ($record?->tier_id === $wholesaler_domestic->getKey() && $wholesaler_domestic->has_approval == 1) {
+                            if ($record && ($record->tier_approval_status === TierApprovalStatus::APPROVED || $record->tier_id == ($tier->getKey() ?? null))) {
+                                return true;
+                            }
 
+                            if (($record ?? null) && ($record->tier_id === ($wholesaler_domestic?->getKey() ?? null) && ($wholesaler_domestic?->has_approval ?? null) == 1)) {
                                 return false;
                             }
 
-                            if ($record?->tier_id === $wholesaler_international->getKey() && $wholesaler_international->has_approval == 1) {
-
+                            if (($record ?? null) && ($record->tier_id === ($wholesaler_international?->getKey() ?? null) && ($wholesaler_international?->has_approval ?? null) == 1)) {
                                 return false;
                             }
 
@@ -399,7 +405,7 @@ class CustomerResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->translateLabel()
-                    ->hidden(fn (Customer $record) => $record?->tier_approval_status == TierApprovalStatus::REJECTED ? true : false),
+                    ->hidden(fn (?Customer $record) => $record?->tier_approval_status == TierApprovalStatus::REJECTED ? true : false),
                 Tables\Actions\DeleteAction::make()
                     ->translateLabel()
                     ->using(function (Customer $record) {
@@ -410,7 +416,7 @@ class CustomerResource extends Resource
                         }
                     })
                     ->button()
-                    ->hidden(fn (Customer $record) => $record?->tier_approval_status == TierApprovalStatus::REJECTED ? false : true),
+                    ->hidden(fn (?Customer $record) => $record?->tier_approval_status == TierApprovalStatus::REJECTED ? false : true),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('send-register-invitation')
                         ->label(fn (Customer $record) => match ($record->register_status) {

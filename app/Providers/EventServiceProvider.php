@@ -6,8 +6,6 @@ namespace App\Providers;
 
 use Domain\Cart\Events\SanitizeCartEvent;
 use Domain\Cart\Listeners\SanitizeCartListener;
-use Domain\Customer\Events\TierRejected;
-use Domain\Customer\Listeners\DeleteRejectedCustomerListener;
 use Domain\Order\Events\AdminOrderBankPaymentEvent;
 use Domain\Order\Events\OrderPlacedEvent;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
@@ -50,9 +48,6 @@ class EventServiceProvider extends ServiceProvider
         ],
         SanitizeCartEvent::class => [
             SanitizeCartListener::class,
-        ],
-        TierRejected::class => [
-            DeleteRejectedCustomerListener::class,
         ],
     ];
 
