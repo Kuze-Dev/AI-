@@ -7,37 +7,87 @@ namespace App\FilamentTenant\Resources\ProductResource\RelationManagers;
 use Domain\Tier\Models\Tier;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
-use Filament\Tables;
 use Exception;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables;
+use Filament\Tables\Contracts\HasRelationshipTable;
+use Illuminate\Database\Eloquent\Model;
 
 class TiersRelationManager extends RelationManager
 {
     protected static string $relationship = 'tiers';
     protected static ?string $inverseRelationship = 'products';
     protected static ?string $recordTitleAttribute = 'name';
+    protected static ?string $title = 'Tier Discounts';
 
     /** @throws Exception */
     public static function table(Table $table): Table
     {
+        $tiers = Tier::all();
+
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('name')
+                    ->translateLabel(),
+                Tables\Columns\TextColumn::make('discount')
+                    ->translateLabel()
+                    ->formatStateUsing(fn (string $state) => floatval($state)),
+
             ])
             ->headerActions([
-                Tables\Actions\AssociateAction::make()
-                    ->recordSelectSearchColumns(['name']),
+                Tables\Actions\AttachAction::make()
+                    ->label(trans('Attach Tier Discount'))
+                    ->modalHeading(trans('Attach Tier Discount'))
+                    ->form(fn (Tables\Actions\AttachAction $action): array => [
+                        $action->getRecordSelect()
+                            ->translateLabel(),
+                        TextInput::make('discount')
+                            ->label(trans('Discount (%)'))
+                            ->mask(
+                                fn (TextInput\Mask $mask) => $mask
+                                    ->numeric()
+                                    ->decimalPlaces(3)
+                                    ->decimalSeparator('.')
+                                    ->minValue(0)
+                                    ->maxValue(100)
+                            )
+                            ->required(),
+                    ])
+                    ->preloadRecordSelect()
+                    ->recordSelectSearchColumns(['id', 'name'])
+                    ->using(function (HasRelationshipTable $livewire, array $data): Model|null {
+                        /** @phpstan-ignore-next-line */
+                        return $livewire->getRelationship()
+                            ->attach(
+                                $data['recordId'],
+                                ['discount' => $data['discount']]
+                            );
+                    }),
             ])
             ->actions([
-                Tables\Actions\DissociateAction::make()
-                    ->after(function ($record) {
+                Tables\Actions\EditAction::make()
+                    ->translateLabel()
+                    ->form(fn (): array => [
+                        TextInput::make('discount')
+                            ->label(trans('Discount (%)'))
+                            ->mask(
+                                fn (TextInput\Mask $mask) => $mask
+                                    ->numeric()
+                                    ->decimalPlaces(3)
+                                    ->decimalSeparator('.')
+                                    ->minValue(0)
+                                    ->maxValue(100)
+                            )
+                            ->required(),
+                    ])
+                    ->using(function (Model $record, array $data): Model {
+                        /** @phpstan-ignore-next-line */
+                        $record->products()->update($data);
 
-                        /** @var \Domain\Tier\Models\Tier $tier */
-                        $tier = Tier::whereName(config('domain.tier.default'))->first();
-
-                        $record->update([
-                            'tier_id' => $tier->getKey(),
-                        ]);
+                        return $record;
                     }),
+                Tables\Actions\DetachAction::make()
+                    ->label(trans('Detach Discount')),
             ]);
     }
 }
