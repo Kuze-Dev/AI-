@@ -30,16 +30,23 @@ class CreateBlueprintDataAction
             'type' => $blueprintDataData->type,
         ]);
 
-        if ($blueprintDataData->type == FieldType::MEDIA && $blueprintData->value) {
-            // dd($blueprintData->value);
+        $filtered = [];
+        if (is_array($blueprintDataData->value)) {
+            $filtered = array_filter($blueprintDataData->value, function ($value) {
+                $pathInfo = pathinfo($value);
+                if (isset($pathInfo['extension']) && $pathInfo['extension'] !== '') {
+                    return $value;
+                }
+            });
+        }
+
+        if ($blueprintDataData->type == FieldType::MEDIA && $blueprintData->value && ! empty($filtered)) {
             if (is_array($blueprintDataData->value)) {
                 foreach ($blueprintDataData->value as $value) {
-
                     $blueprintData->addMediaFromDisk($value, 's3')
                         ->toMediaCollection('blueprint_media');
                 }
             } else {
-
                 $blueprintData->addMediaFromDisk($blueprintData->value, 's3')
                     ->toMediaCollection('blueprint_media');
             }
@@ -73,16 +80,15 @@ class CreateBlueprintDataAction
                 $combinedArray[$sectionKey][$fieldKey] = $this->extractDataAction->mergeFields($fieldValue, $model->data[$sectionKey][$fieldKey], $fieldValue['statepath']);
             }
         }
-        foreach($combinedArray as $section) {
-            foreach($section as $field) {
+        foreach ($combinedArray as $section) {
+            foreach ($section as $field) {
                 $data[] = $this->extractDataAction->processRepeaterField($field);
             }
         }
         $flattenData = $this->extractDataAction->flattenArray($data);
 
-        foreach($flattenData as $arrayData) {
+        foreach ($flattenData as $arrayData) {
             $this->storeBlueprintData(BlueprintDataData::fromArray($model, $arrayData));
         }
-
     }
 }
