@@ -37,11 +37,11 @@ class GuestCartSummaryRequest extends AddressRequest
                 },
             ],
             'billing_address' => [
-                'required',
+                'nullable',
                 parent::rules(),
             ],
             'shipping_address' => [
-                'required',
+                'nullable',
                 parent::rules(),
             ],
             'shipping_method_id' => [
@@ -80,7 +80,11 @@ class GuestCartSummaryRequest extends AddressRequest
     /** @return \Domain\Address\Models\Country|null */
     public function getCountry(): ?Country
     {
-        if ($id = $this->validated('billing_address')['country_id']) {
+        if (
+            $this->validated('billing_address')
+        ) {
+            $id = $this->validated('billing_address')['country_id'];
+
             /** @var \Domain\Address\Models\Country $country */
             $country = app(Country::class)->where((new Country())->getRouteKeyName(), $id)->first();
 
@@ -92,8 +96,9 @@ class GuestCartSummaryRequest extends AddressRequest
 
     public function getState(): ?State
     {
-        if ($id = $this->validated('billing_address')['state_id']) {
+        if ($this->validated('billing_address')) {
 
+            $id = $this->validated('billing_address')['state_id'];
             /** @var \Domain\Address\Models\State $state */
             $state = app(State::class)->where((new State())->getRouteKeyName(), $id)->first();
 
