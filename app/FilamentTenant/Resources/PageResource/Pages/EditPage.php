@@ -9,6 +9,7 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\PageResource;
 use App\Settings\CMSSettings;
 use App\Settings\SiteSettings;
+use Domain\Page\Actions\DeletePageAction;
 use Closure;
 use Domain\Page\Actions\CreatePageDraftAction;
 use Domain\Page\Actions\PublishedPageDraftAction;
@@ -27,6 +28,7 @@ use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions\Action;
 use Illuminate\Support\Facades\URL;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Illuminate\Http\RedirectResponse;
 use Livewire\Redirector;
 
@@ -87,6 +89,13 @@ class EditPage extends EditRecord
                 ->view('filament.pages.actions.custom-action-group.index')
                 ->setName('page_draft_actions')
                 ->label(__('filament::resources/pages/edit-record.form.actions.save.label')),
+            Actions\DeleteAction::make()->using(function (Page $record) {
+                try {
+                    return app(DeletePageAction::class)->execute($record);
+                } catch (DeleteRestrictedException $e) {
+                    return false;
+                }
+            }),
             Actions\DeleteAction::make(),
             'other_page_actions' => CustomPageActionGroup::make([
                 Action::make('preview')
@@ -207,7 +216,6 @@ class EditPage extends EditRecord
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-
         return DB::transaction(fn () => app(UpdatePageAction::class)->execute($record, PageData::fromArray($data)));
     }
 

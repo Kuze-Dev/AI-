@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Domain\Site\Traits\Sites;
 use Spatie\Sluggable\HasSlug;
 use Domain\Admin\Models\Admin;
+use Domain\Blueprint\Models\BlueprintData;
 use Spatie\Sluggable\SlugOptions;
 use Support\MetaData\HasMetaData;
 use Support\RouteUrl\HasRouteUrl;
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
@@ -144,6 +146,12 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
     public function content(): BelongsTo
     {
         return $this->belongsTo(Content::class);
+    }
+
+    /** @return MorphMany<BlueprintData> */
+    public function blueprintData(): MorphMany
+    {
+        return $this->morphMany(BlueprintData::class,  'model');
     }
 
     /**

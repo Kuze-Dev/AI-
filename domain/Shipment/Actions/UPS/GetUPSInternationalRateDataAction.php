@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\Actions\UPS;
 
-use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
 use Domain\Shipment\API\UPS\Clients\UPSRateClient;
 use Domain\Shipment\API\UPS\DataTransferObjects\UpsResponse;
 use Domain\Shipment\DataTransferObjects\ParcelData;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 
 class GetUPSInternationalRateDataAction
 {
@@ -20,7 +20,7 @@ class GetUPSInternationalRateDataAction
     public function execute(
         Customer $customer,
         ParcelData $parcelData,
-        Address $address
+        ShippingAddressData $address
     ): UpsResponse {
 
         return $this->rateClient->getInternationalRate(
