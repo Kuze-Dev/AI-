@@ -18,6 +18,7 @@ use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 
@@ -70,6 +71,7 @@ class EditBlueprint extends EditRecord
                 }
             }
         }
+        Artisan::call('media-library:regenerate');
 
         $this->afterSaveOverride();
 
