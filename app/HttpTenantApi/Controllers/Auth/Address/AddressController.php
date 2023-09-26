@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Address;
 
+use App\Features\Customer\AddressBase;
 use App\Features\Customer\CustomerBase;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Requests\Auth\Address\AddressRequest;
@@ -24,7 +25,7 @@ use Throwable;
 
 #[
     Resource('addresses', apiResource: true),
-    Middleware(['auth:sanctum', 'feature.tenant:' . CustomerBase::class])
+    Middleware(['auth:sanctum', 'feature.tenant:' . AddressBase::class])
 ]
 class AddressController extends Controller
 {
@@ -66,7 +67,7 @@ class AddressController extends Controller
     /** @throws Throwable */
     public function update(AddressRequest $request, Address $address): AddressResource
     {
-        $this->authorize('update', $address);
+        // $this->authorize('update', $address);
 
         $address = DB::transaction(
             fn () => app(UpdateAddressAction::class)
@@ -79,7 +80,7 @@ class AddressController extends Controller
     /** @throws Throwable */
     public function destroy(Address $address): Response
     {
-        $this->authorize('delete', $address);
+        // $this->authorize('delete', $address);
 
         try {
             DB::transaction(

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Features\Customer\AddressBase;
+use App\Features\Customer\CustomerBase;
 use Domain\Address\Database\Factories\AddressFactory;
 use Domain\Address\Database\Factories\StateFactory;
 use Domain\Address\Models\Address;
@@ -118,14 +119,11 @@ it('can create then replace new default', function () {
 
 it('can edit address', function () {
 
-    tenancy()->tenant->features()->activate(AddressBase::class);
-
     Address::truncate();
 
     $state = StateFactory::new()->createOne();
     $address = AddressFactory::new()
         ->createOne([
-            // 'country_id' => $state->country->code,
             'state_id' => $state->getKey(),
             'address_line_1' => 'old-address',
             'city' => 'old-city',
