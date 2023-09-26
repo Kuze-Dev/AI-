@@ -11,7 +11,10 @@ use Domain\Order\Actions\PublicOrder\GuestPlaceOrderAction;
 use Domain\Order\Actions\PublicOrder\GuestUpdateOrderAction;
 use Domain\Order\DataTransferObjects\GuestPlaceOrderData;
 use Domain\Order\DataTransferObjects\UpdateOrderData;
+use Domain\Order\Exceptions\OrderEmailSettingsException;
+use Domain\Order\Exceptions\OrderEmailSiteSettingsException;
 use Domain\Order\Models\Order;
+use Domain\Order\Notifications\OrderFailedNotifyAdmin;
 use Domain\Order\Requests\PublicOrder\GuestPlaceOrderRequest;
 use Domain\Order\Requests\UpdateOrderRequest;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
@@ -69,50 +72,62 @@ class GuestOrderController extends Controller
         $validatedData['session_id'] = $sessionId;
 
         try {
-            $result = app(GuestPlaceOrderAction::class)
-                ->execute(GuestPlaceOrderData::fromArray($validatedData));
+            $result = DB::transaction(function () use ($validatedData) {
+                $order = app(GuestPlaceOrderAction::class)
+                    ->execute(GuestPlaceOrderData::fromArray($validatedData));
 
-            if ($result instanceof TransportException) {
-                return response()->json([
-                    'mail' => 'Something wrong with mailer',
-                ], 404);
-            }
+                if (is_array($order) && $order['order'] instanceof Order) {
 
-            if ($result instanceof USPSServiceNotFoundException) {
-                return response()->json([
-                    'service_id' => 'Shipping method service id is required',
-                ], 404);
-            }
-
-            if ($result instanceof PaymentException) {
-                return response()->json([
-                    'payment' => 'Invalid Payment Credentials',
-                ], 404);
-            }
-
-            if ($result instanceof HttpException) {
-                return response()->json([
-                    'message' => $result->getMessage(),
-                ], 422);
-            }
-
-            if (is_array($result) && $result['order'] instanceof Order) {
-                return response()
-                    ->json([
+                    return [
                         'message' => 'Order placed successfully',
-                        'data' => $result,
-                    ]);
-            }
+                        'data' => $order,
+                    ];
+                }
+            });
+
+            return response()->json($result);
+        } catch (TransportException) {
+            return response()->json([
+                'mail' => 'Something wrong with mailer',
+            ], 404);
+        } catch (USPSServiceNotFoundException) {
+            return response()->json([
+                'service_id' => 'Shipping method service id is required',
+            ], 404);
+        } catch (PaymentException) {
+            app(OrderFailedNotifyAdmin::class)->execute('This error is occurring due to an issue with the payment credentials on your website.
+            Please ensure that your payment settings are configured correctly.', 'ecommerceSettings.payments');
 
             return response()->json([
-                'message' => 'Order failed to be created',
-            ], 400);
+                'payment' => 'Invalid Payment Credentials',
+            ], 404);
+        } catch (OrderEmailSettingsException $e) {
+            app(OrderFailedNotifyAdmin::class)->execute('This error is occurring due to an issue with the email sender on your website.
+            Please ensure that your order settings are configured correctly.', 'ecommerceSettings.order');
+
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 404);
+        } catch (OrderEmailSiteSettingsException $e) {
+            app(OrderFailedNotifyAdmin::class)->execute('This error is occurring due to an issue with the logo on your website.
+            Please ensure that your site settings are configured correctly.', 'cmsSettings.site');
+
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 404);
+        } catch (BadRequestHttpException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 404);
         } catch (Exception $e) {
-            Log::info('OrderController exception ' . $e);
+            Log::error([
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
 
-            return response()->json([
-                'message' => 'Something went wrong',
-            ], 400);
+            throw $e;
         }
     }
 
