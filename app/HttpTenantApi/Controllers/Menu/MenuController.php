@@ -31,6 +31,7 @@ class MenuController
                 ])
                 ->allowedIncludes([
                     'nodes.children',
+                    'nodes.model',
                     'parentNodes.children',
                 ])
                 ->jsonPaginate()
