@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Auth\Address;
 
 use App\Features\Customer\AddressBase;
-use App\Features\Customer\CustomerBase;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\AddressResource;
 use Domain\Address\Actions\SetAddressAsDefaultBillingAction;

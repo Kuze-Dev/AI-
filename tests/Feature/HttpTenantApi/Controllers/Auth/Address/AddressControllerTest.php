@@ -2,12 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Features\Customer\AddressBase;
-use App\Features\Customer\CustomerBase;
 use Domain\Address\Database\Factories\AddressFactory;
 use Domain\Address\Database\Factories\StateFactory;
 use Domain\Address\Models\Address;
-use Domain\Address\Models\Country;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
