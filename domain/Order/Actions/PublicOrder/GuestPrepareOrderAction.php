@@ -14,20 +14,29 @@ use Domain\Order\DataTransferObjects\GuestCountriesData;
 use Domain\Order\DataTransferObjects\GuestPlaceOrderData;
 use Domain\Order\DataTransferObjects\GuestPreparedOrderData;
 use Domain\Order\DataTransferObjects\GuestStatesData;
+use Domain\Order\Exceptions\OrderEmailSettingsException;
+use Domain\Order\Exceptions\OrderEmailSiteSettingsException;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Product\Models\ProductVariant;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use App\Settings\OrderSettings;
+use App\Settings\SiteSettings;
 
 class GuestPrepareOrderAction
 {
     public function execute(GuestPlaceOrderData $guestPlaceOrderData): GuestPreparedOrderData
     {
         $customer = $guestPlaceOrderData->customer;
+
+        $this->prepareSiteSettings();
+
+        $this->prepareEmailSettings();
 
         $addresses = $this->prepareAddress($guestPlaceOrderData);
 
@@ -67,6 +76,24 @@ class GuestPrepareOrderAction
         return GuestPreparedOrderData::fromArray($orderData);
     }
 
+    public function prepareEmailSettings(): void
+    {
+        $fromEmail = app(OrderSettings::class)->email_sender_name;
+
+        if (empty($fromEmail)) {
+            throw new OrderEmailSettingsException('No email sender found');
+        }
+    }
+
+    public function prepareSiteSettings(): void
+    {
+        try {
+            app(SiteSettings::class)->getLogoUrl();
+        } catch (Exception) {
+            throw new OrderEmailSiteSettingsException('No logo for site settings found');
+        }
+    }
+
     public function prepareAddress(GuestPlaceOrderData $guestPlaceOrderData): array
     {
         $shippingAddress = $guestPlaceOrderData->addresses->shipping;
@@ -83,7 +110,7 @@ class GuestPrepareOrderAction
     {
         $currency = Currency::where('enabled', true)->first();
 
-        if ( ! $currency instanceof Currency) {
+        if (!$currency instanceof Currency) {
 
             throw new BadRequestHttpException('No currency found');
         }
@@ -101,7 +128,7 @@ class GuestPrepareOrderAction
             $query->morphWith([
                 ProductVariant::class => ['product'],
             ]);
-        }, ])
+        },])
             ->whereCheckoutReference($guestPlaceOrderData->cart_reference)
             ->get();
     }
@@ -110,7 +137,7 @@ class GuestPrepareOrderAction
     {
         $taxZone = Taxation::getTaxZone($country->id, $state->id);
 
-        if ( ! $taxZone instanceof TaxZone) {
+        if (!$taxZone instanceof TaxZone) {
             return null;
         }
 
@@ -147,7 +174,7 @@ class GuestPrepareOrderAction
     {
         $paymentMethod = PaymentMethod::whereSlug($guestPlaceOrderData->payment_method)->first();
 
-        if ( ! $paymentMethod instanceof PaymentMethod) {
+        if (!$paymentMethod instanceof PaymentMethod) {
 
             throw new BadRequestHttpException('No paymentMethod found');
         }

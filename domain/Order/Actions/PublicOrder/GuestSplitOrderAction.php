@@ -45,8 +45,8 @@ class GuestSplitOrderAction
                 $this->guestCreateOrderAddressAction
                     ->execute($order, $guestPreparedOrderData);
 
-                // CartLine::whereCheckoutReference($guestPlaceOrderData->cart_reference)
-                //     ->update(['checked_out_at' => now()]);
+                CartLine::whereCheckoutReference($guestPlaceOrderData->cart_reference)
+                    ->update(['checked_out_at' => now()]);
 
                 $payment = $this->proceedPayment($order, $guestPreparedOrderData);
 
