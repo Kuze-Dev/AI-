@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Address;
 
-use App\Features\ECommerce\ECommerceBase;
+use App\Features\Customer\CustomerBase;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\AddressResource;
 use Domain\Address\Actions\SetAddressAsDefaultBillingAction;
@@ -18,7 +18,7 @@ use Throwable;
 
 #[
     Prefix('addresses'),
-    Middleware(['auth:sanctum', 'feature.tenant:' . ECommerceBase::class])
+    Middleware(['auth:sanctum', 'feature.tenant:' . CustomerBase::class])
 ]
 class AddressSetDefaultController extends Controller
 {
