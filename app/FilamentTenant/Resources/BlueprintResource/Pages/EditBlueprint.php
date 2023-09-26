@@ -64,21 +64,14 @@ class EditBlueprint extends EditRecord
         $blueprinDataCollection = ModelsBlueprintData::where('blueprint_id', $this->record->getRouteKey())->with('media')->get();
         foreach($blueprinDataCollection as $blueprintData) {
             $mediaCollection = $blueprintData->media;
-
             $sections = $this->record->getAttribute('schema')->sections;
             foreach ($sections as $section) {
                 foreach ($section->fields as $field) {
                     $this->extractSchema($field, $section->state_name, $blueprintData->state_path,  $mediaCollection);
                 }
             }
-
-            foreach($sections as $section) {
-                if($section->state_name);
-            }
-
         }
 
-        Artisan::call('media-library:regenerate');
 
         $this->afterSaveOverride();
 
