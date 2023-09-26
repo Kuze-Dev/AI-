@@ -31,6 +31,7 @@ return new class () extends Migration {
             $table->string('service_price');
             $table->dateTime('schedule');
             $table->string('status');
+            $table->string('cancelled_reason');
             $table->decimal('total', 10, 2)->index();
 
             $table->timestamps();

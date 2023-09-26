@@ -7,19 +7,19 @@ namespace Domain\ServiceOrder\Models;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Illuminate\Database\Eloquent\Model;
 
-
 /**
  * @property mixed|null $blueprint
  */
-class ServiceOrder extends Model 
+class ServiceOrder extends Model
 {
     protected $fillable = [
+        'customer_id',
         'schedule',
         'status',
     ];
 
     protected $casts = [
         'schedule' => 'dateTime',
-        'status' => ServiceOrderStatus::class
+        'status' => ServiceOrderStatus::class,
     ];
 }

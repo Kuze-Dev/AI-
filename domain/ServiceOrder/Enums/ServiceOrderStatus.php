@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Enums;
 
 enum ServiceOrderStatus: string
-{   
+{
     case PROCESSING = 'processing';
     case PENDING = 'pending';
     case CANCELLED = 'cancelled';
     case REFUNDED = 'refunded';
     case FULFILLED = 'fulfilled';
-    case ON_HOLD = 'on_hold'; 
+    case ON_HOLD = 'on_hold';
 }
