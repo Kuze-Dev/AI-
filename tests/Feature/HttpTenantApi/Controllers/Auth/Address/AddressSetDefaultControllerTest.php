@@ -25,6 +25,7 @@ it('can set default shipping', function () {
 
     $address = AddressFactory::new()
         ->createOne([
+            'customer_id' => $this->customer->id,
             'is_default_shipping' => false,
             'is_default_billing' => false,
         ]);
@@ -32,7 +33,7 @@ it('can set default shipping', function () {
     postJson('api/addresses/'.$address->getKey().'/set-shipping');
 
     assertDatabaseHas(Address::class, [
-        'customer_id' => $address->customer_id,
+        'customer_id' => $this->customer->id,
         'is_default_shipping' => true,
 
     ]);
@@ -42,13 +43,14 @@ it('can set default shipping', function () {
 it('can set default billing', function () {
     $address = AddressFactory::new()
         ->createOne([
+            'customer_id' => $this->customer->id,
             'is_default_billing' => false,
         ]);
 
     postJson('api/addresses/'.$address->getKey().'/set-billing');
 
     assertDatabaseHas(Address::class, [
-        'customer_id' => $address->customer_id,
+        'customer_id' => $this->customer->id,
         'is_default_billing' => true,
     ]);
 

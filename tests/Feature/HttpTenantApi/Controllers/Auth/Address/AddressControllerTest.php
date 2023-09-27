@@ -31,7 +31,9 @@ beforeEach(function () {
 });
 
 it('can list all addresses', function () {
-    AddressFactory::new()
+    AddressFactory::new([
+        'customer_id' => $this->customer->getKey(),
+    ])
         ->count(5)
         ->create();
 
@@ -42,7 +44,7 @@ it('can list all addresses', function () {
     getJson('api/addresses?'.http_build_query($params, '', ','))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
-            $json->count('included', 2)
+            $json->count('included', 12)
                 ->whereAll([
                     'included.0.type' => 'states',
                     'included.1.type' => 'countries',
@@ -121,6 +123,7 @@ it('can edit address', function () {
     $state = StateFactory::new()->createOne();
     $address = AddressFactory::new()
         ->createOne([
+            'customer_id' => $this->customer->id,
             'state_id' => $state->getKey(),
             'address_line_1' => 'old-address',
             'city' => 'old-city',
@@ -148,7 +151,7 @@ it('can edit address', function () {
         ->assertOk();
 
     assertDatabaseHas(Address::class, [
-        'customer_id' => $address->customer_id,
+        'customer_id' => $this->customer->id,
         'state_id' => $newData['state_id'],
         'address_line_1' => $newData['address_line_1'],
         'city' => $newData['city'],
@@ -163,6 +166,7 @@ it('can edit address', function () {
 it('can delete address', function () {
     $address = AddressFactory::new()
         ->createOne([
+            'customer_id' => $this->customer->id,
             'is_default_shipping' => false,
             'is_default_billing' => false,
         ]);

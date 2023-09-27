@@ -66,7 +66,7 @@ class AddressController extends Controller
     /** @throws Throwable */
     public function update(AddressRequest $request, Address $address): AddressResource
     {
-        // $this->authorize('update', $address);
+        $this->authorize('update', $address);
 
         $address = DB::transaction(
             fn () => app(UpdateAddressAction::class)
@@ -79,7 +79,7 @@ class AddressController extends Controller
     /** @throws Throwable */
     public function destroy(Address $address): Response
     {
-        // $this->authorize('delete', $address);
+        $this->authorize('delete', $address);
 
         try {
             DB::transaction(
