@@ -30,7 +30,6 @@ class CreateBlueprintDataAction
             'type' => $blueprintDataData->type,
         ]);
 
-        $filtered = [];
         if (is_array($blueprintDataData->value)) {
             $filtered = array_filter($blueprintDataData->value, function ($value) {
                 $pathInfo = pathinfo($value);
@@ -38,9 +37,12 @@ class CreateBlueprintDataAction
                     return $value;
                 }
             });
+            if(empty($filtered)) {
+                return $blueprintData;
+            }
         }
 
-        if ($blueprintDataData->type == FieldType::MEDIA && $blueprintData->value && ! empty($filtered)) {
+        if ($blueprintDataData->type == FieldType::MEDIA && $blueprintData->value) {
             if (is_array($blueprintDataData->value)) {
                 foreach ($blueprintDataData->value as $value) {
                     $blueprintData->addMediaFromDisk($value, 's3')
