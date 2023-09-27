@@ -1,0 +1,22 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\FilamentTenant\Resources\ServiceOrderResource\Pages;
+
+use App\FilamentTenant\Resources\ServiceOrderResource;
+use App\FilamentTenant\Resources\ServiceResource;
+use Filament\Pages\Actions;
+use Filament\Resources\Pages\ListRecords;
+
+class ListServiceOrder extends ListRecords
+{
+    protected static string $resource = ServiceOrderResource::class;
+
+    protected function getActions(): array
+    {
+        return [
+            Actions\CreateAction::make(),
+        ];
+    }
+}

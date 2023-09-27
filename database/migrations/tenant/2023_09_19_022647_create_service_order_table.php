@@ -13,7 +13,7 @@ return new class () extends Migration {
     /** Run the migrations. */
     public function up(): void
     {
-        Schema::create('service_order', function (Blueprint $table) {
+        Schema::create('service_orders', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Service::class)->index();
             $table->foreignIdFor(Customer::class)->index();
@@ -43,7 +43,7 @@ return new class () extends Migration {
 
             $table->string('name');
             $table->integer('quantity')->default(1);
-            $table->decimal('price', 2, 10);
+            $table->decimal('price', 10, 2);
 
             $table->timestamps();
         });
@@ -52,7 +52,7 @@ return new class () extends Migration {
     /** Reverse the migrations. */
     public function down(): void
     {
-        Schema::dropIfExists('service_order');
+        Schema::dropIfExists('service_orders');
         Schema::dropIfExists('service_order_additional_charges');
     }
 };
