@@ -97,7 +97,6 @@ class TiersRelationManager extends RelationManager
                             ->required()
                             ->default(DiscountAmountType::PERCENTAGE->value)
                             ->filled()
-                            // ->formatStateUsing(fn ($record) => optional($record?->discountCondition()->withTrashed()->first())->amount_type)
                             ->label(trans('Amount Type')),
                         TextInput::make('discount')
                             ->label(trans('Discount (%)'))
