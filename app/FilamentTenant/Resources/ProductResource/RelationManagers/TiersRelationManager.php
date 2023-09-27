@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ProductResource\RelationManagers;
 
+use Domain\Product\Enums\DiscountAmountType;
 use Domain\Tier\Models\Tier;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Exception;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables;
 use Filament\Tables\Contracts\HasRelationshipTable;
@@ -29,6 +31,11 @@ class TiersRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->translateLabel(),
+                Tables\Columns\TextColumn::make('discount_amount_type')
+                    ->translateLabel()
+                    ->formatStateUsing(fn ($state) =>
+                    $state === DiscountAmountType::PERCENTAGE->value
+                        ? 'Percentage' : 'Fixed Value'),
                 Tables\Columns\TextColumn::make('discount')
                     ->translateLabel()
                     ->formatStateUsing(fn (string $state) => floatval($state)),
@@ -40,9 +47,20 @@ class TiersRelationManager extends RelationManager
                     ->modalHeading(trans('Attach Tier Discount'))
                     ->form(fn (Tables\Actions\AttachAction $action): array => [
                         $action->getRecordSelect()
-                            ->translateLabel(),
+                            ->translateLabel()
+                            ->placeholder(trans('Select tier')),
+                        Radio::make('discount_amount_type')->options([
+                            DiscountAmountType::PERCENTAGE->value =>
+                            ucwords(str_replace('_', ' ', DiscountAmountType::PERCENTAGE->value)),
+                            DiscountAmountType::FIXED_VALUE->value =>
+                            ucwords(str_replace('_', ' ', DiscountAmountType::FIXED_VALUE->value)),
+                        ])
+                            ->reactive()
+                            ->required()
+                            ->filled()
+                            ->label(trans('Amount Type')),
                         TextInput::make('discount')
-                            ->label(trans('Discount (%)'))
+                            ->translateLabel()
                             ->mask(
                                 fn (TextInput\Mask $mask) => $mask
                                     ->numeric()
@@ -60,7 +78,10 @@ class TiersRelationManager extends RelationManager
                         return $livewire->getRelationship()
                             ->attach(
                                 $data['recordId'],
-                                ['discount' => $data['discount']]
+                                [
+                                    'discount_amount_type' => $data['discount_amount_type'],
+                                    'discount' => $data['discount']
+                                ]
                             );
                     }),
             ])
@@ -68,6 +89,16 @@ class TiersRelationManager extends RelationManager
                 Tables\Actions\EditAction::make()
                     ->translateLabel()
                     ->form(fn (): array => [
+                        Radio::make('discount_amount_type')->options([
+                            DiscountAmountType::FIXED_VALUE->value => 'Fixed Value',
+                            DiscountAmountType::PERCENTAGE->value => 'Percentage',
+                        ])
+                            ->reactive()
+                            ->required()
+                            ->default(DiscountAmountType::PERCENTAGE->value)
+                            ->filled()
+                            // ->formatStateUsing(fn ($record) => optional($record?->discountCondition()->withTrashed()->first())->amount_type)
+                            ->label(trans('Amount Type')),
                         TextInput::make('discount')
                             ->label(trans('Discount (%)'))
                             ->mask(
