@@ -33,8 +33,7 @@ class TiersRelationManager extends RelationManager
                     ->translateLabel(),
                 Tables\Columns\TextColumn::make('discount_amount_type')
                     ->translateLabel()
-                    ->formatStateUsing(fn ($state) =>
-                    $state === DiscountAmountType::PERCENTAGE->value
+                    ->formatStateUsing(fn ($state) => $state === DiscountAmountType::PERCENTAGE->value
                         ? 'Percentage' : 'Fixed Value'),
                 Tables\Columns\TextColumn::make('discount')
                     ->translateLabel()
@@ -50,10 +49,8 @@ class TiersRelationManager extends RelationManager
                             ->translateLabel()
                             ->placeholder(trans('Select tier')),
                         Radio::make('discount_amount_type')->options([
-                            DiscountAmountType::PERCENTAGE->value =>
-                            ucwords(str_replace('_', ' ', DiscountAmountType::PERCENTAGE->value)),
-                            DiscountAmountType::FIXED_VALUE->value =>
-                            ucwords(str_replace('_', ' ', DiscountAmountType::FIXED_VALUE->value)),
+                            DiscountAmountType::PERCENTAGE->value => ucwords(str_replace('_', ' ', DiscountAmountType::PERCENTAGE->value)),
+                            DiscountAmountType::FIXED_VALUE->value => ucwords(str_replace('_', ' ', DiscountAmountType::FIXED_VALUE->value)),
                         ])
                             ->reactive()
                             ->required()
@@ -80,7 +77,7 @@ class TiersRelationManager extends RelationManager
                                 $data['recordId'],
                                 [
                                     'discount_amount_type' => $data['discount_amount_type'],
-                                    'discount' => $data['discount']
+                                    'discount' => $data['discount'],
                                 ]
                             );
                     }),
