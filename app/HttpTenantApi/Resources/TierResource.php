@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @mixin \Domain\Taxonomy\Models\Taxonomy
+ * @mixin \Domain\Tier\Models\Tier
  */
 class TierResource extends JsonApiResource
 {
