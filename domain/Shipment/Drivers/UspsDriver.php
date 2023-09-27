@@ -7,7 +7,7 @@ namespace Domain\Shipment\Drivers;
 use Domain\Customer\Models\Customer;
 use Domain\Shipment\Actions\USPS\GetUSPSInternationalRateDataAction;
 use Domain\Shipment\Actions\USPS\GetUSPSRateDataAction;
-use Domain\Shipment\API\USPS\Contracts\RateResponse;
+use Domain\Shipment\Contracts\API\RateResponse;
 use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;

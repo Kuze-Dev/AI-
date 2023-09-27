@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Domain\Shipment\Actions;
 
 use Domain\Customer\Models\Customer;
-use Domain\Shipment\API\USPS\Contracts\RateResponse;
+use Domain\Shipment\Contracts\API\RateResponse;
 use Domain\Shipment\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
+use Domain\ShippingMethod\Enums\Driver;
 use Domain\ShippingMethod\Models\ShippingMethod;
 
 class GetShippingRateAction
@@ -27,7 +28,19 @@ class GetShippingRateAction
 
         $shippingDriver = $this->shippingManager->driver($shippingMethod->driver->value);
 
-        if ($this->isDomesticInUnitedStates($address)) {
+        if ($shippingMethod->driver == Driver::AUSPOST) {
+
+            return $shippingDriver->getRate(
+                $customer,
+                $parcelData,
+                $address,
+                $shippingMethod,
+            );
+        }
+
+        if ($this->isDomesticInUnitedStates($address) &&
+            in_array($shippingMethod->driver, [Driver::USPS, Driver::UPS])
+        ) {
 
             return $shippingDriver->getRate(
                 $customer,

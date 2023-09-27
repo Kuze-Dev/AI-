@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\API\UPS\DataTransferObjects;
 
-use Domain\Shipment\API\USPS\Contracts\RateResponse;
+use Domain\Shipment\Contracts\API\RateResponse;
 
 class UpsResponse implements RateResponse
 {

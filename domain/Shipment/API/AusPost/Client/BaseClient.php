@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Shipment\API\AustriaPost\Clients;
+namespace Domain\Shipment\API\AusPost\Client;
 
 use Illuminate\Support\Facades\Log;
 use Exception;
@@ -10,7 +10,7 @@ use Exception;
 abstract class BaseClient
 {
     public function __construct(
-        protected readonly UPSClient $client
+        protected readonly AuspostClient $client
     ) {
     }
 
