@@ -80,8 +80,7 @@ class TiersRelationManager extends RelationManager
                             )
                             ->required(),
                     ])
-                    ->using(function (Model $record, array $data): Model {
-                        /** @phpstan-ignore-next-line */
+                    ->using(function (Tier $record, array $data): Tier {
                         $record->products()->update($data);
 
                         return $record;
