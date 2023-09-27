@@ -48,7 +48,9 @@ class ServiceOrderResource extends Resource
                                 ->required()
                                 ->preload()
                                 ->optionsFromModel(Customer::class, 'email')
-                                ->disabled(fn (?Customer $record) => $record !== null),
+                                ->disabled(fn (?Customer $record) => $record !== null)
+                                ->reactive(),
+
                             Forms\Components\Group::make()->columns(2)->schema([
                                 Placeholder::make('First Name')
                                     ->content('Jerome'),
@@ -62,7 +64,11 @@ class ServiceOrderResource extends Resource
                                     ->content('123 abc street')->columnSpan(2),
                                 Placeholder::make('Billing Address')
                                     ->content('123 abc street')->columnSpan(2),
-                            ])->visible(),
+                            ])->visible(
+                                function (array $state) {
+                                    return isset($state['customer_id']);
+                                }
+                            ),
 
                         ]),
                     Section::make(trans('Service'))
@@ -75,17 +81,27 @@ class ServiceOrderResource extends Resource
                                     ->preload()
                                     ->optionsFromModel(Service::class, 'name')
                                     ->disabled(fn (?Service $record) => $record !== null),
+
                                 DateTimePicker::make('schedule'),
-                                Forms\Components\Fieldset::make('')->schema([
-                                    Placeholder::make('Service')
-                                        ->content('Sample subscription'),
-                                    Placeholder::make('Service Price')
-                                        ->content('$1000'),
-                                    Placeholder::make('Billing Schedule')
-                                        ->content('Every Xth of the month'),
-                                    Placeholder::make('Due Date')
-                                        ->content('Every Xth of the month'),
+
+                                Forms\Components\Group::make()->columnSpan(2)->schema([
+                                    Forms\Components\Fieldset::make('')->schema([
+                                        Placeholder::make('Service')
+                                            ->content('Sample subscription'),
+                                        Placeholder::make('Service Price')
+                                            ->content('$1000'),
+                                        Placeholder::make('Billing Schedule')
+                                            ->content('Every Xth of the month'),
+                                        Placeholder::make('Due Date')
+                                            ->content('Every Xth of the month'),
+                                    ]),
                                 ]),
+                                // ->visible(
+                                //     function (array $state) {
+                                //         return isset($state['service_id']);
+                                //     }
+                                // )
+
                                 TextLabel::make('')
                                     ->label(trans('Additional Charges'))
                                     ->alignLeft()
@@ -93,6 +109,7 @@ class ServiceOrderResource extends Resource
                                     ->weight('bold')
                                     ->inline()
                                     ->readOnly(),
+
                                 Repeater::make('additional_charges')
                                     ->label('')
                                     ->createItemButtonLabel('Additional Charges')
