@@ -17,8 +17,6 @@ use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\TransactionData;
 use Domain\Payments\Exceptions\PaymentException;
 use Exception;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class GuestSplitOrderAction
 {
@@ -32,43 +30,30 @@ class GuestSplitOrderAction
 
     public function execute(GuestPreparedOrderData $guestPreparedOrderData, GuestPlaceOrderData $guestPlaceOrderData): array|Exception
     {
-        return DB::transaction(function () use ($guestPreparedOrderData, $guestPlaceOrderData) {
-            try {
-                DB::beginTransaction();
+        $order = $this->guestCreateOrderAction
+            ->execute($guestPlaceOrderData, $guestPreparedOrderData);
 
-                $order = $this->guestCreateOrderAction
-                    ->execute($guestPlaceOrderData, $guestPreparedOrderData);
+        $this->guestCreateOrderLineAction
+            ->execute($order, $guestPlaceOrderData, $guestPreparedOrderData);
 
-                $this->guestCreateOrderLineAction
-                    ->execute($order, $guestPlaceOrderData, $guestPreparedOrderData);
+        $this->guestCreateOrderAddressAction
+            ->execute($order, $guestPreparedOrderData);
 
-                $this->guestCreateOrderAddressAction
-                    ->execute($order, $guestPreparedOrderData);
+        CartLine::whereCheckoutReference($guestPlaceOrderData->cart_reference)
+            ->update(['checked_out_at' => now()]);
 
-                CartLine::whereCheckoutReference($guestPlaceOrderData->cart_reference)
-                    ->update(['checked_out_at' => now()]);
+        $payment = $this->proceedPayment($order, $guestPreparedOrderData);
 
-                $payment = $this->proceedPayment($order, $guestPreparedOrderData);
+        event(new GuestOrderPlacedEvent(
+            $order,
+            $guestPreparedOrderData,
+            $guestPlaceOrderData
+        ));
 
-                event(new GuestOrderPlacedEvent(
-                    $order,
-                    $guestPreparedOrderData,
-                    $guestPlaceOrderData
-                ));
-
-                DB::commit();
-
-                return [
-                    'order' => $order,
-                    'payment' => $payment,
-                ];
-            } catch (Exception $e) {
-                DB::rollBack();
-                Log::info('Error on SplitOrderAction->execute() ' . $e);
-
-                return $e;
-            }
-        });
+        return [
+            'order' => $order,
+            'payment' => $payment,
+        ];
     }
 
     private function proceedPayment(Order $order, GuestPreparedOrderData $guestPreparedOrderData): PaymentAuthorize

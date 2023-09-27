@@ -110,7 +110,7 @@ class GuestPrepareOrderAction
     {
         $currency = Currency::where('enabled', true)->first();
 
-        if (!$currency instanceof Currency) {
+        if ( ! $currency instanceof Currency) {
 
             throw new BadRequestHttpException('No currency found');
         }
@@ -128,7 +128,7 @@ class GuestPrepareOrderAction
             $query->morphWith([
                 ProductVariant::class => ['product'],
             ]);
-        },])
+        }, ])
             ->whereCheckoutReference($guestPlaceOrderData->cart_reference)
             ->get();
     }
@@ -137,7 +137,7 @@ class GuestPrepareOrderAction
     {
         $taxZone = Taxation::getTaxZone($country->id, $state->id);
 
-        if (!$taxZone instanceof TaxZone) {
+        if ( ! $taxZone instanceof TaxZone) {
             return null;
         }
 
@@ -174,7 +174,7 @@ class GuestPrepareOrderAction
     {
         $paymentMethod = PaymentMethod::whereSlug($guestPlaceOrderData->payment_method)->first();
 
-        if (!$paymentMethod instanceof PaymentMethod) {
+        if ( ! $paymentMethod instanceof PaymentMethod) {
 
             throw new BadRequestHttpException('No paymentMethod found');
         }

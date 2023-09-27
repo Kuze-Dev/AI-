@@ -25,9 +25,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Resource;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Mailer\Exception\TransportException;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -38,38 +36,9 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 ]
 class GuestOrderController extends Controller
 {
-    public function index(Request $request): mixed
-    {
-        $sessionId = $request->bearerToken();
-
-        if (is_null($sessionId)) {
-            abort(403);
-        }
-
-        return OrderResource::collection(
-            QueryBuilder::for(Order::with([
-                'shippingAddress',
-                'billingAddress',
-                'orderLines.media',
-            ])->where('session_id', $sessionId))
-                ->defaultSort('-created_at')
-                ->allowedIncludes(['orderLines', 'orderLines.review.media'])
-                ->allowedFilters(['status', 'reference'])
-                ->allowedSorts(['reference', 'total', 'status', 'created_at'])
-                ->jsonPaginate()
-        );
-    }
-
     public function store(GuestPlaceOrderRequest $request): JsonResponse
     {
-        $sessionId = $request->bearerToken();
-
-        if (is_null($sessionId)) {
-            abort(403);
-        }
-
         $validatedData = $request->validated();
-        $validatedData['session_id'] = $sessionId;
 
         try {
             $result = DB::transaction(function () use ($validatedData) {
@@ -131,14 +100,8 @@ class GuestOrderController extends Controller
         }
     }
 
-    public function show(Request $request, Order $order): OrderResource
+    public function show(Order $order): OrderResource
     {
-        $sessionId = $request->bearerToken();
-
-        if (is_null($sessionId)) {
-            abort(403);
-        }
-
         $model = QueryBuilder::for(
             $order->with([
                 'shippingAddress',
@@ -146,8 +109,7 @@ class GuestOrderController extends Controller
                 'orderLines.media',
                 'orderLines.review.media',
                 'payments.paymentMethod.media',
-            ])->where('session_id', $sessionId)
-                ->whereReference($order->reference)
+            ])->whereReference($order->reference)
         )
             ->allowedIncludes(['orderLines', 'payments.media', 'payments.paymentMethod.media', 'shippingMethod'])->first();
 
@@ -156,12 +118,6 @@ class GuestOrderController extends Controller
 
     public function update(UpdateOrderRequest $request, Order $order): mixed
     {
-        $sessionId = $request->bearerToken();
-
-        if (is_null($sessionId)) {
-            abort(403);
-        }
-
         $validatedData = $request->validated();
 
         try {

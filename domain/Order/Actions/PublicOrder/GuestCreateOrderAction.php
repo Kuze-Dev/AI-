@@ -44,7 +44,6 @@ class GuestCreateOrderAction
 
         $order = Order::create([
             'customer_id' => null,
-            'session_id' => $guestPlaceOrderData->session_id,
             'customer_first_name' => $guestPreparedOrderData->customer->first_name,
             'customer_last_name' => $guestPreparedOrderData->customer->last_name,
             'customer_mobile' => $guestPreparedOrderData->customer->mobile,

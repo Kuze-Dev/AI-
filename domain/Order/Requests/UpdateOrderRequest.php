@@ -32,17 +32,15 @@ class UpdateOrderRequest extends FormRequest
                     if ( ! in_array($value, ['status', 'bank-transfer'])) {
 
                         $type = auth()->user() ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
-                        /** @var int|string $userId */
-                        $userId = auth()->user() ? auth()->user()->id : $this->bearerToken();
 
                         $isValid = $order->whereHas('payments', function (Builder $query) use ($value, $order) {
                             $query->where('gateway', $value)->where('payable_id', $order->id);
                         })
-                            ->where(function ($query) use ($type, $userId) {
+                            ->where(function ($query) use ($type) {
                                 if ($type === CartUserType::AUTHENTICATED) {
-                                    $query->where('customer_id', $userId);
-                                } elseif ($type === CartUserType::GUEST) {
-                                    $query->where('session_id', $userId);
+                                    /** @var \Domain\Customer\Models\Customer $customer */
+                                    $customer = auth()->user();
+                                    $query->where('customer_id', $customer->id);
                                 }
                             })
                             ->first();

@@ -34,7 +34,6 @@ class GuestUpdateOrderAction
         Order $order,
         UpdateOrderData $updateOrderData
     ): Order|PaymentAuthorize {
-
         /** @var \Domain\Order\Models\Order $orderWithPayment */
         $orderWithPayment = $order->load('payments');
 
@@ -44,15 +43,6 @@ class GuestUpdateOrderAction
                 $updateOrderData->status,
                 $updateOrderData->notes
             );
-
-            // /** @var \Domain\Customer\Models\Customer $customer */
-            // $customer = auth()->user();
-
-            // event(new OrderStatusUpdatedEvent(
-            //     $customer,
-            //     $orderWithPayment,
-            //     $updateOrderData->status
-            // ));
         }
 
         if (

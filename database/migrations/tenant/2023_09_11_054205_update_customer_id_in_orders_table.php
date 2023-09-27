@@ -11,7 +11,6 @@ return new class () extends Migration {
     {
         Schema::table('orders', function (Blueprint $table) {
             $table->foreignId('customer_id')->nullable()->change();
-            $table->string('session_id')->after('customer_id')->nullable();
         });
     }
 
@@ -19,7 +18,6 @@ return new class () extends Migration {
     {
         Schema::table('orders', function (Blueprint $table) {
             $table->foreignId('customer_id')->change();
-            $table->dropColumn('session_id');
         });
     }
 };
