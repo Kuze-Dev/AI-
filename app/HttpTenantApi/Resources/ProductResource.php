@@ -42,6 +42,7 @@ class ProductResource extends JsonApiResource
             'productOptions' => fn () => ProductOptionResource::collection($this->productOptions),
             'productVariants' => fn () => ProductVariantResource::collection($this->productVariants),
             'taxonomyTerms' => fn () => TaxonomyTermResource::collection($this->taxonomyTerms),
+            'tiers' => fn () => TierResource::collection($this->tiers),
             'metaData' => fn () => MetaDataResource::make($this->metaData),
         ];
     }
