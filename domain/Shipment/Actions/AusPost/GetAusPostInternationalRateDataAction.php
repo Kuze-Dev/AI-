@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-namespace Domain\Shipment\Actions\UPS;
+namespace Domain\Shipment\Actions\AusPost;
 
-use Domain\Shipment\API\UPS\Clients\UPSRateClient;
-use Domain\Shipment\API\UPS\DataTransferObjects\UpsResponse;
+use Domain\Shipment\API\AusPost\Client\AusPostInternationalRateClient;
+use Domain\Shipment\API\AusPost\DataTransferObjects\AusPostResponse;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 
-class GetUPSRateDataAction
+class GetAusPostInternationalRateDataAction
 {
     public function __construct(
-        private readonly UPSRateClient $rateClient,
+        private readonly AusPostInternationalRateClient $internationalRateClient,
     ) {
     }
 
     public function execute(
         ParcelData $parcelData,
         ShippingAddressData $customer_address,
-    ): UpsResponse {
+    ): AusPostResponse {
 
-        return $this->rateClient->getRate(
+        return $this->internationalRateClient->getInternationalRate(
             parcelData: $parcelData,
             address: $customer_address,
         );

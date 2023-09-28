@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\Actions;
 
-use Domain\Customer\Models\Customer;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
@@ -17,7 +16,6 @@ class GetShippingfeeAction
     }
 
     public function execute(
-        Customer $customer,
         ParcelData $parcelData,
         ShippingMethod $shippingMethod,
         ShippingAddressData $address,
@@ -25,7 +23,6 @@ class GetShippingfeeAction
     ): float {
 
         return $this->getShippingRateAction->execute(
-            $customer,
             $parcelData,
             $shippingMethod,
             $address
