@@ -48,6 +48,10 @@ class CreateOrderLineAction
                 $placeOrderData->serviceId
             );
 
+            $initialSellingPrice = (float) $cartLine->purchasable->selling_price;
+
+            $sellingPrice = $this->cartSummaryAction->getTierSellingPrice($cartLine->purchasable, $initialSellingPrice);
+
             $name = null;
             if ($cartLine->purchasable instanceof Product) {
                 /** @var \Domain\Product\Models\Product $product */
@@ -70,7 +74,7 @@ class CreateOrderLineAction
                 'purchasable_type' => $cartLine->purchasable_type,
                 'purchasable_sku' => $cartLine->purchasable->sku,
                 'name' => $name,
-                'unit_price' => $cartLine->purchasable->selling_price,
+                'unit_price' => $sellingPrice,
                 'quantity' => $cartLine->quantity,
                 'tax_total' => $summary->taxTotal,
                 'tax_display' => $summary->taxDisplay,
