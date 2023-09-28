@@ -133,6 +133,10 @@ class TenantResource extends Resource
                                         Features\Customer\AddressBase::class => app(Features\Customer\AddressBase::class)->label,
                                     ],
                                 ],
+                                Features\Service\ServiceBase::class => [
+                                    'label' => trans('Service'),
+                                    'extras' => [],
+                                ],
                             ]),
                     ]),
             ])->columns(2);

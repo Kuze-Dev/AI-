@@ -24,13 +24,15 @@ class UpdateServiceAction
     public function execute(Service $service, ServiceData $serviceData): Service|Model
     {
         $service->update([
-            'blueprint_id' => $serviceData->blueprint_id,
             'name' => $serviceData->name,
             'description' => $serviceData->description,
             'price' => $serviceData->price,
+            'billing_cycle' => $serviceData->billing_cycle,
+            'recurring_payment' => $serviceData->recurring_payment,
             'data' => $serviceData->data,
             'is_featured' => $serviceData->is_featured,
             'is_special_offer' => $serviceData->is_special_offer,
+            'pay_upfront' => $serviceData->pay_upfront,
             'is_subscription' => $serviceData->is_subscription,
             'status' => $serviceData->status,
         ]);
