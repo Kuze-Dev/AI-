@@ -9,7 +9,11 @@ use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Support\MetaData\HasMetaData;
 use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 use Spatie\MediaLibrary\HasMedia;
@@ -19,8 +23,11 @@ use Spatie\MediaLibrary\HasMedia;
  */
 class Service extends Model implements HasMetaDataContract, HasMedia
 {
+    use LogsActivity;
     use HasMetaData;
     use InteractsWithMedia;
+    use ConstraintsRelationships;
+    use SoftDeletes;
 
     protected $fillable = [
         'blueprint_id',
@@ -29,8 +36,11 @@ class Service extends Model implements HasMetaDataContract, HasMedia
         'description',
         'price',
         'data',
+        'billing_cycle',
+        'recurring_payment',
         'is_featured',
         'is_special_offer',
+        'pay_upfront',
         'is_subscription',
         'status',
     ];
@@ -56,5 +66,13 @@ class Service extends Model implements HasMetaDataContract, HasMedia
         return [
             'title' => $this->name,
         ];
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }
