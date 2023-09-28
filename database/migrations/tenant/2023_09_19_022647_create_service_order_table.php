@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Domain\Admin\Models\Admin;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
 use Domain\ServiceOrder\Models\ServiceOrder;
@@ -17,11 +18,16 @@ return new class () extends Migration {
             $table->id();
             $table->foreignIdFor(Service::class)->index();
             $table->foreignIdFor(Customer::class)->index();
+            $table->foreignIdFor(Admin::class, 'created_by')
+                ->comment('if not null means created by admin.')
+                ->nullable()
+                ->index();
 
             $table->string('customer_first_name');
             $table->string('customer_last_name');
             $table->string('customer_email');
             $table->string('customer_mobile_no');
+            $table->json('customer_form');
             $table->string('service_address');
             $table->string('billing_address');
             $table->string('currency_code')->index();
@@ -32,7 +38,7 @@ return new class () extends Migration {
             $table->dateTime('schedule');
             $table->string('status');
             $table->string('cancelled_reason');
-            $table->decimal('total', 10, 2)->index();
+            $table->decimal('total_price', 10, 2)->index();
 
             $table->timestamps();
         });
