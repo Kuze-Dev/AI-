@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Order\DataTransferObjects;
 
+use Domain\Cart\Helpers\PrivateCart\ComputedTierSellingPrice;
 use Domain\Product\Models\Product;
 
 class ProductOrderData
@@ -50,13 +51,20 @@ class ProductOrderData
 
     public static function fromProduct(Product $product): self
     {
+        //product tiering discount
+        $selling_price = $product->selling_price;
+
+        if ($product->relationLoaded('productTier') && $product->productTier->isNotEmpty()) {
+            $selling_price = app(ComputedTierSellingPrice::class)->execute($product, (float) $selling_price);
+        }
+
         return new self(
             id: $product->id,
             name: $product->name,
             slug: $product->slug,
             sku: $product->sku,
             retail_price: number_format((float) $product->retail_price, 2, '.', ','),
-            selling_price: number_format((float) $product->selling_price, 2, '.', ','),
+            selling_price: number_format((float) $selling_price, 2, '.', ','),
             status: (bool) $product->status,
             is_digital_product: (bool) $product->is_digital_product,
             is_featured: (bool) $product->is_featured,

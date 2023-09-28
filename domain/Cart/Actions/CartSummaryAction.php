@@ -7,11 +7,13 @@ namespace Domain\Cart\Actions;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\DataTransferObjects\SummaryData;
+use Domain\Cart\Helpers\PrivateCart\ComputedTierSellingPrice;
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
 use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Discount\Enums\DiscountConditionType;
 use Domain\Discount\Models\Discount;
+use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\Actions\GetShippingfeeAction;
@@ -41,7 +43,7 @@ class CartSummaryAction
 
         $taxTotal = $tax['taxPercentage'] ? round($initialSubTotal * $tax['taxPercentage'] / 100, 2) : 0;
 
-        if($cartSummaryShippingData->shippingAddress) {
+        if ($cartSummaryShippingData->shippingAddress) {
 
             $shippingAddress = ShippingAddressData::fromAddressModel($cartSummaryShippingData->shippingAddress);
 
@@ -95,10 +97,9 @@ class CartSummaryAction
             ];
 
             return SummaryData::fromArray($summaryData);
-        }{
+        } {
             throw new BadRequestHttpException('No shipping address found');
         }
-
     }
 
     /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
@@ -110,19 +111,43 @@ class CartSummaryAction
             $subTotal = $collections->reduce(function ($carry, $collection) {
                 /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
                 $purchasable = $collection->purchasable;
-                $sellingPrice = (float) $purchasable->selling_price;
+
+                $initialSellingPrice = (float) $purchasable->selling_price;
+
+                $sellingPrice = $this->getTierSellingPrice($purchasable, $initialSellingPrice);
 
                 return $carry + ($sellingPrice * $collection->quantity);
             }, 0);
         } elseif ($collections instanceof CartLine) {
             /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
             $purchasable = $collections->purchasable;
-            $sellingPrice = (float) $purchasable->selling_price;
+
+            $initialSellingPrice = (float) $purchasable->selling_price;
+
+            $sellingPrice = $this->getTierSellingPrice($purchasable, $initialSellingPrice);
 
             $subTotal = $sellingPrice * $collections->quantity;
         }
 
         return $subTotal;
+    }
+
+    public function getTierSellingPrice(Product|ProductVariant $purchasable, float $sellingPrice): int|float
+    {
+        if ($purchasable instanceof Product) {
+            if ($purchasable->relationLoaded('productTier') && $purchasable->productTier->isNotEmpty()) {
+                $sellingPrice = app(ComputedTierSellingPrice::class)->execute($purchasable, $sellingPrice);
+            }
+        } elseif ($purchasable instanceof ProductVariant) {
+            /** @var \Domain\Product\Models\Product $product */
+            $product = $purchasable->product;
+
+            if ($product->relationLoaded('productTier') && $product->productTier->isNotEmpty()) {
+                $sellingPrice = app(ComputedTierSellingPrice::class)->execute($product, $sellingPrice);
+            }
+        }
+
+        return $sellingPrice;
     }
 
     /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */

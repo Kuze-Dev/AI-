@@ -9,10 +9,13 @@ use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Cart\Models\CartLine;
 use Domain\Discount\Models\Discount;
+use Domain\Product\Models\Product;
+use Domain\Product\Models\ProductVariant;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class CartSummaryRequest extends FormRequest
 {
@@ -71,8 +74,27 @@ class CartSummaryRequest extends FormRequest
         if (empty($this->cartLinesCache)) {
             $cartLineIds = explode(',', $this->validated('cart_line_ids'));
 
+            /** @var \Domain\Customer\Models\Customer $customer */
+            $customer = auth()->user();
+
+            /** @var \Domain\Tier\Models\Tier $tier */
+            $tier = $customer->tier;
+
             $this->cartLinesCache = CartLine::query()
-                ->with('purchasable')
+                ->with(['purchasable' => function ($query) use ($tier) {
+                    $query->morphWith([
+                        Product::class => [
+                            'productTier' => function (BelongsToMany $query) use ($tier) {
+                                $query->where('tier_id', $tier->id);
+                            },
+                        ],
+                        ProductVariant::class => [
+                            'product.productTier' => function (BelongsToMany $query) use ($tier) {
+                                $query->where('tier_id', $tier->id);
+                            },
+                        ],
+                    ]);
+                }])
                 ->whereHas('cart', function ($query) {
                     $query->whereBelongsTo(auth()->user());
                 })
