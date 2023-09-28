@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Domain\Shipment;
 
 use App\Settings\ShippingSettings;
+use Domain\Shipment\API\AusPost\Client\AuspostClient;
 use Domain\Shipment\API\UPS\Clients\UPSClient;
 use Domain\Shipment\API\USPS\Clients\Client as USPSClient;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
+use Domain\Shipment\Drivers\AusPostDriver;
 use Domain\Shipment\Drivers\StorePickupDriver;
 use Domain\Shipment\Drivers\UpsDriver;
 use Domain\Shipment\Drivers\UspsDriver;
@@ -59,6 +61,22 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
             }
         );
 
+        $this->app->bind(
+            AuspostClient::class,
+            function () {
+
+                $setting = app(ShippingSettings::class);
+
+                if ($setting->auspost_api_key === null) {
+                    abort(500, 'Setting AusPost API credential not setup yet.');
+                }
+
+                return new AuspostClient(
+                    auspost_api_key: $setting->auspost_api_key,
+                );
+            }
+        );
+
         $this->mergeConfigFrom(__DIR__ . '/config/shipment.php', 'domain.shipment');
     }
 
@@ -77,6 +95,7 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
                                 Driver::STORE_PICKUP => new StorePickupDriver(),
                                 Driver::USPS => new UspsDriver(),
                                 Driver::UPS => new UpsDriver(),
+                                Driver::AUSPOST => new AusPostDriver(),
                             }
                         );
                 }

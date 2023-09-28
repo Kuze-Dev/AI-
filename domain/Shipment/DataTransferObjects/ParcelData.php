@@ -10,6 +10,7 @@ class ParcelData
 {
     public function __construct(
         public readonly ShippingAddressData $ship_from_address,
+        public readonly ReceiverData $reciever,
         public readonly string $pounds,
         public readonly string $ounces,
         public readonly string $zip_origin,

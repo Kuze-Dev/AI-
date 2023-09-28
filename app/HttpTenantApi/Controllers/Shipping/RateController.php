@@ -14,6 +14,7 @@ use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\Actions\GetShippingRateAction;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
+use Domain\Shipment\DataTransferObjects\ReceiverData;
 // use Domain\Shipment\DataTransferObjects\ShipFromAddressData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
@@ -67,8 +68,8 @@ class RateController extends Controller
             return response(
                 app(GetShippingRateAction::class)
                     ->execute(
-                        customer: $customer->load('verifiedAddress'),
                         parcelData: new ParcelData(
+                            reciever: ReceiverData::fromCustomerModel($customer->load('verifiedAddress')),
                             pounds: (string) $boxData->weight,
                             ounces: '0',
                             zip_origin: $shippingMethod->shipper_zipcode,

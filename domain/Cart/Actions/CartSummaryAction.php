@@ -22,6 +22,7 @@ use Domain\Taxation\Models\TaxZone;
 use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
+use Domain\Shipment\DataTransferObjects\ReceiverData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 
 class CartSummaryAction
@@ -151,6 +152,7 @@ class CartSummaryAction
             $country = $shippingMethod->country;
 
             $parcelData = new ParcelData(
+                reciever: ReceiverData::fromCustomerModel($customer->load('verifiedAddress')),
                 ship_from_address: new ShippingAddressData(
                     address: $shippingMethod->shipper_address,
                     city: $shippingMethod->shipper_city,
@@ -170,7 +172,7 @@ class CartSummaryAction
             );
 
             $shippingFeeTotal = app(GetShippingfeeAction::class)
-                ->execute($customer, $parcelData, $shippingMethod, $shippingAddress, $serviceId);
+                ->execute($parcelData, $shippingMethod, $shippingAddress, $serviceId);
         }
 
         return $shippingFeeTotal;

@@ -4,22 +4,24 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\Drivers;
 
-use Domain\Shipment\Actions\USPS\GetUSPSInternationalRateDataAction;
-use Domain\Shipment\Actions\USPS\GetUSPSRateDataAction;
+use Domain\Shipment\Actions\AusPost\GetAusPostInternationalRateDataAction;
+use Domain\Shipment\Actions\AusPost\GetAuspostRateDataAction;
 use Domain\Shipment\Contracts\API\RateResponse;
-use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
+use Domain\ShippingMethod\Models\ShippingMethod;
 
-class UspsDriver
+class AusPostDriver
 {
     public function getRate(
         ParcelData $parcelData,
-        ShippingAddressData $address// AddressValidateRequestData $addressValidateRequestData
+        ShippingAddressData $address,
+        ShippingMethod $shippingMethod
     ): RateResponse {
-        return app(GetUSPSRateDataAction::class)->execute(
+
+        return app(GetAuspostRateDataAction::class)->execute(
             $parcelData,
-            AddressValidateRequestData::fromShippingDataDTO($address),
+            $address
         );
     }
 
@@ -27,9 +29,10 @@ class UspsDriver
         ParcelData $parcelData,
         ShippingAddressData $address,
     ): RateResponse {
-        return app(GetUSPSInternationalRateDataAction::class)->execute(
+
+        return app(GetAusPostInternationalRateDataAction::class)->execute(
             $parcelData,
-            $address,
+            $address
         );
     }
 }
