@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Auth\Address;
 
 use App\Features\ECommerce\ECommerceBase;
+use App\Features\ECommerce\ShippingUps;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Requests\Auth\Address\AddressRequest;
 use App\HttpTenantApi\Resources\AddressResource;
@@ -13,6 +14,11 @@ use Domain\Address\Actions\DeleteAddressAction;
 use Domain\Address\Actions\UpdateAddressAction;
 use Domain\Address\Exceptions\CantDeleteDefaultAddressException;
 use Domain\Address\Models\Address;
+use Domain\Address\Models\Country;
+use Domain\Address\Models\State;
+use Domain\Shipment\API\USPS\Clients\AddressClient;
+use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -50,14 +56,30 @@ class AddressController extends Controller
     }
 
     /** @throws Throwable */
-    public function store(AddressRequest $request): AddressResource
+    public function store(AddressRequest $request): AddressResource|JsonResponse
     {
         /** @var \Domain\Customer\Models\Customer $customer */
         $customer = Auth::user();
 
+        $country = Country::whereCode($request->country_id)->first();
+
+        $state = State::whereId($request->state_id)->first();
+
+        if ($country && $state) {
+            $countryName = $country->name;
+        } else {
+            return response()->json('Country or State not found', 404);
+        }
+
+        $addressDto = $request->toDTO(customer: $customer);
+
+        if(tenancy()->tenant?->features()->active(ShippingUps::class) && $countryName === 'United States') {
+            $addressDto = app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $state));
+        }
+
         $address = DB::transaction(
             fn () => app(CreateAddressAction::class)
-                ->execute($request->toDTO(customer: $customer))
+                ->execute($addressDto)
         );
 
         return AddressResource::make($address);
