@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Address;
 
+use App\Features\Customer\AddressBase;
 use App\Features\ECommerce\ECommerceBase;
 use App\Features\ECommerce\ShippingUps;
 use App\Http\Controllers\Controller;
@@ -30,7 +31,7 @@ use Throwable;
 
 #[
     Resource('addresses', apiResource: true),
-    Middleware(['auth:sanctum', 'feature.tenant:' . ECommerceBase::class])
+    Middleware(['auth:sanctum', 'feature.tenant:' . AddressBase::class])
 ]
 class AddressController extends Controller
 {
@@ -76,8 +77,26 @@ class AddressController extends Controller
             return response()->json('Country or State not found', 404);
         }
 
-        if(tenancy()->tenant?->features()->active(ShippingUps::class) && $countryName === 'United States') {
-            $addressDto = app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
+        try {
+            if (tenancy()->tenant?->features()->active(ShippingUps::class) && $countryName === 'United States') {
+                app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
+            }
+
+            $address = DB::transaction(
+                fn () => app(CreateAddressAction::class)
+                    ->execute($addressDto)
+            );
+
+        } catch (\Exception $e) {
+            dd($e->statusCode);
+            // Check if the exception is a 422 error.
+            if ($e->getCode() === 422) {
+                // Customize your response here for a 422 error.
+                return response()->json(['error' => 'Address validation failed'], 422);
+            }
+
+            // Handle other exceptions or rethrow them if necessary.
+            throw $e;
         }
 
         $address = DB::transaction(
