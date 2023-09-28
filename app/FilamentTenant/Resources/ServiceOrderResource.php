@@ -9,6 +9,7 @@ use App\FilamentTenant\Resources\ServiceOrderResource\Pages\EditServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ListServiceOrder;
 use App\FilamentTenant\Support\TextLabel;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Closure;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
 use Domain\ServiceOrder\Models\ServiceOrder;
@@ -52,20 +53,32 @@ class ServiceOrderResource extends Resource
                                 ->reactive(),
 
                             Forms\Components\Group::make()->columns(2)->schema([
-                                Placeholder::make('First Name')
-                                    ->content('Jerome'),
-                                Placeholder::make('Last Name')
-                                    ->content('Hipolito'),
-                                Placeholder::make('Email')
-                                    ->content('jerome@halcyon.com'),
-                                Placeholder::make('Mobile')
-                                    ->content('09123456789'),
-                                Placeholder::make('Service Address')
+                                Placeholder::make('first_name')
+                                    ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
+                                        ? Customer::whereId($customerId)->first()->first_name
+                                        : ""),
+                                Placeholder::make('last_name')
+                                    ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
+                                        ? Customer::whereId($customerId)->first()->last_name
+                                        : ""),
+                                Placeholder::make('email')
+                                    ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
+                                        ? Customer::whereId($customerId)->first()->email
+                                        : ""),
+                                Placeholder::make('mobile')
+                                    ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
+                                        ? Customer::whereId($customerId)->first()->mobile
+                                        : ""),
+                                Placeholder::make('service_address')
                                     ->content('123 abc street')->columnSpan(2),
-                                Placeholder::make('Billing Address')
+                                Placeholder::make('billing_address')
                                     ->content('123 abc street')->columnSpan(2),
                             ])->visible(
                                 function (array $state) {
+                                    // if(isset($state['customer_id'])){
+                                    //     dd($state);
+                                    // }
+                            
                                     return isset($state['customer_id']);
                                 }
                             ),
@@ -114,6 +127,7 @@ class ServiceOrderResource extends Resource
                                     ->label('')
                                     ->createItemButtonLabel('Additional Charges')
                                     ->columnSpan(2)
+                                    ->defaultItems(0)
                                     ->schema([
                                         TextInput::make('name'),
                                         TextInput::make('quantity')->numeric(),
@@ -161,14 +175,14 @@ class ServiceOrderResource extends Resource
                                 ->size('md')
                                 ->inline()
                                 ->readOnly()
-                                ->color('warning'),
+                                ->color('primary'),
                             TextLabel::make('')
                                 ->label(trans('$2000.00'))
                                 ->alignLeft()
                                 ->size('md')
                                 ->inline()
                                 ->readOnly()
-                                ->color('warning'),
+                                ->color('primary'),
                         ]),
 
                 ])->columnSpan(1),

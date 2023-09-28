@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\ServiceResource\Pages\CreateService;
 use App\FilamentTenant\Resources\ServiceResource\Pages\EditService;
 use App\FilamentTenant\Resources\ServiceResource\Pages\ListServices;
@@ -13,6 +14,8 @@ use App\Settings\ServiceSettings;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Service\Enums\BillingCycle;
+use Domain\Service\Enums\RecurringPayment;
 use Domain\Service\Enums\Status;
 use Domain\Service\Models\Service;
 use Domain\Taxonomy\Models\TaxonomyTerm;
@@ -21,6 +24,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 
 class ServiceResource extends Resource
 {
@@ -31,6 +35,8 @@ class ServiceResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
     protected static ?string $navigationGroup = 'Service Management';
+
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Form $form): Form
     {
@@ -67,8 +73,7 @@ class ServiceResource extends Resource
                                     fn (?Service $record) => $record?->taxonomyTerms->first()->id ?? null
                                 )
                                 ->statePath('taxonomy_term_id')
-                                ->required()
-                                ->when(fn () => ! empty($categories->toArray())),
+                                ->required(),
                             Forms\Components\FileUpload::make('images')
                                 ->translateLabel()
                                 ->mediaLibraryCollection('image')
@@ -108,6 +113,13 @@ class ServiceResource extends Resource
                                     ->label(trans('Featured Service')),
                             ])
                             ->columns(2),
+                        Forms\Components\Section::make('Dynamic Form Builder')
+                            ->schema([
+                                SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)
+                                    ->schemaData(fn (Closure $get) => Blueprint::query()->firstWhere('id', $get('blueprint_id'))?->schema),
+                            ])
+                            ->hidden(fn (Closure $get) => $get('blueprint_id') === null)
+                            ->columnSpan(2),
                     ])->columnSpan(2),
                 Forms\Components\Group::make()->schema([
                     Forms\Components\Section::make('Status')
@@ -117,18 +129,38 @@ class ServiceResource extends Resource
                                 ->label(
                                     fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value))
                                 ),
+                            Forms\Components\Toggle::make('pay_upfront'),
                             Forms\Components\Toggle::make('is_subscription')
-                                ->label(trans('Subscription Based')),
+                                ->label(trans('Subscription-based'))
+                                ->reactive()
+                                ->helperText('Fields below are only available on subscription'),
+                            Forms\Components\Card::make([
+                                Forms\Components\Select::make('billing_cycle')
+                                    ->options(function () {
+                                        $billing = [];
+                                        foreach (BillingCycle::cases() as $billingCycle) {
+                                            $billing[$billingCycle->name] = $billingCycle->value;
+                                        }
+
+                                        return $billing;
+                                    })
+                                    ->required(fn (Closure $get) => $get('is_subscription') === true),
+                                Forms\Components\Select::make('recurring_payment')
+                                    ->options(function () {
+                                        $payment = [];
+                                        foreach (RecurringPayment::cases() as $recurringPayment) {
+                                            $payment[$recurringPayment->name] = $recurringPayment->value;
+                                        }
+
+                                        return $payment;
+                                    })
+                                    ->required(fn (Closure $get) => $get('is_subscription') === true),
+                            ])
+                                ->reactive()
+                                ->disabled(fn (Closure $get) => $get('is_subscription') === false),
                         ]),
                     MetaDataForm::make('Meta Data'),
                 ])->columnSpan(1),
-                Forms\Components\Section::make('Dynamic Form Builder')
-                    ->schema([
-                        SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)
-                            ->schemaData(fn (Closure $get) => Blueprint::query()->firstWhere('id', $get('blueprint_id'))?->schema),
-                    ])
-                    ->hidden(fn (Closure $get) => $get('blueprint_id') === null)
-                    ->columnSpan(2),
             ])
             ->columns(3);
     }
@@ -137,7 +169,39 @@ class ServiceResource extends Resource
     {
         return $table
             ->columns([
+                SpatieMediaLibraryImageColumn::make('image')
+                    ->collection('image')
+                    ->default(
+                        fn (Service $record) => $record->getFirstMedia('image') === null
+                            ? 'https://via.placeholder.com/500x300/333333/fff?text=No+preview+available'
+                            : null
+                    )
+                    ->extraImgAttributes(['class' => 'aspect-[5/3] object-fill']),
+                Tables\Columns\TextColumn::make('name')
+                    ->translateLabel()
+                    ->searchable()
+                    ->limit(50)
+                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (strlen($state) <= $column->getLimit()) {
+                            return null;
+                        }
 
+                        return $state;
+                    })
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('price')
+                    ->translateLabel()
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\BadgeColumn::make('status')
+                    ->translateLabel()
+                    ->formatStateUsing(fn ($state) => $state
+                        ? ucfirst(STATUS::ACTIVE->value)
+                        : ucfirst(STATUS::INACTIVE->value))
+                    ->color(fn (Service $record) => $record->status ? 'success' : 'secondary')
+                    ->sortable(),
             ])
             ->filters([
 
@@ -153,7 +217,7 @@ class ServiceResource extends Resource
     public static function getRelations(): array
     {
         return [
-
+            ActivitiesRelationManager::class,
         ];
     }
 

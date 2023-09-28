@@ -16,12 +16,16 @@ return new class () extends Migration {
             $table->string('name')->unique();
             $table->text('description')->nullable();
             $table->integer('price');
-            $table->json('data');
+            $table->string('billing_cycle')->nullable(); //monthly and yearly
+            $table->string('recurring_payment')->nullable(); //daily, monthly and yearly
+            $table->json('data')->nullable();
             $table->boolean('is_featured');
             $table->boolean('is_special_offer');
+            $table->boolean('pay_upfront');
             $table->boolean('is_subscription');
             $table->boolean('status');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('service_taxonomy_terms', function (Blueprint $table) {
