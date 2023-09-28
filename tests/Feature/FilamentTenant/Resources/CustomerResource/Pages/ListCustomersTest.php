@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\FilamentTenant\Resources\CustomerResource\Pages\ListCustomers;
 use Domain\Customer\Database\Factories\CustomerFactory;
-use Domain\Tier\Enums\TierApprovalStatus;
 use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 use Filament\Pages\Actions\RestoreAction;
@@ -41,15 +40,13 @@ it('can list customers', function () {
 
 it('can delete customer', function () {
     $customer = CustomerFactory::new()
-        ->createOne([
-            'tier_approval_status' => TierApprovalStatus::APPROVED->value
-        ]);
+        ->createOne();
 
     livewire(ListCustomers::class)
         ->callTableAction(DeleteAction::class, $customer)
         ->assertOk();
 
-    // assertSoftDeleted($customer);
+    assertSoftDeleted($customer);
 });
 
 it('can restore customer', function () {

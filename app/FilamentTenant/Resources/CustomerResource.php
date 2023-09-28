@@ -41,7 +41,6 @@ use Illuminate\Validation\Rules\Password;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Support\Excel\Actions\ExportBulkAction;
 use ErrorException;
-use Filament\Tables\Actions\DeleteAction;
 
 class CustomerResource extends Resource
 {
@@ -144,7 +143,7 @@ class CustomerResource extends Resource
                                 return true;
                             }
 
-                            if ($record && ($record->tier_approval_status === TierApprovalStatus::APPROVED || ($tier && $record->tier_id == $tier->getKey()))) {
+                            if ($record && ($record->tier_approval_status === TierApprovalStatus::APPROVED || $record->tier_id == ($tier->getKey() ?? null))) {
                                 return true;
                             }
 
@@ -407,17 +406,17 @@ class CustomerResource extends Resource
                 Tables\Actions\EditAction::make()
                     ->translateLabel()
                     ->hidden(fn (?Customer $record) => $record?->tier_approval_status == TierApprovalStatus::REJECTED ? true : false),
-                // Tables\Actions\DeleteAction::make()
-                //     ->translateLabel()
-                //     ->using(function (Customer $record) {
-                //         try {
-                //             return app(DeleteCustomerAction::class)->execute($record);
-                //         } catch (DeleteRestrictedException $e) {
-                //             return false;
-                //         }
-                //     })
-                //     ->button()
-                //     ->hidden(fn (?Customer $record) => $record?->tier_approval_status == TierApprovalStatus::REJECTED ? false : true),
+                Tables\Actions\DeleteAction::make()
+                    ->translateLabel()
+                    ->using(function (Customer $record) {
+                        try {
+                            return app(ForceDeleteCustomerAction::class)->execute($record);
+                        } catch (DeleteRestrictedException $e) {
+                            return false;
+                        }
+                    })
+                    ->button()
+                    ->hidden(fn (?Customer $record) => $record?->tier_approval_status == TierApprovalStatus::REJECTED ? false : true),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('send-register-invitation')
                         ->label(fn (Customer $record) => match ($record->register_status) {
@@ -461,8 +460,8 @@ class CustomerResource extends Resource
                             } catch (DeleteRestrictedException $e) {
                                 return false;
                             }
-                        }),
-                        // ->hidden(fn (Customer $record) => $record->register_status == RegisterStatus::REJECTED ? true : false),
+                        })
+                        ->hidden(fn (Customer $record) => $record->register_status == RegisterStatus::REJECTED ? true : false),
                     Tables\Actions\RestoreAction::make()
                         ->translateLabel()
                         ->using(
