@@ -54,6 +54,7 @@ class ProductController
                     'media',
                     'metaData',
                     'tiers',
+                    'productTier',
                 ])
                 ->jsonPaginate()
         );
@@ -71,6 +72,7 @@ class ProductController
                 'media',
                 'metaData',
                 'tiers',
+                'productTier',
             ])
             ->firstOrFail();
 
