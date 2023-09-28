@@ -61,20 +61,23 @@ class AddressController extends Controller
         /** @var \Domain\Customer\Models\Customer $customer */
         $customer = Auth::user();
 
+        $addressDto = $request->toDTO(customer: $customer);
+
+        /** @var \Domain\Address\Models\Country $country */
         $country = Country::whereCode($request->country_id)->first();
 
+        /** @var \Domain\Address\Models\State $state */
         $state = State::whereId($request->state_id)->first();
 
         if ($country && $state) {
             $countryName = $country->name;
+            $stateName = $state->name;
         } else {
             return response()->json('Country or State not found', 404);
         }
 
-        $addressDto = $request->toDTO(customer: $customer);
-
         if(tenancy()->tenant?->features()->active(ShippingUps::class) && $countryName === 'United States') {
-            $addressDto = app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $state));
+            $addressDto = app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
         }
 
         $address = DB::transaction(

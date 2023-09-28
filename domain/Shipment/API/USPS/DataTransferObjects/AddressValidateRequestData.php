@@ -45,14 +45,14 @@ class AddressValidateRequestData
         );
     }
 
-    public static function fromAddressRequest(AddressData $addressDTO, State $state): self
+    public static function fromAddressRequest(AddressData $addressDTO, string $stateName): self
     {
 
         return new self(
             Address1: '',
             Address2: $addressDTO->address_line_1,
             City: $addressDTO->city,
-            State: $state->name,
+            State: $stateName,
             Zip5: $addressDTO->zip_code,
             Zip4: '',
         );
