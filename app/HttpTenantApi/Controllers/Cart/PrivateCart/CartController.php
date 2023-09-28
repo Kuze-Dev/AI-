@@ -10,6 +10,7 @@ use Domain\Cart\Actions\DestroyCartAction;
 use Domain\Cart\Models\Cart;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -26,12 +27,25 @@ class CartController extends Controller
         /** @var \Domain\Customer\Models\Customer $customer */
         $customer = auth()->user();
 
+        /** @var \Domain\Tier\Models\Tier $tier */
+        $tier = $customer->tier;
+
         $model = QueryBuilder::for(
             Cart::with([
-                'cartLines.purchasable' => function (MorphTo $query) {
+                'cartLines.purchasable' => function (MorphTo $query) use ($tier) {
                     $query->morphWith([
-                        Product::class => ['media'],
-                        ProductVariant::class => ['product.media'],
+                        Product::class => [
+                            'media',
+                            'productTier' => function (BelongsToMany $query) use ($tier) {
+                                $query->where('tier_id', $tier->id);
+                            },
+                        ],
+                        ProductVariant::class => [
+                            'product.media',
+                            'product.productTier' => function (BelongsToMany $query) use ($tier) {
+                                $query->where('tier_id', $tier->id);
+                            },
+                        ],
                     ]);
                 },
                 'cartLines.media',

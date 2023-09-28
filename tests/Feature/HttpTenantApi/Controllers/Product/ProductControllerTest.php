@@ -8,6 +8,7 @@ use Domain\Product\Database\Factories\ProductOptionValueFactory;
 use Domain\Product\Database\Factories\ProductVariantFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
+use Domain\Tier\Database\Factories\TierFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Support\Str;
 use Support\MetaData\Database\Factories\MetaDataFactory;
@@ -84,6 +85,7 @@ it('can show a product with includes', function (string $include) {
     $product = ProductFactory::new(['name' => 'Foo', 'status' => 1])
         ->has(TaxonomyTermFactory::new()->for(TaxonomyFactory::new()->withDummyBlueprint())->count(2))
         ->has(ProductOptionFactory::new()->has(ProductOptionValueFactory::new()))
+        ->has(TierFactory::new())
         ->has(ProductVariantFactory::new())
         ->has(MetaDataFactory::new())
         ->create();
@@ -106,6 +108,8 @@ it('can show a product with includes', function (string $include) {
     'productOptions',
     'productVariants',
     'metaData',
+    'tiers',
+    'productTier',
 ]);
 
 it('cant list inactive products', function () {

@@ -4,26 +4,27 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Actions;
 
-use Domain\Address\Models\Address;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\DataTransferObjects\SummaryData;
+use Domain\Cart\Helpers\PrivateCart\ComputedTierSellingPrice;
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
 use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Discount\Enums\DiscountConditionType;
 use Domain\Discount\Models\Discount;
+use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\Actions\GetShippingfeeAction;
 use Domain\Shipment\DataTransferObjects\ParcelData;
-use Domain\Shipment\DataTransferObjects\ShipFromAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
 use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 
 class CartSummaryAction
 {
@@ -42,56 +43,63 @@ class CartSummaryAction
 
         $taxTotal = $tax['taxPercentage'] ? round($initialSubTotal * $tax['taxPercentage'] / 100, 2) : 0;
 
-        $initialShippingTotal = $this->getShippingFee(
-            $collections,
-            $cartSummaryShippingData->customer,
-            $cartSummaryShippingData->shippingAddress,
-            $cartSummaryShippingData->shippingMethod,
-            $serviceId
-        );
+        if ($cartSummaryShippingData->shippingAddress) {
 
-        $discountTotal = $this->getDiscount($discount, $initialSubTotal, $initialShippingTotal);
+            $shippingAddress = ShippingAddressData::fromAddressModel($cartSummaryShippingData->shippingAddress);
 
-        $initialTotal = $initialSubTotal + $taxTotal + $initialShippingTotal;
+            $initialShippingTotal = $this->getShippingFee(
+                $collections,
+                $cartSummaryShippingData->customer,
+                $shippingAddress,
+                $cartSummaryShippingData->shippingMethod,
+                $serviceId
+            );
 
-        $subtotal = $initialSubTotal;
-        $shippingTotal = $initialShippingTotal;
+            $discountTotal = $this->getDiscount($discount, $initialSubTotal, $initialShippingTotal);
 
-        $discountMessages = (new DiscountHelperFunctions())->validateDiscountCode($discount, $initialTotal);
+            $initialTotal = $initialSubTotal + $taxTotal + $initialShippingTotal;
 
-        if ($discount?->discountCondition?->discount_type === DiscountConditionType::ORDER_SUB_TOTAL) {
-            if ($discountTotal >= $initialSubTotal) {
-                $subtotal = 0;
-            } else {
-                $subtotal = $initialSubTotal - $discountTotal;
+            $subtotal = $initialSubTotal;
+            $shippingTotal = $initialShippingTotal;
+
+            $discountMessages = (new DiscountHelperFunctions())->validateDiscountCode($discount, $initialTotal);
+
+            if ($discount?->discountCondition?->discount_type === DiscountConditionType::ORDER_SUB_TOTAL) {
+                if ($discountTotal >= $initialSubTotal) {
+                    $subtotal = 0;
+                } else {
+                    $subtotal = $initialSubTotal - $discountTotal;
+                }
             }
-        }
 
-        if ($discount?->discountCondition?->discount_type === DiscountConditionType::DELIVERY_FEE) {
-            if ($discountTotal >= $initialShippingTotal) {
-                $shippingTotal = 0;
-            } else {
-                $shippingTotal = $initialShippingTotal - $discountTotal;
+            if ($discount?->discountCondition?->discount_type === DiscountConditionType::DELIVERY_FEE) {
+                if ($discountTotal >= $initialShippingTotal) {
+                    $shippingTotal = 0;
+                } else {
+                    $shippingTotal = $initialShippingTotal - $discountTotal;
+                }
             }
+
+            $grandTotal = $subtotal + $taxTotal + $shippingTotal;
+
+            $summaryData = [
+                'initialSubTotal' => $initialSubTotal,
+                'subTotal' => $subtotal,
+                'taxZone' => $tax['taxZone'],
+                'taxDisplay' => $tax['taxDisplay'],
+                'taxPercentage' => $tax['taxPercentage'],
+                'taxTotal' => $taxTotal,
+                'grandTotal' => $grandTotal,
+                'discountTotal' => $discountMessages->status == 'valid' ? $discountTotal : 0,
+                'discountMessages' => $discountMessages,
+                'initialShippingTotal' => $initialShippingTotal,
+                'shippingTotal' => $shippingTotal,
+            ];
+
+            return SummaryData::fromArray($summaryData);
+        } {
+            throw new BadRequestHttpException('No shipping address found');
         }
-
-        $grandTotal = $subtotal + $taxTotal + $shippingTotal;
-
-        $summaryData = [
-            'initialSubTotal' => $initialSubTotal,
-            'subTotal' => $subtotal,
-            'taxZone' => $tax['taxZone'],
-            'taxDisplay' => $tax['taxDisplay'],
-            'taxPercentage' => $tax['taxPercentage'],
-            'taxTotal' => $taxTotal,
-            'grandTotal' => $grandTotal,
-            'discountTotal' => $discountMessages->status == 'valid' ? $discountTotal : 0,
-            'discountMessages' => $discountMessages,
-            'initialShippingTotal' => $initialShippingTotal,
-            'shippingTotal' => $shippingTotal,
-        ];
-
-        return SummaryData::fromArray($summaryData);
     }
 
     /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
@@ -103,14 +111,20 @@ class CartSummaryAction
             $subTotal = $collections->reduce(function ($carry, $collection) {
                 /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
                 $purchasable = $collection->purchasable;
-                $sellingPrice = (float) $purchasable->selling_price;
+
+                $initialSellingPrice = (float) $purchasable->selling_price;
+
+                $sellingPrice = $this->getTierSellingPrice($purchasable, $initialSellingPrice);
 
                 return $carry + ($sellingPrice * $collection->quantity);
             }, 0);
         } elseif ($collections instanceof CartLine) {
             /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
             $purchasable = $collections->purchasable;
-            $sellingPrice = (float) $purchasable->selling_price;
+
+            $initialSellingPrice = (float) $purchasable->selling_price;
+
+            $sellingPrice = $this->getTierSellingPrice($purchasable, $initialSellingPrice);
 
             $subTotal = $sellingPrice * $collections->quantity;
         }
@@ -118,11 +132,29 @@ class CartSummaryAction
         return $subTotal;
     }
 
+    public function getTierSellingPrice(Product|ProductVariant $purchasable, float $sellingPrice): int|float
+    {
+        if ($purchasable instanceof Product) {
+            if ($purchasable->relationLoaded('productTier') && $purchasable->productTier->isNotEmpty()) {
+                $sellingPrice = app(ComputedTierSellingPrice::class)->execute($purchasable, $sellingPrice);
+            }
+        } elseif ($purchasable instanceof ProductVariant) {
+            /** @var \Domain\Product\Models\Product $product */
+            $product = $purchasable->product;
+
+            if ($product->relationLoaded('productTier') && $product->productTier->isNotEmpty()) {
+                $sellingPrice = app(ComputedTierSellingPrice::class)->execute($product, $sellingPrice);
+            }
+        }
+
+        return $sellingPrice;
+    }
+
     /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
     public function getShippingFee(
         CartLine|Collection $collections,
         Customer $customer,
-        ?Address $shippingAddress,
+        ?ShippingAddressData $shippingAddress,
         ?ShippingMethod $shippingMethod,
         ?int $serviceId
     ): float {
@@ -146,7 +178,7 @@ class CartSummaryAction
             $country = $shippingMethod->country;
 
             $parcelData = new ParcelData(
-                ship_from_address: new ShipFromAddressData(
+                ship_from_address: new ShippingAddressData(
                     address: $shippingMethod->shipper_address,
                     city: $shippingMethod->shipper_city,
                     state: $state,
