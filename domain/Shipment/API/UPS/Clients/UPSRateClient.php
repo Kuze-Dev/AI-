@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\API\UPS\Clients;
 
-use Domain\Customer\Models\Customer;
 use Domain\Shipment\API\UPS\DataTransferObjects\UpsResponse;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
@@ -17,7 +16,6 @@ class UPSRateClient extends BaseClient
     }
 
     public function getRate(
-        Customer $customer,
         ParcelData $parcelData,
         ShippingAddressData $address
     ): UpsResponse {
@@ -26,6 +24,7 @@ class UPSRateClient extends BaseClient
         // dd($parcelData);
         $package = $this->getPackage($parcelData);
 
+        $customer = $parcelData->reciever;
         // Create the associative array representing the JSON structure
         $data = [
             'RateRequest' => [
@@ -109,7 +108,6 @@ class UPSRateClient extends BaseClient
     }
 
     public function getInternationalRate(
-        Customer $customer,
         ParcelData $parcelData,
         ShippingAddressData $address,
     ): UpsResponse {
@@ -117,6 +115,8 @@ class UPSRateClient extends BaseClient
         $shipper = $parcelData->ship_from_address;
 
         $package = $this->getPackage($parcelData);
+
+        $customer = $parcelData->reciever;
 
         $data = [
             'RateRequest' => [
