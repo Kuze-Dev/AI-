@@ -4,26 +4,24 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\Actions\AusPost;
 
-use Domain\Customer\Models\Customer;
-use Domain\Shipment\API\AusPost\Client\AusPostRateClient;
+use Domain\Shipment\API\AusPost\Client\AusPostInternationalRateClient;
+use Domain\Shipment\API\AusPost\DataTransferObjects\AusPostResponse;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 
 class GetAusPostInternationalRateDataAction
 {
     public function __construct(
-        private readonly AusPostRateClient $rateClient,
+        private readonly AusPostInternationalRateClient $internationalRateClient,
     ) {
     }
 
     public function execute(
-        Customer $customer,
         ParcelData $parcelData,
         ShippingAddressData $customer_address,
-    ) {
+    ): AusPostResponse {
 
-        return $this->rateClient->getInternationalRate(
-            customer: $customer,
+        return $this->internationalRateClient->getInternationalRate(
             parcelData: $parcelData,
             address: $customer_address,
         );

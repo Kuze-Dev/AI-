@@ -9,16 +9,16 @@ use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\Shipment\Enums\UnitEnum;
 
-class AusPostRateClient extends BaseClient
+class AusPostInternationalRateClient extends BaseClient
 {
     public static function uri(): string
     {
-        return 'postage/parcel/domestic/service.json';
+        return 'postage/parcel/international/service.json';
     }
 
-    public function getRate(
+    public function getInternationalRate(
         ParcelData $parcelData,
-        ShippingAddressData $address
+        ShippingAddressData $address,
     ): AusPostResponse {
 
         $response = $this->client->getClient()
@@ -26,13 +26,9 @@ class AusPostRateClient extends BaseClient
                 'AUTH-KEY' => $this->client->auspost_api_key,
             ])
             ->withQueryParameters([
-                'from_postcode' => $parcelData->ship_from_address->zipcode,
-                'to_postcode' => $address->zipcode,
-                'length' => $parcelData->length,
-                'height' => $parcelData->height,
-                'width' => $parcelData->width,
+                'country_code' => $address->country->code,
                 'weight' => $parcelData->boxData->getTotalWeight(UnitEnum::KG->value),
-                'service_code' => 'AUS_PARCEL_REGULAR',
+
             ])
             ->get(self::uri())
             ->body();

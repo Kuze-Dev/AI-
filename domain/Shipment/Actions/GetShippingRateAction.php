@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\Actions;
 
-use Domain\Customer\Models\Customer;
 use Domain\Shipment\Contracts\API\RateResponse;
 use Domain\Shipment\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
@@ -20,7 +19,6 @@ class GetShippingRateAction
     }
 
     public function execute(
-        Customer $customer,
         ParcelData $parcelData,
         ShippingMethod $shippingMethod,
         ShippingAddressData $address
@@ -31,7 +29,6 @@ class GetShippingRateAction
         if ($shippingMethod->driver == Driver::AUSPOST && $this->isDomesticShipping($address, 'AU')) {
 
             return $shippingDriver->getRate(
-                $customer,
                 $parcelData,
                 $address,
                 $shippingMethod,
@@ -43,7 +40,6 @@ class GetShippingRateAction
         ) {
 
             return $shippingDriver->getRate(
-                $customer,
                 $parcelData,
                 $address, // AddressValidateRequestData::formAddress($address),
                 $shippingMethod,
@@ -51,7 +47,6 @@ class GetShippingRateAction
         }
 
         return $shippingDriver->getInternationalRate(
-            $customer,
             $parcelData,
             $address,
         );
