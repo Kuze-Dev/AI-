@@ -7,7 +7,6 @@ namespace Domain\Shipment\API\UPS\Clients;
 use Domain\Shipment\API\UPS\DataTransferObjects\UpsResponse;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
-use Illuminate\Support\Facades\Auth;
 
 class UPSRateClient extends BaseClient
 {

@@ -17,7 +17,7 @@ class ReceiverData
     ) {
     }
 
-    public static function fromCustomerModel(Customer $customer): self  
+    public static function fromCustomerModel(Customer $customer): self
     {
         return new self(
             last_name: $customer->last_name,

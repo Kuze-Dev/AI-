@@ -34,38 +34,37 @@ class GetUSPSRateDataAction
             $verifiedAddress = $customer->verifiedAddress;
 
             if ($verifiedAddress !== null) {
-    
+
                 if ($verifiedAddress->address != $addressValidateRequestData->toArray()) {
-    
+
                     $updatedVerifiedAddress = $this->addressClient->verify($addressValidateRequestData);
-    
+
                     $verifiedAddress->update([
                         'address' => $addressValidateRequestData->toArray(),
                         'verified_address' => $updatedVerifiedAddress->toArray(),
                     ]);
-    
+
                 }
-    
+
                 $zipDestination = $verifiedAddress->verified_address['zip5'] ?? null;
-    
+
             } else {
-    
+
                 $address = $this->addressClient->verify($addressValidateRequestData);
-    
+
                 $customer->verifiedAddress()->create([
                     'address' => $addressValidateRequestData->toArray(),
                     'verified_address' => $address->toArray(),
                 ]);
-    
+
                 $zipDestination = $address->zip5;
             }
-        }else{
+        } else {
 
             $address = $this->addressClient->verify($addressValidateRequestData);
 
             $zipDestination = $address->zip5;
         }
-      
 
         return $this->rateClient->getV4(
             new RateV4RequestData(
