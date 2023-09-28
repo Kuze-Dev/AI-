@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Domain\Admin\Models\Admin;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
-use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -28,6 +27,7 @@ return new class () extends Migration {
             $table->string('customer_email');
             $table->string('customer_mobile_no');
             $table->json('customer_form');
+            $table->json('additional_charges');
             $table->string('service_address');
             $table->string('billing_address');
             $table->string('currency_code')->index();
@@ -43,22 +43,11 @@ return new class () extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('service_order_additional_charges', function (Blueprint $table) {
-            $table->id();
-            $table->foreignIdFor(ServiceOrder::class)->index();
-
-            $table->string('name');
-            $table->integer('quantity')->default(1);
-            $table->decimal('price', 10, 2);
-
-            $table->timestamps();
-        });
     }
 
     /** Reverse the migrations. */
     public function down(): void
     {
         Schema::dropIfExists('service_orders');
-        Schema::dropIfExists('service_order_additional_charges');
     }
 };

@@ -113,13 +113,13 @@ class ServiceResource extends Resource
                                     ->label(trans('Featured Service')),
                             ])
                             ->columns(2),
-                        Forms\Components\Section::make('Dynamic Form Builder')
-                            ->schema([
-                                SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)
-                                    ->schemaData(fn (Closure $get) => Blueprint::query()->firstWhere('id', $get('blueprint_id'))?->schema),
-                            ])
-                            ->hidden(fn (Closure $get) => $get('blueprint_id') === null)
-                            ->columnSpan(2),
+                        // Forms\Components\Section::make('Dynamic Form Builder')
+                        //     ->schema([
+                        //         SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)
+                        //             ->schemaData(fn (Closure $get) => Blueprint::query()->firstWhere('id', $get('blueprint_id'))?->schema),
+                        //     ])
+                        //     ->hidden(fn (Closure $get) => $get('blueprint_id') === null)
+                        //     ->columnSpan(2),
                     ])->columnSpan(2),
                 Forms\Components\Group::make()->schema([
                     Forms\Components\Section::make('Status')

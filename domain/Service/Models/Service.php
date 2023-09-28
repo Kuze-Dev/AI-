@@ -19,7 +19,55 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 use Spatie\MediaLibrary\HasMedia;
 
 /**
- * @property mixed|null $blueprint
+ * Domain\Service\Models\Service
+ *
+ * @property int $id
+ * @property string $blueprint_id
+ * @property string $name
+ * @property string|null $description
+ * @property int $price
+ * @property string|null $billing_cycle
+ * @property string|null $recurring_payment
+ * @property array|null $data
+ * @property int $is_featured
+ * @property int $is_special_offer
+ * @property int $pay_upfront
+ * @property int $is_subscription
+ * @property int $status
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read Blueprint|null $blueprint
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read int|null $media_count
+ * @property-read \Support\MetaData\Models\MetaData|null $metaData
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
+ * @property-read int|null $taxonomy_terms_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Service newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Service newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Service onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Service query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereBillingCycle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereBlueprintId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereData($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereIsFeatured($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereIsSpecialOffer($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereIsSubscription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service wherePayUpfront($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereRecurringPayment($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Service withoutTrashed()
+ * @mixin \Eloquent
  */
 class Service extends Model implements HasMetaDataContract, HasMedia
 {

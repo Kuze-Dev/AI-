@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Resources;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\CreateServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\EditServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ListServiceOrder;
+use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
@@ -56,19 +57,19 @@ class ServiceOrderResource extends Resource
                                 Placeholder::make('first_name')
                                     ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
                                         ? Customer::whereId($customerId)->first()->first_name
-                                        : ""),
+                                        : ''),
                                 Placeholder::make('last_name')
                                     ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
                                         ? Customer::whereId($customerId)->first()->last_name
-                                        : ""),
+                                        : ''),
                                 Placeholder::make('email')
                                     ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
                                         ? Customer::whereId($customerId)->first()->email
-                                        : ""),
+                                        : ''),
                                 Placeholder::make('mobile')
                                     ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
                                         ? Customer::whereId($customerId)->first()->mobile
-                                        : ""),
+                                        : ''),
                                 Placeholder::make('service_address')
                                     ->content('123 abc street')->columnSpan(2),
                                 Placeholder::make('billing_address')
@@ -78,7 +79,7 @@ class ServiceOrderResource extends Resource
                                     // if(isset($state['customer_id'])){
                                     //     dd($state);
                                     // }
-                            
+
                                     return isset($state['customer_id']);
                                 }
                             ),
@@ -92,6 +93,7 @@ class ServiceOrderResource extends Resource
                                     ->placeholder(trans('Select Service'))
                                     ->required()
                                     ->preload()
+                                    ->reactive()
                                     ->optionsFromModel(Service::class, 'name')
                                     ->disabled(fn (?Service $record) => $record !== null),
 
@@ -100,20 +102,33 @@ class ServiceOrderResource extends Resource
                                 Forms\Components\Group::make()->columnSpan(2)->schema([
                                     Forms\Components\Fieldset::make('')->schema([
                                         Placeholder::make('Service')
-                                            ->content('Sample subscription'),
+                                            ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
+                                            ? Service::whereId($serviceId)->first()->name
+                                            : ''),
                                         Placeholder::make('Service Price')
-                                            ->content('$1000'),
-                                        Placeholder::make('Billing Schedule')
-                                            ->content('Every Xth of the month'),
-                                        Placeholder::make('Due Date')
-                                            ->content('Every Xth of the month'),
+                                            ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
+                                            ? Service::whereId($serviceId)->first()->price
+                                            : ''),
+                                        Forms\Components\Group::make()->columnSpan(2)->columns(2)->visible(
+                                            fn (Closure $get) => Service::whereId($get('service_id'))->first()?->is_subscription
+                                        )->schema([
+                                            Placeholder::make('Billing Schedule')
+                                                ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
+                                                ? Service::whereId($serviceId)->first()->billing_cycle
+                                                : ''),
+                                            Placeholder::make('Due Date')
+                                                ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
+                                                ? Service::whereId($serviceId)->first()->recurring_payment
+                                                : ''),
+                                        ]),
+
                                     ]),
-                                ]),
-                                // ->visible(
-                                //     function (array $state) {
-                                //         return isset($state['service_id']);
-                                //     }
-                                // )
+                                ])
+                                    ->visible(
+                                        function (array $state) {
+                                            return isset($state['service_id']);
+                                        }
+                                    ),
 
                                 TextLabel::make('')
                                     ->label(trans('Additional Charges'))
@@ -136,8 +151,13 @@ class ServiceOrderResource extends Resource
                                     ->columns(3),
                             ]),
                         ]),
-                    Section::make(trans('Form Title'))
-                        ->schema([]),
+                    Forms\Components\Section::make('Form Title')
+                        ->schema([
+                            SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)
+                                ->schemaData(fn (Closure $get) => Service::whereId($get('service_id'))->first()?->blueprint->schema),
+                        ])
+                        ->hidden(fn (Closure $get) => $get('service_id') === null)
+                        ->columnSpan(2),
                 ])->columnSpan(2),
 
                 Forms\Components\Group::make()->schema([
