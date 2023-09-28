@@ -28,7 +28,7 @@ class GetShippingRateAction
 
         $shippingDriver = $this->shippingManager->driver($shippingMethod->driver->value);
 
-        if ($shippingMethod->driver == Driver::AUSPOST) {
+        if ($shippingMethod->driver == Driver::AUSPOST && $this->isDomesticShipping($address, 'AU')) {
 
             return $shippingDriver->getRate(
                 $customer,
@@ -60,5 +60,10 @@ class GetShippingRateAction
     protected function isDomesticInUnitedStates(ShippingAddressData $address): bool
     {
         return $address->country->code == 'US';
+    }
+
+    protected function isDomesticShipping(ShippingAddressData $address, string $countryCode): bool
+    {
+        return $address->country->code == $countryCode;
     }
 }

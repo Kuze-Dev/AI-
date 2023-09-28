@@ -21,18 +21,18 @@ class AusPostRateClient extends BaseClient
         ParcelData $parcelData,
         ShippingAddressData $address
     ): AusPostResponse {
-
+       
         $response = $this->client->getClient()
             ->withHeaders([
                 'AUTH-KEY' => $this->client->auspost_api_key,
             ])
             ->withQueryParameters([
-                'from_postcode' => '2000',
-                'to_postcode' => '3000',
-                'length' => '10',
-                'height' => '5',
-                'width' => '6',
-                'weight' => '1',
+                'from_postcode' => $parcelData->ship_from_address->zipcode,
+                'to_postcode' => $address->zipcode,
+                'length' => $parcelData->length,
+                'height' => $parcelData->height,
+                'width' => $parcelData->width,
+                'weight' => $parcelData->boxData->getTotalWeight(),
                 'service_code' => 'AUS_PARCEL_REGULAR',
             ])
             ->get(self::uri())
@@ -41,5 +41,32 @@ class AusPostRateClient extends BaseClient
         $arrayResponse = json_decode($response, true);
 
         return AusPostResponse::fromArray($arrayResponse);
+    }
+
+    public function getInternationalRate(
+        Customer $customer,
+        ParcelData $parcelData,
+        ShippingAddressData $address,
+    ): AusPostResponse {
+
+        $response = $this->client->getClient()
+        ->withHeaders([
+            'AUTH-KEY' => $this->client->auspost_api_key,
+        ])
+        ->withQueryParameters([
+            'from_postcode' => '2000',
+            'to_postcode' => '3000',
+            'length' => '10',
+            'height' => '5',
+            'width' => '6',
+            'weight' => '1',
+            'service_code' => 'AUS_PARCEL_REGULAR',
+        ])
+        ->get(self::uri())
+        ->body();
+
+    $arrayResponse = json_decode($response, true);
+
+    return AusPostResponse::fromArray($arrayResponse);
     }
 }
