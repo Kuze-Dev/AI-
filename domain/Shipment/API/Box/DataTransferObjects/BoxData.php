@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\API\Box\DataTransferObjects;
 
+use Domain\Shipment\Enums\UnitEnum;
+
 class BoxData
 {
     /** @param \Domain\Shipment\API\Box\DataTransferObjects\BoxItem[] $boxitems*/
@@ -20,12 +22,17 @@ class BoxData
         }, 0);
     }
 
-    public function getTotalWeight(): int|float
+    public function getTotalWeight(?string $unit = ''): int|float
     {
 
-        return array_reduce($this->boxitems, function ($carry, $boxItem) {
+        $totalWeight = array_reduce($this->boxitems, function ($carry, $boxItem) {
             return $carry + $boxItem->weight;
         }, 0);
+
+        return match ($unit) {
+            UnitEnum::KG->value => $totalWeight * 0.45359237,
+            default => $totalWeight,
+        };
     }
 
     public static function fromArray(array $data): self
