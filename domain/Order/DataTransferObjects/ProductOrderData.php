@@ -25,6 +25,7 @@ class ProductOrderData
         public readonly ?int $stock,
         public readonly ?bool $allow_stocks,
         public readonly ?int $minimum_order_quantity,
+        public readonly ?bool $allow_guest_purchase,
     ) {
     }
 
@@ -46,6 +47,7 @@ class ProductOrderData
             stock: $data['stock'] ?? null,
             allow_stocks: isset($data['allow_stocks']) ? $data['allow_stocks'] : null,
             minimum_order_quantity: isset($data['minimum_order_quantity']) ? $data['minimum_order_quantity'] : null,
+            allow_guest_purchase: isset($data['allow_guest_purchase']) ? $data['allow_guest_purchase'] : null,
         );
     }
 
@@ -74,6 +76,7 @@ class ProductOrderData
             stock: $product->stock ?? null,
             allow_stocks: isset($product->allow_stocks) ? $product->allow_stocks : null,
             minimum_order_quantity: isset($product->minimum_order_quantity) ? $product->minimum_order_quantity : null,
+            allow_guest_purchase: isset($product->allow_guest_purchase) ? $product->allow_guest_purchase : null,
         );
     }
 }
