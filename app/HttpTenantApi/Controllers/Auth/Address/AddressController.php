@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Auth\Address;
 
 use App\Features\Customer\AddressBase;
-use App\Features\ECommerce\ECommerceBase;
 use App\Features\ECommerce\ShippingUps;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Requests\Auth\Address\AddressRequest;
@@ -19,6 +18,7 @@ use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Shipment\API\USPS\Clients\AddressClient;
 use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -64,47 +64,35 @@ class AddressController extends Controller
 
         $addressDto = $request->toDTO(customer: $customer);
 
-        /** @var \Domain\Address\Models\Country $country */
+        /** @var \Domain\Address\Models\Country|null $country */
         $country = Country::whereCode($request->country_id)->first();
 
-        /** @var \Domain\Address\Models\State $state */
+        /** @var \Domain\Address\Models\State|null $state */
         $state = State::whereId($request->state_id)->first();
 
-        if ($country && $state) {
-            $countryName = $country->name;
-            $stateName = $state->name;
-        } else {
+        if ( ! $country || ! $state) {
             return response()->json('Country or State not found', 404);
         }
 
-        try {
-            if (tenancy()->tenant?->features()->active(ShippingUps::class) && $countryName === 'United States') {
+        $countryName = $country->name;
+        $stateName = $state->name;
+
+        // Check the condition only once
+        if (tenancy()->tenant?->features()->active(ShippingUps::class) && $countryName === 'United States') {
+            try {
                 app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
+            } catch (Exception $e) {
+                return response()->json(['message: '.$e->getMessage()], 422);
             }
-
-            $address = DB::transaction(
-                fn () => app(CreateAddressAction::class)
-                    ->execute($addressDto)
-            );
-
-        } catch (\Exception $e) {
-            dd($e->statusCode);
-            // Check if the exception is a 422 error.
-            if ($e->getCode() === 422) {
-                // Customize your response here for a 422 error.
-                return response()->json(['error' => 'Address validation failed'], 422);
-            }
-
-            // Handle other exceptions or rethrow them if necessary.
-            throw $e;
         }
 
-        $address = DB::transaction(
-            fn () => app(CreateAddressAction::class)
-                ->execute($addressDto)
-        );
+        try {
+            $address = DB::transaction(fn () => app(CreateAddressAction::class)->execute($addressDto));
 
-        return AddressResource::make($address);
+            return AddressResource::make($address);
+        } catch (Exception $e) {
+            return response()->json($e->getMessage(), 500);
+        }
     }
 
     /** @throws Throwable */
