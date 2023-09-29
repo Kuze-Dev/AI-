@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\API\USPS\DataTransferObjects\InternationalResponse;
 
-use Domain\Shipment\API\USPS\Contracts\RateResponse;
+use Domain\Shipment\Contracts\API\RateResponse;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 
 class IntlRateV2ResponseData implements RateResponse

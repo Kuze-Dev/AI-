@@ -9,19 +9,29 @@ use TiMacDonald\JsonApi\JsonApiResource;
 
 class ProductTierDiscountResource extends JsonApiResource
 {
-    public function toType(Request $request)
+    public function toId(Request $request): string
+    {
+        if ( ! isset($this->pivot)) {
+            return '';
+        }
+
+        return (string) $this->pivot->id;
+    }
+
+    public function toType(Request $request): string
     {
         return 'productTier';
     }
 
     public function toAttributes(Request $request): array
     {
-        /** @phpstan-ignore-next-line */
-        $productTier = $this->pivot;
+        if ( ! isset($this->pivot)) {
+            return [];
+        }
 
         return  [
-            'discount' => $productTier->discount,
-            'discount_amount_type' => $productTier->discount_amount_type,
+            'discount' => $this->pivot->discount,
+            'discount_amount_type' => $this->pivot->discount_amount_type,
         ];
     }
 

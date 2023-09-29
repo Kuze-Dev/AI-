@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\Actions\USPS;
 
-use Domain\Customer\Models\Customer;
 use Domain\Shipment\Actions\GetShippingRateAction;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
@@ -18,7 +17,6 @@ class GetUSPSRateAction
     }
 
     public function execute(
-        Customer $customer,
         ParcelData $parcelData,
         ShippingMethod $shippingMethod,
         ShippingAddressData $address,
@@ -26,7 +24,6 @@ class GetUSPSRateAction
     ): float {
 
         return $this->getShippingRateAction->execute(
-            $customer,
             $parcelData,
             $shippingMethod,
             $address

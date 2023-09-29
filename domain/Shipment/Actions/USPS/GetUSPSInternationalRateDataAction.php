@@ -6,7 +6,6 @@ namespace Domain\Shipment\Actions\USPS;
 
 use Domain\Address\Models\Address;
 use Domain\Shipment\API\USPS\Clients\RateClient;
-use Domain\Customer\Models\Customer;
 use Domain\Shipment\API\USPS\DataTransferObjects\InternationalResponse\IntlRateV2ResponseData;
 use Domain\Shipment\API\USPS\DataTransferObjects\Ratev2InternationalRequestData;
 use Domain\Shipment\API\USPS\Enums\MailType;
@@ -22,7 +21,6 @@ class GetUSPSInternationalRateDataAction
     }
 
     public function execute(
-        Customer $customer,
         ParcelData $parcelData,
         ShippingAddressData $address
     ): IntlRateV2ResponseData {
