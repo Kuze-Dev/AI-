@@ -25,7 +25,8 @@ class ServiceController
             QueryBuilder::for(Service::query()->latest())
                 ->allowedFilters([
                     'name',
-                    'price',
+                    'selling_price',
+                    'retail_price',
                     'is_subscription',
                     'is_special_offer',
                     'is_featured',

@@ -26,10 +26,10 @@ class UpdateServiceAction
         $service->update([
             'name' => $serviceData->name,
             'description' => $serviceData->description,
-            'price' => $serviceData->price,
+            'retail_price' => $serviceData->retail_price,
+            'selling_price' => $serviceData->selling_price,
             'billing_cycle' => $serviceData->billing_cycle,
-            'recurring_payment' => $serviceData->recurring_payment,
-            'data' => $serviceData->data,
+            'due_date_every' => $serviceData->due_date_every,
             'is_featured' => $serviceData->is_featured,
             'is_special_offer' => $serviceData->is_special_offer,
             'pay_upfront' => $serviceData->pay_upfront,

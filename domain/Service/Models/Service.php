@@ -32,21 +32,16 @@ class Service extends Model implements HasMetaDataContract, HasMedia
     protected $fillable = [
         'blueprint_id',
         'name',
-        //        'slug',
         'description',
-        'price',
-        'data',
+        'retail_price',
+        'selling_price',
         'billing_cycle',
-        'recurring_payment',
+        'due_date_every',
         'is_featured',
         'is_special_offer',
         'pay_upfront',
         'is_subscription',
         'status',
-    ];
-
-    protected $casts = [
-        'data' => 'json',
     ];
 
     /** @return BelongsToMany<TaxonomyTerm> */

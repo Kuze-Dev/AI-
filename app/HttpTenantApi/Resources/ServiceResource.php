@@ -19,11 +19,14 @@ class ServiceResource extends JsonApiResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'price' => $this->price,
-            'data' => $this->data,
+            'retail_price' => $this->retail_price,
+            'selling_price' => $this->selling_price,
+            'billing_cycle' => $this->billing_cycle,
+            'due_date_every' => $this->due_date_every,
             'is_featured' => $this->is_featured,
             'is_special_offer' => $this->is_special_offer,
             'is_subscription' => $this->is_subscription,
+            'pay_upfront' => $this->pay_upfront,
             'status' => $this->status,
         ];
     }
