@@ -211,7 +211,7 @@ class CartSummaryAction
 
         $cm_to_inches = 1 / 2.54;
 
-        if (!is_iterable($collections)) {
+        if ( ! is_iterable($collections)) {
             /** @var \Domain\Product\Models\Product $product */
             $product = $collections->purchasable;
 
@@ -220,7 +220,7 @@ class CartSummaryAction
                 $product = $collections->purchasable->product;
             }
 
-            if (!is_null($product->dimension)) {
+            if ( ! is_null($product->dimension)) {
                 $purchasableId = $product->id;
 
                 $length = $product->dimension['length'];
@@ -247,7 +247,7 @@ class CartSummaryAction
                     /** @var \Domain\Product\Models\Product $product */
                     $product = $collection->purchasable->product;
                 }
-                if (!is_null($product->dimension)) {
+                if ( ! is_null($product->dimension)) {
                     $purchasableId = $product->id;
 
                     $length = $product->dimension['length'];
@@ -283,7 +283,7 @@ class CartSummaryAction
 
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
 
-        if (!$taxZone instanceof TaxZone) {
+        if ( ! $taxZone instanceof TaxZone) {
             return [
                 'taxZone' => null,
                 'taxDisplay' => null,
@@ -306,7 +306,7 @@ class CartSummaryAction
     {
         $discountTotal = 0;
 
-        if (!is_null($discount)) {
+        if ( ! is_null($discount)) {
             $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal) ?? 0;
         }
 

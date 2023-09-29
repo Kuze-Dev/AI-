@@ -8,6 +8,7 @@ use App\Features\ECommerce\AllowGuestOrder;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartResource;
 use Domain\Cart\Actions\DestroyCartAction;
+use Domain\Cart\Actions\SanitizeCartAction;
 use Domain\Cart\Helpers\PublicCart\AuthorizeGuestCart;
 use Domain\Cart\Models\Cart;
 use Domain\Product\Models\Product;
@@ -43,9 +44,7 @@ class GuestCartController extends Controller
             ->first();
 
         if ($model && isset($model->cartLines)) {
-            $model->cartLines = $model->cartLines->filter(function ($cartLine) {
-                return $cartLine->purchasable !== null;
-            });
+            $model = app(SanitizeCartAction::class)->sanitizeGuest($model);
         }
 
         if ($model) {

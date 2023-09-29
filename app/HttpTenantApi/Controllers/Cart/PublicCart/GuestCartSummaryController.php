@@ -6,10 +6,10 @@ namespace App\HttpTenantApi\Controllers\Cart\PublicCart;
 
 use App\Features\ECommerce\AllowGuestOrder;
 use App\Http\Controllers\Controller;
+use Domain\Cart\Actions\SanitizeCartSummaryAction;
 use Domain\Cart\Actions\PublicCart\GuestCartSummaryAction;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
-use Domain\Cart\Events\SanitizeCartEvent;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\PublicCart\GuestCartSummaryRequest;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
@@ -41,21 +41,7 @@ class GuestCartSummaryController extends Controller
             ->get();
 
         if ($cartLines->count()) {
-            $cartLineIdsTobeRemoved = [];
-
-            $cartLines = $cartLines->filter(function ($cartLine) use (&$cartLineIdsTobeRemoved) {
-                if ($cartLine->purchasable === null) {
-                    $cartLineIdsTobeRemoved[] = $cartLine->uuid;
-                }
-
-                return $cartLine->purchasable !== null;
-            });
-
-            if ( ! empty($cartLineIdsTobeRemoved)) {
-                event(new SanitizeCartEvent(
-                    $cartLineIdsTobeRemoved,
-                ));
-            }
+            app(SanitizeCartSummaryAction::class)->sanitizeGuest($cartLines);
         }
 
         return response()->json(['cartCount' => $cartLines->count()], 200);
