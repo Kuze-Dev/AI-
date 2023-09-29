@@ -109,6 +109,13 @@ class TenantResource extends Resource
                                         Features\CMS\SitesManagement::class => app(Features\CMS\SitesManagement::class)->label,
                                     ],
                                 ],
+                                Features\Customer\CustomerBase::class => [
+                                    'label' => trans('Customer'),
+                                    'extras' => [
+                                        Features\Customer\TierBase::class => app(Features\Customer\TierBase::class)->label,
+                                        Features\Customer\AddressBase::class => app(Features\Customer\AddressBase::class)->label,
+                                    ],
+                                ],
                                 Features\ECommerce\ECommerceBase::class => [
                                     'label' => trans('eCommerce'),
                                     'extras' => [
@@ -125,13 +132,6 @@ class TenantResource extends Resource
                                             Features\ECommerce\ShippingAusPost::class => app(Features\ECommerce\ShippingAusPost::class)->label,
                                         ],
                                         Features\ECommerce\RewardPoints::class => app(Features\ECommerce\RewardPoints::class)->label,
-                                    ],
-                                ],
-                                Features\Customer\CustomerBase::class => [
-                                    'label' => trans('Customer'),
-                                    'extras' => [
-                                        Features\Customer\TierBase::class => app(Features\Customer\TierBase::class)->label,
-                                        Features\Customer\AddressBase::class => app(Features\Customer\AddressBase::class)->label,
                                     ],
                                 ],
                             ]),
