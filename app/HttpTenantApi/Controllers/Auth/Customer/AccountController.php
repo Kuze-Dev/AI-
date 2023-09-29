@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
-use App\Features\ECommerce\ECommerceBase;
+use App\Features\Customer\CustomerBase;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CustomerResource;
 use Domain\Customer\Actions\EditCustomerAction;
@@ -24,7 +24,7 @@ use Throwable;
 
 #[
     Prefix('account'),
-    Middleware(['auth:sanctum', 'feature.tenant:' . ECommerceBase::class])
+    Middleware(['auth:sanctum', 'feature.tenant:' . CustomerBase::class])
 ]
 class AccountController extends Controller
 {
