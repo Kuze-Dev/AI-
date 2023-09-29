@@ -139,19 +139,19 @@ class CustomerResource extends Resource
                             /** @var \Domain\Tier\Models\Tier $tier */
                             $tier = Tier::whereName(config('domain.tier.default'))->first();
 
-                            if($context == 'create') {
+                            if ($context === 'create') {
                                 return true;
                             }
-
-                            if ($record && ($record->tier_approval_status === TierApprovalStatus::APPROVED || $record->tier_id == ($tier->getKey() ?? null))) {
+                        
+                            if ($record !== null && ($record->tier_approval_status === TierApprovalStatus::APPROVED || ($tier !== null && $record->tier_id == $tier->getKey()))) {
                                 return true;
                             }
-
-                            if (($record ?? null) && ($record->tier_id === ($wholesaler_domestic?->getKey() ?? null) && ($wholesaler_domestic?->has_approval ?? null) == 1)) {
+                        
+                            if ($record !== null && ($record->tier_id === ($wholesaler_domestic->getKey()) && ($wholesaler_domestic->has_approval) == 1)) {
                                 return false;
                             }
-
-                            if (($record ?? null) && ($record->tier_id === ($wholesaler_international?->getKey() ?? null) && ($wholesaler_international?->has_approval ?? null) == 1)) {
+                        
+                            if ($record !== null && ($record->tier_id === ($wholesaler_international->getKey()) && ($wholesaler_international->has_approval) == 1)) {
                                 return false;
                             }
 
