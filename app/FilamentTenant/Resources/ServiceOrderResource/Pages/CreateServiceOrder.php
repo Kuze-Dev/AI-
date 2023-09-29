@@ -6,7 +6,6 @@ namespace App\FilamentTenant\Resources\ServiceOrderResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ServiceOrderResource;
-use App\FilamentTenant\Resources\ServiceResource;
 use Domain\Service\Actions\CreateServiceAction;
 use Domain\Service\DataTransferObjects\ServiceData;
 use Filament\Pages\Actions\Action;
@@ -19,6 +18,12 @@ class CreateServiceOrder extends CreateRecord
     use LogsFormActivity;
 
     protected static string $resource = ServiceOrderResource::class;
+
+    public function handleRecordCreation(array $data): Model
+    {
+        dd($data);
+        // return DB::transaction(fn () => app(CreateServiceAction::class)->execute(ServiceData::fromArray($data)));
+    }
 
     protected function getActions(): array
     {

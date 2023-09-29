@@ -76,10 +76,6 @@ class ServiceOrderResource extends Resource
                                     ->content('123 abc street')->columnSpan(2),
                             ])->visible(
                                 function (array $state) {
-                                    // if(isset($state['customer_id'])){
-                                    //     dd($state);
-                                    // }
-
                                     return isset($state['customer_id']);
                                 }
                             ),
@@ -144,11 +140,13 @@ class ServiceOrderResource extends Resource
                                     ->columnSpan(2)
                                     ->defaultItems(0)
                                     ->schema([
-                                        TextInput::make('name'),
-                                        TextInput::make('quantity')->numeric(),
-                                        TextInput::make('price')->numeric(),
+                                        TextInput::make('name')->required(),
+                                        TextInput::make('quantity')->required()->numeric()->reactive()->default(1),
+                                        TextInput::make('price')->required()->numeric()->reactive(),
                                     ])
+                                    ->maxItems(3)
                                     ->columns(3),
+
                             ]),
                         ]),
                     Forms\Components\Section::make('Form Title')
@@ -172,7 +170,7 @@ class ServiceOrderResource extends Resource
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(trans('$1000.00'))
+                                ->label(fn (Closure $get) => Service::whereId($get('service_id'))->first()?->price ?? 0)
                                 ->alignLeft()
                                 ->size('md')
                                 ->inline()
@@ -184,7 +182,13 @@ class ServiceOrderResource extends Resource
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(trans('$1000.00'))
+                                ->label(fn (Closure $get) => array_reduce($get('additional_charges'), function ($carry, $data) {
+                                    if (isset($data['price']) && is_numeric($data['price']) && isset($data['quantity']) && is_numeric($data['quantity'])) {
+                                        return $carry + ($data['price'] * $data['quantity']);
+                                    }
+
+                                    return $carry;
+                                }, 0))
                                 ->alignLeft()
                                 ->size('md')
                                 ->inline()
@@ -197,7 +201,13 @@ class ServiceOrderResource extends Resource
                                 ->readOnly()
                                 ->color('primary'),
                             TextLabel::make('')
-                                ->label(trans('$2000.00'))
+                                ->label(fn (Closure $get) => Service::whereId($get('service_id'))->first()?->price + array_reduce($get('additional_charges'), function ($carry, $data) {
+                                    if (isset($data['price']) && is_numeric($data['price']) && isset($data['quantity']) && is_numeric($data['quantity'])) {
+                                        return $carry + ($data['price'] * $data['quantity']);
+                                    }
+
+                                    return $carry;
+                                }, 0))
                                 ->alignLeft()
                                 ->size('md')
                                 ->inline()
