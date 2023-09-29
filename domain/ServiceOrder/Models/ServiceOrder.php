@@ -72,8 +72,10 @@ class ServiceOrder extends Model
         'customer_first_name',
         'customer_last_name',
         'customer_email',
-        'customer_mobile_no',
+        'customer_mobile',
         'customer_form',
+        'service_address',
+        'additional_charges',
         'service_address',
         'billing_address',
         'currency_code',
@@ -81,6 +83,7 @@ class ServiceOrder extends Model
         'currency_symbol',
         'service_name',
         'service_price',
+        'is_paid',
         'schedule',
         'status',
         'cancelled_reason',
@@ -89,7 +92,8 @@ class ServiceOrder extends Model
 
     protected $casts = [
         'customer_form' => 'json',
-        'schedule' => 'dateTime',
+        'additional_charges' => 'json',
+        'schedule' => 'datetime',
         'status' => ServiceOrderStatus::class,
     ];
 

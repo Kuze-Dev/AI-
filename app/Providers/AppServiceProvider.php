@@ -51,6 +51,7 @@ use Domain\Payments\Models\PaymentRefund;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Internationalization\Models\Locale;
+use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -139,6 +140,7 @@ class AppServiceProvider extends ServiceProvider
             Locale::class,
             Site::class,
             Service::class,
+            ServiceOrder::class,
         ]);
 
         Password::defaults(

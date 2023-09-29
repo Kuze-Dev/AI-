@@ -12,8 +12,9 @@ class ServiceOrderData
         public readonly ?int $customer_id,
         public readonly int $service_id,
         public readonly DateTime $schedule,
-        public readonly ?array $additional_charges,
-        public readonly ?array $data,
+        public readonly ?string $serviceAddress,
+        public readonly ?array $additionalCharges,
+        public readonly ?array $form,
     ) {
     }
 
@@ -22,9 +23,10 @@ class ServiceOrderData
         return new self(
             customer_id: (int) $data['customer_id'] ?? null,
             service_id: (int) $data['service_id'],
-            schedule: $data['schedule'],
-            additional_charges: $data['additional_charges'] ?? null,
-            data: $data['data'] ?? null,
+            schedule: new DateTime($data['schedule']),
+            serviceAddress: $data['service_address'],
+            additionalCharges: $data['additional_charges'] ?? null,
+            form: $data['data'] ?? null,
         );
     }
 }

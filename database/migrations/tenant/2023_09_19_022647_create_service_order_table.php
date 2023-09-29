@@ -25,7 +25,7 @@ return new class () extends Migration {
             $table->string('customer_first_name');
             $table->string('customer_last_name');
             $table->string('customer_email');
-            $table->string('customer_mobile_no');
+            $table->string('customer_mobile');
             $table->json('customer_form');
             $table->json('additional_charges');
             $table->string('service_address');
@@ -37,7 +37,8 @@ return new class () extends Migration {
             $table->string('service_price');
             $table->dateTime('schedule');
             $table->string('status');
-            $table->string('cancelled_reason');
+            $table->boolean('is_paid')->default(false);
+            $table->string('cancelled_reason')->nullable()->default(null);
             $table->decimal('total_price', 10, 2)->index();
 
             $table->timestamps();

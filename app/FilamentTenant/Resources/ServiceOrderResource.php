@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\CreateServiceOrder;
-use App\FilamentTenant\Resources\ServiceOrderResource\Pages\EditServiceOrder;
+use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ViewServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ListServiceOrder;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
+use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
 use Domain\ServiceOrder\Models\ServiceOrder;
@@ -24,6 +25,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Support\Facades\Auth;
 
 class ServiceOrderResource extends Resource
 {
@@ -50,7 +52,6 @@ class ServiceOrderResource extends Resource
                                 ->required()
                                 ->preload()
                                 ->optionsFromModel(Customer::class, 'email')
-                                ->disabled(fn (?Customer $record) => $record !== null)
                                 ->reactive(),
 
                             Forms\Components\Group::make()->columns(2)->schema([
@@ -70,10 +71,10 @@ class ServiceOrderResource extends Resource
                                     ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
                                         ? Customer::whereId($customerId)->first()->mobile
                                         : ''),
-                                Placeholder::make('service_address')
-                                    ->content('123 abc street')->columnSpan(2),
                                 Placeholder::make('billing_address')
-                                    ->content('123 abc street')->columnSpan(2),
+                                    ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
+                                    ? Address::whereCustomerId($customerId)->first()->address_line_1
+                                    : ''),
                             ])->visible(
                                 function (array $state) {
                                     return isset($state['customer_id']);
@@ -90,10 +91,11 @@ class ServiceOrderResource extends Resource
                                     ->required()
                                     ->preload()
                                     ->reactive()
-                                    ->optionsFromModel(Service::class, 'name')
-                                    ->disabled(fn (?Service $record) => $record !== null),
+                                    ->optionsFromModel(Service::class, 'name'),
 
-                                DateTimePicker::make('schedule'),
+                                DateTimePicker::make('schedule')->minDate(now())->withoutSeconds()->default(now())->timezone(Auth::user()?->timezone),
+
+                                TextInput::make('service_address')->required()->columnSpan(2),
 
                                 Forms\Components\Group::make()->columnSpan(2)->schema([
                                     Forms\Components\Fieldset::make('')->schema([
@@ -220,14 +222,16 @@ class ServiceOrderResource extends Resource
             ]);
     }
 
+    public static function summaryCard(): Section
+    {
+        return Forms\Components\Section::make(trans('Summary'));
+    }
+
     public static function table(Table $table): Table
     {
         return $table
             ->columns([])
             ->filters([])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
@@ -243,7 +247,7 @@ class ServiceOrderResource extends Resource
         return [
             'index' => ListServiceOrder::route('/'),
             'create' => CreateServiceOrder::route('/create'),
-            'edit' => EditServiceOrder::route('/{record}/edit'),
+            'view' => ViewServiceOrder::route('/{record}'),
         ];
     }
 }
