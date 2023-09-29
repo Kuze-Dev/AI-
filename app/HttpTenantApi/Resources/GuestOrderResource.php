@@ -10,11 +10,17 @@ use TiMacDonald\JsonApi\JsonApiResource;
 /**
  * @mixin \Domain\Order\Models\Order
  */
-class OrderResource extends JsonApiResource
+class GuestOrderResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
         return [
+            'customer' => [
+                'first_name' => $this->customer_first_name,
+                'last_name' => $this->customer_last_name,
+                'mobile' => $this->customer_mobile,
+                'email' => $this->customer_email,
+            ],
             'reference' => $this->reference,
             'status' => $this->status,
             'created_at' => $this->created_at,

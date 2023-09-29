@@ -6,7 +6,7 @@ namespace App\HttpTenantApi\Controllers\Order\PublicOrder;
 
 use App\Features\ECommerce\AllowGuestOrder;
 use App\Http\Controllers\Controller;
-use App\HttpTenantApi\Resources\OrderResource;
+use App\HttpTenantApi\Resources\GuestOrderResource;
 use Domain\Order\Actions\PublicOrder\GuestPlaceOrderAction;
 use Domain\Order\Actions\PublicOrder\GuestUpdateOrderAction;
 use Domain\Order\DataTransferObjects\GuestPlaceOrderData;
@@ -100,7 +100,7 @@ class GuestOrderController extends Controller
         }
     }
 
-    public function show(Order $order): OrderResource
+    public function show(Order $order): GuestOrderResource
     {
         $model = QueryBuilder::for(
             $order->with([
@@ -113,7 +113,7 @@ class GuestOrderController extends Controller
         )
             ->allowedIncludes(['orderLines', 'payments.media', 'payments.paymentMethod.media', 'shippingMethod'])->first();
 
-        return OrderResource::make($model);
+        return GuestOrderResource::make($model);
     }
 
     public function update(UpdateOrderRequest $request, Order $order): mixed
