@@ -7,6 +7,9 @@ namespace App\FilamentTenant\Resources;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\CreateServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ViewServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ListServiceOrder;
+use App\FilamentTenant\Support\BadgeLabel;
+use App\FilamentTenant\Support\ButtonAction;
+use App\FilamentTenant\Support\Divider;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
@@ -14,6 +17,7 @@ use Closure;
 use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
+use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
@@ -73,8 +77,8 @@ class ServiceOrderResource extends Resource
                                         : ''),
                                 Placeholder::make('billing_address')
                                     ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
-                                    ? Address::whereCustomerId($customerId)->first()->address_line_1
-                                    : ''),
+                                        ? Address::whereCustomerId($customerId)->first()->address_line_1
+                                        : ''),
                             ])->visible(
                                 function (array $state) {
                                     return isset($state['customer_id']);
@@ -101,23 +105,23 @@ class ServiceOrderResource extends Resource
                                     Forms\Components\Fieldset::make('')->schema([
                                         Placeholder::make('Service')
                                             ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
-                                            ? Service::whereId($serviceId)->first()->name
-                                            : ''),
+                                                ? Service::whereId($serviceId)->first()->name
+                                                : ''),
                                         Placeholder::make('Service Price')
                                             ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
-                                            ? Service::whereId($serviceId)->first()->price
-                                            : ''),
+                                                ? Service::whereId($serviceId)->first()->price
+                                                : ''),
                                         Forms\Components\Group::make()->columnSpan(2)->columns(2)->visible(
                                             fn (Closure $get) => Service::whereId($get('service_id'))->first()?->is_subscription
                                         )->schema([
                                             Placeholder::make('Billing Schedule')
                                                 ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
-                                                ? Service::whereId($serviceId)->first()->billing_cycle
-                                                : ''),
+                                                    ? Service::whereId($serviceId)->first()->billing_cycle
+                                                    : ''),
                                             Placeholder::make('Due Date')
                                                 ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
-                                                ? Service::whereId($serviceId)->first()->recurring_payment
-                                                : ''),
+                                                    ? Service::whereId($serviceId)->first()->recurring_payment
+                                                    : ''),
                                         ]),
 
                                     ]),
@@ -196,7 +200,7 @@ class ServiceOrderResource extends Resource
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(trans('Total'))
+                                ->label(trans('Total Price'))
                                 ->alignLeft()
                                 ->size('md')
                                 ->inline()
@@ -224,7 +228,78 @@ class ServiceOrderResource extends Resource
 
     public static function summaryCard(): Section
     {
-        return Forms\Components\Section::make(trans('Summary'));
+        return Section::make(trans('Summary'))->schema([
+            Forms\Components\Grid::make(2)
+                ->schema([
+                    BadgeLabel::make(trans('status'))->formatStateUsing(function (string $state): string {
+                        return ucfirst($state);
+                    })
+                        ->color(function ($state) {
+                            $newState = str_replace(' ', '_', strtolower($state));
+
+                            return match ($newState) {
+                                ServiceOrderStatus::PENDING->value => 'warning',
+                                ServiceOrderStatus::CANCELLED->value => 'danger',
+                                ServiceOrderStatus::FULFILLED->value => 'success',
+                                default => 'secondary',
+                            };
+                        }),
+                    self::summaryEditButton(),
+                ]),
+            Divider::make(''),
+            Forms\Components\Group::make()->columns(2)->schema([
+                TextLabel::make('')
+                    ->label(trans('Service Price'))
+                    ->alignLeft()
+                    ->size('md')
+                    ->inline()
+                    ->readOnly(),
+                TextLabel::make('')
+                    ->label(fn ($record) => $record->currency_symbol .' '. $record->service_price)
+                    ->alignLeft()
+                    ->size('md')
+                    ->inline()
+                    ->readOnly(),
+                TextLabel::make('')
+                    ->label(trans('Additional Charges'))
+                    ->alignLeft()
+                    ->size('md')
+                    ->inline()
+                    ->readOnly(),
+                TextLabel::make('')
+                    ->label(fn ($record) => $record->currency_symbol .' '. array_reduce($record->additional_charges, function ($carry, $data) {
+                        if (isset($data['price']) && is_numeric($data['price']) && isset($data['quantity']) && is_numeric($data['quantity'])) {
+                            return $carry + ($data['price'] * $data['quantity']);
+                        }
+
+                        return $carry;
+                    }, 0))
+                    ->alignLeft()
+                    ->size('md')
+                    ->inline()
+                    ->readOnly(),
+                TextLabel::make('')
+                    ->label(trans('Total Price'))
+                    ->alignLeft()
+                    ->size('md')
+                    ->inline()
+                    ->readOnly()
+                    ->color('primary'),
+                TextLabel::make('')
+                    ->label(fn ($record) => $record->currency_symbol .' '. $record->total_price)
+                    ->alignLeft()
+                    ->size('md')
+                    ->inline()
+                    ->readOnly()
+                    ->color('primary'),
+            ]),
+
+        ]);
+    }
+
+    private static function summaryEditButton(): ButtonAction
+    {
+        return ButtonAction::make('Edit');
     }
 
     public static function table(Table $table): Table
