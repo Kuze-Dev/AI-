@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Address;
 
-use App\Features\ECommerce\ShippingUps;
 use App\Features\Customer\AddressBase;
+use App\Features\ECommerce\ShippingUsps;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Requests\Auth\Address\AddressRequest;
 use App\HttpTenantApi\Resources\AddressResource;
@@ -78,7 +78,7 @@ class AddressController extends Controller
         $stateName = $state->name;
 
         // Check the condition only once
-        if (tenancy()->tenant?->features()->active(ShippingUps::class) && $countryName === 'United States') {
+        if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $countryName === 'United States') {
             try {
                 app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
             } catch (Exception $e) {
