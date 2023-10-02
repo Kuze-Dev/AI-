@@ -220,8 +220,6 @@ final class CustomerData
                 return $registerStatus = RegisterStatus::REGISTERED;
             }
 
-            // Rest of your code that depends on $data['tier_approval_status']
-            // ...
         }
         //if customer registered through api but no tier indicated or if default was picked
         if((is_null($tier) || $tier->name == config('domain.tier.default')) && is_null($unregistered_customer)) {

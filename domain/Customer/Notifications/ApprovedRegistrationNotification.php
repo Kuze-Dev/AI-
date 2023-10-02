@@ -26,7 +26,7 @@ class ApprovedRegistrationNotification extends Notification implements ShouldQue
             ->subject(trans('Approved Registration'))
             ->line(trans('Congratulations! Your request for the wholesaler tier has been approved!'))
             ->line(trans('You now have access to exclusive benefits and discounts.'))
-            ->action(trans('Visit Our Website'), url(app(SiteSettings::class)->domainWithScheme())) // Add a button with a link to your website.
-            ->line(trans('If you have any questions or need assistance, please contact our support team at support@example.com.'));
+            ->action(trans('Visit Our Website'), url(app(SiteSettings::class)->domainWithScheme()))
+            ->line(trans('If you have any questions or need assistance, please contact our support team.'));
     }
 }
