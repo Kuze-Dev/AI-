@@ -4,21 +4,16 @@ declare(strict_types=1);
 
 namespace Domain\Tenant\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Model;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
-use Laravel\Pennant\Concerns\HasFeatures;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Stancl\Tenancy\Contracts\TenantWithDatabase;
-use Stancl\Tenancy\Database\Concerns\HasDatabase;
-use Stancl\Tenancy\Database\Concerns\HasDomains;
 use Stancl\Tenancy\Database\Models\Domain;
-use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 
 /**
- * Domain\Tenant\Models\Tenant
+ * Domain\Tenant\Models\TenantApiCall
  *
  * @property string $id
  * @property string $name
@@ -29,7 +24,6 @@ use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Domain> $domains
  * @property-read int|null $domains_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, TenantApiCall> $apiCalls
  * @method static \Stancl\Tenancy\Database\TenantCollection<int, static> all($columns = ['*'])
  * @method static \Stancl\Tenancy\Database\TenantCollection<int, static> get($columns = ['*'])
  * @method static \Illuminate\Database\Eloquent\Builder|Tenant newModelQuery()
@@ -43,13 +37,10 @@ use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['domains'])]
-class Tenant extends BaseTenant implements TenantWithDatabase
+class TenantApiCall extends Model
 {
-    use HasDatabase;
-    use HasDomains;
     use LogsActivity;
     use ConstraintsRelationships;
-    use HasFeatures;
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -60,25 +51,9 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     }
 
     protected $fillable = [
-        'name',
+        'tenant_id',
+        'date',
+        'count',
     ];
 
-    public static function getCustomColumns(): array
-    {
-        return [
-            'id',
-            'name',
-        ];
-    }
-
-    public function getTotalApiRequestAttribute(): string
-    {
-        return (string) $this->apiCalls()->sum('count');
-    }
-
-    /** @return HasMany<TenantApiCall> */
-    public function apiCalls(): HasMany
-    {
-        return $this->hasmany(TenantApiCall::class);
-    }
 }
