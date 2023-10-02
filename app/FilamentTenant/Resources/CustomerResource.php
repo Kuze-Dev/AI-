@@ -449,8 +449,7 @@ class CustomerResource extends Resource
                             } catch (DeleteRestrictedException $e) {
                                 return false;
                             }
-                        })
-                        ->hidden(fn (Customer $record) => $record->register_status == RegisterStatus::REJECTED ? false : true),
+                        }),
                     Tables\Actions\RestoreAction::make()
                         ->translateLabel()
                         ->using(
