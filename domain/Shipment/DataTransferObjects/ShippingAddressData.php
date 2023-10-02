@@ -50,6 +50,24 @@ class ShippingAddressData
         );
     }
 
+    public static function fromRequestData(array $data): self
+    {
+        /** @var \Domain\Address\Models\State */
+        $state = State::findorFail($data['state']);
+
+        /** @var \Domain\Address\Models\Country */
+        $country = Country::where('code', $data['country'])->first();
+
+        return new self(
+            address: $data['address'],
+            city: $data['city'],
+            zipcode: $data['zipcode'],
+            code: $state->code,
+            state: $state,
+            country: $country,
+        );
+    }
+
     public function toArray(): array
     {
         return get_object_vars($this);

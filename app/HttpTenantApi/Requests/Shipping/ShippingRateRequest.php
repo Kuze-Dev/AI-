@@ -53,6 +53,6 @@ class ShippingRateRequest extends FormRequest
     {
         $validated = $this->validated();
 
-        return ShippingAddressData::fromArray($validated['destination_address']);
+        return ShippingAddressData::fromRequestData($validated['destination_address']);
     }
 }
