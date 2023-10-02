@@ -12,7 +12,7 @@ use Domain\Order\Models\Order;
 final class CreateDiscountLimitAction
 {
     /** Execute create content query. */
-    public function execute(Discount $discount, Order $order, Customer $customer): void
+    public function execute(Discount $discount, Order $order, ?Customer $customer): void
     {
 
         if( ! is_null($discount->max_uses)) {
@@ -25,8 +25,8 @@ final class CreateDiscountLimitAction
 
         $discountLimit->create([
             'discount_id' => $discount->getKey(),
-            'customer_id' => $customer->getKey(),
-            'customer_type' => $customer->getMorphClass(),
+            'customer_id' => $customer->getKey() ?? null,
+            'customer_type' => $customer->getMorphClass() ?? null,
             'order_id' => $order->getKey(),
             'order_type' => $order->getMorphClass(),
             'code' => $discount->code,
