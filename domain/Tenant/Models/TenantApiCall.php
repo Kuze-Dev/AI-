@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Tenant\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Laravel\Pennant\Concerns\HasFeatures;
@@ -17,7 +18,7 @@ use Stancl\Tenancy\Database\Models\Domain;
 use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 
 /**
- * Domain\Tenant\Models\Tenant
+ * Domain\Tenant\Models\TenantApiCall
  *
  * @property string $id
  * @property string $name
@@ -41,13 +42,10 @@ use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['domains'])]
-class Tenant extends BaseTenant implements TenantWithDatabase
+class TenantApiCall extends Model
 {
-    use HasDatabase;
-    use HasDomains;
     use LogsActivity;
     use ConstraintsRelationships;
-    use HasFeatures;
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -58,20 +56,10 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     }
 
     protected $fillable = [
-        'name',
+        'tenant_id',
+        'date',
+        'count'
     ];
 
-    public static function getCustomColumns(): array
-    {
-        return [
-            'id',
-            'name',
-        ];
-    }
 
-    public function apiCalls()
-    {
-
-        return $this->hasmany(TenantApiCall::class);
-    }
 }
