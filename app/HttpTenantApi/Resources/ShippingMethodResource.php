@@ -14,7 +14,7 @@ class ShippingMethodResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
-        
+
         return  [
             'name' => $this->title,
             'slug' => $this->slug,

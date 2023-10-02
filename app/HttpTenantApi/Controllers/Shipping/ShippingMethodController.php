@@ -31,6 +31,7 @@ class ShippingMethodController extends Controller
                 ->jsonPaginate()
         );
     }
+
     #[Post('v2/shipping-methods')]
     public function shippingMethod(ShippingRateRequest $request): JsonApiResourceCollection
     {
