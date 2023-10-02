@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Features\ECommerce\GuestPurchase;
+use App\Features\ECommerce\AllowGuestOrder;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\ProductResource\Pages\EditProduct;
 use App\FilamentTenant\Resources\ProductResource\RelationManagers\TiersRelationManager;
@@ -236,7 +236,7 @@ class ProductResource extends Resource
                                 ->helperText('Item can be purchased by guests.')
                                 ->default(false)
                                 ->columnSpan(2)
-                                ->hidden(fn () => ! tenancy()->tenant?->features()->active(GuestPurchase::class) ? true : false),
+                                ->hidden(fn () => ! tenancy()->tenant?->features()->active(AllowGuestOrder::class) ? true : false),
                         ]),
                     Forms\Components\Section::make('Associations')
                         ->translateLabel()
