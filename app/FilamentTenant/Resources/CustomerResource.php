@@ -142,16 +142,16 @@ class CustomerResource extends Resource
                             if ($context === 'create') {
                                 return true;
                             }
-                        
+
                             if ($record !== null && ($record->tier_approval_status === TierApprovalStatus::APPROVED || ($tier !== null && $record->tier_id == $tier->getKey()))) {
                                 return true;
                             }
-                        
-                            if ($record !== null && ($record->tier_id === ($wholesaler_domestic->getKey()) && ($wholesaler_domestic->has_approval) == 1)) {
+
+                            if ($record !== null && ($record->tier_id === ($wholesaler_domestic?->getKey()) && ($wholesaler_domestic->has_approval) == 1)) {
                                 return false;
                             }
-                        
-                            if ($record !== null && ($record->tier_id === ($wholesaler_international->getKey()) && ($wholesaler_international->has_approval) == 1)) {
+
+                            if ($record !== null && ($record->tier_id === ($wholesaler_international?->getKey()) && ($wholesaler_international->has_approval) == 1)) {
                                 return false;
                             }
 
@@ -406,17 +406,17 @@ class CustomerResource extends Resource
                 Tables\Actions\EditAction::make()
                     ->translateLabel()
                     ->hidden(fn (?Customer $record) => $record?->tier_approval_status == TierApprovalStatus::REJECTED ? true : false),
-                Tables\Actions\DeleteAction::make()
-                    ->translateLabel()
-                    ->using(function (Customer $record) {
-                        try {
-                            return app(ForceDeleteCustomerAction::class)->execute($record);
-                        } catch (DeleteRestrictedException $e) {
-                            return false;
-                        }
-                    })
-                    ->button()
-                    ->hidden(fn (?Customer $record) => $record?->tier_approval_status == TierApprovalStatus::REJECTED ? false : true),
+                // Tables\Actions\DeleteAction::make()
+                //     ->translateLabel()
+                //     ->using(function (Customer $record) {
+                //         try {
+                //             return app(ForceDeleteCustomerAction::class)->execute($record);
+                //         } catch (DeleteRestrictedException $e) {
+                //             return false;
+                //         }
+                //     })
+                //     ->button()
+                //     ->hidden(fn (?Customer $record) => $record?->tier_approval_status == TierApprovalStatus::REJECTED ? false : true),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('send-register-invitation')
                         ->label(fn (Customer $record) => match ($record->register_status) {

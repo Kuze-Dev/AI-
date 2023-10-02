@@ -31,4 +31,9 @@ class TierFactory extends Factory
     {
         return self::new()->createOne(['name' => config('domain.tier.default')]);
     }
+
+    public static function createWholesaler(): Tier
+    {
+        return self::new()->createOne(['name' => config('domain.tier.wholesaler-domestic')]);
+    }
 }
