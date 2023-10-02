@@ -8,7 +8,6 @@ use App\Features\ECommerce\ECommerceBase;
 use App\Http\Controllers\Controller;
 use Domain\Address\Models\Address;
 use Domain\Cart\Actions\CartSummaryAction;
-use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
 use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\DataTransferObjects\ParcelData;
@@ -37,21 +36,10 @@ class RateController extends Controller
 
             $this->authorize('view', $address);
 
-            $validated = $request->validated();
-
-            $cartLineIds = explode(',', $validated['cart_line_ids']);
-
             /** @var \Domain\Customer\Models\Customer $customer */
             $customer = Auth::user();
 
-            $cartLines = CartLine::query()
-                ->with('purchasable')
-                ->whereHas('cart', function ($query) use ($customer) {
-                    $query->whereBelongsTo($customer);
-                })
-                ->whereNull('checked_out_at')
-                ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
-                ->get();
+            $cartLines = $request->getCartLines();
 
             $productlist = app(CartSummaryAction::class)->getProducts($cartLines);
 

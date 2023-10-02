@@ -8,8 +8,8 @@ use App\Features\ECommerce\AllowGuestOrder;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartLineResource;
 use Domain\Cart\Actions\PublicCart\GuestCartSummaryAction;
-use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
+use Domain\Cart\DataTransferObjects\GuestCartSummaryShippingData;
 use Domain\Cart\Requests\PublicCart\GuestCartMobileSummaryRequest;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -61,7 +61,11 @@ class GuestCheckoutMobileController extends Controller
             $summary = app(GuestCartSummaryAction::class)->execute(
                 $cartLines,
                 new CartSummaryTaxData($country?->id, $state?->id),
-                // new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),
+                new GuestCartSummaryShippingData(
+                    $request->toRecieverDTO(),
+                    $request->getShippingAddress(),
+                    $request->getShippingMethod()
+                ),
                 $discount,
                 $serviceId ? (int) $serviceId : null
             );

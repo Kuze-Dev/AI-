@@ -27,6 +27,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use App\Settings\OrderSettings;
 use App\Settings\SiteSettings;
+use Domain\Shipment\DataTransferObjects\ReceiverData;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 
 class GuestPrepareOrderAction
 {
@@ -56,6 +58,8 @@ class GuestPrepareOrderAction
 
         $shippingMethod = $this->prepareShippingMethod($guestPlaceOrderData);
 
+        $shippingData = $this->prepareShippingData($guestPlaceOrderData);
+
         $notes = $guestPlaceOrderData->notes;
 
         $orderData = [
@@ -68,6 +72,8 @@ class GuestPrepareOrderAction
             'taxZone' => $taxZone,
             'discount' => $discount,
             'shippingMethod' => $shippingMethod,
+            'shippingReceiverData' => $shippingData['receiverData'],
+            'shippingAddressData' => $shippingData['shippingAddress'],
             'paymentMethod' => $paymentMethod,
             'countries' => $countries,
             'states' => $states,
@@ -168,6 +174,39 @@ class GuestPrepareOrderAction
     public function prepareShippingMethod(GuestPlaceOrderData $guestPlaceOrderData): ?ShippingMethod
     {
         return ShippingMethod::where((new ShippingMethod())->getRouteKeyName(), $guestPlaceOrderData->shipping_method)->first() ?? null;
+    }
+
+    public function prepareShippingData(GuestPlaceOrderData $guestPlaceOrderData): array
+    {
+        $receiverData = new ReceiverData(
+            first_name: $guestPlaceOrderData->customer->first_name,
+            last_name: $guestPlaceOrderData->customer->last_name,
+            email: $guestPlaceOrderData->customer->email,
+            mobile: $guestPlaceOrderData->customer->mobile,
+        );
+
+        $stateId = $guestPlaceOrderData->addresses->shipping->state_id;
+        $countryId = $guestPlaceOrderData->addresses->shipping->country_id;
+
+        /** @var \Domain\Address\Models\State $state */
+        $state = app(State::class)->where((new State())->getRouteKeyName(), $stateId)->first();
+
+        /** @var \Domain\Address\Models\Country $country */
+        $country = app(Country::class)->where((new Country())->getRouteKeyName(), $countryId)->first();
+
+        $shippingAddress = new ShippingAddressData(
+            address: $guestPlaceOrderData->addresses->shipping->address_line_1,
+            city: $guestPlaceOrderData->addresses->shipping->city,
+            zipcode: $guestPlaceOrderData->addresses->shipping->zip_code,
+            code: $state->code,
+            state: $state,
+            country: $country,
+        );
+
+        return [
+            'receiverData' => $receiverData,
+            'shippingAddress' => $shippingAddress,
+        ];
     }
 
     public function preparePaymentMethod(GuestPlaceOrderData $guestPlaceOrderData): PaymentMethod

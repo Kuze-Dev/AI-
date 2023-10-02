@@ -6,6 +6,7 @@ namespace App\HttpTenantApi\Controllers\Shipping\Public;
 
 use App\Features\ECommerce\ECommerceBase;
 use App\HttpTenantApi\Requests\Shipping\ShippingRateRequest;
+use Domain\Cart\Actions\PublicCart\GuestCartSummaryAction;
 use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\Actions\GetShippingRateAction;
@@ -23,7 +24,6 @@ class PublicRateController
     #[POST('shipping-rates', name: 'shipping-rates')]
     public function shippingRate(ShippingRateRequest $request): mixed
     {
-
         /** @var ShippingMethod */
         $shippingMethod = ShippingMethod::where('slug', $request->courier)->firstOrFail();
 
@@ -33,21 +33,13 @@ class PublicRateController
                 abort(404);
             }
 
+            $cartLines = $request->getCartLines();
+
+            $productlist = app(GuestCartSummaryAction::class)->getProducts($cartLines);
+
+            $subTotal = app(GuestCartSummaryAction::class)->getSubTotal($cartLines);
+
             $customerAddress = $request->toShippingAddressDto();
-
-            #TODO: Get product list from guest cart
-
-            $productlist = [
-                [
-                    'product_id' => '1',
-                    'length' => 2,
-                    'width' => 2,
-                    'height' => 2,
-                    'weight' => 0.5,
-                ],
-            ];
-
-            $subTotal = 10;
 
             $boxData = app(GetBoxAction::class)->execute(
                 $shippingMethod,

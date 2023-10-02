@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Actions\PublicCart;
 
-use Domain\Address\Models\Address;
-use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
+use Domain\Cart\DataTransferObjects\GuestCartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\SummaryData;
 use Domain\Cart\Models\CartLine;
-use Domain\Customer\Models\Customer;
 use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Discount\Enums\DiscountConditionType;
 use Domain\Discount\Models\Discount;
@@ -17,13 +15,14 @@ use Domain\Product\Models\ProductVariant;
 use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\Actions\GetShippingfeeAction;
 use Domain\Shipment\DataTransferObjects\ParcelData;
-use Domain\Shipment\DataTransferObjects\ShipFromAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
 use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
+use Domain\Shipment\DataTransferObjects\ReceiverData;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 
 class GuestCartSummaryAction
 {
@@ -31,7 +30,7 @@ class GuestCartSummaryAction
     public function execute(
         CartLine|Collection $collections,
         CartSummaryTaxData $cartSummaryTaxData,
-        // CartSummaryShippingData $cartSummaryShippingData,
+        GuestCartSummaryShippingData $cartSummaryShippingData,
         ?Discount $discount,
         ?int $serviceId
     ): SummaryData {
@@ -42,15 +41,13 @@ class GuestCartSummaryAction
 
         $taxTotal = $tax['taxPercentage'] ? round($initialSubTotal * $tax['taxPercentage'] / 100, 2) : 0;
 
-        $initialShippingTotal = 0.00;
-
-        // $initialShippingTotal = $this->getShippingFee(
-        //     $collections,
-        //     $cartSummaryShippingData->customer,
-        //     $cartSummaryShippingData->shippingAddress,
-        //     $cartSummaryShippingData->shippingMethod,
-        //     $serviceId
-        // );
+        $initialShippingTotal = $this->getShippingFee(
+            $collections,
+            $cartSummaryShippingData->receiverData,
+            $cartSummaryShippingData->shippingAddress,
+            $cartSummaryShippingData->shippingMethod,
+            $serviceId
+        );
 
         $discountTotal = $this->getDiscount($discount, $initialSubTotal, $initialShippingTotal);
 
@@ -120,58 +117,53 @@ class GuestCartSummaryAction
         return $subTotal;
     }
 
-    // /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
-    // public function getShippingFee(
-    //     CartLine|Collection $collections,
-    //     Customer $customer,
-    //     ?Address $shippingAddress,
-    //     ?ShippingMethod $shippingMethod,
-    //     ?int $serviceId
-    // ): float {
-    //     $shippingFeeTotal = 0;
+    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
+    public function getShippingFee(
+        CartLine|Collection $collections,
+        ?ReceiverData $receiverData,
+        ?ShippingAddressData $shippingAddress,
+        ?ShippingMethod $shippingMethod,
+        ?int $serviceId
+    ): float {
+        $shippingFeeTotal = 0;
 
-    //     if ($shippingAddress && $shippingMethod) {
-    //         $productlist = $this->getProducts($collections);
+        if ($shippingAddress && $shippingMethod && $receiverData) {
+            $productlist = $this->getProducts($collections);
 
-    //         $subTotal = $this->getSubTotal($collections);
+            $subTotal = $this->getSubTotal($collections);
 
-    //         $boxResponse = app(GetBoxAction::class)->execute(
-    //             $shippingMethod,
-    //             $shippingAddress,
-    //             BoxData::fromArray($productlist)
-    //         );
+            $boxResponse = app(GetBoxAction::class)->execute(
+                $shippingMethod,
+                $shippingAddress,
+                BoxData::fromArray($productlist)
+            );
 
-    //         /** @var \Domain\Address\Models\State $state */
-    //         $state = $shippingMethod->state;
+            $parcelData = new ParcelData(
+                reciever: $receiverData,
+                pounds: (string) $boxResponse->weight,
+                ounces: '0',
+                zip_origin: $shippingMethod->shipper_zipcode,
+                parcel_value: (string) $subTotal,
+                height: (string) $boxResponse->height,
+                width: (string) $boxResponse->width,
+                length: (string) $boxResponse->length,
+                boxData: $boxResponse->boxData,
+                ship_from_address: new ShippingAddressData(
+                    address: $shippingMethod->shipper_address,
+                    city: $shippingMethod->shipper_city,
+                    state: $shippingMethod->state,
+                    zipcode: $shippingMethod->shipper_zipcode,
+                    country: $shippingMethod->country,
+                    code: $shippingMethod->country->code,
+                ),
+            );
 
-    //         /** @var \Domain\Address\Models\Country $country */
-    //         $country = $shippingMethod->country;
+            $shippingFeeTotal = app(GetShippingfeeAction::class)
+                ->execute($parcelData, $shippingMethod, $shippingAddress, $serviceId);
+        }
 
-    //         $parcelData = new ParcelData(
-    //             ship_from_address: new ShipFromAddressData(
-    //                 address: $shippingMethod->shipper_address,
-    //                 city: $shippingMethod->shipper_city,
-    //                 state: $state,
-    //                 zipcode: $shippingMethod->shipper_zipcode,
-    //                 country: $country,
-    //                 code: $country->code,
-    //             ),
-    //             pounds: (string) $boxResponse->weight,
-    //             ounces: '0',
-    //             width: (string) $boxResponse->width,
-    //             height: (string) $boxResponse->height,
-    //             length: (string) $boxResponse->length,
-    //             zip_origin: $shippingMethod->shipper_zipcode,
-    //             boxData: $boxResponse->boxData,
-    //             parcel_value: (string) $subTotal,
-    //         );
-
-    //         $shippingFeeTotal = app(GetShippingfeeAction::class)
-    //             ->execute($customer, $parcelData, $shippingMethod, $shippingAddress, $serviceId);
-    //     }
-
-    //     return $shippingFeeTotal;
-    // }
+        return $shippingFeeTotal;
+    }
 
     /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
     public function getProducts(CartLine|Collection $collections): array
@@ -199,10 +191,10 @@ class GuestCartSummaryAction
 
                 $productlist[] = [
                     'product_id' => (string) $purchasableId,
-                    'length' => ceil($length * $cm_to_inches),
-                    'width' => ceil($width * $cm_to_inches),
-                    'height' => ceil($height * $cm_to_inches),
-                    'weight' => (float) $weight,
+                    'length' => ceil($length * $cm_to_inches * $collections->quantity),
+                    'width' => ceil($width * $cm_to_inches * $collections->quantity),
+                    'height' => ceil($height * $cm_to_inches * $collections->quantity),
+                    'weight' => (float) $weight * $collections->quantity,
                 ];
             }
         } else {
@@ -226,10 +218,10 @@ class GuestCartSummaryAction
 
                     $productlist[] = [
                         'product_id' => (string) $purchasableId,
-                        'length' => ceil($length * $cm_to_inches),
-                        'width' => ceil($width * $cm_to_inches),
-                        'height' => ceil($height * $cm_to_inches),
-                        'weight' => (float) $weight,
+                        'length' => ceil($length * $cm_to_inches * $collection->quantity),
+                        'width' => ceil($width * $cm_to_inches * $collection->quantity),
+                        'height' => ceil($height * $cm_to_inches * $collection->quantity),
+                        'weight' => (float) $weight * $collection->quantity,
                     ];
                 }
             }

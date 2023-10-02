@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Domain\Cart\Requests\PublicCart;
 
 use App\HttpTenantApi\Requests\Auth\Address\AddressRequest;
-use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Cart\Models\CartLine;
 use Domain\Discount\Models\Discount;
+use Domain\Shipment\DataTransferObjects\ReceiverData;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Collection;
@@ -36,6 +37,16 @@ class GuestCartSummaryRequest extends AddressRequest
                     }
                 },
             ],
+            'customer' => 'array|nullable',
+            'customer.first_name' => 'nullable|string|max:255',
+            'customer.last_name' => 'nullable|string|max:255',
+            'customer.email' => [
+                'nullable',
+                Rule::email(),
+                'max:255',
+            ],
+            'customer.mobile' => 'nullable|string|max:255',
+            'customer.tier_id' => 'nullable|int',
             'billing_address' => [
                 'nullable',
                 parent::rules(),
@@ -117,14 +128,40 @@ class GuestCartSummaryRequest extends AddressRequest
         return null;
     }
 
-    // public function getShippingAddress(): ?Address
-    // {
-    //     if ($id = $this->validated('shipping_address_id')) {
-    //         return app(Address::class)->where((new Address())->getRouteKeyName(), $id)->first();
-    //     }
+    public function getShippingAddress(): ?ShippingAddressData
+    {
+        if ($shippingAddressData = $this->validated('shipping_address')) {
 
-    //     return null;
-    // }
+            $stateId = $this->validated('shipping_address')['state_id'];
+            $countryId = $this->validated('shipping_address')['country_id'];
+
+            /** @var \Domain\Address\Models\State $state */
+            $state = app(State::class)->where((new State())->getRouteKeyName(), $stateId)->first();
+
+            /** @var \Domain\Address\Models\Country $country */
+            $country = app(Country::class)->where((new Country())->getRouteKeyName(), $countryId)->first();
+
+            return new ShippingAddressData(
+                address: $shippingAddressData['address_line_1'],
+                city: $shippingAddressData['city'],
+                zipcode: $shippingAddressData['zip_code'],
+                code: $state->code,
+                state: $state,
+                country: $country,
+            );
+        }
+
+        return null;
+    }
+
+    public function toRecieverDTO(): ?ReceiverData
+    {
+        if ($customerData = $this->validated('customer')) {
+            return ReceiverData::fromArray($customerData);
+        }
+
+        return null;
+    }
 
     public function getDiscount(): ?Discount
     {

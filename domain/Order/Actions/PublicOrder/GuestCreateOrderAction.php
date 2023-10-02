@@ -6,6 +6,7 @@ namespace Domain\Order\Actions\PublicOrder;
 
 use Domain\Cart\Actions\PublicCart\GuestCartSummaryAction;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
+use Domain\Cart\DataTransferObjects\GuestCartSummaryShippingData;
 use Domain\Order\DataTransferObjects\GuestPlaceOrderData;
 use Domain\Order\DataTransferObjects\GuestPreparedOrderData;
 use Domain\Order\Enums\OrderStatuses;
@@ -29,12 +30,11 @@ class GuestCreateOrderAction
                 $guestPreparedOrderData->countries->billingCountry->id,
                 $guestPreparedOrderData->states->billingState->id,
             ),
-            // TODO: wait for shipping adjustment
-            // new CartSummaryShippingData(
-            //     $guestPreparedOrderData->customer,
-            //     $guestPreparedOrderData->shippingAddress,
-            //     $guestPreparedOrderData->shippingMethod
-            // ),
+            new GuestCartSummaryShippingData(
+                $guestPreparedOrderData->shippingReceiverData,
+                $guestPreparedOrderData->shippingAddressData,
+                $guestPreparedOrderData->shippingMethod
+            ),
             $guestPreparedOrderData->discount,
             $guestPlaceOrderData->serviceId
         );
