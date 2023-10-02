@@ -7,9 +7,11 @@ use Filament\Widgets\LineChartWidget;
 
 class TenantApiCallChart extends LineChartWidget
 {
-    protected static ?string $heading = 'Tenant Api Calls';
+    protected static ?string $heading = 'Tenant api Calls';
 
-    protected static ?string $pollingInterval = null;
+    protected int | string | array $columnSpan = 'full';
+
+    protected static ?string $pollingInterval = '300';
 
     protected function getFilters(): ?array
     {
@@ -24,32 +26,34 @@ class TenantApiCallChart extends LineChartWidget
     protected function getData(): array
     {
 
-        $activeFilter = $this->filter;
-
-        // dd(now()->format('Y-m-d'));
+        $activeFilter = $this->filter ?? 'today';
         
-        // dump($activeFilter);
-        
-        $tenants = Tenant::all();
+        $tenants = Tenant::with('apiCalls')->get();
 
         $data = [];
         
         foreach ($tenants as $tenant) {
             
-            
-            $data[$tenant->name] = rand(2,50000);
+            $count = match ($activeFilter) {
+                'today' => $tenant->apiCalls->where('date', now()->format('Y-m-d'))->first()?->count ?? 0,
+                'week' => $tenant->apiCalls->whereBetween('date', [now()->subWeek()->format('Y-m-d'), now()->format('Y-m-d')])->sum('count'),
+                'month' => $tenant->apiCalls->whereBetween('date', [now()->subMonth()->format('Y-m-d'), now()->format('Y-m-d')])->sum('count'),
+                'year' => $tenant->apiCalls->whereBetween('date', [now()->subYear()->format('Y-m-d'), now()->format('Y-m-d')])->sum('count'),
+                 
+            };
+
+            $data[$tenant->name] = $count;
         }
-
-        // dd($data);
-
+       
         return [
             'datasets' => [
                 [
-                    'label' => 'Blog posts created',
+                    'label' => 'total api calls',
                     'data' => array_values($data),
                 ],
             ],
             'labels' => array_keys($data)
+            
         ];
     }
 }
