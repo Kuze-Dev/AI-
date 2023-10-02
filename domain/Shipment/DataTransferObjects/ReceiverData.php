@@ -17,6 +17,17 @@ class ReceiverData
     ) {
     }
 
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            last_name: $data['last_name'] ?? null,
+            first_name: $data['first_name'] ?? null,
+            email: $data['email'] ?? null,
+            tier_id: $data['tier_id'] ?? null,
+            mobile: $data['mobile'] ?? null,
+        );
+    }
+
     public static function fromCustomerModel(Customer $customer): self
     {
         return new self(

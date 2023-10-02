@@ -30,6 +30,7 @@ class ProductTierDiscountResource extends JsonApiResource
         }
 
         return  [
+            'tier_id' => $this->pivot->tier_id,
             'discount' => $this->pivot->discount,
             'discount_amount_type' => $this->pivot->discount_amount_type,
         ];

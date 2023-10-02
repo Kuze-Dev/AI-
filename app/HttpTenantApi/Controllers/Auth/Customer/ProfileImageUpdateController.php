@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
-use App\Features\ECommerce\ECommerceBase;
+use App\Features\Customer\CustomerBase;
 use App\Http\Controllers\Controller;
 use Domain\Customer\Actions\UpdateCustomerProfileImageAction;
 use Illuminate\Http\Request;
@@ -14,7 +14,7 @@ use Spatie\RouteAttributes\Attributes\Prefix;
 
 #[
     Prefix('account/profile-image'),
-    Middleware(['auth:sanctum', 'feature.tenant:' . ECommerceBase::class])
+    Middleware(['auth:sanctum', 'feature.tenant:' . CustomerBase::class])
 ]
 class ProfileImageUpdateController extends Controller
 {
