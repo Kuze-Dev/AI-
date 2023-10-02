@@ -233,6 +233,8 @@ class RoleResource extends Resource
             'shippingMethod' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
             'taxZone' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
             'ecommerceSettings' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
+            'customers' => tenancy()->tenant?->features()->inactive(\App\Features\Customer\CustomerBase::class),
+            'tiers' => tenancy()->tenant?->features()->inactive(\App\Features\Customer\TierBase::class),
             default => false
         };
     }
