@@ -147,11 +147,11 @@ class CustomerResource extends Resource
                                 return true;
                             }
 
-                            if ($record !== null && ($record->tier_id === ($wholesaler_domestic?->getKey()) && ($wholesaler_domestic->has_approval) == 1)) {
+                            if ($record !== null && ($record->tier_id === ($wholesaler_domestic->getKey()) && ($wholesaler_domestic->has_approval) == 1)) {
                                 return false;
                             }
 
-                            if ($record !== null && ($record->tier_id === ($wholesaler_international?->getKey()) && ($wholesaler_international->has_approval) == 1)) {
+                            if ($record !== null && ($record->tier_id === ($wholesaler_international->getKey()) && ($wholesaler_international->has_approval) == 1)) {
                                 return false;
                             }
 

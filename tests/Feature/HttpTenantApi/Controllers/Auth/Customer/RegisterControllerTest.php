@@ -165,7 +165,7 @@ it('can register with wholesaler tier', function () {
         'birth_date' => $data['birth_date'] . ' 00:00:00',
         'register_status' => RegisterStatus::UNREGISTERED,
     ]);
-})->only();
+});
 
 it('can register without address', function () {
 
