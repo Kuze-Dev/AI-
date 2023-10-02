@@ -146,6 +146,7 @@ class TenantResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TagsColumn::make('domains.domain'),
+                Tables\Columns\TextColumn::make('total_api_request'),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
