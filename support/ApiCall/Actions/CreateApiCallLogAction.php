@@ -11,28 +11,28 @@ class CreateApiCallLogAction
 {
     public function execute(ApiCallData $data): void
     {
-
-        ApiCall::create([
-            'request_url' => $data->requestUrl,
-            'request_type' => $data->requestType,
-            'request_response' => $data->requestResponse,
-        ]);
-
         $tenant = tenancy()->tenant;
 
         if ($tenant) {
-           
+
+            ApiCall::create([
+                'request_url' => $data->requestUrl,
+                'request_type' => $data->requestType,
+                'request_response' => $data->requestResponse,
+            ]);
+
             $today = now()->format('Y-m-d');
 
             /** @var \Domain\Tenant\Models\TenantApiCall|null */
             $tenantLog = $tenant->apiCalls()->where(
-              'date', $today
+                'date',
+                $today
             )->first();
 
             if ($tenantLog) {
 
                 $tenantLog->update([
-                    'count' => $tenantLog->count += 1
+                    'count' => $tenantLog->count += 1,
                 ]);
 
             } else {
@@ -42,6 +42,6 @@ class CreateApiCallLogAction
                 ]);
             }
         }
-        
+
     }
 }

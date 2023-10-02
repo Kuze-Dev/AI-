@@ -7,15 +7,10 @@ namespace Domain\Tenant\Models;
 use Illuminate\Database\Eloquent\Model;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
-use Laravel\Pennant\Concerns\HasFeatures;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Stancl\Tenancy\Contracts\TenantWithDatabase;
-use Stancl\Tenancy\Database\Concerns\HasDatabase;
-use Stancl\Tenancy\Database\Concerns\HasDomains;
 use Stancl\Tenancy\Database\Models\Domain;
-use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 
 /**
  * Domain\Tenant\Models\TenantApiCall
@@ -58,8 +53,7 @@ class TenantApiCall extends Model
     protected $fillable = [
         'tenant_id',
         'date',
-        'count'
+        'count',
     ];
-
 
 }

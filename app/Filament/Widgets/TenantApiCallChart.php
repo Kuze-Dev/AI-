@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Widgets;
 
 use Domain\Tenant\Models\Tenant;
@@ -9,7 +11,7 @@ class TenantApiCallChart extends LineChartWidget
 {
     protected static ?string $heading = 'Tenant api Calls';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?string $pollingInterval = '300';
 
@@ -25,26 +27,27 @@ class TenantApiCallChart extends LineChartWidget
 
     protected function getData(): array
     {
-
+        /** @var string */
         $activeFilter = $this->filter ?? 'today';
-        
+
+        /** @var \Illuminate\Database\Eloquent\Collection|Tenant[] */
         $tenants = Tenant::with('apiCalls')->get();
 
         $data = [];
-        
+
         foreach ($tenants as $tenant) {
-            
+
             $count = match ($activeFilter) {
                 'today' => $tenant->apiCalls->where('date', now()->format('Y-m-d'))->first()?->count ?? 0,
                 'week' => $tenant->apiCalls->whereBetween('date', [now()->subWeek()->format('Y-m-d'), now()->format('Y-m-d')])->sum('count'),
                 'month' => $tenant->apiCalls->whereBetween('date', [now()->subMonth()->format('Y-m-d'), now()->format('Y-m-d')])->sum('count'),
                 'year' => $tenant->apiCalls->whereBetween('date', [now()->subYear()->format('Y-m-d'), now()->format('Y-m-d')])->sum('count'),
-                 
+                default => $tenant->apiCalls->where('date', now()->format('Y-m-d'))->first()?->count ?? 0,
             };
 
             $data[$tenant->name] = $count;
         }
-       
+
         return [
             'datasets' => [
                 [
@@ -52,8 +55,8 @@ class TenantApiCallChart extends LineChartWidget
                     'data' => array_values($data),
                 ],
             ],
-            'labels' => array_keys($data)
-            
+            'labels' => array_keys($data),
+
         ];
     }
 }
