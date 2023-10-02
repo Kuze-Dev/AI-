@@ -11,7 +11,6 @@ use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
-use Illuminate\Support\Str;
 
 class CreateOrderAction
 {

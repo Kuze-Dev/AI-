@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Order\Actions\PublicOrder;
 
-use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Order\DataTransferObjects\UpdateOrderData;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Events\OrderStatusUpdatedEvent;
@@ -18,7 +17,6 @@ use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\ProofOfPaymentData;
 use Domain\Payments\DataTransferObjects\TransactionData;
 use Domain\Payments\Models\Payment;
-use Domain\Product\Actions\UpdateProductStockAction;
 use Illuminate\Database\Eloquent\Builder;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Illuminate\Http\UploadedFile;
@@ -152,7 +150,7 @@ class GuestUpdateOrderAction
             $query->where('payable_id', $order->id);
         })->whereNot('status', 'paid')->first();
 
-        if (!$payment) {
+        if ( ! $payment) {
             throw new BadRequestHttpException('Your order is already paid');
         }
 

@@ -39,6 +39,7 @@ class OrderStatusUpdatedListener
                 if ($customer) {
                     Notification::send($customer, new OrderCancelledNotification($order));
                 }
+
                 break;
             case OrderStatuses::FULFILLED->value:
                 if ($customer) {
@@ -49,6 +50,7 @@ class OrderStatusUpdatedListener
 
                     // }
                 }
+
                 break;
         }
     }

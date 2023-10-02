@@ -34,7 +34,7 @@ class OrderPlacedListener
         $discount = $event->preparedOrderData->discount;
 
         // minus the discount
-        if (!is_null($discount)) {
+        if ( ! is_null($discount)) {
             app(CreateDiscountLimitAction::class)->execute($discount, $order, $customer);
         }
 

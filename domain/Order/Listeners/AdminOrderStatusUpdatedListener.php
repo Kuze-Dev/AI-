@@ -120,6 +120,7 @@ class AdminOrderStatusUpdatedListener
                 foreach ($order->orderLines as $orderLine) {
                     app(UpdateProductStockAction::class)->execute($orderLine->purchasable_type, $orderLine->purchasable_id, $orderLine->quantity, true);
                 }
+
                 break;
         }
 
