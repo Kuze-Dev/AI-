@@ -80,7 +80,10 @@ class ProductController
             $totalSold = OrderLine::whereHas('order', function (Builder $query) {
                 $query->where('status', OrderStatuses::FULFILLED);
             })
-                ->where('purchasable_id', $product->id)
+                ->where(function ($query) use ($product) {
+                    $query->whereRaw('JSON_EXTRACT(purchasable_data, "$.product.id") = ?', [$product->id])
+                        ->orWhereRaw('JSON_EXTRACT(purchasable_data, "$.id") = ?', [$product->id]);
+                })
                 ->sum('quantity');
 
             $product->setAttribute('total_sold', $totalSold);
