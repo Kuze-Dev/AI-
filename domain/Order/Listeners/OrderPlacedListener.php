@@ -35,7 +35,7 @@ class OrderPlacedListener
 
         // minus the discount
         if ( ! is_null($discount)) {
-            app(CreateDiscountLimitAction::class)->execute($discount, $order, $customer);
+            app(CreateDiscountLimitAction::class)->execute($discount, $order, ($customer ?? null) );
         }
 
         foreach ($order->orderLines as $orderLine) {
