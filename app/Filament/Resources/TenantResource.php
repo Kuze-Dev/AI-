@@ -133,6 +133,7 @@ class TenantResource extends Resource
                                         ],
                                         Features\ECommerce\AllowGuestOrder::class => 'Allow Guest Orders',
                                         Features\ECommerce\RewardPoints::class => app(Features\ECommerce\RewardPoints::class)->label,
+                                        Features\ECommerce\GuestPurchase::class => app(Features\ECommerce\GuestPurchase::class)->label,
                                     ],
                                 ],
                             ]),
