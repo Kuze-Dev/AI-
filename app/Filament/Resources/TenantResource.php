@@ -132,6 +132,7 @@ class TenantResource extends Resource
                                             Features\ECommerce\ShippingAusPost::class => app(Features\ECommerce\ShippingAusPost::class)->label,
                                         ],
                                         Features\ECommerce\RewardPoints::class => app(Features\ECommerce\RewardPoints::class)->label,
+                                        Features\ECommerce\GuestPurchase::class => app(Features\ECommerce\GuestPurchase::class)->label,
                                     ],
                                 ],
                             ]),

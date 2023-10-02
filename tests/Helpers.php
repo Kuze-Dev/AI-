@@ -7,6 +7,7 @@ use App\Features\Customer\AddressBase;
 use App\Features\Customer\CustomerBase;
 use App\Features\Customer\TierBase;
 use App\Features\ECommerce\ECommerceBase;
+use App\Features\ECommerce\GuestPurchase;
 use Database\Seeders\Tenant\Auth\PermissionSeeder;
 use Database\Seeders\Tenant\Auth\RoleSeeder;
 use Domain\Admin\Database\Factories\AdminFactory;
@@ -81,6 +82,7 @@ function testInTenantContext(): Tenant
     $tenant->features()->activate(CustomerBase::class);
     $tenant->features()->activate(TierBase::class);
     $tenant->features()->activate(AddressBase::class);
+    $tenant->features()->activate(GuestPurchase::class);
 
     URL::forceRootUrl(Request::getScheme() . '://' . $domain);
 
