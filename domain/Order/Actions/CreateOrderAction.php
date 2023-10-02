@@ -16,13 +16,14 @@ use Illuminate\Support\Str;
 class CreateOrderAction
 {
     public function __construct(
-        private readonly CartSummaryAction $cartSummaryAction
+        private readonly CartSummaryAction $cartSummaryAction,
+        private readonly CreateOrderReference $createOrderReference
     ) {
     }
 
     public function execute(PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData): Order
     {
-        $referenceNumber = Str::upper(Str::random(12));
+        $referenceNumber = $this->createOrderReference->execute();
 
         /** @var \Domain\Address\Models\State $state */
         $state = $preparedOrderData->billingAddress->state;
