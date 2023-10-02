@@ -13,7 +13,7 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Get;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
-#[Middleware(['feature.tenant:'. ECommerceBase::class, 'auth:sanctum'])]
+#[Middleware(['feature.tenant:'. ECommerceBase::class])]
 class ShippingMethodController extends Controller
 {
     #[Get('shipping-methods')]
