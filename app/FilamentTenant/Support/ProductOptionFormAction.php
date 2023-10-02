@@ -200,7 +200,7 @@ class ProductOptionFormAction extends Action
     protected function generateUniqueSku(Product $record, Collection $result): string
     {
         do {
-            $generatedSku = $record->sku . rand(1000, 9999);
+            $generatedSku = $record->sku . rand(100000, 999999);
         } while ($result->pluck('sku')->contains($generatedSku));
 
         return $generatedSku;

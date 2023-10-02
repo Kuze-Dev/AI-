@@ -14,7 +14,9 @@ use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\Actions\GetShippingRateAction;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
-use Domain\Shipment\DataTransferObjects\ShipFromAddressData;
+use Domain\Shipment\DataTransferObjects\ReceiverData;
+// use Domain\Shipment\DataTransferObjects\ShipFromAddressData;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Support\Facades\Auth;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -55,17 +57,19 @@ class RateController extends Controller
 
             $subTotal = app(CartSummaryAction::class)->getSubTotal($cartLines);
 
+            $customerAddress = ShippingAddressData::fromAddressModel($address);
+
             $boxData = app(GetBoxAction::class)->execute(
                 $shippingMethod,
-                $address,
+                $customerAddress,
                 BoxData::fromArray($productlist)
             );
 
             return response(
                 app(GetShippingRateAction::class)
                     ->execute(
-                        customer: $customer->load('verifiedAddress'),
                         parcelData: new ParcelData(
+                            reciever: ReceiverData::fromCustomerModel($customer->load('verifiedAddress')),
                             pounds: (string) $boxData->weight,
                             ounces: '0',
                             zip_origin: $shippingMethod->shipper_zipcode,
@@ -74,7 +78,7 @@ class RateController extends Controller
                             width: (string) $boxData->width,
                             length: (string) $boxData->length,
                             boxData: $boxData->boxData,
-                            ship_from_address: new ShipFromAddressData(
+                            ship_from_address: new ShippingAddressData(
                                 address: $shippingMethod->shipper_address,
                                 city: $shippingMethod->shipper_city,
                                 state: $shippingMethod->state,
@@ -84,7 +88,7 @@ class RateController extends Controller
                             ),
                         ),
                         shippingMethod: $shippingMethod,
-                        address: $address
+                        address: $customerAddress
                     )->getRateResponseAPI()
             );
         } catch (Throwable $th) {

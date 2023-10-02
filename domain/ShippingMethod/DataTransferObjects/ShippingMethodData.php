@@ -35,7 +35,7 @@ class ShippingMethodData
             shipper_address : $data['shipper_address'],
             shipper_city : $data['shipper_city'],
             shipper_zipcode : $data['shipper_zipcode'],
-            active: $data['status'] ?? null,
+            active: $data['status'] ?: false,
             description: $data['description'] ?? null,
             logo: $data['logo'] ?? null,
         );

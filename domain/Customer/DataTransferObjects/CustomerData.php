@@ -66,7 +66,8 @@ final class CustomerData
             email: $validated['email'],
             password: $validated['password'],
             image: $validated['profile_image'] ?? null,
-            shipping_address_data: new AddressData(
+            shipping_address_data: isset($validated['shipping'])
+            ? new AddressData(
                 state_id: (int) $validated['shipping']['state_id'],
                 label_as: $validated['shipping']['label_as'],
                 address_line_1: $validated['shipping']['address_line_1'],
@@ -74,18 +75,17 @@ final class CustomerData
                 city: $validated['shipping']['city'],
                 is_default_shipping: true,
                 is_default_billing: $sameAsShipping,
-            ),
-            billing_address_data: $sameAsShipping
-                ? null
-                : new AddressData(
-                    state_id: (int) $validated['billing']['state_id'],
-                    label_as: $validated['billing']['label_as'],
-                    address_line_1: $validated['billing']['address_line_1'],
-                    zip_code: $validated['billing']['zip_code'],
-                    city: $validated['billing']['city'],
-                    is_default_shipping: false,
-                    is_default_billing: true,
-                ),
+            ) : null,
+            billing_address_data: ! $sameAsShipping && isset($validated['billing'])
+            ? new AddressData(
+                state_id: (int) $validated['billing']['state_id'],
+                label_as: $validated['billing']['label_as'],
+                address_line_1: $validated['billing']['address_line_1'],
+                zip_code: $validated['billing']['zip_code'],
+                city: $validated['billing']['city'],
+                is_default_shipping: false,
+                is_default_billing: true,
+            ) : null,
             email_verification_type: isset($validated['email_verification_type'])
                 ? EmailVerificationType::from($validated['email_verification_type'])
                 : EmailVerificationType::LINK,

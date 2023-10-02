@@ -77,7 +77,7 @@ abstract class BaseSettings extends SettingsPage
 
     public static function getRouteName(): string
     {
-        return 'filament.pages.settings.'.self::getSlug();
+        return 'filament.pages.settings.' . self::getSlug();
     }
 
     protected function getBreadcrumb(): Htmlable|string
@@ -100,9 +100,9 @@ abstract class BaseSettings extends SettingsPage
         return function () {
             $slug = self::getSlug();
 
-            Route::get('settings/'.$slug, static::class)
+            Route::get('settings/' . $slug, static::class)
                 ->middleware(static::getMiddlewares())
-                ->name('settings.'.$slug);
+                ->name('settings.' . $slug);
         };
     }
 }

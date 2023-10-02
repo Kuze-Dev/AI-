@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Actions;
 
-use Domain\Address\Models\Address;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\DataTransferObjects\SummaryData;
@@ -17,13 +16,14 @@ use Domain\Product\Models\ProductVariant;
 use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\Actions\GetShippingfeeAction;
 use Domain\Shipment\DataTransferObjects\ParcelData;
-use Domain\Shipment\DataTransferObjects\ShipFromAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
 use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
+use Domain\Shipment\DataTransferObjects\ReceiverData;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 
 class CartSummaryAction
 {
@@ -42,13 +42,19 @@ class CartSummaryAction
 
         $taxTotal = $tax['taxPercentage'] ? round($initialSubTotal * $tax['taxPercentage'] / 100, 2) : 0;
 
-        $initialShippingTotal = $this->getShippingFee(
-            $collections,
-            $cartSummaryShippingData->customer,
-            $cartSummaryShippingData->shippingAddress,
-            $cartSummaryShippingData->shippingMethod,
-            $serviceId
-        );
+        $initialShippingTotal = 0;
+
+        if ($cartSummaryShippingData->shippingAddress) {
+            $shippingAddress = ShippingAddressData::fromAddressModel($cartSummaryShippingData->shippingAddress);
+
+            $initialShippingTotal = $this->getShippingFee(
+                $collections,
+                $cartSummaryShippingData->customer,
+                $shippingAddress,
+                $cartSummaryShippingData->shippingMethod,
+                $serviceId
+            );
+        }
 
         $discountTotal = $this->getDiscount($discount, $initialSubTotal, $initialShippingTotal);
 
@@ -122,7 +128,7 @@ class CartSummaryAction
     public function getShippingFee(
         CartLine|Collection $collections,
         Customer $customer,
-        ?Address $shippingAddress,
+        ?ShippingAddressData $shippingAddress,
         ?ShippingMethod $shippingMethod,
         ?int $serviceId
     ): float {
@@ -146,7 +152,8 @@ class CartSummaryAction
             $country = $shippingMethod->country;
 
             $parcelData = new ParcelData(
-                ship_from_address: new ShipFromAddressData(
+                reciever: ReceiverData::fromCustomerModel($customer->load('verifiedAddress')),
+                ship_from_address: new ShippingAddressData(
                     address: $shippingMethod->shipper_address,
                     city: $shippingMethod->shipper_city,
                     state: $state,
@@ -165,7 +172,7 @@ class CartSummaryAction
             );
 
             $shippingFeeTotal = app(GetShippingfeeAction::class)
-                ->execute($customer, $parcelData, $shippingMethod, $shippingAddress, $serviceId);
+                ->execute($parcelData, $shippingMethod, $shippingAddress, $serviceId);
         }
 
         return $shippingFeeTotal;
@@ -197,10 +204,10 @@ class CartSummaryAction
 
                 $productlist[] = [
                     'product_id' => (string) $purchasableId,
-                    'length' => ceil($length * $cm_to_inches),
-                    'width' => ceil($width * $cm_to_inches),
-                    'height' => ceil($height * $cm_to_inches),
-                    'weight' => (float) $weight,
+                    'length' => ceil($length * $cm_to_inches * $collections->quantity),
+                    'width' => ceil($width * $cm_to_inches * $collections->quantity),
+                    'height' => ceil($height * $cm_to_inches * $collections->quantity),
+                    'weight' => (float) $weight * $collections->quantity,
                 ];
             }
         } else {
@@ -224,10 +231,10 @@ class CartSummaryAction
 
                     $productlist[] = [
                         'product_id' => (string) $purchasableId,
-                        'length' => ceil($length * $cm_to_inches),
-                        'width' => ceil($width * $cm_to_inches),
-                        'height' => ceil($height * $cm_to_inches),
-                        'weight' => (float) $weight,
+                        'length' => ceil($length * $cm_to_inches * $collection->quantity),
+                        'width' => ceil($width * $cm_to_inches * $collection->quantity),
+                        'height' => ceil($height * $cm_to_inches * $collection->quantity),
+                        'weight' => (float) $weight * $collection->quantity,
                     ];
                 }
             }

@@ -37,6 +37,9 @@ class FavoriteController
                     'customer',
                     'product.media',
                 ])
+                ->allowedSorts([
+                    'updated_at',
+                ])
                 ->get()
         );
     }

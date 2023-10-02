@@ -8,15 +8,23 @@ use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
- * @mixin \Domain\Discount\Models\Discount
+ * @mixin \Domain\Tier\Models\Tier
  */
 class TierResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
-        return [
+        return  [
             'name' => $this->name,
             'description' => $this->description,
+        ];
+    }
+
+    /** @return array<string, callable> */
+    public function toRelationships(Request $request): array
+    {
+        return [
+            'products' => fn () => ProductResource::collection($this->products),
         ];
     }
 }
