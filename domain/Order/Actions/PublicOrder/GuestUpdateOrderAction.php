@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Order\Actions\PublicOrder;
 
+use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Order\DataTransferObjects\UpdateOrderData;
 use Domain\Order\Enums\OrderStatuses;
+use Domain\Order\Events\OrderStatusUpdatedEvent;
 use Domain\Order\Models\Order;
 use Domain\Payments\Actions\CreatePaymentLink;
 use Domain\Payments\Actions\UploadProofofPaymentAction;
@@ -16,6 +18,7 @@ use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\ProofOfPaymentData;
 use Domain\Payments\DataTransferObjects\TransactionData;
 use Domain\Payments\Models\Payment;
+use Domain\Product\Actions\UpdateProductStockAction;
 use Illuminate\Database\Eloquent\Builder;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Illuminate\Http\UploadedFile;
@@ -66,7 +69,7 @@ class GuestUpdateOrderAction
         return $order;
     }
 
-    private function updateStatus(Order $order, string|OrderStatuses $status, ?string $notes = null): Order
+    private function updateStatus(Order $order, string $status, ?string $notes = null): Order
     {
         $orderData = [
             'status' => $status,
@@ -82,6 +85,11 @@ class GuestUpdateOrderAction
             $payment->update([
                 'status' => 'cancelled',
             ]);
+
+            event(new OrderStatusUpdatedEvent(
+                $order,
+                $status
+            ));
         } else {
             $orderData['cancelled_reason'] = null;
         }
@@ -144,7 +152,7 @@ class GuestUpdateOrderAction
             $query->where('payable_id', $order->id);
         })->whereNot('status', 'paid')->first();
 
-        if ( ! $payment) {
+        if (!$payment) {
             throw new BadRequestHttpException('Your order is already paid');
         }
 

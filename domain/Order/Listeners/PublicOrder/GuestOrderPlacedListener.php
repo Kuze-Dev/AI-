@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Order\Listeners\PublicOrder;
 
+use Domain\Discount\Actions\CreateDiscountLimitAction;
 use Domain\Order\Events\PublicOrder\GuestOrderPlacedEvent;
 use Domain\Order\Notifications\OrderPlacedMail;
 use Domain\Product\Actions\UpdateProductStockAction;
@@ -21,16 +22,13 @@ class GuestOrderPlacedListener
     {
         $email = $event->guestPreparedOrderData->customer->email;
         $order = $event->order;
-        // $shippingAddress = $event->guestPreparedOrderData->shippingAddress;
-        // $shippingMethod = $event->guestPreparedOrderData->shippingMethod;
 
-        // $discount = $event->guestPreparedOrderData->discount;
+        $discount = $event->guestPreparedOrderData->discount;
 
         // minus the discount
-        // TODO: make this helper accepts null customer
-        // if (!is_null($discount)) {
-        //     app(CreateDiscountLimitAction::class)->execute($discount, $order, $customer);
-        // }
+        if (!is_null($discount)) {
+            app(CreateDiscountLimitAction::class)->execute($discount, $order, null);
+        }
 
         foreach ($order->orderLines as $orderLine) {
             app(UpdateProductStockAction::class)->execute(

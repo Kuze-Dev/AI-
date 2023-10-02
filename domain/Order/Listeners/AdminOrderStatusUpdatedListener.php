@@ -91,7 +91,6 @@ class AdminOrderStatusUpdatedListener
                 break;
         }
 
-        //comment when the env and mail is not set
         if ($event->shouldSendEmail) {
             $customer->notify(new AdminOrderStatusUpdatedMail($order, $event->status, $event->emailRemarks));
         }
@@ -102,10 +101,31 @@ class AdminOrderStatusUpdatedListener
         $customerEmail = $event->order->customer_email;
         $order = $event->order;
 
+        switch ($event->status) {
+            case OrderStatuses::CANCELLED->value:
+                // back the discount
+                app(DiscountHelperFunctions::class)->resetDiscountUsage($order);
+
+                // back the product stock
+                foreach ($order->orderLines as $orderLine) {
+                    app(UpdateProductStockAction::class)->execute($orderLine->purchasable_type, $orderLine->purchasable_id, $orderLine->quantity, true);
+                }
+
+                break;
+            case OrderStatuses::REFUNDED->value:
+                // back the discount
+                app(DiscountHelperFunctions::class)->resetDiscountUsage($order);
+
+                // back the product stock
+                foreach ($order->orderLines as $orderLine) {
+                    app(UpdateProductStockAction::class)->execute($orderLine->purchasable_type, $orderLine->purchasable_id, $orderLine->quantity, true);
+                }
+                break;
+        }
+
         if ($event->shouldSendEmail) {
             Notification::route('mail', $customerEmail)
                 ->notify(new AdminOrderStatusUpdatedMail($order, $event->status, $event->emailRemarks));
-            // $customer->notify(new AdminOrderStatusUpdatedMail($order, $event->status, $event->emailRemarks));
         }
     }
 }
