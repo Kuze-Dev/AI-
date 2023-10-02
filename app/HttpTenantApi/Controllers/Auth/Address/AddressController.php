@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Address;
 
-use App\Features\Customer\AddressBase;
 use App\Features\ECommerce\ShippingUps;
+use App\Features\Customer\AddressBase;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Requests\Auth\Address\AddressRequest;
 use App\HttpTenantApi\Resources\AddressResource;

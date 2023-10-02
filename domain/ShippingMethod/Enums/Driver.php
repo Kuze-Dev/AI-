@@ -9,5 +9,6 @@ enum Driver: string
     case USPS = 'usps';
     case UPS = 'ups';
     case STORE_PICKUP = 'store-pickup';
+    case AUSPOST = 'auspost';
 
 }

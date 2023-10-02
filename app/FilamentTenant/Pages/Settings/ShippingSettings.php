@@ -65,6 +65,16 @@ class ShippingSettings extends TenantBaseSettings
                         fn () => ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\ShippingUps::class)
                     ),
 
+                Forms\Components\Section::make(trans('AusPost Shipping'))
+                    ->collapsible()
+                    ->schema([
+                        Forms\Components\TextInput::make('auspost_api_key')
+                            ->translateLabel(),
+
+                    ])->hidden(
+                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\ShippingAusPost::class)
+                    ),
+
             ]),
 
         ];

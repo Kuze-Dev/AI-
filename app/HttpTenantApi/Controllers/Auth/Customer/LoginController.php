@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
-use App\Features\ECommerce\ECommerceBase;
+use App\Features\Customer\CustomerBase;
 use App\Http\Controllers\Controller;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
@@ -16,7 +16,7 @@ use Illuminate\Validation\Rule;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 
-#[Middleware('feature.tenant:' . ECommerceBase::class)]
+#[Middleware('feature.tenant:' . CustomerBase::class)]
 class LoginController extends Controller
 {
     /** @throws \Illuminate\Auth\AuthenticationException */
