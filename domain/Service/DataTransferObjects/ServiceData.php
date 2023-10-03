@@ -35,7 +35,7 @@ class ServiceData
             retail_price: (int) $data['retail_price'],
             selling_price: (int) $data['selling_price'],
             billing_cycle: $data['billing_cycle'] ?? null,
-            due_date_every: (int) $data['due_date_every'],
+            due_date_every: array_key_exists('due_date_every', $data) ? (int)$data['due_date_every'] : null,
             is_featured: $data['is_featured'],
             is_special_offer: $data['is_special_offer'],
             pay_upfront: $data['pay_upfront'],

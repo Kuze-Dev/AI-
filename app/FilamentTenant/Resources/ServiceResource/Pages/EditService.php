@@ -22,6 +22,11 @@ class EditService extends EditRecord
 
     protected static string $resource = ServiceResource::class;
 
+    /**
+     * @param Service $record
+     * @param array $data
+     * @return Model
+     */
     public function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(fn () => app(UpdateServiceAction::class)->execute($record, ServiceData::fromArray($data)));
