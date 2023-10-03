@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\ServiceOrderResource\Pages;
 
 use App\FilamentTenant\Resources\ServiceOrderResource;
-use App\FilamentTenant\Resources\ServiceResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Domain\ServiceOrder\Models\ServiceBill
- * 
+ *
  * @property int $service_order_id
  * @property int $payment_method_id
  * @property \Illuminate\Support\Carbon|null $bill_date
