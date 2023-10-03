@@ -79,6 +79,7 @@ class ServiceOrder extends Model
         'customer_email',
         'customer_mobile',
         'customer_form',
+        'reference',
         'service_address',
         'additional_charges',
         'service_address',
@@ -93,6 +94,9 @@ class ServiceOrder extends Model
         'status',
         'cancelled_reason',
         'total_price',
+        'service_address_id',
+        'billing_address_id',
+        'is_same_as_billing',
     ];
 
     protected $casts = [
@@ -102,9 +106,9 @@ class ServiceOrder extends Model
         'status' => ServiceOrderStatus::class,
     ];
 
-    public function getIsCreatedByAdminAttribute(): bool
+    public function getRouteKeyName(): string
     {
-        return $this->created_by !== null;
+        return 'reference';
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\ServiceOrder\Models\ServiceOrder> */

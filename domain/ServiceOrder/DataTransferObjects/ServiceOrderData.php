@@ -9,10 +9,12 @@ use DateTime;
 class ServiceOrderData
 {
     public function __construct(
-        public readonly ?int $customer_id,
-        public readonly int $service_id,
+        public readonly ?int $customerId,
+        public readonly int $serviceId,
         public readonly DateTime $schedule,
-        public readonly ?string $serviceAddress,
+        public readonly ?int $serviceAddressId,
+        public readonly ?int $billingAddressId,
+        public readonly bool $isSameAsBilling,
         public readonly ?array $additionalCharges,
         public readonly ?array $form,
     ) {
@@ -21,10 +23,12 @@ class ServiceOrderData
     public static function fromArray(array $data): self
     {
         return new self(
-            customer_id: (int) $data['customer_id'] ?? null,
-            service_id: (int) $data['service_id'],
+            customerId: (int) $data['customer_id'] ?? null,
+            serviceId: (int) $data['service_id'],
             schedule: new DateTime($data['schedule']),
-            serviceAddress: $data['service_address'],
+            serviceAddressId: (int) $data['service_address_id'],
+            billingAddressId: (int) $data['billing_address_id'],
+            isSameAsBilling: $data['is_same_as_billing'],
             additionalCharges: $data['additional_charges'] ?? null,
             form: $data['data'] ?? null,
         );

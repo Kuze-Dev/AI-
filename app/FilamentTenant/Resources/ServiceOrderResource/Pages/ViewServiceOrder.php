@@ -14,12 +14,18 @@ use Filament\Forms\Components\Section;
 use Filament\Resources\Pages\ViewRecord;
 use App\FilamentTenant\Support;
 use App\FilamentTenant\Support\SchemaFormBuilder;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ViewServiceOrder extends ViewRecord
 {
     use LogsFormActivity;
 
     protected static string $resource = ServiceOrderResource::class;
+
+    protected function getHeading(): string|Htmlable
+    {
+        return trans('Service Order Details #') . $this->record->reference;
+    }
 
     protected function getFormSchema(): array
     {
@@ -60,8 +66,13 @@ class ViewServiceOrder extends ViewRecord
                             ->content(fn ($record) => $record->customer_email),
                         Placeholder::make('mobile')
                             ->content(fn ($record) => $record->customer_mobile),
-                        Placeholder::make('billing_address')
-                            ->content(fn ($record) => $record->customer->addresses->first()->address_line_1),
+                        Forms\Components\Group::make()->schema([
+                            Placeholder::make('billing_address')
+                                ->content(fn ($record) => $record->billing_address),
+                            Placeholder::make('service_address')
+                                ->content(fn ($record) => $record->service_address),
+                        ]),
+
                     ]),
 
                 ]),

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Actions;
 
+use Domain\Address\Models\Address;
 use Domain\Currency\Models\Currency;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
@@ -20,7 +21,7 @@ class CreateServiceOrderAction
     ) {
     }
 
-    public function execute(ServiceOrderData $serviceData, int|null $adminId): ServiceOrder
+    public function execute(ServiceOrderData $serviceOrderData, int|null $adminId): ServiceOrder
     {
         $uniqueReference = null;
 
@@ -36,11 +37,24 @@ class CreateServiceOrderAction
             }
         } while (true);
 
-        $customer = Customer::whereId($serviceData->customer_id)->first();
+        $customer = Customer::whereId($serviceOrderData->customer_id)->first();
 
-        $service = Service::whereId($serviceData->service_id)->first();
+        $service = Service::whereId($serviceOrderData->service_id)->first();
 
         $currency = Currency::whereEnabled(true)->first();
+
+        $serviceAddressModel = Address::whereId($serviceOrderData->service_address_id)->first();
+
+        $serviceAddress = $serviceAddressModel->address_line_1 .' '. $serviceAddressModel->city .' '. $serviceAddressModel->state->name . ' ' .
+                            $serviceAddressModel->state->country->name . ' ' . $serviceAddressModel->zip_code;
+
+        $billingAddress = $serviceAddress;
+
+        if( ! $serviceOrderData->is_same_as_billing) {
+            $billingAddressModel = Address::whereId($serviceOrderData->billing_address_id)->first();
+            $billingAddress = $billingAddressModel->address_line_1 .' '. $billingAddressModel->city .' '. $billingAddressModel->state->name . ' ' .
+                            $billingAddressModel->state->country->name . ' ' . $billingAddressModel->zip_code;
+        }
 
         $totalPrice = $this->calculateServiceOrderTotalPriceAction
             ->execute(
@@ -57,29 +71,29 @@ class CreateServiceOrderAction
                             $additionalCharge['quantity']
                         );
                     }
-                }, $serviceData->additionalCharges)
+                }, $serviceOrderData->additional_charges)
             );
 
         $serviceOrder = ServiceOrder::create([
             'admin_id' => $adminId,
-            'customer_id' => $serviceData->customer_id,
+            'service_id' => $serviceOrderData->service_id,
+            'customer_id' => $serviceOrderData->customer_id,
             'customer_first_name' => $customer->first_name,
             'customer_last_name' => $customer->last_name,
             'customer_email' => $customer->email,
             'customer_mobile' => $customer->mobile,
-            'customer_form' => $serviceData->form,
+            'customer_form' => $serviceOrderData->form,
             'currency_code' => $currency->code,
             'currency_name' => $currency->name,
             'currency_symbol' => $currency->symbol,
-            'service_address' => $serviceData->serviceAddress,
-            'billing_address' => $customer->addresses->first()->address_line_1,
+            'service_address' => $serviceAddress,
+            'billing_address' => $billingAddress,
             'service_name' => $service->name,
             'service_price' => $service->price,
-            'service_id' => $serviceData->service_id,
-            'schedule' => $serviceData->schedule,
+            'schedule' => $serviceOrderData->schedule,
             'reference' => $uniqueReference,
             'status' => ServiceOrderStatus::PENDING,
-            'additional_charges' => $serviceData->additionalCharges,
+            'additional_charges' => $serviceOrderData->additional_charges,
             'total_price' => $totalPrice,
         ]);
 
