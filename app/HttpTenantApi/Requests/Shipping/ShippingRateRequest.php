@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Requests\Shipping;
 
-use Domain\Cart\Models\CartLine;
+use Domain\Cart\Helpers\PrivateCart\CartLineQuery;
 use Domain\Shipment\DataTransferObjects\ReceiverData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Illuminate\Foundation\Http\FormRequest;
@@ -66,14 +66,10 @@ class ShippingRateRequest extends FormRequest
         if (empty($this->cartLinesCache)) {
             $cartLineIds = $this->validated('cart_line_ids');
 
-            $this->cartLinesCache = CartLine::query()
-                ->with('purchasable')
-                ->whereHas('cart', function ($query) {
-                    $query->where('session_id', $this->bearerToken());
-                })
-                ->whereNull('checked_out_at')
-                ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
-                ->get();
+            /** @var string $sessionId */
+            $sessionId = $this->bearerToken();
+
+            $this->cartLinesCache = app(CartLineQuery::class)->guests($cartLineIds, $sessionId);
         }
 
         return $this->cartLinesCache;

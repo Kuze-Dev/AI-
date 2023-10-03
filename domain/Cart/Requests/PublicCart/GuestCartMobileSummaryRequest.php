@@ -7,6 +7,7 @@ namespace Domain\Cart\Requests\PublicCart;
 use App\HttpTenantApi\Requests\Auth\Address\AddressRequest;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
+use Domain\Cart\Helpers\PrivateCart\CartLineQuery;
 use Domain\Cart\Models\CartLine;
 use Domain\Discount\Models\Discount;
 use Domain\Product\Models\Product;
@@ -94,14 +95,10 @@ class GuestCartMobileSummaryRequest extends AddressRequest
     {
         if (empty($this->cartLinesCache)) {
 
-            $this->cartLinesCache = CartLine::query()
-                ->with('purchasable')
-                ->whereHas('cart', function ($query) {
-                    $query->where('session_id', $this->bearerToken());
-                })
-                ->whereNull('checked_out_at')
-                ->whereIn((new CartLine())->getRouteKeyName(), $this->cartLineIds)
-                ->get();
+            /** @var string $sessionId */
+            $sessionId = $this->bearerToken();
+
+            $this->cartLinesCache = app(CartLineQuery::class)->guests($this->cartLineIds, $sessionId);
         }
 
         return $this->cartLinesCache;
