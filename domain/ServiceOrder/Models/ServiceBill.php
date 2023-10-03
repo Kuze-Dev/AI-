@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Models;
 
+use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -61,7 +62,7 @@ class ServiceBill extends Model
         return $this->belongsTo(ServiceOrder::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ServiceOrder\Models\PaymentMethod, \Domain\ServiceOrder\Models\ServiceBill> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\PaymentMethod\Models\PaymentMethod, \Domain\ServiceOrder\Models\ServiceBill> */
     public function payment_method(): BelongsTo
     {
         return $this->belongsTo(PaymentMethod::class);
