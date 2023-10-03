@@ -72,7 +72,8 @@ class CreateServiceOrderAction
                         );
                     }
                 }, $serviceOrderData->additional_charges)
-            );
+            )
+            ->getAmount();
 
         $serviceOrder = ServiceOrder::create([
             'admin_id' => $adminId,
