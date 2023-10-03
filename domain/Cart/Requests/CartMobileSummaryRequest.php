@@ -15,6 +15,7 @@ use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class CartMobileSummaryRequest extends FormRequest
@@ -90,8 +91,27 @@ class CartMobileSummaryRequest extends FormRequest
     public function getCartLines(): Collection
     {
         if (empty($this->cartLinesCache)) {
+            /** @var \Domain\Customer\Models\Customer $customer */
+            $customer = auth()->user();
+
+            /** @var \Domain\Tier\Models\Tier $tier */
+            $tier = $customer->tier;
+
             $this->cartLinesCache = CartLine::query()
-                ->with('purchasable')
+                ->with(['purchasable' => function ($query) use ($tier) {
+                    $query->morphWith([
+                        Product::class => [
+                            'productTier' => function (BelongsToMany $query) use ($tier) {
+                                $query->where('tier_id', $tier->id);
+                            },
+                        ],
+                        ProductVariant::class => [
+                            'product.productTier' => function (BelongsToMany $query) use ($tier) {
+                                $query->where('tier_id', $tier->id);
+                            },
+                        ],
+                    ]);
+                }])
                 ->whereHas('cart', function ($query) {
                     $query->whereBelongsTo(auth()->user());
                 })

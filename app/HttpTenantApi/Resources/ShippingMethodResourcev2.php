@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
+use Domain\Cart\Actions\CartSummaryAction;
+use Domain\Cart\Models\CartLine;
 use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\Actions\GetShippingRateAction;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
@@ -21,7 +23,6 @@ class ShippingMethodResourcev2 extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
-
         $rateData = $this->getRateData($request);
 
         return  [
@@ -49,6 +50,7 @@ class ShippingMethodResourcev2 extends JsonApiResource
 
         try {
             //code...
+            $sessionId = $request->bearerToken();
 
             $shippingMethod = $this->resource;
 
@@ -56,19 +58,20 @@ class ShippingMethodResourcev2 extends JsonApiResource
 
             $customerAddress = ShippingAddressData::fromRequestData($request->destination_address);
 
-            #TODO: Get product list from guest cart
+            $cartLineIds = $request['cart_line_ids'];
 
-            $productlist = [
-                [
-                    'product_id' => '1',
-                    'length' => 2,
-                    'width' => 2,
-                    'height' => 2,
-                    'weight' => 0.5,
-                ],
-            ];
+            $cartLines = CartLine::query()
+                ->with('purchasable')
+                ->whereHas('cart', function ($query) use ($sessionId) {
+                    $query->where('session_id', $sessionId);
+                })
+                ->whereNull('checked_out_at')
+                ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
+                ->get();
 
-            $subTotal = 10;
+            $productlist = app(CartSummaryAction::class)->getProducts($cartLines);
+
+            $subTotal = app(CartSummaryAction::class)->getSubTotal($cartLines);
 
             $boxData = app(GetBoxAction::class)->execute(
                 $shippingMethod,
@@ -100,13 +103,11 @@ class ShippingMethodResourcev2 extends JsonApiResource
                     shippingMethod: $shippingMethod,
                     address: $customerAddress
                 )->getRateResponseAPI();
-
         } catch (Throwable $th) {
 
             return [
                 'message' => $th->getMessage(),
             ];
         }
-
     }
 }
