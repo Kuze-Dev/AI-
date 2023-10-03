@@ -470,6 +470,7 @@ class CustomerResource extends Resource
                             }
                         }
                     })
+                    ->deselectRecordsAfterCompletion()
                     ->icon('heroicon-o-speakerphone'),
             ])
             ->defaultSort('updated_at', 'desc');
