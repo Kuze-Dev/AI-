@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 use Domain\Admin\Models\Admin;
 use Domain\Customer\Models\Customer;
+use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\Payments\Models\Payment;
 use Domain\Service\Models\Service;
+use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -57,6 +60,20 @@ return new class () extends Migration {
             $table->timestamps();
         });
 
+        Schema::create('service_transactions', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignIdFor(ServiceOrder::class)->index();
+            $table->foreignIdFor(ServiceBill::class)->index();
+            $table->foreignIdFor(Payment::class)->index();
+            $table->foreignIdFor(PaymentMethod::class)->index();
+
+            $table->string('currency')->index();
+            $table->decimal('total_amount', 10, 2)->index();
+            $table->string('status')->index();
+
+            $table->timestamps();
+        });
     }
 
     /** Reverse the migrations. */
