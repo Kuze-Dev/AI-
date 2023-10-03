@@ -7,6 +7,7 @@ namespace Domain\ServiceOrder\Actions;
 use Domain\Currency\Models\Currency;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
+use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
@@ -14,13 +15,15 @@ use Illuminate\Support\Str;
 
 class CreateServiceOrderAction
 {
-    public function __construct()
-    {
+    public function __construct(
+        private CalculateServiceOrderTotalPriceAction $calculateServiceOrderTotalPriceAction,
+    ) {
     }
 
     public function execute(ServiceOrderData $serviceData, int|null $adminId): ServiceOrder
     {
         $uniqueReference = null;
+
         do {
             $referenceNumber = Str::upper(Str::random(12));
 
@@ -34,15 +37,28 @@ class CreateServiceOrderAction
         } while (true);
 
         $customer = Customer::whereId($serviceData->customer_id)->first();
-        $service = Service::whereId($serviceData->service_id)->first();
-        $currency = Currency::whereEnabled(true)->first();
-        $totalPrice = $service->price + array_reduce($serviceData->additionalCharges, function ($carry, $data) {
-            if (isset($data['price']) && is_numeric($data['price']) && isset($data['quantity']) && is_numeric($data['quantity'])) {
-                return $carry + ($data['price'] * $data['quantity']);
-            }
 
-            return $carry;
-        }, 0);
+        $service = Service::whereId($serviceData->service_id)->first();
+
+        $currency = Currency::whereEnabled(true)->first();
+
+        $totalPrice = $this->calculateServiceOrderTotalPriceAction
+            ->execute(
+                $service->price,
+                array_map(function ($additionalCharge) {
+                    if (
+                        isset($additionalCharge['price']) &&
+                        is_numeric($additionalCharge['price']) &&
+                        isset($additionalCharge['quantity']) &&
+                        is_numeric($additionalCharge['quantity'])
+                    ) {
+                        return new ServiceOrderAdditionalChargeData(
+                            $additionalCharge['price'],
+                            $additionalCharge['quantity']
+                        );
+                    }
+                }, $serviceData->additionalCharges)
+            );
 
         $serviceOrder = ServiceOrder::create([
             'admin_id' => $adminId,
