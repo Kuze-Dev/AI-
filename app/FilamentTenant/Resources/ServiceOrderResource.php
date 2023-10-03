@@ -20,6 +20,7 @@ use Domain\Service\Models\Service;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Filament\Forms;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
@@ -30,6 +31,7 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 
 class ServiceOrderResource extends Resource
 {
@@ -75,10 +77,6 @@ class ServiceOrderResource extends Resource
                                     ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
                                         ? Customer::whereId($customerId)->first()->mobile
                                         : ''),
-                                Placeholder::make('billing_address')
-                                    ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
-                                        ? Address::whereCustomerId($customerId)->first()->address_line_1
-                                        : ''),
                             ])->visible(
                                 function (array $state) {
                                     return isset($state['customer_id']);
@@ -86,75 +84,161 @@ class ServiceOrderResource extends Resource
                             ),
 
                         ]),
-                    Section::make(trans('Service'))
+                    Section::make(trans('Service Address'))
                         ->schema([
+                            Forms\Components\Select::make('service_address_id')
+                                ->label(trans(''))
+                                ->placeholder(trans('Select Address'))
+                                ->required()
+                                ->preload()
+                                ->optionsFromModel(
+                                    Address::class,
+                                    'address_line_1',
+                                    fn (Builder $query, Closure $get) => $query->where('customer_id', $get('customer_id'))
+                                )
+                                ->reactive(),
+
                             Forms\Components\Group::make()->columns(2)->schema([
-                                Forms\Components\Select::make('service_id')
-                                    ->label(trans('Select Service'))
-                                    ->placeholder(trans('Select Service'))
+                                Placeholder::make('country')
+                                    ->content(fn (Closure $get) => ($addressId = $get('service_address_id'))
+                                        ? Address::whereId($addressId)->first()->state->country->name
+                                        : ''),
+                                Placeholder::make('state')
+                                    ->content(fn (Closure $get) => ($addressId = $get('service_address_id'))
+                                    ? Address::whereId($addressId)->first()->state->name
+                                    : ''),
+                                Placeholder::make('City/Province')
+                                    ->content(fn (Closure $get) => ($addressId = $get('service_address_id'))
+                                    ? Address::whereId($addressId)->first()->city
+                                    : ''),
+                                Placeholder::make('Zip')
+                                    ->content(fn (Closure $get) => ($addressId = $get('service_address_id'))
+                                    ? Address::whereId($addressId)->first()->zip_code
+                                    : ''),
+                                Checkbox::make('is_same_as_billing')->reactive()->label('Same as Billing Address'),
+                            ])->visible(
+                                function (array $state) {
+                                    return isset($state['service_address_id']);
+                                }
+                            ),
+
+                        ])->visible(function (array $state) {
+                            return isset($state['customer_id']);
+                        }),
+
+                    Section::make(trans('Billing Address'))
+                        ->schema([
+                                Forms\Components\Select::make('billing_address_id')
+                                    ->label(trans(''))
+                                    ->placeholder(trans('Select Address'))
                                     ->required()
                                     ->preload()
-                                    ->reactive()
-                                    ->optionsFromModel(Service::class, 'name'),
+                                    ->optionsFromModel(
+                                        Address::class,
+                                        'address_line_1',
+                                        fn (Builder $query, Closure $get) => $query->where('customer_id', $get('customer_id'))
+                                    )
+                                    ->reactive(),
 
-                                DateTimePicker::make('schedule')->minDate(now())->withoutSeconds()->default(now())->timezone(Auth::user()?->timezone),
+                                Forms\Components\Group::make()->columns(2)->schema([
+                                    Placeholder::make('country')
+                                        ->content(fn (Closure $get) => ($addressId = $get('billing_address_id'))
+                                            ? Address::whereId($addressId)->first()->state->country->name
+                                            : ''),
+                                    Placeholder::make('state')
+                                        ->content(fn (Closure $get) => ($addressId = $get('billing_address_id'))
+                                        ? Address::whereId($addressId)->first()->state->name
+                                        : ''),
+                                    Placeholder::make('City/Province')
+                                        ->content(fn (Closure $get) => ($addressId = $get('billing_address_id'))
+                                        ? Address::whereId($addressId)->first()->city
+                                        : ''),
+                                    Placeholder::make('Zip')
+                                        ->content(fn (Closure $get) => ($addressId = $get('billing_address_id'))
+                                        ? Address::whereId($addressId)->first()->zip_code
+                                        : ''),
+                            ])->visible(
+                                function (array $state) {
+                                    if(isset($state['customer_id'])) {
+                                        // dd(Address::whereCustomerId($state['customer_id'])->whereIsDefaultBilling(true)->first()?->address_line_1);
+                                    }
 
-                                TextInput::make('service_address')->required()->columnSpan(2),
+                                    return isset($state['billing_address_id']);
+                                }
+                            ),
 
-                                Forms\Components\Group::make()->columnSpan(2)->schema([
-                                    Forms\Components\Fieldset::make('')->schema([
-                                        Placeholder::make('Service')
-                                            ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
-                                                ? Service::whereId($serviceId)->first()->name
-                                                : ''),
-                                        Placeholder::make('Service Price')
-                                            ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
-                                                ? Service::whereId($serviceId)->first()->price
-                                                : ''),
-                                        Forms\Components\Group::make()->columnSpan(2)->columns(2)->visible(
-                                            fn (Closure $get) => Service::whereId($get('service_id'))->first()?->is_subscription
-                                        )->schema([
-                                            Placeholder::make('Billing Schedule')
-                                                ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
-                                                    ? Service::whereId($serviceId)->first()->billing_cycle
-                                                    : ''),
-                                            Placeholder::make('Due Date')
-                                                ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
-                                                    ? Service::whereId($serviceId)->first()->recurring_payment
-                                                    : ''),
-                                        ]),
+                            ])->visible(function (array $state) {
+                                return ! $state['is_same_as_billing'] && isset($state['customer_id']);
+                            }),
+                    Section::make(trans('Service'))
+                        ->schema([
+                                    Forms\Components\Group::make()->columns(2)->schema([
+                                        Forms\Components\Select::make('service_id')
+                                            ->label(trans('Select Service'))
+                                            ->placeholder(trans('Select Service'))
+                                            ->required()
+                                            ->preload()
+                                            ->reactive()
+                                            ->optionsFromModel(Service::class, 'name'),
+
+                                        DateTimePicker::make('schedule')->minDate(now())->withoutSeconds()->default(now())->timezone(Auth::user()?->timezone),
+
+                                        TextInput::make('service_address_id')->required()->columnSpan(2),
+
+                                        Forms\Components\Group::make()->columnSpan(2)->schema([
+                                            Forms\Components\Fieldset::make('')->schema([
+                                                Placeholder::make('Service')
+                                                    ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
+                                                        ? Service::whereId($serviceId)->first()->name
+                                                        : ''),
+                                                Placeholder::make('Service Price')
+                                                    ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
+                                                        ? Service::whereId($serviceId)->first()->price
+                                                        : ''),
+                                                Forms\Components\Group::make()->columnSpan(2)->columns(2)->visible(
+                                                    fn (Closure $get) => Service::whereId($get('service_id'))->first()?->is_subscription
+                                                )->schema([
+                                                    Placeholder::make('Billing Schedule')
+                                                        ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
+                                                            ? Service::whereId($serviceId)->first()->billing_cycle
+                                                            : ''),
+                                                    Placeholder::make('Due Date')
+                                                        ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
+                                                            ? Service::whereId($serviceId)->first()->recurring_payment
+                                                            : ''),
+                                                ]),
+
+                                            ]),
+                                        ])
+                                            ->visible(
+                                                function (array $state) {
+                                                    return isset($state['service_id']);
+                                                }
+                                            ),
+
+                                        TextLabel::make('')
+                                            ->label(trans('Additional Charges'))
+                                            ->alignLeft()
+                                            ->size('xl')
+                                            ->weight('bold')
+                                            ->inline()
+                                            ->readOnly(),
+
+                                        Repeater::make('additional_charges')
+                                            ->label('')
+                                            ->createItemButtonLabel('Additional Charges')
+                                            ->columnSpan(2)
+                                            ->defaultItems(0)
+                                            ->schema([
+                                                TextInput::make('name')->required(),
+                                                TextInput::make('quantity')->required()->numeric()->reactive()->default(1),
+                                                TextInput::make('price')->required()->numeric()->reactive(),
+                                            ])
+                                            ->maxItems(3)
+                                            ->columns(3),
 
                                     ]),
-                                ])
-                                    ->visible(
-                                        function (array $state) {
-                                            return isset($state['service_id']);
-                                        }
-                                    ),
-
-                                TextLabel::make('')
-                                    ->label(trans('Additional Charges'))
-                                    ->alignLeft()
-                                    ->size('xl')
-                                    ->weight('bold')
-                                    ->inline()
-                                    ->readOnly(),
-
-                                Repeater::make('additional_charges')
-                                    ->label('')
-                                    ->createItemButtonLabel('Additional Charges')
-                                    ->columnSpan(2)
-                                    ->defaultItems(0)
-                                    ->schema([
-                                        TextInput::make('name')->required(),
-                                        TextInput::make('quantity')->required()->numeric()->reactive()->default(1),
-                                        TextInput::make('price')->required()->numeric()->reactive(),
-                                    ])
-                                    ->maxItems(3)
-                                    ->columns(3),
-
-                            ]),
-                        ]),
+                                ]),
                     Forms\Components\Section::make('Form Title')
                         ->schema([
                             SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)

@@ -12,10 +12,10 @@ use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\Settings\ServiceSettings;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Carbon\Carbon;
 use Closure;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Service\Enums\BillingCycle;
-use Domain\Service\Enums\RecurringPayment;
 use Domain\Service\Enums\Status;
 use Domain\Service\Models\Service;
 use Domain\Taxonomy\Models\TaxonomyTerm;
@@ -25,6 +25,7 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Illuminate\Database\Eloquent\Builder;
 
 class ServiceResource extends Resource
 {
@@ -55,13 +56,6 @@ class ServiceResource extends Resource
                             Forms\Components\RichEditor::make('description')
                                 ->translateLabel()
                                 ->maxLength(255),
-                            Forms\Components\Select::make('blueprint_id')
-                                ->label(trans('Blueprint'))
-                                ->required()
-                                ->preload()
-                                ->optionsFromModel(Blueprint::class, 'name')
-                                ->disabled(fn (?Service $record) => $record !== null)
-                                ->reactive(),
                             Forms\Components\Select::make('taxonomyTerms')
                                 ->label(trans('Service Category'))
                                 ->options(
@@ -83,8 +77,30 @@ class ServiceResource extends Resource
                         Forms\Components\Section::make('Service Price')
                             ->translateLabel()
                             ->schema([
-                                Forms\Components\TextInput::make('price')
+                                Forms\Components\Toggle::make('pay_upfront'),
+                                Forms\Components\TextInput::make('retail_price')
                                     ->translateLabel()
+                                    ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
+                                        prefix: '$',
+                                        thousandsSeparator: ',',
+                                        decimalPlaces: 2,
+                                        isSigned: false
+                                    ))
+                                    ->rules([
+                                        function () {
+                                            return function (string $attribute, mixed $value, Closure $fail) {
+                                                if ($value <= 0) {
+                                                    $attributeName = ucfirst(explode('.', $attribute)[1]);
+                                                    $fail("{$attributeName} must be above zero.");
+                                                }
+                                            };
+                                        },
+                                    ])
+                                    ->dehydrateStateUsing(fn ($state) => (float) $state)
+                                    ->required(),
+                                Forms\Components\TextInput::make('selling_price')
+                                    ->translateLabel()
+                                    // Put custom rule to validate minimum value
                                     ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
                                         prefix: '$',
                                         thousandsSeparator: ',',
@@ -113,13 +129,21 @@ class ServiceResource extends Resource
                                     ->label(trans('Featured Service')),
                             ])
                             ->columns(2),
-                        // Forms\Components\Section::make('Dynamic Form Builder')
-                        //     ->schema([
-                        //         SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)
-                        //             ->schemaData(fn (Closure $get) => Blueprint::query()->firstWhere('id', $get('blueprint_id'))?->schema),
-                        //     ])
-                        //     ->hidden(fn (Closure $get) => $get('blueprint_id') === null)
-                        //     ->columnSpan(2),
+                        Forms\Components\Section::make('Dynamic Form Builder')
+                            ->schema([
+                                Forms\Components\Select::make('blueprint_id')
+                                    ->label(trans('Blueprint'))
+                                    ->required()
+                                    ->preload()
+                                    ->optionsFromModel(Blueprint::class, 'name')
+                                    ->disabled(fn (?Service $record) => $record !== null)
+                                    ->reactive(),
+                                SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)
+                                    ->schemaData(fn (Closure $get) => Blueprint::query()->firstWhere('id', $get('blueprint_id'))?->schema)
+                                    ->hidden(fn (Closure $get) => $get('blueprint_id') === null)
+                                    ->disabled(),
+                            ])
+                            ->columnSpan(2),
                     ])->columnSpan(2),
                 Forms\Components\Group::make()->schema([
                     Forms\Components\Section::make('Status')
@@ -129,7 +153,6 @@ class ServiceResource extends Resource
                                 ->label(
                                     fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value))
                                 ),
-                            Forms\Components\Toggle::make('pay_upfront'),
                             Forms\Components\Toggle::make('is_subscription')
                                 ->label(trans('Subscription-based'))
                                 ->reactive()
@@ -139,25 +162,27 @@ class ServiceResource extends Resource
                                     ->options(function () {
                                         $billing = [];
                                         foreach (BillingCycle::cases() as $billingCycle) {
-                                            $billing[$billingCycle->name] = $billingCycle->value;
+                                            $billing[$billingCycle->value] = $billingCycle->name;
                                         }
 
                                         return $billing;
                                     })
                                     ->required(fn (Closure $get) => $get('is_subscription') === true),
-                                Forms\Components\Select::make('recurring_payment')
+                                Forms\Components\Select::make('due_date_every')
+                                    ->reactive()
                                     ->options(function () {
-                                        $payment = [];
-                                        foreach (RecurringPayment::cases() as $recurringPayment) {
-                                            $payment[$recurringPayment->name] = $recurringPayment->value;
+                                        $days = [];
+                                        for ($day = 1; $day <= Carbon::now()->daysInMonth; $day++) {
+                                            $days[] = $day;
                                         }
 
-                                        return $payment;
+                                        return $days;
                                     })
+                                    ->disabled(fn (Closure $get) => $get('billing_cycle') === false)
                                     ->required(fn (Closure $get) => $get('is_subscription') === true),
                             ])
                                 ->reactive()
-                                ->disabled(fn (Closure $get) => $get('is_subscription') === false),
+                                ->hidden(fn (Closure $get) => $get('is_subscription') === false),
                         ]),
                     MetaDataForm::make('Meta Data'),
                 ])->columnSpan(1),
@@ -204,7 +229,8 @@ class ServiceResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-
+                Tables\Filters\Filter::make('status')
+                    ->query(fn (Builder $query) => dd($query->where('status', true)->get())),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

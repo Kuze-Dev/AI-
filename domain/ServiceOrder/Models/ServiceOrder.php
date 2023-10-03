@@ -79,6 +79,7 @@ class ServiceOrder extends Model
         'customer_email',
         'customer_mobile',
         'customer_form',
+        'reference',
         'service_address',
         'additional_charges',
         'service_address',
@@ -93,6 +94,9 @@ class ServiceOrder extends Model
         'status',
         'cancelled_reason',
         'total_price',
+        'service_address_id',
+        'billing_address_id',
+        'is_same_as_billing',
     ];
 
     protected $casts = [

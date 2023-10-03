@@ -15,10 +15,10 @@ return new class () extends Migration {
             $table->foreignIdFor(\Domain\Blueprint\Models\Blueprint::class)->index();
             $table->string('name')->unique();
             $table->text('description')->nullable();
-            $table->integer('price');
+            $table->integer('retail_price');
+            $table->integer('selling_price');
             $table->string('billing_cycle')->nullable(); //monthly and yearly
-            $table->string('recurring_payment')->nullable(); //daily, monthly and yearly
-            $table->json('data')->nullable();
+            $table->integer('due_date_every')->nullable();
             $table->boolean('is_featured');
             $table->boolean('is_special_offer');
             $table->boolean('pay_upfront');

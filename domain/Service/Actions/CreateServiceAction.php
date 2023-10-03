@@ -7,6 +7,7 @@ namespace Domain\Service\Actions;
 use Domain\Service\DataTransferObjects\ServiceData;
 use Domain\Service\Models\Service;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Support\Common\Actions\SyncMediaCollectionAction;
 use Support\Common\DataTransferObjects\MediaCollectionData;
 use Support\Common\DataTransferObjects\MediaData;
@@ -16,9 +17,10 @@ use Support\MetaData\DataTransferObjects\MetaDataData;
 class CreateServiceAction
 {
     public function __construct(
-        protected CreateMetaDataAction $createMetaData,
+        protected CreateMetaDataAction      $createMetaData,
         protected SyncMediaCollectionAction $syncMediaCollection,
-    ) {
+    )
+    {
     }
 
     public function execute(ServiceData $serviceData): Service|Model
@@ -27,10 +29,10 @@ class CreateServiceAction
             'blueprint_id' => $serviceData->blueprint_id,
             'name' => $serviceData->name,
             'description' => $serviceData->description,
-            'price' => $serviceData->price,
+            'retail_price' => $serviceData->retail_price,
+            'selling_price' => $serviceData->selling_price,
             'billing_cycle' => $serviceData->billing_cycle,
-            'recurring_payment' => $serviceData->recurring_payment,
-            'data' => $serviceData->data,
+            'due_date_every' => $serviceData->due_date_every,
             'is_featured' => $serviceData->is_featured,
             'is_special_offer' => $serviceData->is_special_offer,
             'pay_upfront' => $serviceData->pay_upfront,
@@ -42,7 +44,7 @@ class CreateServiceAction
 
         $this->createMetaData->execute($service, MetaDataData::fromArray($serviceData->meta_data ?? []));
 
-        $media = collect($serviceData->media_collection['media'])->map(function ($material) {
+        $media = collect($serviceData->media_collection['media'] ?? [])->map(function ($material): MediaData {
             return new MediaData(media: $material);
         })->toArray();
 
@@ -50,6 +52,7 @@ class CreateServiceAction
             collection: $serviceData->media_collection['collection'] ?? null,
             media: $media
         ));
+
 
         return $service;
     }

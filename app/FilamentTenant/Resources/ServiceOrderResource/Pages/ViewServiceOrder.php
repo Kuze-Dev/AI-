@@ -60,8 +60,13 @@ class ViewServiceOrder extends ViewRecord
                             ->content(fn ($record) => $record->customer_email),
                         Placeholder::make('mobile')
                             ->content(fn ($record) => $record->customer_mobile),
-                        Placeholder::make('billing_address')
-                            ->content(fn ($record) => $record->customer->addresses->first()->address_line_1),
+                        Forms\Components\Group::make()->schema([
+                            Placeholder::make('billing_address')
+                                ->content(fn ($record) => $record->billing_address),
+                            Placeholder::make('service_address')
+                                ->content(fn ($record) => $record->service_address),
+                        ]),
+
                     ]),
 
                 ]),
