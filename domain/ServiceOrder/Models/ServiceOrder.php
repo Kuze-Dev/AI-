@@ -106,9 +106,9 @@ class ServiceOrder extends Model
         'status' => ServiceOrderStatus::class,
     ];
 
-    public function getIsCreatedByAdminAttribute(): bool
+    public function getRouteKeyName(): string
     {
-        return $this->created_by !== null;
+        return 'reference';
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\ServiceOrder\Models\ServiceOrder> */

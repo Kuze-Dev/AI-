@@ -39,7 +39,7 @@ return new class () extends Migration {
             $table->dateTime('schedule');
             $table->string('status');
             $table->boolean('is_paid')->default(false);
-            $table->string('reference')->nullable()->default(null);
+            $table->string('reference')->unique();
             $table->string('cancelled_reason')->nullable()->default(null);
             $table->decimal('total_price', 10, 2)->index();
 

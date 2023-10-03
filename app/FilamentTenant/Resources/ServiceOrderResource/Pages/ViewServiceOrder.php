@@ -14,12 +14,18 @@ use Filament\Forms\Components\Section;
 use Filament\Resources\Pages\ViewRecord;
 use App\FilamentTenant\Support;
 use App\FilamentTenant\Support\SchemaFormBuilder;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ViewServiceOrder extends ViewRecord
 {
     use LogsFormActivity;
 
     protected static string $resource = ServiceOrderResource::class;
+
+    protected function getHeading(): string|Htmlable
+    {
+        return trans('Service Order Details #') . $this->record->reference;
+    }
 
     protected function getFormSchema(): array
     {
