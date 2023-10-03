@@ -21,11 +21,6 @@ use Throwable;
 ]
 class GuestCheckoutMobileController extends Controller
 {
-    // public function __construct(
-    //     private readonly GuestCartSummaryAction $guestCartSummaryAction,
-    // ) {
-    // }
-
     #[Post('guest/carts/mobile/summary', name: 'guest.carts.mobile.summary')]
     public function summary(GuestCartMobileSummaryRequest $request): mixed
     {
