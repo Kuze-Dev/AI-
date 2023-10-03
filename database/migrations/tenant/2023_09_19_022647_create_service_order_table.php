@@ -50,12 +50,12 @@ return new class () extends Migration {
             $table->id();
             $table->foreignIdFor(ServiceOrder::class)->index();
 
-            $table->dateTime('bill_date')->nullable();
-            $table->dateTime('due_date')->nullable();
+            $table->dateTime('bill_date')->nullable()->index();
+            $table->dateTime('due_date')->nullable()->index();
             $table->string('service_price');
             $table->json('additional_charges');
             $table->decimal('total_amount');
-            $table->string('status');
+            $table->string('status')->index();
 
             $table->timestamps();
         });
@@ -68,7 +68,7 @@ return new class () extends Migration {
             $table->foreignIdFor(Payment::class)->index();
             $table->foreignIdFor(PaymentMethod::class)->index();
 
-            $table->string('currency')->index();
+            $table->string('currency');
             $table->decimal('total_amount', 10, 2)->index();
             $table->string('status')->index();
 
@@ -79,6 +79,7 @@ return new class () extends Migration {
     /** Reverse the migrations. */
     public function down(): void
     {
+        Schema::dropIfExists('service_transactions');
         Schema::dropIfExists('service_bills');
         Schema::dropIfExists('service_orders');
     }
