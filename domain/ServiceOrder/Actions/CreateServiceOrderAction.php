@@ -10,16 +10,29 @@ use Domain\Service\Models\Service;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
+use Illuminate\Support\Str;
 
 class CreateServiceOrderAction
 {
-    public function __construct(
-
-    ) {
+    public function __construct()
+    {
     }
 
-    public function execute(ServiceOrderData $serviceData): ServiceOrder
+    public function execute(ServiceOrderData $serviceData, int|null $adminId): ServiceOrder
     {
+        $uniqueReference = null;
+        do {
+            $referenceNumber = Str::upper(Str::random(12));
+
+            $existingReference = ServiceOrder::where('reference', $referenceNumber)->first();
+
+            if ( ! $existingReference) {
+                $uniqueReference = $referenceNumber;
+
+                break;
+            }
+        } while (true);
+
         $customer = Customer::whereId($serviceData->customer_id)->first();
         $service = Service::whereId($serviceData->service_id)->first();
         $currency = Currency::whereEnabled(true)->first();
@@ -32,6 +45,7 @@ class CreateServiceOrderAction
         }, 0);
 
         $serviceOrder = ServiceOrder::create([
+            'admin_id' => $adminId,
             'customer_id' => $serviceData->customer_id,
             'customer_first_name' => $customer->first_name,
             'customer_last_name' => $customer->last_name,
@@ -47,6 +61,7 @@ class CreateServiceOrderAction
             'service_price' => $service->price,
             'service_id' => $serviceData->service_id,
             'schedule' => $serviceData->schedule,
+            'reference' => $uniqueReference,
             'status' => ServiceOrderStatus::PENDING,
             'additional_charges' => $serviceData->additionalCharges,
             'total_price' => $totalPrice,

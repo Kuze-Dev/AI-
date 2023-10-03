@@ -12,4 +12,7 @@ enum ServiceOrderStatus: string
     case REFUNDED = 'refunded';
     case FULFILLED = 'fulfilled';
     case ON_HOLD = 'on_hold';
+    case SUBSCRIBED = 'subscribed';
+    case UNSUBSCRIBED = 'unsubscribed';
+    case EXPIRED = 'expired';
 }

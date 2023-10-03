@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Domain\Admin\Models\Admin;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
+use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,10 +18,7 @@ return new class () extends Migration {
             $table->id();
             $table->foreignIdFor(Service::class)->index();
             $table->foreignIdFor(Customer::class)->index();
-            $table->foreignIdFor(Admin::class, 'created_by')
-                ->comment('if not null means created by admin.')
-                ->nullable()
-                ->index();
+            $table->foreignIdFor(Admin::class)->nullable()->index();
 
             $table->string('customer_first_name');
             $table->string('customer_last_name');
@@ -38,8 +36,23 @@ return new class () extends Migration {
             $table->dateTime('schedule');
             $table->string('status');
             $table->boolean('is_paid')->default(false);
+            $table->string('reference')->nullable()->default(null);
             $table->string('cancelled_reason')->nullable()->default(null);
             $table->decimal('total_price', 10, 2)->index();
+
+            $table->timestamps();
+        });
+
+        Schema::create('service_bills', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(ServiceOrder::class)->index();
+
+            $table->dateTime('bill_date')->nullable();
+            $table->dateTime('due_date')->nullable();
+            $table->string('service_price');
+            $table->json('additional_charges');
+            $table->decimal('total_amount');
+            $table->string('status');
 
             $table->timestamps();
         });
@@ -49,6 +62,7 @@ return new class () extends Migration {
     /** Reverse the migrations. */
     public function down(): void
     {
+        Schema::dropIfExists('service_bills');
         Schema::dropIfExists('service_orders');
     }
 };

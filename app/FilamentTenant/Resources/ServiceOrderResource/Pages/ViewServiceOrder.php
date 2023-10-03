@@ -7,8 +7,6 @@ namespace App\FilamentTenant\Resources\ServiceOrderResource\Pages;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ServiceOrderResource;
 use Closure;
-use Domain\Address\Models\Address;
-use Domain\Service\Models\Service;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
@@ -45,10 +43,10 @@ class ViewServiceOrder extends ViewRecord
                     ->content(fn ($record) => $record->service_price),
                 Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
                     Placeholder::make('BillingCycle')
-                        ->content(fn ($record) => Service::whereId($record->service_id)->first()->billing_cycle),
+                        ->content(fn ($record) => $record->service->billing_cycle),
                     Placeholder::make('Recurring payment')
-                        ->content(fn ($record) => Service::whereId($record->service_id)->first()->recurring_payment),
-                ])->visible(fn ($record) => Service::whereId($record->service_id)->first()->is_subscription),
+                        ->content(fn ($record) => $record->service->recurring_payment),
+                ])->visible(fn ($record) => $record->service->is_subscription),
             ]),
         ]),
             Section::make(trans('Customer'))
@@ -63,7 +61,7 @@ class ViewServiceOrder extends ViewRecord
                         Placeholder::make('mobile')
                             ->content(fn ($record) => $record->customer_mobile),
                         Placeholder::make('billing_address')
-                            ->content(fn ($record) => Address::whereCustomerId($record->customer_id)->first()->address_line_1),
+                            ->content(fn ($record) => $record->customer->addresses->first()->address_line_1),
                     ]),
 
                 ]),
@@ -71,12 +69,12 @@ class ViewServiceOrder extends ViewRecord
             Section::make(trans('Additional Charges'))
                 ->schema([
                     Forms\Components\Group::make()->schema($this->getAdditionalCharges()),
-                ]),
+                ])->visible(fn ($record) => ! empty($record->additional_charges)),
 
             Section::make(trans('Service Fill-up Form'))
                 ->schema([
-                    SchemaFormBuilder::make('customer_form', fn ($record) => Service::whereId($record->service_id)->first()?->blueprint->schema)
-                        ->schemaData(fn ($record) => Service::whereId($record->service_id)->first()?->blueprint->schema),
+                    SchemaFormBuilder::make('customer_form', fn ($record) => $record->service->blueprint->schema)
+                        ->schemaData(fn ($record) => $record->service->blueprint->schema),
                 ])
                 ->hidden(fn (Closure $get) => $get('service_id') === null)
                 ->columnSpan(2),

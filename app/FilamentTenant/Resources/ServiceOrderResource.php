@@ -229,7 +229,7 @@ class ServiceOrderResource extends Resource
     public static function summaryCard(): Section
     {
         return Section::make(trans('Summary'))->schema([
-            Forms\Components\Grid::make(2)
+            Forms\Components\Group::make()->columns(2)
                 ->schema([
                     BadgeLabel::make(trans('status'))->formatStateUsing(function (string $state): string {
                         return ucfirst($state);
@@ -246,6 +246,20 @@ class ServiceOrderResource extends Resource
                         }),
                     self::summaryEditButton(),
                 ]),
+            Forms\Components\Group::make()->columns(2)->schema([
+                TextLabel::make('')
+                    ->label(trans('Created By'))
+                    ->alignLeft()
+                    ->size('md')
+                    ->inline()
+                    ->readOnly(),
+                TextLabel::make('')
+                    ->label(fn ($record) => $record->admin->first_name . ' ' . $record->admin->last_name)
+                    ->alignLeft()
+                    ->size('md')
+                    ->inline()
+                    ->readOnly(),
+            ]),
             Divider::make(''),
             Forms\Components\Group::make()->columns(2)->schema([
                 TextLabel::make('')
@@ -299,7 +313,58 @@ class ServiceOrderResource extends Resource
 
     private static function summaryEditButton(): ButtonAction
     {
-        return ButtonAction::make('Edit');
+        return ButtonAction::make('Edit')
+            ->execute(function (ServiceOrder $record, Closure $get, Closure $set) {
+                return Forms\Components\Actions\Action::make(trans('edit'))
+                    ->color('primary')
+                    ->label('Edit')
+                    ->size('sm')
+                    ->modalHeading(trans('Edit Status'))
+                    ->modalWidth('xl')
+                    ->form([
+                        Forms\Components\Select::make('status_options')
+                            ->label('')
+                            ->options(function () {
+
+                                $options = [];
+                                foreach(ServiceOrderStatus::cases() as $status) {
+                                    $options[] = ucwords(str_replace('_', ' ', $status->value));
+                                }
+                                // if ($record->is_paid) {
+                                //     $options[OrderStatuses::FULFILLED->value] = trans('Fulfilled');
+                                // }
+
+                                return $options;
+                            })
+                            ->disablePlaceholderSelection()
+                            ->formatStateUsing(function () use ($record) {
+                                return $record->status;
+                            }),
+                        Forms\Components\Toggle::make('send_email')
+                            ->label(trans('Send email notification'))
+                            ->default(false)
+                            ->reactive(),
+                        Forms\Components\Textarea::make('email_remarks')
+                            ->maxLength(255)
+                            ->label(trans('Remarks'))
+                            ->visible(fn (Closure $get) => $get('send_email') == true)
+                            ->dehydrateStateUsing(function (string|null $state) use ($get) {
+                                if (filled($state) && $get('send_email') == true) {
+                                    return $state;
+                                }
+
+                                return null;
+                            }),
+                    ]);
+            })
+            ->disableLabel()
+            ->columnSpan(1)
+            ->alignRight()
+            ->size('sm')
+            ->hidden(function (ServiceOrder $record) {
+                return $record->status == ServiceOrderStatus::CANCELLED ||
+                    $record->status == ServiceOrderStatus::FULFILLED;
+            });
     }
 
     public static function table(Table $table): Table

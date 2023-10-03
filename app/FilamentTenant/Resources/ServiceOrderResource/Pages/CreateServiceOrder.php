@@ -11,6 +11,7 @@ use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CreateServiceOrder extends CreateRecord
@@ -21,7 +22,9 @@ class CreateServiceOrder extends CreateRecord
 
     public function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(fn () => app(CreateServiceOrderAction::class)->execute(ServiceOrderData::fromArray($data)));
+        $user = Auth::user();
+
+        return DB::transaction(fn () => app(CreateServiceOrderAction::class)->execute(ServiceOrderData::fromArray($data), $user->id));
     }
 
     protected function getActions(): array

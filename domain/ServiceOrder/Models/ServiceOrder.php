@@ -7,6 +7,10 @@ namespace Domain\ServiceOrder\Models;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Illuminate\Database\Eloquent\Model;
 use dateTime;
+use Domain\Admin\Models\Admin;
+use Domain\Customer\Models\Customer;
+use Domain\Service\Models\Service;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Domain\ServiceOrder\Models\ServiceOrder
@@ -66,6 +70,7 @@ use dateTime;
 class ServiceOrder extends Model
 {
     protected $fillable = [
+        'created_by',
         'service_id',
         'customer_id',
         'admin_id',
@@ -100,5 +105,23 @@ class ServiceOrder extends Model
     public function getIsCreatedByAdminAttribute(): bool
     {
         return $this->created_by !== null;
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\ServiceOrder\Models\ServiceOrder> */
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Service\Models\Service, \Domain\ServiceOrder\Models\ServiceOrder> */
+    public function service(): BelongsTo
+    {
+        return $this->belongsTo(Service::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Admin\Models\Admin, \Domain\ServiceOrder\Models\ServiceOrder> */
+    public function admin(): BelongsTo
+    {
+        return $this->belongsTo(Admin::class);
     }
 }
