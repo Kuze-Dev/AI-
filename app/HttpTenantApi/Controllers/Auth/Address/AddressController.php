@@ -82,7 +82,7 @@ class AddressController extends Controller
             try {
                 app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
             } catch (Exception $e) {
-                return response()->json(['message: '.$e->getMessage()], 422);
+                return response()->json([$e->getMessage()], 422);
             }
         }
 
