@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 use Domain\Shipment\DataTransferObjects\ReceiverData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
+use Domain\Shipment\Enums\UnitEnum;
 
 class GuestCartSummaryAction
 {
@@ -166,11 +167,16 @@ class GuestCartSummaryAction
     }
 
     /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
-    public function getProducts(CartLine|Collection $collections): array
+    public function getProducts(CartLine|Collection $collections, ?UnitEnum $unit = UnitEnum::CM): array
     {
         $productlist = [];
 
-        $cm_to_inches = 1 / 2.54;
+        $measurement = 1 / 2.54;
+
+        match ($unit) {
+            UnitEnum::CM => null,
+            default => null,
+        };
 
         if ( ! is_iterable($collections)) {
             /** @var \Domain\Product\Models\Product $product */
@@ -189,13 +195,15 @@ class GuestCartSummaryAction
                 $height = $product->dimension['height'];
                 $weight = $product->weight;
 
-                $productlist[] = [
-                    'product_id' => (string) $purchasableId,
-                    'length' => ceil($length * $cm_to_inches * $collections->quantity),
-                    'width' => ceil($width * $cm_to_inches * $collections->quantity),
-                    'height' => ceil($height * $cm_to_inches * $collections->quantity),
-                    'weight' => (float) $weight * $collections->quantity,
-                ];
+                for ($i = 0; $i < $collections->quantity; $i++) {
+                    $productlist[] = [
+                        'product_id' => (string) $purchasableId,
+                        'length' => ceil($length * $measurement),
+                        'width' => ceil($width * $measurement),
+                        'height' => ceil($height * $measurement),
+                        'weight' => (float) $weight,
+                    ];
+                }
             }
         } else {
             foreach ($collections as $collection) {
@@ -216,13 +224,15 @@ class GuestCartSummaryAction
                     $height = $product->dimension['height'];
                     $weight = $product->weight;
 
-                    $productlist[] = [
-                        'product_id' => (string) $purchasableId,
-                        'length' => ceil($length * $cm_to_inches * $collection->quantity),
-                        'width' => ceil($width * $cm_to_inches * $collection->quantity),
-                        'height' => ceil($height * $cm_to_inches * $collection->quantity),
-                        'weight' => (float) $weight * $collection->quantity,
-                    ];
+                    for ($i = 0; $i < $collection->quantity; $i++) {
+                        $productlist[] = [
+                            'product_id' => (string) $purchasableId,
+                            'length' => ceil($length * $measurement),
+                            'width' => ceil($width * $measurement),
+                            'height' => ceil($height * $measurement),
+                            'weight' => (float) $weight,
+                        ];
+                    }
                 }
             }
         }
