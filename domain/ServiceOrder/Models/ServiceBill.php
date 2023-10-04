@@ -56,6 +56,7 @@ class ServiceBill extends Model
         'bill_date' => 'datetime',
         'due_date' => 'datetime',
         'additional_charges' => 'array',
+        'service_price' => 'float',
         'total_amount' => 'float',
         'status' => ServiceBillStatus::class,
     ];
