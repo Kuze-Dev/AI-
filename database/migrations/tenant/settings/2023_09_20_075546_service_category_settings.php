@@ -15,6 +15,5 @@ return new class () extends SettingsMigration {
         $this->migrator->add('service.email_sender_name', '');
         $this->migrator->add('service.email_reply_to', null);
         $this->migrator->add('service.email_footer', null);
-
     }
 };

@@ -15,6 +15,7 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
 use Closure;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Currency\Models\Currency;
 use Domain\Service\Enums\BillingCycle;
 use Domain\Service\Enums\Status;
 use Domain\Service\Models\Service;
@@ -42,6 +43,7 @@ class ServiceResource extends Resource
     public static function form(Form $form): Form
     {
         $categories = TaxonomyTerm::where('taxonomy_id', app(ServiceSettings::class)->service_category)->get();
+        $defaultCurrency = Currency::whereEnabled(true)->firstOrFail()->symbol;
 
         return $form
             ->schema([
@@ -81,7 +83,7 @@ class ServiceResource extends Resource
                                 Forms\Components\TextInput::make('retail_price')
                                     ->translateLabel()
                                     ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
-                                        prefix: '$',
+                                        prefix: $defaultCurrency,
                                         thousandsSeparator: ',',
                                         decimalPlaces: 2,
                                         isSigned: false
@@ -102,7 +104,7 @@ class ServiceResource extends Resource
                                     ->translateLabel()
                                     // Put custom rule to validate minimum value
                                     ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
-                                        prefix: '$',
+                                        prefix: $defaultCurrency,
                                         thousandsSeparator: ',',
                                         decimalPlaces: 2,
                                         isSigned: false
@@ -138,10 +140,11 @@ class ServiceResource extends Resource
                                     ->optionsFromModel(Blueprint::class, 'name')
                                     ->disabled(fn (?Service $record) => $record !== null)
                                     ->reactive(),
-                                SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)
-                                    ->schemaData(fn (Closure $get) => Blueprint::query()->firstWhere('id', $get('blueprint_id'))?->schema)
-                                    ->hidden(fn (Closure $get) => $get('blueprint_id') === null)
-                                    ->disabled(),
+//                                SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)
+//                                    ->schemaData(fn (Closure $get) => Blueprint::query()->firstWhere('id', $get('blueprint_id'))?->schema)
+//                                    ->hidden(fn (Closure $get) => $get('blueprint_id') === null)
+//                                    ->getState()
+//                                    ->disabled(),
                             ])
                             ->columnSpan(2),
                     ])->columnSpan(2),
