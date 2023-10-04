@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read PaymentMethod|null $payment_method
- * @property-read \Domain\ServiceOrder\Models\ServiceOrder|null $service_order
+ * @property-read \Domain\ServiceOrder\Models\ServiceOrder $service_order
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill query()
