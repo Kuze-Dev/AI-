@@ -26,7 +26,6 @@ class CreateServiceBillAction
             'total_amount' => $serviceBillData->total_amount,
             'status' => $serviceBillData->status,
         ]);
-
         return $serviceOrder;
     }
 }

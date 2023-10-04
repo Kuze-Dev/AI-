@@ -62,6 +62,7 @@ class CreateServiceOrderAction
                             (float) $additionalCharge['price'],
                             (int) $additionalCharge['quantity']
                         );
+
                     }
                 }, $serviceOrderData->additional_charges)
             )
