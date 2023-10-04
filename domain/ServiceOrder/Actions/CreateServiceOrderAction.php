@@ -18,6 +18,7 @@ class CreateServiceOrderAction
 {
     public function __construct(
         private CalculateServiceOrderTotalPriceAction $calculateServiceOrderTotalPriceAction,
+        private CreateServiceOrderAddressAction $createServiceOrderAddressAction,
     ) {
     }
 
@@ -58,7 +59,7 @@ class CreateServiceOrderAction
 
         $totalPrice = $this->calculateServiceOrderTotalPriceAction
             ->execute(
-                $service->price,
+                $service->selling_price,
                 array_map(function ($additionalCharge) {
                     if (
                         isset($additionalCharge['price']) &&
@@ -66,9 +67,8 @@ class CreateServiceOrderAction
                         isset($additionalCharge['quantity']) &&
                         is_numeric($additionalCharge['quantity'])
                     ) {
-                        return new ServiceOrderAdditionalChargeData(
-                            $additionalCharge['price'],
-                            $additionalCharge['quantity']
+                        return ServiceOrderAdditionalChargeData::fromArray(
+                            $additionalCharge
                         );
                     }
                 }, $serviceOrderData->additional_charges)
@@ -87,16 +87,16 @@ class CreateServiceOrderAction
             'currency_code' => $currency->code,
             'currency_name' => $currency->name,
             'currency_symbol' => $currency->symbol,
-            'service_address' => $serviceAddress,
-            'billing_address' => $billingAddress,
             'service_name' => $service->name,
-            'service_price' => $service->price,
+            'service_price' => $service->selling_price,
             'schedule' => $serviceOrderData->schedule,
             'reference' => $uniqueReference,
             'status' => ServiceOrderStatus::PENDING,
             'additional_charges' => $serviceOrderData->additional_charges,
             'total_price' => $totalPrice,
         ]);
+
+        $this->createServiceOrderAddressAction->execute($serviceOrder, $serviceOrderData);
 
         return $serviceOrder;
     }

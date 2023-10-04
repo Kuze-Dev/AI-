@@ -9,6 +9,38 @@ use Domain\Payments\Models\Payment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Domain\ServiceOrder\Models\ServiceTransaction
+ *
+ * @property int $id
+ * @property int $service_order_id
+ * @property int $service_bill_id
+ * @property int $payment_id
+ * @property int $payment_method_id
+ * @property string $currency
+ * @property float $total_amount
+ * @property string $status
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read Payment|null $payment
+ * @property-read PaymentMethod|null $payment_method
+ * @property-read \Domain\ServiceOrder\Models\ServiceBill|null $service_bill
+ * @property-read \Domain\ServiceOrder\Models\ServiceOrder|null $service_order
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction whereCurrency($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction wherePaymentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction wherePaymentMethodId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction whereServiceBillId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction whereServiceOrderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction whereTotalAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class ServiceTransaction extends Model
 {
     protected $fillable = [

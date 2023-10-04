@@ -29,8 +29,6 @@ return new class () extends Migration {
             $table->string('customer_mobile');
             $table->json('customer_form');
             $table->json('additional_charges');
-            $table->string('service_address');
-            $table->string('billing_address');
             $table->string('currency_code')->index();
             $table->string('currency_name')->index();
             $table->string('currency_symbol');
@@ -42,6 +40,21 @@ return new class () extends Migration {
             $table->string('reference')->unique();
             $table->string('cancelled_reason')->nullable()->default(null);
             $table->decimal('total_price', 10, 2)->index();
+
+            $table->timestamps();
+        });
+
+        Schema::create('service_order_addresses', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignIdFor(ServiceOrder::class);
+            $table->string('type')->index();
+            $table->string('country');
+            $table->string('state');
+            $table->string('label_as');
+            $table->text('address_line_1');
+            $table->string('zip_code');
+            $table->string('city');
 
             $table->timestamps();
         });

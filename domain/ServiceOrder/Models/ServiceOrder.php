@@ -6,11 +6,11 @@ namespace Domain\ServiceOrder\Models;
 
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Illuminate\Database\Eloquent\Model;
-use dateTime;
 use Domain\Admin\Models\Admin;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Domain\ServiceOrder\Models\ServiceOrder
@@ -18,35 +18,38 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $service_id
  * @property int $customer_id
- * @property int|null $created_by if not null means created by admin.
+ * @property int|null $admin_id
  * @property string $customer_first_name
  * @property string $customer_last_name
  * @property string $customer_email
- * @property string $customer_mobile_no
+ * @property string $customer_mobile
  * @property array $customer_form
- * @property mixed $additional_charges
- * @property string $service_address
- * @property string $billing_address
+ * @property array $additional_charges
  * @property string $currency_code
  * @property string $currency_name
  * @property string $currency_symbol
  * @property string $service_name
  * @property string $service_price
- * @property dateTime $schedule
+ * @property \Illuminate\Support\Carbon $schedule
  * @property ServiceOrderStatus $status
- * @property string $cancelled_reason
+ * @property int $is_paid
+ * @property string $reference
+ * @property string|null $cancelled_reason
  * @property string $total_price
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read bool $is_created_by_admin
+ * @property-read Admin|null $admin
+ * @property-read Customer|null $customer
+ * @property-read Service|null $service
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\ServiceOrder\Models\ServiceOrderAddress> $serviceOrderAddress
+ * @property-read int|null $service_order_address_count
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder query()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereAdditionalCharges($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereBillingAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereAdminId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCancelledReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCreatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCurrencyCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCurrencyName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCurrencySymbol($value)
@@ -55,10 +58,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCustomerForm($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCustomerId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCustomerLastName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCustomerMobileNo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCustomerMobile($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereIsPaid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereReference($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereSchedule($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereServiceAddress($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereServiceId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereServiceName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereServicePrice($value)
@@ -82,8 +86,6 @@ class ServiceOrder extends Model
         'reference',
         'service_address',
         'additional_charges',
-        'service_address',
-        'billing_address',
         'currency_code',
         'currency_name',
         'currency_symbol',
@@ -127,5 +129,11 @@ class ServiceOrder extends Model
     public function admin(): BelongsTo
     {
         return $this->belongsTo(Admin::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceOrderAddress>*/
+    public function serviceOrderAddress(): HasMany
+    {
+        return $this->hasMany(ServiceOrderAddress::class);
     }
 }

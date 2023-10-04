@@ -25,10 +25,10 @@ use Spatie\MediaLibrary\HasMedia;
  * @property string $blueprint_id
  * @property string $name
  * @property string|null $description
- * @property int $price
+ * @property int $retail_price
+ * @property int $selling_price
  * @property string|null $billing_cycle
- * @property string|null $recurring_payment
- * @property array|null $data
+ * @property int|null $due_date_every
  * @property int $is_featured
  * @property int $is_special_offer
  * @property int $pay_upfront
@@ -52,17 +52,17 @@ use Spatie\MediaLibrary\HasMedia;
  * @method static \Illuminate\Database\Eloquent\Builder|Service whereBillingCycle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Service whereBlueprintId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Service whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service whereData($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Service whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Service whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereDueDateEvery($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Service whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Service whereIsFeatured($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Service whereIsSpecialOffer($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Service whereIsSubscription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Service whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Service wherePayUpfront($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service wherePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service whereRecurringPayment($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereRetailPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereSellingPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Service whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Service whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Service withTrashed()
