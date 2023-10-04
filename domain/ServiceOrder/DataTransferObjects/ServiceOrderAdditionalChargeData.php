@@ -7,7 +7,7 @@ namespace Domain\ServiceOrder\DataTransferObjects;
 class ServiceOrderAdditionalChargeData
 {
     public function __construct(
-        public float $selling_price,
+        public float $price,
         public int $quantity,
     ) {
     }
@@ -15,7 +15,7 @@ class ServiceOrderAdditionalChargeData
     public static function fromArray(array $data): self
     {
         return new self(
-            selling_price: (float) $data['selling_price'],
+            price: (float) $data['price'],
             quantity: (int) $data['quantity'],
         );
     }
