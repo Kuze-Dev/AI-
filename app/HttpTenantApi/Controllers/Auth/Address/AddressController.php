@@ -121,10 +121,6 @@ class AddressController extends Controller
             /** @var \Domain\Address\Models\State $state */
             $state = State::whereId($request->state_id)->firstOrFail();
 
-            if ( ! $country || ! $state) {
-                return response()->json(['message' => 'Country or State not found'], 404);
-            }
-
             $stateName = $state->name;
 
             // Check the condition only once
