@@ -9,7 +9,7 @@ class AmountData
     public function __construct(
         public readonly PaymentDetailsData $details,
         public readonly string $currency,
-        public readonly int $total,
+        public readonly int|float $total,
     ) {
     }
 
