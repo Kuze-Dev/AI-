@@ -27,7 +27,8 @@ class ShippingMethodResourcev2 extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         $rateData = $this->getRateData($request);
-
+        dd($rateData);
+        dd('x');
         return  [
             'name' => $this->title,
             'slug' => $this->slug,
@@ -52,14 +53,15 @@ class ShippingMethodResourcev2 extends JsonApiResource
     {
 
         try {
-            //code...
+           
+            // TODO: handle when user is authenticated.
 
             $shippingMethod = $this->resource;
 
             $reciever = ReceiverData::fromArray($request->receiver);
 
             $customerAddress = ShippingAddressData::fromRequestData($request->destination_address);
-
+            dd($customerAddress);
             $cartLines = $this->getCartLines($request);
 
             $productlist = app(CartSummaryAction::class)->getProducts($cartLines, UnitEnum::INCH);
