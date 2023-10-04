@@ -129,7 +129,7 @@ class GuestCartSummaryAction
         $shippingFeeTotal = 0;
 
         if ($shippingAddress && $shippingMethod && $receiverData) {
-            $productlist = $this->getProducts($collections);
+            $productlist = $this->getProducts($collections, UnitEnum::INCH);
 
             $subTotal = $this->getSubTotal($collections);
 
@@ -171,11 +171,9 @@ class GuestCartSummaryAction
     {
         $productlist = [];
 
-        $measurement = 1 / 2.54;
-
-        match ($unit) {
-            UnitEnum::CM => null,
-            default => null,
+        $measurement = match ($unit) {
+            UnitEnum::INCH => 1 / 2.54,
+            default => 1,
         };
 
         if ( ! is_iterable($collections)) {

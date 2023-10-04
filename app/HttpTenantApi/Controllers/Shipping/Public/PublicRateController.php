@@ -12,6 +12,7 @@ use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\Actions\GetShippingRateAction;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
+use Domain\Shipment\Enums\UnitEnum;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
@@ -35,7 +36,7 @@ class PublicRateController
 
             $cartLines = $request->getCartLines();
 
-            $productlist = app(GuestCartSummaryAction::class)->getProducts($cartLines);
+            $productlist = app(GuestCartSummaryAction::class)->getProducts($cartLines, UnitEnum::INCH);
 
             $subTotal = app(GuestCartSummaryAction::class)->getSubTotal($cartLines);
 

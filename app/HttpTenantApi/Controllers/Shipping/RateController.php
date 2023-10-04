@@ -16,6 +16,7 @@ use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 use Domain\Shipment\DataTransferObjects\ReceiverData;
 // use Domain\Shipment\DataTransferObjects\ShipFromAddressData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
+use Domain\Shipment\Enums\UnitEnum;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Support\Facades\Auth;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -41,7 +42,7 @@ class RateController extends Controller
 
             $cartLines = $request->getCartLines();
 
-            $productlist = app(CartSummaryAction::class)->getProducts($cartLines);
+            $productlist = app(CartSummaryAction::class)->getProducts($cartLines, UnitEnum::INCH);
 
             $subTotal = app(CartSummaryAction::class)->getSubTotal($cartLines);
 

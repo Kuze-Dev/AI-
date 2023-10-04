@@ -13,6 +13,7 @@ use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ReceiverData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
+use Domain\Shipment\Enums\UnitEnum;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
@@ -61,7 +62,7 @@ class ShippingMethodResourcev2 extends JsonApiResource
 
             $cartLines = $this->getCartLines($request);
 
-            $productlist = app(CartSummaryAction::class)->getProducts($cartLines);
+            $productlist = app(CartSummaryAction::class)->getProducts($cartLines, UnitEnum::INCH);
 
             $subTotal = app(CartSummaryAction::class)->getSubTotal($cartLines);
 
