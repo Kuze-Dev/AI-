@@ -23,32 +23,32 @@ use Spatie\RouteAttributes\Attributes\Post;
 class ValidateGuestAddressController extends Controller
 {
     #[Post('validate/address', name: 'validate.address')]
+    /** @throws Throwable */
     public function __invoke(AddressRequest $request): JsonResponse
     {
-        $addressDto = $request->toGuestDTO();
+        try {
+            $addressDto = $request->toGuestDTO();
+            $countryCode = $request->country_id;
 
-        /** @var \Domain\Address\Models\Country|null $country */
-        $country = Country::whereCode($request->country_id)->first();
+            /** @var \Domain\Address\Models\Country $country */
+            $country = Country::whereCode($countryCode)->firstOrFail();
 
-        /** @var \Domain\Address\Models\State|null $state */
-        $state = State::whereId($request->state_id)->first();
+            /** @var \Domain\Address\Models\State $state */
+            $state = State::whereId($request->state_id)->firstOrFail();
 
-        if ( ! $country || ! $state) {
-            return response()->json('Country or State not found', 404);
-        }
+            $stateName = $state->name;
 
-        $stateName = $state->name;
+            if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $country->code == 'US') {
 
-        if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $country->code == 'US') {
-            try {
                 $address = app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
 
                 return response()->json($address, 200);
-            } catch (Exception $e) {
-                return response()->json($e->getMessage(), 422);
             }
+
+            return response()->json(['message' => 'Success'], 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
         }
 
-        return response()->json(['message' => 'Success'], 200);
     }
 }

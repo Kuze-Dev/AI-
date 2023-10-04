@@ -60,26 +60,25 @@ class AddressController extends Controller
     /** @throws Throwable */
     public function store(AddressRequest $request): AddressResource|JsonResponse
     {
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = Auth::user();
+        try {
+            /** @var \Domain\Customer\Models\Customer $customer */
+            $customer = Auth::user();
 
-        $addressDto = $request->toDTO(customer: $customer);
+            $addressDto = $request->toDTO(customer: $customer);
 
-        /** @var \Domain\Address\Models\Country|null $country */
-        $country = Country::whereCode($request->country_id)->first();
+            $countryCode = $request->country_id;
 
-        /** @var \Domain\Address\Models\State|null $state */
-        $state = State::whereId($request->state_id)->first();
+            /** @var \Domain\Address\Models\Country $country */
+            $country = Country::whereCode($countryCode)->firstOrFail();
 
-        if ( ! $country || ! $state) {
-            return response()->json('Country or State not found', 404);
-        }
+            /** @var \Domain\Address\Models\State $state */
+            $state = State::whereId($request->state_id)->firstOrFail();
 
-        $stateName = $state->name;
+            $stateName = $state->name;
 
-        // Check the condition only once
-        if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $country->code === 'US') {
-            try {
+            // Check the condition only once
+            if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $country->code === 'US') {
+
                 $USaddress = app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
 
                 $newAddressDto = new AddressData(
@@ -94,44 +93,43 @@ class AddressController extends Controller
                 );
 
                 $addressDto = $newAddressDto;
-
-            } catch (Exception $e) {
-                return response()->json(['message' => $e->getMessage()], 422);
             }
-        }
 
-        try {
             $address = DB::transaction(fn () => app(CreateAddressAction::class)->execute($addressDto));
 
             return AddressResource::make($address);
 
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()]);
         }
+
     }
 
     /** @throws Throwable */
     public function update(AddressRequest $request, Address $address): AddressResource|JsonResponse
     {
-        $this->authorize('update', $address);
+        try {
+            $this->authorize('update', $address);
 
-        $addressDto = $request->toDTO(address: $address);
+            $addressDto = $request->toDTO(address: $address);
 
-        /** @var \Domain\Address\Models\Country|null $country */
-        $country = Country::whereCode($request->country_id)->first();
+            $countryCode = $request->country_id;
 
-        /** @var \Domain\Address\Models\State|null $state */
-        $state = State::whereId($request->state_id)->first();
+            /** @var \Domain\Address\Models\Country $country */
+            $country = Country::whereCode($countryCode)->firstOrFail();
 
-        if ( ! $country || ! $state) {
-            return response()->json(['message' => 'Country or State not found'], 404);
-        }
+            /** @var \Domain\Address\Models\State $state */
+            $state = State::whereId($request->state_id)->firstOrFail();
 
-        $stateName = $state->name;
+            if ( ! $country || ! $state) {
+                return response()->json(['message' => 'Country or State not found'], 404);
+            }
 
-        // Check the condition only once
-        if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $country->code === 'US') {
-            try {
+            $stateName = $state->name;
+
+            // Check the condition only once
+            if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $country->code === 'US') {
+
                 $USaddress = app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
 
                 $newAddressDto = new AddressData(
@@ -147,21 +145,19 @@ class AddressController extends Controller
 
                 $addressDto = $newAddressDto;
 
-            } catch (Exception $e) {
-                return response()->json(['message' => $e->getMessage()], 422);
             }
-        }
 
-        try {
             $address = DB::transaction(
                 fn () => app(UpdateAddressAction::class)
                     ->execute($address, $addressDto)
             );
 
             return AddressResource::make($address);
+
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()]);
         }
+
     }
 
     /** @throws Throwable */
