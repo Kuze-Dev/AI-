@@ -140,11 +140,11 @@ class ServiceResource extends Resource
                                     ->optionsFromModel(Blueprint::class, 'name')
                                     ->disabled(fn (?Service $record) => $record !== null)
                                     ->reactive(),
-//                                SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)
-//                                    ->schemaData(fn (Closure $get) => Blueprint::query()->firstWhere('id', $get('blueprint_id'))?->schema)
-//                                    ->hidden(fn (Closure $get) => $get('blueprint_id') === null)
-//                                    ->getState()
-//                                    ->disabled(),
+                                SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)
+                                    ->schemaData(fn (Closure $get) => Blueprint::query()->firstWhere('id', $get('blueprint_id'))?->schema)
+                                    ->hidden(fn (Closure $get) => $get('blueprint_id') === null)
+                                    ->dehydrated(false)
+                                    ->disabled(),
                             ])
                             ->columnSpan(2),
                     ])->columnSpan(2),
@@ -232,8 +232,21 @@ class ServiceResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\Filter::make('status')
-                    ->query(fn (Builder $query) => dd($query->where('status', true)->get())),
+                Tables\Filters\SelectFilter::make('status')
+                    ->translateLabel()
+                    ->options(['1' => Status::ACTIVE->value, '0' => Status::INACTIVE->value])
+                    ->query(function (Builder $query, array $data) {
+                        $query->when(filled($data['value']), function (Builder $query) use ($data) {
+                            $query->when(filled($data['value']), function (Builder $query) use ($data) {
+                                /** @var Service|Builder $query */
+                                match ($data['value']) {
+                                    '1' => $query->where('status', true),
+                                    '0' => $query->where('status', false),
+                                    default => '',
+                                };
+                            });
+                        });
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
