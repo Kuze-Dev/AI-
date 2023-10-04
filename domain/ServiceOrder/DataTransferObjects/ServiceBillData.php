@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\DataTransferObjects;
 
-use DateTime;
-
 class ServiceBillData
 {
     public function __construct(
         public readonly int $service_order_id,
-        public readonly DateTime $bill_date,
-        public readonly DateTime $due_date,
-        public readonly string $service_price,
+        public readonly float $service_price,
         public readonly array $additional_charges,
         public readonly float $total_amount,
         public readonly string $status,
@@ -23,11 +19,9 @@ class ServiceBillData
     {
         return new self(
             service_order_id: isset($data['service_order_id']) ? (int) $data['service_order_id'] : (int) $data['id'],
-            bill_date: new DateTime($data['bill_date']),
-            due_date: new DateTime($data['due_date']),
             service_price: $data['service_price'],
             additional_charges: $data['additional_charges'],
-            total_amount: $data['total_amount'],
+            total_amount: $data['total_price'],
             status: $data['status'],
         );
     }

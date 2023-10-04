@@ -18,11 +18,11 @@ class CreateServiceBillAction
     public function execute(
         ServiceOrder|ServiceBill $serviceData,
         ServiceBillData $serviceBillData
-    ): ServiceOrder {
+    ): ServiceBill {
         $billingDates = $this->getServiceBillingAndDueDateAction->execute($serviceData);
 
-        $serviceOrder = ServiceBill::create([
-            'service_id' => $serviceBillData->service_order_id,
+        $serviceBill = ServiceBill::create([
+            'service_order_id' => $serviceBillData->service_order_id,
             'bill_date' => $billingDates->bill_date,
             'due_date' => $billingDates->due_date,
             'service_price' => $serviceBillData->service_price,
@@ -31,6 +31,6 @@ class CreateServiceBillAction
             'status' => $serviceBillData->status,
         ]);
 
-        return $serviceOrder;
+        return $serviceBill;
     }
 }

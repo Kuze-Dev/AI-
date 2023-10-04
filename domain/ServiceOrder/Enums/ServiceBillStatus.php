@@ -7,4 +7,5 @@ namespace Domain\ServiceOrder\Enums;
 enum ServiceBillStatus: string
 {
     case PAID = 'paid';
+    case PENDING = 'pending';
 }

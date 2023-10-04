@@ -56,7 +56,10 @@ class CreateServiceOrderAction
                             isset($additionalCharge['quantity']) &&
                             is_numeric($additionalCharge['quantity'])
                         ) {
-                            return ServiceOrderAdditionalChargeData::fromArray($additionalCharge);
+                            return new ServiceOrderAdditionalChargeData(
+                                (float) $additionalCharge['price'],
+                                (int) $additionalCharge['quantity']
+                            );
                         }
                     }, $serviceOrderData->additional_charges)
                 )
