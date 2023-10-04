@@ -12,7 +12,7 @@ class DiscountConditionData
     public function __construct(
         public readonly DiscountConditionType $discount_type,
         public readonly DiscountAmountType $discount_amount_type,
-        public readonly int $amount
+        public readonly int|float $amount
     ) {
     }
 }
