@@ -82,7 +82,7 @@ class AddressController extends Controller
             try {
                 app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
             } catch (Exception $e) {
-                return response()->json([$e->getMessage()], 422);
+                return response()->json(['message' => $e->getMessage()], 422);
             }
         }
 
@@ -91,21 +91,49 @@ class AddressController extends Controller
 
             return AddressResource::make($address);
         } catch (Exception $e) {
-            return response()->json($e->getMessage(), 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
     /** @throws Throwable */
-    public function update(AddressRequest $request, Address $address): AddressResource
+    public function update(AddressRequest $request, Address $address): AddressResource|JsonResponse
     {
         $this->authorize('update', $address);
 
-        $address = DB::transaction(
-            fn () => app(UpdateAddressAction::class)
-                ->execute($address, $request->toDTO(address: $address))
-        );
+        $addressDto = $request->toDTO(address: $address);
 
-        return AddressResource::make($address);
+        /** @var \Domain\Address\Models\Country|null $country */
+        $country = Country::whereCode($request->country_id)->first();
+
+        /** @var \Domain\Address\Models\State|null $state */
+        $state = State::whereId($request->state_id)->first();
+
+        if ( ! $country || ! $state) {
+            return response()->json('Country or State not found', 404);
+        }
+
+        $countryName = $country->name;
+        $stateName = $state->name;
+
+        // Check the condition only once
+        if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $countryName === 'United States') {
+            try {
+                app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
+            } catch (Exception $e) {
+                return response()->json(['message' => $e->getMessage()], 422);
+            }
+        }
+
+        try {
+            $address = DB::transaction(
+                fn () => app(UpdateAddressAction::class)
+                    ->execute($address, $addressDto)
+            );
+
+            return AddressResource::make($address);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 
     /** @throws Throwable */
