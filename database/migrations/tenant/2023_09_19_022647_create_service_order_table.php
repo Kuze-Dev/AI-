@@ -23,6 +23,7 @@ return new class () extends Migration {
             $table->foreignIdFor(Customer::class)->index();
             $table->foreignIdFor(Admin::class)->nullable()->index();
 
+            $table->string('reference')->unique();
             $table->string('customer_first_name');
             $table->string('customer_last_name');
             $table->string('customer_email');
@@ -34,10 +35,11 @@ return new class () extends Migration {
             $table->string('currency_symbol');
             $table->string('service_name');
             $table->decimal('service_price', 10, 2);
+            $table->string('billing_cycle');
+            $table->integer('due_date_every');
             $table->dateTime('schedule');
             $table->string('status');
             $table->boolean('is_paid')->default(false);
-            $table->string('reference')->unique();
             $table->string('cancelled_reason')->nullable()->default(null);
             $table->decimal('total_price', 10, 2)->index();
 
@@ -94,6 +96,7 @@ return new class () extends Migration {
     {
         Schema::dropIfExists('service_transactions');
         Schema::dropIfExists('service_bills');
+        Schema::dropIfExists('service_order_addresses');
         Schema::dropIfExists('service_orders');
     }
 };

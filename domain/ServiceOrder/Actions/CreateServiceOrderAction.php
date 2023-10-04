@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Actions;
 
-use Domain\Address\Models\Address;
 use Domain\Currency\Models\Currency;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
@@ -46,8 +45,6 @@ class CreateServiceOrderAction
 
         $currency = Currency::whereEnabled(true)->first();
 
-        $serviceAddressModel = Address::whereId($serviceOrderData->service_address_id)->first();
-
         $totalPrice = $this->calculateServiceOrderTotalPriceAction
             ->execute(
                 $service->selling_price,
@@ -82,6 +79,8 @@ class CreateServiceOrderAction
             'currency_symbol' => $currency->symbol,
             'service_name' => $service->name,
             'service_price' => $service->selling_price,
+            'billing_cycle' => $service->billing_cycle,
+            'due_date_every' => $service->due_date_every,
             'schedule' => $serviceOrderData->schedule,
             'reference' => $uniqueReference,
             'status' => ServiceOrderStatus::PENDING,

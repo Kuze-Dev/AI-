@@ -10,7 +10,6 @@ class ServiceBillData
 {
     public function __construct(
         public readonly int $service_order_id,
-        public readonly int $payment_method_id,
         public readonly DateTime $bill_date,
         public readonly DateTime $due_date,
         public readonly string $service_price,
@@ -23,8 +22,7 @@ class ServiceBillData
     public static function fromArray(array $data): self
     {
         return new self(
-            service_order_id: (int) $data['service_order_id'],
-            payment_method_id: (int) $data['payment_method_id'],
+            service_order_id: isset($data['service_order_id']) ? (int) $data['service_order_id'] : (int) $data['id'],
             bill_date: new DateTime($data['bill_date']),
             due_date: new DateTime($data['due_date']),
             service_price: $data['service_price'],
