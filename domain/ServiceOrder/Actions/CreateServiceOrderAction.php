@@ -8,6 +8,7 @@ use Domain\Address\Models\Address;
 use Domain\Currency\Models\Currency;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
+use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
@@ -19,6 +20,7 @@ class CreateServiceOrderAction
     public function __construct(
         private CalculateServiceOrderTotalPriceAction $calculateServiceOrderTotalPriceAction,
         private CreateServiceOrderAddressAction $createServiceOrderAddressAction,
+        private CreateServiceBillAction $createServiceBillAction,
     ) {
     }
 
@@ -46,17 +48,6 @@ class CreateServiceOrderAction
 
         $serviceAddressModel = Address::whereId($serviceOrderData->service_address_id)->first();
 
-        $serviceAddress = $serviceAddressModel->address_line_1 .' '. $serviceAddressModel->city .' '. $serviceAddressModel->state->name . ' ' .
-                            $serviceAddressModel->state->country->name . ' ' . $serviceAddressModel->zip_code;
-
-        $billingAddress = $serviceAddress;
-
-        if( ! $serviceOrderData->is_same_as_billing) {
-            $billingAddressModel = Address::whereId($serviceOrderData->billing_address_id)->first();
-            $billingAddress = $billingAddressModel->address_line_1 .' '. $billingAddressModel->city .' '. $billingAddressModel->state->name . ' ' .
-                            $billingAddressModel->state->country->name . ' ' . $billingAddressModel->zip_code;
-        }
-
         $totalPrice = $this->calculateServiceOrderTotalPriceAction
             ->execute(
                 $service->selling_price,
@@ -68,7 +59,10 @@ class CreateServiceOrderAction
                             isset($additionalCharge['quantity']) &&
                             is_numeric($additionalCharge['quantity'])
                         ) {
-                            return ServiceOrderAdditionalChargeData::fromArray($additionalCharge);
+                            return new ServiceOrderAdditionalChargeData(
+                                (float) $additionalCharge['price'],
+                                (int) $additionalCharge['quantity']
+                            );
                         }
                     }, $serviceOrderData->additional_charges)
                 )
@@ -97,6 +91,8 @@ class CreateServiceOrderAction
         ]);
 
         $this->createServiceOrderAddressAction->execute($serviceOrder, $serviceOrderData);
+
+        $this->createServiceBillAction->execute(ServiceBillData::fromArray($serviceOrder->toArray()));
 
         return $serviceOrder;
     }

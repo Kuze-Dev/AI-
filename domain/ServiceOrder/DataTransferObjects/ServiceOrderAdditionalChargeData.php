@@ -11,12 +11,4 @@ class ServiceOrderAdditionalChargeData
         public int $quantity,
     ) {
     }
-
-    public static function fromArray(array $data): self
-    {
-        return new self(
-            price: (float) $data['price'],
-            quantity: (int) $data['quantity'],
-        );
-    }
 }
