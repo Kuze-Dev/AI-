@@ -12,6 +12,7 @@ use App\HttpTenantApi\Resources\AddressResource;
 use Domain\Address\Actions\CreateAddressAction;
 use Domain\Address\Actions\DeleteAddressAction;
 use Domain\Address\Actions\UpdateAddressAction;
+use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Address\Exceptions\CantDeleteDefaultAddressException;
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
@@ -74,13 +75,26 @@ class AddressController extends Controller
             return response()->json('Country or State not found', 404);
         }
 
-        $countryName = $country->name;
         $stateName = $state->name;
 
         // Check the condition only once
-        if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $countryName === 'United States') {
+        if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $country->code === 'US') {
             try {
-                app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
+                $USaddress = app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
+
+                $newAddressDto = new AddressData(
+                    $addressDto->state_id,
+                    $addressDto->label_as,
+                    $USaddress->address2,
+                    $USaddress->zip5,
+                    $USaddress->city,
+                    $addressDto->is_default_shipping,
+                    $addressDto->is_default_billing,
+                    $addressDto->customer_id
+                );
+
+                $addressDto = $newAddressDto;
+
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 422);
             }
@@ -90,6 +104,7 @@ class AddressController extends Controller
             $address = DB::transaction(fn () => app(CreateAddressAction::class)->execute($addressDto));
 
             return AddressResource::make($address);
+
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
@@ -109,16 +124,29 @@ class AddressController extends Controller
         $state = State::whereId($request->state_id)->first();
 
         if ( ! $country || ! $state) {
-            return response()->json('Country or State not found', 404);
+            return response()->json(['message' => 'Country or State not found'], 404);
         }
 
-        $countryName = $country->name;
         $stateName = $state->name;
 
         // Check the condition only once
-        if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $countryName === 'United States') {
+        if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $country->code === 'US') {
             try {
-                app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
+                $USaddress = app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
+
+                $newAddressDto = new AddressData(
+                    $addressDto->state_id,
+                    $addressDto->label_as,
+                    $USaddress->address2,
+                    $USaddress->zip5,
+                    $USaddress->city,
+                    $addressDto->is_default_shipping,
+                    $addressDto->is_default_billing,
+                    $addressDto->customer_id
+                );
+
+                $addressDto = $newAddressDto;
+
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 422);
             }

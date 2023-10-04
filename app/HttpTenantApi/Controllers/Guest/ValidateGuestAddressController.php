@@ -37,13 +37,13 @@ class ValidateGuestAddressController extends Controller
             return response()->json('Country or State not found', 404);
         }
 
-        $countryName = $country->name;
         $stateName = $state->name;
-        if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $countryName === 'United States') {
+
+        if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $country->code == 'US') {
             try {
-                app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
-                // If the try block is successful, return a response with status 200
-                return response()->json(['message' => 'Success'], 200);
+                $address = app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
+
+                return response()->json($address, 200);
             } catch (Exception $e) {
                 return response()->json($e->getMessage(), 422);
             }
