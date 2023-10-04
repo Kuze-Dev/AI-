@@ -48,20 +48,21 @@ class CreateServiceOrderAction
         $totalPrice = $this->calculateServiceOrderTotalPriceAction
             ->execute(
                 $service->selling_price,
-                array_map(function ($additionalCharge) {
-                    if (
-                        isset($additionalCharge['price']) &&
-                        is_numeric($additionalCharge['price']) &&
-                        isset($additionalCharge['quantity']) &&
-                        is_numeric($additionalCharge['quantity'])
-                    ) {
-                        return new ServiceOrderAdditionalChargeData(
-                            (float) $additionalCharge['price'],
-                            (int) $additionalCharge['quantity']
-                        );
-
-                    }
-                }, $serviceOrderData->additional_charges)
+                array_filter(
+                    array_map(function ($additionalCharge) {
+                        if (
+                            isset($additionalCharge['price']) &&
+                            is_numeric($additionalCharge['price']) &&
+                            isset($additionalCharge['quantity']) &&
+                            is_numeric($additionalCharge['quantity'])
+                        ) {
+                            return new ServiceOrderAdditionalChargeData(
+                                (float) $additionalCharge['price'],
+                                (int) $additionalCharge['quantity']
+                            );
+                        }
+                    }, $serviceOrderData->additional_charges)
+                )
             )
             ->getAmount();
 

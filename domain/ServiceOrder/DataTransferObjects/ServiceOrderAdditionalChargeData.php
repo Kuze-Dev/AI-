@@ -11,5 +11,4 @@ class ServiceOrderAdditionalChargeData
         public int $quantity,
     ) {
     }
-
 }

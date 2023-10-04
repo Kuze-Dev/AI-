@@ -9,8 +9,8 @@ use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData;
 
 class CalculateServiceOrderTotalPriceAction
 {
-    // /** @param Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData[] $additionalCharges*/
-    public function execute(int $servicePrice, array $additionalCharges = []): Money
+    /** @param \Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData[] $additionalCharges*/
+    public function execute(float $servicePrice, array $additionalCharges = []): Money
     {
         $result = money($servicePrice);
 
