@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Cart\Requests;
 
 use Domain\Cart\Actions\CartPurchasableValidatorAction;
+use Domain\Cart\Enums\CartUserType;
 use Domain\Cart\Exceptions\InvalidPurchasableException;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
@@ -51,9 +52,13 @@ class CreateCartLineRequest extends FormRequest
                         $fail('Invalid product.');
                     }
 
+                    $type = auth()->user() ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
+                    /** @var int|string $userId */
+                    $userId = auth()->user() ? auth()->user()->id : $this->bearerToken();
+
                     if (is_null($variantId)) {
                         try {
-                            app(CartPurchasableValidatorAction::class)->validateProduct($purchasableId, $value);
+                            app(CartPurchasableValidatorAction::class)->validateProduct($purchasableId, $value, $userId, $type);
                         } catch (Throwable $th) {
                             if ($th instanceof InvalidPurchasableException) {
                                 $fail($th->getMessage());
@@ -64,7 +69,9 @@ class CreateCartLineRequest extends FormRequest
                             app(CartPurchasableValidatorAction::class)->validateProductVariant(
                                 $purchasableId,
                                 $variantId,
-                                $value
+                                $value,
+                                $userId,
+                                $type
                             );
                         } catch (Throwable $th) {
                             if ($th instanceof InvalidPurchasableException) {

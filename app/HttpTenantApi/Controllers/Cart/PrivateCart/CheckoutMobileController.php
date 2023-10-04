@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Cart;
+namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartLineResource;
@@ -49,13 +49,50 @@ class CheckoutMobileController extends Controller
         $serviceId = $validated['service_id'] ?? null;
 
         try {
-            $summary = app(CartSummaryAction::class)->getSummary(
+            $summary = app(CartSummaryAction::class)->execute(
                 $cartLines,
                 new CartSummaryTaxData($country?->id, $state?->id),
                 new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),
                 $discount,
                 $serviceId ? (int) $serviceId : null
             );
+
+            $responseArray = [
+                'summary' => [
+                    'tax' => [
+                        'inclusive_sub_total' => $summary->taxTotal ? number_format((float) ($summary->subTotal + $summary->taxTotal), 2, '.', ',') : null,
+                        'display' => $summary->taxTotal ? $summary->taxDisplay : null,
+                        'percentage' => $summary->taxPercentage ? round($summary->taxPercentage, 2) : 0,
+                        'amount' => $summary->taxTotal ? number_format((float) $summary->taxTotal, 2, '.', ',') : 0,
+                    ],
+                    'sub_total' => [
+                        'initial_amount' => number_format((float) $summary->initialSubTotal, 2, '.', ','),
+                        'discounted_amount' => number_format((float) $summary->subTotal, 2, '.', ','),
+                    ],
+                    'shipping_fee' => [
+                        'initial_amount' => number_format((float) $summary->initialShippingTotal, 2, '.', ','),
+                        'discounted_amount' => number_format((float) $summary->shippingTotal, 2, '.', ','),
+                    ],
+                    'total' => number_format((float) $summary->grandTotal, 2, '.', ','),
+                    'discount' => [
+                        'status' => $summary->discountMessages->status ?? null,
+                        'message' => $summary->discountMessages->message ?? null,
+                        'type' => $summary->discountMessages->amount_type ?? null,
+                        'amount' => $summary->discountMessages ? number_format((float) $summary->discountMessages->amount, 2, '.', ',') : null,
+                        'discount_type' => $summary->discountMessages->discount_type ?? null,
+                        'total_savings' => $discount ? number_format((float) $summary->discountTotal, 2, '.', ',') : 0,
+                    ],
+                ],
+
+                'cartLines' => CartLineResource::collection($cartLines),
+                'reference' => $reference,
+            ];
+
+            if ( ! $discountCode) {
+                unset($responseArray['summary']['discount']);
+            }
+
+            return response()->json($responseArray, 200);
         } catch (Throwable $th) {
             if ($th instanceof USPSServiceNotFoundException) {
                 return response()->json([
@@ -67,42 +104,5 @@ class CheckoutMobileController extends Controller
                 ], 422);
             }
         }
-
-        $responseArray = [
-            'summary' => [
-                'tax' => [
-                    'inclusive_sub_total' => $summary->taxTotal ? number_format((float) ($summary->subTotal + $summary->taxTotal), 2, '.', ',') : null,
-                    'display' => $summary->taxTotal ? $summary->taxDisplay : null,
-                    'percentage' => $summary->taxPercentage ? round($summary->taxPercentage, 2) : 0,
-                    'amount' => $summary->taxTotal ? number_format((float) $summary->taxTotal, 2, '.', ',') : 0,
-                ],
-                'sub_total' => [
-                    'initial_amount' => number_format((float) $summary->initialSubTotal, 2, '.', ','),
-                    'discounted_amount' => number_format((float) $summary->subTotal, 2, '.', ','),
-                ],
-                'shipping_fee' => [
-                    'initial_amount' => number_format((float) $summary->initialShippingTotal, 2, '.', ','),
-                    'discounted_amount' => number_format((float) $summary->shippingTotal, 2, '.', ','),
-                ],
-                'total' => number_format((float) $summary->grandTotal, 2, '.', ','),
-                'discount' => [
-                    'status' => $summary->discountMessages->status ?? null,
-                    'message' => $summary->discountMessages->message ?? null,
-                    'type' => $summary->discountMessages->amount_type ?? null,
-                    'amount' => $summary->discountMessages ? number_format((float) $summary->discountMessages->amount, 2, '.', ',') : null,
-                    'discount_type' => $summary->discountMessages->discount_type ?? null,
-                    'total_savings' => $discount ? number_format((float) $summary->discountTotal, 2, '.', ',') : 0,
-                ],
-            ],
-
-            'cartLines' => CartLineResource::collection($cartLines),
-            'reference' => $reference,
-        ];
-
-        if ( ! $discountCode) {
-            unset($responseArray['summary']['discount']);
-        }
-
-        return response()->json($responseArray, 200);
     }
 }

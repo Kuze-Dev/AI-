@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Cart;
+namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
 use App\HttpTenantApi\Resources\CartLineResource;
 use Domain\Cart\Actions\CheckoutAction;
@@ -18,7 +18,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
-    Resource('carts/checkouts', apiResource: true, only: ['index', 'store']),
+    Resource('carts/checkouts', apiResource: true, only: ['index', 'store'], names: 'carts.checkouts'),
     Middleware(['auth:sanctum'])
 ]
 class CheckoutController

@@ -7,7 +7,7 @@ namespace Domain\Cart\Requests;
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
-use Domain\Cart\Models\CartLine;
+use Domain\Cart\Helpers\PrivateCart\CartLineQuery;
 use Domain\Discount\Models\Discount;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Foundation\Http\FormRequest;
@@ -71,14 +71,7 @@ class CartSummaryRequest extends FormRequest
         if (empty($this->cartLinesCache)) {
             $cartLineIds = explode(',', $this->validated('cart_line_ids'));
 
-            $this->cartLinesCache = CartLine::query()
-                ->with('purchasable')
-                ->whereHas('cart', function ($query) {
-                    $query->whereBelongsTo(auth()->user());
-                })
-                ->whereNull('checked_out_at')
-                ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
-                ->get();
+            $this->cartLinesCache = app(CartLineQuery::class)->execute($cartLineIds);
         }
 
         return $this->cartLinesCache;

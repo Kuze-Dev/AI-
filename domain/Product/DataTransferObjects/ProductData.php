@@ -23,8 +23,8 @@ class ProductData
         public readonly bool $is_special_offer = false,
         public readonly bool $allow_customer_remarks = false,
         public readonly bool $allow_stocks = true,
-        public readonly bool $allow_guest_purchase = false,
         public readonly array $taxonomy_terms = [],
+        public readonly ?bool $allow_guest_purchase = null,
         public readonly ?float $weight = null,
         public ?array $product_options = [],
         public ?array $product_variants = [],
@@ -60,7 +60,7 @@ class ProductData
             is_special_offer: $data['is_special_offer'],
             allow_customer_remarks: $data['allow_customer_remarks'],
             allow_stocks: $data['allow_stocks'],
-            allow_guest_purchase: $data['allow_guest_purchase'],
+            allow_guest_purchase: isset($data['allow_guest_purchase']) ? $data['allow_guest_purchase'] : null,
             images: $data['images'],
             videos: $data['videos'],
             media_collection: [

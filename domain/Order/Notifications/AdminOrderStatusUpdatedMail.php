@@ -11,6 +11,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Settings\OrderSettings;
+use Domain\Customer\Models\Customer;
+use Domain\Order\DataTransferObjects\GuestCustomerData;
 
 class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
 {
@@ -58,6 +60,8 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
     /** Get the mail representation of the notification. */
     public function toMail(object $notifiable): MailMessage
     {
+        $customer = $this->getCustomer($notifiable);
+
         return (new MailMessage())
             ->subject('Order ' .  $this->order->reference . ' has been ' . $this->status)
             ->replyTo($this->replyTo)
@@ -69,7 +73,7 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
                 'status' => $this->status,
                 'remarks' => $this->remarks,
                 'order' => $this->order,
-                'customer' => $notifiable,
+                'customer' => $customer,
                 'footer' => $this->footer,
             ]);
     }
@@ -82,6 +86,20 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [];
+    }
+
+    private function getCustomer(object $notifiable): Customer|GuestCustomerData
+    {
+        if ($notifiable instanceof Customer) {
+            return $notifiable;
+        } else {
+            return new GuestCustomerData(
+                first_name: $this->order->customer_first_name,
+                last_name: $this->order->customer_last_name,
+                mobile: $this->order->customer_mobile,
+                email: $this->order->customer_email,
+            );
+        }
     }
 
     private function sanitizeEmailArray(array $emailArray): array
