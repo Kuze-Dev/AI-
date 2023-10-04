@@ -101,8 +101,10 @@ class ServiceOrder extends Model
 
     protected $casts = [
         'customer_form' => 'json',
+        'service_price' => 'float',
         'additional_charges' => 'json',
         'schedule' => 'datetime',
+        'total_price' => 'float',
         'status' => ServiceOrderStatus::class,
     ];
 

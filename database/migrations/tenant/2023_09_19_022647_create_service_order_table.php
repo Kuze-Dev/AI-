@@ -35,7 +35,7 @@ return new class () extends Migration {
             $table->string('currency_name')->index();
             $table->string('currency_symbol');
             $table->string('service_name');
-            $table->string('service_price');
+            $table->decimal('service_price', 10, 2);
             $table->dateTime('schedule');
             $table->string('status');
             $table->boolean('is_paid')->default(false);
@@ -52,9 +52,9 @@ return new class () extends Migration {
 
             $table->dateTime('bill_date')->nullable()->index();
             $table->dateTime('due_date')->nullable()->index();
-            $table->string('service_price');
+            $table->decimal('service_price', 10, 2);
             $table->json('additional_charges');
-            $table->decimal('total_amount');
+            $table->decimal('total_amount', 10, 2);
             $table->string('status')->index();
 
             $table->timestamps();

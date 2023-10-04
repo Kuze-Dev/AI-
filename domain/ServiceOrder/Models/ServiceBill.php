@@ -51,6 +51,7 @@ class ServiceBill extends Model
     protected $casts = [
         'bill_date' => 'datetime',
         'due_date' => 'datetime',
+        'service_price' => 'float',
         'additional_charges' => 'array',
         'total_amount' => 'float',
         'status' => ServiceBillStatus::class,
