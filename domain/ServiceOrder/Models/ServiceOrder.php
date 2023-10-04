@@ -87,6 +87,8 @@ class ServiceOrder extends Model
         'service_address',
         'additional_charges',
         'currency_code',
+        'billing_cycle',
+        'due_date_every',
         'currency_name',
         'currency_symbol',
         'service_name',

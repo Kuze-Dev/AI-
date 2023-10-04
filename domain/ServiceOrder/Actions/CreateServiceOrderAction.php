@@ -91,7 +91,7 @@ class CreateServiceOrderAction
 
         $this->createServiceOrderAddressAction->execute($serviceOrder, $serviceOrderData);
 
-        $this->createServiceBillAction->execute(ServiceBillData::fromArray($serviceOrder->toArray()));
+        // $this->createServiceBillAction->execute(ServiceBillData::fromArray($serviceOrder->toArray()));
 
         return $serviceOrder;
     }

@@ -7,8 +7,8 @@ namespace App\FilamentTenant\Resources;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\CreateServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ViewServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ListServiceOrder;
+use App\FilamentTenant\Support;
 use App\FilamentTenant\Support\BadgeLabel;
-use App\FilamentTenant\Support\ButtonAction;
 use App\FilamentTenant\Support\Divider;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
@@ -16,6 +16,8 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
+use Domain\Order\Enums\OrderStatuses;
+use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
 use Domain\Service\Models\Service;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
@@ -33,6 +35,7 @@ use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Str;
+use Filament\Notifications\Notification;
 
 class ServiceOrderResource extends Resource
 {
@@ -390,9 +393,9 @@ class ServiceOrderResource extends Resource
         ]);
     }
 
-    private static function summaryEditButton(): ButtonAction
+    private static function summaryEditButton(): Support\ButtonAction
     {
-        return ButtonAction::make('Edit')
+        return Support\ButtonAction::make('Edit')
             ->execute(function (ServiceOrder $record, Closure $get, Closure $set) {
                 return Forms\Components\Actions\Action::make(trans('edit'))
                     ->color('primary')
@@ -403,15 +406,17 @@ class ServiceOrderResource extends Resource
                     ->form([
                         Forms\Components\Select::make('status_options')
                             ->label('')
-                            ->options(function () {
+                            ->options(function () use ($record) {
+                                $options = [
+                                    ServiceOrderStatus::PENDING->value => trans('Pending'),
+                                    ServiceOrderStatus::PROCESSING->value => trans('Processing'),
+                                    ServiceOrderStatus::CANCELLED->value => trans('Cancelled'),
+                                    ServiceOrderStatus::REFUNDED->value => trans('Refunded'),
+                                ];
 
-                                $options = [];
-                                foreach (ServiceOrderStatus::cases() as $status) {
-                                    $options[] = ucwords(str_replace('_', ' ', $status->value));
+                                if ($record->is_paid) {
+                                    $options[OrderStatuses::FULFILLED->value] = trans('Fulfilled');
                                 }
-                                // if ($record->is_paid) {
-                                //     $options[OrderStatuses::FULFILLED->value] = trans('Fulfilled');
-                                // }
 
                                 return $options;
                             })
@@ -434,7 +439,74 @@ class ServiceOrderResource extends Resource
 
                                 return null;
                             }),
-                    ]);
+                    ])
+                    ->action(
+                        function (array $data, $livewire) use ($record, $set) {
+
+                            $shouldSendEmail = $livewire->mountedFormComponentActionData['send_email'];
+                            $emailRemarks = $livewire->mountedFormComponentActionData['email_remarks'];
+
+                            if ($shouldSendEmail) {
+                                $fromEmail = app(OrderSettings::class)->email_sender_name;
+
+                                if (empty($fromEmail)) {
+                                    Notification::make()
+                                        ->title(trans('Email sender not found, please update your order settings.'))
+                                        ->warning()
+                                        ->send();
+
+                                    return;
+                                }
+                            }
+
+                            $status = $data['status_options'];
+                            $updateData = ['status' => $status];
+
+                            if ($status == ServiceOrderStatus::CANCELLED->value) {
+                                if ( ! in_array($record->status, [ServiceOrderStatus::PENDING, ServiceOrderStatus::FORPAYMENT])) {
+                                    Notification::make()
+                                        ->title(trans("You can't cancel this order."))
+                                        ->warning()
+                                        ->send();
+
+                                    return;
+                                }
+
+                                $updateData['cancelled_at'] = now();
+
+                                $order = $record;
+
+                                /** @var \Domain\Payments\Models\Payment $payment */
+                                $payment = $order->payments->first();
+
+                                $payment->update([
+                                    'status' => 'cancelled',
+                                ]);
+                            }
+
+                            $result = $record->update($updateData);
+
+                            if ($result) {
+                                $set('status', ucfirst($data['status_options']));
+                                Notification::make()
+                                    ->title(trans('Order updated successfully'))
+                                    ->success()
+                                    ->send();
+                            }
+
+                            $customer = Customer::where('id', $record->customer_id)->first();
+
+                            if ($customer) {
+                                event(new AdminOrderStatusUpdatedEvent(
+                                    $customer,
+                                    $record,
+                                    $shouldSendEmail,
+                                    $data['status_options'],
+                                    $emailRemarks
+                                ));
+                            }
+                        }
+                    );
             })
             ->disableLabel()
             ->columnSpan(1)

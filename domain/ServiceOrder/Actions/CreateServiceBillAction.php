@@ -18,7 +18,6 @@ class CreateServiceBillAction
     {
         $serviceOrder = ServiceBill::create([
             'service_id' => $serviceBillData->service_order_id,
-            'payment_method_id' => $serviceBillData->payment_method_id,
             'bill_date' => $serviceBillData->bill_date,
             'due_date' => $serviceBillData->due_date,
             'service_price' => $serviceBillData->service_price,
