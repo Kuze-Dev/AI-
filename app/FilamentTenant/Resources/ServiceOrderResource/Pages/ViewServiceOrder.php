@@ -14,6 +14,8 @@ use Filament\Forms\Components\Section;
 use Filament\Resources\Pages\ViewRecord;
 use App\FilamentTenant\Support;
 use App\FilamentTenant\Support\SchemaFormBuilder;
+use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
+use Domain\ServiceOrder\Models\ServiceOrderAddress;
 use Illuminate\Contracts\Support\Htmlable;
 
 class ViewServiceOrder extends ViewRecord
@@ -50,8 +52,8 @@ class ViewServiceOrder extends ViewRecord
                 Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
                     Placeholder::make('BillingCycle')
                         ->content(fn ($record) => $record->service->billing_cycle),
-                    Placeholder::make('Recurring payment')
-                        ->content(fn ($record) => $record->service->recurring_payment),
+                    Placeholder::make('Due date every')
+                        ->content(fn ($record) => $record->service->due_date_every),
                 ])->visible(fn ($record) => $record->service->is_subscription),
             ]),
         ]),
@@ -66,15 +68,39 @@ class ViewServiceOrder extends ViewRecord
                             ->content(fn ($record) => $record->customer_email),
                         Placeholder::make('mobile')
                             ->content(fn ($record) => $record->customer_mobile),
-                        Forms\Components\Group::make()->schema([
-                            Placeholder::make('billing_address')
-                                ->content(fn ($record) => $record->billing_address),
-                            Placeholder::make('service_address')
-                                ->content(fn ($record) => $record->service_address),
-                        ]),
-
                     ]),
+                ]),
 
+            Section::make(trans('Service Address'))
+                ->schema([
+                    Forms\Components\Group::make()->columns(2)->schema([
+                        Placeholder::make('House/Unit/Flr #, Bldg Name, Blk or Lot #')
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::SERVICE_ADDRESS)->first()->address_line_1),
+                        Placeholder::make('Country')
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::SERVICE_ADDRESS)->first()->country),
+                        Placeholder::make('State')
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::SERVICE_ADDRESS)->first()->state),
+                        Placeholder::make('City/Province')
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::SERVICE_ADDRESS)->first()->city),
+                        Placeholder::make('Zip Code')
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::SERVICE_ADDRESS)->first()->zip_code),
+                    ]),
+                ]),
+
+            Section::make(trans('Billing Address'))
+                ->schema([
+                    Forms\Components\Group::make()->columns(2)->schema([
+                        Placeholder::make('House/Unit/Flr #, Bldg Name, Blk or Lot #')
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::BILLING_ADDRESS)->first()->address_line_1),
+                        Placeholder::make('Country')
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::BILLING_ADDRESS)->first()->country),
+                        Placeholder::make('State')
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::BILLING_ADDRESS)->first()->state),
+                        Placeholder::make('City/Province')
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::BILLING_ADDRESS)->first()->city),
+                        Placeholder::make('Zip Code')
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::BILLING_ADDRESS)->first()->zip_code),
+                    ]),
                 ]),
 
             Section::make(trans('Additional Charges'))

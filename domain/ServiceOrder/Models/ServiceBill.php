@@ -12,28 +12,32 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * Domain\ServiceOrder\Models\ServiceBill
  *
+ * @property int $id
  * @property int $service_order_id
- * @property int $payment_method_id
  * @property \Illuminate\Support\Carbon|null $bill_date
  * @property \Illuminate\Support\Carbon|null $due_date
  * @property string $service_price
  * @property array $additional_charges
  * @property float $total_amount
  * @property ServiceBillStatus $status
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read PaymentMethod|null $payment_method
+ * @property-read \Domain\ServiceOrder\Models\ServiceOrder|null $service_order
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereAdditionalCharges($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereBillDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereDueDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereServiceOrderId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill wherePaymentMethodId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereBillDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereDueDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereServicePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereAdditionalCharges($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereTotalAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereTotalAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereCreatedAt($value)
+ * @mixin \Eloquent
  */
 class ServiceBill extends Model
 {

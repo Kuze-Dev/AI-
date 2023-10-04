@@ -9,7 +9,8 @@ use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData;
 
 class CalculateServiceOrderTotalPriceAction
 {
-    public function execute(int $servicePrice, array $additionalCharges = []): Money
+    /** @param Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData[] $additionalCharges*/
+    public function execute(float $servicePrice, array $additionalCharges = []): Money
     {
         $result = money($servicePrice);
 
@@ -20,7 +21,7 @@ class CalculateServiceOrderTotalPriceAction
         foreach ($additionalCharges as $additionalCharge) {
             $result = $result
                 ->add(
-                    $this->calculateServiceOrderAdditionalCharge($additionalCharge)
+                    $this->calculateServiceOrderAdditionalCharge(ServiceOrderAdditionalChargeData::fromArray($additionalCharge))
                 );
         }
 
@@ -29,7 +30,7 @@ class CalculateServiceOrderTotalPriceAction
 
     public function calculateServiceOrderAdditionalCharge(ServiceOrderAdditionalChargeData $additionalCharge): Money
     {
-        return money($additionalCharge->price)
+        return money($additionalCharge->selling_price)
             ->multiply($additionalCharge->quantity);
     }
 }
