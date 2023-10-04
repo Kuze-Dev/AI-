@@ -15,8 +15,8 @@ return new class () extends Migration {
             $table->foreignIdFor(\Domain\Blueprint\Models\Blueprint::class)->index();
             $table->string('name')->unique();
             $table->text('description')->nullable();
-            $table->integer('retail_price');
-            $table->integer('selling_price');
+            $table->float('retail_price');
+            $table->float('selling_price');
             $table->string('billing_cycle')->nullable(); //monthly and yearly
             $table->integer('due_date_every')->nullable();
             $table->boolean('is_featured');
