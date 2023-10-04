@@ -37,7 +37,9 @@ class GetServiceBillingAndDueDateAction
 
         return new ServiceOrderBillingAndDueDateData(
             bill_date: $billDate,
-            due_date: $billDate->addDays($serviceData->due_date_every)
+            due_date: now()
+                ->parse($billDate)
+                ->addDays($serviceData->due_date_every)
         );
     }
 }
