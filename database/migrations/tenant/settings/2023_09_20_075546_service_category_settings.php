@@ -7,6 +7,6 @@ use Spatie\LaravelSettings\Migrations\SettingsMigration;
 return new class () extends SettingsMigration {
     public function up(): void
     {
-        $this->migrator->add('category.service_category');
+        $this->migrator->add('service.service_category');
     }
 };

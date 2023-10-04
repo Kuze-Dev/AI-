@@ -12,6 +12,6 @@ class ServiceSettings extends Settings
 
     public static function group(): string
     {
-        return 'category';
+        return 'service';
     }
 }
