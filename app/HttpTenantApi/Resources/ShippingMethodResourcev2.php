@@ -27,8 +27,7 @@ class ShippingMethodResourcev2 extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         $rateData = $this->getRateData($request);
-        dd($rateData);
-        dd('x');
+     
         return  [
             'name' => $this->title,
             'slug' => $this->slug,
