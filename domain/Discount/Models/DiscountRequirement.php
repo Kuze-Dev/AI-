@@ -47,7 +47,7 @@ class DiscountRequirement extends Model
 
     protected $casts = [
         'requirement_type' => DiscountRequirementType::class,
-        'minimum_amount' => 'int',
+        'minimum_amount' => 'float',
     ];
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Discount\Models\Discount, \Domain\Discount\Models\DiscountRequirement> */
