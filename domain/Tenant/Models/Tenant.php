@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Tenant\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Laravel\Pennant\Concerns\HasFeatures;
@@ -28,6 +29,7 @@ use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Domain> $domains
  * @property-read int|null $domains_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, TenantApiCall> $apiCalls
  * @method static \Stancl\Tenancy\Database\TenantCollection<int, static> all($columns = ['*'])
  * @method static \Stancl\Tenancy\Database\TenantCollection<int, static> get($columns = ['*'])
  * @method static \Illuminate\Database\Eloquent\Builder|Tenant newModelQuery()
@@ -67,5 +69,16 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             'id',
             'name',
         ];
+    }
+
+    public function getTotalApiRequestAttribute(): string
+    {
+        return (string) $this->apiCalls()->sum('count');
+    }
+
+    /** @return HasMany<TenantApiCall> */
+    public function apiCalls(): HasMany
+    {
+        return $this->hasmany(TenantApiCall::class);
     }
 }

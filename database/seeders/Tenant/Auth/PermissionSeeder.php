@@ -28,7 +28,7 @@ class PermissionSeeder extends BasePermissionSeeder
                 ),
                 ...$this->generateFilamentResourcePermissions('role', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('activity', only: ['viewAny', 'view']),
-                ...$this->generatePermissionGroup('settings', ['site', 'cms']),
+                ...$this->generatePermissionGroup('cmsSettings', ['site', 'cms', 'form']),
                 ...$this->generateFilamentResourcePermissions('blueprint', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('menu', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('page', except: ['deleteAny']),
@@ -39,6 +39,7 @@ class PermissionSeeder extends BasePermissionSeeder
                 ...$this->generateFilamentResourcePermissions('content', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('contentEntry', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('globals', except: ['deleteAny']),
+                ...$this->generatePermissionGroup('ecommerceSettings', ['e-commerce', 'payments', 'shipping', 'order']),
                 ...$this->generateFilamentResourcePermissions('taxZone', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('country', only: ['viewAny', 'update']),
                 ...$this->generateFilamentResourcePermissions('currency', only: ['viewAny', 'update']),
@@ -77,7 +78,11 @@ class PermissionSeeder extends BasePermissionSeeder
                         'siteManager',
                     ]
                 ),
-                ...$this->generateFilamentResourcePermissions('order', only: ['viewAny', 'update']),
+                ...$this->generateFilamentResourcePermissions(
+                    'order',
+                    only: ['view', 'viewAny', 'update'],
+                    customPermissions: ['reports']
+                ),
             ],
         ];
     }

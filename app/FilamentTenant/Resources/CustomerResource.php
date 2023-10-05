@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Features\Customer\TierBase;
 use App\Features\ECommerce\RewardPoints;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\CustomerResource\RelationManagers\AddressesRelationManager;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
-use Domain\Address\Enums\AddressLabelAs;
-use Domain\Address\Models\Country;
-use Domain\Address\Models\State;
 use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Actions\ForceDeleteCustomerAction;
 use Domain\Customer\Actions\RestoreCustomerAction;
@@ -39,6 +37,8 @@ use Illuminate\Validation\Rules\Password;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Support\Excel\Actions\ExportBulkAction;
 use ErrorException;
+use Filament\Tables\Actions\BulkAction;
+use Illuminate\Database\Eloquent\Collection;
 
 class CustomerResource extends Resource
 {
@@ -118,8 +118,8 @@ class CustomerResource extends Resource
                         ->before(fn () => now()),
                     Forms\Components\Select::make('tier_id')
                         ->label(trans('Tier'))
-                        ->required()
                         ->preload()
+                        ->hidden(fn () => ! tenancy()->tenant?->features()->active(TierBase::class) ? true : false)
                         ->optionsFromModel(Tier::class, 'name'),
                     Forms\Components\TextInput::make('password')
                         ->translateLabel()
@@ -450,6 +450,28 @@ class CustomerResource extends Resource
                             $customer->created_at?->format(config('tables.date_time_format')),
                         ]
                     ),
+                BulkAction::make('bulk_invite')
+                    ->translateLabel()
+                    ->action(function (Collection $records, Tables\Actions\BulkAction $action) {
+
+                        /** @var \Domain\Customer\Models\Customer $customer */
+                        foreach($records as $customer) {
+                            if($customer->status === Status::INACTIVE && $customer->register_status === RegisterStatus::UNREGISTERED) {
+                                $success = app(SendRegisterInvitationAction::class)->execute($customer);
+                                if ($success) {
+                                    $action
+                                        ->successNotificationTitle(trans('Invitation Email sent.'))
+                                        ->success();
+                                } else {
+                                    $action->failureNotificationTitle(trans('Failed to send  invitation.'))
+                                        ->failure();
+                                }
+
+                            }
+                        }
+                    })
+                    ->deselectRecordsAfterCompletion()
+                    ->icon('heroicon-o-speakerphone'),
             ])
             ->defaultSort('updated_at', 'desc');
     }

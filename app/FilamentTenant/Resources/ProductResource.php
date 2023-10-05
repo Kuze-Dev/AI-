@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\ProductResource\Pages\EditProduct;
+use App\FilamentTenant\Resources\ProductResource\RelationManagers\TiersRelationManager;
 use App\FilamentTenant\Resources\ReviewResource\RelationManagers\ReviewRelationManager;
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\ProductOption as ProductOptionSupport;
@@ -230,6 +231,11 @@ class ProductResource extends Resource
                                     fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value))
                                 )
                                 ->helperText('This product will be hidden from all sales channels.'),
+                            Forms\Components\Toggle::make('allow_guest_purchase')
+                                ->helperText('Item can be purchased by guests.')
+                                ->default(false)
+                                ->hidden()
+                                ->columnSpan(2),
                         ]),
                     Forms\Components\Section::make('Associations')
                         ->translateLabel()
@@ -302,7 +308,9 @@ class ProductResource extends Resource
                     ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->translateLabel()
-                    ->formatStateUsing(fn ($state) => $state ? STATUS::ACTIVE->value : STATUS::INACTIVE->value)
+                    ->formatStateUsing(fn ($state) => $state
+                        ? ucfirst(STATUS::ACTIVE->value)
+                        : ucfirst(STATUS::INACTIVE->value))
                     ->color(fn (Product $record) => $record->status ? 'success' : 'secondary')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
@@ -356,6 +364,7 @@ class ProductResource extends Resource
         return [
             ReviewRelationManager::class,
             ActivitiesRelationManager::class,
+            TiersRelationManager::class,
         ];
     }
 

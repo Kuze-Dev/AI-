@@ -6,6 +6,7 @@
         padding-left: 16em;
         padding-right: 16em;
         font-size: medium;
+        font-family: 'Arial', 'Helvetica', 'Impact', 'Haettenschweiler', 'Arial Narrow Bold', sans-serif;
     }
 
     .header {
@@ -15,6 +16,7 @@
         justify-content: center;
         border-bottom: 1.3px solid #e5e7eb;
         padding-bottom: 1em;
+        font-family: 'Arial', 'Helvetica', 'Impact', 'Haettenschweiler', 'Arial Narrow Bold', sans-serif;
     }
 
     .header img {
@@ -51,6 +53,21 @@
         padding-right: 1.3em;
         text-align: left;
         border-radius: 0.8em;
+    }
+
+    .footer {
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        border-top: 1px solid #e5e7eb;
+        padding-top: 1em;
+    }
+
+    .footer p {
+        margin: 0;
+        padding: 0;
     }
 
     @media (max-width: 1024px) and (min-width: 769px) {
@@ -94,7 +111,7 @@
     }
 </style>
 
-<div style="width: 100%; font-family: Arial, Helvetica, Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif">
+<div style="width: 100%; ">
     <div class="header">
         @if ($logo)
             <div>
@@ -125,5 +142,12 @@
             </div>
         @endif
 
+    </div>
+
+    <div class="footer">
+        @php
+            $htmlFooter = $footer;
+        @endphp
+        {!! $htmlFooter !!}
     </div>
 </div>

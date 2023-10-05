@@ -23,6 +23,12 @@ use Illuminate\Support\Str;
 
 class UpdateOrderPaymentAction
 {
+    public function __construct(
+        private readonly UploadProofofPaymentAction $uploadProofofPaymentAction,
+        private readonly CreatePaymentLink $createPaymentLink,
+    ) {
+    }
+
     public function status(Order $order, string|OrderStatuses $status, ?string $notes = null): Order
     {
         $orderData = [
@@ -82,7 +88,7 @@ class UpdateOrderPaymentAction
                         'customer_message' => $notes,
                     ]);
 
-                    app(UploadProofofPaymentAction::class)->execute(
+                    $this->uploadProofofPaymentAction->execute(
                         $payment,
                         new ProofOfPaymentData(
                             $image
@@ -111,7 +117,7 @@ class UpdateOrderPaymentAction
                     'reference_id' => $order->reference,
                     'amount' => AmountData::fromArray([
                         'currency' => $order->currency_code,
-                        'total' => (int) $order->total,
+                        'total' => $order->total,
                         'details' => PaymentDetailsData::fromArray(
                             [
                                 'subtotal' => strval($order->sub_total - $order->discount_total),
@@ -124,7 +130,7 @@ class UpdateOrderPaymentAction
             payment_driver: $gateway
         );
 
-        $result = app(CreatePaymentLink::class)->execute(
+        $result = $this->createPaymentLink->execute(
             $payment,
             $providerData
         );

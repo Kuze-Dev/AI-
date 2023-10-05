@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Pages\Settings;
 
+use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
 use App\Settings\PaymentSettings as SettingsPaymentSettings;
 use Filament\Forms;
 
 class PaymentSettings extends TenantBaseSettings
 {
+    use AuthorizeEcommerceSettings;
+
     protected static string $settings = SettingsPaymentSettings::class;
 
     protected static ?string $navigationIcon = 'heroicon-s-credit-card';
@@ -31,7 +34,8 @@ class PaymentSettings extends TenantBaseSettings
                             ->label(fn ($state) => $state ? 'PayPal (Live)' : 'PayPal (sandbox)')
                             ->helperText('If the feature is activated, it is necessary to provide production keys. However, if the feature is deactivated, payment processing will occur in sandbox mode')
                             ->reactive(),
-                    ]),
+                    ])
+                    ->hidden(fn () => ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\PaypalGateway::class)),
                 Forms\Components\Section::make(trans('Stripe'))
                     ->collapsible()
                     ->schema([
@@ -42,7 +46,8 @@ class PaymentSettings extends TenantBaseSettings
                             ->label(fn ($state) => $state ? 'Stripe (Live)' : 'Stripe (sandbox)')
                             ->helperText('If the feature is activated, it is necessary to provide production keys. However, if the feature is deactivated, payment processing will occur in sandbox mode')
                             ->reactive(),
-                    ]),
+                    ])
+                    ->hidden(fn () => ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\StripeGateway::class)),
 
             ]),
 

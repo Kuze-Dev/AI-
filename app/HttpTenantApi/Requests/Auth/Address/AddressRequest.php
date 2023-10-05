@@ -47,15 +47,41 @@ class AddressRequest extends FormRequest
     {
         $validated = $this->validated();
 
+        $default_shipping = true;
+        $default_billing = true;
+
+        if ( ! is_null($customer) && isset($validated['is_default_shipping'], $validated['is_default_billing'])) {
+            $default_shipping = $validated['is_default_shipping'];
+            $default_billing = $validated['is_default_billing'];
+        }
+
+        if ( ! is_null($address) && isset($address->is_default_billing, $address->is_default_shipping)) {
+            $default_shipping = $address->is_default_shipping;
+            $default_billing = $address->is_default_billing;
+        }
+
         return new AddressData(
             state_id: (int) $validated['state_id'],
             label_as: $validated['label_as'],
             address_line_1: $validated['address_line_1'],
             zip_code: $validated['zip_code'],
             city: $validated['city'],
-            is_default_shipping: ($validated['is_default_shipping'] ?? false) === true || ($address?->is_default_shipping ?? true),
-            is_default_billing:  ($validated['is_default_billing'] ?? false) === true || ($address?->is_default_billing ?? true),
+            is_default_shipping: $default_shipping,
+            is_default_billing:  $default_billing,
             customer_id: ($customer ? $customer->getKey() : null) ?? ($address && $address->customer ? $address->customer->getKey() : null),
+        );
+    }
+
+    public function toGuestDTO(): AddressData
+    {
+        $validated = $this->validated();
+
+        return new AddressData(
+            state_id: (int) $validated['state_id'],
+            label_as: $validated['label_as'],
+            address_line_1: $validated['address_line_1'],
+            zip_code: $validated['zip_code'],
+            city: $validated['city'],
         );
     }
 }

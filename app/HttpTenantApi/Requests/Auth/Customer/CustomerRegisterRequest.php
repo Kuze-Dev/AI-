@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Requests\Auth\Customer;
 
+use App\Features\Customer\AddressBase;
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
@@ -11,6 +12,7 @@ use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Models\Customer;
+use Domain\Tier\Models\Tier;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -18,9 +20,14 @@ use Illuminate\Validation\Rules\Password;
 
 class CustomerRegisterRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        logger('register', $this->all());
+    }
+
     public function rules(): array
     {
-        return [
+        $rules = [
             'profile_image' => 'nullable|image',
             'email_verification_type' => ['nullable', Rule::enum(EmailVerificationType::class)],
 
@@ -35,52 +42,66 @@ class CustomerRegisterRequest extends FormRequest
             ],
             'mobile' => 'required|string|max:255|unique:customers,mobile',
             'gender' => ['required', Rule::enum(Gender::class)],
+            'tier_id' => [
+                'nullable',
+                Rule::exists(Tier::class, (new Tier())->getRouteKeyName()),
+            ],
             'birth_date' => 'required|date',
             'password' => ['required', 'confirmed', Password::default()],
-
-            // shipping address
-            'shipping.country_id' => [
-                'required',
-                Rule::exists(Country::class, (new Country())->getRouteKeyName()),
-            ],
-            'shipping.state_id' => [
-                'required',
-                Rule::exists(State::class, (new State())->getRouteKeyName())
-                    ->where(function (Builder $query) {
-
-                        $country = app(Country::class)
-                            ->resolveRouteBinding($this->input('shipping.country_id'));
-
-                        return $query->where('country_id', $country?->getKey());
-                    }),
-            ],
-            'shipping.address_line_1' => 'required|string|max:255',
-            'shipping.zip_code' => 'required|string|max:255',
-            'shipping.city' => 'required|string|max:255',
-            'shipping.label_as' => ['required', Rule::enum(AddressLabelAs::class)],
-
-            // billing address
-            'billing.same_as_shipping' => 'required|bool',
-            'billing.country_id' => [
-                'required_if:billing.same_as_shipping,0',
-                Rule::exists(Country::class, (new Country())->getRouteKeyName()),
-            ],
-            'billing.state_id' => [
-                'required_if:billing.same_as_shipping,0',
-                Rule::exists(State::class, (new State())->getRouteKeyName())
-                    ->where(function (Builder $query) {
-
-                        $country = app(Country::class)
-                            ->resolveRouteBinding($this->input('billing.country_id'));
-
-                        return $query->where('country_id', $country?->getKey());
-                    }),
-            ],
-            'billing.address_line_1' => 'required_if:billing.same_as_shipping,0|string|max:255',
-            'billing.zip_code' => 'required_if:billing.same_as_shipping,0|string|max:255',
-            'billing.city' => 'required_if:billing.same_as_shipping,0|string|max:255',
-            'billing.label_as' => ['required_if:billing.same_as_shipping,0', Rule::enum(AddressLabelAs::class)],
         ];
+
+        // Billing and shipping rules
+        if (tenancy()->tenant?->features()->active(AddressBase::class)) {
+            $rules['billing.same_as_shipping'] = 'required|bool';
+
+            $shippingRules = [
+                'shipping.country_id' => [
+                    'required',
+                    Rule::exists(Country::class, (new Country())->getRouteKeyName()),
+                ],
+                'shipping.state_id' => [
+                    'required',
+                    Rule::exists(State::class, (new State())->getRouteKeyName())
+                        ->where(function (Builder $query) {
+
+                            $country = app(Country::class)
+                                ->resolveRouteBinding($this->input('shipping.country_id'));
+
+                            return $query->where('country_id', $country?->getKey());
+                        }),
+                ],
+                'shipping.address_line_1' => 'required|string|max:255',
+                'shipping.zip_code' => 'required|string|max:255',
+                'shipping.city' => 'required|string|max:255',
+                'shipping.label_as' => ['required', Rule::enum(AddressLabelAs::class)],
+            ];
+
+            $billingRules = [
+                'billing.country_id' => [
+                    'required_if:billing.same_as_shipping,0',
+                    Rule::exists(Country::class, (new Country())->getRouteKeyName()),
+                ],
+                'billing.state_id' => [
+                    'required_if:billing.same_as_shipping,0',
+                    Rule::exists(State::class, (new State())->getRouteKeyName())
+                        ->where(function (Builder $query) {
+
+                            $country = app(Country::class)
+                                ->resolveRouteBinding($this->input('billing.country_id'));
+
+                            return $query->where('country_id', $country?->getKey());
+                        }),
+                ],
+                'billing.address_line_1' => 'required_if:billing.same_as_shipping,0|string|max:255',
+                'billing.zip_code' => 'required_if:billing.same_as_shipping,0|string|max:255',
+                'billing.city' => 'required_if:billing.same_as_shipping,0|string|max:255',
+                'billing.label_as' => ['required_if:billing.same_as_shipping,0', Rule::enum(AddressLabelAs::class)],
+            ];
+
+            $rules = array_merge($rules, $shippingRules, $billingRules);
+        }
+
+        return $rules;
     }
 
     public function messages(): array

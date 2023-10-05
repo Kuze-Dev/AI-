@@ -18,6 +18,7 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Domain\Tier\Models\Tier;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
@@ -107,6 +108,7 @@ class Product extends Model implements HasMetaDataContract, HasMedia
         'is_special_offer',
         'allow_customer_remarks',
         'allow_stocks',
+        'allow_guest_purchase',
         'weight',
         'dimension',
         'minimum_order_quantity',
@@ -124,6 +126,7 @@ class Product extends Model implements HasMetaDataContract, HasMedia
         'is_special_offer' => 'boolean',
         'allow_customer_remarks' => 'boolean',
         'allow_stocks' => 'boolean',
+        'allow_guest_purchase' => 'boolean',
     ];
 
     /**
@@ -167,6 +170,17 @@ class Product extends Model implements HasMetaDataContract, HasMedia
     public function taxonomyTerms(): BelongsToMany
     {
         return $this->belongsToMany(TaxonomyTerm::class);
+    }
+
+    /**
+     * Declare relationship of
+     * current model to tiers.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Tier\Models\Tier>
+     */
+    public function tiers(): BelongsToMany
+    {
+        return $this->belongsToMany(Tier::class);
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Product\Models\ProductVariant> */

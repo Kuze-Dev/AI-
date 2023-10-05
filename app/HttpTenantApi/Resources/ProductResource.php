@@ -26,9 +26,9 @@ class ProductResource extends JsonApiResource
             'status' => $this->status,
             'is_digital_product' => $this->is_digital_product,
             'is_featured' => $this->is_featured,
-            'is_favorite' => $this->isFavorite(), // TODO: do not make resource as getter
             'is_special_offer' => $this->is_special_offer,
             'allow_customer_remarks' => $this->allow_customer_remarks,
+            'allow_guest_purchase' => $this->allow_guest_purchase,
             'allow_stocks' => $this->allow_stocks,
             'total_sold' => isset($this->total_sold) ? (int) $this->total_sold : null,
         ];
