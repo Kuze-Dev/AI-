@@ -39,6 +39,7 @@ use Support\Excel\Actions\ExportBulkAction;
 use ErrorException;
 use Filament\Tables\Actions\BulkAction;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\HtmlString;
 
 class CustomerResource extends Resource
 {
@@ -160,6 +161,17 @@ class CustomerResource extends Resource
                         ->label(trans('Earned points from orders: '))
                         ->content(fn ($record) => PointEarning::whereCustomerId($record?->getKey())->sum('earned_points') ?? 0)
                         ->hidden(fn () => ! tenancy()->tenant?->features()->active(RewardPoints::class) ? true : false),
+
+                    Forms\Components\Placeholder::make('is_verified')
+                        ->label(trans('Is Verified: '))
+                        ->content(function ($record) {
+                            if($record->hasVerifiedEmail())
+                            {
+                                return new HtmlString('<span class="px-2 py-1 rounded-full bg-green-500 text-white">Verified</span>');
+                            }else {
+                                return new HtmlString('<span class="px-2 py-1 rounded-full bg-red-500 text-white">Unverified</span>');
+                            }
+                        }),
                 ])
                     ->columns(2),
                 //                Forms\Components\Fieldset::make(trans('Address'))
