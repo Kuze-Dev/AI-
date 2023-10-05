@@ -43,7 +43,6 @@ class ServiceBill extends Model
 {
     protected $fillable = [
         'service_order_id',
-        'payment_method_id',
         'bill_date',
         'due_date',
         'service_price',

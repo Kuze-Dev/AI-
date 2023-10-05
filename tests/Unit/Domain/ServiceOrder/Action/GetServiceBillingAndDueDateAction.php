@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Carbon\Carbon;
 use Domain\Service\Enums\BillingCycle;
 use Domain\ServiceOrder\Actions\GetServiceBillingAndDueDateAction;
+use Domain\ServiceOrder\Database\Factories\ServiceBillFactory;
 use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
 
 beforeEach(function () {
@@ -92,6 +93,40 @@ it(
 
         $dates = app(GetServiceBillingAndDueDateAction::class)
             ->execute($serviceOrder);
+
+        $dateFormat = 'Y-m-d';
+
+        expect($dates->bill_date->format($dateFormat))
+            ->toBe($billDate->format($dateFormat));
+
+        expect($dates->due_date->format($dateFormat))
+            ->toBe($dueDate->format($dateFormat));
+    }
+)
+->with($dataSets);
+
+it(
+    'can get billing dates based on service bill',
+    function (
+        BillingCycle $billingCycle,
+        int $dueDateEvery,
+        Carbon $createdAt,
+        Carbon $billDate,
+        Carbon $dueDate
+    ) {
+        $serviceOrder = ServiceOrderFactory::new()->createOne([
+            'billing_cycle' => $billingCycle,
+            'due_date_every' => $dueDateEvery,
+            'created_at' => $createdAt
+        ]);
+
+        $serviceBill = ServiceBillFactory::new()->createOne([
+            'service_order_id' => $serviceOrder->id,
+            'bill_date' => $createdAt,
+        ]);
+
+        $dates = app(GetServiceBillingAndDueDateAction::class)
+            ->execute($serviceBill);
 
         $dateFormat = 'Y-m-d';
 
