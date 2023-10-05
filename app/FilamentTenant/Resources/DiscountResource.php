@@ -30,6 +30,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TextInput\Mask;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -160,7 +161,12 @@ class DiscountResource extends Resource
 
                             TextInput::make('discountCondition.amount')
                                 ->required()
-                                ->numeric()
+                                ->mask(fn (Mask $mask) => $mask->money(
+                                    prefix: Currency::whereEnabled(true)->value('symbol'),
+                                    thousandsSeparator: ',',
+                                    decimalPlaces: 2,
+                                    isSigned: false
+                                ))
                                 ->minValue(1)
                                 ->rules(['max:100'], fn (Closure $get) => $get('discountCondition.amount_type') === 'percentage')
                                 ->formatStateUsing(fn ($record) => optional($record?->discountCondition()->withTrashed()->first())->amount)
@@ -180,7 +186,12 @@ class DiscountResource extends Resource
 
                             TextInput::make('discountRequirement.minimum_amount')
                                 ->label(trans('Minimum purchase amount'))
-                                ->numeric()
+                                ->mask(fn (Mask $mask) => $mask->money(
+                                    prefix: Currency::whereEnabled(true)->value('symbol'),
+                                    thousandsSeparator: ',',
+                                    decimalPlaces: 2,
+                                    isSigned: false
+                                ))
                                 ->formatStateUsing(fn ($record) => $record?->discountRequirement?->minimum_amount)
                                 ->helperText(new HtmlString(<<<HTML
                                         Leave this blank if no minimum purchase amount.
