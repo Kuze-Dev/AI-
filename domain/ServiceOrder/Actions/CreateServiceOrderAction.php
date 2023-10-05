@@ -84,7 +84,7 @@ class CreateServiceOrderAction
             'due_date_every' => $service->due_date_every,
             'schedule' => $serviceOrderData->schedule,
             'reference' => $uniqueReference,
-            'status' => ServiceOrderStatus::PENDING,
+            'status' => ServiceOrderStatus::FORPAYMENT,
             'additional_charges' => $serviceOrderData->additional_charges,
             'total_price' => $totalPrice,
         ]);
@@ -95,7 +95,7 @@ class CreateServiceOrderAction
             $serviceOrder,
             ServiceBillData::fromArray($serviceOrder->toArray())
         );
-
+        
         return $serviceOrder;
     }
 }
