@@ -13,6 +13,7 @@ use App\FilamentTenant\Support\Divider;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Carbon\Carbon;
 use Closure;
 use Domain\Address\Models\Address;
 use Domain\Currency\Models\Currency;
@@ -344,6 +345,29 @@ class ServiceOrderResource extends Resource
                     ->size('md')
                     ->inline()
                     ->readOnly(),
+            ]),
+            Forms\Components\Grid::make(2)
+            ->schema([
+                Support\TextLabel::make('')
+                    ->label(trans('Order Date'))
+                    ->alignLeft()
+                    ->size('md')
+                    ->inline()
+                    ->readOnly(),
+                Support\TextLabel::make('created_at')
+                    ->alignRight()
+                    ->size('md')
+                    ->inline()
+                    ->formatStateUsing(function ($state) {
+                        /** @var string */
+                        $timeZone = Auth::user()?->timezone;
+
+                        $formattedState = Carbon::parse($state)
+                            ->setTimezone($timeZone)
+                            ->translatedFormat('F d, Y g:i A');
+
+                        return $formattedState;
+                    }),
             ]),
             Divider::make(''),
             Forms\Components\Group::make()->columns(2)->schema([
