@@ -165,10 +165,9 @@ class CustomerResource extends Resource
                     Forms\Components\Placeholder::make('is_verified')
                         ->label(trans('Is Verified: '))
                         ->content(function ($record) {
-                            if($record->hasVerifiedEmail())
-                            {
+                            if($record?->hasVerifiedEmail()) {
                                 return new HtmlString('<span class="px-2 py-1 rounded-full bg-green-500 text-white">Verified</span>');
-                            }else {
+                            } else {
                                 return new HtmlString('<span class="px-2 py-1 rounded-full bg-red-500 text-white">Unverified</span>');
                             }
                         }),
@@ -300,8 +299,10 @@ class CustomerResource extends Resource
                     ->conversion('original')
                     ->circular()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('full_name')
                     ->translateLabel()
+                    ->searchable(['first_name', 'last_name'])
                     ->sortable(['first_name', 'last_name'])
                     ->wrap(),
                 Tables\Columns\TextColumn::make('email')
