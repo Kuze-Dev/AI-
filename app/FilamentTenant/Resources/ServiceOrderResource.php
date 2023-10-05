@@ -13,8 +13,10 @@ use App\FilamentTenant\Support\Divider;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Carbon\Carbon;
 use Closure;
 use Domain\Address\Models\Address;
+use Domain\Currency\Models\Currency;
 use Domain\Customer\Models\Customer;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
@@ -49,6 +51,7 @@ class ServiceOrderResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $Currency = Currency::whereEnabled(true)->firstOrFail()->symbol;
 
         return $form
             ->columns(3)
@@ -119,7 +122,7 @@ class ServiceOrderResource extends Resource
                                     ->content(fn (Closure $get) => ($addressId = $get('service_address_id'))
                                         ? Address::whereId($addressId)->first()->zip_code
                                         : ''),
-                                Checkbox::make('is_same_as_billing')->reactive()->label('Same as Billing Address'),
+                                Checkbox::make('is_same_as_billing')->reactive()->label('Same as Billing Address')->default(true),
                             ])->visible(
                                 function (array $state) {
                                     return isset($state['service_address_id']);
@@ -258,8 +261,8 @@ class ServiceOrderResource extends Resource
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(fn (Closure $get) => Service::whereId($get('service_id'))->first()?->selling_price ?? 0)
-                                ->alignLeft()
+                                ->label(fn (Closure $get) => $Currency . ' ' . (Service::whereId($get('service_id'))->first()?->selling_price ?? 0))
+                                ->alignRight()
                                 ->size('md')
                                 ->inline()
                                 ->readOnly(),
@@ -270,14 +273,14 @@ class ServiceOrderResource extends Resource
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(fn (Closure $get) => array_reduce($get('additional_charges'), function ($carry, $data) {
+                                ->label(fn (Closure $get) => $Currency . ' ' . array_reduce($get('additional_charges'), function ($carry, $data) {
                                     if (isset($data['price']) && is_numeric($data['price']) && isset($data['quantity']) && is_numeric($data['quantity'])) {
                                         return $carry + ($data['price'] * $data['quantity']);
                                     }
 
                                     return $carry;
                                 }, 0))
-                                ->alignLeft()
+                                ->alignRight()
                                 ->size('md')
                                 ->inline()
                                 ->readOnly(),
@@ -289,14 +292,14 @@ class ServiceOrderResource extends Resource
                                 ->readOnly()
                                 ->color('primary'),
                             TextLabel::make('')
-                                ->label(fn (Closure $get) => Service::whereId($get('service_id'))->first()?->selling_price + array_reduce($get('additional_charges'), function ($carry, $data) {
+                                ->label(fn (Closure $get) => $Currency . ' ' . Service::whereId($get('service_id'))->first()?->selling_price + array_reduce($get('additional_charges'), function ($carry, $data) {
                                     if (isset($data['price']) && is_numeric($data['price']) && isset($data['quantity']) && is_numeric($data['quantity'])) {
                                         return $carry + ($data['price'] * $data['quantity']);
                                     }
 
                                     return $carry;
                                 }, 0))
-                                ->alignLeft()
+                                ->alignRight()
                                 ->size('md')
                                 ->inline()
                                 ->readOnly()
@@ -325,7 +328,8 @@ class ServiceOrderResource extends Resource
                                 ServiceOrderStatus::FULFILLED->value => 'success',
                                 default => 'secondary',
                             };
-                        }),
+                        })->inline()
+                        ->alignLeft(),
                     self::summaryEditButton(),
                 ]),
             Forms\Components\Group::make()->columns(2)->schema([
@@ -337,10 +341,33 @@ class ServiceOrderResource extends Resource
                     ->readOnly(),
                 TextLabel::make('')
                     ->label(fn ($record) => $record->admin->first_name . ' ' . $record->admin->last_name)
+                    ->alignRight()
+                    ->size('md')
+                    ->inline()
+                    ->readOnly(),
+            ]),
+            Forms\Components\Grid::make(2)
+            ->schema([
+                Support\TextLabel::make('')
+                    ->label(trans('Order Date'))
                     ->alignLeft()
                     ->size('md')
                     ->inline()
                     ->readOnly(),
+                Support\TextLabel::make('created_at')
+                    ->alignRight()
+                    ->size('md')
+                    ->inline()
+                    ->formatStateUsing(function ($state) {
+                        /** @var string */
+                        $timeZone = Auth::user()?->timezone;
+
+                        $formattedState = Carbon::parse($state)
+                            ->setTimezone($timeZone)
+                            ->translatedFormat('F d, Y g:i A');
+
+                        return $formattedState;
+                    }),
             ]),
             Divider::make(''),
             Forms\Components\Group::make()->columns(2)->schema([
@@ -352,7 +379,7 @@ class ServiceOrderResource extends Resource
                     ->readOnly(),
                 TextLabel::make('')
                     ->label(fn ($record) => $record->currency_symbol . ' ' . $record->service_price)
-                    ->alignLeft()
+                    ->alignRight()
                     ->size('md')
                     ->inline()
                     ->readOnly(),
@@ -370,7 +397,7 @@ class ServiceOrderResource extends Resource
 
                         return $carry;
                     }, 0))
-                    ->alignLeft()
+                    ->alignRight()
                     ->size('md')
                     ->inline()
                     ->readOnly(),
@@ -383,7 +410,7 @@ class ServiceOrderResource extends Resource
                     ->color('primary'),
                 TextLabel::make('')
                     ->label(fn ($record) => $record->currency_symbol . ' ' . $record->total_price)
-                    ->alignLeft()
+                    ->alignRight()
                     ->size('md')
                     ->inline()
                     ->readOnly()
