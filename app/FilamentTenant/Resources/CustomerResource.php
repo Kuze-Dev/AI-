@@ -19,6 +19,7 @@ use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\RewardPoint\Models\PointEarning;
+use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
 use Exception;
 use Filament\Facades\Filament;
@@ -121,6 +122,43 @@ class CustomerResource extends Resource
                         ->preload()
                         ->hidden(fn () => ! tenancy()->tenant?->features()->active(TierBase::class) ? true : false)
                         ->optionsFromModel(Tier::class, 'name'),
+
+                    Forms\Components\Select::make('tier_approval_status')
+                        ->options([
+                            TierApprovalStatus::APPROVED->value => 'Approved',
+                            TierApprovalStatus::REJECTED->value => 'Rejected',
+                        ])
+                        ->hidden(function ($record, $context) {
+
+                            $wholesaler_domestic = Tier::whereName(config('domain.tier.wholesaler-domestic'))->first();
+
+                            $wholesaler_international = Tier::whereName(config('domain.tier.wholesaler-international'))->first();
+
+                            /** @var \Domain\Tier\Models\Tier $tier */
+                            $tier = Tier::whereName(config('domain.tier.default'))->first();
+
+                            if ( ! $wholesaler_domestic || ! $wholesaler_international) {
+                                return true;
+                            }
+
+                            if ($context === 'create') {
+                                return true;
+                            }
+
+                            if ($record !== null && ($record->tier_approval_status === TierApprovalStatus::APPROVED || ($tier !== null && $record->tier_id == $tier->getKey()))) {
+                                return true;
+                            }
+
+                            if ($record !== null && ($record->tier_id === ($wholesaler_domestic->getKey()) && ($wholesaler_domestic->has_approval) == 1)) {
+                                return false;
+                            }
+
+                            if ($record !== null && ($record->tier_id === ($wholesaler_international->getKey()) && ($wholesaler_international->has_approval) == 1)) {
+                                return false;
+                            }
+
+                        }),
+
                     Forms\Components\TextInput::make('password')
                         ->translateLabel()
                         ->password()
@@ -368,31 +406,36 @@ class CustomerResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->translateLabel(),
+                    ->translateLabel()
+                    ->hidden(fn (?Customer $record) => $record?->tier_approval_status == TierApprovalStatus::REJECTED ? true : false),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('send-register-invitation')
                         ->label(fn (Customer $record) => match ($record->register_status) {
                             RegisterStatus::UNREGISTERED => 'Send register invitation',
                             RegisterStatus::INVITED => 'Resend register invitation',
+                            RegisterStatus::REJECTED => 'Send rejected email notification',
                             default => throw new ErrorException('Invalid register status.'),
                         })
                         ->translateLabel()
                         ->requiresConfirmation()
                         ->icon('heroicon-o-speakerphone')
                         ->action(function (Customer $record, Tables\Actions\Action $action): void {
-                            $success = app(SendRegisterInvitationAction::class)
-                                ->execute($record);
 
-                            if ($success) {
-                                $action
-                                    ->successNotificationTitle(trans('A registration link has been sent to your email address.'))
-                                    ->success();
+                            if($record->register_status == RegisterStatus::UNREGISTERED) {
+                                $success = app(SendRegisterInvitationAction::class)
+                                    ->execute($record);
 
-                                return;
+                                if ($success) {
+                                    $action
+                                        ->successNotificationTitle(trans('A registration link has been sent to your email address.'))
+                                        ->success();
+
+                                    return;
+                                }
+
+                                $action->failureNotificationTitle(trans('Failed to send register invitation.'))
+                                    ->failure();
                             }
-
-                            $action->failureNotificationTitle(trans('Failed to send register invitation.'))
-                                ->failure();
                         })
                         ->authorize('sendRegisterInvitation')
                         ->withActivityLog(

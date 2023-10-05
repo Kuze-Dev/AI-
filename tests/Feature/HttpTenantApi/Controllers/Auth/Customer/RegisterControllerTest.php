@@ -123,6 +123,50 @@ it('register w/ same address', function () {
     ]);
 });
 
+it('can register with wholesaler tier', function () {
+
+    $tier = TierFactory::createWholesaler();
+
+    $state = StateFactory::new()->createOne();
+    $data = CustomerRegistrationRequestFactory::new()
+        ->withShippingAddress($state)
+        ->withBillingAddress($state)
+        ->create([
+            'tier_id' => $tier->getKey(),
+        ]);
+
+    // to get latest customer
+    travelTo(now()->addSecond());
+
+    postJson('api/register', $data)
+        ->assertValid()
+        ->assertCreated()
+        ->assertJson(function (AssertableJson $json) {
+            $customer = Customer::latest()->first();
+            $json
+                ->where('data.type', 'customers')
+                ->where('data.attributes.first_name', $customer->first_name)
+                ->where('data.attributes.last_name', $customer->last_name)
+                ->where('data.attributes.email', $customer->email)
+                ->where('data.attributes.mobile', $customer->mobile)
+                ->where('data.attributes.status', $customer->status->value)
+                ->where('data.attributes.birth_date', $customer->birth_date->toDateString())
+                ->etc();
+        });
+
+    assertDatabaseHas(Customer::class, [
+        'tier_id' => $data['tier_id'],
+        'first_name' => $data['first_name'],
+        'last_name' => $data['last_name'],
+        'email' => $data['email'],
+        'mobile' => $data['mobile'],
+        'gender' => $data['gender'],
+        'status' => Status::ACTIVE->value,
+        'birth_date' => $data['birth_date'] . ' 00:00:00',
+        'register_status' => RegisterStatus::UNREGISTERED,
+    ]);
+});
+
 it('can register without address', function () {
 
     tenancy()->tenant->features()->deactivate(AddressBase::class);

@@ -135,6 +135,7 @@ class TenantResource extends Resource
                                         Features\ECommerce\RewardPoints::class => app(Features\ECommerce\RewardPoints::class)->label,
                                     ],
                                 ],
+
                             ]),
                     ]),
             ])->columns(2);
