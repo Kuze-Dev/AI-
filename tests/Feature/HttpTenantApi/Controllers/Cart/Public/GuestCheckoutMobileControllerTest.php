@@ -100,7 +100,7 @@ it('can get guest checkout summary in mobile version', function () {
         ->execute(CheckoutData::fromArray(['cart_line_ids' => $cartLineIds]));
 
     postJson(
-        'api/guest/carts/mobile/summary',
+        'api/v2/guest/carts/summary',
         [
             'reference' => $reference,
             'customer' => $this->customer,

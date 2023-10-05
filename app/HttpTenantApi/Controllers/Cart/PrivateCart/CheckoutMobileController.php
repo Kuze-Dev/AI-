@@ -20,7 +20,7 @@ use Throwable;
 ]
 class CheckoutMobileController extends Controller
 {
-    #[Get('carts/mobile/summary', name: 'carts.mobile.summary')]
+    #[Get('/v2/carts/summary', name: 'v2.carts.summary')]
     public function summary(CartMobileSummaryRequest $request): mixed
     {
         $validated = $request->validated();

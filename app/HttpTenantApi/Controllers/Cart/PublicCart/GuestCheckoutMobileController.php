@@ -21,7 +21,7 @@ use Throwable;
 ]
 class GuestCheckoutMobileController extends Controller
 {
-    #[Post('guest/carts/mobile/summary', name: 'guest.carts.mobile.summary')]
+    #[Post('/v2/guest/carts/summary', name: 'v2.guest.carts.summary')]
     public function summary(GuestCartMobileSummaryRequest $request): mixed
     {
         $sessionId = $request->bearerToken();

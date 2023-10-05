@@ -91,7 +91,7 @@ it('can get checkout summary in mobile version', function () {
     $reference = app(CheckoutAction::class)
         ->execute(CheckoutData::fromArray(['cart_line_ids' => $cartLineIds]));
 
-    getJson('api/carts/mobile/summary?' . http_build_query(
+    getJson('api/v2/carts/summary?' . http_build_query(
         [
             'reference' => $reference,
             'billing_address_id' => $this->address->id,
