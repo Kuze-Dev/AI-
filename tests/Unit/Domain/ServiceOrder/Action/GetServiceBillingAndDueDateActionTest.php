@@ -88,7 +88,7 @@ it(
         $serviceOrder = ServiceOrderFactory::new()->createOne([
             'billing_cycle' => $billingCycle,
             'due_date_every' => $dueDateEvery,
-            'created_at' => $createdAt
+            'created_at' => $createdAt,
         ]);
 
         $dates = app(GetServiceBillingAndDueDateAction::class)
@@ -103,7 +103,7 @@ it(
             ->toBe($dueDate->format($dateFormat));
     }
 )
-->with($dataSets);
+    ->with($dataSets);
 
 it(
     'can get billing dates based on service bill',
@@ -117,7 +117,7 @@ it(
         $serviceOrder = ServiceOrderFactory::new()->createOne([
             'billing_cycle' => $billingCycle,
             'due_date_every' => $dueDateEvery,
-            'created_at' => $createdAt
+            'created_at' => $createdAt,
         ]);
 
         $serviceBill = ServiceBillFactory::new()->createOne([
@@ -137,4 +137,4 @@ it(
             ->toBe($dueDate->format($dateFormat));
     }
 )
-->with($dataSets);
+    ->with($dataSets);
