@@ -31,7 +31,7 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 #[
-    Resource('guest/orders', apiResource: true, except: 'destroy'),
+    Resource('guest/orders', apiResource: true, except: 'destroy', names: 'guest.orders'),
     Middleware(['feature.tenant:' . AllowGuestOrder::class])
 ]
 class GuestOrderController extends Controller

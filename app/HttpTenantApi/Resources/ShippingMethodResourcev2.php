@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
+use Domain\Address\Models\Address;
 use Domain\Cart\Actions\CartSummaryAction;
 use Domain\Cart\Enums\CartUserType;
 use Domain\Cart\Helpers\PrivateCart\CartLineQuery;
@@ -27,7 +28,7 @@ class ShippingMethodResourcev2 extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         $rateData = $this->getRateData($request);
-     
+
         return  [
             'name' => $this->title,
             'slug' => $this->slug,
@@ -52,15 +53,27 @@ class ShippingMethodResourcev2 extends JsonApiResource
     {
 
         try {
-           
+
             // TODO: handle when user is authenticated.
 
             $shippingMethod = $this->resource;
+            /** @var \Domain\Customer\Models\Customer|null */
+            $user = auth()->user();
 
-            $reciever = ReceiverData::fromArray($request->receiver);
+            if($user) {
+                /** @var \Domain\Address\Models\Address */
+                $addressModel = Address::findOrfail($request->address_id);
 
-            $customerAddress = ShippingAddressData::fromRequestData($request->destination_address);
-            dd($customerAddress);
+                $reciever = ReceiverData::fromCustomerModel($user);
+
+                $customerAddress = ShippingAddressData::fromAddressModel($addressModel);
+
+            } else {
+                $reciever = ReceiverData::fromArray($request->receiver);
+
+                $customerAddress = ShippingAddressData::fromRequestData($request->destination_address);
+            }
+
             $cartLines = $this->getCartLines($request);
 
             $productlist = app(CartSummaryAction::class)->getProducts($cartLines, UnitEnum::INCH);
@@ -108,17 +121,18 @@ class ShippingMethodResourcev2 extends JsonApiResource
     /** @return \Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> */
     private function getCartLines(Request $request): Collection
     {
-        $cartLineIds = $request['cart_line_ids'];
+
+        $cartLineIds = is_array($request->cart_line_ids) ? $request->cart_line_ids : explode(',', $request->cart_line_ids);
 
         $type = auth()->user() ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
 
         /** @var string $sessionId */
         $sessionId = auth()->user() ? auth()->user()->id : $request->bearerToken();
 
-        $cartLines = app(CartLineQuery::class)->guests($cartLineIds, $sessionId);
-
         if ($type === CartUserType::AUTHENTICATED) {
             $cartLines = app(CartLineQuery::class)->execute($cartLineIds);
+        } else {
+            $cartLines = app(CartLineQuery::class)->guests($cartLineIds, $sessionId);
         }
 
         return $cartLines;
