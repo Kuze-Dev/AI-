@@ -60,7 +60,7 @@ class ProductData
             is_special_offer: $data['is_special_offer'],
             allow_customer_remarks: $data['allow_customer_remarks'],
             allow_stocks: $data['allow_stocks'],
-            allow_guest_purchase: $data['allow_guest_purchase'],
+            allow_guest_purchase: $data['allow_guest_purchase'] ?? false,
             images: $data['images'],
             videos: $data['videos'],
             media_collection: [
