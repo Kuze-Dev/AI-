@@ -108,6 +108,16 @@ class CustomerRegisterRequest extends FormRequest
             'billing.zip_code.required_if' => trans('validation.required'),
             'billing.city.required_if' => trans('validation.required'),
             'billing.label_as.required_if' => trans('validation.required'),
+
+            'email.required' => trans('The email addresss field is required.'),
+            'email.email' => trans('The email address must be valid.'),
+            'email.unique' => trans('The email address has already been taken.'),
+            'email.max' => trans('The email address must not exceed :max characters.'),
+
+            'mobile.required' => trans('The mobile field is required.'),
+            'mobile.string' => trans('The mobile field must be a string.'),
+            'mobile.max' => trans('The mobile field must not exceed :max characters.'),
+            'mobile.unique' => trans('The mobile number has already been taken.'),
         ];
     }
 

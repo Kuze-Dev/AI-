@@ -90,12 +90,13 @@ class PasswordController extends Controller
 
         return new JsonResponse(['message' => trans('Your password has been updated!')], 200);
     }
+
     #[Post('validate/token', name:'validate.token')]
-    public function validateToken(Request $request):JsonResponse
+    public function validateToken(Request $request): JsonResponse
     {
         $emailExists = DB::table('customer_password_resets')
-        ->where('email', $request->email)
-        ->exists();
+            ->where('email', $request->email)
+            ->exists();
 
         if ($emailExists) {
             // Email exists in the database
