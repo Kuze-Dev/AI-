@@ -30,7 +30,7 @@ class GetServiceBillingAndDueDateAction
         $billDate = match ($serviceData->billing_cycle) {
             BillingCycle::DAILY => $referenceDate->addDay(),
             BillingCycle::MONTHLY => $referenceDate->addMonthNoOverflow(),
-            BillingCycle::YEARLY => $referenceDate->addYear(),
+            BillingCycle::YEARLY => $referenceDate->addYearNoOverflow(),
             /** @phpstan-ignore-next-line  */
             default => throw new InvalidServiceBillingCycleException()
         };
