@@ -130,14 +130,17 @@ class CustomerResource extends Resource
                             TierApprovalStatus::REJECTED->value => 'Rejected',
                         ])
                         ->hidden(function ($record, $context) {
-                            /** @var \Domain\Tier\Models\Tier $wholesaler_domestic */
+
                             $wholesaler_domestic = Tier::whereName(config('domain.tier.wholesaler-domestic'))->first();
 
-                            /** @var \Domain\Tier\Models\Tier $wholesaler_international */
                             $wholesaler_international = Tier::whereName(config('domain.tier.wholesaler-international'))->first();
 
                             /** @var \Domain\Tier\Models\Tier $tier */
                             $tier = Tier::whereName(config('domain.tier.default'))->first();
+
+                            if ( ! $wholesaler_domestic || ! $wholesaler_international) {
+                                return true;
+                            }
 
                             if ($context === 'create') {
                                 return true;

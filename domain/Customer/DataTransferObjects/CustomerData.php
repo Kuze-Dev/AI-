@@ -45,8 +45,12 @@ final class CustomerData
         $validated = $request->validated();
         $sameAsShipping = $request->boolean('billing.same_as_shipping');
 
-        /** @var \Domain\Tier\Models\Tier $tier */
-        $tier = Tier::whereId($validated['tier_id'])->first();
+        $tier = null;
+
+        if (isset($validated['tier_id'])) {
+            /** @var \Domain\Tier\Models\Tier $tier */
+            $tier = Tier::whereId($validated['tier_id'])->first();
+        }
 
         $register_status = self::getStatus( ! isset($validated['tier_id']) ? null : $tier, $validated, null);
 
@@ -90,6 +94,7 @@ final class CustomerData
                 ? EmailVerificationType::from($validated['email_verification_type'])
                 : EmailVerificationType::LINK,
             register_status: $register_status,
+            tier_approval_status: null,
             through_api_registration: true,
         );
     }
@@ -122,26 +127,6 @@ final class CustomerData
             image: $data['image'] ?? null,
             tier_approval_status: TierApprovalStatus::APPROVED,
             register_status: RegisterStatus::UNREGISTERED,
-            //            shipping_address_data: new AddressData(
-            //                state_id: (int) $data['shipping_state_id'],
-            //                label_as: $data['shipping_label_as'],
-            //                address_line_1: $data['shipping_address_line_1'],
-            //                zip_code: $data['shipping_zip_code'],
-            //                city: $data['shipping_city'],
-            //                is_default_shipping: true,
-            //                is_default_billing: $data['same_as_shipping'],
-            //            ),
-            //            billing_address_data: $data['same_as_shipping']
-            //                ? null
-            //                : new AddressData(
-            //                    state_id: (int) $data['billing_state_id'],
-            //                    label_as: $data['billing_label_as'],
-            //                    address_line_1: $data['billing_address_line_1'],
-            //                    zip_code: $data['billing_zip_code'],
-            //                    city: $data['billing_city'],
-            //                    is_default_shipping: false,
-            //                    is_default_billing: true,
-            //                ),
         );
     }
 
