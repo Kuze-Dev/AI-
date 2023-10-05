@@ -116,16 +116,16 @@ class CustomerRegisterRequest extends FormRequest
         return [
             'shipping.country_id' => 'shipping country',
             'shipping.state_id' => 'shipping state',
-            'shipping.address_line_1' => 'shipping address_line_1',
-            'shipping.zip_code' => 'shipping zip_code',
+            'shipping.address_line_1' => 'shipping address line 1',
+            'shipping.zip_code' => 'shipping zip code',
             'shipping.city' => 'shipping city',
-            'shipping.label_as' => 'shipping label_as',
+            'shipping.label_as' => 'shipping label as',
 
-            'billing.same_as_shipping' => 'billing same_as_shipping',
+            'billing.same_as_shipping' => 'billing same as shipping',
             'billing.country_id' => 'billing country',
             'billing.state_id' => 'billing state',
-            'billing.address_line_1' => 'shipping address_line_1',
-            'billing.zip_code' => 'shipping zip_code',
+            'billing.address_line_1' => 'shipping address line 1',
+            'billing.zip_code' => 'shipping zip code',
             'billing.city' => 'shipping city',
             'billing.label_as' => 'shipping label_as',
         ];
