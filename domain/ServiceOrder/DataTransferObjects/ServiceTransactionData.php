@@ -21,7 +21,7 @@ class ServiceTransactionData
     {
         return new self(
             service_order_id: (int) $data['service_order_id'],
-            service_bill_id: (int) $data['service_bill_id'],
+            service_bill_id: isset($data['service_bill_id']) ? (int) $data['service_bill_id'] : (int) $data['id'],
             payment_id: (int) $data['payment_id'],
             payment_method_id: (int) $data['payment_method_id'],
             currency: $data['currency'],

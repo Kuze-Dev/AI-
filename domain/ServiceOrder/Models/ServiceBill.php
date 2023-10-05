@@ -22,7 +22,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property ServiceBillStatus $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read PaymentMethod|null $payment_method
  * @property-read \Domain\ServiceOrder\Models\ServiceOrder $service_order
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill newQuery()
@@ -43,7 +42,6 @@ class ServiceBill extends Model
 {
     protected $fillable = [
         'service_order_id',
-        'payment_method_id',
         'bill_date',
         'due_date',
         'service_price',
@@ -67,9 +65,4 @@ class ServiceBill extends Model
         return $this->belongsTo(ServiceOrder::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\PaymentMethod\Models\PaymentMethod, \Domain\ServiceOrder\Models\ServiceBill> */
-    public function payment_method(): BelongsTo
-    {
-        return $this->belongsTo(PaymentMethod::class);
-    }
 }

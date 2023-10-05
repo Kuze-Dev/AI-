@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Actions;
 
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
+use Domain\ServiceOrder\DataTransferObjects\ServiceTransactionData;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 
 class CreateServiceBillAction
 {
     public function __construct(
-        private GetServiceBillingAndDueDateAction $getServiceBillingAndDueDateAction
+        private GetServiceBillingAndDueDateAction $getServiceBillingAndDueDateAction,
+        private CreateServiceTransactionAction $createServiceTransactionAction
     ) {
     }
 
