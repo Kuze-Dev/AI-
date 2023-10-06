@@ -92,6 +92,7 @@ pipelines:
                 - *setup-script
                 - composer require laravel/vapor-cli
                 - ./vendor/bin/vapor deploy ecommerce-branch --commit="$BITBUCKET_COMMIT"
+                - php artisan tenants:migrate
   pull-requests:
     "**":
       - parallel:
