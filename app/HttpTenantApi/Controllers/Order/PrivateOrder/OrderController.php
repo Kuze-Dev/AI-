@@ -30,7 +30,7 @@ use Symfony\Component\Mailer\Exception\TransportException;
 use Illuminate\Support\Facades\DB;
 
 #[
-    Resource('orders', apiResource: true, except: 'destroy'),
+    Resource('orders', apiResource: true, except: 'destroy', names: 'guest.orders'),
     Middleware(['auth:sanctum'])
 ]
 class OrderController extends Controller
