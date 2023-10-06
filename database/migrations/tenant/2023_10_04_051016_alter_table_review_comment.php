@@ -10,10 +10,15 @@ return new class () extends Migration {
     /** Run the migrations. */
     public function up(): void
     {
-
         Schema::table('reviews', function (Blueprint $table) {
-
             $table->text('comment')->nullable()->change();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('reviews', function (Blueprint $table) {
+            $table->string('comment')->nullable()->change();
         });
     }
 };
