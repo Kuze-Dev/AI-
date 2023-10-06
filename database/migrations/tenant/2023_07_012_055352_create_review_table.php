@@ -23,7 +23,7 @@ return new class () extends Migration {
             $table->smallInteger('rating');
             $table->string('customer_name')->nullable();
             $table->string('customer_email')->nullable();
-            $table->string('comment', 1000)->nullable();
+            $table->string('comment')->nullable();
             $table->json('data')->nullable();
             $table->boolean('is_anonymous')->default(false);
 
