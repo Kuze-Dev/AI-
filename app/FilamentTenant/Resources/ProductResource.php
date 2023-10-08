@@ -234,6 +234,7 @@ class ProductResource extends Resource
                             Forms\Components\Toggle::make('allow_guest_purchase')
                                 ->helperText('Item can be purchased by guests.')
                                 ->default(false)
+                                ->hidden()
                                 ->columnSpan(2),
                         ]),
                     Forms\Components\Section::make('Associations')
