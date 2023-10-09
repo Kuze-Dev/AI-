@@ -108,7 +108,13 @@ class PlaceOrderRequest extends FormRequest
             ],
             'service_id' => [
                 'nullable',
-                'int',
+                function ($attribute, $value, $fail) {
+                    if (is_int($value) || is_string($value)) {
+                        return true;
+                    } else {
+                        $fail($attribute . ' is invalid.');
+                    }
+                },
             ],
         ];
     }

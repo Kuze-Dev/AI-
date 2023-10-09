@@ -33,7 +33,7 @@ class GuestCartSummaryAction
         CartSummaryTaxData $cartSummaryTaxData,
         GuestCartSummaryShippingData $cartSummaryShippingData,
         ?Discount $discount,
-        ?int $serviceId
+        int|string|null $serviceId
     ): SummaryData {
 
         $initialSubTotal = $this->getSubTotal($collections);
@@ -124,7 +124,7 @@ class GuestCartSummaryAction
         ?ReceiverData $receiverData,
         ?ShippingAddressData $shippingAddress,
         ?ShippingMethod $shippingMethod,
-        ?int $serviceId
+        int|string|null $serviceId
     ): float {
         $shippingFeeTotal = 0;
 

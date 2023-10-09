@@ -8,5 +8,5 @@ interface RateResponse
 {
     public function getRateResponseAPI(): array;
 
-    public function getRate(int|string $serviceID = null): string|int|float;
+    public function getRate(int|string|null $serviceID = null): string|int|float;
 }

@@ -27,7 +27,6 @@ class IntlRateV2ResponseData implements RateResponse
                     foreach ($extraService as $list) {
                         $extraServices[] = ExtraServiceData::fromArray($list);
                     }
-
                 } else {
                     $extraServices[] = ExtraServiceData::fromArray($extraService);
                 }
@@ -44,7 +43,7 @@ class IntlRateV2ResponseData implements RateResponse
                 country: $service['Country'],
                 postage: (float) $service['Postage'],
                 extra_services: $extraServices,
-                value_of_content:(float) $service['ValueOfContents'],
+                value_of_content: (float) $service['ValueOfContents'],
                 svc_commitment: $service['SvcCommitments'],
                 svc_description: $service['SvcDescription'],
                 max_dimension: $service['MaxDimensions'],
@@ -71,10 +70,10 @@ class IntlRateV2ResponseData implements RateResponse
         return ['is_united_state_domestic' => false] + get_object_vars($this);
     }
 
-    public function getRate(int $serviceID = null): float
+    public function getRate(int|string|null $serviceID = null): float
     {
         foreach ($this->package->services as $service) {
-            if($service->id === $serviceID) {
+            if ($service->id == $serviceID) {
                 return $service->postage;
             }
         }
