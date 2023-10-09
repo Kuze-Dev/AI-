@@ -33,7 +33,7 @@ class CartSummaryAction
         CartSummaryTaxData $cartSummaryTaxData,
         CartSummaryShippingData $cartSummaryShippingData,
         ?Discount $discount,
-        ?int $serviceId
+        int|string|null $serviceId
     ): SummaryData {
 
         $initialSubTotal = $this->getSubTotal($collections);
@@ -130,8 +130,9 @@ class CartSummaryAction
         Customer $customer,
         ?ShippingAddressData $shippingAddress,
         ?ShippingMethod $shippingMethod,
-        ?int $serviceId
+        int|string|null $serviceId
     ): float {
+
         $shippingFeeTotal = 0;
 
         if ($shippingAddress && $shippingMethod) {
