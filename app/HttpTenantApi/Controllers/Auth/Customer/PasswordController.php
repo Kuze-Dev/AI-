@@ -90,5 +90,4 @@ class PasswordController extends Controller
 
         return new JsonResponse(['message' => trans('Your password has been updated!')], 200);
     }
-
 }

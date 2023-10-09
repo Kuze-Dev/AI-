@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Features\Customer\AddressBase;
+use App\Features\Customer\CustomerBase;
+use App\Features\Customer\TierBase;
 use App\FilamentTenant\Resources\CustomerResource\Pages\ListCustomers;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Filament\Facades\Filament;
@@ -18,7 +21,10 @@ use function PHPUnit\Framework\assertCount;
 uses()->group('customer');
 
 beforeEach(function () {
-    testInTenantContext();
+    $tenant = testInTenantContext();
+    $tenant->features()->activate(CustomerBase::class);
+    $tenant->features()->activate(AddressBase::class);
+    $tenant->features()->activate(TierBase::class);
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 });

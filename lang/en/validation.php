@@ -159,9 +159,8 @@ return [
     */
 
     'custom' => [
-        'email' => [
-            'required' => 'The :attribute address field is required.',
-            'email' => 'The :attribute address must be valid.',
+        'attribute-name' => [
+            'rule-name' => 'custom-message',
         ],
     ],
 
