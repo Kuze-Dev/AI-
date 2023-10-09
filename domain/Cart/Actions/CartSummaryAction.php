@@ -38,7 +38,6 @@ class CartSummaryAction
         ?Discount $discount,
         int|string|null $serviceId
     ): SummaryData {
-
         $initialSubTotal = $this->getSubTotal($collections);
 
         $tax = $this->getTax($cartSummaryTaxData->countryId, $cartSummaryTaxData->stateId);
