@@ -12,6 +12,7 @@ use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\DataTransferObjects\GuestCartSummaryShippingData;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\PublicCart\GuestCartSummaryRequest;
+use Domain\Shipment\API\AusPost\Exceptions\AusPostServiceNotFoundException;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Illuminate\Http\Request;
 use Spatie\RouteAttributes\Attributes\Get;
@@ -76,7 +77,7 @@ class GuestCartSummaryController extends Controller
                     $request->getShippingMethod()
                 ),
                 $discount,
-                $serviceId ? (int) $serviceId : null
+                $serviceId ? $serviceId : null
             );
 
             $responseArray = [
@@ -105,13 +106,16 @@ class GuestCartSummaryController extends Controller
                 ],
             ];
 
-            if ( ! $discountCode) {
+            if (!$discountCode) {
                 unset($responseArray['discount']);
             }
 
             return response()->json($responseArray, 200);
         } catch (Throwable $th) {
-            if ($th instanceof USPSServiceNotFoundException) {
+            if (
+                $th instanceof USPSServiceNotFoundException ||
+                $th instanceof AusPostServiceNotFoundException
+            ) {
                 return response()->json([
                     'service_id' => 'Shipping method service id is required',
                 ], 404);

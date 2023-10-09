@@ -82,7 +82,7 @@ class GuestCartMobileSummaryRequest extends AddressRequest
             ],
             'service_id' => [
                 'nullable',
-                'int',
+                'string',
             ],
             'discount_code' => [
                 'nullable',

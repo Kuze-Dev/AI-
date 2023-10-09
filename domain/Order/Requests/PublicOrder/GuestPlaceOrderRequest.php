@@ -51,7 +51,7 @@ class GuestPlaceOrderRequest extends AddressRequest
                         ->whereNull('checked_out_at')
                         ->count();
 
-                    if ( ! $cartLines) {
+                    if (!$cartLines) {
                         $fail('No cart lines for checkout');
 
                         return;
@@ -106,7 +106,7 @@ class GuestPlaceOrderRequest extends AddressRequest
             ],
             'service_id' => [
                 'nullable',
-                'int',
+                'string',
             ],
         ];
     }

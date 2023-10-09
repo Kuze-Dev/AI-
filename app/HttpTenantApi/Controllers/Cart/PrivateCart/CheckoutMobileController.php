@@ -55,7 +55,7 @@ class CheckoutMobileController extends Controller
                 new CartSummaryTaxData($country?->id, $state?->id),
                 new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),
                 $discount,
-                $serviceId ? (int) $serviceId : null
+                $serviceId ? $serviceId : null
             );
 
             $responseArray = [
