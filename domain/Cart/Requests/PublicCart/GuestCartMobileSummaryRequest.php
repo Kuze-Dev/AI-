@@ -82,7 +82,13 @@ class GuestCartMobileSummaryRequest extends AddressRequest
             ],
             'service_id' => [
                 'nullable',
-                'string',
+                function ($attribute, $value, $fail) {
+                    if (is_int($value) || is_string($value)) {
+                        return true;
+                    } else {
+                        $fail($attribute . ' is invalid.');
+                    }
+                },
             ],
             'discount_code' => [
                 'nullable',

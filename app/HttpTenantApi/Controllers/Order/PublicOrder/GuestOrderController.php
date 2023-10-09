@@ -60,7 +60,7 @@ class GuestOrderController extends Controller
             return response()->json([
                 'mail' => 'Something wrong with mailer',
             ], 404);
-        } catch (USPSServiceNotFoundException | AusPostServiceNotFoundException) {
+        } catch (USPSServiceNotFoundException|AusPostServiceNotFoundException) {
             return response()->json([
                 'service_id' => 'Shipping method service id is required',
             ], 404);

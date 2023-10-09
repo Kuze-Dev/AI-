@@ -106,7 +106,7 @@ class GuestCartSummaryController extends Controller
                 ],
             ];
 
-            if (!$discountCode) {
+            if ( ! $discountCode) {
                 unset($responseArray['discount']);
             }
 
