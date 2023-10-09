@@ -87,7 +87,16 @@ class ImportProductAction
             ->first();
 
         // If the product does not exist, create a new one
-        if ( ! $foundProduct instanceof Product) {
+        if (!$foundProduct instanceof Product) {
+            Log::info(
+                'Import row(s) of product ',
+                [
+                    'name' => $data['name'],
+                    'product_id' => $data['product_sku'] ?? $data['sku'],
+                    'sku' => $data['sku'],
+                ]
+            );
+
             return app(CreateProductAction::class)->execute(ProductData::fromCsv([
                 ...$data,
                 'sku' => $data['product_sku'] ?? $data['sku'],
@@ -154,7 +163,7 @@ class ImportProductAction
                 return $option['name'] === $row['product_option_1_name'];
             });
 
-            if ( ! $foundOption) {
+            if (!$foundOption) {
                 throw ValidationException::withMessages([
                     'product_option_1_name' => trans("{$row['name']} must not exceed 2 product options."),
                 ]);
@@ -207,7 +216,7 @@ class ImportProductAction
                 }
             }
 
-            if ( ! $hasFound) {
+            if (!$hasFound) {
                 $existingOptions = array_merge($csvRowOptions, $existingOptions);
             }
         }
@@ -363,7 +372,7 @@ class ImportProductAction
             if ($taxonomy) {
                 $termModel = TaxonomyTerm::whereName($taxonomyTerm)->first();
 
-                if ( ! $termModel) {
+                if (!$termModel) {
                     $termModel = TaxonomyTerm::create([
                         'name' => $taxonomyTerm,
                         'taxonomy_id' => $taxonomy->id,
