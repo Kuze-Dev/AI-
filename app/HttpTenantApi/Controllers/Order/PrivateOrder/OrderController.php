@@ -18,6 +18,7 @@ use Domain\Order\Requests\PlaceOrderRequest;
 use Domain\Order\Requests\UpdateOrderRequest;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\Exceptions\PaymentException;
+use Domain\Shipment\API\AusPost\Exceptions\AusPostServiceNotFoundException;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -77,7 +78,7 @@ class OrderController extends Controller
             return response()->json([
                 'mail' => 'Something wrong with mailer',
             ], 404);
-        } catch (USPSServiceNotFoundException) {
+        } catch (USPSServiceNotFoundException | AusPostServiceNotFoundException) {
             return response()->json([
                 'service_id' => 'Shipping method service id is required',
             ], 404);

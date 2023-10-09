@@ -49,7 +49,7 @@ class PlaceOrderRequest extends FormRequest
                         ->whereNull('checked_out_at')
                         ->count();
 
-                    if ( ! $cartLines) {
+                    if (!$cartLines) {
                         $fail('No cart lines for checkout');
 
                         return;
@@ -108,7 +108,7 @@ class PlaceOrderRequest extends FormRequest
             ],
             'service_id' => [
                 'nullable',
-                'int',
+                'string',
             ],
         ];
     }

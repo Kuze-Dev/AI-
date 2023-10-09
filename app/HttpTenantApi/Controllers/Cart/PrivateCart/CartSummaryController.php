@@ -11,6 +11,7 @@ use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\Events\SanitizeCartEvent;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
+use Domain\Shipment\API\AusPost\Exceptions\AusPostServiceNotFoundException;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -42,7 +43,7 @@ class CartSummaryController extends Controller
                 return $cartLine->purchasable !== null;
             });
 
-            if ( ! empty($cartLineIdsTobeRemoved)) {
+            if (!empty($cartLineIdsTobeRemoved)) {
                 event(new SanitizeCartEvent(
                     $cartLineIdsTobeRemoved,
                 ));
@@ -103,13 +104,16 @@ class CartSummaryController extends Controller
                 ],
             ];
 
-            if ( ! $discountCode) {
+            if (!$discountCode) {
                 unset($responseArray['discount']);
             }
 
             return response()->json($responseArray, 200);
         } catch (Throwable $th) {
-            if ($th instanceof USPSServiceNotFoundException) {
+            if (
+                $th instanceof USPSServiceNotFoundException ||
+                $th instanceof AusPostServiceNotFoundException
+            ) {
                 return response()->json([
                     'service_id' => 'Shipping method service id is required',
                 ], 404);

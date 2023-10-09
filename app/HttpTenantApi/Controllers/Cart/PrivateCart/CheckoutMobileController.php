@@ -10,6 +10,7 @@ use Domain\Cart\Actions\CartSummaryAction;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\Requests\CartMobileSummaryRequest;
+use Domain\Shipment\API\AusPost\Exceptions\AusPostServiceNotFoundException;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -88,13 +89,16 @@ class CheckoutMobileController extends Controller
                 'reference' => $reference,
             ];
 
-            if ( ! $discountCode) {
+            if (!$discountCode) {
                 unset($responseArray['summary']['discount']);
             }
 
             return response()->json($responseArray, 200);
         } catch (Throwable $th) {
-            if ($th instanceof USPSServiceNotFoundException) {
+            if (
+                $th instanceof USPSServiceNotFoundException ||
+                $th instanceof AusPostServiceNotFoundException
+            ) {
                 return response()->json([
                     'service_id' => 'Shipping method service id is required',
                 ], 404);
