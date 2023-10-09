@@ -30,7 +30,6 @@ class ServiceFactory extends Factory
         }
 
         return [
-//            'blueprint_id' => Blueprint::query()->pluck('id')->random(1)->first(),
             'name' => $this->faker->name,
             'description' => $this->faker->sentence,
             'retail_price' => $this->faker->numberBetween(1, 99999),

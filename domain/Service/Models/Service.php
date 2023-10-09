@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Support\MetaData\HasMetaData;
 use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
@@ -21,6 +22,7 @@ use Spatie\MediaLibrary\HasMedia;
 /**
  * @property mixed|null $blueprint
  */
+#[OnDeleteCascade(['metaData, taxonomyTerms'])]
 class Service extends Model implements HasMetaDataContract, HasMedia
 {
     use LogsActivity;

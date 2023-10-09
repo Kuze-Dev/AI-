@@ -7,6 +7,7 @@ namespace Domain\Service\Actions;
 use Domain\Service\DataTransferObjects\ServiceData;
 use Domain\Service\Models\Service;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Support\Common\Actions\SyncMediaCollectionAction;
 use Support\Common\DataTransferObjects\MediaCollectionData;
 use Support\Common\DataTransferObjects\MediaData;
@@ -41,7 +42,11 @@ class UpdateServiceAction
 
         $this->updateMetaData->execute($service, MetaDataData::fromArray($serviceData->meta_data ?? []));
 
-        $media = collect($serviceData->media_collection['media'])->map(function ($material) {
+        /** @var array<int, array> $mediaMaterials */
+        $mediaMaterials = $serviceData->media_collection['media'] ?? [];
+
+        $media = collect($mediaMaterials)->map(function ($material) {
+            /** @var UploadedFile|string $material */
             return new MediaData(media: $material);
         })->toArray();
 
