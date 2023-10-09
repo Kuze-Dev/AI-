@@ -71,7 +71,7 @@ class IntlRateV2ResponseData implements RateResponse
         return ['is_united_state_domestic' => false] + get_object_vars($this);
     }
 
-    public function getRate(int $serviceID = null): float
+    public function getRate(int|string|null $serviceID = null): float
     {
         foreach ($this->package->services as $service) {
             if($service->id === $serviceID) {
