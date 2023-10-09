@@ -71,7 +71,7 @@ class EditBlueprint extends EditRecord
                 }
             }
         }
-        Artisan::call('media-library:regenerate');
+        // Artisan::call('media-library:regenerate');
 
         $this->afterSaveOverride();
 
