@@ -75,15 +75,15 @@ class ViewServiceOrder extends ViewRecord
                 ->schema([
                     Forms\Components\Group::make()->columns(2)->schema([
                         Placeholder::make('House/Unit/Flr #, Bldg Name, Blk or Lot #')
-                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::SERVICE_ADDRESS)->first()->address_line_1),
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::SERVICE_ADDRESS)->first()->address_line_1 ?? null),
                         Placeholder::make('Country')
-                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::SERVICE_ADDRESS)->first()->country),
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::SERVICE_ADDRESS)->first()->country ?? null),
                         Placeholder::make('State')
-                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::SERVICE_ADDRESS)->first()->state),
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::SERVICE_ADDRESS)->first()->state ?? null),
                         Placeholder::make('City/Province')
-                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::SERVICE_ADDRESS)->first()->city),
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::SERVICE_ADDRESS)->first()->city ?? null),
                         Placeholder::make('Zip Code')
-                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::SERVICE_ADDRESS)->first()->zip_code),
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::SERVICE_ADDRESS)->first()->zip_code ?? null),
                     ]),
                 ]),
 
@@ -91,15 +91,15 @@ class ViewServiceOrder extends ViewRecord
                 ->schema([
                     Forms\Components\Group::make()->columns(2)->schema([
                         Placeholder::make('House/Unit/Flr #, Bldg Name, Blk or Lot #')
-                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::BILLING_ADDRESS)->first()->address_line_1),
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::BILLING_ADDRESS)->first()->address_line_1 ?? null),
                         Placeholder::make('Country')
-                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::BILLING_ADDRESS)->first()->country),
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::BILLING_ADDRESS)->first()->country ?? null),
                         Placeholder::make('State')
-                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::BILLING_ADDRESS)->first()->state),
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::BILLING_ADDRESS)->first()->state ?? null),
                         Placeholder::make('City/Province')
-                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::BILLING_ADDRESS)->first()->city),
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::BILLING_ADDRESS)->first()->city ?? null),
                         Placeholder::make('Zip Code')
-                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::BILLING_ADDRESS)->first()->zip_code),
+                            ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::BILLING_ADDRESS)->first()->zip_code ?? null),
                     ]),
                 ]),
 

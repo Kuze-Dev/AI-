@@ -13,6 +13,7 @@ use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class CreateServiceOrderAction
 {
@@ -44,6 +45,11 @@ class CreateServiceOrderAction
         $service = Service::whereId($serviceOrderData->service_id)->first();
 
         $currency = Currency::whereEnabled(true)->first();
+
+        if ( ! $customer instanceof Customer || ! $service instanceof Service || ! $currency instanceof Currency) {
+
+            throw new BadRequestHttpException('No paymentMethod found');
+        }
 
         $totalPrice = $this->calculateServiceOrderTotalPriceAction
             ->execute(
@@ -95,7 +101,7 @@ class CreateServiceOrderAction
             $serviceOrder,
             ServiceBillData::fromArray($serviceOrder->toArray())
         );
-        
+
         return $serviceOrder;
     }
 }
