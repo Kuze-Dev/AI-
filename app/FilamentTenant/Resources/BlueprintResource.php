@@ -543,7 +543,7 @@ class BlueprintResource extends Resource
                                             ]),
                                             /** @phpstan-ignore-next-line */
                                             default => throw new ErrorException(
-                                                ManipulationType::class . '::' . Str::upper($manipulationType->value) . ' field not setup for conversion manipulation.'
+                                                ManipulationType::class.'::'.Str::upper($manipulationType->value) . ' field not setup for conversion manipulation.'
                                             )
                                         })
                                         ->toArray();
