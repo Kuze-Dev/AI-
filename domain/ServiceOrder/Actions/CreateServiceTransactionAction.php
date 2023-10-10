@@ -9,8 +9,8 @@ use Domain\ServiceOrder\Models\serviceTransaction;
 
 class CreateServiceTransactionAction
 {
-    public function __construct(
-    ) {
+    public function __construct()
+    {
     }
 
     public function execute(
@@ -19,15 +19,14 @@ class CreateServiceTransactionAction
 
         $serviceTransaction = serviceTransaction::create([
             // 'service_order_id' => $serviceTransactionData->service_order_id,
-            // 'bill_date' => $billingDates->bill_date,
-            // 'due_date' => $billingDates->due_date,
-            // 'service_price' => $serviceTransactionData->service_price,
-            // 'additional_charges' => $serviceTransactionData->additional_charges,
-            // 'total_amount' => $serviceTransactionData->total_amount,
-            // 'status' => $serviceTransactionData->status,
+            // 'service_bill_id' => $ServiceTransactionData->service_bill_id,
+            // 'payment_id' => $ServiceTransactionData->payment_id,
+            // 'payment_method_id' => $ServiceTransactionData->payment_method_id,
+            // 'total_amount' => $ServiceTransactionData->total_amount,
+            // 'status' => $ServiceTransactionData->status,
         ]);
 
-        
+
         return $serviceTransaction;
     }
 }
