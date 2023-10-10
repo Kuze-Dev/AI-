@@ -55,7 +55,7 @@ class CartSummaryRequest extends FormRequest
             ],
             'service_id' => [
                 'nullable',
-                'int',
+                'string',
             ],
             'discount_code' => [
                 'nullable',
