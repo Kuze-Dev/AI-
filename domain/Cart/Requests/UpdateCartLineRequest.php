@@ -6,6 +6,7 @@ namespace Domain\Cart\Requests;
 
 use Domain\Cart\Actions\CartPurchasableValidatorAction;
 use Domain\Cart\Exceptions\InvalidPurchasableException;
+use Domain\Cart\Helpers\ValidateRemarksMedia;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Validation\Rule;
@@ -50,6 +51,7 @@ class UpdateCartLineRequest extends FormRequest
                 'nullable',
                 'array',
                 function ($attribute, $value, $fail) use ($cartLine) {
+
                     /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
                     $purchasable = $cartLine->purchasable;
 
@@ -80,6 +82,8 @@ class UpdateCartLineRequest extends FormRequest
                 'nullable',
                 'array',
                 function ($attribute, $value, $fail) use ($cartLine) {
+                    app(ValidateRemarksMedia::class)->execute($value, $fail);
+
                     /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
                     $purchasable = $cartLine->purchasable;
 
