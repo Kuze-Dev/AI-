@@ -2,22 +2,41 @@
 
 declare(strict_types=1);
 
-use Domain\Page\Actions\CreatePageAction;
-use Domain\Page\Database\Factories\BlockFactory;
-use Domain\Page\DataTransferObjects\PageData;
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Blueprint\Enums\FieldType;
+use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Page\Models\Page;
 use Domain\Page\Models\BlockContent;
 use Support\MetaData\Models\MetaData;
+use Domain\Page\Actions\CreatePageAction;
+use Domain\Page\DataTransferObjects\PageData;
+use Domain\Site\Database\Factories\SiteFactory;
+
+use Domain\Page\Database\Factories\BlockFactory;
 
 use function Pest\Laravel\assertDatabaseHas;
 
 beforeEach(fn () => testInTenantContext());
 
 it('can create page', function () {
+
+    LocaleFactory::createDefault();
+
     $blockId = BlockFactory::new()
-        ->withDummyBlueprint()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'main'])
+                ->addSchemaField([
+                    'title' => 'text',
+                    'type' => FieldType::TEXT,
+                ])
+                ->createOne()
+        )
         ->createOne()
         ->getKey();
+
+    $site = SiteFactory::new()
+        ->createOne();
 
     $page = app(CreatePageAction::class)
         ->execute(PageData::fromArray([
@@ -29,7 +48,7 @@ it('can create page', function () {
             'block_contents' => [
                 [
                     'block_id' => $blockId,
-                    'data' => ['name' => 'foo'],
+                    'data' => ['main' => ['text' => 'fooBarra']],
                 ],
             ],
             'meta_data' => [
@@ -38,13 +57,14 @@ it('can create page', function () {
                 'keywords' => '',
                 'description' => '',
             ],
+            'sites' => [$site->id],
         ]));
 
     assertDatabaseHas(Page::class, ['name' => 'Foo']);
     assertDatabaseHas(BlockContent::class, [
         'page_id' => $page->id,
         'block_id' => $blockId,
-        'data' => json_encode(['name' => 'foo']),
+        'data' => json_encode(['main' => ['text' => 'fooBarra']]),
     ]);
     assertDatabaseHas(
         MetaData::class,
@@ -57,4 +77,6 @@ it('can create page', function () {
             'model_id' => $page->getKey(),
         ]
     );
+
+    expect($page->sites->pluck('id'))->toContain($site->id);
 });

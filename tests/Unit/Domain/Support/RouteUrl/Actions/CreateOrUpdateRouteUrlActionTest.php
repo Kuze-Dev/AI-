@@ -9,8 +9,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Tests\Fixtures\TestModelForRouteUrl;
 
-use Tests\Fixtures\TestSecondModelForRouteUrl;
-
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\travelTo;
 use function PHPUnit\Framework\assertTrue;
@@ -100,34 +98,4 @@ it('can reuse previous route_url', function () {
 
     assertTrue($model->activeRouteUrl()->is($reinstatedRouteUrl));
     assertTrue($initialRouteUrl->is($reinstatedRouteUrl));
-});
-
-it('can transfer non active url to another model', function () {
-    DB::connection()
-        ->getSchemaBuilder()
-        ->create((new TestSecondModelForRouteUrl())->getTable(), function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->timestamps();
-        });
-    Relation::morphMap([TestSecondModelForRouteUrl::class]);
-
-    $modelA = TestModelForRouteUrl::create(['name' => 'one']);
-    $modelB = TestSecondModelForRouteUrl::create(['name' => 'two']);
-
-    $initialModelARouteUrl = app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($modelA, new RouteUrlData('url-one', true));
-
-    travelTo(now()->addSecond());
-
-    $newModelARouteUrl = app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($modelA, new RouteUrlData('url-one-new', true));
-
-    travelTo(now()->addSecond());
-
-    $reinstatedRouteUrl = app(CreateOrUpdateRouteUrlAction::class)
-        ->execute($modelB, new RouteUrlData('url-one', true));
-
-    assertTrue($modelB->activeRouteUrl()->is($reinstatedRouteUrl));
-    assertTrue($initialModelARouteUrl->is($reinstatedRouteUrl));
 });

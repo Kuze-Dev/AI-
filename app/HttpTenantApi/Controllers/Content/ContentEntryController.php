@@ -64,6 +64,7 @@ class ContentEntryController
                             }
                         }
                     ),
+                    AllowedFilter::exact('sites.id'),
                 ])
                 ->allowedSorts([
                     'order',
@@ -87,6 +88,7 @@ class ContentEntryController
                     ->whereRelation('content', 'slug', $content)
             )
                 ->allowedIncludes([
+                    'content',
                     'taxonomyTerms.taxonomy',
                     'routeUrls',
                     'metaData',

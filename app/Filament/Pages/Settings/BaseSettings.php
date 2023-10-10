@@ -28,7 +28,7 @@ abstract class BaseSettings extends SettingsPage
 
     public function mount(): void
     {
-        abort_unless(self::authorizeAccess(), 403);
+        abort_unless(static::authorizeAccess(), 403);
 
         parent::mount();
     }
@@ -50,7 +50,7 @@ abstract class BaseSettings extends SettingsPage
 
     public static function shouldShowSettingsCard(): bool
     {
-        return self::authorizeAccess();
+        return static::authorizeAccess();
     }
 
     protected static function authorizeAccess(): bool
@@ -77,7 +77,7 @@ abstract class BaseSettings extends SettingsPage
 
     public static function getRouteName(): string
     {
-        return 'filament.pages.settings.'.self::getSlug();
+        return 'filament.pages.settings.' . self::getSlug();
     }
 
     protected function getBreadcrumb(): Htmlable|string
@@ -100,9 +100,9 @@ abstract class BaseSettings extends SettingsPage
         return function () {
             $slug = self::getSlug();
 
-            Route::get('settings/'.$slug, static::class)
+            Route::get('settings/' . $slug, static::class)
                 ->middleware(static::getMiddlewares())
-                ->name('settings.'.$slug);
+                ->name('settings.' . $slug);
         };
     }
 }

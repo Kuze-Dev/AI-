@@ -21,6 +21,7 @@ class PageResource extends JsonApiResource
             'route_url' => $this->activeRouteUrl?->url,
             'visibility' => $this->visibility,
             'published_at' => $this->published_at,
+            'locale' => $this->locale,
         ];
     }
 
@@ -29,7 +30,7 @@ class PageResource extends JsonApiResource
     {
         return [
             'blockContents' => fn () => BlockContentResource::collection($this->blockContents),
-            'routeUrls' => fn () => RouteUrlResource::collection($this->routeUrls),
+            'routeUrls' => fn () => RouteUrlResource::make($this->routeUrls),
             'metaData' => fn () => MetaDataResource::make($this->metaData),
         ];
     }

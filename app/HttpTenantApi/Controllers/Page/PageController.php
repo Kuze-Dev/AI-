@@ -10,13 +10,13 @@ use Carbon\Carbon;
 use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Page\Models\Page;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\URL;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
-use TiMacDonald\JsonApi\JsonApiResourceCollection;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\URL;
 use Spatie\RouteAttributes\Attributes\Middleware;
+use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('pages', only: ['index', 'show']),
@@ -28,13 +28,14 @@ class PageController
     {
         return PageResource::collection(
             QueryBuilder::for(
-                Page::with('activeRouteUrl')
+                Page::with(['activeRouteUrl'])
                     ->whereNotNull('published_at')
             )
                 ->allowedFilters([
                     'name',
                     'slug',
                     'visibility',
+                    AllowedFilter::exact('locale'),
                     AllowedFilter::callback(
                         'published_at_start',
                         fn (PageBuilder $query, $value) => $query->wherePublishedAtRange(publishedAtStart: Carbon::parse($value))
@@ -54,9 +55,11 @@ class PageController
                             $query->wherePublishedAtYearMonth($year, $month);
                         },
                     ),
+                    AllowedFilter::exact('sites.id'),
                 ])
                 ->allowedIncludes([
                     'blockContents.block',
+                    'blockContents.blueprintData',
                     'routeUrls',
                     'metaData',
                 ])

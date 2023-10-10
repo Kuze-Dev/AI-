@@ -13,6 +13,7 @@ use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Domain\Site\Traits\Sites;
 
 /**
  * Domain\Menu\Models\Menu
@@ -20,6 +21,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property int $id
  * @property string $name
  * @property string $slug
+ * @property string $locale
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
@@ -44,10 +46,12 @@ class Menu extends Model
     use HasSlug;
     use LogsActivity;
     use ConstraintsRelationships;
+    use Sites;
 
     protected $fillable = [
         'name',
         'slug',
+        'locale',
     ];
 
     public function getActivitylogOptions(): LogOptions

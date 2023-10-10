@@ -211,12 +211,32 @@ class RoleResource extends Resource
                                             ->dehydrated(false),
                                     ])
                                     ->columns(1),
-                            ])
+                            ])->hidden(fn () => self::hideFeaturePermission($permissionGroup->main->name))
                             ->columnSpan(1)
                     )
                         ->toArray()
                 ),
         ];
+    }
+
+    private static function hideFeaturePermission(string $groupName): bool
+    {
+        /** @var bool */
+        return match ($groupName) {
+            'site' => tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class),
+            'country' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
+            'currency' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
+            'discount' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
+            'order' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
+            'product' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
+            'paymentMethod' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
+            'shippingMethod' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
+            'taxZone' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
+            'ecommerceSettings' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
+            'customers' => tenancy()->tenant?->features()->inactive(\App\Features\Customer\CustomerBase::class),
+            'tiers' => tenancy()->tenant?->features()->inactive(\App\Features\Customer\TierBase::class),
+            default => false
+        };
     }
 
     private static function refreshSelectAllState(Closure $get, Closure $set): void

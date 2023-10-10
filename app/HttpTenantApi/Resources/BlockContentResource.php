@@ -13,6 +13,8 @@ use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
  * @mixin \Domain\Page\Models\BlockContent
+ * @property-read \Domain\Page\Models\Block $block
+ * @property-read \Domain\Blueprint\Models\Blueprint $blueprint
  */
 class BlockContentResource extends JsonApiResource
 {
@@ -26,10 +28,12 @@ class BlockContentResource extends JsonApiResource
         ];
     }
 
+    /** @return array<string, callable> */
     public function toRelationships(Request $request): array
     {
         return [
             'block' => fn () => BlockResource::make($this->block),
+            'blueprintData' => fn () => BlueprintDataResource::collection($this->blueprintData),
         ];
     }
 

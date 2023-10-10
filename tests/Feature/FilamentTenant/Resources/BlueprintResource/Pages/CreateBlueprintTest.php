@@ -133,6 +133,14 @@ it('can show field options', function (FieldType $fieldType, array $fieldOptions
         'type' => FieldType::SELECT,
         'field_options' => ['multiple'],
     ],
+    'checkbox field' => [
+        'type' => FieldType::CHECKBOX,
+        'field_options' => [],
+    ],
+    'radio field' => [
+        'type' => FieldType::RADIO,
+        'field_options' => [],
+    ],
     'textarea field' => [
         'type' => FieldType::TEXTAREA,
         'field_options' => [
@@ -183,6 +191,13 @@ it('can show field options', function (FieldType $fieldType, array $fieldOptions
         'field_options' => [
             'min_length',
             'max_length',
+        ],
+    ],
+    'media field' => [
+        'type' => FieldType::MEDIA,
+        'field_options' => [
+            'min_size',
+            'max_size',
         ],
     ],
 ]);

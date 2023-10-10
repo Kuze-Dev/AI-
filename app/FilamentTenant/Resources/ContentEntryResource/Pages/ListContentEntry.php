@@ -12,6 +12,7 @@ use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class ListContentEntry extends ListRecords
 {
@@ -72,6 +73,20 @@ class ListContentEntry extends ListRecords
     /** @return Builder<\Domain\Content\Models\ContentEntry> */
     protected function getTableQuery(): Builder
     {
+
+        if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+            return $this->ownerRecord->contentEntries()->getQuery();
+        }
+
+        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+            Auth::user()?->can('site.siteManager') &&
+            ! (Auth::user()->hasRole(config('domain.role.super_admin')))
+        ) {
+            return $this->ownerRecord->contentEntries()->getQuery()->wherehas('sites', function ($q) {
+                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
+            });
+        }
+
         return $this->ownerRecord->contentEntries()->getQuery();
     }
 }

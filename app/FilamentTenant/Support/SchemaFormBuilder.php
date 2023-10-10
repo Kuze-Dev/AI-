@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Support;
 
 use Closure;
+use Domain\Blueprint\DataTransferObjects\CheckBoxFieldData;
 use Domain\Blueprint\DataTransferObjects\DatetimeFieldData;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\FileFieldData;
 use Domain\Blueprint\DataTransferObjects\MarkdownFieldData;
+use Domain\Blueprint\DataTransferObjects\MediaFieldData;
+use Domain\Blueprint\DataTransferObjects\RadioFieldData;
 use Domain\Blueprint\DataTransferObjects\RelatedResourceFieldData;
 use Domain\Blueprint\DataTransferObjects\RepeaterFieldData;
 use Domain\Blueprint\DataTransferObjects\RichtextFieldData;
@@ -21,11 +24,13 @@ use Domain\Blueprint\DataTransferObjects\ToggleFieldData;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
@@ -35,6 +40,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class SchemaFormBuilder extends Component
 {
@@ -105,11 +111,19 @@ class SchemaFormBuilder extends Component
             SelectFieldData::class => Select::make($field->state_name)
                 ->options(Arr::pluck($field->options, 'label', 'value'))
                 ->multiple($field->multiple),
+            CheckBoxFieldData::class => CheckboxList::make($field->state_name)
+                ->options(Arr::pluck($field->options, 'label', 'value'))
+                ->bulkToggleable($field->bulk_toggleable),
+            RadioFieldData::class => Radio::make($field->state_name)
+                ->options(Arr::pluck($field->options, 'label', 'value'))
+                ->inline($field->inline)
+                ->descriptions(Arr::pluck($field->descriptions, 'description', 'value')),
             TextareaFieldData::class => $this->makeTextAreaComponent($field),
             TextFieldData::class => $this->makeTextInputComponent($field),
             ToggleFieldData::class => Toggle::make($field->state_name),
             RepeaterFieldData::class => $this->makeRepeaterComponent($field),
             RelatedResourceFieldData::class => $this->makeRelatedResourceComponent($field),
+            MediaFieldData::class => $this->makeMediaComponent($field),
             default => throw new InvalidArgumentException('Cannot generate field component for `' . $field::class . '` as its not supported.'),
         };
 
@@ -149,6 +163,10 @@ class SchemaFormBuilder extends Component
                 ->imagePreviewHeight('256');
         }
 
+        if ($fileFieldData->can_download) {
+            $fileUpload->enableDownload($fileFieldData->can_download);
+        }
+
         if ($fileFieldData->reorder) {
             $fileUpload->enableReordering($fileFieldData->reorder);
         }
@@ -166,6 +184,70 @@ class SchemaFormBuilder extends Component
         }
 
         return $fileUpload;
+    }
+
+    private function makeMediaComponent(MediaFieldData $mediaFieldData): FileUpload
+    {
+        $media = FileUpload::make($mediaFieldData->state_name);
+
+        if ($mediaFieldData->multiple) {
+            $media->multiple($mediaFieldData->multiple)
+                ->appendFiles()
+                ->minFiles($mediaFieldData->min_files)
+                ->maxFiles($mediaFieldData->max_files)
+                ->panelLayout('grid')
+                ->imagePreviewHeight('256');
+        }
+
+        if ($mediaFieldData->reorder) {
+            $media->enableReordering($mediaFieldData->reorder);
+        }
+
+        $media->formatStateUsing(function (?array $state): array {
+
+            if ($state) {
+
+                /** @var array */
+                $media = Media::whereIn('uuid', $state)->orwhereIN('file_name', $state)->pluck('uuid')->toArray();
+
+                if ($media) {
+                    return $media;
+                }
+            }
+
+            return [];
+        });
+
+        $media->dehydrateStateUsing(function (?array $state) {
+            return array_values($state ?? []) ?: null;
+        });
+
+        $media->getUploadedFileUrlUsing(function ($file) {
+
+            if ( ! is_null($file)) {
+                $media = Media::where('uuid', $file)->first();
+                if ($media) {
+                    return $media->getUrl();
+                }
+            }
+
+            return [];
+
+        });
+
+        if ( ! empty($mediaFieldData->accept)) {
+            $media->acceptedFileTypes($mediaFieldData->accept);
+        }
+
+        if ($mediaFieldData->min_size) {
+            $media->minSize($mediaFieldData->min_size);
+        }
+
+        if ($mediaFieldData->max_size) {
+            $media->maxSize($mediaFieldData->max_size);
+        }
+
+        return $media;
     }
 
     private function makeTextAreaComponent(TextareaFieldData $textareaFieldData): Textarea

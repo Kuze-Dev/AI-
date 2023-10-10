@@ -9,6 +9,7 @@
 .env
 .env.backup
 .env.production
+.env.testing
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
@@ -29,3 +30,4 @@ docker-compose.override.yml
 error.log
 output.txt
 Thumbs.db
+.env.ecommerce-branch

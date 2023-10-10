@@ -16,10 +16,12 @@ class UpdateFormEmailNotificationAction
                 'to' => $formEmailNotificationData->to,
                 'cc' => $formEmailNotificationData->cc,
                 'bcc' => $formEmailNotificationData->bcc,
+                'sender' => $formEmailNotificationData->sender,
                 'sender_name' => $formEmailNotificationData->sender_name,
                 'reply_to' => $formEmailNotificationData->reply_to,
                 'subject' => $formEmailNotificationData->subject,
                 'template' => $formEmailNotificationData->template,
+                'has_attachments' => $formEmailNotificationData->has_attachments,
             ]
         );
 

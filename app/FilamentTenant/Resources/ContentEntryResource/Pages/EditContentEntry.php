@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ContentEntryResource\Pages;
 
+use App\Filament\Livewire\Actions\CustomPageActionGroup;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Filament\Resources\Pages\EditRecord;
@@ -12,13 +13,29 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use App\FilamentTenant\Resources\ContentEntryResource;
 use App\FilamentTenant\Resources\ContentResource;
+use Domain\Content\Actions\CreateContentEntryDraftAction;
+use Domain\Content\Actions\PublishedContentEntryDraftAction;
 use Domain\Content\Actions\UpdateContentEntryAction;
+use Filament\Notifications\Notification;
 use Domain\Content\Models\Content;
+use App\Settings\CMSSettings;
+use App\Settings\SiteSettings;
 use Filament\Pages\Actions;
+use Domain\Site\Models\Site;
 use Filament\Pages\Actions\Action;
+use Domain\Content\Models\ContentEntry;
+use Filament\Forms\Components\Radio;
 use Filament\Pages\Actions\DeleteAction;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
+use Livewire\Redirector;
+use Closure;
 
-/** @method class-string<\Illuminate\Database\Eloquent\Model> getModel() */
+/** @method class-string<\Illuminate\Database\Eloquent\Model> getModel()
+ *
+ * @property \Domain\Content\Models\ContentEntry $record
+ */
 class EditContentEntry extends EditRecord
 {
     use LogsFormActivity;
@@ -63,17 +80,213 @@ class EditContentEntry extends EditRecord
     protected function getActions(): array
     {
         return [
-            Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
-                ->action('save')
-                ->keyBindings(['mod+s']),
+            'content_entries_group_actions' => CustomPageActionGroup::make([
+                Action::make('published')
+                    ->label(__('Published Draft'))
+                    ->action('published')
+                    ->hidden(function () {
+                        return $this->record->draftable_id == null ? true : false;
+                    }),
+                Action::make('draft')
+                    ->label(__('Save As Draft'))
+                    ->action('draft')
+                    ->hidden(function () {
+
+                        if($this->record->draftable_id != null) {
+                            return true;
+                        }
+
+                        return ($this->record->draftable_id == null && $this->record->pageDraft) ? true : false;
+                    }),
+                Action::make('overwriteDraft')
+                    ->label(__('Save As Draft'))
+                    ->action('overwriteDraft')
+                    ->requiresConfirmation()
+                    ->modalHeading('Draft for this content already exists')
+                    ->modalSubheading('You have an existing draft for this content. Do you want to overwrite the existing draft?')
+                    ->modalCancelAction(function () {
+                        return Action::makeModalAction('redirect')
+                            ->label(__('Edit Existing Draft'))
+                            ->color('secondary')
+                            ->url(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $this->record->pageDraft]));
+                    })
+                    ->hidden(function () {
+
+                        return ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true;
+                    }),
+                Action::make('save')
+                    ->label(__('Save and Continue Editing'))
+                    ->action('save')
+                    ->keyBindings(['mod+s']),
+            ])
+                ->view('filament.pages.actions.custom-action-group.index')
+                ->setName('page_draft_actions')
+                ->label(__('filament::resources/pages/edit-record.form.actions.save.label')),
+            // Action::make('save')
+            //     ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+            //     ->action('save')
+            //     ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
+            'other_page_actions' => CustomPageActionGroup::make([
+                Action::make('preview')
+                    ->color('secondary')
+                    ->hidden((bool) tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                    ->label(__('Preview Page'))
+                    ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
+                        $domain = $siteSettings->front_end_domain ?? $cmsSettings->front_end_domain;
+
+                        if ( ! $domain) {
+                            return null;
+                        }
+
+                        $queryString = Str::after(URL::temporarySignedRoute('tenant.api.contents.entries.show', now()->addMinutes(15), [$this->ownerRecord, $this->record], false), '?');
+
+                        return "https://{$domain}/preview?contents={$this->ownerRecord->slug}&slug={$this->record->slug}&{$queryString}";
+                    }, true),
+                Action::make('preview_microsite_action')
+                    ->label('Preview Microsite')
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class))
+                    ->color('secondary')
+                    ->record($this->getRecord())
+                    ->modalHeading('Preview Microsite')
+                    ->slideOver(true)
+                    ->action(function (ContentEntry $record, Action $action, array $data): void {
+
+                        /** @var Site */
+                        $site = Site::find($data['preview_microsite']);
+
+                        if ($site->domain == null) {
+
+                            Notification::make()
+                                ->danger()
+                                ->title(trans('No Domain Set'))
+                                ->body(trans('Please set a domain for :value to preview.', ['value' => $site->name]))
+                                ->send();
+                        }
+                    })
+                    ->form([
+                        Radio::make('preview_microsite')
+                            ->required()
+                            ->options(function () {
+
+                                /** @var ContentEntry */
+                                $site = $this->getRecord();
+
+                                return $site->sites()->orderby('name')->pluck('name', 'id')->toArray();
+                            })
+                            ->descriptions(function () {
+
+                                /** @var ContentEntry */
+                                $site = $this->getRecord();
+
+                                return $site->sites()->orderby('name')->pluck('domain', 'id')->toArray();
+                            })
+                            ->reactive()
+                            ->afterStateUpdated(function (Closure $set, $state, $livewire) {
+
+                                /** @var Site */
+                                $site = Site::find($state);
+
+                                $domain = $site->domain;
+
+                                /** @var CustomPageActionGroup */
+                                $other_page_actions = $livewire->getCachedActions()['other_page_actions'];
+
+                                $modelAction = $other_page_actions->getActions()['preview_microsite_action'];
+
+                                $modelAction->modalSubmitAction(function () use ($domain) {
+
+                                    $queryString = Str::after(URL::temporarySignedRoute('tenant.api.contents.entries.show', now()->addMinutes(15), [$this->ownerRecord, $this->record], false), '?');
+
+                                    return Action::makeModalAction('preview')->url("https://{$domain}/preview?contents={$this->ownerRecord->slug}&slug={$this->record->slug}&{$queryString}", true);
+                                });
+
+                                $set('domain', $domain);
+                            }),
+
+                    ]),
+
+            ])->view('filament.pages.actions.custom-action-group.index')
+                ->setName('other_page_draft')
+                ->color('secondary')
+                ->label(trans('More Actions')),
         ];
     }
 
     protected function getFormActions(): array
     {
         return $this->getCachedActions();
+    }
+
+    public function draft(): RedirectResponse|Redirector|false
+    {
+        $data = $this->form->getState();
+
+        $record = $this->record;
+
+        $pageData = ContentEntryData::fromArray($data);
+
+        #check if page has existing draft
+
+        if( ! is_null($record->pageDraft)) {
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Has Draft'))
+                ->body(trans('Page :title has a existing draft', ['title' => $record->title]))
+                ->send();
+
+            return false;
+        }
+
+        $draftpage = app(CreateContentEntryDraftAction::class)->execute($record, $pageData);
+
+        return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $draftpage]));
+    }
+
+    public function overwriteDraft(): RedirectResponse|Redirector
+    {
+        $data = $this->form->getState();
+
+        $record = $this->record;
+
+        $record->pageDraft?->delete();
+
+        $pageData = ContentEntryData::fromArray($data);
+
+        $draftpage = app(CreateContentEntryDraftAction::class)->execute($record, $pageData);
+
+        Notification::make()
+            ->success()
+            ->title(trans('Overwritten Draft'))
+            ->body(trans('Content Entry Draft has been overwritten'))
+            ->send();
+
+        return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $draftpage]));
+    }
+
+    public function published(): RedirectResponse|Redirector
+    {
+        $data = $this->form->getState();
+
+        $pageDraft = $this->record;
+
+        /** @var \Domain\Content\Models\ContentEntry */
+        $parentPage = $pageDraft->parentPage;
+
+        $data['published_draft'] = true;
+
+        $contentEntryData = ContentEntryData::fromArray($data);
+
+        $contentEntry = DB::transaction(
+            fn () => app(PublishedContentEntryDraftAction::class)->execute(
+                $parentPage,
+                $pageDraft,
+                $contentEntryData
+            )
+        );
+
+        return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $contentEntry]));
     }
 
     protected function configureDeleteAction(DeleteAction $action): void

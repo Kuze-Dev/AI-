@@ -17,6 +17,7 @@ use Filament\Tables;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Content\Actions\DeleteContentAction;
+use Domain\Site\Models\Site;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Database\Eloquent\Builder;
@@ -138,6 +139,51 @@ class ContentResource extends Resource
                             ->helperText(trans('Grants option for ordering of content entries'))
                             ->reactive(),
                     ]),
+
+                    Forms\Components\Card::make([
+                        Forms\Components\CheckboxList::make('sites')
+                            ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                            ->rules([
+                                function (?Content $record, Closure $get) {
+
+                                    return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+
+                                        $siteIDs = $value;
+
+                                        if ($record) {
+                                            $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
+
+                                            $content = Content::where('name', $get('name'))
+                                                ->where('id', '!=', $record->id)
+                                                ->whereHas(
+                                                    'sites',
+                                                    fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                                )->count();
+
+                                        } else {
+
+                                            $content = Content::where('name', $get('name'))->whereHas(
+                                                'sites',
+                                                fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                            )->count();
+                                        }
+
+                                        if ($content > 0) {
+                                            $fail("Content {$get('name')} is already available in selected sites.");
+                                        }
+
+                                    };
+                                },
+                            ])
+                            ->options(
+                                fn () => Site::orderBy('name')
+                                    ->pluck('name', 'id')
+                                    ->toArray()
+                            )
+                            ->formatStateUsing(fn (?Content $record) => $record ? $record->sites->pluck('id')->toArray() : []),
+
+                    ])
+                        ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
                 ]),
             ]);
     }
@@ -150,11 +196,16 @@ class ContentResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
+                Tables\Columns\TagsColumn::make('sites.name')
+                    ->toggleable(isToggledHiddenByDefault:true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('sites')
+                    ->multiple()
+                    ->relationship('sites', 'name'),
                 Tables\Filters\SelectFilter::make('blueprint')
                     ->relationship('blueprint', 'name')
                     ->searchable()
@@ -190,6 +241,26 @@ class ContentResource extends Resource
         return [
             ActivitiesRelationManager::class,
         ];
+    }
+
+    /** @return Builder<\Domain\Content\Models\Content> */
+    public static function getEloquentQuery(): Builder
+    {
+        if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+            return static::getModel()::query();
+        }
+
+        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+            Auth::user()?->can('site.siteManager') &&
+            ! (Auth::user()->hasRole(config('domain.role.super_admin')))
+        ) {
+            return static::getModel()::query()->wherehas('sites', function ($q) {
+                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
+            });
+        }
+
+        return static::getModel()::query();
+
     }
 
     /** @return array */

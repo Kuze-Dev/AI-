@@ -3,7 +3,12 @@
 declare(strict_types=1);
 
 use App\Features\CMS\CMSBase;
+use App\Features\Customer\AddressBase;
+use App\Features\Customer\CustomerBase;
+use App\Features\Customer\TierBase;
 use App\Features\ECommerce\ECommerceBase;
+use Database\Seeders\Tenant\Auth\PermissionSeeder;
+use Database\Seeders\Tenant\Auth\RoleSeeder;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
 use Domain\Tenant\Database\Factories\TenantFactory;
@@ -16,6 +21,7 @@ use Spatie\Activitylog\ActivitylogServiceProvider;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\seed;
 
 function loginAsSuperAdmin(Admin $admin = null): Admin
 {
@@ -72,10 +78,18 @@ function testInTenantContext(): Tenant
 
     $tenant->features()->activate(CMSBase::class);
     $tenant->features()->activate(ECommerceBase::class);
+    $tenant->features()->activate(CustomerBase::class);
+    $tenant->features()->activate(TierBase::class);
+    $tenant->features()->activate(AddressBase::class);
 
     URL::forceRootUrl(Request::getScheme() . '://' . $domain);
 
     tenancy()->initialize($tenant);
+
+    seed([
+        PermissionSeeder::class,
+        RoleSeeder::class,
+    ]);
 
     return $tenant;
 }

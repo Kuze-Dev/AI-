@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 use App\FilamentTenant\Resources\FormResource\Pages\CreateForm;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Form\Database\Factories\FormFactory;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
+use Domain\Internationalization\Database\Factories\LocaleFactory;
+use Domain\Site\Database\Factories\SiteFactory;
 use Support\Captcha\CaptchaProvider;
 use Filament\Facades\Filament;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 
+use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -17,6 +21,7 @@ beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
+    LocaleFactory::createDefault();
 });
 
 it('can render page', function () {
@@ -39,10 +44,12 @@ it('can create form', function () {
                     'to' => ['test@user'],
                     'cc' => ['test@user'],
                     'bcc' => ['test@user'],
+                    'sender' => 'test@user',
                     'sender_name' => 'test user',
                     'reply_to' => ['test@user'],
                     'subject' => 'Test Subject',
                     'template' => 'Some test template',
+                    'has_attachments' => false,
                 ],
             ],
         ])
@@ -58,11 +65,65 @@ it('can create form', function () {
         'to' => ['test@user'],
         'cc' => ['test@user'],
         'bcc' => ['test@user'],
+        'sender' => 'test@user',
         'sender_name' => 'test user',
         'reply_to' => ['test@user'],
         'subject' => 'Test Subject',
         'template' => 'Some test template',
+        'has_attachments' => false,
     ]);
+});
+
+it('can create form with same name', function () {
+
+    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+
+    $form = FormFactory::new()
+        ->withDummyBlueprint()
+        ->storeSubmission()
+        ->createOne();
+
+    SiteFactory::new()->count(2)->create();
+
+    $form->sites()->sync([1]);
+
+    livewire(CreateForm::class)
+        ->fillForm([
+            'name' => $form->name,
+            'blueprint_id' => $form->blueprint_id,
+            'sites' => [2],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk();
+
+    assertDatabaseCount(Form::class, 2);
+
+});
+
+it('cannot create form with same name in same microsite', function () {
+
+    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+
+    $form = FormFactory::new()
+        ->withDummyBlueprint()
+        ->storeSubmission()
+        ->createOne();
+
+    SiteFactory::new()->create();
+
+    $form->sites()->sync([1]);
+
+    livewire(CreateForm::class)
+        ->fillForm([
+            'name' => $form->name,
+            'blueprint_id' => $form->blueprint_id,
+            'sites' => [1],
+        ])
+        ->call('create');
+
+    assertDatabaseCount(Form::class, 1);
+
 });
 
 it('can\'t toggle uses captcha if not set up', function () {

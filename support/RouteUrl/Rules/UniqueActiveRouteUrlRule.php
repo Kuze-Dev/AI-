@@ -36,9 +36,27 @@ class UniqueActiveRouteUrlRule implements ValidationRule
             );
 
         if ($this->ignoreModel) {
+
+            if ($this->ignoreModel->parentPage) {
+
+                $ignoreModelIds = [
+                    $this->ignoreModel->getKey(),
+                    $this->ignoreModel->parentPage->getKey(),
+                ];
+
+            } else {
+
+                $ignoreModelIds = [
+                    $this->ignoreModel->getKey(),
+                    $this->ignoreModel->pageDraft?->getKey() ?: null,
+                ];
+
+            }
+
             $query->whereNot(fn (EloquentBuilder $query) => $query
                 ->where('model_type',  $this->ignoreModel->getMorphClass())
-                ->where('model_id',  $this->ignoreModel->getKey()));
+                ->whereIn('model_id', array_filter($ignoreModelIds)));
+
         }
 
         if ($query->exists()) {

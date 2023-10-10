@@ -26,9 +26,27 @@ class RouteUrlController
     ]
     public function __invoke(string $url = ''): JsonApiResource
     {
-        $routeUrl = RouteUrl::whereUrl(Str::start($url, '/'))
-            ->with('model')
-            ->firstOrFail();
+        $queryRouteUrl = RouteUrl::whereUrl(Str::start($url, '/'))
+            ->with('model');
+
+        if(
+            tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+            request('site')
+        ) {
+
+            $siteId = request('site');
+
+            $queryRouteUrl->whereHas('model', function ($query) use ($siteId) {
+                return $query->whereHas('sites', fn ($q) => $q->where('site_id', $siteId));
+            });
+
+        }
+
+        $queryRouteUrl->whereHas('model', function ($query) {
+            return $query->where('draftable_id', null);
+        });
+
+        $routeUrl = $queryRouteUrl->firstOrFail();
 
         return match ($routeUrl->model::class) {
             Page::class => PageResource::make($routeUrl->model),

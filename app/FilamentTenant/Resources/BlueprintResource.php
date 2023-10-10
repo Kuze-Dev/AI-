@@ -12,6 +12,7 @@ use Domain\Blueprint\Actions\DeleteBlueprintAction;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\SectionData;
 use Domain\Blueprint\Enums\FieldType;
+use Domain\Blueprint\Enums\ManipulationType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
 use Domain\Blueprint\Models\Blueprint;
@@ -28,6 +29,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\HtmlString;
+use ErrorException;
 
 class BlueprintResource extends Resource
 {
@@ -238,6 +240,7 @@ class BlueprintResource extends Resource
                 Forms\Components\Toggle::make('multiple')
                     ->reactive(),
                 Forms\Components\Toggle::make('reorder'),
+                Forms\Components\Toggle::make('can_download'),
                 Forms\Components\TextInput::make('accept')
                     ->afterStateHydrated(function (Closure $set, ?array $state): void {
                         $set('accept', implode(',', $state ?? []));
@@ -315,6 +318,21 @@ class BlueprintResource extends Resource
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
                     ->when(fn (Closure $get) => $get('multiple') === true),
+                Forms\Components\Repeater::make('options')
+                    ->collapsible()
+                    ->orderable()
+                    ->itemLabel(fn (array $state) => $state['title'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('value'),
+                        Forms\Components\TextInput::make('label'),
+                    ]),
+            ],
+            FieldType::CHECKBOX => [
+                Forms\Components\Toggle::make('bulk_toggleable')
+                    ->reactive()
+                    ->columnSpanFull(),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
                     ->orderable()
@@ -447,6 +465,107 @@ class BlueprintResource extends Resource
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 self::getFieldsSchema()
                     ->columnSpanFull(),
+            ],
+            FieldType::MEDIA => [
+                Forms\Components\Toggle::make('multiple')
+                    ->reactive(),
+                Forms\Components\Toggle::make('reorder'),
+                Forms\Components\TextInput::make('accept')
+                    ->afterStateHydrated(function (Closure $set, ?array $state): void {
+                        $set('accept', implode(',', $state ?? []));
+                    })
+                    ->dehydrateStateUsing(function (string|null $state): array {
+                        if ($state === null) {
+                            return [];
+                        }
+
+                        return Str::contains($state, ',')
+                            ? Str::of($state)->split('/\,/')
+                                ->map(fn (string $rule) => trim($rule))
+                                ->toArray()
+                            : [$state];
+                    })
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('min_size')
+                    ->helperText(new HtmlString(<<<HTML
+                         in kb
+                        HTML))
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('max_size')
+                    ->helperText(new HtmlString(<<<HTML
+                         in kb
+                        HTML))
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('min_files')
+                    ->numeric()
+                    ->integer()
+                    ->when(fn (Closure $get) => $get('multiple') === true)
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('max_files')
+                    ->numeric()
+                    ->integer()
+                    ->when(fn (Closure $get) => $get('multiple') === true)
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\Repeater::make('conversions')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')->required(),
+                        Forms\Components\Fieldset::make('Manipulations')
+                            ->statePath('manipulations')
+                            ->schema(
+                                function (?Blueprint $record, $state) {
+
+                                    $stateData = fn (ManipulationType $type) => $state[$type->value]['params'][0] ?? null;
+
+                                    return collect(ManipulationType::cases())
+                                        ->map(fn (ManipulationType $manipulationType) => match ($manipulationType) {
+                                            ManipulationType::WIDTH, ManipulationType::HEIGHT => Forms\Components\TextInput::make(
+                                                $manipulationType->value
+                                            )
+                                                ->translateLabel()
+                                                ->numeric()
+                                                ->minValue(0)
+                                                ->required()
+                                                ->formatStateUsing(fn () => $stateData($manipulationType)),
+                                            /** @phpstan-ignore-next-line */
+                                            default => throw new ErrorException(
+                                                ManipulationType::class.'::'.Str::upper($manipulationType->value) . ' field not setup for conversion manipulation.'
+                                            )
+                                        })
+                                        ->toArray();
+                                }
+                            )
+                            ->columns(2),
+                    ])
+                    ->columnSpanFull(),
+
+            ],
+            FieldType::RADIO => [
+                Forms\Components\Toggle::make('inline')
+                    ->columnSpanFull(),
+                Forms\Components\Repeater::make('options')
+                    ->collapsible()
+                    ->orderable()
+                    ->itemLabel(fn (array $state) => $state['title'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('value'),
+                        Forms\Components\TextInput::make('label'),
+                    ]),
+                Forms\Components\Repeater::make('descriptions')
+                    ->collapsible()
+                    ->orderable()
+                    ->itemLabel(fn (array $state) => $state['title'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('value'),
+                        Forms\Components\TextInput::make('description'),
+                    ]),
             ],
             default => [],
         };

@@ -35,7 +35,7 @@ use Eloquent;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Node> $children
  * @property-read int|null $children_count
  * @property-read \Domain\Menu\Models\Menu|null $menu
- * @property-read Model|Eloquent $model
+ * @property-read Model|Eloquent|null $model
  * @method static Builder|Node newModelQuery()
  * @method static Builder|Node newQuery()
  * @method static Builder|Node ordered(string $direction = 'asc')
@@ -52,7 +52,7 @@ use Eloquent;
  * @method static Builder|Node whereType($value)
  * @method static Builder|Node whereUpdatedAt($value)
  * @method static Builder|Node whereUrl($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 #[OnDeleteCascade(['children'])]
 class Node extends Model implements Sortable

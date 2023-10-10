@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-use Domain\Page\Database\Factories\PageFactory;
-use Domain\Page\Database\Factories\BlockFactory;
-use Support\RouteUrl\Database\Factories\RouteUrlFactory;
-use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Testing\Fluent\AssertableJson;
+use Domain\Page\Database\Factories\PageFactory;
+use Domain\Site\Database\Factories\SiteFactory;
+use Domain\Page\Database\Factories\BlockFactory;
+
+use Support\RouteUrl\Database\Factories\RouteUrlFactory;
 
 use function Pest\Laravel\getJson;
 
@@ -26,7 +28,7 @@ it('can list pages', function () {
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json
-                ->count('data', 11)
+                ->count('data', 10)
                 ->where('data.0.type', 'pages')
                 ->whereType('data.0.attributes.name', 'string')
                 ->etc();
@@ -39,9 +41,9 @@ it('can filter pages', function ($attribute) {
         ->published()
         ->count(2)
         ->sequence(
-            ['name' => 'Foo', 'visibility' => 'authenticated'],
-            ['name' => 'Bar', 'visibility' => 'guest'],
-            ['name' => 'Example', 'visibility' => 'public']
+            ['name' => 'Foo', 'visibility' => 'authenticated', 'locale' => 'jp'],
+            ['name' => 'Bar', 'visibility' => 'guest', 'locale' => 'fr'],
+            ['name' => 'Example', 'visibility' => 'public', 'locale' => 'de']
         )
         ->create();
 
@@ -57,7 +59,7 @@ it('can filter pages', function ($attribute) {
                     ->etc();
             });
     }
-})->with(['name', 'slug', 'visibility']);
+})->with(['name', 'slug', 'visibility', 'locale']);
 
 it('can show a page with includes', function (string $include) {
     $page = PageFactory::new()
@@ -113,6 +115,27 @@ it('can show an unpublished page with valid signature', function () {
             $json
                 ->where('data.type', 'pages')
                 ->where('data.id', Str::slug($page->name))
+                ->etc();
+        });
+});
+
+it('can list pages of specific site', function () {
+    $site = SiteFactory::new()->createOne();
+    PageFactory::new()
+        ->published()
+        ->hasAttached($site)
+        ->count(1)
+        ->create();
+    PageFactory::new()
+        ->published()
+        ->count(2)
+        ->create();
+
+    getJson("api/pages?filter[sites.id]={$site->id}")
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) {
+            $json
+                ->count('data', 1)
                 ->etc();
         });
 });

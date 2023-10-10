@@ -104,15 +104,39 @@ class TenantResource extends Resource
                             ->options([
                                 Features\CMS\CMSBase::class => [
                                     'label' => trans('CMS'),
-                                    'extras' => [],
+                                    'extras' => [
+                                        Features\CMS\Internationalization::class => app(Features\CMS\Internationalization::class)->label,
+                                        Features\CMS\SitesManagement::class => app(Features\CMS\SitesManagement::class)->label,
+                                    ],
                                 ],
                                 Features\ECommerce\ECommerceBase::class => [
                                     'label' => trans('eCommerce'),
-                                    'extras' => [],
+                                    'extras' => [
+                                        'Payments' => [
+                                            Features\ECommerce\PaypalGateway::class => app(Features\ECommerce\PaypalGateway::class)->label,
+                                            Features\ECommerce\StripeGateway::class => app(Features\ECommerce\StripeGateway::class)->label,
+                                            Features\ECommerce\OfflineGateway::class => app(Features\ECommerce\OfflineGateway::class)->label,
+                                            Features\ECommerce\BankTransfer::class => app(Features\ECommerce\BankTransfer::class)->label,
+                                        ],
+                                        'shipping' => [
+                                            Features\ECommerce\ShippingStorePickup::class => app(Features\ECommerce\ShippingStorePickup::class)->label,
+                                            Features\ECommerce\ShippingUsps::class => app(Features\ECommerce\ShippingUsps::class)->label,
+                                            Features\ECommerce\ShippingUps::class => app(Features\ECommerce\ShippingUps::class)->label,
+                                            Features\ECommerce\ShippingAusPost::class => app(Features\ECommerce\ShippingAusPost::class)->label,
+                                        ],
+                                        Features\ECommerce\RewardPoints::class => app(Features\ECommerce\RewardPoints::class)->label,
+                                    ],
+                                ],
+                                Features\Customer\CustomerBase::class => [
+                                    'label' => trans('Customer'),
+                                    'extras' => [
+                                        Features\Customer\TierBase::class => app(Features\Customer\TierBase::class)->label,
+                                        Features\Customer\AddressBase::class => app(Features\Customer\AddressBase::class)->label,
+                                    ],
                                 ],
                             ]),
                     ]),
-            ]);
+            ])->columns(2);
     }
 
     public static function table(Table $table): Table
@@ -122,6 +146,7 @@ class TenantResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TagsColumn::make('domains.domain'),
+                Tables\Columns\TextColumn::make('total_api_request'),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),

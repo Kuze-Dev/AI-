@@ -17,12 +17,14 @@ class SendImportFailedNotification
     ) {
     }
 
-    public function handle(ImportFailed $event): void
+    public function __invoke(ImportFailed $event): void
     {
         if ($event->getException() instanceof ValidationException) {
+            $errors = array_values($event->getException()->errors());
+
             Notification::send(
                 $this->notifiable,
-                new ImportFailedNotification($event->getException()->errors()[0][0])
+                new ImportFailedNotification($errors[0][0])
             );
         }
     }
