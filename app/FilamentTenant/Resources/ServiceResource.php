@@ -69,11 +69,11 @@ class ServiceResource extends Resource
                                 ->label(trans('Service Category'))
                                 ->options(
                                     $categories->sortBy('name')
-                                        ->mapWithKeys(fn($categories) => [$categories->id => $categories->name])
+                                        ->mapWithKeys(fn ($categories) => [$categories->id => $categories->name])
                                         ->toArray()
                                 )
                                 ->formatStateUsing(
-                                    fn(?Service $record) => $record?->taxonomyTerms->first()->id ?? null
+                                    fn (?Service $record) => $record?->taxonomyTerms->first()->id ?? null
                                 )
                                 ->statePath('taxonomy_term_id')
                                 ->required(),
@@ -89,7 +89,7 @@ class ServiceResource extends Resource
                                 Forms\Components\Toggle::make('pay_upfront'),
                                 Forms\Components\TextInput::make('retail_price')
                                     ->translateLabel()
-                                    ->mask(fn(Forms\Components\TextInput\Mask $mask) => $mask->money(
+                                    ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
                                         prefix: $defaultCurrency,
                                         thousandsSeparator: ',',
                                         decimalPlaces: 2,
@@ -105,12 +105,12 @@ class ServiceResource extends Resource
                                             };
                                         },
                                     ])
-                                    ->dehydrateStateUsing(fn($state) => (float)$state)
+                                    ->dehydrateStateUsing(fn ($state) => (float) $state)
                                     ->required(),
                                 Forms\Components\TextInput::make('selling_price')
                                     ->translateLabel()
                                     // Put custom rule to validate minimum value
-                                    ->mask(fn(Forms\Components\TextInput\Mask $mask) => $mask->money(
+                                    ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
                                         prefix: $defaultCurrency,
                                         thousandsSeparator: ',',
                                         decimalPlaces: 2,
@@ -126,7 +126,7 @@ class ServiceResource extends Resource
                                             };
                                         },
                                     ])
-                                    ->dehydrateStateUsing(fn($state) => (float)$state)
+                                    ->dehydrateStateUsing(fn ($state) => (float) $state)
                                     ->required(),
                             ]),
                         Forms\Components\Section::make('Section Display')
@@ -145,12 +145,12 @@ class ServiceResource extends Resource
                                     ->required()
                                     ->preload()
                                     ->optionsFromModel(Blueprint::class, 'name')
-                                    ->disabled(fn(?Service $record) => $record !== null)
+                                    ->disabled(fn (?Service $record) => $record !== null)
                                     ->reactive(),
-                                SchemaFormBuilder::make('data', fn(?Service $record) => $record?->blueprint->schema)
-                                    ->schemaData(fn(Closure $get) => Blueprint::query()
+                                SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)
+                                    ->schemaData(fn (Closure $get) => Blueprint::query()
                                         ->firstWhere('id', $get('blueprint_id'))?->schema)
-                                    ->hidden(fn(Closure $get) => $get('blueprint_id') === null)
+                                    ->hidden(fn (Closure $get) => $get('blueprint_id') === null)
                                     ->dehydrated(false)
                                     ->disabled(),
                             ])
@@ -162,7 +162,7 @@ class ServiceResource extends Resource
                         ->schema([
                             Forms\Components\Toggle::make('status')
                                 ->label(
-                                    fn($state) => $state ? ucfirst(trans(Status::ACTIVE->value))
+                                    fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value))
                                         : ucfirst(trans(Status::INACTIVE->value))
                                 ),
                             Forms\Components\Toggle::make('is_subscription')
@@ -179,7 +179,7 @@ class ServiceResource extends Resource
 
                                         return $billing;
                                     })
-                                    ->required(fn(Closure $get) => $get('is_subscription') === true),
+                                    ->required(fn (Closure $get) => $get('is_subscription') === true),
                                 Forms\Components\Select::make('due_date_every')
                                     ->reactive()
                                     ->options(function () {
@@ -190,11 +190,11 @@ class ServiceResource extends Resource
 
                                         return $days;
                                     })
-                                    ->disabled(fn(Closure $get) => $get('billing_cycle') === false)
-                                    ->required(fn(Closure $get) => $get('is_subscription') === true),
+                                    ->disabled(fn (Closure $get) => $get('billing_cycle') === false)
+                                    ->required(fn (Closure $get) => $get('is_subscription') === true),
                             ])
                                 ->reactive()
-                                ->hidden(fn(Closure $get) => $get('is_subscription') === false),
+                                ->hidden(fn (Closure $get) => $get('is_subscription') === false),
                         ]),
                     MetaDataForm::make('Meta Data'),
                 ])->columnSpan(1),
@@ -209,7 +209,7 @@ class ServiceResource extends Resource
                 SpatieMediaLibraryImageColumn::make('image')
                     ->collection('image')
                     ->default(
-                        fn(Service $record) => $record->getFirstMedia('image') === null
+                        fn (Service $record) => $record->getFirstMedia('image') === null
                             ? 'https://via.placeholder.com/500x300/333333/fff?text=No+preview+available'
                             : null
                     )
@@ -238,10 +238,10 @@ class ServiceResource extends Resource
                     ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->translateLabel()
-                    ->formatStateUsing(fn($state) => $state
+                    ->formatStateUsing(fn ($state) => $state
                         ? ucfirst(STATUS::ACTIVE->value)
                         : ucfirst(STATUS::INACTIVE->value))
-                    ->color(fn(Service $record) => $record->status ? 'success' : 'secondary')
+                    ->color(fn (Service $record) => $record->status ? 'success' : 'secondary')
                     ->sortable(),
             ])
             ->filters([
@@ -253,8 +253,8 @@ class ServiceResource extends Resource
                             $query->when(filled($data['value']), function (Builder $query) use ($data) {
                                 /** @var Service|Builder $query */
                                 match ($data['value']) {
-                                    '1' => $query->whereStatus( true),
-                                    '0' => $query->whereStatus( false),
+                                    '1' => $query->whereStatus(true),
+                                    '0' => $query->whereStatus(false),
                                     default => '',
                                 };
                             });

@@ -22,7 +22,7 @@ class ServiceController
     public function index(): JsonApiResourceCollection
     {
         return ServiceResource::collection(
-            QueryBuilder::for(Service::query()->latest())
+            QueryBuilder::for(Service::query()->whereStatus(true))
                 ->allowedFilters([
                     'name',
                     'selling_price',
@@ -30,6 +30,7 @@ class ServiceController
                     'is_subscription',
                     'is_special_offer',
                     'is_featured',
+                    'pay_upfront',
                     'status',
                     AllowedInclude::relationship('taxonomyTerms'),
                 ])
@@ -45,7 +46,7 @@ class ServiceController
     public function show(string $service): ServiceResource
     {
         return ServiceResource::make(
-            QueryBuilder::for(Service::whereId($service))
+            QueryBuilder::for(Service::whereId($service)->whereStatus(true))
                 ->allowedIncludes([
                     'taxonomyTerms',
                     'media',

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 use App\Features\Service\ServiceBase;
 use App\FilamentTenant\Resources\ServiceResource\Pages\CreateService;
-use Database\Seeders\Tenant\Auth\PermissionSeeder;
-use Database\Seeders\Tenant\Auth\RoleSeeder;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Currency\Database\Factories\CurrencyFactory;
 use Domain\Service\Databases\Factories\ServiceFactory;
@@ -14,35 +12,19 @@ use Domain\Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Models\TaxonomyTerm;
-use Domain\Tenant\Database\Factories\TenantFactory;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\seed;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    $tenant = TenantFactory::new()->createOne(['name' => 'testing']);
-
-    $domain = 'test.' . parse_url(config('app.url'), PHP_URL_HOST);
-
-    $tenant->createDomain(['domain' => $domain]);
-
-    $tenant->features()->activate(ServiceBase::class);
-
-    URL::forceRootUrl(Request::getScheme() . '://' . $domain);
-
-    tenancy()->initialize($tenant);
-
-    seed([
-        PermissionSeeder::class,
-        RoleSeeder::class,
-    ]);
-
+    testInTenantContext();
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
+
+    tenancy()->tenant->features()->activate(ServiceBase::class);
     CurrencyFactory::new()->createOne([
         'enabled' => true,
     ]);
@@ -105,7 +87,6 @@ it('can create service', function () {
     assertDatabaseHas(TaxonomyTerm::class, [
         'name' => 'category',
     ]);
-
 
     assertDatabaseHas(
         MetaData::class,
