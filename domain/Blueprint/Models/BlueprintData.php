@@ -119,6 +119,7 @@ class BlueprintData extends Model implements HasMedia
                     $title = $conversion->name;
                     $width = null;
                     $height = null;
+                    $type = null;
                     if (isset($conversion->manipulations)) {
                         foreach($conversion->manipulations as $manipulation) {
                             if($manipulation->type == ManipulationType::WIDTH) {
@@ -127,12 +128,25 @@ class BlueprintData extends Model implements HasMedia
                             if($manipulation->type == ManipulationType::HEIGHT) {
                                 $height = $manipulation->params[0];
                             }
+                            if($manipulation->type == ManipulationType::TYPE) {
+                                if( ! empty($manipulation->params[0])) {
+                                    $type = $manipulation->params[0];
+                                }
+                            }
                         }
-                        /** @phpstan-ignore-next-line */
-                        $this->addMediaConversion($title)
-                            ->width($width)
-                            ->height($height)
-                            ->keepOriginalImageFormat();
+
+                        if($type) {
+                            $this->addMediaConversion($title)
+                                ->width($width)
+                                ->height($height)
+                                ->format($type);
+                        } else {
+                            /** @phpstan-ignore-next-line */
+                            $this->addMediaConversion($title)
+                                ->width($width)
+                                ->height($height)
+                                ->keepOriginalImageFormat();
+                        }
                     }
                 }
             }
