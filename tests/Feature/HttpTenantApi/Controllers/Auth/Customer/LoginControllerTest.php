@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\Customer\CustomerBase;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -13,7 +14,8 @@ use function PHPUnit\Framework\assertCount;
 uses()->group('customer');
 
 beforeEach(function () {
-    testInTenantContext();
+    $tenant = testInTenantContext();
+    $tenant->features()->activate(CustomerBase::class);
 });
 
 it('can generate token', function () {
