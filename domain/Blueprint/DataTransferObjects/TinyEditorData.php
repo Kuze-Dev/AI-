@@ -17,8 +17,6 @@ class TinyEditorData extends FieldData
         public readonly array $rules = [],
         public readonly ?int $min_length = null,
         public readonly ?int $max_length = null,
-        public readonly ?int $rows = null,
-        public readonly ?int $cols = null,
         public readonly ?string $helper_text = null,
     ) {
     }
@@ -35,8 +33,6 @@ class TinyEditorData extends FieldData
             rules: $data['rules'] ?? [],
             min_length: $data['min_length'] ?? null,
             max_length: $data['max_length'] ?? null,
-            rows: $data['rows'] ?? null,
-            cols: $data['cols'] ?? null,
             helper_text: $data['helper_text'] ?? null,
         );
     }

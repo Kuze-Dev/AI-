@@ -127,7 +127,7 @@ class SchemaFormBuilder extends Component
             RelatedResourceFieldData::class => $this->makeRelatedResourceComponent($field),
             MediaFieldData::class => $this->makeMediaComponent($field),
             TinyEditorData::class => $this->makeTinyEditorComponent($field),
-            
+
             default => throw new InvalidArgumentException('Cannot generate field component for `' . $field::class . '` as its not supported.'),
         };
 
@@ -338,21 +338,20 @@ class SchemaFormBuilder extends Component
 
     private function makeTinyEditorComponent(TinyEditorData $tinyEditorData): TinyEditor
     {
-    
+
         $tinyEditor = TinyEditor::make($tinyEditorData->state_name)
             ->fileAttachmentsDisk('s3')
             ->fileAttachmentsVisibility('public')
             ->showMenuBar()
             ->fileAttachmentsDirectory('tinyeditor_uploads');
-           
 
-        // if ($tinyEditorData->min_length) {
-        //     $tinyEditor->minLength(fn () => $tinyEditorData->min_length);
-        // }
+        if ($tinyEditorData->min_length) {
+            $tinyEditor->minLength(fn () => $tinyEditorData->min_length);
+        }
 
-        // if ($tinyEditorData->max_length) {
-        //     $tinyEditor->maxLength(fn () => $tinyEditorData->max_length);
-        // }
+        if ($tinyEditorData->max_length) {
+            $tinyEditor->maxLength(fn () => $tinyEditorData->max_length);
+        }
 
         return $tinyEditor;
     }
