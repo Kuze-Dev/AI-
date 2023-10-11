@@ -20,6 +20,7 @@ use Domain\Blueprint\DataTransferObjects\SectionData;
 use Domain\Blueprint\DataTransferObjects\SelectFieldData;
 use Domain\Blueprint\DataTransferObjects\TextareaFieldData;
 use Domain\Blueprint\DataTransferObjects\TextFieldData;
+use Domain\Blueprint\DataTransferObjects\TinyEditorData;
 use Domain\Blueprint\DataTransferObjects\ToggleFieldData;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\MarkdownButton;
@@ -38,6 +39,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Mohamedsabil83\FilamentFormsTinyeditor\Components\TinyEditor;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -124,6 +126,8 @@ class SchemaFormBuilder extends Component
             RepeaterFieldData::class => $this->makeRepeaterComponent($field),
             RelatedResourceFieldData::class => $this->makeRelatedResourceComponent($field),
             MediaFieldData::class => $this->makeMediaComponent($field),
+            TinyEditorData::class => $this->makeTinyEditorComponent($field),
+            
             default => throw new InvalidArgumentException('Cannot generate field component for `' . $field::class . '` as its not supported.'),
         };
 
@@ -330,5 +334,26 @@ class SchemaFormBuilder extends Component
         }
 
         return $component;
+    }
+
+    private function makeTinyEditorComponent(TinyEditorData $tinyEditorData): TinyEditor
+    {
+    
+        $tinyEditor = TinyEditor::make($tinyEditorData->state_name)
+            ->fileAttachmentsDisk('s3')
+            ->fileAttachmentsVisibility('public')
+            ->showMenuBar()
+            ->fileAttachmentsDirectory('tinyeditor_uploads');
+           
+
+        // if ($tinyEditorData->min_length) {
+        //     $tinyEditor->minLength(fn () => $tinyEditorData->min_length);
+        // }
+
+        // if ($tinyEditorData->max_length) {
+        //     $tinyEditor->maxLength(fn () => $tinyEditorData->max_length);
+        // }
+
+        return $tinyEditor;
     }
 }
