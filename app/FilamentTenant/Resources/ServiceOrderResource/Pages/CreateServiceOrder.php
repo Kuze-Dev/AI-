@@ -6,8 +6,7 @@ namespace App\FilamentTenant\Resources\ServiceOrderResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ServiceOrderResource;
-use Domain\ServiceOrder\Actions\CreateServiceOrderAction;
-use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
+use Domain\ServiceOrder\Actions\PlaceServiceOrderAction;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -24,7 +23,7 @@ class CreateServiceOrder extends CreateRecord
     {
         $user = Auth::user();
 
-        return DB::transaction(fn () => app(CreateServiceOrderAction::class)->execute(ServiceOrderData::fromArray($data, null), $user->id));
+        return DB::transaction(fn () => app(PlaceServiceOrderAction::class)->execute($data, null, $user->id));
     }
 
     protected function getActions(): array

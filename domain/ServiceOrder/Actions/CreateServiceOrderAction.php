@@ -7,7 +7,6 @@ namespace Domain\ServiceOrder\Actions;
 use Domain\Currency\Models\Currency;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
-use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
@@ -19,7 +18,6 @@ class CreateServiceOrderAction
 {
     public function __construct(
         private CalculateServiceOrderTotalPriceAction $calculateServiceOrderTotalPriceAction,
-        private CreateServiceOrderAddressAction $createServiceOrderAddressAction,
         private CreateServiceBillAction $createServiceBillAction,
     ) {
     }
@@ -94,13 +92,6 @@ class CreateServiceOrderAction
             'additional_charges' => $serviceOrderData->additional_charges,
             'total_price' => $totalPrice,
         ]);
-
-        $this->createServiceOrderAddressAction->execute($serviceOrder, $serviceOrderData);
-
-        $this->createServiceBillAction->execute(
-            $serviceOrder,
-            ServiceBillData::fromArray($serviceOrder->toArray())
-        );
 
         return $serviceOrder;
     }

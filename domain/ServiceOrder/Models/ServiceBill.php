@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Models;
 
-use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\Payments\Interfaces\PayableInterface;
+use Domain\Payments\Models\Traits\HasPayments;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $bill_date
  * @property \Illuminate\Support\Carbon|null $due_date
  * @property string $service_price
+ * @property string $reference
  * @property array $additional_charges
  * @property float $total_amount
  * @property ServiceBillStatus $status
@@ -38,12 +40,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class ServiceBill extends Model
+class ServiceBill extends Model implements PayableInterface
 {
+    use HasPayments;
     protected $fillable = [
         'service_order_id',
         'bill_date',
         'due_date',
+        'reference',
         'service_price',
         'additional_charges',
         'total_amount',
@@ -59,10 +63,19 @@ class ServiceBill extends Model
         'status' => ServiceBillStatus::class,
     ];
 
+    public function getRouteKeyName(): string
+    {
+        return 'reference';
+    }
+
+    public function getReferenceNumber(): string
+    {
+        return $this->reference;
+    }
+
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ServiceOrder\Models\ServiceOrder, \Domain\ServiceOrder\Models\ServiceBill> */
     public function service_order(): BelongsTo
     {
         return $this->belongsTo(ServiceOrder::class);
     }
-
 }

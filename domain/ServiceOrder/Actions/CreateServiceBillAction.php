@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Actions;
 
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
-use Domain\ServiceOrder\DataTransferObjects\ServiceTransactionData;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
+use Illuminate\Support\Str;
 
 class CreateServiceBillAction
 {
@@ -23,8 +23,23 @@ class CreateServiceBillAction
     ): ServiceBill {
         $billingDates = $this->getServiceBillingAndDueDateAction->execute($serviceData);
 
+        $uniqueReference = null;
+
+        do {
+            $referenceNumber = str::upper(str::random(12));
+
+            $existingReference = ServiceBill::where('reference', $referenceNumber)->first();
+
+            if ( ! $existingReference) {
+                $uniqueReference = $referenceNumber;
+
+                break;
+            }
+        } while (true);
+
         $serviceBill = ServiceBill::create([
             'service_order_id' => $serviceBillData->service_order_id,
+            'reference' => $uniqueReference,
             'bill_date' => $billingDates->bill_date,
             'due_date' => $billingDates->due_date,
             'service_price' => $serviceBillData->service_price,

@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Domain\Admin\Models\Admin;
 use Domain\Customer\Models\Customer;
 use Domain\PaymentMethod\Models\PaymentMethod;
-use Domain\Payments\Models\Payment;
 use Domain\Service\Models\Service;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
@@ -65,6 +64,7 @@ return new class () extends Migration {
             $table->id();
             $table->foreignIdFor(ServiceOrder::class)->index();
 
+            $table->string('reference')->unique();
             $table->dateTime('bill_date')->nullable()->index();
             $table->dateTime('due_date')->nullable()->index();
             $table->decimal('service_price', 10, 2);
@@ -80,7 +80,6 @@ return new class () extends Migration {
 
             $table->foreignIdFor(ServiceOrder::class)->index();
             $table->foreignIdFor(ServiceBill::class)->index();
-            $table->foreignIdFor(Payment::class)->index();
             $table->foreignIdFor(PaymentMethod::class)->index();
 
             $table->string('currency');
