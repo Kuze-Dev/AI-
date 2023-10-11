@@ -6,6 +6,7 @@ use App\Features\Customer\AddressBase;
 use App\Features\Customer\CustomerBase;
 use App\Features\Customer\TierBase;
 use Domain\Address\Models\Country;
+use App\Features\ECommerce\AllowGuestOrder;
 use App\Features\ECommerce\ECommerceBase;
 use App\Features\ECommerce\ShippingStorePickup;
 use Domain\Cart\Database\Factories\CartFactory;
@@ -28,6 +29,7 @@ beforeEach(function () {
     tenancy()->tenant->features()->activate(AddressBase::class);
     tenancy()->tenant->features()->activate(ECommerceBase::class);
     tenancy()->tenant->features()->activate(ShippingStorePickup::class);
+    tenancy()->tenant->features()->activate(AllowGuestOrder::class);
 
     $country = Country::create([
         'code' => 'US',
