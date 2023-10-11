@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\DataTransferObjects;
 
 use DateTime;
+use Domain\Customer\Models\Customer;
 
 class ServiceOrderData
 {
@@ -20,17 +21,17 @@ class ServiceOrderData
     ) {
     }
 
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data, int|null $customer_id): self
     {
         return new self(
-            customer_id: (int) $data['customer_id'],
+            customer_id: isset($data['customer_id']) ? (int) $data['customer_id'] : $customer_id,
             service_id: (int) $data['service_id'],
             schedule: new DateTime($data['schedule']),
             service_address_id: (int) $data['service_address_id'],
             billing_address_id: (int) $data['billing_address_id'],
             is_same_as_billing: $data['is_same_as_billing'],
             additional_charges: $data['additional_charges'] ?? null,
-            form: $data['data'] ?? null,
+            form: $data['form'] ?? null,
         );
     }
 }

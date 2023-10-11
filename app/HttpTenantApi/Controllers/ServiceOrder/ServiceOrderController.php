@@ -6,8 +6,11 @@ namespace App\HttpTenantApi\Controllers\ServiceOrder;
 
 use App\Features\Service\ServiceBase;
 use App\HttpTenantApi\Resources\ServiceOrderResource;
-use Domain\Service\Models\Service;
+use Domain\ServiceOrder\Actions\CreateServiceOrderAction;
+use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Models\ServiceOrder;
+use Domain\ServiceOrder\Requests\ServiceOrderStoreRequest;
+use Illuminate\Http\JsonResponse;
 use Spatie\QueryBuilder\AllowedInclude;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
@@ -36,8 +39,15 @@ class ServiceOrderController
     }
 
 
-    public function store(string $service)
+    public function store(ServiceOrderStoreRequest $request, CreateServiceOrderAction $createServiceOrderAction): JsonResponse
     {
+        $validatedData = $request->validated();
 
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = auth()->user();
+
+        $createServiceOrderAction->execute(ServiceOrderData::fromArray($validatedData, $customer->id), null);
+
+        return response()->json(['message' => 'Service Order created successfully'], 201);
     }
 }

@@ -242,7 +242,7 @@ class ServiceOrderResource extends Resource
                         ]),
                     Forms\Components\Section::make('Form Title')
                         ->schema([
-                            SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)
+                            SchemaFormBuilder::make('form', fn (?Service $record) => $record?->blueprint->schema)
                                 ->schemaData(fn (Closure $get) => Service::whereId($get('service_id'))->first()?->blueprint->schema),
                         ])
                         ->hidden(fn (Closure $get) => $get('service_id') === null)
@@ -317,6 +317,9 @@ class ServiceOrderResource extends Resource
             Forms\Components\Group::make()->columns(2)
                 ->schema([
                     BadgeLabel::make(trans('status'))->formatStateUsing(function (string $state): string {
+                        if ($state == OrderStatuses::FORPAYMENT->value) {
+                            return trans('For Payment');
+                        }
                         return ucfirst($state);
                     })
                         ->color(function ($state) {

@@ -30,12 +30,28 @@ class ServiceOrderStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'service' => [
-            //     'required',
-            //     'integer',
-            //     'min:1',
-            //     'max:5',
-            // ],
+            'service_id' => [
+                'integer',
+            ],
+            'service_address_id' => [
+                'integer',
+            ],
+            'billing_address_id' => [
+                'integer',
+            ],
+            'is_same_as_billing' => [
+                'bool',
+            ],
+            'schedule' => [
+                'datetime',
+            ],
+            'form' => [
+                'json',
+            ],
+            'additional_charges' => [
+                'json',
+            ],
+
         ];
     }
 
