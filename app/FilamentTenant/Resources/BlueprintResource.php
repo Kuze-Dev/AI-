@@ -578,6 +578,16 @@ class BlueprintResource extends Resource
                         Forms\Components\TextInput::make('description'),
                     ]),
             ],
+            FieldType::TINYEDITOR => [
+                Forms\Components\TextInput::make('min_length')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('max_length')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+            ],
             default => [],
         };
     }
