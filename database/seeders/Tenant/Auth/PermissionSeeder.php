@@ -47,7 +47,7 @@ class PermissionSeeder extends BasePermissionSeeder
                 ...$this->generateFilamentResourcePermissions('discount', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('paymentMethod', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions(
-                    'customers',
+                    'customer',
                     except: [
                         'deleteAny',
                         'restoreAny',
