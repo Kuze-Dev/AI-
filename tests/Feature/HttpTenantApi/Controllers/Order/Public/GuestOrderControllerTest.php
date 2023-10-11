@@ -24,6 +24,7 @@ use Domain\Shipment\Drivers\StorePickupDriver;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Testing\Fluent\AssertableJson;
+use App\Features\ECommerce\AllowGuestOrder;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\getJson;
@@ -34,6 +35,8 @@ use function PHPUnit\Framework\assertInstanceOf;
 
 beforeEach(function () {
     testInTenantContext();
+
+    tenancy()->tenant->features()->activate(AllowGuestOrder::class);
 
     app(OrderSettings::class)->fill(['email_sender_name' => fake()->safeEmail()])->save();
 

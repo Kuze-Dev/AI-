@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\ECommerce\AllowGuestOrder;
 use Domain\Address\Models\Country;
 use Domain\Cart\Actions\CheckoutAction;
 use Domain\Cart\Database\Factories\CartFactory;
@@ -18,6 +19,8 @@ use function Pest\Laravel\withHeader;
 
 beforeEach(function () {
     testInTenantContext();
+
+    tenancy()->tenant->features()->activate(AllowGuestOrder::class);
 
     $country = Country::create([
         'code' => 'US',
