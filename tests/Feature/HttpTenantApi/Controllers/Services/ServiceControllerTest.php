@@ -7,7 +7,6 @@ use Domain\Service\Databases\Factories\ServiceFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
-
 use function Pest\Laravel\getJson;
 
 beforeEach(function () {
@@ -20,8 +19,7 @@ it('can list services', function () {
     ServiceFactory::new(['status' => 1])
         ->has(TaxonomyTermFactory::new()
             ->for(TaxonomyFactory::new()
-                ->withDummyBlueprint())
-            ->count(2))
+                ->withDummyBlueprint()))
         ->withDummyBlueprint()
         ->count(10)
         ->create();
@@ -39,8 +37,7 @@ it('can show a service', function () {
     $service = ServiceFactory::new(['status' => 1])
         ->has(TaxonomyTermFactory::new()
             ->for(TaxonomyFactory::new()
-                ->withDummyBlueprint())
-            ->count(2))
+                ->withDummyBlueprint()))
         ->withDummyBlueprint()
         ->createOne();
 
@@ -49,11 +46,34 @@ it('can show a service', function () {
         ->assertJson(function (AssertableJson $json) use ($service) {
             $json
                 ->where('data.type', 'services')
-                ->where('data.id', (string) $service->getRouteKey())
+                ->where('data.id', (string)$service->getRouteKey())
                 ->where('data.attributes.name', $service->name)
                 ->etc();
         });
 });
+
+it("can filter services", function ($attribute) {
+    $services = ServiceFactory::new()
+        ->has(TaxonomyTermFactory::new()
+            ->for(TaxonomyFactory::new()
+                ->withDummyBlueprint()))
+        ->withDummyBlueprint()
+        ->count(1)
+        ->create();
+
+    $services->each(function ($service) use ($attribute) {
+        getJson('api/services?' . http_build_query(['filter' => [$attribute => $service->$attribute]]))
+            ->assertOk()
+            ->assertJson(function (AssertableJson $json) use ($service) {
+                dd($json
+                    ->where('data.0.type', 'services')
+                    ->where('data.0.id', (string)$service->getRouteKey())
+                    ->where('data.0.attributes.name', $service->name)
+                    ->count('data', 1)
+                    ->etc());
+            });
+    });
+})->with(['name', 'selling_price', 'retail_price', 'is_featured', 'is_special_offer', 'pay_upfront', 'is_subscription', 'status'])->only();
 
 it("can't list inactive services", function () {
     ServiceFactory::new(['status' => 0])
@@ -78,8 +98,7 @@ it("can't show an inactive service", function () {
     $service = ServiceFactory::new(['status' => 0])
         ->has(TaxonomyTermFactory::new()
             ->for(TaxonomyFactory::new()
-                ->withDummyBlueprint())
-            ->count(2))
+                ->withDummyBlueprint()))
         ->withDummyBlueprint()
         ->createOne();
 
