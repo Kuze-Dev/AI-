@@ -18,8 +18,6 @@ use Closure;
 use Domain\Address\Models\Address;
 use Domain\Currency\Models\Currency;
 use Domain\Customer\Models\Customer;
-use Domain\Order\Enums\OrderStatuses;
-use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
 use Domain\Service\Models\Service;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
@@ -317,9 +315,13 @@ class ServiceOrderResource extends Resource
             Forms\Components\Group::make()->columns(2)
                 ->schema([
                     BadgeLabel::make(trans('status'))->formatStateUsing(function (string $state): string {
-                        if ($state == OrderStatuses::FORPAYMENT->value) {
+                        if ($state == ServiceOrderStatus::FORPAYMENT->value) {
                             return trans('For Payment');
                         }
+                        if ($state == ServiceOrderStatus::INPROGRESS->value) {
+                            return trans('For Payment');
+                        }
+
                         return ucfirst($state);
                     })
                         ->color(function ($state) {
@@ -327,8 +329,8 @@ class ServiceOrderResource extends Resource
 
                             return match ($newState) {
                                 ServiceOrderStatus::PENDING->value => 'warning',
-                                ServiceOrderStatus::CANCELLED->value => 'danger',
-                                ServiceOrderStatus::FULFILLED->value => 'success',
+                                ServiceOrderStatus::CLOSED->value => 'danger',
+                                ServiceOrderStatus::COMPLETED->value => 'success',
                                 default => 'secondary',
                             };
                         })->inline()
@@ -350,28 +352,28 @@ class ServiceOrderResource extends Resource
                     ->readOnly(),
             ]),
             Forms\Components\Grid::make(2)
-            ->schema([
-                Support\TextLabel::make('')
-                    ->label(trans('Order Date'))
-                    ->alignLeft()
-                    ->size('md')
-                    ->inline()
-                    ->readOnly(),
-                Support\TextLabel::make('created_at')
-                    ->alignRight()
-                    ->size('md')
-                    ->inline()
-                    ->formatStateUsing(function ($state) {
-                        /** @var string */
-                        $timeZone = Auth::user()?->timezone;
+                ->schema([
+                    Support\TextLabel::make('')
+                        ->label(trans('Order Date'))
+                        ->alignLeft()
+                        ->size('md')
+                        ->inline()
+                        ->readOnly(),
+                    Support\TextLabel::make('created_at')
+                        ->alignRight()
+                        ->size('md')
+                        ->inline()
+                        ->formatStateUsing(function ($state) {
+                            /** @var string */
+                            $timeZone = Auth::user()?->timezone;
 
-                        $formattedState = Carbon::parse($state)
-                            ->setTimezone($timeZone)
-                            ->translatedFormat('F d, Y g:i A');
+                            $formattedState = Carbon::parse($state)
+                                ->setTimezone($timeZone)
+                                ->translatedFormat('F d, Y g:i A');
 
-                        return $formattedState;
-                    }),
-            ]),
+                            return $formattedState;
+                        }),
+                ]),
             Divider::make(''),
             Forms\Components\Group::make()->columns(2)->schema([
                 TextLabel::make('')
@@ -436,17 +438,11 @@ class ServiceOrderResource extends Resource
                     ->form([
                         Forms\Components\Select::make('status_options')
                             ->label('')
-                            ->options(function () use ($record) {
+                            ->options(function () {
                                 $options = [
-                                    ServiceOrderStatus::PENDING->value => trans('Pending'),
-                                    ServiceOrderStatus::PROCESSING->value => trans('Processing'),
-                                    ServiceOrderStatus::CANCELLED->value => trans('Cancelled'),
-                                    ServiceOrderStatus::REFUNDED->value => trans('Refunded'),
+                                    ServiceOrderStatus::INPROGRESS->value => trans('In progress'),
+                                    ServiceOrderStatus::COMPLETED->value => trans('Completed'),
                                 ];
-
-                                if ($record->is_paid) {
-                                    $options[OrderStatuses::FULFILLED->value] = trans('Fulfilled');
-                                }
 
                                 return $options;
                             })
@@ -492,48 +488,14 @@ class ServiceOrderResource extends Resource
                             $status = $data['status_options'];
                             $updateData = ['status' => $status];
 
-                            if ($status == ServiceOrderStatus::CANCELLED->value) {
-                                if ( ! in_array($record->status, [ServiceOrderStatus::PENDING, ServiceOrderStatus::FORPAYMENT])) {
-                                    Notification::make()
-                                        ->title(trans("You can't cancel this order."))
-                                        ->warning()
-                                        ->send();
-
-                                    return;
-                                }
-
-                                $updateData['cancelled_at'] = now();
-
-                                $order = $record;
-
-                                /** @var \Domain\Payments\Models\Payment $payment */
-                                $payment = $order->payments->first();
-
-                                $payment->update([
-                                    'status' => 'cancelled',
-                                ]);
-                            }
-
                             $result = $record->update($updateData);
 
                             if ($result) {
                                 $set('status', ucfirst($data['status_options']));
                                 Notification::make()
-                                    ->title(trans('Order updated successfully'))
+                                    ->title(trans('Service Order updated successfully'))
                                     ->success()
                                     ->send();
-                            }
-
-                            $customer = Customer::where('id', $record->customer_id)->first();
-
-                            if ($customer) {
-                                event(new AdminOrderStatusUpdatedEvent(
-                                    $customer,
-                                    $record,
-                                    $shouldSendEmail,
-                                    $data['status_options'],
-                                    $emailRemarks
-                                ));
                             }
                         }
                     );
@@ -543,8 +505,8 @@ class ServiceOrderResource extends Resource
             ->alignRight()
             ->size('sm')
             ->hidden(function (ServiceOrder $record) {
-                return $record->status == ServiceOrderStatus::CANCELLED ||
-                    $record->status == ServiceOrderStatus::FULFILLED;
+                return $record->status == ServiceOrderStatus::FORPAYMENT ||
+                $record->status == ServiceOrderStatus::COMPLETED;
             });
     }
 

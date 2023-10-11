@@ -4,22 +4,20 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\ServiceOrder;
 
-use App\Features\Service\ServiceBase;
 use App\HttpTenantApi\Resources\ServiceOrderResource;
 use Domain\ServiceOrder\Actions\CreateServiceOrderAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Requests\ServiceOrderStoreRequest;
 use Illuminate\Http\JsonResponse;
-use Spatie\QueryBuilder\AllowedInclude;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
-    ApiResource('service-order', except: ['delete']),
-    Middleware('feature.tenant:' . ServiceBase::class)
+    ApiResource('service-order', except: ['destroy']),
+    Middleware(['auth:sanctum'])
 ]
 class ServiceOrderController
 {
@@ -37,7 +35,6 @@ class ServiceOrderController
             QueryBuilder::for(ServiceOrder::whereReference($serviceOrder))->firstOrFail()
         );
     }
-
 
     public function store(ServiceOrderStoreRequest $request, CreateServiceOrderAction $createServiceOrderAction): JsonResponse
     {
