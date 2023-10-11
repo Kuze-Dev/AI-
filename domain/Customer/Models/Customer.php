@@ -17,6 +17,7 @@ use Domain\Customer\Enums\Status;
 use Domain\Discount\Models\DiscountLimit;
 use Domain\Favorite\Models\Favorite;
 use Domain\Shipment\Models\VerifiedAddress;
+use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -122,6 +123,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
         'register_status',
         'birth_date',
         'email_verification_type',
+        'tier_approval_status',
     ];
 
     protected $hidden = [
@@ -136,6 +138,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
         'email_verification_type' => EmailVerificationType::class,
         'register_status' => RegisterStatus::class,
         'email_verified_at' => 'datetime',
+        'tier_approval_status' => TierApprovalStatus::class,
     ];
 
     public function getRouteKeyName(): string

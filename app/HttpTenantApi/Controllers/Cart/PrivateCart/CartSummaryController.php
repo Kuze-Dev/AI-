@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Cart;
+namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
 use App\Http\Controllers\Controller;
-use App\HttpTenantApi\Resources\CartLineResource;
 use Domain\Cart\Actions\CartSummaryAction;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
-use Domain\Cart\Requests\CartMobileSummaryRequest;
+use Domain\Cart\Events\SanitizeCartEvent;
+use Domain\Cart\Models\CartLine;
+use Domain\Cart\Requests\CartSummaryRequest;
+use Domain\Shipment\API\AusPost\Exceptions\AusPostServiceNotFoundException;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -18,30 +20,49 @@ use Throwable;
 #[
     Middleware(['auth:sanctum'])
 ]
-class CheckoutMobileController extends Controller
+class CartSummaryController extends Controller
 {
-    #[Get('carts/mobile/summary', name: 'carts.mobile.summary')]
-    public function summary(CartMobileSummaryRequest $request): mixed
+    #[Get('carts/count', name: 'carts.count')]
+    public function count(): mixed
+    {
+        $cartLines = CartLine::with('purchasable')
+            ->whereHas('cart', function ($query) {
+                $query->whereBelongsTo(auth()->user());
+            })
+            ->whereNull('checked_out_at')
+            ->get();
+
+        if ($cartLines->count()) {
+            $cartLineIdsTobeRemoved = [];
+
+            $cartLines = $cartLines->filter(function ($cartLine) use (&$cartLineIdsTobeRemoved) {
+                if ($cartLine->purchasable === null) {
+                    $cartLineIdsTobeRemoved[] = $cartLine->uuid;
+                }
+
+                return $cartLine->purchasable !== null;
+            });
+
+            if ( ! empty($cartLineIdsTobeRemoved)) {
+                event(new SanitizeCartEvent(
+                    $cartLineIdsTobeRemoved,
+                ));
+            }
+        }
+
+        return response()->json(['cartCount' => $cartLines->count()], 200);
+    }
+
+    #[Get('carts/summary', name: 'carts.summary')]
+    public function summary(CartSummaryRequest $request): mixed
     {
         $validated = $request->validated();
         $discountCode = $validated['discount_code'] ?? null;
-        $reference = $validated['reference'];
 
         /** @var \Domain\Customer\Models\Customer $customer */
         $customer = auth()->user();
 
         $cartLines = $request->getCartLines();
-
-        if ($cartLines->isNotEmpty()) {
-            $expiredCartLines = $cartLines->where('checkout_expiration', '<=', now());
-
-            // Check if there are expired cart lines
-            if ($expiredCartLines->isNotEmpty()) {
-                return response()->json([
-                    'message' => 'Key has been expired, checkout again to revalidate your cart',
-                ], 400);
-            }
-        }
 
         $country = $request->getCountry();
         $state = $request->getState();
@@ -49,27 +70,15 @@ class CheckoutMobileController extends Controller
         $serviceId = $validated['service_id'] ?? null;
 
         try {
-            $summary = app(CartSummaryAction::class)->getSummary(
+            $summary = app(CartSummaryAction::class)->execute(
                 $cartLines,
                 new CartSummaryTaxData($country?->id, $state?->id),
                 new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),
                 $discount,
-                $serviceId ? (int) $serviceId : null
+                $serviceId ? $serviceId : null
             );
-        } catch (Throwable $th) {
-            if ($th instanceof USPSServiceNotFoundException) {
-                return response()->json([
-                    'service_id' => 'Shipping method service id is required',
-                ], 404);
-            } else {
-                return response()->json([
-                    'message' => $th->getMessage(),
-                ], 422);
-            }
-        }
 
-        $responseArray = [
-            'summary' => [
+            $responseArray = [
                 'tax' => [
                     'inclusive_sub_total' => $summary->taxTotal ? number_format((float) ($summary->subTotal + $summary->taxTotal), 2, '.', ',') : null,
                     'display' => $summary->taxTotal ? $summary->taxDisplay : null,
@@ -93,16 +102,26 @@ class CheckoutMobileController extends Controller
                     'discount_type' => $summary->discountMessages->discount_type ?? null,
                     'total_savings' => $discount ? number_format((float) $summary->discountTotal, 2, '.', ',') : 0,
                 ],
-            ],
+            ];
 
-            'cartLines' => CartLineResource::collection($cartLines),
-            'reference' => $reference,
-        ];
+            if ( ! $discountCode) {
+                unset($responseArray['discount']);
+            }
 
-        if ( ! $discountCode) {
-            unset($responseArray['summary']['discount']);
+            return response()->json($responseArray, 200);
+        } catch (Throwable $th) {
+            if (
+                $th instanceof USPSServiceNotFoundException ||
+                $th instanceof AusPostServiceNotFoundException
+            ) {
+                return response()->json([
+                    'service_id' => 'Shipping method service id is required',
+                ], 404);
+            } else {
+                return response()->json([
+                    'message' => $th->getMessage(),
+                ], 422);
+            }
         }
-
-        return response()->json($responseArray, 200);
     }
 }

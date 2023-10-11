@@ -2,29 +2,32 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Cart;
+namespace App\HttpTenantApi\Controllers\Cart\PublicCart;
 
+use App\Features\ECommerce\AllowGuestOrder;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartResource;
 use Domain\Cart\Actions\DestroyCartAction;
+use Domain\Cart\Actions\SanitizeCartAction;
+use Domain\Cart\Helpers\PublicCart\AuthorizeGuestCart;
 use Domain\Cart\Models\Cart;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\RouteAttributes\Attributes\Middleware;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Http\Request;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
-    Resource('carts', apiResource: true, only: ['index', 'destroy']),
-    Middleware(['auth:sanctum'])
+    Resource('guest/carts', apiResource: true, only: ['index', 'destroy'], names: 'guest.carts'),
+    Middleware(['feature.tenant:' . AllowGuestOrder::class])
 ]
-class CartController extends Controller
+class GuestCartController extends Controller
 {
-    public function index(): mixed
+    public function index(Request $request): mixed
     {
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
+        $sessionId = $request->bearerToken();
 
         $model = QueryBuilder::for(
             Cart::with([
@@ -36,14 +39,12 @@ class CartController extends Controller
                 },
                 'cartLines.media',
             ])
-                ->whereBelongsTo($customer)
+                ->where('session_id', $sessionId)
         )->allowedIncludes(['cartLines.media'])
             ->first();
 
         if ($model && isset($model->cartLines)) {
-            $model->cartLines = $model->cartLines->filter(function ($cartLine) {
-                return $cartLine->purchasable !== null;
-            });
+            $model = app(SanitizeCartAction::class)->sanitizeGuest($model);
         }
 
         if ($model) {
@@ -56,9 +57,15 @@ class CartController extends Controller
             ], 200);
     }
 
-    public function destroy(Cart $cart): mixed
+    public function destroy(Request $request, Cart $cart): mixed
     {
-        $this->authorize('delete', $cart);
+        $sessionId = $request->bearerToken();
+
+        $allowed = app(AuthorizeGuestCart::class)->execute($cart, $sessionId);
+
+        if ( ! $allowed) {
+            abort(403);
+        }
 
         $result = app(DestroyCartAction::class)
             ->execute($cart);

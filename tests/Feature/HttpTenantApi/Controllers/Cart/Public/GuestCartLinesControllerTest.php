@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Domain\Cart\Database\Factories\CartFactory;
 use Domain\Cart\Database\Factories\CartLineFactory;
-use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Product\Database\Factories\ProductFactory;
 use Domain\Product\Database\Factories\ProductVariantFactory;
 
@@ -20,26 +19,23 @@ beforeEach(function () {
         ->createOne([
             'status' => true,
             'minimum_order_quantity' => 1,
+            'allow_customer_remarks' => true,
+            'allow_guest_purchase' => true,
         ]);
 
-    $product->update([
-        'allow_customer_remarks' => true,
-    ]);
+    $uuid = uuid_create(UUID_TYPE_RANDOM);
 
-    $customer = CustomerFactory::new()
-        ->createOne();
+    $sessionId = time() . $uuid;
 
-    CartFactory::new()->setCustomerId($customer->id)->createOne();
+    CartFactory::new()->setGuestId($sessionId)->createOne();
 
-    withHeader('Authorization', 'Bearer ' . $customer
-        ->createToken('testing-auth')
-        ->plainTextToken);
+    withHeader('Authorization', 'Bearer ' . $sessionId);
 
     $this->product = $product;
 });
 
 it('can add to cart a purchasable product', function () {
-    postJson('api/carts/cartlines', [
+    postJson('api/guest/carts/cartlines', [
         'purchasable_id' => $this->product->slug,
         'purchasable_type' => 'Product',
         'quantity' => 1,
@@ -48,11 +44,26 @@ it('can add to cart a purchasable product', function () {
         ->assertOk();
 });
 
+it('cant add to cart when purchasable cant purchase as a guest', function () {
+    $invalidProduct = ProductFactory::new()
+        ->createOne([
+            'status' => true,
+            'minimum_order_quantity' => 1,
+            'allow_guest_purchase' => false,
+        ]);
+
+    postJson('api/guest/carts/cartlines', [
+        'purchasable_id' => $invalidProduct->slug,
+        'purchasable_type' => 'Product',
+        'quantity' => 1,
+    ])->assertStatus(422);
+});
+
 it('can add to cart a purchasable product with variant', function () {
     $productVariant = ProductVariantFactory::new()->setProductId($this->product->id)
         ->createOne();
 
-    postJson('api/carts/cartlines', [
+    postJson('api/guest/carts/cartlines', [
         'purchasable_id' => $this->product->slug,
         'variant_id' => $productVariant->id,
         'purchasable_type' => 'Product',
@@ -66,7 +77,7 @@ it('can add to cart a purchasable product with remarks', function () {
     $productVariant = ProductVariantFactory::new()->setProductId($this->product->id)
         ->createOne();
 
-    postJson('api/carts/cartlines', [
+    postJson('api/guest/carts/cartlines', [
         'purchasable_id' => $this->product->slug,
         'variant_id' => $productVariant->id,
         'purchasable_type' => 'Product',
@@ -80,9 +91,26 @@ it('can add to cart a purchasable product with remarks', function () {
 });
 
 it('can update cart line quantity', function () {
-    $cartLine = CartLineFactory::new()->createOne();
+    $product = ProductFactory::new()
+        ->createOne([
+            'status' => true,
+            'minimum_order_quantity' => 1,
+            'allow_customer_remarks' => true,
+            'allow_guest_purchase' => true,
+            'stock' => 5,
+        ]);
 
-    patchJson('api/carts/cartlines/' . $cartLine->uuid, [
+    postJson('api/guest/carts/cartlines', [
+        'purchasable_id' => $product->slug,
+        'purchasable_type' => 'Product',
+        'quantity' => 1,
+    ])
+        ->assertValid()
+        ->assertOk();
+
+    $cartLine = CartLineFactory::new()->setPurchasableId($product->id)->createOne();
+
+    patchJson('api/guest/carts/cartlines/' . $cartLine->uuid, [
         'type' => 'quantity',
         'quantity' => 2,
     ])
@@ -94,7 +122,7 @@ it('can update cart line remarks', function () {
 
     $cartLine = CartLineFactory::new()->createOne();
 
-    patchJson('api/carts/cartlines/' . $cartLine->uuid, [
+    patchJson('api/guest/carts/cartlines/' . $cartLine->uuid, [
         'type' => 'remarks',
         'remarks' => [
             'notes' => 'test remarks',
@@ -108,7 +136,7 @@ it('can delete cart line', function () {
 
     $cartLine = CartLineFactory::new()->createOne();
 
-    deleteJson('api/carts/cartlines/' . $cartLine->uuid)
+    deleteJson('api/guest/carts/cartlines/' . $cartLine->uuid)
         ->assertValid()
         ->assertNoContent();
 });

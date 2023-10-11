@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Shipping;
+namespace App\HttpTenantApi\Controllers\Shipping\Public;
 
 use App\Features\ECommerce\ECommerceBase;
-use App\Http\Controllers\Controller;
-use App\HttpTenantApi\Requests\Shipping\ShippingRateRequest;
+use App\HttpTenantApi\Requests\Shipping\ShippingRateRequestv2;
 use App\HttpTenantApi\Resources\ShippingMethodResource;
 use App\HttpTenantApi\Resources\ShippingMethodResourcev2;
 use Domain\ShippingMethod\Models\ShippingMethod;
@@ -17,9 +16,9 @@ use Spatie\RouteAttributes\Attributes\Post;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[Middleware(['feature.tenant:'. ECommerceBase::class])]
-class ShippingMethodController extends Controller
+class ShippingMethodController
 {
-    #[Get('shipping-methods')]
+    #[Get('shipping-methods', 'api.public.shipping-methods')]
     public function index(): JsonApiResourceCollection
     {
         return ShippingMethodResource::collection(
@@ -32,8 +31,8 @@ class ShippingMethodController extends Controller
         );
     }
 
-    #[Post('v2/shipping-methods')]
-    public function shippingMethod(ShippingRateRequest $request): JsonApiResourceCollection
+    #[Post('v2/shipping-methods', 'api.v2.shipping-methods')]
+    public function shippingMethod(ShippingRateRequestv2 $request): JsonApiResourceCollection
     {
         return ShippingMethodResourcev2::collection(
             QueryBuilder::for(ShippingMethod::whereActive(true))
