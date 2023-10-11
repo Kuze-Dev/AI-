@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Blueprint\Models;
 
 use Domain\Blueprint\DataTransferObjects\FieldData;
+use Domain\Blueprint\DataTransferObjects\MediaFieldData;
 use Domain\Blueprint\DataTransferObjects\RepeaterFieldData;
 use Domain\Blueprint\Enums\BlueprintDataType;
 use Domain\Blueprint\Enums\FieldType;
@@ -95,7 +96,7 @@ class BlueprintData extends Model implements HasMedia
 
     }
 
-    protected function processRepeaterField(RepeaterFieldData|FieldData $field, string $currentpath): void
+    protected function processRepeaterField(RepeaterFieldData|FieldData|MediaFieldData $field, string $currentpath): void
     {
         $statePath = $currentpath . '.' . $field->state_name;
         if($field->type === FieldType::REPEATER) {
