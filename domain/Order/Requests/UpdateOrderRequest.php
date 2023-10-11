@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Order\Requests;
 
 use Domain\Cart\Enums\CartUserType;
+use Domain\Cart\Helpers\ValidateRemarksMedia;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Illuminate\Database\Eloquent\Builder;
@@ -85,7 +86,13 @@ class UpdateOrderRequest extends FormRequest
                 'min:1',
                 'max:255',
             ],
-            'proof_of_payment' => 'nullable|string',
+            'proof_of_payment' => [
+                'nullable',
+                'string',
+                function ($attribute, $value, $fail) {
+                    app(ValidateRemarksMedia::class)->execute([$value], $fail);
+                },
+            ],
         ];
     }
 }

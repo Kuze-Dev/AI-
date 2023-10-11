@@ -7,6 +7,7 @@ namespace Domain\Cart\Requests;
 use Domain\Cart\Actions\CartPurchasableValidatorAction;
 use Domain\Cart\Enums\CartUserType;
 use Domain\Cart\Exceptions\InvalidPurchasableException;
+use Domain\Cart\Helpers\ValidateRemarksMedia;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Foundation\Http\FormRequest;
@@ -109,6 +110,8 @@ class CreateCartLineRequest extends FormRequest
                 'nullable',
                 'array',
                 function ($attribute, $value, $fail) {
+                    app(ValidateRemarksMedia::class)->execute($value, $fail);
+
                     $purchasableId = $this->input('purchasable_id');
 
                     $product = Product::where((new Product())->getRouteKeyName(), $purchasableId)->first();
