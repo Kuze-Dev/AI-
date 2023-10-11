@@ -183,6 +183,17 @@ class Product extends Model implements HasMetaDataContract, HasMedia
         return $this->belongsToMany(Tier::class);
     }
 
+    /**
+     * Get the product tier relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Tier\Models\Tier>
+     */
+    public function productTier(): BelongsToMany
+    {
+        return $this->belongsToMany(Tier::class, 'product_tier', 'product_id', 'tier_id')
+            ->withPivot(['id', 'tier_id', 'discount', 'discount_amount_type']);
+    }
+
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Product\Models\ProductVariant> */
     public function productVariants(): HasMany
     {

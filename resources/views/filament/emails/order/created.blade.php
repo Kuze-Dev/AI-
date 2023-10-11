@@ -184,7 +184,7 @@
             Your Order has been Placed.
         </h3>
 
-        <p style="line-height: 1.5em">Hi {{ $customer->first_name . $customer->last_name }},</p>
+        <p style="line-height: 1.5em">Hi {{ $customer->first_name . ' ' . $customer->last_name }},</p>
 
         <p style="line-height: 1.5em">
             Thank you for placing an order with us! Your order number is
@@ -203,7 +203,7 @@
             </div>
 
             <p style="line-height: 1.5em">
-                Name: <span> {{ $customer->first_name . $customer->last_name }}</span>
+                Name: <span> {{ $customer->first_name . ' ' . $customer->last_name }}</span>
             </p>
             <p style="line-height: 1.5em">Address: <span> {{ $address }}</span></p>
             <p style="line-height: 1.5em">Phone: <span> {{ $customer->mobile }} </span></p>

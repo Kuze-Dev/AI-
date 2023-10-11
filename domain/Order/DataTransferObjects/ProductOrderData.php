@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Order\DataTransferObjects;
 
+use Domain\Cart\Helpers\PrivateCart\ComputedTierSellingPrice;
 use Domain\Product\Models\Product;
 
 class ProductOrderData
@@ -24,6 +25,7 @@ class ProductOrderData
         public readonly ?int $stock,
         public readonly ?bool $allow_stocks,
         public readonly ?int $minimum_order_quantity,
+        public readonly ?bool $allow_guest_purchase,
     ) {
     }
 
@@ -45,18 +47,26 @@ class ProductOrderData
             stock: $data['stock'] ?? null,
             allow_stocks: isset($data['allow_stocks']) ? $data['allow_stocks'] : null,
             minimum_order_quantity: isset($data['minimum_order_quantity']) ? $data['minimum_order_quantity'] : null,
+            allow_guest_purchase: isset($data['allow_guest_purchase']) ? $data['allow_guest_purchase'] : null,
         );
     }
 
     public static function fromProduct(Product $product): self
     {
+        //product tiering discount
+        $selling_price = $product->selling_price;
+
+        if ($product->relationLoaded('productTier') && $product->productTier->isNotEmpty()) {
+            $selling_price = app(ComputedTierSellingPrice::class)->execute($product, (float) $selling_price);
+        }
+
         return new self(
             id: $product->id,
             name: $product->name,
             slug: $product->slug,
             sku: $product->sku,
             retail_price: number_format((float) $product->retail_price, 2, '.', ','),
-            selling_price: number_format((float) $product->selling_price, 2, '.', ','),
+            selling_price: number_format((float) $selling_price, 2, '.', ','),
             status: (bool) $product->status,
             is_digital_product: (bool) $product->is_digital_product,
             is_featured: (bool) $product->is_featured,
@@ -66,6 +76,7 @@ class ProductOrderData
             stock: $product->stock ?? null,
             allow_stocks: isset($product->allow_stocks) ? $product->allow_stocks : null,
             minimum_order_quantity: isset($product->minimum_order_quantity) ? $product->minimum_order_quantity : null,
+            allow_guest_purchase: isset($product->allow_guest_purchase) ? $product->allow_guest_purchase : null,
         );
     }
 }

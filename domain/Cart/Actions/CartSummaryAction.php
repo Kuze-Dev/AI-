@@ -7,11 +7,13 @@ namespace Domain\Cart\Actions;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\DataTransferObjects\SummaryData;
+use Domain\Cart\Helpers\PrivateCart\ComputedTierSellingPrice;
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
 use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Discount\Enums\DiscountConditionType;
 use Domain\Discount\Models\Discount;
+use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\Actions\GetShippingfeeAction;
@@ -24,18 +26,18 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 use Domain\Shipment\DataTransferObjects\ReceiverData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
+use Domain\Shipment\Enums\UnitEnum;
 
 class CartSummaryAction
 {
     /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
-    public function getSummary(
+    public function execute(
         CartLine|Collection $collections,
         CartSummaryTaxData $cartSummaryTaxData,
         CartSummaryShippingData $cartSummaryShippingData,
         ?Discount $discount,
         int|string|null $serviceId
     ): SummaryData {
-
         $initialSubTotal = $this->getSubTotal($collections);
 
         $tax = $this->getTax($cartSummaryTaxData->countryId, $cartSummaryTaxData->stateId);
@@ -109,19 +111,43 @@ class CartSummaryAction
             $subTotal = $collections->reduce(function ($carry, $collection) {
                 /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
                 $purchasable = $collection->purchasable;
-                $sellingPrice = (float) $purchasable->selling_price;
+
+                $initialSellingPrice = (float) $purchasable->selling_price;
+
+                $sellingPrice = $this->getTierSellingPrice($purchasable, $initialSellingPrice);
 
                 return $carry + ($sellingPrice * $collection->quantity);
             }, 0);
         } elseif ($collections instanceof CartLine) {
             /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
             $purchasable = $collections->purchasable;
-            $sellingPrice = (float) $purchasable->selling_price;
+
+            $initialSellingPrice = (float) $purchasable->selling_price;
+
+            $sellingPrice = $this->getTierSellingPrice($purchasable, $initialSellingPrice);
 
             $subTotal = $sellingPrice * $collections->quantity;
         }
 
         return $subTotal;
+    }
+
+    public function getTierSellingPrice(Product|ProductVariant $purchasable, float $sellingPrice): int|float
+    {
+        if ($purchasable instanceof Product) {
+            if ($purchasable->relationLoaded('productTier') && $purchasable->productTier->isNotEmpty()) {
+                $sellingPrice = app(ComputedTierSellingPrice::class)->execute($purchasable, $sellingPrice);
+            }
+        } elseif ($purchasable instanceof ProductVariant) {
+            /** @var \Domain\Product\Models\Product $product */
+            $product = $purchasable->product;
+
+            if ($product->relationLoaded('productTier') && $product->productTier->isNotEmpty()) {
+                $sellingPrice = app(ComputedTierSellingPrice::class)->execute($product, $sellingPrice);
+            }
+        }
+
+        return $sellingPrice;
     }
 
     /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
@@ -136,7 +162,7 @@ class CartSummaryAction
         $shippingFeeTotal = 0;
 
         if ($shippingAddress && $shippingMethod) {
-            $productlist = $this->getProducts($collections);
+            $productlist = $this->getProducts($collections, UnitEnum::INCH);
 
             $subTotal = $this->getSubTotal($collections);
 
@@ -180,11 +206,14 @@ class CartSummaryAction
     }
 
     /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
-    public function getProducts(CartLine|Collection $collections): array
+    public function getProducts(CartLine|Collection $collections, ?UnitEnum $unit = UnitEnum::CM): array
     {
         $productlist = [];
 
-        $cm_to_inches = 1 / 2.54;
+        $measurement = match ($unit) {
+            UnitEnum::INCH => 1 / 2.54,
+            default => 1,
+        };
 
         if ( ! is_iterable($collections)) {
             /** @var \Domain\Product\Models\Product $product */
@@ -203,13 +232,15 @@ class CartSummaryAction
                 $height = $product->dimension['height'];
                 $weight = $product->weight;
 
-                $productlist[] = [
-                    'product_id' => (string) $purchasableId,
-                    'length' => ceil($length * $cm_to_inches * $collections->quantity),
-                    'width' => ceil($width * $cm_to_inches * $collections->quantity),
-                    'height' => ceil($height * $cm_to_inches * $collections->quantity),
-                    'weight' => (float) $weight * $collections->quantity,
-                ];
+                for ($i = 0; $i < $collections->quantity; $i++) {
+                    $productlist[] = [
+                        'product_id' => (string) $purchasableId,
+                        'length' => ceil($length * $measurement),
+                        'width' => ceil($width * $measurement),
+                        'height' => ceil($height * $measurement),
+                        'weight' => (float) $weight,
+                    ];
+                }
             }
         } else {
             foreach ($collections as $collection) {
@@ -230,13 +261,15 @@ class CartSummaryAction
                     $height = $product->dimension['height'];
                     $weight = $product->weight;
 
-                    $productlist[] = [
-                        'product_id' => (string) $purchasableId,
-                        'length' => ceil($length * $cm_to_inches * $collection->quantity),
-                        'width' => ceil($width * $cm_to_inches * $collection->quantity),
-                        'height' => ceil($height * $cm_to_inches * $collection->quantity),
-                        'weight' => (float) $weight * $collection->quantity,
-                    ];
+                    for ($i = 0; $i < $collection->quantity; $i++) {
+                        $productlist[] = [
+                            'product_id' => (string) $purchasableId,
+                            'length' => ceil($length * $measurement),
+                            'width' => ceil($width * $measurement),
+                            'height' => ceil($height * $measurement),
+                            'weight' => (float) $weight,
+                        ];
+                    }
                 }
             }
         }

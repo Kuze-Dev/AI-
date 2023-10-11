@@ -2,66 +2,49 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Order;
+namespace App\HttpTenantApi\Controllers\Order\PublicOrder;
 
+use App\Features\ECommerce\AllowGuestOrder;
 use App\Http\Controllers\Controller;
-use App\HttpTenantApi\Resources\OrderResource;
-use Domain\Order\Actions\PlaceOrderAction;
-use Domain\Order\Actions\UpdateOrderAction;
-use Domain\Order\DataTransferObjects\PlaceOrderData;
+use App\HttpTenantApi\Resources\GuestOrderResource;
+use Domain\Order\Actions\PublicOrder\GuestPlaceOrderAction;
+use Domain\Order\Actions\PublicOrder\GuestUpdateOrderAction;
+use Domain\Order\DataTransferObjects\GuestPlaceOrderData;
 use Domain\Order\DataTransferObjects\UpdateOrderData;
 use Domain\Order\Exceptions\OrderEmailSettingsException;
 use Domain\Order\Exceptions\OrderEmailSiteSettingsException;
 use Domain\Order\Models\Order;
 use Domain\Order\Notifications\OrderFailedNotifyAdmin;
-use Domain\Order\Requests\PlaceOrderRequest;
+use Domain\Order\Requests\PublicOrder\GuestPlaceOrderRequest;
 use Domain\Order\Requests\UpdateOrderRequest;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\Exceptions\PaymentException;
+use Domain\Shipment\API\AusPost\Exceptions\AusPostServiceNotFoundException;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Illuminate\Support\Facades\DB;
+use Spatie\RouteAttributes\Attributes\Middleware;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 #[
-    Resource('orders', apiResource: true, except: 'destroy'),
-    Middleware(['auth:sanctum'])
+    Resource('guest/orders', apiResource: true, except: 'destroy', names: 'guest.orders'),
+    Middleware(['feature.tenant:' . AllowGuestOrder::class])
 ]
-class OrderController extends Controller
+class GuestOrderController extends Controller
 {
-    public function index(): mixed
-    {
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
-
-        return OrderResource::collection(
-            QueryBuilder::for(Order::with([
-                'shippingAddress',
-                'billingAddress',
-                'orderLines.media',
-            ])->whereBelongsTo($customer))
-                ->defaultSort('-created_at')
-                ->allowedIncludes(['orderLines', 'orderLines.review.media'])
-                ->allowedFilters(['status', 'reference'])
-                ->allowedSorts(['reference', 'total', 'status', 'created_at'])
-                ->jsonPaginate()
-        );
-    }
-
-    public function store(PlaceOrderRequest $request): mixed
+    public function store(GuestPlaceOrderRequest $request): JsonResponse
     {
         $validatedData = $request->validated();
 
         try {
             $result = DB::transaction(function () use ($validatedData) {
-                $order = app(PlaceOrderAction::class)
-                    ->execute(PlaceOrderData::fromArray($validatedData));
+                $order = app(GuestPlaceOrderAction::class)
+                    ->execute(GuestPlaceOrderData::fromArray($validatedData));
 
                 if (is_array($order) && $order['order'] instanceof Order) {
 
@@ -77,7 +60,7 @@ class OrderController extends Controller
             return response()->json([
                 'mail' => 'Something wrong with mailer',
             ], 404);
-        } catch (USPSServiceNotFoundException) {
+        } catch (USPSServiceNotFoundException|AusPostServiceNotFoundException) {
             return response()->json([
                 'service_id' => 'Shipping method service id is required',
             ], 404);
@@ -118,11 +101,8 @@ class OrderController extends Controller
         }
     }
 
-    public function show(Order $order): OrderResource
+    public function show(Order $order): GuestOrderResource
     {
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
-
         $model = QueryBuilder::for(
             $order->with([
                 'shippingAddress',
@@ -130,35 +110,46 @@ class OrderController extends Controller
                 'orderLines.media',
                 'orderLines.review.media',
                 'payments.paymentMethod.media',
-            ])->whereBelongsTo($customer)
-                ->whereReference($order->reference)
+            ])->whereReference($order->reference)
         )
             ->allowedIncludes(['orderLines', 'payments.media', 'payments.paymentMethod.media', 'shippingMethod'])->first();
 
-        return OrderResource::make($model);
+        return GuestOrderResource::make($model);
     }
 
-    public function update(UpdateOrderRequest $request, Order $order): JsonResponse
+    public function update(UpdateOrderRequest $request, Order $order): mixed
     {
         $validatedData = $request->validated();
 
-        $result = app(UpdateOrderAction::class)
-            ->execute($order, UpdateOrderData::fromArray($validatedData));
+        try {
+            $dbResult = DB::transaction(function () use ($validatedData, $order) {
+                $result = app(GuestUpdateOrderAction::class)
+                    ->execute($order, UpdateOrderData::fromArray($validatedData));
 
-        if (is_string($result)) {
+                if ($result instanceof PaymentAuthorize) {
+                    return $result;
+                }
+
+                return [
+                    'message' => 'Order updated successfully',
+                ];
+            });
+
+            return response()->json($dbResult);
+        } catch (BadRequestHttpException $e) {
             return response()->json([
                 'message' => 'Order failed to be updated',
-                'error' => $result,
-            ], 400);
-        }
-
-        if ($result instanceof PaymentAuthorize) {
-            return response()->json($result);
-        }
-
-        return response()
-            ->json([
-                'message' => 'Order updated successfully',
+                'error' => $e->getMessage(),
+            ], 404);
+        } catch (Exception $e) {
+            Log::error([
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
             ]);
+
+            throw $e;
+        }
     }
 }
