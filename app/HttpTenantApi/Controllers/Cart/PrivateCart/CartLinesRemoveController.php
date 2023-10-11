@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Cart;
+namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
 use Domain\Cart\Actions\BulkDestroyCartLineAction;
 use Domain\Cart\Requests\BulkRemoveRequest;
@@ -14,7 +14,7 @@ use Spatie\RouteAttributes\Attributes\Post;
 ]
 class CartLinesRemoveController
 {
-    #[Post('carts/cartlines/bulk-remove', name: 'carts.bulk-remove')]
+    #[Post('carts/cartlines/bulk-remove', name: 'carts.cartlines.bulk-remove')]
     public function __invoke(BulkRemoveRequest $request): mixed
     {
         $validated = $request->validated();

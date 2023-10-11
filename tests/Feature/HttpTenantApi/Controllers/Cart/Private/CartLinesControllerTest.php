@@ -80,7 +80,24 @@ it('can add to cart a purchasable product with remarks', function () {
 });
 
 it('can update cart line quantity', function () {
-    $cartLine = CartLineFactory::new()->createOne();
+    $product = ProductFactory::new()
+        ->createOne([
+            'status' => true,
+            'minimum_order_quantity' => 1,
+            'allow_customer_remarks' => true,
+            'allow_guest_purchase' => true,
+            'stock' => 5,
+        ]);
+
+    postJson('api/carts/cartlines', [
+        'purchasable_id' => $product->slug,
+        'purchasable_type' => 'Product',
+        'quantity' => 1,
+    ])
+        ->assertValid()
+        ->assertOk();
+
+    $cartLine = CartLineFactory::new()->setPurchasableId($product->id)->createOne();
 
     patchJson('api/carts/cartlines/' . $cartLine->uuid, [
         'type' => 'quantity',

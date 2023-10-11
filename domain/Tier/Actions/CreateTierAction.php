@@ -14,6 +14,7 @@ class CreateTierAction
         return Tier::create([
             'name' => $tierData->name,
             'description' => $tierData->description,
+            'has_approval' => $tierData->has_approval,
         ]);
     }
 }
