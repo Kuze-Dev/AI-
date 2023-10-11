@@ -103,7 +103,7 @@ class AdminResource extends Resource
                                     'name',
                                     function (Builder $query) {
 
-                                        if(Auth::user()->hasRole(config('domain.role.super_admin'))) {
+                                        if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
                                             return $query->where('guard_name', 'admin');
                                         }
 
