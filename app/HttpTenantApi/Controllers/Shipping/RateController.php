@@ -8,13 +8,15 @@ use App\Features\ECommerce\ECommerceBase;
 use App\Http\Controllers\Controller;
 use Domain\Address\Models\Address;
 use Domain\Cart\Actions\CartSummaryAction;
-use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
 use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\Actions\GetShippingRateAction;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
-use Domain\Shipment\DataTransferObjects\ShipFromAddressData;
+use Domain\Shipment\DataTransferObjects\ReceiverData;
+// use Domain\Shipment\DataTransferObjects\ShipFromAddressData;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
+use Domain\Shipment\Enums\UnitEnum;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Support\Facades\Auth;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -35,37 +37,28 @@ class RateController extends Controller
 
             $this->authorize('view', $address);
 
-            $validated = $request->validated();
-
-            $cartLineIds = explode(',', $validated['cart_line_ids']);
-
             /** @var \Domain\Customer\Models\Customer $customer */
             $customer = Auth::user();
 
-            $cartLines = CartLine::query()
-                ->with('purchasable')
-                ->whereHas('cart', function ($query) use ($customer) {
-                    $query->whereBelongsTo($customer);
-                })
-                ->whereNull('checked_out_at')
-                ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
-                ->get();
+            $cartLines = $request->getCartLines();
 
-            $productlist = app(CartSummaryAction::class)->getProducts($cartLines);
+            $productlist = app(CartSummaryAction::class)->getProducts($cartLines, UnitEnum::INCH);
 
             $subTotal = app(CartSummaryAction::class)->getSubTotal($cartLines);
 
+            $customerAddress = ShippingAddressData::fromAddressModel($address);
+
             $boxData = app(GetBoxAction::class)->execute(
                 $shippingMethod,
-                $address,
+                $customerAddress,
                 BoxData::fromArray($productlist)
             );
 
             return response(
                 app(GetShippingRateAction::class)
                     ->execute(
-                        customer: $customer->load('verifiedAddress'),
                         parcelData: new ParcelData(
+                            reciever: ReceiverData::fromCustomerModel($customer->load('verifiedAddress')),
                             pounds: (string) $boxData->weight,
                             ounces: '0',
                             zip_origin: $shippingMethod->shipper_zipcode,
@@ -74,7 +67,7 @@ class RateController extends Controller
                             width: (string) $boxData->width,
                             length: (string) $boxData->length,
                             boxData: $boxData->boxData,
-                            ship_from_address: new ShipFromAddressData(
+                            ship_from_address: new ShippingAddressData(
                                 address: $shippingMethod->shipper_address,
                                 city: $shippingMethod->shipper_city,
                                 state: $shippingMethod->state,
@@ -84,7 +77,7 @@ class RateController extends Controller
                             ),
                         ),
                         shippingMethod: $shippingMethod,
-                        address: $address
+                        address: $customerAddress
                     )->getRateResponseAPI()
             );
         } catch (Throwable $th) {

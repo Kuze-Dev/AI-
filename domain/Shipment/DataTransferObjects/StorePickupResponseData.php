@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\DataTransferObjects;
 
-use Domain\Shipment\API\USPS\Contracts\RateResponse;
+use Domain\Shipment\Contracts\API\RateResponse;
 
 class StorePickupResponseData implements RateResponse
 {
@@ -18,7 +18,7 @@ class StorePickupResponseData implements RateResponse
         return get_object_vars($this);
     }
 
-    public function getRate(int $serviceID = null): float
+    public function getRate(int|string|null $serviceID = null): float
     {
         return $this->rate;
     }

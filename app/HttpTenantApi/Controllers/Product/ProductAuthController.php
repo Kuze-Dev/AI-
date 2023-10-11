@@ -8,7 +8,7 @@ use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;
 
 #[
-    ApiResource('auth/products', only: ['index', 'show']),
+    ApiResource('auth/products', only: ['index', 'show'], names: 'auth.products'),
     Middleware(['auth:sanctum'])
 ]
 class ProductAuthController extends ProductController

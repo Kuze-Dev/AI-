@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\API\UPS\Clients;
 
-use Domain\Address\Models\Address;
-use Domain\Customer\Models\Customer;
 use Domain\Shipment\API\UPS\DataTransferObjects\UpsResponse;
 use Domain\Shipment\DataTransferObjects\ParcelData;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 
 class UPSRateClient extends BaseClient
 {
@@ -17,15 +16,15 @@ class UPSRateClient extends BaseClient
     }
 
     public function getRate(
-        Customer $customer,
         ParcelData $parcelData,
-        Address $address
+        ShippingAddressData $address
     ): UpsResponse {
 
         $shipper = $parcelData->ship_from_address;
         // dd($parcelData);
         $package = $this->getPackage($parcelData);
 
+        $customer = $parcelData->reciever;
         // Create the associative array representing the JSON structure
         $data = [
             'RateRequest' => [
@@ -53,10 +52,10 @@ class UPSRateClient extends BaseClient
                     'ShipTo' => [
                         'Name' => $customer->first_name. ' '. $customer->last_name,
                         'Address' => [
-                            'AddressLine' => $address->address_line_1,
+                            'AddressLine' => $address->address,
                             'City' => $address->city,
                             // 'StateProvinceCode' => $address->state->name,
-                            'PostalCode' => $address->zip_code,
+                            'PostalCode' => $address->zipcode,
                             'CountryCode' => 'US',
                         ],
                     ],
@@ -109,14 +108,15 @@ class UPSRateClient extends BaseClient
     }
 
     public function getInternationalRate(
-        Customer $customer,
         ParcelData $parcelData,
-        Address $address,
+        ShippingAddressData $address,
     ): UpsResponse {
 
         $shipper = $parcelData->ship_from_address;
 
         $package = $this->getPackage($parcelData);
+
+        $customer = $parcelData->reciever;
 
         $data = [
             'RateRequest' => [
@@ -144,11 +144,11 @@ class UPSRateClient extends BaseClient
                     'ShipTo' => [
                         'Name' => $customer->first_name. ' '. $customer->last_name,
                         'Address' => [
-                            'AddressLine' => $address->address_line_1,
+                            'AddressLine' => $address->address,
                             'City' => $address->city,
                             'StateProvinceCode' => $address->state->name,
-                            'PostalCode' => $address->zip_code,
-                            'CountryCode' => $address->state->country->code,
+                            'PostalCode' => $address->zipcode,
+                            'CountryCode' => $address->country->code,
                         ],
                     ],
                     'ShipFrom' => [

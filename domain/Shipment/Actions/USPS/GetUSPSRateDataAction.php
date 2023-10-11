@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\Actions\USPS;
 
-use Domain\Customer\Models\Customer;
 use Domain\Shipment\API\USPS\Clients\AddressClient;
 use Domain\Shipment\API\USPS\Clients\RateClient;
 use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
@@ -12,6 +11,7 @@ use Domain\Shipment\API\USPS\DataTransferObjects\RateV4RequestData;
 use Domain\Shipment\API\USPS\DataTransferObjects\RateV4Response\RateV4ResponseData;
 use Domain\Shipment\API\USPS\Enums\ServiceType;
 use Domain\Shipment\DataTransferObjects\ParcelData;
+use Illuminate\Support\Facades\Auth;
 
 class GetUSPSRateDataAction
 {
@@ -22,36 +22,46 @@ class GetUSPSRateDataAction
     }
 
     public function execute(
-        Customer $customer,
         ParcelData $parcelData,
         AddressValidateRequestData $addressValidateRequestData
     ): RateV4ResponseData {
 
-        $verifiedAddress = $customer->verifiedAddress;
+        /** @var \Domain\Customer\Models\Customer */
+        $customer = Auth::user();
 
-        if ($verifiedAddress !== null) {
+        if ($customer != null) {
 
-            if ($verifiedAddress->address != $addressValidateRequestData->toArray()) {
+            $verifiedAddress = $customer->verifiedAddress;
 
-                $updatedVerifiedAddress = $this->addressClient->verify($addressValidateRequestData);
+            if ($verifiedAddress !== null) {
 
-                $verifiedAddress->update([
+                if ($verifiedAddress->address != $addressValidateRequestData->toArray()) {
+
+                    $updatedVerifiedAddress = $this->addressClient->verify($addressValidateRequestData);
+
+                    $verifiedAddress->update([
+                        'address' => $addressValidateRequestData->toArray(),
+                        'verified_address' => $updatedVerifiedAddress->toArray(),
+                    ]);
+
+                }
+
+                $zipDestination = $verifiedAddress->verified_address['zip5'] ?? null;
+
+            } else {
+
+                $address = $this->addressClient->verify($addressValidateRequestData);
+
+                $customer->verifiedAddress()->create([
                     'address' => $addressValidateRequestData->toArray(),
-                    'verified_address' => $updatedVerifiedAddress->toArray(),
+                    'verified_address' => $address->toArray(),
                 ]);
 
+                $zipDestination = $address->zip5;
             }
-
-            $zipDestination = $verifiedAddress->verified_address['zip5'] ?? null;
-
         } else {
 
             $address = $this->addressClient->verify($addressValidateRequestData);
-
-            $customer->verifiedAddress()->create([
-                'address' => $addressValidateRequestData->toArray(),
-                'verified_address' => $address->toArray(),
-            ]);
 
             $zipDestination = $address->zip5;
         }

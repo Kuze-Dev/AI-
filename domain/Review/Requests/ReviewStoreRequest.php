@@ -62,6 +62,7 @@ class ReviewStoreRequest extends FormRequest
             ],
             'comment' => [
                 'nullable',
+                'max:1000',
             ],
             'media' => [
                 'nullable',

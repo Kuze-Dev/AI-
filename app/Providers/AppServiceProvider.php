@@ -63,6 +63,7 @@ use Laravel\Pennant\Feature;
 use Stancl\Tenancy\Database\Models\Tenant;
 use TiMacDonald\JsonApi\JsonApiResource;
 use Domain\Site\Models\Site;
+use Domain\Tenant\Models\TenantApiCall;
 
 /** @property \Illuminate\Foundation\Application $app */
 class AppServiceProvider extends ServiceProvider
@@ -139,6 +140,7 @@ class AppServiceProvider extends ServiceProvider
             Locale::class,
             Site::class,
             Service::class,
+            TenantApiCall::class,
         ]);
 
         Password::defaults(

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
-use App\Features\ECommerce\ECommerceBase;
+use App\Features\Customer\CustomerBase;
 use App\Http\Controllers\Controller;
 use App\Settings\ECommerceSettings;
 use App\Settings\SiteSettings;
@@ -24,7 +24,7 @@ use Throwable;
 
 #[
     Prefix('account/verification'),
-    Middleware(['feature.tenant:' . ECommerceBase::class])
+    Middleware(['feature.tenant:' . CustomerBase::class])
 ]
 class VerifyEmailController extends Controller
 {
