@@ -9,11 +9,13 @@ use Domain\Product\Actions\UpdateProductAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductOption;
+use Domain\Product\Models\ProductVariant;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Validation\ValidationException;
 use Support\Common\Rules\MinimumValueRule;
 use Support\Excel\Actions\ImportAction;
+use Log;
 
 class ImportProductAction
 {
@@ -28,7 +30,7 @@ class ImportProductAction
                     'name' => 'required|string|max:100',
                     'category' => 'required|string|max:100',
                     'brand' => 'required|string|max:100',
-                    'sku' => 'required|unique:product_variants|string|max:100',
+                    'sku' => 'required|string|max:100',
                     'stock' => ['required', 'numeric', new MinimumValueRule(0)],
                     'retail_price' => ['required', 'numeric', new MinimumValueRule(0.1)],
                     'selling_price' => ['required', 'numeric', new MinimumValueRule(0.1)],
@@ -95,6 +97,38 @@ class ImportProductAction
         // Merge the product options and variants with the existing product
         $data['product_options'] = self::mergingProductOptions($foundProduct, $data['product_options']);
         $data['product_variants'] = self::mergingProductVariants($foundProduct, $data);
+
+        // Check for possible sku duplication
+        $foundProductViaSku = Product::where('sku', $data['product_sku'])->first();
+
+        if ($foundProductViaSku instanceof Product && $foundProductViaSku->id != $foundProduct->id) {
+            throw ValidationException::withMessages([
+                'product_id' => trans("Product ID of {$data['name']} is already exists."),
+            ]);
+        }
+
+        $foundProductVariant = ProductVariant::where('sku', $data['sku'])->first();
+
+        if ($foundProductVariant instanceof ProductVariant) {
+            if ($foundProductVariant->product_id != $foundProduct->id) {
+                throw ValidationException::withMessages([
+                    'sku' => trans("SKU of {$data['name']} is already exists."),
+                ]);
+            }
+
+            if ($foundProductVariant->product_id == $foundProduct->id) {
+                return $foundProduct;
+            }
+        }
+
+        Log::info(
+            'Import row(s) of product ',
+            [
+                'name' => $data['name'],
+                'product_id' => $data['product_sku'] ?? $data['sku'],
+                'sku' => $data['sku'],
+            ]
+        );
 
         // Update the existing product
         return app(UpdateProductAction::class)->execute($foundProduct, ProductData::fromCsv([

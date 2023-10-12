@@ -16,6 +16,7 @@ use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Exceptions\OrderEmailSettingsException;
 use Domain\Order\Exceptions\OrderEmailSiteSettingsException;
 use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -23,6 +24,7 @@ use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Log;
 
@@ -116,9 +118,24 @@ class PrepareOrderAction
      */
     public function prepareCartLines(PlaceOrderData $placeOrderData): Collection
     {
-        return CartLine::with(['purchasable' => function (MorphTo $query) {
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = auth()->user();
+
+        /** @var \Domain\Tier\Models\Tier $tier */
+        $tier = $customer->tier;
+
+        return CartLine::with(['purchasable' => function (MorphTo $query) use ($tier) {
             $query->morphWith([
-                ProductVariant::class => ['product'],
+                Product::class => [
+                    'productTier' => function (BelongsToMany $query) use ($tier) {
+                        $query->where('tier_id', $tier->id);
+                    },
+                ],
+                ProductVariant::class => [
+                    'product.productTier' => function (BelongsToMany $query) use ($tier) {
+                        $query->where('tier_id', $tier->id);
+                    },
+                ],
             ]);
         }, ])
             ->whereCheckoutReference($placeOrderData->cart_reference)

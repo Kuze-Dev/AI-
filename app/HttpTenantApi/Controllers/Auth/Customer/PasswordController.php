@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
-use App\Features\ECommerce\ECommerceBase;
+use App\Features\Customer\CustomerBase;
 use App\Http\Controllers\Controller;
 use Domain\Auth\Actions\ForgotPasswordAction;
 use Domain\Auth\Actions\ResetPasswordAction;
@@ -25,7 +25,7 @@ use Throwable;
 
 #[
     Prefix('account/password'),
-    Middleware('feature.tenant:' . ECommerceBase::class)
+    Middleware('feature.tenant:' . CustomerBase::class)
 ]
 class PasswordController extends Controller
 {

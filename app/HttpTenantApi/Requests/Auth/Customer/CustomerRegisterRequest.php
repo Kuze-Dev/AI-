@@ -20,6 +20,11 @@ use Illuminate\Validation\Rules\Password;
 
 class CustomerRegisterRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        logger('register', $this->all());
+    }
+
     public function rules(): array
     {
         $rules = [
@@ -108,6 +113,16 @@ class CustomerRegisterRequest extends FormRequest
             'billing.zip_code.required_if' => trans('validation.required'),
             'billing.city.required_if' => trans('validation.required'),
             'billing.label_as.required_if' => trans('validation.required'),
+
+            'email.required' => trans('The email addresss field is required.'),
+            'email.email' => trans('The email address must be valid.'),
+            'email.unique' => trans('The email address has already been taken.'),
+            'email.max' => trans('The email address must not exceed :max characters.'),
+
+            'mobile.required' => trans('The mobile field is required.'),
+            'mobile.string' => trans('The mobile field must be a string.'),
+            'mobile.max' => trans('The mobile field must not exceed :max characters.'),
+            'mobile.unique' => trans('The mobile number has already been taken.'),
         ];
     }
 
@@ -116,16 +131,16 @@ class CustomerRegisterRequest extends FormRequest
         return [
             'shipping.country_id' => 'shipping country',
             'shipping.state_id' => 'shipping state',
-            'shipping.address_line_1' => 'shipping address_line_1',
-            'shipping.zip_code' => 'shipping zip_code',
+            'shipping.address_line_1' => 'shipping address line 1',
+            'shipping.zip_code' => 'shipping zip code',
             'shipping.city' => 'shipping city',
-            'shipping.label_as' => 'shipping label_as',
+            'shipping.label_as' => 'shipping label as',
 
-            'billing.same_as_shipping' => 'billing same_as_shipping',
+            'billing.same_as_shipping' => 'billing same as shipping',
             'billing.country_id' => 'billing country',
             'billing.state_id' => 'billing state',
-            'billing.address_line_1' => 'shipping address_line_1',
-            'billing.zip_code' => 'shipping zip_code',
+            'billing.address_line_1' => 'shipping address line 1',
+            'billing.zip_code' => 'shipping zip code',
             'billing.city' => 'shipping city',
             'billing.label_as' => 'shipping label_as',
         ];

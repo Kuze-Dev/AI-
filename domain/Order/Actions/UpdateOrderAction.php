@@ -43,9 +43,9 @@ class UpdateOrderAction
                     $customer = auth()->user();
 
                     event(new OrderStatusUpdatedEvent(
-                        $customer,
                         $orderWithPayment,
-                        $updateOrderData->status
+                        $updateOrderData->status,
+                        $customer,
                     ));
                 }
 

@@ -10,7 +10,7 @@ class DiscountRequirementData
 {
     public function __construct(
         public readonly ?DiscountRequirementType $discount_requirement_type = null,
-        public readonly ?int $minimum_amount = null,
+        public readonly float|int|null $minimum_amount,
     ) {
     }
 }

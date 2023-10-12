@@ -71,4 +71,17 @@ class AddressRequest extends FormRequest
             customer_id: ($customer ? $customer->getKey() : null) ?? ($address && $address->customer ? $address->customer->getKey() : null),
         );
     }
+
+    public function toGuestDTO(): AddressData
+    {
+        $validated = $this->validated();
+
+        return new AddressData(
+            state_id: (int) $validated['state_id'],
+            label_as: $validated['label_as'],
+            address_line_1: $validated['address_line_1'],
+            zip_code: $validated['zip_code'],
+            city: $validated['city'],
+        );
+    }
 }

@@ -35,6 +35,7 @@ class ProductController
                     'is_special_offer',
                     'is_featured',
                     'status',
+                    'allow_guest_purchase',
                     AllowedFilter::callback(
                         'taxonomies',
                         function (ProductBuilder $query, array $value) {
@@ -52,6 +53,8 @@ class ProductController
                     'productVariants',
                     'media',
                     'metaData',
+                    'tiers',
+                    'productTier',
                 ])
                 ->jsonPaginate()
         );
@@ -68,6 +71,8 @@ class ProductController
                 'productVariants',
                 'media',
                 'metaData',
+                'tiers',
+                'productTier',
             ])
             ->firstOrFail();
 
@@ -75,7 +80,10 @@ class ProductController
             $totalSold = OrderLine::whereHas('order', function (Builder $query) {
                 $query->where('status', OrderStatuses::FULFILLED);
             })
-                ->where('purchasable_id', $product->id)
+                ->where(function ($query) use ($product) {
+                    $query->whereRaw('JSON_EXTRACT(purchasable_data, "$.product.id") = ?', [$product->id])
+                        ->orWhereRaw('JSON_EXTRACT(purchasable_data, "$.id") = ?', [$product->id]);
+                })
                 ->sum('quantity');
 
             $product->setAttribute('total_sold', $totalSold);

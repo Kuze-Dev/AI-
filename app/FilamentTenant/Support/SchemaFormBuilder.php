@@ -54,6 +54,32 @@ class SchemaFormBuilder extends Component
         $this->schemaData($schemaData);
     }
 
+    public function schemaData(SchemaData|Closure $schemaData = null): self
+    {
+        $this->schemaData = $schemaData;
+
+        return $this;
+    }
+
+    public function getChildComponents(): array
+    {
+        return ($schema = $this->getSchemaData())
+            ? array_map(fn (SectionData $section) => $this->generateSectionSchema($section), $schema->sections)
+            : [];
+    }
+
+    public function getSchemaData(): ?SchemaData
+    {
+        return $this->evaluate($this->schemaData);
+    }
+
+    private function generateSectionSchema(SectionData $section): Section
+    {
+        return Section::make($section->title)
+            ->statePath($section->state_name)
+            ->schema(array_map(fn (FieldData $field) => $this->generateFieldComponent($field), $section->fields));
+    }
+
     public static function make(string $name, SchemaData|Closure $schemaData = null): static
     {
         $static = app(static::class, [
@@ -64,39 +90,6 @@ class SchemaFormBuilder extends Component
         $static->configure();
 
         return $static;
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->columnSpan('full');
-    }
-
-    public function schemaData(SchemaData|Closure $schemaData = null): self
-    {
-        $this->schemaData = $schemaData;
-
-        return $this;
-    }
-
-    public function getSchemaData(): ?SchemaData
-    {
-        return $this->evaluate($this->schemaData);
-    }
-
-    public function getChildComponents(): array
-    {
-        return ($schema = $this->getSchemaData())
-            ? array_map(fn (SectionData $section) => $this->generateSectionSchema($section), $schema->sections)
-            : [];
-    }
-
-    private function generateSectionSchema(SectionData $section): Section
-    {
-        return Section::make($section->title)
-            ->statePath($section->state_name)
-            ->schema(array_map(fn (FieldData $field) => $this->generateFieldComponent($field), $section->fields));
     }
 
     private function generateFieldComponent(FieldData $field): Field
@@ -126,6 +119,12 @@ class SchemaFormBuilder extends Component
             MediaFieldData::class => $this->makeMediaComponent($field),
             default => throw new InvalidArgumentException('Cannot generate field component for `' . $field::class . '` as its not supported.'),
         };
+
+        if ( ! $this->isDehydrated()) {
+            return $fieldComponent
+                ->label($field->title)
+                ->helperText($field->helper_text);
+        }
 
         return $fieldComponent
             ->label($field->title)
@@ -184,70 +183,6 @@ class SchemaFormBuilder extends Component
         }
 
         return $fileUpload;
-    }
-
-    private function makeMediaComponent(MediaFieldData $mediaFieldData): FileUpload
-    {
-        $media = FileUpload::make($mediaFieldData->state_name);
-
-        if ($mediaFieldData->multiple) {
-            $media->multiple($mediaFieldData->multiple)
-                ->appendFiles()
-                ->minFiles($mediaFieldData->min_files)
-                ->maxFiles($mediaFieldData->max_files)
-                ->panelLayout('grid')
-                ->imagePreviewHeight('256');
-        }
-
-        if ($mediaFieldData->reorder) {
-            $media->enableReordering($mediaFieldData->reorder);
-        }
-
-        $media->formatStateUsing(function (?array $state): array {
-
-            if ($state) {
-
-                /** @var array */
-                $media = Media::whereIn('uuid', $state)->orwhereIN('file_name', $state)->pluck('uuid')->toArray();
-
-                if ($media) {
-                    return $media;
-                }
-            }
-
-            return [];
-        });
-
-        $media->dehydrateStateUsing(function (?array $state) {
-            return array_values($state ?? []) ?: null;
-        });
-
-        $media->getUploadedFileUrlUsing(function ($file) {
-
-            if ( ! is_null($file)) {
-                $media = Media::where('uuid', $file)->first();
-                if ($media) {
-                    return $media->getUrl();
-                }
-            }
-
-            return [];
-
-        });
-
-        if ( ! empty($mediaFieldData->accept)) {
-            $media->acceptedFileTypes($mediaFieldData->accept);
-        }
-
-        if ($mediaFieldData->min_size) {
-            $media->minSize($mediaFieldData->min_size);
-        }
-
-        if ($mediaFieldData->max_size) {
-            $media->maxSize($mediaFieldData->max_size);
-        }
-
-        return $media;
     }
 
     private function makeTextAreaComponent(TextareaFieldData $textareaFieldData): Textarea
@@ -330,5 +265,76 @@ class SchemaFormBuilder extends Component
         }
 
         return $component;
+    }
+
+    private function makeMediaComponent(MediaFieldData $mediaFieldData): FileUpload
+    {
+        $media = FileUpload::make($mediaFieldData->state_name);
+
+        if ($mediaFieldData->multiple) {
+            $media->multiple($mediaFieldData->multiple)
+                ->appendFiles()
+                ->minFiles($mediaFieldData->min_files)
+                ->maxFiles($mediaFieldData->max_files)
+                ->panelLayout('grid')
+                ->imagePreviewHeight('256');
+        }
+
+        if ($mediaFieldData->reorder) {
+            $media->enableReordering($mediaFieldData->reorder);
+        }
+
+        $media->formatStateUsing(function (?array $state): array {
+
+            if ($state) {
+
+                /** @var array */
+                $media = Media::whereIn('uuid', $state)->orwhereIN('file_name', $state)->pluck('uuid')->toArray();
+
+                if ($media) {
+                    return $media;
+                }
+            }
+
+            return [];
+        });
+
+        $media->dehydrateStateUsing(function (?array $state) {
+            return array_values($state ?? []) ?: null;
+        });
+
+        $media->getUploadedFileUrlUsing(function ($file) {
+
+            if ( ! is_null($file)) {
+                $media = Media::where('uuid', $file)->first();
+                if ($media) {
+                    return $media->getUrl();
+                }
+            }
+
+            return [];
+
+        });
+
+        if ( ! empty($mediaFieldData->accept)) {
+            $media->acceptedFileTypes($mediaFieldData->accept);
+        }
+
+        if ($mediaFieldData->min_size) {
+            $media->minSize($mediaFieldData->min_size);
+        }
+
+        if ($mediaFieldData->max_size) {
+            $media->maxSize($mediaFieldData->max_size);
+        }
+
+        return $media;
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->columnSpan('full');
     }
 }

@@ -11,12 +11,14 @@ use Domain\Order\Events\AdminOrderFailedNotificationEvent;
 use Domain\Order\Events\OrderPlacedEvent;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
 use Domain\Order\Events\OrderStatusUpdatedEvent;
+use Domain\Order\Events\PublicOrder\GuestOrderPlacedEvent;
 use Domain\Order\Listeners\AdminOrderBankPaymentListener;
 use Domain\Order\Listeners\AdminOrderFailedNotificationListener;
 use Domain\Order\Listeners\OrderPlacedListener;
 use Domain\Order\Listeners\AdminOrderStatusUpdatedListener;
 use Domain\Order\Listeners\OrderPaymentUpdatedListener;
 use Domain\Order\Listeners\OrderStatusUpdatedListener;
+use Domain\Order\Listeners\PublicOrder\GuestOrderPlacedListener;
 use Domain\Payments\Events\PaymentProcessEvent;
 use Domain\ServiceOrder\Listeners\ServiceOrderPaymentUpdatedListener;
 use Illuminate\Auth\Events\Registered;
@@ -55,6 +57,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         AdminOrderFailedNotificationEvent::class => [
             AdminOrderFailedNotificationListener::class,
+        ],
+        GuestOrderPlacedEvent::class => [
+            GuestOrderPlacedListener::class,
         ],
     ];
 

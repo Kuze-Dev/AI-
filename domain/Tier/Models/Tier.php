@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Domain\Tier\Models;
 
 use Domain\Customer\Models\Customer;
+use Domain\Product\Models\Product;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
@@ -46,6 +48,11 @@ class Tier extends Model
     protected $fillable = [
         'name',
         'description',
+        'has_approval',
+    ];
+
+    protected $casts = [
+        'has_approval' => 'boolean',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -60,5 +67,16 @@ class Tier extends Model
     public function customers(): HasMany
     {
         return $this->hasMany(Customer::class);
+    }
+
+    /**
+     * Declare relationship of
+     * current model to products.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Product\Models\Product>
+     */
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class);
     }
 }

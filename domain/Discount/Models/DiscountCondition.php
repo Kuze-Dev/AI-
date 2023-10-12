@@ -52,7 +52,7 @@ class DiscountCondition extends Model
     protected $casts = [
         'discount_type' => DiscountConditionType::class,
         'amount_type' => DiscountAmountType::class,
-        'amount' => 'int',
+        'amount' => 'float',
     ];
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Discount\Models\Discount, \Domain\Discount\Models\DiscountCondition> */

@@ -11,18 +11,18 @@ use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
-use Illuminate\Support\Str;
 
 class CreateOrderAction
 {
     public function __construct(
-        private readonly CartSummaryAction $cartSummaryAction
+        private readonly CartSummaryAction $cartSummaryAction,
+        private readonly CreateOrderReference $createOrderReference
     ) {
     }
 
     public function execute(PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData): Order
     {
-        $referenceNumber = Str::upper(Str::random(12));
+        $referenceNumber = $this->createOrderReference->execute();
 
         /** @var \Domain\Address\Models\State $state */
         $state = $preparedOrderData->billingAddress->state;
@@ -30,7 +30,7 @@ class CreateOrderAction
         /** @var \Domain\Address\Models\Country $country */
         $country = $state->country;
 
-        $summary = $this->cartSummaryAction->getSummary(
+        $summary = $this->cartSummaryAction->execute(
             $preparedOrderData->cartLine,
             new CartSummaryTaxData(
                 $country->id,

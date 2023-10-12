@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\DiscountResource\Pages\CreateDiscount;
+use Domain\Currency\Database\Factories\CurrencyFactory;
 use Domain\Discount\Enums\DiscountRequirementType;
 use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
@@ -17,6 +18,9 @@ beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
+    CurrencyFactory::new()->createOne([
+        'enabled' => true,
+    ]);
 });
 
 it('can render page', function () {

@@ -117,7 +117,7 @@ class UpdateOrderPaymentAction
                     'reference_id' => $order->reference,
                     'amount' => AmountData::fromArray([
                         'currency' => $order->currency_code,
-                        'total' => (int) $order->total,
+                        'total' => $order->total,
                         'details' => PaymentDetailsData::fromArray(
                             [
                                 'subtotal' => strval($order->sub_total - $order->discount_total),

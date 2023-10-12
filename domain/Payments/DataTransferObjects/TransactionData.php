@@ -39,7 +39,7 @@ class TransactionData
         );
     }
 
-    public function getTotal(): int
+    public function getTotal(): int|float
     {
         return $this->amount->total / 100;
     }
