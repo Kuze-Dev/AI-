@@ -20,7 +20,7 @@ class SuccessUpdatePasswordNotification extends Notification
     {
         return [
             'type' => 'update_password_success',
-            'message' => 'YYou have successfully update your password.',
+            'message' => 'You have successfully update your password.',
         ];
     }
 }
