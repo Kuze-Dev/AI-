@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Domain\Cart\Database\Factories\CartFactory;
 use Domain\Cart\Database\Factories\CartLineFactory;
+use App\Features\ECommerce\AllowGuestOrder;
 use Domain\Cart\Models\CartLine;
 
 use function Pest\Laravel\postJson;
@@ -11,6 +12,8 @@ use function Pest\Laravel\withHeader;
 
 beforeEach(function () {
     testInTenantContext();
+
+    tenancy()->tenant->features()->activate(AllowGuestOrder::class);
 
     $uuid = uuid_create(UUID_TYPE_RANDOM);
 

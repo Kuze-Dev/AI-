@@ -3,10 +3,6 @@
 declare(strict_types=1);
 
 use App\Features\CMS\CMSBase;
-use App\Features\Customer\AddressBase;
-use App\Features\Customer\CustomerBase;
-use App\Features\Customer\TierBase;
-use App\Features\ECommerce\AllowGuestOrder;
 use App\Features\ECommerce\ECommerceBase;
 use Database\Seeders\Tenant\Auth\PermissionSeeder;
 use Database\Seeders\Tenant\Auth\RoleSeeder;
@@ -79,10 +75,6 @@ function testInTenantContext(): Tenant
 
     $tenant->features()->activate(CMSBase::class);
     $tenant->features()->activate(ECommerceBase::class);
-    $tenant->features()->activate(CustomerBase::class);
-    $tenant->features()->activate(TierBase::class);
-    $tenant->features()->activate(AddressBase::class);
-    $tenant->features()->activate(AllowGuestOrder::class);
 
     URL::forceRootUrl(Request::getScheme() . '://' . $domain);
 

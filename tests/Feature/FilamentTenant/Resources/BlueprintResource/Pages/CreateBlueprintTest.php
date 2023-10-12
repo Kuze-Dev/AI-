@@ -200,4 +200,11 @@ it('can show field options', function (FieldType $fieldType, array $fieldOptions
             'max_size',
         ],
     ],
+    'tinyeditor field' => [
+        'type' => FieldType::TINYEDITOR,
+        'field_options' => [
+            'min_length',
+            'max_length',
+        ],
+    ],
 ]);

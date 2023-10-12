@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Features\Customer\AddressBase;
+use App\Features\Customer\CustomerBase;
+use App\Features\Customer\TierBase;
 use Domain\Auth\Events\PasswordResetSent;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Customer\Notifications\ResetPassword;
@@ -21,7 +24,10 @@ use function PHPUnit\Framework\assertTrue;
 uses()->group('customer');
 
 beforeEach(function () {
-    testInTenantContext();
+    $tenant = testInTenantContext();
+    $tenant->features()->activate(CustomerBase::class);
+    $tenant->features()->activate(AddressBase::class);
+    $tenant->features()->activate(TierBase::class);
 });
 
 // it('can send link', function () {
