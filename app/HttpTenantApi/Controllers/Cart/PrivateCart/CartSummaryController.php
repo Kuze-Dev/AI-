@@ -80,8 +80,7 @@ class CartSummaryController extends Controller
 
             $responseArray = [
                 'tax' => [
-                    'inclusive_sub_total' => $summary->taxTotal ? number_format((float) ($summary->subTotal + $summary->taxTotal), 2, '.', ',') : null,
-                    'display' => $summary->taxTotal ? $summary->taxDisplay : null,
+                    'display' => $summary->taxDisplay,
                     'percentage' => $summary->taxPercentage ? round($summary->taxPercentage, 2) : 0,
                     'amount' => $summary->taxTotal ? number_format((float) $summary->taxTotal, 2, '.', ',') : 0,
                 ],

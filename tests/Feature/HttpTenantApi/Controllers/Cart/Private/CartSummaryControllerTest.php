@@ -89,7 +89,6 @@ beforeEach(function () {
     $this->address = $address;
     $this->shippingMethod = $shippingMethod;
     $this->cartLines = $cartLines;
-
 });
 
 it('can get cart count', function () {
@@ -116,7 +115,6 @@ it('can show cart summary', function () {
         ->assertValid()
         ->assertJsonStructure([
             'tax' => [
-                'inclusive_sub_total',
                 'display',
                 'percentage',
                 'amount',
