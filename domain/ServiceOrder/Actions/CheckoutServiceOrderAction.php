@@ -28,7 +28,7 @@ class CheckoutServiceOrderAction
     {
         $paymentMethod = $this->preparePaymentMethod($data['payment_method']);
 
-        $serviceBill = ServiceBill::whereId($data['service_bill_id'])->firstOrFail();
+        $serviceBill = ServiceBill::whereReference($data['reference_id'])->firstOrFail();
 
         $payment = $this->proceedPayment($serviceBill, $paymentMethod);
 

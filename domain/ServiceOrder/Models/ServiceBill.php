@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereDueDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereReference($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereServiceOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereServicePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereStatus($value)

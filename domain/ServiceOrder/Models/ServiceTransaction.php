@@ -48,6 +48,7 @@ class ServiceTransaction extends Model
         'service_bill_id',
         'payment_id',
         'payment_method',
+        'payment_method_id',
         'currency',
         'total_amount',
         'status',
