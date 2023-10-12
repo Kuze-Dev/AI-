@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 use App\Features\Service\ServiceBase;
-use Domain\Product\Database\Factories\ProductFactory;
 use Domain\Service\Databases\Factories\ServiceFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
+
 use function Pest\Laravel\getJson;
 
 beforeEach(function () {
@@ -46,13 +46,13 @@ it('can show a service', function () {
         ->assertJson(function (AssertableJson $json) use ($service) {
             $json
                 ->where('data.type', 'services')
-                ->where('data.id', (string)$service->getRouteKey())
+                ->where('data.id', (string) $service->getRouteKey())
                 ->where('data.attributes.name', $service->name)
                 ->etc();
         });
 });
 
-it("can filter services", function ($attribute) {
+it('can filter services', function ($attribute) {
     $services = ServiceFactory::new(['status' => 1])
         ->has(TaxonomyTermFactory::new()
             ->for(TaxonomyFactory::new()
@@ -64,13 +64,13 @@ it("can filter services", function ($attribute) {
 
     foreach ($services as $service) {
         getJson('api/services?' . http_build_query([
-                'filter' => [$attribute => $service->$attribute],
-            ]))
+            'filter' => [$attribute => $service->$attribute],
+        ]))
             ->assertOk()
             ->assertJson(function (AssertableJson $json) use ($service) {
                 $json
                     ->where('data.0.type', 'services')
-                    ->where('data.0.id', (string)$service->getRouteKey())
+                    ->where('data.0.id', (string) $service->getRouteKey())
                     ->where('data.0.attributes.name', $service->name)
                     ->count('data', 1)
                     ->etc();
@@ -96,7 +96,6 @@ it("can't list inactive services", function () {
                 ->etc();
         });
 });
-
 
 it("can't show an inactive service", function () {
     $service = ServiceFactory::new(['status' => 0])
