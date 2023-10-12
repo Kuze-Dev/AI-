@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $service_order_id
  * @property int $service_bill_id
- * @property int $payment_id
  * @property int $payment_method_id
  * @property string $currency
  * @property float $total_amount
@@ -32,7 +31,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction whereCurrency($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction wherePaymentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction wherePaymentMethodId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction whereServiceBillId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction whereServiceOrderId($value)

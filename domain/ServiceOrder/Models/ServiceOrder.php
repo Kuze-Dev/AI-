@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $service_id
  * @property int $customer_id
  * @property int|null $admin_id
+ * @property string $reference
  * @property string $customer_first_name
  * @property string $customer_last_name
  * @property string $customer_email
@@ -30,13 +31,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $currency_name
  * @property string $currency_symbol
  * @property string $service_name
- * @property string $service_price
+ * @property float $service_price
+ * @property BillingCycle $billing_cycle
+ * @property int $due_date_every
  * @property \Illuminate\Support\Carbon $schedule
  * @property ServiceOrderStatus $status
  * @property int $is_paid
- * @property string $reference
  * @property string|null $cancelled_reason
- * @property string $total_price
+ * @property float $total_price
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Admin|null $admin
@@ -49,6 +51,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder query()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereAdditionalCharges($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereAdminId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereBillingCycle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCancelledReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCurrencyCode($value)
@@ -60,6 +63,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCustomerId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCustomerLastName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCustomerMobile($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereDueDateEvery($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereIsPaid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereReference($value)

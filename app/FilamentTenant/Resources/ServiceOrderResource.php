@@ -438,11 +438,17 @@ class ServiceOrderResource extends Resource
                     ->form([
                         Forms\Components\Select::make('status_options')
                             ->label('')
-                            ->options(function () {
+                            ->options(function () use ($record) {
                                 $options = [
                                     ServiceOrderStatus::INPROGRESS->value => trans('In progress'),
                                     ServiceOrderStatus::COMPLETED->value => trans('Completed'),
                                 ];
+                                if($record->billing_cycle) {
+                                    $options = [
+                                        ServiceOrderStatus::ACTIVE->value => trans('Active'),
+                                        ServiceOrderStatus::CLOSED->value => trans('Closed'),
+                                    ];
+                                }
 
                                 return $options;
                             })

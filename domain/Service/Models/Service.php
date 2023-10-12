@@ -25,8 +25,8 @@ use Spatie\MediaLibrary\HasMedia;
  * @property string $blueprint_id
  * @property string $name
  * @property string|null $description
- * @property int $retail_price
- * @property int $selling_price
+ * @property float $retail_price
+ * @property float $selling_price
  * @property string|null $billing_cycle
  * @property int|null $due_date_every
  * @property int $is_featured
