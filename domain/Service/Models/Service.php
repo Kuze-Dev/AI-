@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Service\Models;
 
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Service\Enums\BillingCycle;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -44,6 +45,10 @@ class Service extends Model implements HasMetaDataContract, HasMedia
         'pay_upfront',
         'is_subscription',
         'status',
+    ];
+
+    protected $casts = [
+        'billing_cycle' => BillingCycle::class,
     ];
 
     /** @return BelongsToMany<TaxonomyTerm> */

@@ -6,9 +6,9 @@ namespace Domain\Service\Enums;
 
 enum BillingCycle: string
 {
-    case DAILY = 'Daily';
+    case DAILY = 'daily';
 
-    case MONTHLY = 'Monthly';
+    case MONTHLY = 'monthly';
 
-    case YEARLY = 'Yearly';
+    case YEARLY = 'yearly';
 }

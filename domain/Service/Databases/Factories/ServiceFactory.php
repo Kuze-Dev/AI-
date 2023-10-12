@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Service\Databases\Factories;
 
-use Carbon\Carbon;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Service\Enums\BillingCycle;
 use Domain\Service\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Arr;
 
 /**
  * @extends Factory<Service>
@@ -19,29 +19,40 @@ class ServiceFactory extends Factory
 
     public function definition(): array
     {
-        $random = [true, false];
-        $billing = [];
-        foreach (BillingCycle::cases() as $billingCycle) {
-            $billing[$billingCycle->value] = $billingCycle->name;
-        }
-        $days = [];
-        for ($day = 1; $day <= Carbon::now()->daysInMonth; $day++) {
-            $days[] = $day;
-        }
-
         return [
             'name' => $this->faker->name,
             'description' => $this->faker->sentence,
-            'retail_price' => $this->faker->numberBetween(1, 99999),
-            'selling_price' => $this->faker->numberBetween(1, 99999),
-            'billing_cycle' => array_rand($billing),
-            'due_date_every' => array_rand($days),
-            'pay_upfront' => array_rand($random),
-            'is_featured' => array_rand($random),
-            'is_special_offer' => array_rand($random),
-            'is_subscription' => array_rand($random),
-            'status' => array_rand(['active', 'inactive']),
+            'retail_price' => $this->faker->numberBetween(1, 99_999),
+            'selling_price' => $this->faker->numberBetween(1, 99_999),
+            'billing_cycle' => Arr::random(BillingCycle::cases()),
+            'due_date_every' => Arr::random(range(1, now()->daysInMonth)),
+            'pay_upfront' => $this->faker->boolean(),
+            'is_featured' => $this->faker->boolean(),
+            'is_special_offer' => $this->faker->boolean(),
+            'is_subscription' => $this->faker->boolean(),
+            'status' => $this->faker->boolean(),
         ];
+    }
+
+    public function featured(): self
+    {
+        return $this->state([
+            'is_featured' => true,
+        ]);
+    }
+
+    public function specialOffer(): self
+    {
+        return $this->state([
+            'is_special_offer' => true,
+        ]);
+    }
+
+    public function subscription(): self
+    {
+        return $this->state([
+            'is_subscription' => true,
+        ]);
     }
 
     public function withDummyBlueprint(): self
