@@ -38,7 +38,6 @@ class ServiceOrderFactory extends Factory
             'due_date_every' => $this->faker->randomDigit(),
             'schedule' => now()->addDay(),
             'status' => ServiceOrderStatus::PENDING,
-            'is_paid' => $this->faker->boolean(),
             'cancelled_reason' => null,
             'total_price' => $this->faker->randomFloat(2, 1, 100),
         ];

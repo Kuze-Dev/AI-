@@ -36,7 +36,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $due_date_every
  * @property \Illuminate\Support\Carbon $schedule
  * @property ServiceOrderStatus $status
- * @property int $is_paid
  * @property string|null $cancelled_reason
  * @property float $total_price
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -65,7 +64,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCustomerMobile($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereDueDateEvery($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereIsPaid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereReference($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereSchedule($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereServiceId($value)
@@ -100,7 +98,6 @@ class ServiceOrder extends Model
         'service_price',
         'billing_cycle',
         'due_date_every',
-        'is_paid',
         'schedule',
         'status',
         'cancelled_reason',

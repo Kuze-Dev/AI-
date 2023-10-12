@@ -545,10 +545,30 @@ class ServiceOrderResource extends Resource
                     ->label(trans('Total'))
                     ->sortable(),
 
-                Tables\Columns\IconColumn::make('is_paid')
-                    ->label(trans('Paid'))
+                Tables\Columns\BadgeColumn::make('status')
+                    ->label(trans('Status'))
                     ->alignRight()
-                    ->boolean(),
+                    ->formatStateUsing(function (string $state): string {
+                        if ($state == ServiceOrderStatus::FORPAYMENT->value) {
+                            return trans('For Payment');
+                        }
+                        if ($state == ServiceOrderStatus::INPROGRESS->value) {
+                            return trans('In Progress');
+                        }
+
+                        return ucfirst($state);
+                    })
+                    ->color(function ($state) {
+                        $newState = str_replace(' ', '_', strtolower($state));
+
+                        return match ($newState) {
+                            ServiceOrderStatus::PENDING->value, ServiceOrderStatus::INPROGRESS->value => 'warning',
+                            ServiceOrderStatus::CLOSED->value, ServiceOrderStatus::INACTIVE->value, ServiceOrderStatus::CLOSED->value => 'danger',
+                            ServiceOrderStatus::COMPLETED->value, ServiceOrderStatus::ACTIVE->value => 'success',
+                            default => 'secondary',
+                        };
+                    })->inline()
+                    ->alignLeft(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()
                     ->label(trans('Order Date'))

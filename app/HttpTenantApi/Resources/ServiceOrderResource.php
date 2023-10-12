@@ -26,7 +26,6 @@ class ServiceOrderResource extends JsonApiResource
             'billing_address' => $this->billing_address,
             'currency_symbol' => $this->currency_symbol,
             'form' => $this->customer_form,
-            'is_paid' => $this->is_paid,
             'schedule' => $this->schedule,
             'total_price' => $this->total_price,
         ];
