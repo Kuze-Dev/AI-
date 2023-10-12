@@ -16,7 +16,11 @@ class ResetPassword extends \Illuminate\Auth\Notifications\ResetPassword impleme
     protected function buildMailMessage($url)
     {
         return (new MailMessage())
-            ->from(app(FormSettings::class)->sender_email ?? config('mail.from.address'))
+            ->from(
+                tenancy()->tenant ?
+                (app(FormSettings::class)->sender_email ? config('mail.from.address') : config('mail.from.address')) :
+                config('mail.from.address')
+            )
             ->subject(trans('Reset Password Notification'))
             ->line(trans('You are receiving this email because we received a password reset request for your account.'))
             ->action(trans('Reset Password'), $url)

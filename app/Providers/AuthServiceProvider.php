@@ -73,7 +73,11 @@ class AuthServiceProvider extends ServiceProvider
 
             if ($notifiable instanceof HasEmailVerificationOTP && $notifiable->isEmailVerificationUseOTP()) {
                 return (new MailMessage())
-                    ->from(app(FormSettings::class)->sender_email ?? config('mail.from.address'))
+                    ->from(
+                        tenancy()->tenant ?
+                        (app(FormSettings::class)->sender_email ? config('mail.from.address') : config('mail.from.address')) :
+                        config('mail.from.address')
+                    )
                     ->subject(trans('Verify Email Address'))
                     ->line(trans('Please copy OTP below to verify your email address.'))
                     ->line('OTP: ' . $notifiable->generateEmailVerificationOTP())
@@ -83,7 +87,11 @@ class AuthServiceProvider extends ServiceProvider
             // copied from \Illuminate\Auth\Notifications\VerifyEmail::buildMailMessage($url)
             // https://github.com/laravel/framework/blob/v10.16.1/src/Illuminate/Auth/Notifications/VerifyEmail.php#L62
             return (new MailMessage())
-                ->from(app(FormSettings::class)->sender_email ?? config('mail.from.address'))
+                ->from(
+                    tenancy()->tenant ?
+                    (app(FormSettings::class)->sender_email ? config('mail.from.address') : config('mail.from.address')) :
+                    config('mail.from.address')
+                )
                 ->subject(trans('Verify Email Address'))
                 ->line(trans('Please click the button below to verify your email address.'))
                 ->action(trans('Verify Email Address'), $url)
