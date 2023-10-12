@@ -7,6 +7,7 @@ namespace App\HttpTenantApi\Controllers\Auth\Customer;
 use App\Features\Customer\CustomerBase;
 use App\Http\Controllers\Controller;
 use App\Notifications\Customer\SuccessResetPasswordNotification;
+use App\Notifications\Customer\SuccessUpdatePasswordNotification;
 use Domain\Auth\Actions\ForgotPasswordAction;
 use Domain\Auth\Actions\ResetPasswordAction;
 use Domain\Auth\DataTransferObjects\ResetPasswordData;
@@ -96,6 +97,7 @@ class PasswordController extends Controller
             fn () => app(EditCustomerPasswordAction::class)
                 ->execute($customer, $validated['password'])
         );
+        Notification::send($customer, new SuccessUpdatePasswordNotification());
 
         return new JsonResponse(['message' => trans('Your password has been updated!')], 200);
     }

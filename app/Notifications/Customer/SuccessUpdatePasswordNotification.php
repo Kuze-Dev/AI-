@@ -7,7 +7,7 @@ namespace App\Notifications\Customer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
-class SuccessResetPasswordNotification extends Notification
+class SuccessUpdatePasswordNotification extends Notification
 {
     use Queueable;
 
@@ -19,8 +19,8 @@ class SuccessResetPasswordNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'type' => 'reset_password_success',
-            'message' => 'You have successfully reset your password.',
+            'type' => 'update_password_success',
+            'message' => 'YYou have successfully update your password.',
         ];
     }
 }
