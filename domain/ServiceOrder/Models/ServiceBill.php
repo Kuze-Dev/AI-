@@ -15,16 +15,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @property int $id
  * @property int $service_order_id
+ * @property string $reference
  * @property \Illuminate\Support\Carbon|null $bill_date
  * @property \Illuminate\Support\Carbon|null $due_date
- * @property string $service_price
- * @property string $reference
+ * @property float $service_price
  * @property array $additional_charges
  * @property float $total_amount
  * @property ServiceBillStatus $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Domain\ServiceOrder\Models\ServiceOrder $service_order
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Payments\Models\Payment> $payments
+ * @property-read int|null $payments_count
+ * @property-read \Domain\ServiceOrder\Models\ServiceOrder|null $service_order
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill query()
@@ -33,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereDueDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereReference($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereServiceOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereServicePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereStatus($value)

@@ -24,7 +24,7 @@ class CreateServiceTransactionAction
         $serviceTransaction = ServiceTransaction::create([
             'service_order_id' => $serviceTransactionData->service_order_id,
             'service_bill_id' => $serviceTransactionData->service_bill_id,
-            'payment_method' => $serviceTransactionData->payment_method,
+            'payment_method_id' => $serviceTransactionData->payment_method_id,
             'total_amount' => $serviceTransactionData->total_amount,
             'currency' => $serviceTransactionData->currency,
             'status' => $serviceTransactionData->status,
@@ -35,7 +35,7 @@ class CreateServiceTransactionAction
 
     private function prepareTransactionData(array $data, PaymentMethod $paymentMethod): ServiceTransactionData
     {
-        $serviceBill = ServiceBill::whereId($data['service_bill_id'])->firstOrFail();
+        $serviceBill = ServiceBill::whereReference($data['reference_id'])->firstOrFail();
 
         $newData = [
             'service_order_id' => $serviceBill->service_order_id,
@@ -43,7 +43,7 @@ class CreateServiceTransactionAction
             'payment_method_id' => $paymentMethod->id,
             'total_amount' => $serviceBill->total_amount,
             'currency' => $serviceBill->service_order->currency_code,
-            'status' => ServiceTransactionStatus::PAID,
+            'status' => ServiceTransactionStatus::PENDING,
         ];
 
         $serviceTransactionData = ServiceTransactionData::fromArray($newData);

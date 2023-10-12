@@ -32,8 +32,8 @@ class PlaceServiceOrderAction
 
         if( ! $adminId) {
             return $serviceBill;
+        } else {
+            return $serviceOrder;
         }
-
-        return $serviceOrder;
     }
 }

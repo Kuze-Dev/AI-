@@ -319,7 +319,7 @@ class ServiceOrderResource extends Resource
                             return trans('For Payment');
                         }
                         if ($state == ServiceOrderStatus::INPROGRESS->value) {
-                            return trans('For Payment');
+                            return trans('In Progress');
                         }
 
                         return ucfirst($state);
@@ -328,9 +328,9 @@ class ServiceOrderResource extends Resource
                             $newState = str_replace(' ', '_', strtolower($state));
 
                             return match ($newState) {
-                                ServiceOrderStatus::PENDING->value => 'warning',
-                                ServiceOrderStatus::CLOSED->value => 'danger',
-                                ServiceOrderStatus::COMPLETED->value => 'success',
+                                ServiceOrderStatus::PENDING->value, ServiceOrderStatus::INPROGRESS->value => 'warning',
+                                ServiceOrderStatus::CLOSED->value, ServiceOrderStatus::INACTIVE->value, ServiceOrderStatus::CLOSED->value => 'danger',
+                                ServiceOrderStatus::COMPLETED->value, ServiceOrderStatus::ACTIVE->value => 'success',
                                 default => 'secondary',
                             };
                         })->inline()
@@ -438,11 +438,17 @@ class ServiceOrderResource extends Resource
                     ->form([
                         Forms\Components\Select::make('status_options')
                             ->label('')
-                            ->options(function () {
+                            ->options(function () use ($record) {
                                 $options = [
                                     ServiceOrderStatus::INPROGRESS->value => trans('In progress'),
                                     ServiceOrderStatus::COMPLETED->value => trans('Completed'),
                                 ];
+                                if($record->billing_cycle) {
+                                    $options = [
+                                        ServiceOrderStatus::ACTIVE->value => trans('Active'),
+                                        ServiceOrderStatus::CLOSED->value => trans('Closed'),
+                                    ];
+                                }
 
                                 return $options;
                             })
@@ -539,10 +545,30 @@ class ServiceOrderResource extends Resource
                     ->label(trans('Total'))
                     ->sortable(),
 
-                Tables\Columns\IconColumn::make('is_paid')
-                    ->label(trans('Paid'))
+                Tables\Columns\BadgeColumn::make('status')
+                    ->label(trans('Status'))
                     ->alignRight()
-                    ->boolean(),
+                    ->formatStateUsing(function (string $state): string {
+                        if ($state == ServiceOrderStatus::FORPAYMENT->value) {
+                            return trans('For Payment');
+                        }
+                        if ($state == ServiceOrderStatus::INPROGRESS->value) {
+                            return trans('In Progress');
+                        }
+
+                        return ucfirst($state);
+                    })
+                    ->color(function ($state) {
+                        $newState = str_replace(' ', '_', strtolower($state));
+
+                        return match ($newState) {
+                            ServiceOrderStatus::PENDING->value, ServiceOrderStatus::INPROGRESS->value => 'warning',
+                            ServiceOrderStatus::CLOSED->value, ServiceOrderStatus::INACTIVE->value, ServiceOrderStatus::CLOSED->value => 'danger',
+                            ServiceOrderStatus::COMPLETED->value, ServiceOrderStatus::ACTIVE->value => 'success',
+                            default => 'secondary',
+                        };
+                    })->inline()
+                    ->alignLeft(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()
                     ->label(trans('Order Date'))

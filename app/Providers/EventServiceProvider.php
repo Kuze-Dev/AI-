@@ -20,6 +20,7 @@ use Domain\Order\Listeners\OrderPaymentUpdatedListener;
 use Domain\Order\Listeners\OrderStatusUpdatedListener;
 use Domain\Order\Listeners\PublicOrder\GuestOrderPlacedListener;
 use Domain\Payments\Events\PaymentProcessEvent;
+use Domain\ServiceOrder\Listeners\ServiceOrderPaymentUpdatedListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -37,6 +38,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         PaymentProcessEvent::class => [
             OrderPaymentUpdatedListener::class,
+            ServiceOrderPaymentUpdatedListener::class,
         ],
         OrderPlacedEvent::class => [
             OrderPlacedListener::class,

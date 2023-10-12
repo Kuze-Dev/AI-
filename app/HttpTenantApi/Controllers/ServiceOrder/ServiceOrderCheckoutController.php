@@ -6,7 +6,6 @@ namespace App\HttpTenantApi\Controllers\ServiceOrder;
 
 use Domain\ServiceOrder\Actions\CheckoutServiceOrderAction;
 use Domain\ServiceOrder\Exceptions\InvalidServiceTransactionException;
-use Domain\ServiceOrder\Models\ServiceTransaction;
 use Domain\ServiceOrder\Requests\ServiceTransactionStoreRequest;
 use Illuminate\Http\JsonResponse;
 use Spatie\RouteAttributes\Attributes\ApiResource;
@@ -22,16 +21,16 @@ class ServiceOrderCheckoutController
     {
         $validatedData = $request->validated();
 
-        $serviceTransaction = $checkoutServiceOrderAction->execute($validatedData);
+        $data = $checkoutServiceOrderAction->execute($validatedData);
 
-        if ( ! $serviceTransaction instanceof ServiceTransaction) {
+        if ( ! $data) {
             throw new InvalidServiceTransactionException();
         }
 
         return response()->json(
             [
-                'message' => 'Service Transaction created successfully',
-                'data' => $serviceTransaction,
+                'message' => 'Proceed to payment',
+                'data' => $data,
             ],
             201
         );
