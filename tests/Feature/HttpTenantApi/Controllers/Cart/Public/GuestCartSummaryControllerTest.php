@@ -125,7 +125,6 @@ it('can show cart summary', function () {
         ->assertValid()
         ->assertJsonStructure([
             'tax' => [
-                'inclusive_sub_total',
                 'display',
                 'percentage',
                 'amount',

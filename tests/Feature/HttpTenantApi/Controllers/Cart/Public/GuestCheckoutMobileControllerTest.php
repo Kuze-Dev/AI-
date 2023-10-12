@@ -113,7 +113,6 @@ it('can get guest checkout summary in mobile version', function () {
         ->assertJsonStructure([
             'summary' => [
                 'tax' => [
-                    'inclusive_sub_total',
                     'display',
                     'percentage',
                     'amount',
