@@ -43,7 +43,7 @@ class CreateServiceTransactionAction
             'payment_method_id' => $paymentMethod->id,
             'total_amount' => $serviceBill->total_amount,
             'currency' => $serviceBill->service_order->currency_code,
-            'status' => ServiceTransactionStatus::PAID,
+            'status' => ServiceTransactionStatus::PENDING,
         ];
 
         $serviceTransactionData = ServiceTransactionData::fromArray($newData);

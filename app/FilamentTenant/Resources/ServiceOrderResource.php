@@ -319,7 +319,7 @@ class ServiceOrderResource extends Resource
                             return trans('For Payment');
                         }
                         if ($state == ServiceOrderStatus::INPROGRESS->value) {
-                            return trans('For Payment');
+                            return trans('In Progress');
                         }
 
                         return ucfirst($state);
@@ -328,9 +328,9 @@ class ServiceOrderResource extends Resource
                             $newState = str_replace(' ', '_', strtolower($state));
 
                             return match ($newState) {
-                                ServiceOrderStatus::PENDING->value => 'warning',
-                                ServiceOrderStatus::CLOSED->value => 'danger',
-                                ServiceOrderStatus::COMPLETED->value => 'success',
+                                ServiceOrderStatus::PENDING->value, ServiceOrderStatus::INPROGRESS->value => 'warning',
+                                ServiceOrderStatus::CLOSED->value, ServiceOrderStatus::INACTIVE->value, ServiceOrderStatus::CLOSED->value => 'danger',
+                                ServiceOrderStatus::COMPLETED->value, ServiceOrderStatus::ACTIVE->value => 'success',
                                 default => 'secondary',
                             };
                         })->inline()

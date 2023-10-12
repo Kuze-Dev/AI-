@@ -13,7 +13,6 @@ use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\TransactionData;
 use Domain\Payments\Exceptions\PaymentException;
 use Domain\ServiceOrder\Models\ServiceBill;
-use Domain\ServiceOrder\Models\ServiceTransaction;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class CheckoutServiceOrderAction
@@ -24,7 +23,7 @@ class CheckoutServiceOrderAction
     ) {
     }
 
-    public function execute(array $data): ServiceTransaction
+    public function execute(array $data): array
     {
         $paymentMethod = $this->preparePaymentMethod($data['payment_method']);
 
@@ -32,9 +31,12 @@ class CheckoutServiceOrderAction
 
         $payment = $this->proceedPayment($serviceBill, $paymentMethod);
 
-        $serviceTransaction = $this->createServiceTransactionAction->execute($data, $paymentMethod);
+        $this->createServiceTransactionAction->execute($data, $paymentMethod);
 
-        return $serviceTransaction;
+        return [
+            $payment,
+            $serviceBill,
+        ];
     }
 
     private function preparePaymentMethod(string $payment_method): PaymentMethod
