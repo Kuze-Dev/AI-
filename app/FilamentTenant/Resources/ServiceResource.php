@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Closure;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Currency\Models\Currency;
+use Domain\Service\Actions\DeleteServiceAction;
 use Domain\Service\Enums\BillingCycle;
 use Domain\Service\Enums\Status;
 use Domain\Service\Models\Service;
@@ -27,6 +28,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class ServiceResource extends Resource
 {
@@ -40,9 +42,14 @@ class ServiceResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name'];
+    }
+
     public static function form(Form $form): Form
     {
-        $categories = TaxonomyTerm::where('taxonomy_id', app(ServiceSettings::class)->service_category)->get();
+        $categories = TaxonomyTerm::whereTaxonomyId(app(ServiceSettings::class)->service_category)->get();
         $defaultCurrency = Currency::whereEnabled(true)->firstOrFail()->symbol;
 
         return $form
@@ -140,11 +147,12 @@ class ServiceResource extends Resource
                                     ->optionsFromModel(Blueprint::class, 'name')
                                     ->disabled(fn (?Service $record) => $record !== null)
                                     ->reactive(),
-//                                SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)
-//                                    ->schemaData(fn (Closure $get) => Blueprint::query()->firstWhere('id', $get('blueprint_id'))?->schema)
-//                                    ->hidden(fn (Closure $get) => $get('blueprint_id') === null)
-//                                    ->getState()
-//                                    ->disabled(),
+                                SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)
+                                    ->schemaData(fn (Closure $get) => Blueprint::query()
+                                        ->firstWhere('id', $get('blueprint_id'))?->schema)
+                                    ->hidden(fn (Closure $get) => $get('blueprint_id') === null)
+                                    ->dehydrated(false)
+                                    ->disabled(),
                             ])
                             ->columnSpan(2),
                     ])->columnSpan(2),
@@ -154,7 +162,8 @@ class ServiceResource extends Resource
                         ->schema([
                             Forms\Components\Toggle::make('status')
                                 ->label(
-                                    fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value))
+                                    fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value))
+                                        : ucfirst(trans(Status::INACTIVE->value))
                                 ),
                             Forms\Components\Toggle::make('is_subscription')
                                 ->label(trans('Subscription-based'))
@@ -219,7 +228,11 @@ class ServiceResource extends Resource
                     })
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('price')
+                Tables\Columns\TextColumn::make('selling_price')
+                    ->translateLabel()
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('retail_price')
                     ->translateLabel()
                     ->searchable()
                     ->sortable(),
@@ -232,14 +245,40 @@ class ServiceResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\Filter::make('status')
-                    ->query(fn (Builder $query) => dd($query->where('status', true)->get())),
+                Tables\Filters\SelectFilter::make('status')
+                    ->translateLabel()
+                    ->options(['1' => Status::ACTIVE->value, '0' => Status::INACTIVE->value])
+                    ->query(function (Builder $query, array $data) {
+                        $query->when(filled($data['value']), function (Builder $query) use ($data) {
+                            $query->when(filled($data['value']), function (Builder $query) use ($data) {
+                                /** @var Service|Builder $query */
+                                match ($data['value']) {
+                                    '1' => $query->whereStatus(true),
+                                    '0' => $query->whereStatus(false),
+                                    default => '',
+                                };
+                            });
+                        });
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make()
+                        ->translateLabel()
+                        ->using(function (Service $record) {
+                            try {
+                                return app(DeleteServiceAction::class)->execute($record);
+                            } catch (DeleteRestrictedException $e) {
+                                return false;
+                            }
+                        })
+                        ->authorize('delete'),
+                ]),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make()
+                    ->translateLabel(),
             ]);
     }
 

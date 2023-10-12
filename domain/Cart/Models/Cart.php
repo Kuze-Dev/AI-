@@ -48,6 +48,7 @@ class Cart extends Model
     protected $fillable = [
         'uuid',
         'customer_id',
+        'session_id',
         'coupon_code',
     ];
 

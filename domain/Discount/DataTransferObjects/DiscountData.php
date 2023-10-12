@@ -41,7 +41,7 @@ final class DiscountData
             discountConditionData: new DiscountConditionData(
                 discount_type: DiscountConditionType::from($data['discountCondition']['discount_type']),
                 discount_amount_type: DiscountAmountType::from($data['discountCondition']['amount_type']),
-                amount: (int) ($data['discountCondition']['amount'] ?? 0)
+                amount: (float) ($data['discountCondition']['amount'] ?? 0)
             ),
             discountRequirementData: new DiscountRequirementData(
                 discount_requirement_type: ! empty($data['discountRequirement']['minimum_amount']) ? DiscountRequirementType::MINIMUM_ORDER_AMOUNT : null,

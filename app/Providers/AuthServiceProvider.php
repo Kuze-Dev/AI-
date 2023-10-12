@@ -143,6 +143,7 @@ class AuthServiceProvider extends ServiceProvider
 
                 return $baseUrl . '/password/reset' . '?' . http_build_query([
                     'token' => $token,
+                    'expired_at' => now()->addMinutes(config('auth.passwords.customer.expire'))->timestamp,
                     'email' => $notifiable->getEmailForPasswordReset(),
                 ]);
             }

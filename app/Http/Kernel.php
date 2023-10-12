@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http;
 
+use App\Http\Middleware\ApiCallTrackMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -51,6 +52,7 @@ class Kernel extends HttpKernel
         'tenant' => [
             \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
             \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+            ApiCallTrackMiddleware::class,
         ],
     ];
 

@@ -20,6 +20,9 @@ class ShippingSettings extends Settings
     public ?string $ups_client_secret = null;
     public ?string $ups_shipper_account = null;
 
+    /** auspost */
+    public ?string $auspost_api_key = null;
+
     public static function group(): string
     {
         return 'shipping';

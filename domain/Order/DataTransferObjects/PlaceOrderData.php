@@ -13,7 +13,7 @@ class PlaceOrderData
         public readonly string $payment_method,
         public readonly ?string $notes,
         public readonly ?string $discountCode,
-        public readonly ?int $serviceId,
+        public readonly int|string|null $serviceId = null,
     ) {
     }
 

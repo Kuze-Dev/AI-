@@ -17,10 +17,9 @@ use Support\MetaData\DataTransferObjects\MetaDataData;
 class CreateServiceAction
 {
     public function __construct(
-        protected CreateMetaDataAction      $createMetaData,
+        protected CreateMetaDataAction $createMetaData,
         protected SyncMediaCollectionAction $syncMediaCollection,
-    )
-    {
+    ) {
     }
 
     public function execute(ServiceData $serviceData): Service|Model
@@ -44,7 +43,11 @@ class CreateServiceAction
 
         $this->createMetaData->execute($service, MetaDataData::fromArray($serviceData->meta_data ?? []));
 
-        $media = collect($serviceData->media_collection['media'] ?? [])->map(function ($material): MediaData {
+        /** @var array<int, array> $mediaMaterials */
+        $mediaMaterials = $serviceData->media_collection['media'] ?? [];
+
+        $media = collect($mediaMaterials)->map(function ($material): MediaData {
+            /** @var UploadedFile|string $material */
             return new MediaData(media: $material);
         })->toArray();
 
@@ -52,7 +55,6 @@ class CreateServiceAction
             collection: $serviceData->media_collection['collection'] ?? null,
             media: $media
         ));
-
 
         return $service;
     }

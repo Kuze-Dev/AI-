@@ -128,7 +128,8 @@
 
     <div class="main-container">
         <p style="line-height: 1.5em">
-            Hi {{ $customer->first_name . $customer->last_name }}, we just want to inform you that your item(s) in order
+            Hi {{ $customer->first_name . ' ' . $customer->last_name }}, we just want to inform you that your item(s) in
+            order
             #{{ $order->reference }} has
             been {{ $status }}.
         </p>

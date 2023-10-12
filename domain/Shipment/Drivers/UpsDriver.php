@@ -4,25 +4,22 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\Drivers;
 
-use Domain\Address\Models\Address;
-use Domain\Customer\Models\Customer;
 use Domain\Shipment\Actions\UPS\GetUPSInternationalRateDataAction;
 use Domain\Shipment\Actions\UPS\GetUPSRateDataAction;
-use Domain\Shipment\API\USPS\Contracts\RateResponse;
+use Domain\Shipment\Contracts\API\RateResponse;
 use Domain\Shipment\DataTransferObjects\ParcelData;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 
 class UpsDriver
 {
     public function getRate(
-        Customer $customer,
         ParcelData $parcelData,
-        Address $address,
+        ShippingAddressData $address,
         ShippingMethod $shippingMethod
     ): RateResponse {
 
         return app(GetUPSRateDataAction::class)->execute(
-            $customer,
             $parcelData,
             $address,
             $shippingMethod
@@ -30,12 +27,10 @@ class UpsDriver
     }
 
     public function getInternationalRate(
-        Customer $customer,
         ParcelData $parcelData,
-        Address $address,
+        ShippingAddressData $address,
     ): RateResponse {
         return app(GetUPSInternationalRateDataAction::class)->execute(
-            $customer,
             $parcelData,
             $address,
         );

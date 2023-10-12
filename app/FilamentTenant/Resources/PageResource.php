@@ -61,9 +61,13 @@ class PageResource extends Resource
                             Forms\Components\TextInput::make('name')
                                 ->unique(
                                     ignoreRecord: true,
-                                    callback: function (Unique $rule) {
+                                    callback: function (Unique $rule, $state, $livewire) {
 
                                         if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+                                            return false;
+                                        }
+
+                                        if($livewire->record?->parentPage?->name == $state) {
                                             return false;
                                         }
 
