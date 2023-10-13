@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ServiceOrderResource\Pages;
 
-use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ServiceOrderResource;
 use Closure;
 use Filament\Forms;
@@ -20,13 +19,16 @@ use Illuminate\Contracts\Support\Htmlable;
 
 class ViewServiceOrder extends ViewRecord
 {
-    use LogsFormActivity;
-
     protected static string $resource = ServiceOrderResource::class;
 
     protected function getHeading(): string|Htmlable
     {
         return trans('Service Order Details #') . $this->record->reference;
+    }
+
+    protected function getRelationManagers(): array
+    {
+        return [];
     }
 
     protected function getFormSchema(): array

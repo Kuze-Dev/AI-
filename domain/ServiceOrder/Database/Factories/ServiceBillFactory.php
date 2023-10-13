@@ -8,6 +8,9 @@ use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\ServiceOrder\Models\ServiceBill>
+ */
 class ServiceBillFactory extends Factory
 {
     protected $model = ServiceBill::class;

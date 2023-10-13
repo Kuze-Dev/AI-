@@ -31,7 +31,9 @@ class PlaceServiceOrderAction
 
         $serviceBill = $this->createServiceBillAction->execute($serviceOrder, $serviceBillData);
 
-        $serviceOrder->customer->notify(new PlaceServiceOrderMail($serviceBill));
+        if($serviceOrder->customer) {
+            $serviceOrder->customer->notify(new PlaceServiceOrderMail($serviceBill));
+        }
 
         if( ! $adminId) {
             return $serviceBill;

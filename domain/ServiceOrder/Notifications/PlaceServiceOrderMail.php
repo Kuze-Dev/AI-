@@ -6,29 +6,23 @@ namespace Domain\ServiceOrder\Notifications;
 
 use App\Settings\ServiceSettings;
 use App\Settings\SiteSettings;
-use Domain\Address\Models\Address;
 use Domain\Admin\Models\Admin;
-use Domain\Order\Models\Order;
 use Domain\ServiceOrder\Models\ServiceBill;
-use Domain\ServiceOrder\Models\ServiceOrder;
-use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Arr;
 
 class PlaceServiceOrderMail extends Notification implements ShouldQueue
 {
     use Queueable;
 
     private ServiceBill $serviceBill;
-    private ShippingMethod $shippingMethod;
     private string $logo;
     private string $title;
     private string $description;
     private string $from;
-    private string $url = "http://tenant.saas-platform.test/admin/service-orders";
+    private string $url = 'http://tenant.saas-platform.test/admin/service-orders';
     private array $replyTo;
     private ?string $footer = null;
 
@@ -77,8 +71,7 @@ class PlaceServiceOrderMail extends Notification implements ShouldQueue
                 'customer' => $notifiable,
                 'footer' => $this->footer,
                 'url' => $this->url,
-            ])
-            ;
+            ]);
     }
 
     /**

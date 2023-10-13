@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\DataTransferObjects;
 
 use DateTime;
-use Domain\Customer\Models\Customer;
 
 class ServiceOrderData
 {
     public function __construct(
-        public readonly int $customer_id,
+        public readonly ?int $customer_id,
         public readonly int $service_id,
         public readonly DateTime $schedule,
         public readonly ?int $service_address_id,

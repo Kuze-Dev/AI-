@@ -147,7 +147,7 @@ class ServiceResource extends Resource
                                     ->optionsFromModel(Blueprint::class, 'name')
                                     ->disabled(fn (?Service $record) => $record !== null)
                                     ->reactive(),
-                                SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint->schema)
+                                SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint?->schema)
                                     ->schemaData(fn (Closure $get) => Blueprint::query()
                                         ->firstWhere('id', $get('blueprint_id'))?->schema)
                                     ->hidden(fn (Closure $get) => $get('blueprint_id') === null)
