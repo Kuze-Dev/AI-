@@ -21,15 +21,10 @@ class CreateServiceBillCommand extends Command
      */
     protected $description = 'Generate service bill for customer';
 
-    public function __construct(private CreateServiceBillingsAction $createServiceBillingsAction)
+    public function handle(CreateServiceBillingsAction $createServiceBillingsAction)
     {
-    }
+        $createServiceBillingsAction->execute();
 
-    public function handle()
-    {
-        echo 'test';
-        // $this->createServiceBillingsAction->execute();
-
-        // return self::SUCCESS;
+        return self::SUCCESS;
     }
 }
