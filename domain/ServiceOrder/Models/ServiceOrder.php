@@ -159,10 +159,15 @@ class ServiceOrder extends Model
         return $this->hasMany(ServiceBill::class);
     }
 
-    public function latestServiceBill(): ServiceBill
+    public function latestPaidServiceBill(): ?ServiceBill
     {
-        return $this->serviceBills()
+        /** @var \Domain\ServiceOrder\Models\ServiceBill $serviceBill */
+        $serviceBill = $this->serviceBills()
             ->latest()
             ->first();
+
+        return $serviceBill->status === ServiceBillStatus::PAID
+            ? $serviceBill
+            : null;
     }
 }

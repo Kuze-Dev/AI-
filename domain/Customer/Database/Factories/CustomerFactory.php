@@ -7,6 +7,7 @@ namespace Domain\Customer\Database\Factories;
 use Carbon\Carbon;
 use Domain\Address\Database\Factories\AddressFactory;
 use Domain\Customer\Enums\Gender;
+use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Database\Factories\TierFactory;
@@ -85,5 +86,10 @@ class CustomerFactory extends Factory
     public function status(Status $status): self
     {
         return $this->state(['status' => $status]);
+    }
+
+    public function registered(): self
+    {
+        return $this->state(['register_status' => RegisterStatus::REGISTERED]);
     }
 }

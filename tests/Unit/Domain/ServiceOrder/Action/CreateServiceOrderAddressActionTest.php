@@ -56,6 +56,7 @@ it('can create service order addresses', function () {
     app(CreateServiceOrderAddressAction::class)
         ->execute($serviceOrder, $serviceOrderData);
 
+    /** TODO: fix */
     expect(ServiceOrderAddress::get()->count())
         ->toBeGreaterThan(0);
 });

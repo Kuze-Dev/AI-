@@ -46,15 +46,20 @@ class ServiceOrderFactory extends Factory
         ];
     }
 
-    public function configure(): self
+    // public function configure(): self
+    // {
+    //     return $this
+    //         ->afterCreating(function (ServiceOrder $serviceOrder) {
+    //             ServiceBillFactory::new()
+    //                 ->createOne([
+    //                     'service_order_id' => $serviceOrder->id,
+    //                     'reference' => $serviceOrder->reference
+    //                 ]);
+    //         });
+    // }
+
+    public function active(): self
     {
-        return $this
-            ->afterCreating(function (ServiceOrder $serviceOrder) {
-                ServiceBillFactory::new()
-                    ->createOne([
-                        'service_order_id' => $serviceOrder->id,
-                        'reference' => $serviceOrder->reference
-                    ]);
-            });
+        return $this->state(['status' => ServiceOrderStatus::ACTIVE]);
     }
 }

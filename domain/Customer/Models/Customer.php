@@ -174,17 +174,17 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
             ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 
-    public function scopeActive(Builder $query): void
+    public function scopeWhereActive(Builder $query): void
     {
         $query->where('status', Status::ACTIVE);
     }
 
-    public function scopeRegistered(Builder $query): void
+    public function scopeWhereRegistered(Builder $query): void
     {
         $query->where('register_status', RegisterStatus::REGISTERED);
     }
 
-    public function scopeWithActiveServiceOrder($query)
+    public function scopeWhereActiveServiceOrder($query)
     {
         return $query->whereHas('serviceOrders', function ($query) {
             $query->where('status', ServiceOrderStatus::ACTIVE);

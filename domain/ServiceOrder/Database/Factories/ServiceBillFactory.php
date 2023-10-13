@@ -14,8 +14,7 @@ class ServiceBillFactory extends Factory
 
     public function definition(): array
     {
-        $serviceOrder = ServiceOrderFactory::new()
-            ->make();
+        $serviceOrder = ServiceOrderFactory::new()->make();
 
         return [
             'service_order_id' => $serviceOrder->id,
@@ -25,7 +24,12 @@ class ServiceBillFactory extends Factory
             'service_price' => $this->faker->randomFloat(2, 1, 100),
             'additional_charges' => [],
             'total_amount' => $this->faker->randomFloat(2, 1, 100),
-            'status' => ServiceBillStatus::PENDING
+            'status' => ServiceBillStatus::PENDING,
         ];
+    }
+
+    public function paid(): self
+    {
+        return $this->state(['status' => ServiceBillStatus::PAID]);
     }
 }

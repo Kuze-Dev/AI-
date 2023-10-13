@@ -5,39 +5,35 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Actions;
 
 use Domain\Customer\Models\Customer;
-use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Jobs\CreateServiceBillJob;
 use Domain\ServiceOrder\Models\ServiceOrder;
 
 class CreateServiceBillingsAction
 {
-    public function execute()
+    public function execute(): void
     {
         $customers = Customer::query()
             ->with([
                 'serviceOrders' => fn ($query) => $query->active(),
-                'serviceOrders.serviceBills'
+                'serviceOrders.serviceBills',
             ])
-            ->active()
-            ->registered()
-            ->withActiveServiceOrder()
+            ->whereActive()
+            ->whereRegistered()
+            ->whereActiveServiceOrder()
             ->get();
 
         $customers
-            ->each( function (Customer $customer) {
+            ->each(function (Customer $customer) {
                 $customer
                     ->serviceOrders
                     ->each(function (ServiceOrder $serviceOrder) use ($customer) {
-                        /** @var \Domain\ServiceOrder\Models\ServiceBill $latestPaidServiceBill */
-                        $latestServiceBill = $serviceOrder->latestServiceBill();
+                        /** @var \Domain\ServiceOrder\Models\ServiceBill|null $latestPaidServiceBill */
+                        $latestPaidServiceBill = $serviceOrder->latestPaidServiceBill();
 
-                        if (
-                            $latestServiceBill->status === ServiceBillStatus::PAID &&
-                            $latestServiceBill->bill_date <= now()
-                        ) {
+                        if ($latestPaidServiceBill && $latestPaidServiceBill->bill_date <= now()) {
                             CreateServiceBillJob::dispatch(
                                 $customer,
-                                $latestServiceBill
+                                $latestPaidServiceBill
                             );
                         }
                     });
