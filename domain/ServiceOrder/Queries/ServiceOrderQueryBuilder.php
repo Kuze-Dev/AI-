@@ -10,12 +10,12 @@ use Illuminate\Database\Eloquent\Builder;
 /** @extends \Illuminate\Database\Eloquent\Builder<\Domain\ServiceOrder\Models\ServiceOrder> */
 class ServiceOrderQueryBuilder extends Builder
 {
-    public function scopeWhereActive(): self
+    public function whereActive(): self
     {
         return $this->where('status', ServiceOrderStatus::ACTIVE);
     }
 
-    public function scopeWhereSubscriptionBased(): self
+    public function whereSubscriptionBased(): self
     {
         return $this->whereHas('service', function ($nestedQuery) {
             $nestedQuery->where('is_subscription', true);
