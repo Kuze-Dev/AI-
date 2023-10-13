@@ -22,7 +22,7 @@ class CreateServiceBillJob implements ShouldQueue
     use SerializesModels;
 
     public function __construct(
-        /** 
+        /**
          * TODO: to be removed.
          * @phpstan-ignore-next-line
          */

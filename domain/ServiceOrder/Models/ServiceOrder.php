@@ -11,7 +11,7 @@ use Domain\Customer\Models\Customer;
 use Domain\Service\Enums\BillingCycle;
 use Domain\Service\Models\Service;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
-use Illuminate\Database\Eloquent\Builder;
+use Domain\ServiceOrder\Queries\ServiceOrderQueryBuilder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -124,18 +124,9 @@ class ServiceOrder extends Model
         return 'reference';
     }
 
-    /** @param \Illuminate\Database\Eloquent\Builder<\Domain\ServiceOrder\Models\ServiceOrder> $query */
-    public function scopeWhereActive(Builder $query): void
+    public function newEloquentBuilder($query): ServiceOrderQueryBuilder
     {
-        $query->where('status', ServiceOrderStatus::ACTIVE);
-    }
-
-    /** @param \Illuminate\Database\Eloquent\Builder<\Domain\ServiceOrder\Models\ServiceOrder> $query */
-    public function scopeWhereSubscriptionBased(Builder $query): void
-    {
-        $query->whereHas('service', function ($nestedQuery) {
-            $nestedQuery->where('is_subscription', true);
-        });
+        return new ServiceOrderQueryBuilder($query);
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\ServiceOrder\Models\ServiceOrder> */

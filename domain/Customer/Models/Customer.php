@@ -14,15 +14,14 @@ use Domain\Customer\Notifications\ResetPassword;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Customer\Enums\Status;
+use Domain\Customer\Queries\CustomerQueryBuilder;
 use Domain\Discount\Models\DiscountLimit;
 use Domain\Favorite\Models\Favorite;
-use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\Shipment\Models\VerifiedAddress;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -174,28 +173,9 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
             ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 
-    /** @param \Illuminate\Database\Eloquent\Builder<\Domain\Customer\Models\Customer> $query */
-    public function scopeWhereActive(Builder $query): void
+    public function newEloquentBuilder($query): CustomerQueryBuilder
     {
-        $query->where('status', Status::ACTIVE);
-    }
-
-    /** @param \Illuminate\Database\Eloquent\Builder<\Domain\Customer\Models\Customer> $query */
-    public function scopeWhereRegistered(Builder $query): void
-    {
-        $query->where('register_status', RegisterStatus::REGISTERED);
-    }
-
-    /** @param \Illuminate\Database\Eloquent\Builder<\Domain\Customer\Models\Customer> $query */
-    public function scopeWhereHasActiveSubscriptionBasedServiceOrder($query): void
-    {
-        $query->whereHas('serviceOrders', function ($nestedQuery) {
-            $nestedQuery
-                ->where('status', ServiceOrderStatus::ACTIVE)
-                ->whereHas('service', function ($deepQuery) {
-                    $deepQuery->where('is_subscription', true);
-                });
-        });
+        return new CustomerQueryBuilder($query);
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Tier\Models\Tier, \Domain\Customer\Models\Customer> */
