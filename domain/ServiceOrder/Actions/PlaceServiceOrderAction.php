@@ -8,6 +8,7 @@ use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
+use Domain\ServiceOrder\Notifications\PlaceServiceOrderMail;
 
 class PlaceServiceOrderAction
 {
@@ -29,6 +30,8 @@ class PlaceServiceOrderAction
         $serviceBillData = ServiceBillData::fromArray($serviceOrder->toArray());
 
         $serviceBill = $this->createServiceBillAction->execute($serviceOrder, $serviceBillData);
+
+        $serviceOrder->customer->notify(new PlaceServiceOrderMail($serviceBill));
 
         if( ! $adminId) {
             return $serviceBill;
