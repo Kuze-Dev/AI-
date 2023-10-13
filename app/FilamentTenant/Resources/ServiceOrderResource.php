@@ -12,6 +12,7 @@ use App\FilamentTenant\Support\BadgeLabel;
 use App\FilamentTenant\Support\Divider;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
+use App\Settings\ServiceSettings;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
 use Closure;
@@ -64,23 +65,22 @@ class ServiceOrderResource extends Resource
                                 ->preload()
                                 ->optionsFromModel(Customer::class, 'email')
                                 ->reactive(),
-
                             Forms\Components\Group::make()->columns(2)->schema([
                                 Placeholder::make('first_name')
                                     ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
-                                        ? Customer::whereId($customerId)->first()->first_name
+                                        ? Customer::whereId($customerId)->first()?->first_name
                                         : ''),
                                 Placeholder::make('last_name')
                                     ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
-                                        ? Customer::whereId($customerId)->first()->last_name
+                                        ? Customer::whereId($customerId)->first()?->last_name
                                         : ''),
                                 Placeholder::make('email')
                                     ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
-                                        ? Customer::whereId($customerId)->first()->email
+                                        ? Customer::whereId($customerId)->first()?->email
                                         : ''),
                                 Placeholder::make('mobile')
                                     ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
-                                        ? Customer::whereId($customerId)->first()->mobile
+                                        ? Customer::whereId($customerId)->first()?->mobile
                                         : ''),
                             ])->visible(
                                 function (array $state) {
@@ -106,19 +106,19 @@ class ServiceOrderResource extends Resource
                             Forms\Components\Group::make()->columns(2)->schema([
                                 Placeholder::make('country')
                                     ->content(fn (Closure $get) => ($addressId = $get('service_address_id'))
-                                        ? Address::whereId($addressId)->first()->state->country->name
+                                        ? Address::whereId($addressId)->first()?->state->country->name
                                         : ''),
                                 Placeholder::make('state')
                                     ->content(fn (Closure $get) => ($addressId = $get('service_address_id'))
-                                        ? Address::whereId($addressId)->first()->state->name
+                                        ? Address::whereId($addressId)->first()?->state->name
                                         : ''),
                                 Placeholder::make('City/Province')
                                     ->content(fn (Closure $get) => ($addressId = $get('service_address_id'))
-                                        ? Address::whereId($addressId)->first()->city
+                                        ? Address::whereId($addressId)->first()?->city
                                         : ''),
                                 Placeholder::make('Zip')
                                     ->content(fn (Closure $get) => ($addressId = $get('service_address_id'))
-                                        ? Address::whereId($addressId)->first()->zip_code
+                                        ? Address::whereId($addressId)->first()?->zip_code
                                         : ''),
                                 Checkbox::make('is_same_as_billing')->reactive()->label('Same as Billing Address')->default(true),
                             ])->visible(
@@ -148,19 +148,19 @@ class ServiceOrderResource extends Resource
                             Forms\Components\Group::make()->columns(2)->schema([
                                 Placeholder::make('country')
                                     ->content(fn (Closure $get) => ($addressId = $get('billing_address_id'))
-                                        ? Address::whereId($addressId)->first()->state->country->name
+                                        ? Address::whereId($addressId)->first()?->state->country->name
                                         : ''),
                                 Placeholder::make('state')
                                     ->content(fn (Closure $get) => ($addressId = $get('billing_address_id'))
-                                        ? Address::whereId($addressId)->first()->state->name
+                                        ? Address::whereId($addressId)->first()?->state->name
                                         : ''),
                                 Placeholder::make('City/Province')
                                     ->content(fn (Closure $get) => ($addressId = $get('billing_address_id'))
-                                        ? Address::whereId($addressId)->first()->city
+                                        ? Address::whereId($addressId)->first()?->city
                                         : ''),
                                 Placeholder::make('Zip')
                                     ->content(fn (Closure $get) => ($addressId = $get('billing_address_id'))
-                                        ? Address::whereId($addressId)->first()->zip_code
+                                        ? Address::whereId($addressId)->first()?->zip_code
                                         : ''),
                             ])->visible(
                                 function (array $state) {
@@ -188,22 +188,22 @@ class ServiceOrderResource extends Resource
                                     Forms\Components\Fieldset::make('')->schema([
                                         Placeholder::make('Service')
                                             ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
-                                                ? Service::whereId($serviceId)->first()->name
+                                                ? Service::whereId($serviceId)->first()?->name
                                                 : ''),
                                         Placeholder::make('Service Price')
                                             ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
-                                                ? Service::whereId($serviceId)->first()->selling_price
+                                                ? Service::whereId($serviceId)->first()?->selling_price
                                                 : ''),
                                         Forms\Components\Group::make()->columnSpan(2)->columns(2)->visible(
                                             fn (Closure $get) => Service::whereId($get('service_id'))->first()?->is_subscription
                                         )->schema([
                                             Placeholder::make('Billing Schedule')
                                                 ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
-                                                    ? Service::whereId($serviceId)->first()->billing_cycle
+                                                    ? Service::whereId($serviceId)->first()?->billing_cycle
                                                     : ''),
                                             Placeholder::make('Due Date')
                                                 ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
-                                                    ? Service::whereId($serviceId)->first()->due_date_every
+                                                    ? Service::whereId($serviceId)->first()?->due_date_every
                                                     : ''),
                                         ]),
 
@@ -240,8 +240,8 @@ class ServiceOrderResource extends Resource
                         ]),
                     Forms\Components\Section::make('Form Title')
                         ->schema([
-                            SchemaFormBuilder::make('form', fn (?Service $record) => $record?->blueprint->schema)
-                                ->schemaData(fn (Closure $get) => Service::whereId($get('service_id'))->first()?->blueprint->schema),
+                            SchemaFormBuilder::make('form', fn (?Service $record) => $record?->blueprint?->schema)
+                                ->schemaData(fn (Closure $get) => Service::whereId($get('service_id'))->first()?->blueprint?->schema),
                         ])
                         ->hidden(fn (Closure $get) => $get('service_id') === null)
                         ->columnSpan(2),
@@ -443,7 +443,7 @@ class ServiceOrderResource extends Resource
                                     ServiceOrderStatus::INPROGRESS->value => trans('In progress'),
                                     ServiceOrderStatus::COMPLETED->value => trans('Completed'),
                                 ];
-                                if($record->billing_cycle) {
+                                if(isset($record->billing_cycle)) {
                                     $options = [
                                         ServiceOrderStatus::ACTIVE->value => trans('Active'),
                                         ServiceOrderStatus::CLOSED->value => trans('Closed'),
@@ -479,7 +479,7 @@ class ServiceOrderResource extends Resource
                             $emailRemarks = $livewire->mountedFormComponentActionData['email_remarks'];
 
                             if ($shouldSendEmail) {
-                                $fromEmail = app(OrderSettings::class)->email_sender_name;
+                                $fromEmail = app(ServiceSettings::class)->email_sender_name;
 
                                 if (empty($fromEmail)) {
                                     Notification::make()

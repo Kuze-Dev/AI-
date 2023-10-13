@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Payments\Models\Payment> $payments
  * @property-read int|null $payments_count
- * @property-read \Domain\ServiceOrder\Models\ServiceOrder|null $service_order
+ * @property-read \Domain\ServiceOrder\Models\ServiceOrder $service_order
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill query()

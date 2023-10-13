@@ -13,7 +13,6 @@ class CreateServiceBillAction
 {
     public function __construct(
         private GetServiceBillingAndDueDateAction $getServiceBillingAndDueDateAction,
-        private CreateServiceTransactionAction $createServiceTransactionAction
     ) {
     }
 

@@ -24,7 +24,7 @@ use Spatie\Activitylog\LogOptions;
  * @property string $city
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Domain\ServiceOrder\Models\ServiceOrder|null $serviceOrder
+ * @property-read \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrderAddress newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrderAddress newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrderAddress query()

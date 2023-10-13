@@ -18,7 +18,6 @@ class CreateServiceOrderAction
 {
     public function __construct(
         private CalculateServiceOrderTotalPriceAction $calculateServiceOrderTotalPriceAction,
-        private CreateServiceBillAction $createServiceBillAction,
     ) {
     }
 
@@ -65,7 +64,7 @@ class CreateServiceOrderAction
                                 (int) $additionalCharge['quantity']
                             );
                         }
-                    }, $serviceOrderData->additional_charges)
+                    }, isset($serviceOrderData->additional_charges) ? $serviceOrderData->additional_charges : [])
                 )
             )
             ->getAmount();

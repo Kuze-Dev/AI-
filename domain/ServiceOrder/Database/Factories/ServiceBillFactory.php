@@ -8,6 +8,9 @@ use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\ServiceOrder\Models\ServiceBill>
+ */
 class ServiceBillFactory extends Factory
 {
     protected $model = ServiceBill::class;
@@ -21,7 +24,7 @@ class ServiceBillFactory extends Factory
             'service_price' => $this->faker->randomFloat(2, 1, 100),
             'additional_charges' => [],
             'total_amount' => $this->faker->randomFloat(2, 1, 100),
-            'status' => ServiceBillStatus::PENDING
+            'status' => ServiceBillStatus::PENDING,
         ];
     }
 }
