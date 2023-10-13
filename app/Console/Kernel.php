@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console;
 
+use Domain\ServiceOrder\Commands\CreateServiceBillCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -15,6 +16,10 @@ class Kernel extends ConsoleKernel
     /** Define the application's command schedule. */
     protected function schedule(Schedule $schedule): void
     {
+        $schedule->command(CreateServiceBillCommand::class)
+            ->everySecond()
+            ->sentryMonitor();
+
         $schedule->command(PruneExcelCommand::class)
             ->daily();
 
