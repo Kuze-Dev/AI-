@@ -22,6 +22,10 @@ class CreateServiceBillJob implements ShouldQueue
     use SerializesModels;
 
     public function __construct(
+        /** 
+         * TODO: to be removed.
+         * @phpstan-ignore-next-line
+         */
         private Customer $customer,
         private ServiceBill $serviceBill
     ) {
@@ -31,7 +35,7 @@ class CreateServiceBillJob implements ShouldQueue
     {
         $serviceBillData = ServiceBillData::fromArray($this->serviceBill->toArray());
 
-        $serviceBill = $createServiceBillAction
+        $createServiceBillAction
             ->execute(
                 $this->serviceBill,
                 $serviceBillData

@@ -9,10 +9,10 @@ use Illuminate\Console\Command;
 
 class CreateServiceBillCommand extends Command
 {
-    /** @var string $signature*/
+    /** @var string */
     protected $signature = 'app:create-service-bill-command';
 
-    /** @var string $description*/
+    /** @var string */
     protected $description = 'Generate service bill for customer';
 
     public function handle(CreateServiceBillingsAction $createServiceBillingsAction): int

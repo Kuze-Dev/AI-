@@ -124,11 +124,13 @@ class ServiceOrder extends Model
         return 'reference';
     }
 
+    /** @param \Illuminate\Database\Eloquent\Builder<\Domain\ServiceOrder\Models\ServiceOrder> $query */
     public function scopeWhereActive(Builder $query): void
     {
         $query->where('status', ServiceOrderStatus::ACTIVE);
     }
 
+    /** @param \Illuminate\Database\Eloquent\Builder<\Domain\ServiceOrder\Models\ServiceOrder> $query */
     public function scopeWhereSubscriptionBased(Builder $query): void
     {
         $query->whereHas('service', function ($nestedQuery) {

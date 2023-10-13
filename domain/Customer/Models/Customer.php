@@ -174,19 +174,22 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
             ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 
+    /** @param \Illuminate\Database\Eloquent\Builder<\Domain\Customer\Models\Customer> $query */
     public function scopeWhereActive(Builder $query): void
     {
         $query->where('status', Status::ACTIVE);
     }
 
+    /** @param \Illuminate\Database\Eloquent\Builder<\Domain\Customer\Models\Customer> $query */
     public function scopeWhereRegistered(Builder $query): void
     {
         $query->where('register_status', RegisterStatus::REGISTERED);
     }
 
-    public function scopeWhereHasActiveSubscriptionBasedServiceOrder($query)
+    /** @param \Illuminate\Database\Eloquent\Builder<\Domain\Customer\Models\Customer> $query */
+    public function scopeWhereHasActiveSubscriptionBasedServiceOrder($query): void
     {
-        return $query->whereHas('serviceOrders', function ($nestedQuery) {
+        $query->whereHas('serviceOrders', function ($nestedQuery) {
             $nestedQuery
                 ->where('status', ServiceOrderStatus::ACTIVE)
                 ->whereHas('service', function ($deepQuery) {
