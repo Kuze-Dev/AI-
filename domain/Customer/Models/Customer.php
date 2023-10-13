@@ -16,10 +16,13 @@ use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Customer\Enums\Status;
 use Domain\Discount\Models\DiscountLimit;
 use Domain\Favorite\Models\Favorite;
+use Domain\ServiceOrder\Enums\ServiceOrderStatus;
+use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\Shipment\Models\VerifiedAddress;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -171,6 +174,23 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
             ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 
+    public function scopeActive(Builder $query): void
+    {
+        $query->where('status', Status::ACTIVE);
+    }
+
+    public function scopeRegistered(Builder $query): void
+    {
+        $query->where('register_status', RegisterStatus::REGISTERED);
+    }
+
+    public function scopeWithActiveServiceOrder($query)
+    {
+        return $query->whereHas('serviceOrders', function ($query) {
+            $query->where('status', ServiceOrderStatus::ACTIVE);
+        });
+    }
+
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Tier\Models\Tier, \Domain\Customer\Models\Customer> */
     public function tier(): BelongsTo
     {
@@ -209,5 +229,11 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
     public function verifiedAddress(): HasOne
     {
         return $this->hasOne(VerifiedAddress::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceOrder>*/
+    public function serviceOrders(): HasMany
+    {
+        return $this->hasMany(ServiceOrder::class);
     }
 }

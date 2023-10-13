@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Database\Factories;
 
+use Domain\Admin\Database\Factories\AdminFactory;
+use Domain\Customer\Database\Factories\CustomerFactory;
+use Domain\Service\Databases\Factories\ServiceFactory;
 use Domain\Service\Enums\BillingCycle;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
@@ -19,9 +22,9 @@ class ServiceOrderFactory extends Factory
     public function definition(): array
     {
         return [
-            'service_id' => $this->faker->randomNumber(),
-            'customer_id' => $this->faker->randomNumber(),
-            'admin_id' => $this->faker->randomNumber(),
+            'service_id' => ServiceFactory::new()->withDummyBlueprint(),
+            'customer_id' => CustomerFactory::new(),
+            'admin_id' => AdminFactory::new(),
             'reference' => $this->faker->uuid(),
             'customer_first_name' => $this->faker->firstName(),
             'customer_last_name' => $this->faker->lastName(),
@@ -41,5 +44,17 @@ class ServiceOrderFactory extends Factory
             'cancelled_reason' => null,
             'total_price' => $this->faker->randomFloat(2, 1, 100),
         ];
+    }
+
+    public function configure(): self
+    {
+        return $this
+            ->afterCreating(function (ServiceOrder $serviceOrder) {
+                ServiceBillFactory::new()
+                    ->createOne([
+                        'service_order_id' => $serviceOrder->id,
+                        'reference' => $serviceOrder->reference
+                    ]);
+            });
     }
 }

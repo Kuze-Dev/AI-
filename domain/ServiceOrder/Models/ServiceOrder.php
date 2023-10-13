@@ -10,6 +10,8 @@ use Domain\Admin\Models\Admin;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Enums\BillingCycle;
 use Domain\Service\Models\Service;
+use Domain\ServiceOrder\Enums\ServiceBillStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -122,6 +124,11 @@ class ServiceOrder extends Model
         return 'reference';
     }
 
+    public function scopeActive(Builder $query): void
+    {
+        $query->where('status', ServiceOrderStatus::ACTIVE);
+    }
+
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\ServiceOrder\Models\ServiceOrder> */
     public function customer(): BelongsTo
     {
@@ -144,5 +151,18 @@ class ServiceOrder extends Model
     public function serviceOrderAddress(): HasMany
     {
         return $this->hasMany(ServiceOrderAddress::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceBill>*/
+    public function serviceBills(): HasMany
+    {
+        return $this->hasMany(ServiceBill::class);
+    }
+
+    public function latestServiceBill(): ServiceBill
+    {
+        return $this->serviceBills()
+            ->latest()
+            ->first();
     }
 }

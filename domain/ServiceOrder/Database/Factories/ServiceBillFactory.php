@@ -17,8 +17,12 @@ class ServiceBillFactory extends Factory
 
     public function definition(): array
     {
+        $serviceOrder = ServiceOrderFactory::new()
+            ->make();
+
         return [
-            'service_order_id' => $this->faker->randomNumber(),
+            'service_order_id' => $serviceOrder->id,
+            'reference' => $serviceOrder->reference,
             'bill_date' => now()->addDay(),
             'due_date' => now()->addDays(2),
             'service_price' => $this->faker->randomFloat(2, 1, 100),
