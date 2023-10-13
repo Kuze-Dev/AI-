@@ -14,7 +14,7 @@ class CreateServiceBillingsAction
     {
         $customers = Customer::query()
             ->with([
-                'serviceOrders' => fn ($query) => $query->active(),
+                'serviceOrders' => fn ($query) => $query->whereActive(),
                 'serviceOrders.serviceBills',
             ])
             ->whereActive()

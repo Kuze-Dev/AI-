@@ -124,7 +124,7 @@ class ServiceOrder extends Model
         return 'reference';
     }
 
-    public function scopeActive(Builder $query): void
+    public function scopeWhereActive(Builder $query): void
     {
         $query->where('status', ServiceOrderStatus::ACTIVE);
     }
