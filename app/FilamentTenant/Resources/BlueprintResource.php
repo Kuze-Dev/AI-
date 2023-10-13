@@ -12,6 +12,7 @@ use Domain\Blueprint\Actions\DeleteBlueprintAction;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\SectionData;
 use Domain\Blueprint\Enums\FieldType;
+use Domain\Blueprint\Enums\ManipulationFit;
 use Domain\Blueprint\Enums\ManipulationFormat;
 use Domain\Blueprint\Enums\ManipulationType;
 use Domain\Blueprint\Enums\MarkdownButton;
@@ -520,9 +521,14 @@ class BlueprintResource extends Resource
                                 function (?Blueprint $record, $state) {
 
                                     $stateData = fn (ManipulationType $type) => $state[$type->value]['params'][0] ?? null;
-                                    $options = [];
+                                    $FormatOptions = [];
                                     foreach (ManipulationFormat::cases() as $format) {
-                                        $options[$format->value] = $format->value;
+                                        $FormatOptions[$format->value] = $format->value;
+                                    }
+
+                                    $Fitoptions = [];
+                                    foreach (ManipulationFit::cases() as $format) {
+                                        $Fitoptions[$format->value] = $format->value;
                                     }
 
                                     return collect(ManipulationType::cases())
@@ -535,11 +541,21 @@ class BlueprintResource extends Resource
                                                 ->minValue(0)
                                                 ->required()
                                                 ->formatStateUsing(fn () => $stateData($manipulationType)),
-                                            ManipulationType::TYPE => Forms\Components\Group::make()->columnSpan(2)->schema([
+                                            ManipulationType::TYPE => Forms\Components\Group::make()->schema([
                                                 Forms\Components\Select::make('type')
                                                     ->translateLabel()
-                                                    ->options($options)
+                                                    ->options($FormatOptions)
                                                     ->formatStateUsing(fn () => $stateData($manipulationType)),
+                                            ]),
+
+                                            ManipulationType::FIT => Forms\Components\Group::make()->schema([
+                                                Forms\Components\Select::make('fit')
+                                                    ->translateLabel()
+                                                    ->options($Fitoptions)
+                                                    ->formatStateUsing(fn () => $stateData($manipulationType))
+                                                    ->hint(str('[Documentation](https://spatie.be/docs/image/v1/image-manipulations/resizing-images)')->inlineMarkdown()->toHtmlString())
+                                                    ->hintColor('primary')
+                                                    ->hintIcon('heroicon-s-question-mark-circle'),
                                             ]),
                                             /** @phpstan-ignore-next-line */
                                             default => throw new ErrorException(
