@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
+use Domain\Address\Models\Address;
+use Domain\Cart\Actions\CartSummaryAction;
+use Domain\Cart\Enums\CartUserType;
+use Domain\Cart\Helpers\PrivateCart\CartLineQuery;
 use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\Actions\GetShippingRateAction;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ReceiverData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
+use Domain\Shipment\Enums\UnitEnum;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 use Throwable;
@@ -21,7 +27,6 @@ class ShippingMethodResourcev2 extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
-
         $rateData = $this->getRateData($request);
 
         return  [
@@ -48,27 +53,32 @@ class ShippingMethodResourcev2 extends JsonApiResource
     {
 
         try {
-            //code...
+
+            // TODO: handle when user is authenticated.
 
             $shippingMethod = $this->resource;
+            /** @var \Domain\Customer\Models\Customer|null */
+            $user = auth()->user();
 
-            $reciever = ReceiverData::fromArray($request->receiver);
+            if($user) {
+                /** @var \Domain\Address\Models\Address */
+                $addressModel = Address::findOrfail($request->address_id);
 
-            $customerAddress = ShippingAddressData::fromRequestData($request->destination_address);
+                $reciever = ReceiverData::fromCustomerModel($user);
 
-            #TODO: Get product list from guest cart
+                $customerAddress = ShippingAddressData::fromAddressModel($addressModel);
 
-            $productlist = [
-                [
-                    'product_id' => '1',
-                    'length' => 2,
-                    'width' => 2,
-                    'height' => 2,
-                    'weight' => 0.5,
-                ],
-            ];
+            } else {
+                $reciever = ReceiverData::fromArray($request->receiver);
 
-            $subTotal = 10;
+                $customerAddress = ShippingAddressData::fromRequestData($request->destination_address);
+            }
+
+            $cartLines = $this->getCartLines($request);
+
+            $productlist = app(CartSummaryAction::class)->getProducts($cartLines, UnitEnum::INCH);
+
+            $subTotal = app(CartSummaryAction::class)->getSubTotal($cartLines);
 
             $boxData = app(GetBoxAction::class)->execute(
                 $shippingMethod,
@@ -100,13 +110,31 @@ class ShippingMethodResourcev2 extends JsonApiResource
                     shippingMethod: $shippingMethod,
                     address: $customerAddress
                 )->getRateResponseAPI();
-
         } catch (Throwable $th) {
 
             return [
                 'message' => $th->getMessage(),
             ];
         }
+    }
 
+    /** @return \Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> */
+    private function getCartLines(Request $request): Collection
+    {
+
+        $cartLineIds = is_array($request->cart_line_ids) ? $request->cart_line_ids : explode(',', $request->cart_line_ids);
+
+        $type = auth()->user() ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
+
+        /** @var string $sessionId */
+        $sessionId = auth()->user() ? auth()->user()->id : $request->bearerToken();
+
+        if ($type === CartUserType::AUTHENTICATED) {
+            $cartLines = app(CartLineQuery::class)->execute($cartLineIds);
+        } else {
+            $cartLines = app(CartLineQuery::class)->guests($cartLineIds, $sessionId);
+        }
+
+        return $cartLines;
     }
 }

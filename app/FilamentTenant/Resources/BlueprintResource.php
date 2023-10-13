@@ -12,6 +12,7 @@ use Domain\Blueprint\Actions\DeleteBlueprintAction;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\SectionData;
 use Domain\Blueprint\Enums\FieldType;
+use Domain\Blueprint\Enums\ManipulationFormat;
 use Domain\Blueprint\Enums\ManipulationType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
@@ -519,6 +520,10 @@ class BlueprintResource extends Resource
                                 function (?Blueprint $record, $state) {
 
                                     $stateData = fn (ManipulationType $type) => $state[$type->value]['params'][0] ?? null;
+                                    $options = [];
+                                    foreach (ManipulationFormat::cases() as $format) {
+                                        $options[$format->value] = $format->value;
+                                    }
 
                                     return collect(ManipulationType::cases())
                                         ->map(fn (ManipulationType $manipulationType) => match ($manipulationType) {
@@ -530,6 +535,12 @@ class BlueprintResource extends Resource
                                                 ->minValue(0)
                                                 ->required()
                                                 ->formatStateUsing(fn () => $stateData($manipulationType)),
+                                            ManipulationType::TYPE => Forms\Components\Group::make()->columnSpan(2)->schema([
+                                                Forms\Components\Select::make('type')
+                                                    ->translateLabel()
+                                                    ->options($options)
+                                                    ->formatStateUsing(fn () => $stateData($manipulationType)),
+                                            ]),
                                             /** @phpstan-ignore-next-line */
                                             default => throw new ErrorException(
                                                 ManipulationType::class.'::'.Str::upper($manipulationType->value) . ' field not setup for conversion manipulation.'
@@ -566,6 +577,16 @@ class BlueprintResource extends Resource
                         Forms\Components\TextInput::make('value'),
                         Forms\Components\TextInput::make('description'),
                     ]),
+            ],
+            FieldType::TINYEDITOR => [
+                Forms\Components\TextInput::make('min_length')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('max_length')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
             ],
             default => [],
         };

@@ -61,6 +61,8 @@ class EditCustomer extends EditRecord
 
     protected function getFormActions(): array
     {
+        // dd($this->record->tier_approval_status);
+
         return $this->getCachedActions();
     }
 
@@ -72,7 +74,7 @@ class EditCustomer extends EditRecord
     {
         return DB::transaction(
             fn () => app(EditCustomerAction::class)
-                ->execute($record, CustomerData::fromArrayEditByAdmin($data))
+                ->execute($record, CustomerData::fromArrayEditByAdmin($record, $data))
         );
     }
 }

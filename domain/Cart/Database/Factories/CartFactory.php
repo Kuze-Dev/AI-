@@ -28,4 +28,12 @@ class CartFactory extends Factory
     {
         return $this->state(['customer_id' => $id]);
     }
+
+    public function setGuestId(string $sessionId): self
+    {
+        return $this->state([
+            'customer_id' => null,
+            'session_id' => $sessionId,
+        ]);
+    }
 }

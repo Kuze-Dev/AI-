@@ -101,7 +101,14 @@ class AdminResource extends Resource
                                 ->optionsFromModel(
                                     config('permission.models.role'),
                                     'name',
-                                    fn (Builder $query) => $query->where('guard_name', 'admin')
+                                    function (Builder $query) {
+
+                                        if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+                                            return $query->where('guard_name', 'admin');
+                                        }
+
+                                        return $query->where('guard_name', 'admin')->where('name', '!=', config('domain.role.super_admin'));
+                                    }
                                 )
                                 ->formatStateUsing(fn (?Admin $record) => $record ? $record->roles->pluck('id')->toArray() : []),
                             Forms\Components\Select::make('permissions')

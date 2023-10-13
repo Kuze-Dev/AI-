@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\Customer\CustomerBase;
 use App\FilamentTenant\Resources\CustomerResource;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Filament\Facades\Filament;
@@ -9,7 +10,8 @@ use Filament\Facades\Filament;
 uses()->group('customer');
 
 beforeEach(function () {
-    testInTenantContext();
+    $tenant = testInTenantContext();
+    $tenant->features()->activate(CustomerBase::class);
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 });
