@@ -62,4 +62,9 @@ class ServiceOrderFactory extends Factory
     {
         return $this->state(['status' => ServiceOrderStatus::ACTIVE]);
     }
+
+    public function inactive(): self
+    {
+        return $this->state(['status' => ServiceOrderStatus::INACTIVE]);
+    }
 }

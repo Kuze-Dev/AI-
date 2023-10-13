@@ -35,4 +35,9 @@ class ServiceBillFactory extends Factory
     {
         return $this->state(['status' => ServiceBillStatus::PAID]);
     }
+
+    public function unpaid(): self
+    {
+        return $this->state(['status' => ServiceBillStatus::FORPAYMENT]);
+    }
 }

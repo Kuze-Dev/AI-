@@ -92,4 +92,9 @@ class CustomerFactory extends Factory
     {
         return $this->state(['register_status' => RegisterStatus::REGISTERED]);
     }
+
+    public function unregistered(): self
+    {
+        return $this->state(['register_status' => RegisterStatus::UNREGISTERED]);
+    }
 }

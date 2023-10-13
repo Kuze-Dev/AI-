@@ -166,7 +166,7 @@ class ServiceOrder extends Model
             ->latest()
             ->first();
 
-        return $serviceBill->status === ServiceBillStatus::PAID
+        return filled($serviceBill) && $serviceBill->status === ServiceBillStatus::PAID
             ? $serviceBill
             : null;
     }
