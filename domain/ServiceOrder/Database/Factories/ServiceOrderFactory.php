@@ -46,6 +46,7 @@ class ServiceOrderFactory extends Factory
         ];
     }
 
+    // TODO: to be removed. Re-implement test: create and use state method.
     // public function configure(): self
     // {
     //     return $this
@@ -66,5 +67,10 @@ class ServiceOrderFactory extends Factory
     public function inactive(): self
     {
         return $this->state(['status' => ServiceOrderStatus::INACTIVE]);
+    }
+
+    public function closed(): self
+    {
+        return $this->state(['status' => ServiceOrderStatus::CLOSED]);
     }
 }

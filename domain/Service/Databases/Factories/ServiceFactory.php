@@ -44,6 +44,11 @@ class ServiceFactory extends Factory
         ];
     }
 
+    public function subscriptionBased(): self
+    {
+        return $this->state(['is_subscription' => true]);
+    }
+
     public function withDummyBlueprint(): self
     {
         return $this->for(BlueprintFactory::new()->withDummySchema());

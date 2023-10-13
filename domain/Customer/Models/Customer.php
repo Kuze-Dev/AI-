@@ -184,10 +184,14 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
         $query->where('register_status', RegisterStatus::REGISTERED);
     }
 
-    public function scopeWhereActiveServiceOrder($query)
+    public function scopeWhereHasActiveSubscriptionBasedServiceOrder($query)
     {
-        return $query->whereHas('serviceOrders', function ($query) {
-            $query->where('status', ServiceOrderStatus::ACTIVE);
+        return $query->whereHas('serviceOrders', function ($nestedQuery) {
+            $nestedQuery
+                ->where('status', ServiceOrderStatus::ACTIVE)
+                ->whereHas('service', function ($deepQuery) {
+                    $deepQuery->where('is_subscription', true);
+                });
         });
     }
 

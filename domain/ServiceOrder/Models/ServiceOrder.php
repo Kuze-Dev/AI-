@@ -129,6 +129,13 @@ class ServiceOrder extends Model
         $query->where('status', ServiceOrderStatus::ACTIVE);
     }
 
+    public function scopeWhereSubscriptionBased(Builder $query): void
+    {
+        $query->whereHas('service', function ($nestedQuery) {
+            $nestedQuery->where('is_subscription', true);
+        });
+    }
+
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\ServiceOrder\Models\ServiceOrder> */
     public function customer(): BelongsTo
     {
