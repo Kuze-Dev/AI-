@@ -43,7 +43,7 @@ it('can create service order addresses', function () {
         customer_id: $customer->id,
         service_id: $service->id,
         schedule: $serviceOrder['schedule'],
-        service_address_id: null,
+        service_address_id: $address->id,
         billing_address_id: null,
         is_same_as_billing: true,
         additional_charges: $serviceOrder['additional_charges'],
@@ -56,7 +56,6 @@ it('can create service order addresses', function () {
     app(CreateServiceOrderAddressAction::class)
         ->execute($serviceOrder, $serviceOrderData);
 
-    /** TODO: fix */
     expect(ServiceOrderAddress::get()->count())
         ->toBeGreaterThan(0);
 });
