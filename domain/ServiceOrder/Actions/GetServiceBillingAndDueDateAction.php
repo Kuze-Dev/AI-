@@ -27,8 +27,11 @@ class GetServiceBillingAndDueDateAction
                 ? $serviceData->created_at
                 : $serviceData->due_date;
 
+            /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceData */
             $serviceData = $serviceData->serviceOrder;
         }
+
+        $referenceDate = now()->parse($referenceDate);
 
         $billDate = match ($serviceData->billing_cycle) {
             BillingCycle::DAILY => $referenceDate->addDay(),

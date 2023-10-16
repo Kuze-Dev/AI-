@@ -64,8 +64,8 @@ class EventServiceProvider extends ServiceProvider
             GuestOrderPlacedListener::class,
         ],
         ServiceBillDueDateNotificationSentEvent::class => [
-            ServiceBillDueDateNotificationSentListener::class
-        ]
+            ServiceBillDueDateNotificationSentListener::class,
+        ],
     ];
 
     /** Register any events for your application. */

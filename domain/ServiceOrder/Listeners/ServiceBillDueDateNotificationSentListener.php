@@ -11,8 +11,7 @@ class ServiceBillDueDateNotificationSentListener
 {
     public function __construct(
         public SaveServiceBillEmailSentTimestampAction $saveServiceBillEmailSentTimestampAction
-    )
-    {
+    ) {
     }
 
     public function handle(ServiceBillDueDateNotificationSentEvent $event): void

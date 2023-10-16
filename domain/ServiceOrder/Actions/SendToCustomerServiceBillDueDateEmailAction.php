@@ -16,8 +16,7 @@ class SendToCustomerServiceBillDueDateEmailAction
 
     public function __construct(
         private ServiceBillDueDateNotificationSentEvent $serviceBillDueDateNotificationSentEvent
-    )
-    {
+    ) {
     }
 
     public function execute(Customer $customer, ServiceBill $serviceBill): void

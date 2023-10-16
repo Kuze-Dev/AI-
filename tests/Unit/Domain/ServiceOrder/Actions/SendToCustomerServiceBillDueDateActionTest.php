@@ -43,7 +43,8 @@ it('can execute', function () {
         );
 
     Notification::assertSentTo(
-        [$customer], ServiceBillDueDateNotification::class
+        [$customer],
+        ServiceBillDueDateNotification::class
     );
 
     Event::assertDispatched(ServiceBillDueDateNotificationSentEvent::class);

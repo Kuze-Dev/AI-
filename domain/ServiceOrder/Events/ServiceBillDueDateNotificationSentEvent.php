@@ -11,7 +11,9 @@ use Illuminate\Queue\SerializesModels;
 
 class ServiceBillDueDateNotificationSentEvent
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public function __construct(
         public ServiceBill $serviceBill
