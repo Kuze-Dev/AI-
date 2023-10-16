@@ -46,16 +46,16 @@ it('cannot dispatch non subscription service order', function () {
         ->has(
             ServiceOrderFactory::new()
                 ->active()
-                ->for(ServiceFactory::new()->subscriptionBased()->withDummyBlueprint())
+                ->for(ServiceFactory::new()->nonSubscriptionBased()->withDummyBlueprint())
                 ->has(ServiceBillFactory::new(['bill_date' => now()])->paid())
         )
         ->createOne();
 
     app(CreateServiceBillingsAction::class)->execute();
 
-    Queue::assertPushed(CreateServiceBillJob::class);
+    Queue::assertNotPushed(CreateServiceBillJob::class);
 
-    QueueableActionFake::assertPushed(SendToCustomerServiceBillEmailAction::class);
+    QueueableActionFake::assertNotPushed(SendToCustomerServiceBillEmailAction::class);
 });
 
 it('cannot dispatch active only customer', function () {

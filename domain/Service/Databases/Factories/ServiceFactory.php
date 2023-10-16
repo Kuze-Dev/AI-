@@ -49,6 +49,11 @@ class ServiceFactory extends Factory
         return $this->state(['is_subscription' => true]);
     }
 
+    public function nonSubscriptionBased(): self
+    {
+        return $this->state(['is_subscription' => false]);
+    }
+
     public function withDummyBlueprint(): self
     {
         return $this->for(BlueprintFactory::new()->withDummySchema());
