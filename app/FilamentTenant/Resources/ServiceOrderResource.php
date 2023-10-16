@@ -176,13 +176,22 @@ class ServiceOrderResource extends Resource
                             Forms\Components\Group::make()->columns(2)->schema([
                                 Forms\Components\Select::make('service_id')
                                     ->label(trans('Select Service'))
+                                    ->columnSpan(2)
                                     ->placeholder(trans('Select Service'))
                                     ->required()
                                     ->preload()
                                     ->reactive()
                                     ->optionsFromModel(Service::class, 'name'),
 
-                                DateTimePicker::make('schedule')->minDate(now())->withoutSeconds()->default(now())->timezone(Auth::user()?->timezone),
+                                DateTimePicker::make('schedule')
+                                    ->columnSpan(2)
+                                    ->minDate(now())
+                                    ->withoutSeconds()
+                                    ->default(now())
+                                    ->timezone(Auth::user()?->timezone)
+                                    ->visible(
+                                        fn (Closure $get) => Service::whereId($get('service_id'))->first()?->is_subscription
+                                    ),
 
                                 Forms\Components\Group::make()->columnSpan(2)->schema([
                                     Forms\Components\Fieldset::make('')->schema([
@@ -512,7 +521,7 @@ class ServiceOrderResource extends Resource
             ->size('sm')
             ->hidden(function (ServiceOrder $record) {
                 return $record->status == ServiceOrderStatus::FORPAYMENT ||
-                $record->status == ServiceOrderStatus::COMPLETED;
+                    $record->status == ServiceOrderStatus::COMPLETED;
             });
     }
 
