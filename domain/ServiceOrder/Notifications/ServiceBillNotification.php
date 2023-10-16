@@ -26,7 +26,7 @@ class ServiceBillNotification extends Notification implements ShouldQueue
     private array $replyTo;
     private ?string $footer = null;
 
-    public function __construct(ServiceBill $serviceBill): void
+    public function __construct(ServiceBill $serviceBill)
     {
         $this->serviceBill = $serviceBill;
 

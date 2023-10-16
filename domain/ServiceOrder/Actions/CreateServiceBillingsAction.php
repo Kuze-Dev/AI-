@@ -45,11 +45,14 @@ class CreateServiceBillingsAction
                                 $latestPaidServiceBill
                             );
 
+                            /** @var \Domain\ServiceOrder\Models\ServiceBill $serviceBill */
+                            $serviceBill = $serviceOrder->refresh()->latestForPaymentServiceBill();
+
                             $this->sendToCustomerServiceBillEmailAction
                                 ->onQueue()
                                 ->execute(
                                     $customer,
-                                    $serviceOrder->refresh()->latestForPaymentServiceBill()
+                                    $serviceBill
                                 );
                         }
                     });
