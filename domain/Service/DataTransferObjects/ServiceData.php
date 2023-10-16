@@ -20,6 +20,7 @@ class ServiceData
         public readonly bool $pay_upfront = false,
         public readonly bool $is_subscription = false,
         public readonly bool $status = false,
+        public readonly bool $needs_approval = false,
         public readonly ?array $meta_data = [],
         public readonly ?array $media_collection = [],
     ) {
@@ -41,6 +42,7 @@ class ServiceData
             pay_upfront: $data['pay_upfront'],
             is_subscription: $data['is_subscription'],
             status: $data['status'],
+            needs_approval: $data['needs_approval'],
             meta_data: $data['meta_data'],
             media_collection: ['collection' => 'image', 'media' => $data['images']],
         );

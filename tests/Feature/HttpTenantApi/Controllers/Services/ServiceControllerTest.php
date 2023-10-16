@@ -15,11 +15,12 @@ beforeEach(function () {
 });
 
 it('can list services', function () {
-    ServiceFactory::new(['status' => 1])
+    ServiceFactory::new()
         ->has(TaxonomyTermFactory::new()
             ->for(TaxonomyFactory::new()
                 ->withDummyBlueprint()))
         ->withDummyBlueprint()
+        ->isActive()
         ->count(10)
         ->create();
 
@@ -34,11 +35,12 @@ it('can list services', function () {
 });
 
 it('can show a service', function () {
-    $service = ServiceFactory::new(['status' => 1])
+    $service = ServiceFactory::new()
         ->has(TaxonomyTermFactory::new()
             ->for(TaxonomyFactory::new()
                 ->withDummyBlueprint()))
         ->withDummyBlueprint()
+        ->isActive()
         ->createOne();
 
     getJson('api/services/' . $service->getRouteKey())
@@ -53,12 +55,13 @@ it('can show a service', function () {
 });
 
 it('can filter services', function ($attribute) {
-    $services = ServiceFactory::new(['status' => 1])
+    $services = ServiceFactory::new()
         ->has(TaxonomyTermFactory::new()
             ->for(TaxonomyFactory::new()
                 ->withDummyBlueprint())
             ->count(2))
         ->withDummyBlueprint()
+        ->isActive()
         ->count(1)
         ->create();
 
@@ -76,15 +79,16 @@ it('can filter services', function ($attribute) {
                     ->etc();
             });
     }
-})->with(['name ', 'retail_price', 'selling_price', 'is_featured', 'is_special_offer', 'pay_upfront', 'is_subscription', 'status']);
+})->with(['name', 'retail_price', 'selling_price', 'is_featured', 'is_special_offer', 'pay_upfront', 'is_subscription', 'status', 'needs_approval']);
 
 it("can't list inactive services", function () {
-    ServiceFactory::new(['status' => 0])
+    ServiceFactory::new()
         ->has(TaxonomyTermFactory::new()
             ->for(TaxonomyFactory::new()
                 ->withDummyBlueprint())
             ->count(2))
         ->withDummyBlueprint()
+        ->isActive(false)
         ->count(10)
         ->create();
 
@@ -98,11 +102,12 @@ it("can't list inactive services", function () {
 });
 
 it("can't show an inactive service", function () {
-    $service = ServiceFactory::new(['status' => 0])
+    $service = ServiceFactory::new()
         ->has(TaxonomyTermFactory::new()
             ->for(TaxonomyFactory::new()
                 ->withDummyBlueprint()))
         ->withDummyBlueprint()
+        ->isActive(false)
         ->createOne();
 
     getJson("api/services/{$service->getRouteKey()}")

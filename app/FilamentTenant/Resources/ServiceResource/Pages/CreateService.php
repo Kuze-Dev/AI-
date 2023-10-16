@@ -12,6 +12,8 @@ use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Exception;
+use Throwable;
 
 class CreateService extends CreateRecord
 {
@@ -19,11 +21,13 @@ class CreateService extends CreateRecord
 
     protected static string $resource = ServiceResource::class;
 
+    /** @throws Throwable */
     public function handleRecordCreation(array $data): Model
     {
         return DB::transaction(fn () => app(CreateServiceAction::class)->execute(ServiceData::fromArray($data)));
     }
 
+    /** @throws Exception */
     protected function getActions(): array
     {
         return [

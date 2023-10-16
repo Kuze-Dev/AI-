@@ -7,6 +7,5 @@ namespace Domain\Service\Enums;
 enum Status: string
 {
     case ACTIVE = 'active';
-
     case INACTIVE = 'inactive';
 }

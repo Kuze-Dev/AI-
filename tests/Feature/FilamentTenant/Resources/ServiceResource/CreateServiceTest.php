@@ -15,16 +15,16 @@ use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Support\MetaData\Database\Factories\MetaDataFactory;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    testInTenantContext();
+    testInTenantContext()->features()->activate(ServiceBase::class);
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 
-    tenancy()->tenant->features()->activate(ServiceBase::class);
     CurrencyFactory::new()->createOne([
         'enabled' => true,
     ]);
@@ -61,13 +61,8 @@ it('can create service', function () {
             'blueprint_id' => $blueprint->getKey(),
             'retail_price' => 99.99,
             'selling_price' => 99.69,
-            'billing_cycle' => 'Daily',
+            'billing_cycle' => 'daily',
             'due_date_every' => 20,
-            'is_featured' => false,
-            'is_special_offer' => false,
-            'pay_upfront' => false,
-            'is_subscription' => false,
-            'status' => false,
             'taxonomy_term_id' => $taxonomyTerm->id,
             'images.0' => $image,
             'meta_data' => $metaData,
@@ -111,19 +106,12 @@ it('cannot create service with same name', function () {
         ->withDummySchema()
         ->createOne();
 
-    ServiceFactory::new()->createOne([
-        'name' => 'Test',
-        'blueprint_id' => $blueprint->getKey(),
-        'retail_price' => 99.99,
-        'selling_price' => 99.69,
-        'billing_cycle' => 'Daily',
-        'due_date_every' => 20,
-        'is_featured' => false,
-        'is_special_offer' => false,
-        'pay_upfront' => false,
-        'is_subscription' => false,
-        'status' => false,
-    ]);
+    ServiceFactory::new(['name' => 'Test'])
+        ->withTaxonomyTerm()
+        ->withDummyBlueprint()
+        ->has(MetaDataFactory::new())
+        ->isActive()
+        ->createOne();
 
     livewire(CreateService::class)
         ->fillForm([
@@ -131,13 +119,8 @@ it('cannot create service with same name', function () {
             'blueprint_id' => $blueprint->getKey(),
             'retail_price' => 99.99,
             'selling_price' => 99.69,
-            'billing_cycle' => 'Daily',
+            'billing_cycle' => 'daily',
             'due_date_every' => 20,
-            'is_featured' => false,
-            'is_special_offer' => false,
-            'pay_upfront' => false,
-            'is_subscription' => false,
-            'status' => false,
         ])
         ->call('create')
         ->assertHasFormErrors(['name' => 'unique'])
@@ -166,13 +149,8 @@ it('can create service with metadata', function () {
             'blueprint_id' => $blueprint->getKey(),
             'retail_price' => 99.99,
             'selling_price' => 99.69,
-            'billing_cycle' => 'Daily',
+            'billing_cycle' => 'daily',
             'due_date_every' => 20,
-            'is_featured' => false,
-            'is_special_offer' => false,
-            'pay_upfront' => false,
-            'is_subscription' => false,
-            'status' => false,
             'meta_data' => $metaData,
             'taxonomy_term_id' => $taxonomyTerm->id,
         ])
@@ -193,3 +171,36 @@ it('can create service with metadata', function () {
         )
     );
 });
+
+it('can create different types of service', function ($attribute) {
+    $blueprint = BlueprintFactory::new()
+        ->withDummySchema()
+        ->createOne();
+
+    $taxonomyTerm = TaxonomyTermFactory::new(['name' => 'category'])
+        ->for(TaxonomyFactory::new()->withDummyBlueprint())
+        ->createOne();
+
+    livewire(CreateService::class)
+        ->fillForm([
+            'name' => 'Test',
+            'blueprint_id' => $blueprint->getKey(),
+            'retail_price' => 99.99,
+            'selling_price' => 99.69,
+            'is_subscription' => $attribute !== 'once',
+            'billing_cycle' => $attribute !== 'once' ? $attribute : null,
+            'due_date_every' => $attribute !== 'once' ? 20 : null,
+            'taxonomy_term_id' => $taxonomyTerm->id,
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors()
+        ->assertOk()
+        ->instance()
+        ->record;
+
+    assertDatabaseHas(Service::class, [
+        'is_subscription' => $attribute !== 'once',
+        'billing_cycle' => $attribute !== 'once' ? $attribute : null,
+    ]);
+
+})->with(['daily', 'monthly', 'yearly', 'once'])->only();

@@ -24,6 +24,7 @@ return new class () extends Migration {
             $table->boolean('pay_upfront');
             $table->boolean('is_subscription');
             $table->boolean('status');
+            $table->boolean('needs_approval');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -22,11 +22,10 @@ use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    testInTenantContext();
+    testInTenantContext()->features()->activate(ServiceBase::class);
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 
-    tenancy()->tenant->features()->activate(ServiceBase::class);
     CurrencyFactory::new()->createOne([
         'enabled' => true,
     ]);
@@ -34,9 +33,10 @@ beforeEach(function () {
 
 it('can render service', function () {
     $service = ServiceFactory::new()
+        ->withTaxonomyTerm()
         ->withDummyBlueprint()
-        ->has(TaxonomyTermFactory::new()->for(TaxonomyFactory::new()->withDummyBlueprint()))
         ->has(MetaDataFactory::new())
+        ->isActive()
         ->createOne();
 
     livewire(EditService::class, ['record' => $service->getRouteKey()])
@@ -48,16 +48,14 @@ it('can render service', function () {
             'blueprint_id' => $service->blueprint_id,
             'retail_price' => $service->retail_price,
             'selling_price' => $service->selling_price,
-            'billing_cycle' => $service->billing_cycle,
+            'billing_cycle' => $service->billing_cycle?->value,
             'due_date_every' => $service->due_date_every,
             'is_featured' => $service->is_featured,
             'is_special_offer' => $service->is_special_offer,
             'pay_upfront' => $service->pay_upfront,
             'is_subscription' => $service->is_subscription,
             'status' => $service->status,
-            //            'images' => $service->media,
-            //            'meta_data' => $service->metaData,
-            //            'taxonomy_term_id' => $service->taxonomyTerms,
+            'needs_approval' => $service->needs_approval,
         ])
         ->assertOk();
 });
@@ -67,6 +65,7 @@ it('can edit service', function () {
         ->withDummyBlueprint()
         ->has(TaxonomyTermFactory::new()->for(TaxonomyFactory::new()->withDummyBlueprint()))
         ->has(MetaDataFactory::new())
+        ->isActive()
         ->createOne();
 
     $taxonomyTerm = TaxonomyTermFactory::new(['name' => 'category'])
@@ -87,13 +86,14 @@ it('can edit service', function () {
             'name' => 'Test',
             'retail_price' => 99.99,
             'selling_price' => 99.69,
-            'billing_cycle' => 'Daily',
+            'billing_cycle' => 'daily',
             'due_date_every' => 20,
             'is_featured' => ! $service->is_featured,
             'is_special_offer' => ! $service->is_special_offer,
             'pay_upfront' => ! $service->pay_upfront,
             'is_subscription' => ! $service->is_subscription,
             'status' => ! $service->status,
+            'needs_approval' => ! $service->needs_approval,
             'taxonomy_term_id' => $taxonomyTerm->id,
             'images.0' => $image,
             'meta_data' => $metaData,

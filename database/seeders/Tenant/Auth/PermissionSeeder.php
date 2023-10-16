@@ -83,6 +83,10 @@ class PermissionSeeder extends BasePermissionSeeder
                     only: ['view', 'viewAny', 'update'],
                     customPermissions: ['reports']
                 ),
+                ...$this->generateFilamentResourcePermissions(
+                    'service',
+                    except: ['deleteAny']
+                ),
             ],
         ];
     }
