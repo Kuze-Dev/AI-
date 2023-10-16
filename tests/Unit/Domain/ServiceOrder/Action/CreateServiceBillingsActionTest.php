@@ -5,10 +5,12 @@ declare(strict_types=1);
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Service\Databases\Factories\ServiceFactory;
 use Domain\ServiceOrder\Actions\CreateServiceBillingsAction;
+use Domain\ServiceOrder\Actions\SendToCustomerServiceBillEmailAction;
 use Domain\ServiceOrder\Database\Factories\ServiceBillFactory;
 use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
 use Domain\ServiceOrder\Jobs\CreateServiceBillJob;
 use Illuminate\Support\Facades\Queue;
+use Spatie\QueueableAction\Testing\QueueableActionFake;
 
 beforeEach(function () {
     testInTenantContext();
@@ -31,6 +33,8 @@ it('can dispatch billable customer only', function () {
     app(CreateServiceBillingsAction::class)->execute();
 
     Queue::assertPushed(CreateServiceBillJob::class);
+
+    QueueableActionFake::assertPushed(SendToCustomerServiceBillEmailAction::class);
 });
 
 it('cannot dispatch non subscription service order', function () {
@@ -50,6 +54,8 @@ it('cannot dispatch non subscription service order', function () {
     app(CreateServiceBillingsAction::class)->execute();
 
     Queue::assertPushed(CreateServiceBillJob::class);
+
+    QueueableActionFake::assertPushed(SendToCustomerServiceBillEmailAction::class);
 });
 
 it('cannot dispatch active only customer', function () {
@@ -63,6 +69,8 @@ it('cannot dispatch active only customer', function () {
     app(CreateServiceBillingsAction::class)->execute();
 
     Queue::assertNotPushed(CreateServiceBillJob::class);
+
+    QueueableActionFake::assertNotPushed(SendToCustomerServiceBillEmailAction::class);
 });
 
 it('cannot dispatch registered only customer', function () {
@@ -76,6 +84,8 @@ it('cannot dispatch registered only customer', function () {
     app(CreateServiceBillingsAction::class)->execute();
 
     Queue::assertNotPushed(CreateServiceBillJob::class);
+
+    QueueableActionFake::assertNotPushed(SendToCustomerServiceBillEmailAction::class);
 });
 
 it('cannot dispatch inactive service order', function () {
@@ -95,6 +105,8 @@ it('cannot dispatch inactive service order', function () {
     app(CreateServiceBillingsAction::class)->execute();
 
     Queue::assertNotPushed(CreateServiceBillJob::class);
+
+    QueueableActionFake::assertNotPushed(SendToCustomerServiceBillEmailAction::class);
 });
 
 it('cannot dispatch closed service order', function () {
@@ -114,6 +126,8 @@ it('cannot dispatch closed service order', function () {
     app(CreateServiceBillingsAction::class)->execute();
 
     Queue::assertNotPushed(CreateServiceBillJob::class);
+
+    QueueableActionFake::assertNotPushed(SendToCustomerServiceBillEmailAction::class);
 });
 
 it('cannot dispatch active service order without current/latest bill', function () {
@@ -132,6 +146,8 @@ it('cannot dispatch active service order without current/latest bill', function 
     app(CreateServiceBillingsAction::class)->execute();
 
     Queue::assertNotPushed(CreateServiceBillJob::class);
+
+    QueueableActionFake::assertNotPushed(SendToCustomerServiceBillEmailAction::class);
 });
 
 it('cannot dispatch active service order with current/latest bill but still unpaid', function () {
@@ -151,6 +167,8 @@ it('cannot dispatch active service order with current/latest bill but still unpa
     app(CreateServiceBillingsAction::class)->execute();
 
     Queue::assertNotPushed(CreateServiceBillJob::class);
+
+    QueueableActionFake::assertNotPushed(SendToCustomerServiceBillEmailAction::class);
 });
 
 it('cannot dispatch active service order with current/latest bill but not past due date yet', function () {
@@ -170,4 +188,6 @@ it('cannot dispatch active service order with current/latest bill but not past d
     app(CreateServiceBillingsAction::class)->execute();
 
     Queue::assertNotPushed(CreateServiceBillJob::class);
+
+    QueueableActionFake::assertNotPushed(SendToCustomerServiceBillEmailAction::class);
 });
