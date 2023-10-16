@@ -18,7 +18,7 @@ beforeEach(function () {
 });
 
 it('can dispatch to customer with payable bills only (subscription based)', function () {
-    $customer = CustomerFactory::new()
+    CustomerFactory::new()
         ->active()
         ->registered()
         ->has(
