@@ -13,10 +13,8 @@ class SendToCustomerServiceBillDueDateEmailAction
 {
     use QueueableAction;
 
-    public function execute(Customer $customer, ServiceBill $serviceBill): bool
+    public function execute(Customer $customer, ServiceBill $serviceBill): void
     {
         $customer->notify(new ServiceBillDueDateNotification($serviceBill));
-
-        return true;
     }
 }

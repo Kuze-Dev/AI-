@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Service\Databases\Factories\ServiceFactory;
 use Domain\ServiceOrder\Actions\NotifyCustomerServiceBillDueDateAction;
+use Domain\ServiceOrder\Actions\SaveServiceBillEmailSentTimestampAction;
 use Domain\ServiceOrder\Actions\SendToCustomerServiceBillDueDateEmailAction;
 use Domain\ServiceOrder\Database\Factories\ServiceBillFactory;
 use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
@@ -35,7 +36,10 @@ it('can dispatch to customer with payable bills only (subscription based)', func
 
     app(NotifyCustomerServiceBillDueDateAction::class)->execute();
 
-    QueueableActionFake::assertPushed(SendToCustomerServiceBillDueDateEmailAction::class);
+    QueueableActionFake::assertPushedWithChain(
+        SendToCustomerServiceBillDueDateEmailAction::class,
+        [SaveServiceBillEmailSentTimestampAction::class]
+    );
 });
 
 it('can dispatch to customer with payable bills only (non-subscription based)', function () {
