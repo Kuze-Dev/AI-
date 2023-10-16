@@ -10,7 +10,7 @@ use Domain\ServiceOrder\Events\ServiceBillDueDateNotificationSentEvent;
 class ServiceBillDueDateNotificationSentListener
 {
     public function __construct(
-        private SaveServiceBillEmailSentTimestampAction $saveServiceBillEmailSentTimestampAction
+        public SaveServiceBillEmailSentTimestampAction $saveServiceBillEmailSentTimestampAction
     )
     {
     }

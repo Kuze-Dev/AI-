@@ -14,7 +14,7 @@ class ServiceBillDueDateNotificationSentEvent
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public function __construct(
-        private ServiceBill $serviceBill
+        public ServiceBill $serviceBill
     ) {
         $this->serviceBill = $serviceBill;
     }
