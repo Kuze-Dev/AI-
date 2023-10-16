@@ -24,6 +24,7 @@ use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 use Domain\Shipment\DataTransferObjects\ReceiverData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\Shipment\Enums\UnitEnum;
+use Domain\Taxation\Enums\PriceDisplay;
 
 class GuestCartSummaryAction
 {
@@ -41,6 +42,10 @@ class GuestCartSummaryAction
         $tax = $this->getTax($cartSummaryTaxData->countryId, $cartSummaryTaxData->stateId);
 
         $taxTotal = $tax['taxPercentage'] ? round($initialSubTotal * $tax['taxPercentage'] / 100, 2) : 0;
+
+        if ($tax['taxDisplay'] == PriceDisplay::INCLUSIVE) {
+            $taxTotal = 0;
+        }
 
         $initialShippingTotal = $this->getShippingFee(
             $collections,

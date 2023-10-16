@@ -57,7 +57,7 @@ class PermissionSeeder extends BasePermissionSeeder
                     customPermissions: ['sendRegisterInvitation']
                 ),
                 ...$this->generateFilamentResourcePermissions(
-                    'tiers',
+                    'tier',
                     except: [
                         'deleteAny',
                         'restoreAny',

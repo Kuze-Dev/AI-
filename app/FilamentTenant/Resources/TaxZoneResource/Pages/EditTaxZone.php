@@ -35,15 +35,6 @@ class EditTaxZone extends EditRecord
         ];
     }
 
-    protected function getBreadcrumbs(): array
-    {
-        return [
-            TaxZoneResource::getUrl('index') => trans('Taxation'),
-            url()->current() => $this->record->name,
-            'Edit',
-        ];
-    }
-
     protected function getFormActions(): array
     {
         return $this->getCachedActions();
