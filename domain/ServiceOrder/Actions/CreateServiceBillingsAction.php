@@ -39,6 +39,8 @@ class CreateServiceBillingsAction
                                 $customer,
                                 $latestPaidServiceBill
                             );
+
+                            /** TODO: email notification */
                         }
                     });
             });
