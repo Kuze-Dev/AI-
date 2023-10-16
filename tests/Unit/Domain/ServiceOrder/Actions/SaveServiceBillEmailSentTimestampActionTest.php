@@ -10,7 +10,9 @@ beforeEach(function () {
 });
 
 it('can update', function () {
-    $serviceBill = ServiceBillFactory::new()->createOne();
+    $serviceBill = ServiceBillFactory::new()
+        ->forPayment()
+        ->createOne();
 
     app(SaveServiceBillEmailSentTimestampAction::class)->execute($serviceBill);
 
