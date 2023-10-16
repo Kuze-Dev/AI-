@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Domain\ServiceOrder\Events;
+
+use Domain\ServiceOrder\Models\ServiceBill;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class ServiceBillDueDateNotificationSentEvent
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public function __construct(
+        private ServiceBill $serviceBill
+    ) {
+        $this->serviceBill = $serviceBill;
+    }
+}

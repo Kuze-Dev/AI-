@@ -20,6 +20,8 @@ use Domain\Order\Listeners\OrderPaymentUpdatedListener;
 use Domain\Order\Listeners\OrderStatusUpdatedListener;
 use Domain\Order\Listeners\PublicOrder\GuestOrderPlacedListener;
 use Domain\Payments\Events\PaymentProcessEvent;
+use Domain\ServiceOrder\Events\ServiceBillDueDateNotificationSentEvent;
+use Domain\ServiceOrder\Listeners\ServiceBillDueDateNotificationSentListener;
 use Domain\ServiceOrder\Listeners\ServiceOrderPaymentUpdatedListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -61,6 +63,9 @@ class EventServiceProvider extends ServiceProvider
         GuestOrderPlacedEvent::class => [
             GuestOrderPlacedListener::class,
         ],
+        ServiceBillDueDateNotificationSentEvent::class => [
+            ServiceBillDueDateNotificationSentListener::class
+        ]
     ];
 
     /** Register any events for your application. */

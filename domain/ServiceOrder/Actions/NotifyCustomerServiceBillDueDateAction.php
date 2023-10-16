@@ -6,7 +6,6 @@ namespace Domain\ServiceOrder\Actions;
 
 use Domain\Customer\Models\Customer;
 use Domain\ServiceOrder\Models\ServiceOrder;
-use Spatie\QueueableAction\ActionJob;
 
 class NotifyCustomerServiceBillDueDateAction
 {
@@ -54,10 +53,7 @@ class NotifyCustomerServiceBillDueDateAction
                                 ->execute(
                                     $customer,
                                     $latestForPaymentServiceBill
-                                )
-                                ->chain([
-                                    new ActionJob(SaveServiceBillEmailSentTimestampAction::class),
-                                ]);
+                                );
                         }
                     });
             });
