@@ -19,16 +19,15 @@ class GetServiceBillingAndDueDateAction
     ): mixed {
 
         if ($serviceData instanceof ServiceOrder) {
-            $referenceDate = now()->parse($serviceData->created_at);
+            $referenceDate = $serviceData->created_at;
         }
 
         if ($serviceData instanceof ServiceBill) {
-            if ($serviceData->due_date <= now()) {
-                $referenceDate = now()->parse($serviceData->created_at);
-            } else {
-                $referenceDate = now()->parse($serviceData->due_date);
-            }
-            $serviceData = $serviceData->service_order;
+            $referenceDate = $serviceData->due_date <= now()
+                ? $serviceData->created_at
+                : $serviceData->due_date;
+
+            $serviceData = $serviceData->serviceOrder;
         }
 
         $billDate = match ($serviceData->billing_cycle) {

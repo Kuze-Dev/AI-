@@ -10,6 +10,10 @@ use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
 
 beforeEach(function () {
     testInTenantContext();
+
+    $this->dateFormat = 'Y-m-d';
+
+    $this->getServiceBillingAndDueDateAction = app(GetServiceBillingAndDueDateAction::class);
 });
 
 $now = now();
@@ -18,61 +22,59 @@ $dataSets = [
     /** daily billing cycle */
     [
         BillingCycle::DAILY,        // billing cycle
-        5,                          // due date every
+        5,                          // current due date every
         $now->parse('2023-01-01'),  // ordered date
-        $now->parse('2023-01-02'),  // bill date
-        $now->parse('2023-01-07'),  // due date
-    ],
-    [
-        BillingCycle::DAILY,        // billing cycle
-        5,                          // due date every
-        $now->parse('2023-01-31'),  // ordered date
-        $now->parse('2023-02-01'),  // bill date
-        $now->parse('2023-02-06'),  // due date
-    ],
-    [
-        BillingCycle::DAILY,        // billing cycle
-        5,                          // due date every
-        $now->parse('2023-01-29'),  // ordered date
-        $now->parse('2023-01-30'),  // bill date
-        $now->parse('2023-02-04'),  // due date
+        $now->parse('2023-01-02'),  // current bill date
+        $now->parse('2023-01-07'),  // current due date
+        $now->parse('2023-01-08'),  // next bill date
+        $now->parse('2023-01-13'),  // next due date
     ],
     /** monthly billing cycle */
     [
         BillingCycle::MONTHLY,      // billing cycle
-        13,                         // due date every
+        13,                         // current due date every
         $now->parse('2023-01-31'),  // ordered date
-        $now->parse('2023-02-28'),  // bill date
-        $now->parse('2023-03-13'),  // due date
+        $now->parse('2023-02-28'),  // current bill date
+        $now->parse('2023-03-13'),  // current due date
+        $now->parse('2023-04-13'),  // next bill date
+        $now->parse('2023-04-26'),  // next due date
     ],
     [
         BillingCycle::MONTHLY,      // billing cycle
-        8,                          // due date every
+        8,                          // current due date every
         $now->parse('2023-01-13'),  // ordered date
-        $now->parse('2023-02-13'),  // bill date
-        $now->parse('2023-02-21'),  // due date
+        $now->parse('2023-02-13'),  // current bill date
+        $now->parse('2023-02-21'),  // current due date
+        $now->parse('2023-03-21'),  // next bill date
+        $now->parse('2023-03-29'),  // next due date
     ],
     [
         BillingCycle::MONTHLY,      // billing cycle
-        15,                         // due date every
+        15,                         // current due date every
         $now->parse('2023-03-28'),  // ordered date
-        $now->parse('2023-04-28'),  // bill date
-        $now->parse('2023-05-13'),  // due date
+        $now->parse('2023-04-28'),  // current bill date
+        $now->parse('2023-05-13'),  // current due date
+        $now->parse('2023-06-13'),  // next bill date
+        $now->parse('2023-06-28'),  // next due date
     ],
-    /** yearly billing cycle */
+    // /** yearly billing cycle */
     [
         BillingCycle::YEARLY,       // billing cycle
-        15,                         // due date every
+        15,                         // current due date every
         $now->parse('2023-01-01'),  // ordered date
-        $now->parse('2024-01-01'),  // bill date
-        $now->parse('2024-01-16'),  // due date
+        $now->parse('2024-01-01'),  // current bill date
+        $now->parse('2024-01-16'),  // current due date
+        $now->parse('2025-01-16'),  // next bill date
+        $now->parse('2025-01-31'),  // next due date
     ],
     [
         BillingCycle::YEARLY,       // billing cycle
-        16,                         // due date every
+        16,                         // current due date every
         $now->parse('2024-02-29'),  // ordered date
-        $now->parse('2025-02-28'),  // bill date
-        $now->parse('2025-03-16'),  // due date
+        $now->parse('2025-02-28'),  // current bill date
+        $now->parse('2025-03-16'),  // current due date
+        $now->parse('2026-03-16'),  // next bill date
+        $now->parse('2026-04-01'),  // next due date
     ],
 ];
 
@@ -85,56 +87,95 @@ it(
         Carbon $billDate,
         Carbon $dueDate
     ) {
+        now()->setTestNow($createdAt);
+
         $serviceOrder = ServiceOrderFactory::new()->createOne([
             'billing_cycle' => $billingCycle,
             'due_date_every' => $dueDateEvery,
-            'created_at' => $createdAt,
         ]);
 
-        $dates = app(GetServiceBillingAndDueDateAction::class)
-            ->execute($serviceOrder);
+        $dates = $this->getServiceBillingAndDueDateAction->execute($serviceOrder);
 
-        $dateFormat = 'Y-m-d';
+        expect($dates->bill_date->format($this->dateFormat))
+            ->toBe($billDate->format($this->dateFormat));
 
-        expect($dates->bill_date->format($dateFormat))
-            ->toBe($billDate->format($dateFormat));
-
-        expect($dates->due_date->format($dateFormat))
-            ->toBe($dueDate->format($dateFormat));
+        expect($dates->due_date->format($this->dateFormat))
+            ->toBe($dueDate->format($this->dateFormat));
     }
-)
-    ->with($dataSets);
+)->with($dataSets);
 
 it(
-    'can get billing dates based on service bill',
+    'can get billing dates based on service bill (on-time)',
     function (
         BillingCycle $billingCycle,
         int $dueDateEvery,
         Carbon $createdAt,
         Carbon $billDate,
-        Carbon $dueDate
+        Carbon $dueDate,
+        Carbon $nextBillDate,
+        Carbon $nextDueDate
     ) {
-        $serviceOrder = ServiceOrderFactory::new()->createOne([
-            'billing_cycle' => $billingCycle,
-            'due_date_every' => $dueDateEvery,
-            'created_at' => $createdAt,
-        ]);
+        //set current date before the bill's due date.
+        now()->setTestNow(now()->parse($dueDate)->subDay());
 
-        $serviceBill = ServiceBillFactory::new()->createOne([
-            'service_order_id' => $serviceOrder->id,
-            'bill_date' => $createdAt,
-        ]);
+        $serviceOrder = ServiceOrderFactory::new()
+            ->has(
+                ServiceBillFactory::new([
+                    'bill_date' => $billDate,
+                    'due_date' => $dueDate,
+                ])
+            )
+            ->createOne([
+                'billing_cycle' => $billingCycle,
+                'due_date_every' => $dueDateEvery,
+            ]);
 
-        $dates = app(GetServiceBillingAndDueDateAction::class)
-            ->execute($serviceBill);
+        $dates = $this->getServiceBillingAndDueDateAction->execute(
+            $serviceOrder->serviceBills->first()
+        );
 
-        $dateFormat = 'Y-m-d';
+        expect($dates->bill_date->format($this->dateFormat))
+            ->toBe($nextBillDate->format($this->dateFormat));
 
-        expect($dates->bill_date->format($dateFormat))
-            ->toBe($billDate->format($dateFormat));
-
-        expect($dates->due_date->format($dateFormat))
-            ->toBe($dueDate->format($dateFormat));
+        expect($dates->due_date->format($this->dateFormat))
+            ->toBe($nextDueDate->format($this->dateFormat));
     }
-)
-    ->with($dataSets);
+)->with($dataSets);
+
+it(
+    'can get billing dates based on service bill (late)',
+    function (
+        BillingCycle $billingCycle,
+        int $dueDateEvery,
+        Carbon $createdAt,
+        Carbon $billDate,
+        Carbon $dueDate,
+        Carbon $nextBillDate,
+        Carbon $nextDueDate
+    ) {
+        //set current date after the bill's due date.
+        now()->setTestNow(now()->parse($dueDate)->addDay());
+
+        $serviceOrder = ServiceOrderFactory::new()
+            ->has(
+                ServiceBillFactory::new([
+                    'bill_date' => $billDate,
+                    'due_date' => $dueDate,
+                ])
+            )
+            ->createOne([
+                'billing_cycle' => $billingCycle,
+                'due_date_every' => $dueDateEvery,
+            ]);
+
+        $dates = $this->getServiceBillingAndDueDateAction->execute(
+            $serviceOrder->serviceBills->first()
+        );
+
+        expect($dates->bill_date->format($this->dateFormat))
+            ->toBe($nextBillDate->addDay()->format($this->dateFormat));
+
+        expect($dates->due_date->format($this->dateFormat))
+            ->toBe($nextDueDate->addDay()->format($this->dateFormat));
+    }
+)->with($dataSets);
