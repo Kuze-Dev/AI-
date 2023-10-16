@@ -22,6 +22,7 @@ class CustomerQueryBuilder extends Builder
         return $this->where('register_status', RegisterStatus::REGISTERED);
     }
 
+    /** TODO: to be removed. */
     public function whereHasActiveSubscriptionBasedServiceOrder(): self
     {
         return $this->whereHas('serviceOrders', function ($nestedQuery) {
