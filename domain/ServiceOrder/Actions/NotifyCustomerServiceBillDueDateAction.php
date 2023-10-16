@@ -48,6 +48,7 @@ class NotifyCustomerServiceBillDueDateAction
                             now()->parse($latestForPaymentServiceBill->bill_date)
                                 ->toDateString() <= now()->toDateString()
                         ) {
+                            /** @phpstan-ignore-next-line */
                             $this->sendToCustomerServiceBillDueDateAction
                                 ->onQueue()
                                 ->execute(
@@ -55,7 +56,7 @@ class NotifyCustomerServiceBillDueDateAction
                                     $latestForPaymentServiceBill
                                 )
                                 ->chain([
-                                    new ActionJob(SaveServiceBillEmailSentTimestampAction::class)
+                                    new ActionJob(SaveServiceBillEmailSentTimestampAction::class),
                                 ]);
                         }
                     });

@@ -19,7 +19,7 @@ class ServiceBillFactory extends Factory
     public function definition(): array
     {
         /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
-        $serviceOrder = ServiceOrderFactory::new()->make();
+        $serviceOrder = ServiceOrderFactory::new()->createOne();
 
         return [
             'service_order_id' => $serviceOrder->id,
