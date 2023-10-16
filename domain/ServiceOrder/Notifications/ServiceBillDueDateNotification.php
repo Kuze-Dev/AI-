@@ -13,8 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-/** TODO: to be removed. */
-class ServiceBillNotification extends Notification implements ShouldQueue
+class ServiceBillDueDateNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -54,7 +53,7 @@ class ServiceBillNotification extends Notification implements ShouldQueue
         $admin = Admin::first();
 
         return (new MailMessage())
-            ->subject('Service Bill')
+            ->subject('Service Bill Due Date')
             ->replyTo($this->replyTo)
             ->from($this->from)
             ->view('filament.emails.serviceOrder.created', [

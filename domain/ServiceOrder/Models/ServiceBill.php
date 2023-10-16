@@ -7,6 +7,7 @@ namespace Domain\ServiceOrder\Models;
 use Domain\Payments\Interfaces\PayableInterface;
 use Domain\Payments\Models\Traits\HasPayments;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
+use Domain\ServiceOrder\Queries\ServiceBillQueryBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -46,6 +47,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ServiceBill extends Model implements PayableInterface
 {
     use HasPayments;
+
     protected $fillable = [
         'service_order_id',
         'bill_date',
@@ -55,6 +57,7 @@ class ServiceBill extends Model implements PayableInterface
         'additional_charges',
         'total_amount',
         'status',
+        'email_notification_sent_at',
     ];
 
     protected $casts = [
@@ -64,6 +67,7 @@ class ServiceBill extends Model implements PayableInterface
         'service_price' => 'float',
         'total_amount' => 'float',
         'status' => ServiceBillStatus::class,
+        'email_notification_sent_at' => 'datetime',
     ];
 
     public function getRouteKeyName(): string
@@ -76,8 +80,13 @@ class ServiceBill extends Model implements PayableInterface
         return $this->reference;
     }
 
+    public function newEloquentBuilder($query): ServiceBillQueryBuilder
+    {
+        return new ServiceBillQueryBuilder($query);
+    }
+
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ServiceOrder\Models\ServiceOrder, \Domain\ServiceOrder\Models\ServiceBill> */
-    public function service_order(): BelongsTo
+    public function serviceOrder(): BelongsTo
     {
         return $this->belongsTo(ServiceOrder::class);
     }

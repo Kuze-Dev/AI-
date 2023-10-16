@@ -70,6 +70,9 @@ return new class () extends Migration {
             $table->json('additional_charges');
             $table->decimal('total_amount', 10, 2);
             $table->string('status')->index();
+            $table->timestamp('email_notification_sent_at')
+                ->comment('for due date')
+                ->nullable();
 
             $table->timestamps();
         });
