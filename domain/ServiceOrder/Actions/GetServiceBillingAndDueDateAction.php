@@ -23,7 +23,11 @@ class GetServiceBillingAndDueDateAction
         }
 
         if ($serviceData instanceof ServiceBill) {
-            $referenceDate = now()->parse($serviceData->bill_date);
+            if ($serviceData->due_date <= now()) {
+                $referenceDate = now()->parse($serviceData->created_at);
+            } else {
+                $referenceDate = now()->parse($serviceData->due_date);
+            }
             $serviceData = $serviceData->service_order;
         }
 
