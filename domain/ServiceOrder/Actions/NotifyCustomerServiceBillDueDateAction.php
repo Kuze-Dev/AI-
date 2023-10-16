@@ -21,7 +21,7 @@ class NotifyCustomerServiceBillDueDateAction
                 'serviceOrders' => fn ($query) => $query->whereActive(),
                 'serviceOrders.serviceBills' => fn ($query) => $query
                     ->whereForPaymentStatus()
-                    ->whereHasNotSentEmailNotification()
+                    ->whereHasNotSentEmailNotification(),
             ])
             ->whereActive()
             ->whereRegistered()
