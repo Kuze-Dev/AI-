@@ -27,7 +27,7 @@ class CreateServiceBillingsAction
             ])
             ->whereActive()
             ->whereRegistered()
-            ->whereHasActiveSubscriptionBasedServiceOrder()
+            ->whereHas('serviceOrders')
             ->get();
 
         $customers
