@@ -12,6 +12,7 @@ class CalculateServiceOrderTotalPriceAction
     /** @param \Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData[] $additionalCharges*/
     public function execute(float $servicePrice, array $additionalCharges = []): Money
     {
+        /** @var \Akaunting\Money\Money $result */
         $result = money($servicePrice);
 
         if (empty($additionalCharges)) {

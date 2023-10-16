@@ -10,6 +10,10 @@ use Domain\ServiceOrder\Models\ServiceOrder;
 
 class CreateServiceBillingsAction
 {
+    public function __construct(private SendToCustomerServiceBillEmailAction $sendToCustomerServiceBillEmailAction)
+    {
+    }
+
     public function execute(): void
     {
         $customers = Customer::query()
@@ -37,10 +41,16 @@ class CreateServiceBillingsAction
                         if ($latestPaidServiceBill && $latestPaidServiceBill->bill_date <= now()) {
                             CreateServiceBillJob::dispatch(
                                 $customer,
+                                $serviceOrder,
                                 $latestPaidServiceBill
                             );
 
-                            /** TODO: email notification */
+                            $this->sendToCustomerServiceBillEmailAction
+                                ->onQueue()
+                                ->execute(
+                                    $customer,
+                                    $serviceOrder->refresh()->latestForPaymentServiceBill()
+                                );
                         }
                     });
             });

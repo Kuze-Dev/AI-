@@ -8,13 +8,15 @@ use Domain\Customer\Models\Customer;
 use Domain\ServiceOrder\Actions\CreateServiceBillAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
 use Domain\ServiceOrder\Models\ServiceBill;
+use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class CreateServiceBillJob implements ShouldQueue
+class CreateServiceBillJob implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable;
     use InteractsWithQueue;
@@ -27,8 +29,14 @@ class CreateServiceBillJob implements ShouldQueue
          * @phpstan-ignore-next-line
          */
         private Customer $customer,
+        private ServiceOrder $serviceOrder,
         private ServiceBill $serviceBill
     ) {
+    }
+
+    public function uniqueId(): string
+    {
+        return $this->serviceOrder->reference;
     }
 
     public function handle(CreateServiceBillAction $createServiceBillAction): void
