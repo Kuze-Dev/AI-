@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console;
 
+use Domain\ServiceOrder\Commands\CheckDueDateCommand;
 use Domain\ServiceOrder\Commands\CreateServiceBillCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Console\Scheduling\Schedule;
@@ -20,6 +21,10 @@ class Kernel extends ConsoleKernel
             ->daily()
             ->sentryMonitor();
 
+        $schedule->command(CheckDueDateCommand::class)
+            ->daily()
+            ->sentryMonitor();
+
         $schedule->command(PruneExcelCommand::class)
             ->daily();
 
@@ -33,6 +38,6 @@ class Kernel extends ConsoleKernel
     /** Register the commands for the application. */
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
     }
 }
