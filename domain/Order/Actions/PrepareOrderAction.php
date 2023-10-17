@@ -22,6 +22,7 @@ use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
+use Domain\Tier\Models\Tier;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -122,7 +123,7 @@ class PrepareOrderAction
         $customer = auth()->user();
 
         /** @var \Domain\Tier\Models\Tier $tier */
-        $tier = $customer->tier;
+        $tier = $customer->tier ?? Tier::query()->where('name', config('domain.tier.default'))->first();
 
         return CartLine::with(['purchasable' => function (MorphTo $query) use ($tier) {
             $query->morphWith([
