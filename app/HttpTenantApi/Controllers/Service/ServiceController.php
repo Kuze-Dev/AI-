@@ -47,7 +47,7 @@ class ServiceController
     public function show(string $service): ServiceResource
     {
         return ServiceResource::make(
-            QueryBuilder::for(Service::whereId($service)->whereStatus(true))
+            QueryBuilder::for(Service::whereUuid($service)->whereStatus(true))
                 ->allowedIncludes([
                     'taxonomyTerms',
                     'media',

@@ -166,7 +166,7 @@ class ServiceResource extends Resource
                                         : ucfirst(trans(Status::INACTIVE->value))
                                 ),
                             Forms\Components\Toggle::make('is_subscription')
-                                ->label(trans('Subscription-based'))
+                                ->label(trans('Subscription Based'))
                                 ->reactive()
                                 ->helperText('Fields below are only available on subscription'),
                             Forms\Components\Card::make([
@@ -189,7 +189,7 @@ class ServiceResource extends Resource
                                 ->reactive()
                                 ->hidden(fn (Closure $get) => $get('is_subscription') === false),
                             Forms\Components\Toggle::make('needs_approval')
-                                ->label(trans('Approval')),
+                                ->label(trans('Needs Approval')),
                         ]),
                     MetaDataForm::make('Meta Data'),
                 ])->columnSpan(1),

@@ -11,6 +11,7 @@ use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Service>
@@ -22,6 +23,7 @@ class ServiceFactory extends Factory
     public function definition(): array
     {
         return [
+            'uuid' => (string) Str::uuid(),
             'name' => $this->faker->name,
             'description' => $this->faker->sentence,
             'retail_price' => $this->faker->numberBetween(1, 99_999),

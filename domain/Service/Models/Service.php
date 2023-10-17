@@ -7,6 +7,7 @@ namespace Domain\Service\Models;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -28,6 +29,7 @@ use Support\MetaData\Models\MetaData;
  * Domain\Service\Models\Service
  *
  * @property int $id
+ * @property string $uuid
  * @property string $blueprint_id
  * @property string $name
  * @property string|null $description
@@ -86,6 +88,7 @@ class Service extends Model implements HasMetaDataContract, HasMedia
     use SoftDeletes;
 
     protected $fillable = [
+        'uuid',
         'blueprint_id',
         'name',
         'description',
@@ -122,6 +125,11 @@ class Service extends Model implements HasMetaDataContract, HasMedia
         return [
             'title' => $this->name,
         ];
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
     }
 
     public function getActivitylogOptions(): LogOptions
