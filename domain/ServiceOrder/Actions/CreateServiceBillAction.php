@@ -14,8 +14,7 @@ class CreateServiceBillAction
     public function execute(
         ServiceBillData $serviceBillData,
         ?ServiceOrderBillingAndDueDateData $serviceOrderBillingAndDueDateData = null
-    ): ServiceBill
-    {
+    ): ServiceBill {
         $uniqueReference = null;
 
         do {
