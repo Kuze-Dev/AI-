@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Listeners;
 
 use Domain\Payments\Events\PaymentProcessEvent;
+use Domain\ServiceOrder\Actions\CreateServiceBillAction;
+use Domain\ServiceOrder\Actions\GetServiceBillingAndDueDateAction;
+use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
@@ -35,6 +38,12 @@ class ServiceOrderPaymentUpdatedListener
     private function onServiceBillPaid(ServiceBill $serviceBill): void
     {
         $serviceTransaction = ServiceTransaction::whereServiceBillId($serviceBill->id)->firstOrFail();
+
+        //WIP
+        // if($serviceBill->serviceOrder->service->is_subscription){
+        //     $serviceBillingDate = app(GetServiceBillingAndDueDateAction::class)->execute($serviceBill, $serviceTransaction);
+        //     app(CreateServiceBillAction::class)->execute(ServiceBillData::fromCreatedServiceOrder($serviceBill->serviceOrder),$serviceBillingDate);
+        // }
 
         $serviceTransaction->update([
             'status' => ServiceTransactionStatus::PAID,

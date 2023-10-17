@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\DataTransferObjects;
 
 use Carbon\Carbon;
+use Domain\ServiceOrder\Enums\ServiceBillStatus;
 
 class ServiceBillData
 {
@@ -16,7 +17,7 @@ class ServiceBillData
         public readonly float $service_price,
         public readonly array $additional_charges,
         public readonly float $total_amount,
-        public readonly string $status,
+        public readonly ServiceBillStatus $status,
         public readonly ?Carbon $email_notification_sent_at = null
     ) {
     }
@@ -31,7 +32,7 @@ class ServiceBillData
             service_price: $data['service_price'],
             additional_charges: $data['additional_charges'],
             total_amount: $data['total_price'],
-            status: $data['status'],
+            status: ServiceBillStatus::PENDING,
             email_notification_sent_at: null
         );
     }

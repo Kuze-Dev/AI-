@@ -458,6 +458,7 @@ class ServiceOrderResource extends Resource
                                 ];
                                 if(isset($record->billing_cycle)) {
                                     $options = [
+                                        ServiceOrderStatus::FORPAYMENT->value => trans('For payment'),
                                         ServiceOrderStatus::ACTIVE->value => trans('Active'),
                                         ServiceOrderStatus::CLOSED->value => trans('Closed'),
                                     ];

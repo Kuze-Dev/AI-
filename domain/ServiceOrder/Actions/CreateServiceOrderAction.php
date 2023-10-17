@@ -55,9 +55,10 @@ class CreateServiceOrderAction
             throw new BadRequestHttpException('inactive service found');
         }
 
-        $status = ServiceOrderStatus::INPROGRESS;
-        if($service->pay_upfront) {
-            $status = ServiceOrderStatus::FORPAYMENT;
+        $status = ServiceOrderStatus::FORPAYMENT;
+
+        if( ! $service->pay_upfront && ! $service->is_subscription) {
+            $status = ServiceOrderStatus::INPROGRESS;
         } elseif($service->needs_approval) {
             $status = ServiceOrderStatus::PENDING;
         }

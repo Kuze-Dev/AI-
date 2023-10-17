@@ -6,6 +6,7 @@ namespace Domain\ServiceOrder\Actions;
 
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
+use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Notifications\PlaceServiceOrderMail;
@@ -31,7 +32,7 @@ class PlaceServiceOrderAction
             ServiceBillData::fromCreatedServiceOrder($serviceOrder->toArray())
         );
 
-        if($serviceOrder->customer) {
+        if($serviceOrder->customer && $serviceBill->serviceOrder->status == ServiceOrderStatus::FORPAYMENT) {
             $serviceOrder->customer->notify(new PlaceServiceOrderMail($serviceBill));
         }
 
