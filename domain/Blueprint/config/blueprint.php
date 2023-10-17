@@ -7,6 +7,7 @@ return [
         'forms' => Domain\Form\Models\Form::class,
         'globals' => Domain\Globals\Models\Globals::class,
         'taxonomies' => Domain\Taxonomy\Models\Taxonomy::class,
+        'services' => \Domain\Service\Models\Service::class,
     ],
 
     /**
@@ -48,5 +49,8 @@ return [
                 ],
             ]
         ],
-    ]
+        \Domain\Service\Models\Service::class => [
+            'title_column' => 'name',
+        ]
+    ],
 ];
