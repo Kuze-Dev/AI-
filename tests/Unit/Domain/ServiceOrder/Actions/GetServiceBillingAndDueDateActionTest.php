@@ -3,10 +3,12 @@
 declare(strict_types=1);
 
 use Carbon\Carbon;
-use Domain\Service\Enums\BillingCycle;
+use Domain\Service\Enums\BillingCycleEnum;
 use Domain\ServiceOrder\Actions\GetServiceBillingAndDueDateAction;
 use Domain\ServiceOrder\Database\Factories\ServiceBillFactory;
 use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
+use Domain\ServiceOrder\Database\Factories\ServiceTransactionFactory;
+use Domain\ServiceOrder\Exceptions\ServiceBillStatusMusBePaidException;
 
 beforeEach(function () {
     testInTenantContext();
@@ -21,7 +23,7 @@ $now = now();
 $dataSets = [
     /** daily billing cycle */
     [
-        BillingCycle::DAILY,        // billing cycle
+        BillingCycleEnum::DAILY,        // billing cycle
         5,                          // current due date every
         $now->parse('2023-01-01'),  // ordered date
         $now->parse('2023-01-02'),  // current bill date
@@ -31,7 +33,7 @@ $dataSets = [
     ],
     /** monthly billing cycle */
     [
-        BillingCycle::MONTHLY,      // billing cycle
+        BillingCycleEnum::MONTHLY,      // billing cycle
         13,                         // current due date every
         $now->parse('2023-01-31'),  // ordered date
         $now->parse('2023-02-28'),  // current bill date
@@ -40,7 +42,7 @@ $dataSets = [
         $now->parse('2023-04-26'),  // next due date
     ],
     [
-        BillingCycle::MONTHLY,      // billing cycle
+        BillingCycleEnum::MONTHLY,      // billing cycle
         8,                          // current due date every
         $now->parse('2023-01-13'),  // ordered date
         $now->parse('2023-02-13'),  // current bill date
@@ -49,7 +51,7 @@ $dataSets = [
         $now->parse('2023-03-29'),  // next due date
     ],
     [
-        BillingCycle::MONTHLY,      // billing cycle
+        BillingCycleEnum::MONTHLY,      // billing cycle
         15,                         // current due date every
         $now->parse('2023-03-28'),  // ordered date
         $now->parse('2023-04-28'),  // current bill date
@@ -59,7 +61,7 @@ $dataSets = [
     ],
     // /** yearly billing cycle */
     [
-        BillingCycle::YEARLY,       // billing cycle
+        BillingCycleEnum::YEARLY,       // billing cycle
         15,                         // current due date every
         $now->parse('2023-01-01'),  // ordered date
         $now->parse('2024-01-01'),  // current bill date
@@ -68,7 +70,7 @@ $dataSets = [
         $now->parse('2025-01-31'),  // next due date
     ],
     [
-        BillingCycle::YEARLY,       // billing cycle
+        BillingCycleEnum::YEARLY,       // billing cycle
         16,                         // current due date every
         $now->parse('2024-02-29'),  // ordered date
         $now->parse('2025-02-28'),  // current bill date
@@ -78,36 +80,28 @@ $dataSets = [
     ],
 ];
 
-it(
-    'can get billing dates based on service order',
-    function (
-        BillingCycle $billingCycle,
-        int $dueDateEvery,
-        Carbon $createdAt,
-        Carbon $billDate,
-        Carbon $dueDate
-    ) {
-        now()->setTestNow($createdAt);
+it('cannot execute', function () {
+    $serviceOrder = ServiceOrderFactory::new()
+        ->has(
+            ServiceBillFactory::new()
+                ->forPayment()
+                ->has(ServiceTransactionFactory::new())
+        )
+        ->createOne();
 
-        $serviceOrder = ServiceOrderFactory::new()->createOne([
-            'billing_cycle' => $billingCycle,
-            'due_date_every' => $dueDateEvery,
-        ]);
+    $serviceBill = $serviceOrder->serviceBills->first();
 
-        $dates = $this->getServiceBillingAndDueDateAction->execute($serviceOrder);
-
-        expect($dates->bill_date->format($this->dateFormat))
-            ->toBe($billDate->format($this->dateFormat));
-
-        expect($dates->due_date->format($this->dateFormat))
-            ->toBe($dueDate->format($this->dateFormat));
-    }
-)->with($dataSets);
+    $this->getServiceBillingAndDueDateAction->execute(
+        $serviceBill,
+        $serviceBill->serviceTransaction
+    );
+})
+    ->throws(ServiceBillStatusMusBePaidException::class);
 
 it(
     'can get billing dates based on service bill (on-time)',
     function (
-        BillingCycle $billingCycle,
+        BillingCycleEnum $billingCycle,
         int $dueDateEvery,
         Carbon $createdAt,
         Carbon $billDate,
@@ -124,14 +118,19 @@ it(
                     'bill_date' => $billDate,
                     'due_date' => $dueDate,
                 ])
+                    ->paid()
+                    ->has(ServiceTransactionFactory::new())
             )
             ->createOne([
                 'billing_cycle' => $billingCycle,
                 'due_date_every' => $dueDateEvery,
             ]);
 
+        $serviceBill = $serviceOrder->serviceBills->first();
+
         $dates = $this->getServiceBillingAndDueDateAction->execute(
-            $serviceOrder->serviceBills->first()
+            $serviceBill,
+            $serviceBill->serviceTransaction
         );
 
         expect($dates->bill_date->format($this->dateFormat))
@@ -145,7 +144,7 @@ it(
 it(
     'can get billing dates based on service bill (late)',
     function (
-        BillingCycle $billingCycle,
+        BillingCycleEnum $billingCycle,
         int $dueDateEvery,
         Carbon $createdAt,
         Carbon $billDate,
@@ -162,14 +161,19 @@ it(
                     'bill_date' => $billDate,
                     'due_date' => $dueDate,
                 ])
+                    ->paid()
+                    ->has(ServiceTransactionFactory::new())
             )
             ->createOne([
                 'billing_cycle' => $billingCycle,
                 'due_date_every' => $dueDateEvery,
             ]);
 
+        $serviceBill = $serviceOrder->serviceBills->first();
+
         $dates = $this->getServiceBillingAndDueDateAction->execute(
-            $serviceOrder->serviceBills->first()
+            $serviceBill,
+            $serviceBill->serviceTransaction
         );
 
         expect($dates->bill_date->format($this->dateFormat))

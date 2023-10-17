@@ -10,6 +10,7 @@ use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Queries\ServiceBillQueryBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Domain\ServiceOrder\Models\ServiceBill
@@ -89,5 +90,11 @@ class ServiceBill extends Model implements PayableInterface
     public function serviceOrder(): BelongsTo
     {
         return $this->belongsTo(ServiceOrder::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<ServiceTransaction> */
+    public function serviceTransaction(): HasOne
+    {
+        return $this->hasOne(ServiceTransaction::class);
     }
 }

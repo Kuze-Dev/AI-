@@ -7,8 +7,12 @@ use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Service\Databases\Factories\ServiceFactory;
 use Domain\ServiceOrder\Actions\CreateServiceBillAction;
 use Domain\ServiceOrder\Actions\CreateServiceOrderAction;
+use Domain\ServiceOrder\Actions\GetServiceBillingAndDueDateAction;
+use Domain\ServiceOrder\Database\Factories\ServiceBillFactory;
 use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
+use Domain\ServiceOrder\Database\Factories\ServiceTransactionFactory;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
+use Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Filament\Facades\Filament;
@@ -28,26 +32,29 @@ beforeEach(function () {
         'symbol' => '$',
         'enabled' => true,
     ]);
+
+    $this->serviceOrder = ServiceOrderFactory::new()->createOne();
+
+    $this->customer_id = CustomerFactory::new()
+        ->createOne()
+        ->id;
+
+    $this->service_id = ServiceFactory::new()
+        ->withDummyBlueprint()
+        ->createOne()
+        ->id;
 });
 
-it('can create service bill based on service order', function () {
-    $service = ServiceFactory::new()
-        ->withDummyBlueprint()
-        ->createOne();
-
-    $customer = CustomerFactory::new()->createOne();
-
-    $serviceOrder = ServiceOrderFactory::new()->definition();
-
+it('can create', function () {
     $serviceOrderData = new ServiceOrderData(
-        customer_id: $customer->id,
-        service_id: $service->id,
-        schedule: $serviceOrder['schedule'],
+        customer_id: $this->customer_id,
+        service_id: $this->service_id,
+        schedule: $this->serviceOrder->schedule,
         service_address_id: null,
         billing_address_id: null,
         is_same_as_billing: true,
-        additional_charges: $serviceOrder['additional_charges'],
-        form: $serviceOrder['customer_form'],
+        additional_charges: $this->serviceOrder->additional_charges,
+        form: $this->serviceOrder->customer_form,
     );
 
     $serviceOrder = app(CreateServiceOrderAction::class)
@@ -55,6 +62,39 @@ it('can create service bill based on service order', function () {
 
     $serviceBill = app(CreateServiceBillAction::class)->execute(
         ServiceBillData::fromCreatedServiceOrder($serviceOrder->toArray())
+    );
+
+    assertInstanceOf(ServiceBill::class, $serviceBill);
+});
+
+it('can create will billing and due dates', function () {
+    $serviceOrderData = new ServiceOrderData(
+        customer_id: $this->customer_id,
+        service_id: $this->service_id,
+        schedule: $this->serviceOrder->schedule,
+        service_address_id: null,
+        billing_address_id: null,
+        is_same_as_billing: true,
+        additional_charges: $this->serviceOrder->additional_charges,
+        form: $this->serviceOrder->customer_form,
+    );
+
+    $serviceBill = ServiceBillFactory::new()
+        ->paid()
+        ->has(ServiceTransactionFactory::new())
+        ->createOne();
+
+    $serviceOrder = app(CreateServiceOrderAction::class)
+        ->execute($serviceOrderData, $this->admin->id);
+
+    $serviceOrderBillingAndDueDateData = app(GetServiceBillingAndDueDateAction::class)->execute(
+        $serviceBill,
+        $serviceBill->serviceTransaction
+    );
+
+    $serviceBill = app(CreateServiceBillAction::class)->execute(
+        ServiceBillData::fromCreatedServiceOrder($serviceOrder->toArray()),
+        $serviceOrderBillingAndDueDateData
     );
 
     assertInstanceOf(ServiceBill::class, $serviceBill);
