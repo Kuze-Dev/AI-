@@ -6,22 +6,12 @@ namespace Domain\ServiceOrder\Actions;
 
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
 use Domain\ServiceOrder\Models\ServiceBill;
-use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Support\Str;
 
 class CreateServiceBillAction
 {
-    public function __construct(
-        private GetServiceBillingAndDueDateAction $getServiceBillingAndDueDateAction,
-    ) {
-    }
-
-    public function execute(
-        ServiceOrder|ServiceBill $serviceData,
-        ServiceBillData $serviceBillData
-    ): ServiceBill {
-        $billingDates = $this->getServiceBillingAndDueDateAction->execute($serviceData);
-
+    public function execute(ServiceBillData $serviceBillData): ServiceBill
+    {
         $uniqueReference = null;
 
         do {
@@ -39,8 +29,6 @@ class CreateServiceBillAction
         $serviceBill = ServiceBill::create([
             'service_order_id' => $serviceBillData->service_order_id,
             'reference' => $uniqueReference,
-            'bill_date' => $billingDates->bill_date,
-            'due_date' => $billingDates->due_date,
             'service_price' => $serviceBillData->service_price,
             'additional_charges' => $serviceBillData->additional_charges,
             'total_amount' => $serviceBillData->total_amount,

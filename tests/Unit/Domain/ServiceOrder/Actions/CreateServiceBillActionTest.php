@@ -53,10 +53,9 @@ it('can create service bill based on service order', function () {
     $serviceOrder = app(CreateServiceOrderAction::class)
         ->execute($serviceOrderData, $this->admin->id);
 
-    $serviceBillData = ServiceBillData::fromArray($serviceOrder->toArray());
-
-    $serviceBill = app(CreateServiceBillAction::class)
-        ->execute($serviceOrder, $serviceBillData);
+    $serviceBill = app(CreateServiceBillAction::class)->execute(
+        ServiceBillData::fromCreatedServiceOrder($serviceOrder->toArray())
+    );
 
     assertInstanceOf(ServiceBill::class, $serviceBill);
 });

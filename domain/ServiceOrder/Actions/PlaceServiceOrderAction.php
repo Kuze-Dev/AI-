@@ -15,7 +15,7 @@ class PlaceServiceOrderAction
     public function __construct(
         private CreateServiceOrderAction $createServiceOrderAction,
         private CreateServiceOrderAddressAction $createServiceOrderAddressAction,
-        private CreateServiceBillAction $createServiceBillAction,
+        private CreateServiceBillAction $createServiceBillAction
     ) {
     }
 
@@ -27,9 +27,9 @@ class PlaceServiceOrderAction
 
         $this->createServiceOrderAddressAction->execute($serviceOrder, $serviceOrderData);
 
-        $serviceBillData = ServiceBillData::fromArray($serviceOrder->toArray());
-
-        $serviceBill = $this->createServiceBillAction->execute($serviceOrder, $serviceBillData);
+        $serviceBill = $this->createServiceBillAction->execute(
+            ServiceBillData::fromCreatedServiceOrder($serviceOrder->toArray())
+        );
 
         if($serviceOrder->customer) {
             $serviceOrder->customer->notify(new PlaceServiceOrderMail($serviceBill));
