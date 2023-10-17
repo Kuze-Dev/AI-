@@ -237,6 +237,20 @@ it('can render component', function (SchemaData $schema) {
             ],
         ],
     ]),
+    'tinyeditor field' => SchemaData::fromArray([
+        'sections' => [
+            [
+                'title' => 'Main',
+                'fields' => [
+                    [
+                        'title' => 'Field',
+                        'type' => 'tinyeditor',
+                        'rules' => ['required'],
+                    ],
+                ],
+            ],
+        ],
+    ]),
 ]);
 
 class TestComponentWithSchemaFormBuilder extends Component implements HasForms

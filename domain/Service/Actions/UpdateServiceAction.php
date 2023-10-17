@@ -36,6 +36,7 @@ class UpdateServiceAction
             'pay_upfront' => $serviceData->pay_upfront,
             'is_subscription' => $serviceData->is_subscription,
             'status' => $serviceData->status,
+            'needs_approval' => $serviceData->needs_approval,
         ]);
 
         $service->taxonomyTerms()->sync([$serviceData->taxonomy_term_id]);

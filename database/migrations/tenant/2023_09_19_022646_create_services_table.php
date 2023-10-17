@@ -17,13 +17,14 @@ return new class () extends Migration {
             $table->text('description')->nullable();
             $table->float('retail_price');
             $table->float('selling_price');
-            $table->string('billing_cycle')->nullable(); //monthly and yearly
+            $table->string('billing_cycle')->nullable();
             $table->integer('due_date_every')->nullable();
             $table->boolean('is_featured');
             $table->boolean('is_special_offer');
             $table->boolean('pay_upfront');
             $table->boolean('is_subscription');
             $table->boolean('status');
+            $table->boolean('needs_approval');
             $table->timestamps();
             $table->softDeletes();
         });

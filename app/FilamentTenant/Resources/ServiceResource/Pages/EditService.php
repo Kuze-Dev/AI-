@@ -15,6 +15,8 @@ use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Exception;
+use Throwable;
 
 class EditService extends EditRecord
 {
@@ -26,12 +28,15 @@ class EditService extends EditRecord
      * @param Service $record
      * @param array $data
      * @return Model
+     * @throws Throwable
      */
     public function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdateServiceAction::class)->execute($record, ServiceData::fromArray($data)));
+        return DB::transaction(fn () => app(UpdateServiceAction::class)
+            ->execute($record, ServiceData::fromArray($data)));
     }
 
+    /** @throws Exception */
     protected function getActions(): array
     {
         return [
@@ -40,7 +45,10 @@ class EditService extends EditRecord
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make()
-                ->using(fn (Service $record) => DB::transaction(fn () => app(DeleteServiceAction::class)->execute($record))),
+                ->using(fn (Service $record) => DB::transaction(
+                    fn () => app(DeleteServiceAction::class)
+                        ->execute($record)
+                )),
         ];
     }
 

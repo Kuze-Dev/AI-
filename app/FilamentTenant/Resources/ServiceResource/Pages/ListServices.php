@@ -7,11 +7,13 @@ namespace App\FilamentTenant\Resources\ServiceResource\Pages;
 use App\FilamentTenant\Resources\ServiceResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Exception;
 
 class ListServices extends ListRecords
 {
     protected static string $resource = ServiceResource::class;
 
+    /** @throws Exception */
     protected function getActions(): array
     {
         return [

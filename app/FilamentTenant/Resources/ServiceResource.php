@@ -12,12 +12,11 @@ use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\Settings\ServiceSettings;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Carbon\Carbon;
 use Closure;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Currency\Models\Currency;
 use Domain\Service\Actions\DeleteServiceAction;
-use Domain\Service\Enums\BillingCycle;
+use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Service\Enums\Status;
 use Domain\Service\Models\Service;
 use Domain\Taxonomy\Models\TaxonomyTerm;
@@ -49,9 +48,6 @@ class ServiceResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $categories = TaxonomyTerm::whereTaxonomyId(app(ServiceSettings::class)->service_category)->get();
-        $defaultCurrency = Currency::whereEnabled(true)->firstOrFail()->symbol;
-
         return $form
             ->schema([
                 Forms\Components\Group::make()
@@ -67,17 +63,21 @@ class ServiceResource extends Resource
                                 ->maxLength(255),
                             Forms\Components\Select::make('taxonomyTerms')
                                 ->label(trans('Service Category'))
-                                ->options(
-                                    $categories->sortBy('name')
+                                ->options(function () {
+                                    $categories = TaxonomyTerm::whereTaxonomyId(app(ServiceSettings::class)
+                                        ->service_category)->get();
+
+                                    return $categories->sortBy('name')
                                         ->mapWithKeys(fn ($categories) => [$categories->id => $categories->name])
-                                        ->toArray()
-                                )
+                                        ->toArray();
+                                })
                                 ->formatStateUsing(
                                     fn (?Service $record) => $record?->taxonomyTerms->first()->id ?? null
                                 )
                                 ->statePath('taxonomy_term_id')
                                 ->required(),
-                            Forms\Components\FileUpload::make('images')
+                            Forms\Components\FileUpload::make('media')
+                                ->statePath('images')
                                 ->translateLabel()
                                 ->mediaLibraryCollection('image')
                                 ->image()
@@ -90,7 +90,7 @@ class ServiceResource extends Resource
                                 Forms\Components\TextInput::make('retail_price')
                                     ->translateLabel()
                                     ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
-                                        prefix: $defaultCurrency,
+                                        prefix: Currency::whereEnabled(true)->firstOrFail()->symbol,
                                         thousandsSeparator: ',',
                                         decimalPlaces: 2,
                                         isSigned: false
@@ -111,7 +111,7 @@ class ServiceResource extends Resource
                                     ->translateLabel()
                                     // Put custom rule to validate minimum value
                                     ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
-                                        prefix: $defaultCurrency,
+                                        prefix: Currency::whereEnabled(true)->firstOrFail()->symbol,
                                         thousandsSeparator: ',',
                                         decimalPlaces: 2,
                                         isSigned: false
@@ -147,7 +147,7 @@ class ServiceResource extends Resource
                                     ->optionsFromModel(Blueprint::class, 'name')
                                     ->disabled(fn (?Service $record) => $record !== null)
                                     ->reactive(),
-                                SchemaFormBuilder::make('data', fn (?Service $record) => $record?->blueprint?->schema)
+                                SchemaFormBuilder::make('data')
                                     ->schemaData(fn (Closure $get) => Blueprint::query()
                                         ->firstWhere('id', $get('blueprint_id'))?->schema)
                                     ->hidden(fn (Closure $get) => $get('blueprint_id') === null)
@@ -173,7 +173,7 @@ class ServiceResource extends Resource
                                 Forms\Components\Select::make('billing_cycle')
                                     ->options(function () {
                                         $billing = [];
-                                        foreach (BillingCycle::cases() as $billingCycle) {
+                                        foreach (BillingCycleEnum::cases() as $billingCycle) {
                                             $billing[$billingCycle->value] = $billingCycle->name;
                                         }
 
@@ -182,19 +182,14 @@ class ServiceResource extends Resource
                                     ->required(fn (Closure $get) => $get('is_subscription') === true),
                                 Forms\Components\Select::make('due_date_every')
                                     ->reactive()
-                                    ->options(function () {
-                                        $days = [];
-                                        for ($day = 1; $day <= Carbon::now()->daysInMonth; $day++) {
-                                            $days[] = $day;
-                                        }
-
-                                        return $days;
-                                    })
+                                    ->options(fn () => range(1, now()->daysInMonth))
                                     ->disabled(fn (Closure $get) => $get('billing_cycle') === false)
                                     ->required(fn (Closure $get) => $get('is_subscription') === true),
                             ])
                                 ->reactive()
                                 ->hidden(fn (Closure $get) => $get('is_subscription') === false),
+                            Forms\Components\Toggle::make('needs_approval')
+                                ->label(trans('Approval')),
                         ]),
                     MetaDataForm::make('Meta Data'),
                 ])->columnSpan(1),
