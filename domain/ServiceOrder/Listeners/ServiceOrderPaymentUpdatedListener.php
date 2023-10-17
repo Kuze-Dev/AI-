@@ -45,11 +45,11 @@ class ServiceOrderPaymentUpdatedListener
         ]);
 
         if ($serviceBill->bill_date) {
-            $serviceBill->service_order->update([
+            $serviceBill->serviceOrder->update([
                 'status' => ServiceOrderStatus::ACTIVE,
             ]);
         } else {
-            $serviceBill->service_order->update([
+            $serviceBill->serviceOrder->update([
                 'status' => ServiceOrderStatus::PENDING,
             ]);
         }

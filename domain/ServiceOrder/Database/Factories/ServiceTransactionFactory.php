@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Database\Factories;
 
-use Carbon\Carbon;
 use Domain\PaymentMethod\Database\Factories\PaymentMethodFactory;
-use Domain\Payments\Database\Factories\PaymentFactory;
-use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
-use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceTransaction;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -27,7 +23,7 @@ class ServiceTransactionFactory extends Factory
             'service_bill_id' => ServiceBillFactory::new(),
             'payment_method_id' => PaymentMethodFactory::new(),
             'currency' => $this->faker->currencyCode(),
-            'total_amount' => $this->faker->randomNumber(1, 100),
+            'total_amount' => $this->faker->numberBetween(1, 100),
             'status' => ServiceTransactionStatus::PAID,
         ];
     }

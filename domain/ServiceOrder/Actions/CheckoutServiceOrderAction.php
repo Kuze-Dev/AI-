@@ -57,7 +57,7 @@ class CheckoutServiceOrderAction
                 [
                     'reference_id' => $serviceBill->reference,
                     'amount' => AmountData::fromArray([
-                        'currency' => $serviceBill->service_order->currency_code,
+                        'currency' => $serviceBill->serviceOrder->currency_code,
                         'total' => (int) $serviceBill->total_amount,
                         'details' => PaymentDetailsData::fromArray(
                             []
