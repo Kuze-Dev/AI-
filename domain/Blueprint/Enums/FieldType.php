@@ -16,6 +16,7 @@ use Domain\Blueprint\DataTransferObjects\RichtextFieldData;
 use Domain\Blueprint\DataTransferObjects\SelectFieldData;
 use Domain\Blueprint\DataTransferObjects\TextareaFieldData;
 use Domain\Blueprint\DataTransferObjects\TextFieldData;
+use Domain\Blueprint\DataTransferObjects\TinyEditorData;
 use Domain\Blueprint\DataTransferObjects\ToggleFieldData;
 
 enum FieldType: string
@@ -38,6 +39,7 @@ enum FieldType: string
     case MEDIA = 'media';
     case CHECKBOX = 'checkbox';
     case RADIO = 'radio';
+    case TINYEDITOR = 'tinyeditor';
 
     public function getFieldDataClass(): string
     {
@@ -60,6 +62,7 @@ enum FieldType: string
             self::MEDIA => MediaFieldData::class,
             self::CHECKBOX => CheckBoxFieldData::class,
             self::RADIO => RadioFieldData::class,
+            self::TINYEDITOR => TinyEditorData::class
         };
     }
 }

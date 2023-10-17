@@ -32,6 +32,7 @@ class ServiceController
                     'is_featured',
                     'pay_upfront',
                     'status',
+                    'needs_approval',
                     AllowedInclude::relationship('taxonomyTerms'),
                 ])
                 ->allowedIncludes([

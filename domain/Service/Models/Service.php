@@ -5,19 +5,24 @@ declare(strict_types=1);
 namespace Domain\Service\Models;
 
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Support\MetaData\HasMetaData;
 use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
 use Spatie\MediaLibrary\HasMedia;
+use Support\MetaData\Models\MetaData;
 
 /**
  * Domain\Service\Models\Service
@@ -28,22 +33,23 @@ use Spatie\MediaLibrary\HasMedia;
  * @property string|null $description
  * @property float $retail_price
  * @property float $selling_price
- * @property string|null $billing_cycle
+ * @property BillingCycleEnum|null $billing_cycle
  * @property int|null $due_date_every
  * @property int $is_featured
  * @property int $is_special_offer
  * @property int $pay_upfront
  * @property int $is_subscription
  * @property int $status
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property int $needs_approval
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Blueprint|null $blueprint
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read MediaCollection<int, Media> $media
  * @property-read int|null $media_count
- * @property-read \Support\MetaData\Models\MetaData|null $metaData
+ * @property-read MetaData|null $metaData
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
  * @method static \Illuminate\Database\Eloquent\Builder|Service newModelQuery()
@@ -92,15 +98,20 @@ class Service extends Model implements HasMetaDataContract, HasMedia
         'pay_upfront',
         'is_subscription',
         'status',
+        'needs_approval',
     ];
 
-    /** @return BelongsToMany<TaxonomyTerm> */
+    protected $casts = [
+        'billing_cycle' => BillingCycleEnum::class,
+    ];
+
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm> */
     public function taxonomyTerms(): BelongsToMany
     {
         return $this->belongsToMany(TaxonomyTerm::class, 'service_taxonomy_terms');
     }
 
-    /** @return BelongsTo<Blueprint, Service> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Service\Models\Service> */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);

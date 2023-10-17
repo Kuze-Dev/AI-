@@ -25,6 +25,7 @@
         "league/flysystem-aws-s3-v3": "^3.13",
         "lloricode/spatie-image-optimizer-health-check": "^1.0",
         "maatwebsite/excel": "^3.1.48",
+        "mohamedsabil83/filament-forms-tinyeditor": "^1.7",
         "pragmarx/google2fa": "^8.0",
         "saade/filament-laravel-log": "^1.2",
         "sentry/sentry-laravel": "^3.6.1",
