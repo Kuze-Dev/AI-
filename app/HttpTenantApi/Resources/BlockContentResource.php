@@ -25,6 +25,7 @@ class BlockContentResource extends JsonApiResource
         return  [
             'data' => $this->transformSchemaPayload($this->data ?? []),
             'order' => $this->order,
+            'blueprintData' => fn () => BlueprintDataResource::collection($this->blueprintData),
         ];
     }
 
