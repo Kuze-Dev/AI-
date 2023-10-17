@@ -32,8 +32,6 @@ it('can dispatch', function () {
 it('can execute', function () {
     Notification::fake();
 
-    Event::fake();
-
     $customer = CustomerFactory::new()->make();
 
     app(SendToCustomerServiceBillDueDateEmailAction::class)
@@ -46,6 +44,4 @@ it('can execute', function () {
         [$customer],
         ServiceBillDueDateNotification::class
     );
-
-    Event::assertDispatched(ServiceBillDueDateNotificationSentEvent::class);
 });

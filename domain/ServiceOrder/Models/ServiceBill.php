@@ -58,7 +58,6 @@ class ServiceBill extends Model implements PayableInterface
         'additional_charges',
         'total_amount',
         'status',
-        'email_notification_sent_at',
     ];
 
     protected $casts = [
@@ -68,7 +67,6 @@ class ServiceBill extends Model implements PayableInterface
         'service_price' => 'float',
         'total_amount' => 'float',
         'status' => ServiceBillStatus::class,
-        'email_notification_sent_at' => 'datetime',
     ];
 
     public function getRouteKeyName(): string

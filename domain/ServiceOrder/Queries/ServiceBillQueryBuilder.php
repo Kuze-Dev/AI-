@@ -15,11 +15,6 @@ class ServiceBillQueryBuilder extends Builder
         return $this->where('status', ServiceBillStatus::FORPAYMENT);
     }
 
-    public function whereHasNotSentEmailNotification(): self
-    {
-        return $this->where('email_notification_sent_at', null);
-    }
-
     public function whereHasBillingDate(): self
     {
         return $this->whereNotNull('bill_date');
@@ -33,7 +28,6 @@ class ServiceBillQueryBuilder extends Builder
     public function whereNotifiable(): self
     {
         return $this->whereForPaymentStatus()
-            ->whereHasNotSentEmailNotification()
             ->whereHasBillingDate()
             ->whereHasDueDate();
     }

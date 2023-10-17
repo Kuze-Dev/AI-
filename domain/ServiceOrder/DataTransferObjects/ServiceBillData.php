@@ -18,7 +18,6 @@ class ServiceBillData
         public readonly array $additional_charges,
         public readonly float $total_amount,
         public readonly ServiceBillStatus $status,
-        public readonly ?Carbon $email_notification_sent_at = null
     ) {
     }
 
@@ -33,7 +32,6 @@ class ServiceBillData
             additional_charges: $data['additional_charges'],
             total_amount: $data['total_price'],
             status: ServiceBillStatus::PENDING,
-            email_notification_sent_at: null
         );
     }
 }

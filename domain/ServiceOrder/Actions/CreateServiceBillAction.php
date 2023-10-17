@@ -36,7 +36,6 @@ class CreateServiceBillAction
             'additional_charges' => $serviceBillData->additional_charges,
             'total_amount' => $serviceBillData->total_amount,
             'status' => $serviceBillData->status,
-            'email_notification_sent_at' => null,
         ];
 
         if ($serviceOrderBillingAndDueDateData) {
