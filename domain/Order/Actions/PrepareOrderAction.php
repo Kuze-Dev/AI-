@@ -123,7 +123,7 @@ class PrepareOrderAction
         $customer = auth()->user();
 
         /** @var \Domain\Tier\Models\Tier $tier */
-        $tier = $customer->tier ?? Tier::find(1);
+        $tier = $customer->tier ?? Tier::query()->where('name', config('domain.tier.default'))->first();
 
         return CartLine::with(['purchasable' => function (MorphTo $query) use ($tier) {
             $query->morphWith([

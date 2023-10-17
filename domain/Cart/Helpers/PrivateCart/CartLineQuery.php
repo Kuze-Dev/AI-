@@ -20,7 +20,7 @@ class CartLineQuery
         $customer = auth()->user();
 
         /** @var \Domain\Tier\Models\Tier $tier */
-        $tier = $customer->tier ?? Tier::find(1);
+        $tier = $customer->tier ?? Tier::query()->where('name', config('domain.tier.default'))->first();
 
         $cartLines = CartLine::query()
             ->with(['purchasable' => function ($query) use ($tier) {
