@@ -50,7 +50,7 @@ class ServiceBillFactory extends Factory
         return $this->state(['status' => ServiceBillStatus::FORPAYMENT]);
     }
 
-    public function billingDate(Carbon $bill_date): self
+    public function billingDate(?Carbon $bill_date): self
     {
         return $this->state(['bill_date' => $bill_date]);
     }

@@ -59,6 +59,27 @@ it('can dispatch to customer with payable bills only (non-subscription based)', 
     QueueableActionFake::assertPushed(SendToCustomerServiceBillDueDateEmailAction::class);
 });
 
+it('cannot dispatch non notifiable bill', function () {
+    CustomerFactory::new()
+        ->active()
+        ->registered()
+        ->has(
+            ServiceOrderFactory::new()
+                ->active()
+                ->for(
+                    ServiceFactory::new()
+                        ->nonSubscriptionBased()
+                        ->withDummyBlueprint()
+                )
+                ->has(ServiceBillFactory::new()->forPayment()->billingDate(null))
+        )
+        ->createOne();
+
+    app(NotifyCustomerServiceBillDueDateAction::class)->execute();
+
+    QueueableActionFake::assertNotPushed(SendToCustomerServiceBillDueDateEmailAction::class);
+});
+
 it('cannot dispatch active only customer', function () {
     CustomerFactory::new()
         ->active()

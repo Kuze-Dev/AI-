@@ -19,17 +19,13 @@ class NotifyCustomerServiceBillDueDateAction
         $customers = Customer::query()
             ->with([
                 'serviceOrders' => fn ($query) => $query->whereActive(),
-                'serviceOrders.serviceBills' => fn ($query) => $query
-                    ->whereForPaymentStatus()
-                    ->whereHasNotSentEmailNotification(),
+                'serviceOrders.serviceBills' => fn ($query) => $query->whereNotifiable(),
             ])
             ->whereActive()
             ->whereRegistered()
             ->whereHas('serviceOrders', function ($query) {
                 $query->whereHas('serviceBills', function ($nestedQuery) {
-                    $nestedQuery
-                        ->whereForPaymentStatus()
-                        ->whereHasNotSentEmailNotification();
+                    $nestedQuery->whereNotifiable();
                 });
             })
             ->get();
