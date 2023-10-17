@@ -131,6 +131,12 @@ class SchemaFormBuilder extends Component
             default => throw new InvalidArgumentException('Cannot generate field component for `' . $field::class . '` as its not supported.'),
         };
 
+        if ( ! $this->isDehydrated()) {
+            return $fieldComponent
+                ->label($field->title)
+                ->helperText($field->helper_text);
+        }
+
         return $fieldComponent
             ->label($field->title)
             ->required(fn () => in_array('required', $field->rules))
