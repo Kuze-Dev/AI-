@@ -42,7 +42,7 @@ class CreateServiceTransactionAction
             'service_bill_id' => $serviceBill->id,
             'payment_method_id' => $paymentMethod->id,
             'total_amount' => $serviceBill->total_amount,
-            'currency' => $serviceBill->service_order->currency_code,
+            'currency' => $serviceBill->serviceOrder->currency_code,
             'status' => ServiceTransactionStatus::PENDING,
         ];
 

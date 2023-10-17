@@ -43,9 +43,23 @@ class CreateServiceOrderAction
 
         $currency = Currency::whereEnabled(true)->first();
 
-        if ( ! $customer instanceof Customer || ! $service instanceof Service || ! $currency instanceof Currency) {
+        if ( ! ($customer instanceof Customer)) {
+            throw new BadRequestHttpException('Customer not found');
+        } elseif ( ! ($service instanceof Service)) {
+            throw new BadRequestHttpException('Service not found');
+        } elseif ( ! ($currency instanceof Currency)) {
+            throw new BadRequestHttpException('Currency not found');
+        }
 
-            throw new BadRequestHttpException('No paymentMethod found');
+        if( ! $service->status) {
+            throw new BadRequestHttpException('inactive service found');
+        }
+
+        $status = ServiceOrderStatus::INPROGRESS;
+        if($service->pay_upfront) {
+            $status = ServiceOrderStatus::FORPAYMENT;
+        } elseif($service->needs_approval) {
+            $status = ServiceOrderStatus::PENDING;
         }
 
         $totalPrice = $this->calculateServiceOrderTotalPriceAction
@@ -87,7 +101,7 @@ class CreateServiceOrderAction
             'due_date_every' => $service->due_date_every,
             'schedule' => $serviceOrderData->schedule,
             'reference' => $uniqueReference,
-            'status' => ServiceOrderStatus::FORPAYMENT,
+            'status' => $status,
             'additional_charges' => $serviceOrderData->additional_charges,
             'total_price' => $totalPrice,
         ]);

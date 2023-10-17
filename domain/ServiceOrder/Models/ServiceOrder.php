@@ -8,7 +8,7 @@ use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Illuminate\Database\Eloquent\Model;
 use Domain\Admin\Models\Admin;
 use Domain\Customer\Models\Customer;
-use Domain\Service\Enums\BillingCycle;
+use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Service\Models\Service;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Queries\ServiceOrderQueryBuilder;
@@ -34,7 +34,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $currency_symbol
  * @property string $service_name
  * @property float $service_price
- * @property BillingCycle $billing_cycle
+ * @property BillingCycleEnum $billing_cycle
  * @property int $due_date_every
  * @property \Illuminate\Support\Carbon $schedule
  * @property ServiceOrderStatus $status
@@ -113,7 +113,7 @@ class ServiceOrder extends Model
         'customer_form' => 'json',
         'service_price' => 'float',
         'additional_charges' => 'json',
-        'billing_cycle' => BillingCycle::class,
+        'billing_cycle' => BillingCycleEnum::class,
         'schedule' => 'datetime',
         'total_price' => 'float',
         'status' => ServiceOrderStatus::class,

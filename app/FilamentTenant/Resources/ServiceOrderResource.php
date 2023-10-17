@@ -181,8 +181,11 @@ class ServiceOrderResource extends Resource
                                     ->required()
                                     ->preload()
                                     ->reactive()
-                                    ->optionsFromModel(Service::class, 'name'),
-
+                                    ->optionsFromModel(
+                                        Service::class,
+                                        'name',
+                                        fn (Builder $query) => $query->where('status', true)
+                                    ),
                                 DateTimePicker::make('schedule')
                                     ->columnSpan(2)
                                     ->minDate(now())
@@ -190,7 +193,7 @@ class ServiceOrderResource extends Resource
                                     ->default(now())
                                     ->timezone(Auth::user()?->timezone)
                                     ->visible(
-                                        fn (Closure $get) => Service::whereId($get('service_id'))->first()?->is_subscription
+                                        fn (Closure $get) => ! Service::whereId($get('service_id'))->first()?->is_subscription
                                     ),
 
                                 Forms\Components\Group::make()->columnSpan(2)->schema([
@@ -449,6 +452,7 @@ class ServiceOrderResource extends Resource
                             ->label('')
                             ->options(function () use ($record) {
                                 $options = [
+                                    ServiceOrderStatus::PENDING->value => trans('Pending'),
                                     ServiceOrderStatus::INPROGRESS->value => trans('In progress'),
                                     ServiceOrderStatus::COMPLETED->value => trans('Completed'),
                                 ];

@@ -34,8 +34,8 @@ return new class () extends Migration {
             $table->string('currency_symbol');
             $table->string('service_name');
             $table->decimal('service_price', 10, 2);
-            $table->string('billing_cycle');
-            $table->integer('due_date_every');
+            $table->string('billing_cycle')->nullable();
+            $table->integer('due_date_every')->nullable();
             $table->dateTime('schedule');
             $table->string('status');
             $table->string('cancelled_reason')->nullable()->default(null);

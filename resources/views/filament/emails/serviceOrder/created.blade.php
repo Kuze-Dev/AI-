@@ -215,11 +215,11 @@
             </div>
             <div class="summary-list horizontal-line">
                 <div>
-                    <p>{{ $serviceBill->service_order->service_name }} </p>
+                    <p>{{ $serviceBill->serviceOrder->service_name }} </p>
                 </div>
                 <div style="text-align: right">
-                    <p>{{ $serviceBill->service_order->currency_symbol }}
-                        {{ number_format((float) $serviceBill->service_order->service_price, 2, '.', ',') }}
+                    <p>{{ $serviceBill->serviceOrder->currency_symbol }}
+                        {{ number_format((float) $serviceBill->serviceOrder->service_price, 2, '.', ',') }}
                     </p>
                 </div>
             </div>
@@ -243,7 +243,7 @@
                 <div style="text-align: right">
                     <p style="margin-bottom: 2em">&nbsp;</p>
                     @foreach ($serviceBill->additional_charges as $additionalCharges)
-                    <p style="margin-bottom: 2em">{{ $serviceBill->service_order->currency_symbol }}
+                    <p style="margin-bottom: 2em">{{ $serviceBill->serviceOrder->currency_symbol }}
                         {{ number_format((float) $additionalCharges['price'], 2, '.', ',') }}
                     </p>
                     @endforeach
@@ -255,7 +255,7 @@
                     <p>Grand Total:</p>
                 </div>
                 <div style="text-align: right">
-                    <p>{{ $serviceBill->service_order->currency_symbol }}
+                    <p>{{ $serviceBill->serviceOrder->currency_symbol }}
                         {{ number_format((float) $serviceBill->total_amount, 2, '.', ',') }}
                     </p>
                 </div>

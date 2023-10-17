@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read Payment|null $payment
  * @property-read PaymentMethod|null $payment_method
  * @property-read \Domain\ServiceOrder\Models\ServiceBill $service_bill
- * @property-read \Domain\ServiceOrder\Models\ServiceOrder $service_order
+ * @property-read \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction query()
@@ -57,7 +57,7 @@ class ServiceTransaction extends Model
     ];
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ServiceOrder\Models\ServiceOrder, \Domain\ServiceOrder\Models\ServiceTransaction> */
-    public function service_order(): BelongsTo
+    public function serviceOrder(): BelongsTo
     {
         return $this->belongsTo(ServiceOrder::class);
     }

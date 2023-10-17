@@ -17,7 +17,7 @@ class ExpiredServiceOrderAction
         ServiceBill $serviceBill,
     ): ServiceBill {
 
-        $serviceBill->service_order->update([
+        $serviceBill->serviceOrder->update([
             'status' => ServiceOrderStatus::INACTIVE,
         ]);
         //email notification
