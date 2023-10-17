@@ -7,6 +7,7 @@ use Domain\Service\Enums\BillingCycle;
 use Domain\ServiceOrder\Actions\GetServiceBillingAndDueDateAction;
 use Domain\ServiceOrder\Database\Factories\ServiceBillFactory;
 use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
+use Domain\ServiceOrder\Database\Factories\ServiceTransactionFactory;
 
 beforeEach(function () {
     testInTenantContext();
@@ -79,32 +80,6 @@ $dataSets = [
 ];
 
 it(
-    'can get billing dates based on service order',
-    function (
-        BillingCycle $billingCycle,
-        int $dueDateEvery,
-        Carbon $createdAt,
-        Carbon $billDate,
-        Carbon $dueDate
-    ) {
-        now()->setTestNow($createdAt);
-
-        $serviceOrder = ServiceOrderFactory::new()->createOne([
-            'billing_cycle' => $billingCycle,
-            'due_date_every' => $dueDateEvery,
-        ]);
-
-        $dates = $this->getServiceBillingAndDueDateAction->execute($serviceOrder);
-
-        expect($dates->bill_date->format($this->dateFormat))
-            ->toBe($billDate->format($this->dateFormat));
-
-        expect($dates->due_date->format($this->dateFormat))
-            ->toBe($dueDate->format($this->dateFormat));
-    }
-)->with($dataSets);
-
-it(
     'can get billing dates based on service bill (on-time)',
     function (
         BillingCycle $billingCycle,
@@ -124,14 +99,18 @@ it(
                     'bill_date' => $billDate,
                     'due_date' => $dueDate,
                 ])
+                ->has(ServiceTransactionFactory::new())
             )
             ->createOne([
                 'billing_cycle' => $billingCycle,
                 'due_date_every' => $dueDateEvery,
             ]);
 
+        $serviceBill = $serviceOrder->serviceBills->first();
+
         $dates = $this->getServiceBillingAndDueDateAction->execute(
-            $serviceOrder->serviceBills->first()
+            $serviceBill,
+            $serviceBill->serviceTransaction
         );
 
         expect($dates->bill_date->format($this->dateFormat))
@@ -162,14 +141,18 @@ it(
                     'bill_date' => $billDate,
                     'due_date' => $dueDate,
                 ])
+                ->has(ServiceTransactionFactory::new())
             )
             ->createOne([
                 'billing_cycle' => $billingCycle,
                 'due_date_every' => $dueDateEvery,
             ]);
 
+        $serviceBill = $serviceOrder->serviceBills->first();
+
         $dates = $this->getServiceBillingAndDueDateAction->execute(
-            $serviceOrder->serviceBills->first()
+            $serviceBill,
+            $serviceBill->serviceTransaction
         );
 
         expect($dates->bill_date->format($this->dateFormat))

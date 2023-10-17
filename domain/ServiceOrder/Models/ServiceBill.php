@@ -10,6 +10,7 @@ use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Queries\ServiceBillQueryBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Domain\ServiceOrder\Models\ServiceBill
@@ -27,7 +28,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Payments\Models\Payment> $payments
  * @property-read int|null $payments_count
- * @property-read \Domain\ServiceOrder\Models\ServiceOrder $service_order
+ * @property-read \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill query()
@@ -89,5 +90,11 @@ class ServiceBill extends Model implements PayableInterface
     public function serviceOrder(): BelongsTo
     {
         return $this->belongsTo(ServiceOrder::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<ServiceTransaction> */
+    public function serviceTransaction(): HasOne
+    {
+        return $this->hasOne(ServiceTransaction::class);
     }
 }

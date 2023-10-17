@@ -6,6 +6,7 @@ namespace Domain\ServiceOrder\Models;
 
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Models\Payment;
+use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -54,6 +55,7 @@ class ServiceTransaction extends Model
 
     protected $casts = [
         'total_amount' => 'float',
+        'status' => ServiceTransactionStatus::class,
     ];
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ServiceOrder\Models\ServiceOrder, \Domain\ServiceOrder\Models\ServiceTransaction> */
