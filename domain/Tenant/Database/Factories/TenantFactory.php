@@ -19,7 +19,15 @@ class TenantFactory extends Factory
     {
         return [
             'name' => fake()->unique()->word(),
+            'is_suspended' => false,
         ];
+    }
+
+    public function suspendedTenant(bool $isFeatured = true): self
+    {
+        return $this->state([
+            'is_suspended' => $isFeatured,
+        ]);
     }
 
     /** @param string|array<string> $domains */

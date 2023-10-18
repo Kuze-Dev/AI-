@@ -19,7 +19,7 @@ class UpdateTenantAction
 
     public function execute(Tenant $tenant, TenantData $tenantData): Tenant
     {
-        $tenant->update(['name' => $tenantData->name]);
+        $tenant->update(['name' => $tenantData->name, 'is_suspended' => $tenantData->is_suspended]);
 
         $this->syncDomains($tenant, $tenantData->domains);
         $this->syncFeatures($tenant, $tenantData->getNormalizedFeatureNames());
