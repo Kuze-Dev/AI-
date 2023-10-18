@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Console;
 
-use Domain\ServiceOrder\Commands\CheckDueDateCommand;
 use Domain\ServiceOrder\Commands\NotifyCustomerServiceBillDueDateCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Console\Scheduling\Schedule;
@@ -18,10 +17,6 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command(NotifyCustomerServiceBillDueDateCommand::class)
-            ->daily()
-            ->sentryMonitor();
-
-        $schedule->command(CheckDueDateCommand::class)
             ->daily()
             ->sentryMonitor();
 
