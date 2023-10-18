@@ -41,6 +41,10 @@ class TenantResource extends Resource
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
                         ->required(),
+                    Forms\Components\Toggle::make('is_suspended')
+                        ->label('Suspended')
+                        ->inline(false)
+                        
                 ]),
                 Forms\Components\Section::make(trans('Database'))
                     ->statePath('database')

@@ -61,6 +61,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
 
     protected $fillable = [
         'name',
+        'is_suspended'
     ];
 
     public static function getCustomColumns(): array

@@ -9,6 +9,7 @@ class TenantData
     /** @param array<DomainData> $domains */
     public function __construct(
         public readonly string $name,
+        public readonly bool $is_suspended = true,
         public readonly ?DatabaseData $database = null,
         public readonly array $domains = [],
         public readonly array $features = [],
@@ -20,6 +21,7 @@ class TenantData
 
         return new self(
             name: $data['name'],
+            is_suspended: $data['is_suspended'] ?? false,
             database: filled($data['database'] ?? null)
                 ? new DatabaseData(
                     host: $data['database']['host'],
