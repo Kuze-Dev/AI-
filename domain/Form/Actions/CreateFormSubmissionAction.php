@@ -56,12 +56,13 @@ class CreateFormSubmissionAction
 
         }
 
+        /** @var null|FormSubmission */
         $formSubmission = $form->store_submission
             ? $form->formSubmissions()->create(['data' => $data])
             : null;
 
         foreach ($form->formEmailNotifications as $emailNotification) {
-            Mail::send(new FormEmailNotificationMail($emailNotification, $data, $attachments));
+            Mail::send(new FormEmailNotificationMail($emailNotification, $data, $attachments ,$formSubmission?->id));
         }
 
         return $formSubmission;
