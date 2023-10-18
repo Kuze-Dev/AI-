@@ -455,6 +455,7 @@ class ServiceOrderResource extends Resource
                             ->options(function () use ($record) {
                                 $options = [
                                     ServiceOrderStatus::PENDING->value => trans('Pending'),
+                                    ServiceOrderStatus::FORPAYMENT->value => trans('For payment'),
                                     ServiceOrderStatus::INPROGRESS->value => trans('In progress'),
                                     ServiceOrderStatus::COMPLETED->value => trans('Completed'),
                                 ];
@@ -477,27 +478,14 @@ class ServiceOrderResource extends Resource
                             ->label(trans('Send email notification'))
                             ->default(false)
                             ->reactive(),
-                        Forms\Components\Textarea::make('email_remarks')
-                            ->maxLength(255)
-                            ->label(trans('Remarks'))
-                            ->visible(fn (Closure $get) => $get('send_email') == true)
-                            ->dehydrateStateUsing(function (string|null $state) use ($get) {
-                                if (filled($state) && $get('send_email') == true) {
-                                    return $state;
-                                }
-
-                                return null;
-                            }),
                     ])
                     ->action(
                         function (array $data, $livewire) use ($record, $set) {
 
                             $shouldSendEmail = $livewire->mountedFormComponentActionData['send_email'];
-                            $emailRemarks = $livewire->mountedFormComponentActionData['email_remarks'];
 
                             if ($shouldSendEmail) {
                                 $fromEmail = app(ServiceSettings::class)->email_sender_name;
-
                                 if (empty($fromEmail)) {
                                     Notification::make()
                                         ->title(trans('Email sender not found, please update your order settings.'))
@@ -506,6 +494,7 @@ class ServiceOrderResource extends Resource
 
                                     return;
                                 }
+
                             }
 
                             $status = $data['status_options'];
@@ -521,7 +510,9 @@ class ServiceOrderResource extends Resource
                                     ->send();
                             }
 
-                            app(ChangeServiceOrderStatusAction::class)->execute($record);
+                            if ($shouldSendEmail) {
+                                app(ChangeServiceOrderStatusAction::class)->execute($record);
+                            }
                         }
                     );
             })
