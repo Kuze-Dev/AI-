@@ -527,11 +527,11 @@ class ServiceOrderResource extends Resource
             ->disableLabel()
             ->columnSpan(1)
             ->alignRight()
-            ->size('sm');
-        // ->hidden(function (ServiceOrder $record) {
-        //     return $record->status == ServiceOrderStatus::FORPAYMENT ||
-        //         $record->status == ServiceOrderStatus::COMPLETED;
-        // });
+            ->size('sm')
+            ->hidden(function (ServiceOrder $record) {
+                return $record->status == ServiceOrderStatus::FORPAYMENT ||
+                    $record->status == ServiceOrderStatus::COMPLETED;
+            });
     }
 
     public static function table(Table $table): Table

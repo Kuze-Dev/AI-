@@ -14,7 +14,8 @@ class PlaceServiceOrderAction
     public function __construct(
         private CreateServiceOrderAction $createServiceOrderAction,
         private CreateServiceOrderAddressAction $createServiceOrderAddressAction,
-        private CreateServiceBillAction $createServiceBillAction
+        private CreateServiceBillAction $createServiceBillAction,
+        private ChangeServiceOrderStatusAction $changeServiceOrderStatusAction
     ) {
     }
 
@@ -29,6 +30,8 @@ class PlaceServiceOrderAction
         $serviceBill = $this->createServiceBillAction->execute(
             ServiceBillData::fromCreatedServiceOrder($serviceOrder->toArray())
         );
+
+        $this->changeServiceOrderStatusAction->execute($serviceBill->serviceOrder);
 
         if( ! $adminId) {
             return $serviceBill;
