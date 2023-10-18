@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Resources;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\CreateServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ViewServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ListServiceOrder;
+use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceTransactionRelationManager;
 use App\FilamentTenant\Support;
 use App\FilamentTenant\Support\BadgeLabel;
 use App\FilamentTenant\Support\Divider;
@@ -595,12 +596,15 @@ class ServiceOrderResource extends Resource
             ->filters([])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])
+            ->defaultSort('updated_at', 'desc');
     }
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            ServiceTransactionRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

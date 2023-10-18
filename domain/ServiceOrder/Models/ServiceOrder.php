@@ -141,6 +141,12 @@ class ServiceOrder extends Model
         return $this->belongsTo(Service::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceTransaction>*/
+    public function serviceTransactions(): HasMany
+    {
+        return $this->hasMany(ServiceTransaction::class);
+    }
+
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Admin\Models\Admin, \Domain\ServiceOrder\Models\ServiceOrder> */
     public function admin(): BelongsTo
     {
