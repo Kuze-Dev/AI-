@@ -52,7 +52,7 @@ class Kernel extends HttpKernel
         'tenant' => [
             \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
             \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
-            ApiCallTrackMiddleware::class,
+            // ApiCallTrackMiddleware::class, //temp comment causing database host blocking 
         ],
     ];
 
