@@ -57,10 +57,10 @@ class CreateServiceOrderAction
 
         $status = ServiceOrderStatus::FORPAYMENT;
 
-        if( ! $service->pay_upfront && ! $service->is_subscription) {
-            $status = ServiceOrderStatus::INPROGRESS;
-        } elseif($service->needs_approval) {
+        if($service->needs_approval) {
             $status = ServiceOrderStatus::PENDING;
+        } elseif( ! $service->pay_upfront && ! $service->is_subscription) {
+            $status = ServiceOrderStatus::INPROGRESS;
         }
 
         $totalPrice = $this->calculateServiceOrderTotalPriceAction

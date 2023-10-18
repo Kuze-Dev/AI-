@@ -13,6 +13,9 @@ use Filament\Forms\Components\Section;
 use Filament\Resources\Pages\ViewRecord;
 use App\FilamentTenant\Support;
 use App\FilamentTenant\Support\SchemaFormBuilder;
+use Carbon\Carbon;
+use DateTimeZone;
+use Domain\Admin\Models\Admin;
 use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
 use Domain\ServiceOrder\Models\ServiceOrderAddress;
 use Illuminate\Contracts\Support\Htmlable;
@@ -40,6 +43,8 @@ class ViewServiceOrder extends ViewRecord
 
     private function getSection(): array
     {
+        $admin = Admin::first();
+
         return [Section::make(trans('Service'))->schema([
             Grid::make(2)->schema([
                 Placeholder::make('service')
@@ -52,6 +57,10 @@ class ViewServiceOrder extends ViewRecord
                     Placeholder::make('Due date every')
                         ->content(fn ($record) => $record->service->due_date_every),
                 ])->visible(fn ($record) => $record->service->is_subscription),
+                Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
+                    Placeholder::make('schedule')
+                        ->content(fn ($record) => Carbon::parse($record->schedule)->timezone(new DateTimeZone($admin?->timezone))->format('F j Y g:i A')),
+                ])->visible(fn ($record) => ! $record->service->is_subscription),
             ]),
         ]),
             Section::make(trans('Customer'))
