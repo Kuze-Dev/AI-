@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\ServiceOrder;
 
 use App\HttpTenantApi\Resources\ServiceOrderResource;
+use Domain\ServiceOrder\Actions\ChangeServiceOrderStatusAction;
 use Domain\ServiceOrder\Actions\PlaceServiceOrderAction;
 use Domain\ServiceOrder\Exceptions\InvalidServiceBillException;
 use Domain\ServiceOrder\Models\ServiceBill;
@@ -49,6 +50,8 @@ class ServiceOrderController
         if ( ! $serviceBill instanceof ServiceBill) {
             throw new InvalidServiceBillException();
         }
+
+        app(ChangeServiceOrderStatusAction::class)->execute($serviceBill->serviceOrder);
 
         return response()->json([
             'message' => 'Service order placed successfully',

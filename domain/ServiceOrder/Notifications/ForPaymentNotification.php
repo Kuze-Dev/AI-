@@ -13,7 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class PlaceServiceOrderMail extends Notification implements ShouldQueue
+class ForPaymentNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -60,7 +60,7 @@ class PlaceServiceOrderMail extends Notification implements ShouldQueue
         $admin = Admin::first();
 
         return (new MailMessage())
-            ->subject('Order Being Placed')
+            ->subject('Service order Being Placed')
             ->replyTo($this->replyTo)
             ->from($this->from)
             ->view('filament.emails.serviceOrder.created', [

@@ -20,6 +20,7 @@ use Domain\Address\Models\Address;
 use Domain\Currency\Models\Currency;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
+use Domain\ServiceOrder\Actions\ChangeServiceOrderStatusAction;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Filament\Forms;
@@ -456,8 +457,9 @@ class ServiceOrderResource extends Resource
                                     ServiceOrderStatus::INPROGRESS->value => trans('In progress'),
                                     ServiceOrderStatus::COMPLETED->value => trans('Completed'),
                                 ];
-                                if(isset($record->billing_cycle)) {
+                                if (isset($record->billing_cycle)) {
                                     $options = [
+                                        ServiceOrderStatus::PENDING->value => trans('Pending'),
                                         ServiceOrderStatus::FORPAYMENT->value => trans('For payment'),
                                         ServiceOrderStatus::ACTIVE->value => trans('Active'),
                                         ServiceOrderStatus::CLOSED->value => trans('Closed'),
@@ -517,6 +519,8 @@ class ServiceOrderResource extends Resource
                                     ->success()
                                     ->send();
                             }
+
+                            app(ChangeServiceOrderStatusAction::class)->execute($record);
                         }
                     );
             })

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Listeners;
 
 use Domain\Payments\Events\PaymentProcessEvent;
+use Domain\ServiceOrder\Actions\ChangeServiceOrderStatusAction;
 use Domain\ServiceOrder\Actions\CreateServiceBillAction;
 use Domain\ServiceOrder\Actions\GetServiceBillingAndDueDateAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
@@ -39,12 +40,6 @@ class ServiceOrderPaymentUpdatedListener
     {
         $serviceTransaction = ServiceTransaction::whereServiceBillId($serviceBill->id)->firstOrFail();
 
-        //WIP
-        // if($serviceBill->serviceOrder->service->is_subscription){
-        //     $serviceBillingDate = app(GetServiceBillingAndDueDateAction::class)->execute($serviceBill, $serviceTransaction);
-        //     app(CreateServiceBillAction::class)->execute(ServiceBillData::fromCreatedServiceOrder($serviceBill->serviceOrder),$serviceBillingDate);
-        // }
-
         $serviceTransaction->update([
             'status' => ServiceTransactionStatus::PAID,
         ]);
@@ -53,7 +48,12 @@ class ServiceOrderPaymentUpdatedListener
             'status' => ServiceBillStatus::PAID,
         ]);
 
-        if ($serviceBill->bill_date) {
+        if($serviceBill->serviceOrder->service->is_subscription) {
+            $serviceBillingDate = app(GetServiceBillingAndDueDateAction::class)->execute($serviceBill, $serviceTransaction);
+            app(CreateServiceBillAction::class)->execute(ServiceBillData::fromCreatedServiceOrder($serviceBill->serviceOrder->toArray()), $serviceBillingDate);
+        }
+
+        if ($serviceBill->serviceOrder->service->is_subscription) {
             $serviceBill->serviceOrder->update([
                 'status' => ServiceOrderStatus::ACTIVE,
             ]);
@@ -62,5 +62,7 @@ class ServiceOrderPaymentUpdatedListener
                 'status' => ServiceOrderStatus::PENDING,
             ]);
         }
+
+        app(ChangeServiceOrderStatusAction::class)->execute($serviceBill->serviceOrder);
     }
 }
