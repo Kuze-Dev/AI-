@@ -16,18 +16,17 @@
 </head>
 
 <body>
-    <div class="flex items-center justify-center h-screen bg-gradient-to-br from-gray-200 to-gray-600">
-        {{-- <div class="border rounded-lg w-14 h-12 bg-gray-700 animate-dip">
-          <div class="absolute border-l border-gray-700 h-5 w-3 left-1/2 top-[-30px]"></div>
-          <div class="absolute border-r border-transparent h-5 animate-spin left-1/2 top-[-10px]"></div>
-        </div> --}}
-        <div class="text-center mx-4">
-          <h1 class="my-10">Access to this page is restricted</h1>
-          <p>Please check with the site admin if you believe this is a mistake.</p>
+  <div class="flex items-center justify-center h-screen bg-gradient-to-br from-gray-200 to-gray-600">
+      <div class="text-center mx-4">
+        <div class="justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" style="display: block; margin: auto;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+          </svg>
         </div>
+        
+        <h1 class="my-10 text-5xl">Access to this page is restricted</h1>
+        <p class="text-2xl">Please check with the site admin if you believe this is a mistake.</p>
       </div>
+    </div>
 </body>
-
-  
-
 </html>
