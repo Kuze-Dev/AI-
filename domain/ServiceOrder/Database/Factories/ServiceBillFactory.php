@@ -30,7 +30,6 @@ class ServiceBillFactory extends Factory
             'additional_charges' => [],
             'total_amount' => $this->faker->randomFloat(2, 1, 100),
             'status' => ServiceBillStatus::PENDING,
-            'email_notification_sent_at' => null,
         ];
     }
 
