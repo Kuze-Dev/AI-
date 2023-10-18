@@ -41,7 +41,7 @@ class NotifyCustomerServiceBillDueDateAction
                         if (
                             $latestForPaymentServiceBill &&
                             now()->parse($latestForPaymentServiceBill->bill_date)
-                                ->toDateString() <= now()->toDateString()
+                                ->toDateString() === now()->toDateString()
                         ) {
                             $this->sendToCustomerServiceBillDueDateAction
                                 ->onQueue()
