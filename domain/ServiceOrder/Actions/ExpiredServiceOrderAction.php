@@ -10,6 +10,7 @@ use Domain\ServiceOrder\Models\ServiceBill;
 class ExpiredServiceOrderAction
 {
     public function __construct(
+        private ChangeServiceOrderStatusAction $changeServiceOrderStatusAction
     ) {
     }
 
@@ -20,7 +21,9 @@ class ExpiredServiceOrderAction
         $serviceBill->serviceOrder->update([
             'status' => ServiceOrderStatus::INACTIVE,
         ]);
-        //email notification
+
+        $this->changeServiceOrderStatusAction->execute($serviceBill->serviceOrder);
+
         return $serviceBill;
     }
 }
