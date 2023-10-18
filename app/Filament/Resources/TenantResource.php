@@ -43,8 +43,8 @@ class TenantResource extends Resource
                         ->required(),
                     Forms\Components\Toggle::make('is_suspended')
                         ->label('Suspended')
-                        ->inline(false)
-                        
+                        ->inline(false),
+
                 ]),
                 Forms\Components\Section::make(trans('Database'))
                     ->statePath('database')
