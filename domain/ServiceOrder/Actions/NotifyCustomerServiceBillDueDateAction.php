@@ -10,7 +10,8 @@ use Domain\ServiceOrder\Models\ServiceOrder;
 class NotifyCustomerServiceBillDueDateAction
 {
     public function __construct(
-        private SendToCustomerServiceBillDueDateEmailAction $sendToCustomerServiceBillDueDateAction
+        private SendToCustomerServiceBillDueDateEmailAction $sendToCustomerServiceBillDueDateAction,
+        private ExpiredServiceOrderAction $expiredServiceOrderAction
     ) {
     }
 
@@ -31,11 +32,10 @@ class NotifyCustomerServiceBillDueDateAction
                 $customer
                     ->serviceOrders
                     ->each(function (ServiceOrder $serviceOrder) use ($customer) {
-                        /** @var \Domain\ServiceOrder\Models\ServiceBill|null $latestForPaymentServiceBill */
+                        /** @var \Domain\ServiceOrder\Models\ServiceBill $latestForPaymentServiceBill */
                         $latestForPaymentServiceBill = $serviceOrder->serviceBills->first();
 
                         if (
-                            $latestForPaymentServiceBill &&
                             now()->parse($latestForPaymentServiceBill->bill_date)
                                 ->toDateString() === now()->toDateString()
                         ) {
@@ -45,6 +45,12 @@ class NotifyCustomerServiceBillDueDateAction
                                     $customer,
                                     $latestForPaymentServiceBill
                                 );
+                        }
+
+                        if ($latestForPaymentServiceBill->due_date < now()) {
+                            $this->expiredServiceOrderAction
+                                ->onQueue()
+                                ->execute($latestForPaymentServiceBill);
                         }
                     });
             });

@@ -6,9 +6,12 @@ namespace Domain\ServiceOrder\Actions;
 
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
+use Spatie\QueueableAction\QueueableAction;
 
 class ExpiredServiceOrderAction
 {
+    use QueueableAction;
+
     public function __construct(
         private ChangeServiceOrderStatusAction $changeServiceOrderStatusAction
     ) {
