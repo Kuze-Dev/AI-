@@ -52,7 +52,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
 
             return Blade::render($compiledString, $this->getMailVariables());
         }
-        
+
         return $string;
     }
 
@@ -70,7 +70,6 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
         View::replaceNamespace('mail', $this->htmlComponentPaths());
 
         $compiledTemplate = Blade::compileString($this->getNormalizedTemplate());
-      
 
         $contents = Blade::render($compiledTemplate, $this->getMailVariables());
 
