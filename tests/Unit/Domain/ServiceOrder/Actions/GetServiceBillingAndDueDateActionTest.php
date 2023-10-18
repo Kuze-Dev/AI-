@@ -115,9 +115,9 @@ it(
         $serviceOrder = ServiceOrderFactory::new()
             ->has(
                 ServiceBillFactory::new([
-                        'bill_date' => null,
-                        'due_date' => null,
-                    ])
+                    'bill_date' => null,
+                    'due_date' => null,
+                ])
                     ->paid()
                     ->has(ServiceTransactionFactory::new())
             )

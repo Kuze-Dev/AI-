@@ -39,6 +39,7 @@ class GetServiceBillingAndDueDateAction
         $serviceTransactionComputedBillingCycle = $this->computeBillingCycle(
             $billingCycle,
             $dueDateEvery,
+            /** @phpstan-ignore-next-line */
             $serviceTransaction->created_at,
         );
 
