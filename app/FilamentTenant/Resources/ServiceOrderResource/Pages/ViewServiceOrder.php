@@ -26,11 +26,6 @@ class ViewServiceOrder extends ViewRecord
         return trans('Service Order Details #') . $this->record->reference;
     }
 
-    protected function getRelationManagers(): array
-    {
-        return [];
-    }
-
     protected function getFormSchema(): array
     {
         return [
