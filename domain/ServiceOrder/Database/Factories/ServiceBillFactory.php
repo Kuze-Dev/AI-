@@ -53,4 +53,9 @@ class ServiceBillFactory extends Factory
     {
         return $this->state(['bill_date' => $bill_date]);
     }
+
+    public function dueDate(?Carbon $due_date): self
+    {
+        return $this->state(['due_date' => $due_date]);
+    }
 }
