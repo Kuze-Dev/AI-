@@ -9,11 +9,11 @@ use function Pest\Laravel\getJson;
 
 beforeEach(fn () => testInTenantContext());
 
-// it('can log api routes', function () {
+it('can log api routes', function () {
 
-//     getJson('api/pages')
-//         ->assertOk();
+    getJson('api/pages')
+        ->assertOk();
 
-//     assertDatabaseCount(ApiCall::class, 1);
+    assertDatabaseCount(ApiCall::class, 1);
 
-// });
+});
