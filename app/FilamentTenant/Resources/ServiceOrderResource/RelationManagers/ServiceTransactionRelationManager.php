@@ -80,7 +80,10 @@ class ServiceTransactionRelationManager extends RelationManager
                                 $createdAt.
                                 '.pdf';
 
-                            Pdf::loadHTML(view('web.layouts.service-order.receipts.default', ['transaction' => $record])->render())
+                            Pdf::loadView(
+                                'web.layouts.service-order.receipts.default',
+                                ['transaction' => $record]
+                            )
                                 ->save($filename, 'receipt-files');
 
                             $record->serviceOrder
