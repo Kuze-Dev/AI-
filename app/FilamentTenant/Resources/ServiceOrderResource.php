@@ -39,6 +39,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use Spatie\Browsershot\Exceptions\CouldNotTakeBrowsershot;
 use Str;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Storage;
