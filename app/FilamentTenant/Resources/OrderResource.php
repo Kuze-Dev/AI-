@@ -23,6 +23,7 @@ use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Enums\OrderUserType;
 use Domain\Order\Events\AdminOrderBankPaymentEvent;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
+use Domain\Taxation\Enums\PriceDisplay;
 use Filament\Notifications\Notification;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
@@ -531,7 +532,9 @@ class OrderResource extends Resource
 
                                 return  $record->currency_symbol . ' ' . '0.00';
                             }),
-                    ]),
+                    ])->hidden(function (Order $record) {
+                        return $record->tax_display == PriceDisplay::INCLUSIVE;
+                    }),
                 Forms\Components\Grid::make(2)
                     ->schema([
                         Support\TextLabel::make('')
