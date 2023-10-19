@@ -27,10 +27,16 @@ class MediaPathGenerator extends DefaultPathGenerator
 
         $prefix = config('media-library.prefix', '');
 
+        $md5 = md5(
+            $media->getKey().
+            $media->model->getKey().
+            $media->created_at
+        );
+
         if ($prefix !== '') {
-            return $prefix . '/' . md5((string) $media->getKey());
+            return $prefix . '/' . $md5;
         }
 
-        return md5((string) $media->getKey());
+        return $md5;
     }
 }
