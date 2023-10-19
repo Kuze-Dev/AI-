@@ -590,7 +590,8 @@ class ServiceOrderResource extends Resource
             ])
             ->filters([])
             ->actions([
-                Tables\Actions\Action::make('Print')
+                Tables\Actions\Action::make('print')
+                    ->translateLabel()
                     ->requiresConfirmation()
                     ->action(function (ServiceOrder $record, Tables\Actions\Action $action) {
                         try {
