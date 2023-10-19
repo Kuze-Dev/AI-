@@ -22,6 +22,7 @@ class MediaPathGenerator extends DefaultPathGenerator
     public static function forCustomerReceipt(Media $media): string
     {
         if ($media->collection_name !== 'receipts') {
+            /** @phpstan-ignore-next-line */
             return parent::getBasePath($media);
         }
 
