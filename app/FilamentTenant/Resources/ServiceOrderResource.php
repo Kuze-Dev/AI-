@@ -617,9 +617,9 @@ class ServiceOrderResource extends Resource
 
                             $record->customer
                                 ->addMedia($path)
-                                ->withCustomProperties([
-                                    'Status' => 'sample-status',
-                                ])
+//                                ->withCustomProperties([
+//                                    'status' => 'sample-status',
+//                                ])
                                 ->toMediaCollection('receipts');
 
                             $action
