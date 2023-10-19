@@ -631,7 +631,7 @@ class ServiceOrderResource extends Resource
                         }
                     })
                     ->withActivityLog()
-                    ->authorize('customerPrintReceipts'),
+                    ->authorize('customerPrintReceipt'),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

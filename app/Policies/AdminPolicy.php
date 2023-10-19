@@ -100,7 +100,7 @@ class AdminPolicy
         return $this->checkWildcardPermissions($user);
     }
 
-    public function customerPrintReceipts(User $user, Admin $admin): bool
+    public function customerPrintReceipt(User $user, Admin $admin): bool
     {
         return $this->checkWildcardPermissions($user);
     }
