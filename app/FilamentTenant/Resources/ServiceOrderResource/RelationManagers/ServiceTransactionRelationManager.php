@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers;
 
 use App\Settings\SiteSettings;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Models\ServiceTransaction;
 use Exception;
@@ -13,7 +14,6 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Spatie\Browsershot\Browsershot;
 
 class ServiceTransactionRelationManager extends RelationManager
 {
@@ -68,41 +68,30 @@ class ServiceTransactionRelationManager extends RelationManager
                             /** @var \Illuminate\Support\Carbon $createdAt */
                             $createdAt = $record->created_at->format('m_Y');
 
-                            $filename = Str::snake(app(SiteSettings::class)->name).
+                            $filename =
+                                $record->getKey().
+                                $record->serviceOrder
+                                    ->getKey().
+                                $record->serviceOrder
+                                    ->customer
+                                    ->getKey().DIRECTORY_SEPARATOR.
+                                Str::snake(app(SiteSettings::class)->name).
                                 '_'.
                                 $createdAt.
                                 '.pdf';
 
-                            $path = Storage::disk('receipt-files')->path($filename);
-
-                            try {
-                                /**
-                                 * Set .env values for
-                                 * BROWSERSHOT_NODE_PATH and BROWSERSHOT_NPM_PATH
-                                 * Docs: https://spatie.be/docs/browsershot/v2/requirements
-                                 */
-                                Browsershot::html(
-                                    view(
-                                        'web.layouts.service-order.receipts.default',
-                                        ['transaction' => $record]
-                                    )
-                                        ->render()
-                                )
-                                    ->setNodeBinary(config('browsershot.node_path'))
-                                    ->setNpmBinary(config('browsershot.npm_path'))
-                                    ->save($path);
-                            } catch (Exception $e) {
-                                report($e);
-                            }
+                            Pdf::loadHTML(view('web.layouts.service-order.receipts.default', ['transaction' => $record])->render())
+                                ->save($filename, 'receipt-files');
 
                             $record->serviceOrder
                                 ->customer
-                                ->addMedia($path)
+                                ->addMedia(Storage::disk('receipt-files')->path($filename))
                                 ->toMediaCollection('receipts');
 
                             $action
                                 ->successNotificationTitle(trans('Success'))
                                 ->success();
+
                         } catch (Exception $e) {
                             $action
                                 ->failureNotificationTitle($e->getMessage())
