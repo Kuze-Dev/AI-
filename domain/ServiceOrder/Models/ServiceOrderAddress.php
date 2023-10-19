@@ -64,14 +64,16 @@ class ServiceOrderAddress extends Model
     protected function fullAddress(): Attribute
     {
         return Attribute::get(
-            fn ($value): string => implode(" ", array_filter(
+            fn ($value): string => implode(
+                ' ',
+                array_filter(
                     [
                         $this->label_as->value.': ',
                         $this->address_line_1,
                         $this->city,
                         $this->state,
                         $this->country.', ',
-                        $this->zip_code
+                        $this->zip_code,
                     ]
                 )
             )

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Models;
 
+use Akaunting\Money\Money;
 use Domain\Payments\Interfaces\PayableInterface;
 use Domain\Payments\Models\Traits\HasPayments;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Queries\ServiceBillQueryBuilder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -82,6 +84,26 @@ class ServiceBill extends Model implements PayableInterface
     public function newEloquentBuilder($query): ServiceBillQueryBuilder
     {
         return new ServiceBillQueryBuilder($query);
+    }
+
+    /** @return Attribute<Money, never> */
+    protected function getTotalAdditionalCharges(): Attribute
+    {
+        $total = money(0);
+
+        return Attribute::get(
+            /** @return Money */
+            function ($value) use ($total) {
+                foreach ($this->additional_charges as $additional_charge) {
+                    $total = $total->add(
+                        money($additional_charge['price'])
+                            ->multiply($additional_charge['quantity'])
+                    );
+                }
+
+                return $total;
+            }
+        );
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ServiceOrder\Models\ServiceOrder, \Domain\ServiceOrder\Models\ServiceBill> */

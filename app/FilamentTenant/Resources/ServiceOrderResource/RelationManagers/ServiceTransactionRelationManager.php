@@ -60,7 +60,7 @@ class ServiceTransactionRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\Action::make('print')
                     ->translateLabel()
-                    ->requiresConfirmation()
+                    // ->requiresConfirmation()
                     ->button()
                     ->icon('heroicon-o-download')
                     ->action(function (ServiceTransaction $record, Tables\Actions\Action $action) {
