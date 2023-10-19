@@ -82,7 +82,10 @@ class ServiceTransactionRelationManager extends RelationManager
                                  * Docs: https://spatie.be/docs/browsershot/v2/requirements
                                  */
                                 Browsershot::html(
-                                    view('layouts.service-order.receipts.default')
+                                    view(
+                                        'web.layouts.service-order.receipts.default',
+                                        ['transaction' => $record]
+                                    )
                                         ->render()
                                 )
                                     ->setNodeBinary(config('browsershot.node_path'))
@@ -109,7 +112,7 @@ class ServiceTransactionRelationManager extends RelationManager
                             report($e);
                         }
                     })
-                    // ->withActivityLog()
+                    ->withActivityLog()
                     ->authorize('customerPrintReceipt'),
             ])
             ->bulkActions([])

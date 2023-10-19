@@ -19,6 +19,6 @@ class Controller extends BaseController
     #[Get('test')]
     public function test()
     {
-        return view('layouts.service-order.receipts.default');
+        return view('web.layouts.service-order.receipts.default');
     }
 }
