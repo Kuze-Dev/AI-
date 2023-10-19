@@ -27,15 +27,8 @@ class MediaPathGenerator extends DefaultPathGenerator
 
         $prefix = config('media-library.prefix', '');
 
-        /** @var \Illuminate\Support\Carbon $createdAt */
-        $createdAt = $media->created_at;
-
         if ($prefix !== '') {
-            return $prefix . '/' . md5(
-                $createdAt->toString(),
-                $media->getKey().
-                    $media->model->getKey()
-            );
+            return $prefix . '/' . md5($media->getKey());
         }
 
         return md5($media->getKey());
