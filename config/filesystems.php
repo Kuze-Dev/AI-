@@ -59,6 +59,11 @@ return [
             ]
         ],
 
+        'receipt-files' => [
+            'driver' => 'local',
+            'root' => storage_path('app/receipt-files'),
+            'throw' => false,
+        ],
     ],
 
     /*

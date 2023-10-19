@@ -48,7 +48,7 @@ class NotifyCustomerServiceBillDueDateAction
                         }
 
                         if ($latestForPaymentServiceBill->due_date
-                                ->toDateString() < now()->toDateString()
+                            ->toDateString() < now()->toDateString()
                         ) {
                             $this->expiredServiceOrderAction
                                 ->onQueue()

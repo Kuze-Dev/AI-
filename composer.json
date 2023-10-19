@@ -31,6 +31,7 @@
         "sentry/sentry-laravel": "^3.6.1",
         "shuvroroy/filament-spatie-laravel-health": "^1.5",
         "spatie/array-to-xml": "^3.1",
+        "spatie/browsershot": "^3.59",
         "spatie/eloquent-sortable": "^4.0",
         "spatie/laravel-activitylog": "^4.7",
         "spatie/laravel-json-api-paginate": "^1.12",

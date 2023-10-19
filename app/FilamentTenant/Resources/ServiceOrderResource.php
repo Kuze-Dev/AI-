@@ -14,6 +14,7 @@ use App\FilamentTenant\Support\Divider;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
 use App\Settings\ServiceSettings;
+use App\Settings\SiteSettings;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
 use Closure;
@@ -24,6 +25,7 @@ use Domain\Service\Models\Service;
 use Domain\ServiceOrder\Actions\ChangeServiceOrderStatusAction;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
+use Exception;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DateTimePicker;
@@ -39,6 +41,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Str;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Storage;
+use Spatie\Browsershot\Browsershot;
 
 class ServiceOrderResource extends Resource
 {
@@ -594,6 +598,38 @@ class ServiceOrderResource extends Resource
                     ->dateTime(timezone: Auth::user()?->timezone),
             ])
             ->filters([])
+            ->actions([
+                Tables\Actions\Action::make('Print')
+                    ->requiresConfirmation()
+                    ->action(function (ServiceOrder $record, Tables\Actions\Action $action) {
+                        try {
+                            $view = view('layouts.service-order.receipts.default')->render();
+
+                            $filename = Str::snake(app(SiteSettings::class)->name).
+                                '_'.
+                                ($record->created_at?->format('m_y') ?? throw new Exception('This should not be happen.')).
+                                '.pdf';
+
+                            $path = Storage::disk('receipt-files')->path($filename);
+
+                            Browsershot::html($view)->save($path);
+
+                            $record->customer
+                                ->addMedia($path)
+                                ->withCustomProperties([
+                                    'Status' => 'sample-status',
+                                ])
+                                ->toMediaCollection('receipts');
+
+                            $action
+                                ->successNotificationTitle(trans('Success'))
+                                ->success();
+                        } catch (Exception $e) {
+                            $action->failureNotificationTitle($e->getMessage())
+                                ->failure();
+                        }
+                    }),
+            ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ])

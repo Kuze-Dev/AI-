@@ -172,6 +172,9 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
             ->singleFile()
             ->useFallbackUrl(app(SiteSettings::class)->getLogoUrl())
             ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
+
+        $this->addMediaCollection('receipts')
+            ->acceptsFile(fn () => ['application/pdf']);
     }
 
     public function newEloquentBuilder($query): CustomerQueryBuilder
