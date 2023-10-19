@@ -630,8 +630,8 @@ class ServiceOrderResource extends Resource
                                 ->failure();
                         }
                     })
-                    ->withActivityLog(),
-                //                    ->authorize('test'), // TODO: pritn authorize
+                    ->withActivityLog()
+                    ->authorize('customerPrintReceipts'),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

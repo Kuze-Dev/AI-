@@ -24,6 +24,7 @@ class PermissionSeeder extends BasePermissionSeeder
                         'resendVerification',
                         'sendPasswordReset',
                         'impersonate',
+                        'customerPrintReceipts',
                     ]
                 ),
                 ...$this->generateFilamentResourcePermissions('role', except: ['deleteAny']),
