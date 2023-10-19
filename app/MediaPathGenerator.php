@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App;
 
 use Domain\Customer\Models\Customer;
@@ -17,7 +19,7 @@ class MediaPathGenerator extends DefaultPathGenerator
         return parent::getBasePath($media);
     }
 
-    public static  function forCustomerReceipt(Media $media): string
+    public static function forCustomerReceipt(Media $media): string
     {
         if ($media->collection_name !== 'receipts') {
             return parent::getBasePath($media);
@@ -30,10 +32,10 @@ class MediaPathGenerator extends DefaultPathGenerator
 
         if ($prefix !== '') {
             return $prefix . '/' . md5(
-                    $createdAt->toString(),
-                    $media->getKey().
+                $createdAt->toString(),
+                $media->getKey().
                     $media->model->getKey()
-                );
+            );
         }
 
         return md5($media->getKey());
