@@ -12,7 +12,7 @@ class TenantData
         public readonly bool $is_suspended = true,
         public readonly ?DatabaseData $database = null,
         public readonly array $domains = [],
-        public readonly array $features = [],
+        public readonly null|array $features = [],
     ) {
     }
 
@@ -38,17 +38,23 @@ class TenantData
                 ),
                 $data['domains']
             ),
-            features: isset($data['features']) ? array_filter($data['features']) : []
+            features: isset($data['features']) ? array_filter($data['features']) : null
         );
     }
 
     public function getNormalizedFeatureNames(): array
     {
-        return array_map(
-            fn (string $feature) => class_exists($feature) && (method_exists($feature, 'resolve') || method_exists($feature, '__invoke'))
-                ? app($feature)->name ?? $feature
-                : $feature,
-            $this->features,
-        );
+        $features = $this->features;
+
+        if (is_array($features)) {
+            return array_map(
+                fn (string $feature) => class_exists($feature) && (method_exists($feature, 'resolve') || method_exists($feature, '__invoke'))
+                    ? app($feature)->name ?? $feature
+                    : $feature,
+                $features,
+            );
+        }
+
+        return [];
     }
 }
