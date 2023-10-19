@@ -77,6 +77,8 @@ class ServiceTransactionRelationManager extends RelationManager
 
                             try {
                                 /**
+                                 * Set .env values for
+                                 * BROWSERSHOT_NODE_PATH and BROWSERSHOT_NPM_PATH
                                  * Docs: https://spatie.be/docs/browsershot/v2/requirements
                                  */
                                 Browsershot::html(
