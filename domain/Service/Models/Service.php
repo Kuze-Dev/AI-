@@ -7,7 +7,6 @@ namespace Domain\Service\Models;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Taxonomy\Models\TaxonomyTerm;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;

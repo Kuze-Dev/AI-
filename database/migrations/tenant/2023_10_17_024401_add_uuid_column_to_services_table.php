@@ -11,7 +11,7 @@ return new class () extends Migration {
     public function up(): void
     {
         Schema::table('services', function (Blueprint $table) {
-            $table->uuid()->after('id');
+            $table->uuid()->default((string)\Illuminate\Support\Str::uuid())->after('id');
         });
     }
 
@@ -19,7 +19,7 @@ return new class () extends Migration {
     public function down(): void
     {
         Schema::table('services', function (Blueprint $table) {
-           $table->dropColumn('uuid');
+            $table->dropColumn('uuid');
         });
     }
 };
