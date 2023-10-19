@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers;
 
+use App\Settings\SiteSettings;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Models\ServiceTransaction;
+use Exception;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Spatie\Browsershot\Browsershot;
 
 class ServiceTransactionRelationManager extends RelationManager
 {
@@ -51,6 +56,59 @@ class ServiceTransactionRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Updated at')
                     ->sortable(),
+            ])
+            ->actions([
+                Tables\Actions\Action::make('print')
+                    ->translateLabel()
+                    ->requiresConfirmation()
+                    ->button()
+                    ->icon('heroicon-o-download')
+                    ->action(function (ServiceTransaction $record, Tables\Actions\Action $action) {
+                        try {
+                            /** @var \Illuminate\Support\Carbon $createdAt */
+                            $createdAt = $record->created_at;
+
+                            $filename = Str::snake(app(SiteSettings::class)->name).
+                                '_'.
+                                $createdAt.
+                                '.pdf';
+
+                            $path = Storage::disk('receipt-files')->path($filename);
+
+                            try {
+                                /**
+                                 * Docs: https://spatie.be/docs/browsershot/v2/requirements
+                                 */
+                                Browsershot::html(
+                                    view('layouts.service-order.receipts.default')
+                                        ->render()
+                                )
+                                    ->setNodeBinary(config('browsershot.node_path'))
+                                    ->setNpmBinary(config('browsershot.npm_path'))
+                                    ->save($path);
+                            } catch (Exception $e) {
+                                report($e);
+                            }
+
+                            $record->serviceOrder
+                                ->customer
+                                ->addMedia($path)
+                                ->toMediaCollection('receipts');
+
+                            $action
+                                ->successNotificationTitle(trans('Success'))
+                                ->success();
+                        } catch (Exception $e) {
+                            $action
+                                ->failureNotificationTitle($e->getMessage())
+                                // ->failureNotificationTitle(trans('Something went wrong.'))
+                                ->failure();
+
+                            report($e);
+                        }
+                    })
+                    // ->withActivityLog()
+                    ->authorize('customerPrintReceipt'),
             ])
             ->bulkActions([])
             ->defaultSort('updated_at', 'desc');
