@@ -619,7 +619,9 @@ class ServiceOrderResource extends Resource
                             $action->failureNotificationTitle($e->getMessage())
                                 ->failure();
                         }
-                    }),
+                    })
+                    ->withActivityLog(),
+//                    ->authorize('test'), // TODO: pritn authorize
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
