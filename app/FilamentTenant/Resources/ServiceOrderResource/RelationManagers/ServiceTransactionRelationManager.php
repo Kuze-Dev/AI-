@@ -69,9 +69,9 @@ class ServiceTransactionRelationManager extends RelationManager
                             $createdAt = $record->created_at->format('m_Y');
 
                             $filename =
-                                $record->getKey().
+                                $record->getKey().'-'.
                                 $record->serviceOrder
-                                    ->getKey().
+                                    ->getKey().'-'.
                                 $record->serviceOrder
                                     ->customer
                                     ->getKey().DIRECTORY_SEPARATOR.
