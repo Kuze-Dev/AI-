@@ -41,13 +41,13 @@ class ServiceOrderStoreRequest extends FormRequest
                 'bool',
             ],
             'schedule' => [
-                'datetime',
+                'date',
             ],
             'form' => [
-                'json',
+                'array',
             ],
             'additional_charges' => [
-                'json',
+                'array',
             ],
 
         ];
