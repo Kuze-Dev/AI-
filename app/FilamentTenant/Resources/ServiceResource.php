@@ -86,7 +86,9 @@ class ServiceResource extends Resource
                         Forms\Components\Section::make('Service Price')
                             ->translateLabel()
                             ->schema([
-                                Forms\Components\Toggle::make('pay_upfront'),
+                                Forms\Components\Toggle::make('pay_upfront')
+                                    ->reactive()
+                                    ->formatStateUsing(fn (Closure $get) => $get('is_subscription') === true ? true : false),
                                 Forms\Components\TextInput::make('retail_price')
                                     ->translateLabel()
                                     ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
