@@ -28,9 +28,9 @@ class MediaPathGenerator extends DefaultPathGenerator
         $prefix = config('media-library.prefix', '');
 
         if ($prefix !== '') {
-            return $prefix . '/' . md5($media->getKey());
+            return $prefix . '/' . md5((string) $media->getKey());
         }
 
-        return md5($media->getKey());
+        return md5((string) $media->getKey());
     }
 }
