@@ -43,4 +43,14 @@ class TenantPolicy
     {
         return $this->checkWildcardPermissions($user);
     }
+
+    public function updateFeatures(User $user): bool
+    {
+        return $this->checkWildcardPermissions($user);
+    }
+
+    public function canSuspendTenant(User $user): bool
+    {
+        return $this->checkWildcardPermissions($user);
+    }
 }
