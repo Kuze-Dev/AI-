@@ -596,8 +596,6 @@ class ServiceOrderResource extends Resource
                     ->requiresConfirmation()
                     ->action(function (ServiceOrder $record, Tables\Actions\Action $action) {
                         try {
-                            $view = view('layouts.service-order.receipts.default')->render();
-
                             $filename = Str::snake(app(SiteSettings::class)->name).
                                 '_'.
                                 ($record->created_at?->format('m_y') ?? throw new Exception('This should not be happen.')).
@@ -614,7 +612,11 @@ class ServiceOrderResource extends Resource
                                  *
                                  * Docs: https://spatie.be/docs/browsershot/v2/requirements
                                  */
-                                Browsershot::html($view)->save($path);
+                                Browsershot::html(
+                                    view('layouts.service-order.receipts.default')
+                                        ->render()
+                                )
+                                    ->save($path);
                             } catch (\Exception $e) {
                                 report($e);
                             }
