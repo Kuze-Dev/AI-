@@ -66,7 +66,7 @@ class ServiceTransactionRelationManager extends RelationManager
                     ->action(function (ServiceTransaction $record, Tables\Actions\Action $action) {
                         try {
                             /** @var \Illuminate\Support\Carbon $createdAt */
-                            $createdAt = $record->created_at;
+                            $createdAt = $record->created_at->format('m_Y');
 
                             $filename = Str::snake(app(SiteSettings::class)->name).
                                 '_'.
