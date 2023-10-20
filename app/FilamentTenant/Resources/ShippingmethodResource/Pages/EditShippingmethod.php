@@ -46,7 +46,8 @@ class EditShippingmethod extends EditRecord
     }
 
     /**
-     * @param \Domain\ShippingMethod\Models\ShippingMethod $record
+     * @param  \Domain\ShippingMethod\Models\ShippingMethod  $record
+     *
      * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model

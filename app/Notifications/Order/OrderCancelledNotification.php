@@ -11,6 +11,7 @@ use Illuminate\Notifications\Notification;
 class OrderCancelledNotification extends Notification
 {
     use Queueable;
+
     private Order $order;
 
     /** Create a new notification instance. */

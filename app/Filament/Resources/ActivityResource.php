@@ -119,7 +119,7 @@ class ActivityResource extends Resource
                             /** @var \Filament\Resources\Resource|null $resource */
                             $resource = self::findResourceForModel($record->subject::class);
 
-                            if ( ! $resource) {
+                            if (! $resource) {
                                 return;
                             }
 

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\PaymentMethod\Actions;
 
-use Support\Common\Actions\SyncMediaCollectionAction;
 use Domain\PaymentMethod\DataTransferObjects\PaymentMethodData;
-use Support\Common\DataTransferObjects\MediaCollectionData;
 use Domain\PaymentMethod\Models\PaymentMethod;
+use Support\Common\Actions\SyncMediaCollectionAction;
+use Support\Common\DataTransferObjects\MediaCollectionData;
 
 class CreatePaymentMethodAction
 {

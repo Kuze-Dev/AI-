@@ -12,6 +12,7 @@ use Domain\Customer\Actions\ForceDeleteCustomerAction;
 use Domain\Customer\Actions\RestoreCustomerAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Models\Customer;
+use Exception;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
@@ -19,7 +20,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Throwable;
-use Exception;
 
 class EditCustomer extends EditRecord
 {
@@ -67,7 +67,8 @@ class EditCustomer extends EditRecord
     }
 
     /**
-     * @param \Domain\Customer\Models\Customer $record
+     * @param  \Domain\Customer\Models\Customer  $record
+     *
      * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model

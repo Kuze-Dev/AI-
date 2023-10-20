@@ -9,8 +9,8 @@ use App\FilamentTenant\Resources\GlobalsResource;
 use Domain\Globals\Actions\CreateGlobalsAction;
 use Domain\Globals\DataTransferObjects\GlobalsData;
 use Filament\Pages\Actions\Action;
-use Illuminate\Database\Eloquent\Model;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class CreateGlobals extends CreateRecord

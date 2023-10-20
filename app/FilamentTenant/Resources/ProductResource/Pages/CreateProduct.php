@@ -14,10 +14,10 @@ use App\FilamentTenant\Support\ProductOptionFormAction;
 use App\FilamentTenant\Support\ProductVariantFormAction;
 use Domain\Product\Actions\CreateProductAction;
 use Domain\Product\DataTransferObjects\ProductData;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Pages\Actions\Action;
-use Illuminate\Support\Facades\DB;
+use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class CreateProduct extends CreateRecord implements HasProductOptionsContracts, HasProductVariantsContracts

@@ -49,7 +49,7 @@ class EditDiscount extends EditRecord
         return $this->getCachedActions();
     }
 
-    /** @param \Domain\Discount\Models\Discount $record */
+    /** @param  \Domain\Discount\Models\Discount  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(

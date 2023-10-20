@@ -48,7 +48,8 @@ class EditProduct extends EditRecord implements HasProductOptionsContracts, HasP
     }
 
     /**
-     * @param \Domain\Product\Models\Product $record
+     * @param  \Domain\Product\Models\Product  $record
+     *
      * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model

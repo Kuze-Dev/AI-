@@ -8,13 +8,13 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\BlockResource;
 use Domain\Page\Actions\UpdateBlockAction;
 use Domain\Page\DataTransferObjects\BlockData;
+use Exception;
 use Filament\Pages\Actions;
+use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Throwable;
-use Exception;
-use Filament\Pages\Actions\Action;
 
 class EditBlock extends EditRecord
 {
@@ -40,7 +40,8 @@ class EditBlock extends EditRecord
     }
 
     /**
-     * @param \Domain\Page\Models\Block $record
+     * @param  \Domain\Page\Models\Block  $record
+     *
      * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model

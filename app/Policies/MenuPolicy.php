@@ -13,12 +13,12 @@ use Illuminate\Foundation\Auth\User;
 
 class MenuPolicy
 {
-    use HandlesAuthorization;
     use ChecksWildcardPermissions;
+    use HandlesAuthorization;
 
     public function before(): ?Response
     {
-        if ( ! tenancy()->tenant?->features()->active(CMSBase::class)) {
+        if (! tenancy()->tenant?->features()->active(CMSBase::class)) {
             return Response::denyAsNotFound();
         }
 

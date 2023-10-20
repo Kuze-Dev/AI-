@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @template TModelClass of \Domain\Page\Models\Page
+ *
  * @extends Builder<TModelClass>
  */
 class PageBuilder extends Builder

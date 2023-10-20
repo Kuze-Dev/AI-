@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Rules;
 
+use Closure;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Arr;
 use PDOException;
-use Closure;
 
 class CheckDatabaseConnection implements DataAwareRule, InvokableRule
 {
@@ -32,7 +32,6 @@ class CheckDatabaseConnection implements DataAwareRule, InvokableRule
      * @param  string  $attribute
      * @param  mixed  $value
      * @param  Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
-     * @return void
      */
     public function __invoke($attribute, $value, $fail): void
     {

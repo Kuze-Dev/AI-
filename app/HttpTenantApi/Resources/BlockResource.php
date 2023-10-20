@@ -14,7 +14,7 @@ class BlockResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
-        return  [
+        return [
             'name' => $this->name,
             'component' => $this->component,
         ];

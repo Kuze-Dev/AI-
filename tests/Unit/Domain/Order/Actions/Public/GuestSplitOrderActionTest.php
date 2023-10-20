@@ -72,7 +72,7 @@ beforeEach(function () {
 
     $uuid = uuid_create(UUID_TYPE_RANDOM);
 
-    $sessionId = time() . $uuid;
+    $sessionId = time().$uuid;
 
     CartFactory::new()->setGuestId($sessionId)->createOne();
 

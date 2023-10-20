@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Support\Common\Rules;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 class MinimumValueRule implements ValidationRule
 {

@@ -8,11 +8,11 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ServiceResource;
 use Domain\Service\Actions\CreateServiceAction;
 use Domain\Service\DataTransferObjects\ServiceData;
+use Exception;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Exception;
 use Throwable;
 
 class CreateService extends CreateRecord

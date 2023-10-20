@@ -28,7 +28,7 @@ beforeEach(function () {
     $tenant->features()->activate(CustomerBase::class);
     $tenant->features()->activate(AddressBase::class);
     $tenant->features()->activate(TierBase::class);
-    if( ! Tier::whereName(config('domain.tier.default'))->first()) {
+    if (! Tier::whereName(config('domain.tier.default'))->first()) {
         TierFactory::createDefault();
     }
 });
@@ -71,7 +71,7 @@ it('can register with address', function () {
         'mobile' => $data['mobile'],
         'gender' => $data['gender'],
         'status' => Status::ACTIVE->value,
-        'birth_date' => $data['birth_date'] . ' 00:00:00',
+        'birth_date' => $data['birth_date'].' 00:00:00',
         'register_status' => RegisterStatus::REGISTERED,
     ]);
 
@@ -167,7 +167,7 @@ it('can register with wholesaler tier', function () {
         'mobile' => $data['mobile'],
         'gender' => $data['gender'],
         'status' => Status::ACTIVE->value,
-        'birth_date' => $data['birth_date'] . ' 00:00:00',
+        'birth_date' => $data['birth_date'].' 00:00:00',
         'register_status' => RegisterStatus::UNREGISTERED,
     ]);
 });
@@ -209,7 +209,7 @@ it('can register without address', function () {
         'mobile' => $data['mobile'],
         'gender' => $data['gender'],
         'status' => Status::ACTIVE->value,
-        'birth_date' => $data['birth_date'] . ' 00:00:00',
+        'birth_date' => $data['birth_date'].' 00:00:00',
         'register_status' => RegisterStatus::REGISTERED,
     ]);
 

@@ -42,7 +42,7 @@ class SiteSettings extends TenantBaseSettings
                     ->maxSize(1_000)
                     ->required()
                     ->getUploadedFileNameForStorageUsing(static function (TemporaryUploadedFile $file) {
-                        return 'logo.' . $file->extension();
+                        return 'logo.'.$file->extension();
                     }),
                 FileUpload::make('favicon')
                     ->acceptedFileTypes(['image/ico', 'image/png', 'image/webp', 'image/jpg', 'image/jpeg'])
@@ -51,7 +51,7 @@ class SiteSettings extends TenantBaseSettings
                     ->maxSize(1_000)
                     ->required()
                     ->getUploadedFileNameForStorageUsing(static function (TemporaryUploadedFile $file) {
-                        return 'favicon.' . $file->extension();
+                        return 'favicon.'.$file->extension();
                     }),
                 TextInput::make('front_end_domain')
                     ->required()

@@ -10,8 +10,8 @@ use Illuminate\Support\Str;
 class CheckBoxFieldData extends FieldData
 {
     /**
-     * @param array<string> $rules
-     * @param array<string, OptionData> $options
+     * @param  array<string>  $rules
+     * @param  array<string, OptionData>  $options
      */
     public function __construct(
         public readonly string $title,
@@ -26,11 +26,11 @@ class CheckBoxFieldData extends FieldData
 
     public static function fromArray(array $data): self
     {
-        if ( ! $data['type'] instanceof FieldType) {
+        if (! $data['type'] instanceof FieldType) {
             $data['type'] = FieldType::from($data['type']);
         }
 
-        if ( ! empty($data['options'] ?? [])) {
+        if (! empty($data['options'] ?? [])) {
             $data['options'] = array_map(
                 fn (array $option) => OptionData::fromArray($option),
                 $data['options']
@@ -42,7 +42,7 @@ class CheckBoxFieldData extends FieldData
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             rules: $data['rules'] ?? [],
             options: $data['options'] ?? [],
-            bulk_toggleable:  $data['bulk_toggleable'] ?? false,
+            bulk_toggleable: $data['bulk_toggleable'] ?? false,
             helper_text: $data['helper_text'] ?? null,
         );
     }

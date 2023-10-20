@@ -43,7 +43,7 @@ it('can show a service', function () {
         ->isActive()
         ->createOne();
 
-    getJson('api/services/' . $service->getRouteKey())
+    getJson('api/services/'.$service->getRouteKey())
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($service) {
             $json
@@ -66,7 +66,7 @@ it('can filter services', function ($attribute) {
         ->create();
 
     foreach ($services as $service) {
-        getJson('api/services?' . http_build_query([
+        getJson('api/services?'.http_build_query([
             'filter' => [$attribute => $service->$attribute],
         ]))
             ->assertOk()

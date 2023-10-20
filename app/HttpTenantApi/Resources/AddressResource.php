@@ -14,7 +14,7 @@ class AddressResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
-        return  [
+        return [
             'label_as' => $this->label_as,
             'address_line_1' => $this->address_line_1,
             'zip_code' => $this->zip_code,

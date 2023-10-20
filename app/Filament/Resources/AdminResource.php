@@ -104,7 +104,7 @@ class AdminResource extends Resource
                                     'name',
                                     function (Builder $query) {
 
-                                        if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+                                        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
                                             return $query->where('guard_name', 'admin');
                                         }
 
@@ -159,7 +159,6 @@ class AdminResource extends Resource
                     ->query(function (Builder $query, array $data) {
                         $query->when(filled($data['value']), function (Builder $query) use ($data) {
                             /** @var Admin|Builder $query */
-
                             if ($data['value'] === 'no-roles') {
                                 $query->whereDoesntHave('roles');
 
@@ -237,7 +236,7 @@ class AdminResource extends Resource
                         ->authorize('sendPasswordReset')
                         ->withActivityLog(
                             event: 'password-reset-link-sent',
-                            description: fn (Admin $record) => $record->full_name . ' password reset sent'
+                            description: fn (Admin $record) => $record->full_name.' password reset sent'
                         ),
                     Impersonate::make()
                         ->guard('admin')
@@ -245,7 +244,7 @@ class AdminResource extends Resource
                         ->authorize('impersonate')
                         ->withActivityLog(
                             event: 'impersonated',
-                            description: fn (Admin $record) => $record->full_name . ' impersonated',
+                            description: fn (Admin $record) => $record->full_name.' impersonated',
                             causedBy: Auth::user()
                         ),
                 ]),

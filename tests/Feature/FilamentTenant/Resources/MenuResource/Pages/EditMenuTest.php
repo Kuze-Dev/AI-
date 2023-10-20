@@ -6,10 +6,10 @@ use App\FilamentTenant\Resources\MenuResource\Pages\EditMenu;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Menu\Database\Factories\MenuFactory;
 use Domain\Menu\Database\Factories\NodeFactory;
-use Domain\Site\Database\Factories\SiteFactory;
 use Domain\Menu\Enums\NodeType;
 use Domain\Menu\Enums\Target;
 use Domain\Menu\Models\Menu;
+use Domain\Site\Database\Factories\SiteFactory;
 use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;

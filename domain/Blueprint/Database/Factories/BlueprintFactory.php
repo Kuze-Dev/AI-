@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Blueprint\Database\Factories;
 
-use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Enums\FieldType;
+use Domain\Blueprint\Models\Blueprint;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -41,7 +41,7 @@ class BlueprintFactory extends Factory
     public function addSchemaSection(array $attributes = []): self
     {
         return $this->state(function (array $definition) use ($attributes) {
-            if ( ! isset($definition['schema']['sections'])) {
+            if (! isset($definition['schema']['sections'])) {
                 $definition['schema']['sections'] = [];
             }
 

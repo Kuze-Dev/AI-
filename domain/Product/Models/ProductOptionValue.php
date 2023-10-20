@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Product\Models;
 
-use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Product\Models\ProductOptionValue
@@ -18,6 +18,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property string $slug
  * @property int $product_option_id
  * @property-read \Domain\Product\Models\ProductOption|null $productOption
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue query()
@@ -25,12 +26,13 @@ use Spatie\Sluggable\SlugOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue whereProductOptionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue whereSlug($value)
+ *
  * @mixin \Eloquent
  */
 class ProductOptionValue extends Model
 {
-    use HasSlug;
     use ConstraintsRelationships;
+    use HasSlug;
 
     public $timestamps = false;
 

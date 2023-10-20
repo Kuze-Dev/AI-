@@ -16,7 +16,7 @@ class PaymentMethodResource extends JsonApiResource
     {
         $image = $this->getFirstMedia('logo');
 
-        return  [
+        return [
             'name' => $this->title,
             'slug' => $this->slug,
             'subtitle' => $this->subtitle,

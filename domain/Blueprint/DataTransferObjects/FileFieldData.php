@@ -10,8 +10,8 @@ use Illuminate\Support\Str;
 class FileFieldData extends FieldData
 {
     /**
-     * @param array<string> $rules
-     * @param array<string> $accept
+     * @param  array<string>  $rules
+     * @param  array<string>  $accept
      */
     private function __construct(
         public readonly string $title,
@@ -32,7 +32,7 @@ class FileFieldData extends FieldData
 
     public static function fromArray(array $data): self
     {
-        if ( ! $data['type'] instanceof FieldType) {
+        if (! $data['type'] instanceof FieldType) {
             $data['type'] = FieldType::from($data['type']);
         }
 

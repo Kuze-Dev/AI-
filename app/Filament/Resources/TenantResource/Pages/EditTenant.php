@@ -63,7 +63,8 @@ class EditTenant extends EditRecord
     }
 
     /**
-     * @param Tenant $record
+     * @param  Tenant  $record
+     *
      * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model

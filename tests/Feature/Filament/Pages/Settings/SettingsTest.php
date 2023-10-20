@@ -15,6 +15,6 @@ it('can render page', function () {
 });
 
 it('can render page by groups', function (string $settingClass) {
-    get(Settings::getUrl() . '/' . $settingClass::group())
+    get(Settings::getUrl().'/'.$settingClass::group())
         ->assertOk();
 })->with([SiteSettings::class]);

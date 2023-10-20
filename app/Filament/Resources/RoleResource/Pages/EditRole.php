@@ -39,6 +39,7 @@ class EditRole extends EditRecord
 
     /**
      * @param  \Domain\Role\Models\Role  $record
+     *
      * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Tenant\ShippingMethod;
 
-use Domain\ShippingMethod\Enums\Driver;
-use Illuminate\Database\Seeder;
 use Domain\Shipment\Enums\BoxTypeEnum;
 use Domain\Shipment\Enums\UnitEnum;
 use Domain\Shipment\Models\ShippingBox;
+use Domain\ShippingMethod\Enums\Driver;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class ShippingBoxSeeder extends Seeder

@@ -32,6 +32,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property-read int|null $countries_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, State> $states
  * @property-read int|null $states_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|TaxZone newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TaxZone newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TaxZone query()
@@ -44,12 +45,13 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @method static \Illuminate\Database\Eloquent\Builder|TaxZone wherePriceDisplay($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TaxZone whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TaxZone whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class TaxZone extends Model
 {
-    use LogsActivity;
     use ConstraintsRelationships;
+    use LogsActivity;
 
     protected $fillable = [
         'name',

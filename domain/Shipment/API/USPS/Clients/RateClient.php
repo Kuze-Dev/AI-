@@ -15,7 +15,7 @@ class RateClient extends BaseClient
 {
     public static function uri(): string
     {
-        return'ShippingAPI.dll';
+        return 'ShippingAPI.dll';
     }
 
     public function getV4(RateV4RequestData $requestData): RateV4ResponseData

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Domain\Favorite\Database\Factories\FavoriteFactory;
 use Domain\Customer\Database\Factories\CustomerFactory;
+use Domain\Favorite\Database\Factories\FavoriteFactory;
 use Domain\Product\Database\Factories\ProductFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
 
@@ -21,7 +21,7 @@ beforeEach(function () {
 
     $favorite = FavoriteFactory::new()->setCustomerId($customer->id)->setProductId($product->id)->createOne();
 
-    withHeader('Authorization', 'Bearer ' . $customer
+    withHeader('Authorization', 'Bearer '.$customer
         ->createToken('testing-auth')
         ->plainTextToken);
 
@@ -36,7 +36,7 @@ it('can show favorite with includes', function (string $include) {
     // $response =  getJson('api/favorites?' . http_build_query(['include' => $include]));
     // dd($response->json());
 
-    getJson('api/favorites?' . http_build_query(['include' => $include]))
+    getJson('api/favorites?'.http_build_query(['include' => $include]))
         ->assertValid()
         ->assertJson(function (AssertableJson $json) use ($favorite, $product) {
             $json
@@ -71,7 +71,7 @@ it('can store favorite', function () {
 });
 
 it('can delete favorite', function () {
-    deleteJson('api/favorites/' . $this->favorite->product_id)
+    deleteJson('api/favorites/'.$this->favorite->product_id)
         ->assertValid();
 
     $this->assertDatabaseMissing('favorites', ['id' => $this->favorite->id]);

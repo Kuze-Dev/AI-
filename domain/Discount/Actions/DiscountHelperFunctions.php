@@ -68,7 +68,7 @@ final class DiscountHelperFunctions
             ],
             'grandTotal' => [
                 'condition' => $grandTotal < $discountAmount->minimum_amount,
-                'message' => 'You need to purchase at least ' . $discountAmount->minimum_amount . ' to apply this discount',
+                'message' => 'You need to purchase at least '.$discountAmount->minimum_amount.' to apply this discount',
             ],
         ];
 

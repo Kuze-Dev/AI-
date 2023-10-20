@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Support\RouteUrl\Models;
 
+use Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Eloquent;
 use Stringable;
 
 /**
@@ -20,6 +20,7 @@ use Stringable;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Model|Eloquent $model
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|RouteUrl newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|RouteUrl newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|RouteUrl query()
@@ -30,6 +31,7 @@ use Stringable;
  * @method static \Illuminate\Database\Eloquent\Builder|RouteUrl whereModelType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|RouteUrl whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|RouteUrl whereUrl($value)
+ *
  * @mixin Eloquent
  */
 class RouteUrl extends Model implements Stringable

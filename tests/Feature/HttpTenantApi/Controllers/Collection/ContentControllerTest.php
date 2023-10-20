@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-use Illuminate\Testing\Fluent\AssertableJson;
-use Domain\Site\Database\Factories\SiteFactory;
 use Domain\Content\Database\Factories\ContentFactory;
-
+use Domain\Site\Database\Factories\SiteFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
+use Illuminate\Testing\Fluent\AssertableJson;
 
 use function Pest\Laravel\getJson;
 
@@ -36,7 +35,7 @@ it('can show a content', function () {
         ->withDummyBlueprint()
         ->createOne();
 
-    getJson('api/contents/' . $content->getRouteKey())
+    getJson('api/contents/'.$content->getRouteKey())
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($content) {
             $json
@@ -56,7 +55,7 @@ it('can show a content with includes', function (string $include) {
         )
         ->createOne();
 
-    getJson("api/contents/{$content->getRouteKey()}?" . http_build_query(['include' => $include]))
+    getJson("api/contents/{$content->getRouteKey()}?".http_build_query(['include' => $include]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($content, $include) {
             $json

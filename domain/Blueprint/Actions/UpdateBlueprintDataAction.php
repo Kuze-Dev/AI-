@@ -31,7 +31,7 @@ class UpdateBlueprintDataAction
             return;
         }
 
-        if( ! $model->data) {
+        if (! $model->data) {
             return;
         }
 
@@ -44,14 +44,14 @@ class UpdateBlueprintDataAction
                 $combinedArray[$sectionKey][$fieldKey] = $this->extractDataAction->mergeFields($fieldValue, $model->data[$sectionKey][$fieldKey], $fieldValue['statepath']);
             }
         }
-        foreach($combinedArray as $section) {
-            foreach($section as $field) {
+        foreach ($combinedArray as $section) {
+            foreach ($section as $field) {
                 $data[] = $this->extractDataAction->processRepeaterField($field);
             }
         }
 
         $flattenData = $this->extractDataAction->flattenArray($data);
-        foreach($flattenData as $arrayData) {
+        foreach ($flattenData as $arrayData) {
             $this->updateBlueprintData(BlueprintDataData::fromArray($model, $arrayData));
         }
 
@@ -61,13 +61,13 @@ class UpdateBlueprintDataAction
     {
 
         $blueprintData = BlueprintData::where('model_id', $blueprintDataData->model_id)->where('state_path', $blueprintDataData->state_path)->first();
-        if( ! $blueprintData) {
+        if (! $blueprintData) {
             return new BlueprintData();
         }
 
         if ($blueprintData->type == FieldType::MEDIA->value) {
 
-            if( ! $blueprintDataData->value) {
+            if (! $blueprintDataData->value) {
                 return $blueprintData;
             }
 
@@ -75,7 +75,7 @@ class UpdateBlueprintDataAction
                 $toUpload = $blueprintDataData->value;
                 $currentUploaded = $blueprintDataData->value;
 
-                #filter array with value that has filename extension
+                //filter array with value that has filename extension
 
                 $filtered = array_filter($toUpload, function ($value) {
                     $pathInfo = pathinfo($value);
@@ -84,17 +84,17 @@ class UpdateBlueprintDataAction
                     }
                 });
 
-                # filter $blueprintDataData->value array with value that has no filename extension
+                // filter $blueprintDataData->value array with value that has no filename extension
 
                 $currentMedia = array_filter($currentUploaded, function ($value) {
                     $pathInfo = pathinfo($value);
 
-                    if ( ! array_key_exists('extension', $pathInfo)) {
+                    if (! array_key_exists('extension', $pathInfo)) {
                         return $value;
                     }
                 });
 
-                foreach($filtered as $image) {
+                foreach ($filtered as $image) {
                     $blueprintData->addMediaFromDisk($image, 's3')
                         ->toMediaCollection('blueprint_media');
 

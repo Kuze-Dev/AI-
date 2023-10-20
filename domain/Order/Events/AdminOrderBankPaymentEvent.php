@@ -13,7 +13,9 @@ class AdminOrderBankPaymentEvent
     use SerializesModels;
 
     public Customer $customer;
+
     public Order $order;
+
     public string $paymentRemarks;
 
     public function __construct(

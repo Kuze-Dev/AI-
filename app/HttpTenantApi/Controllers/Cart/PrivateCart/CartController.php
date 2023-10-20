@@ -12,9 +12,9 @@ use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\Tier\Models\Tier;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
@@ -78,7 +78,7 @@ class CartController extends Controller
         $result = app(DestroyCartAction::class)
             ->execute($cart);
 
-        if ( ! $result) {
+        if (! $result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

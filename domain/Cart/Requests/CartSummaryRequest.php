@@ -10,9 +10,9 @@ use Domain\Address\Models\State;
 use Domain\Cart\Helpers\PrivateCart\CartLineQuery;
 use Domain\Discount\Models\Discount;
 use Domain\ShippingMethod\Models\ShippingMethod;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Database\Eloquent\Collection;
 
 class CartSummaryRequest extends FormRequest
 {
@@ -77,7 +77,6 @@ class CartSummaryRequest extends FormRequest
         return $this->cartLinesCache;
     }
 
-    /** @return \Domain\Address\Models\Country|null */
     public function getCountry(): ?Country
     {
         if ($id = $this->validated('billing_address_id')) {

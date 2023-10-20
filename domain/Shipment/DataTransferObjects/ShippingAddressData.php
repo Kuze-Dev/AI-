@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\DataTransferObjects;
 
+use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
-use Domain\Address\Models\Address;
 
 class ShippingAddressData
 {

@@ -15,14 +15,15 @@ use Domain\Product\Models\ProductVariant;
 use Domain\Shipment\DataTransferObjects\ReceiverData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
-use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Validation\Rule;
 
 class GuestCartMobileSummaryRequest extends AddressRequest
 {
     /** @var \Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> */
     private Collection $cartLinesCache;
+
     private array $cartLineIds;
 
     public function rules(): array
@@ -86,7 +87,7 @@ class GuestCartMobileSummaryRequest extends AddressRequest
                     if (is_int($value) || is_string($value)) {
                         return true;
                     } else {
-                        $fail($attribute . ' is invalid.');
+                        $fail($attribute.' is invalid.');
                     }
                 },
             ],
@@ -110,7 +111,6 @@ class GuestCartMobileSummaryRequest extends AddressRequest
         return $this->cartLinesCache;
     }
 
-    /** @return \Domain\Address\Models\Country|null */
     public function getCountry(): ?Country
     {
         if ($id = $this->validated('billing_address')['country_id']) {

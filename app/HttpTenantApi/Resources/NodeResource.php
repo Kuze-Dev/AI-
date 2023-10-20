@@ -8,8 +8,8 @@ use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Domain\Page\Models\Page;
 use Illuminate\Http\Request;
-use TiMacDonald\JsonApi\JsonApiResource;
 use InvalidArgumentException;
+use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
  * @mixin \Domain\Menu\Models\Node
@@ -18,7 +18,7 @@ class NodeResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
-        return  [
+        return [
             'label' => $this->label,
             'url' => $this->url,
             'target' => $this->target,
@@ -34,7 +34,7 @@ class NodeResource extends JsonApiResource
         return [
             'children' => fn () => NodeResource::collection($this->children),
             'model' => function () {
-                if ( ! is_null($this->model)) {
+                if (! is_null($this->model)) {
                     return match ($this->model::class) {
                         Page::class => PageResource::make($this->model),
                         Content::class => ContentResource::make($this->model),

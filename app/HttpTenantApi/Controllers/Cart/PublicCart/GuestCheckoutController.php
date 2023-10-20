@@ -20,7 +20,7 @@ use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
     Resource('guest/carts/checkouts', apiResource: true, only: ['index', 'store'], names: 'guest.carts.checkouts'),
-    Middleware(['feature.tenant:' . AllowGuestOrder::class])
+    Middleware(['feature.tenant:'.AllowGuestOrder::class])
 ]
 class GuestCheckoutController
 {

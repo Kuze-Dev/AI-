@@ -40,7 +40,7 @@ class EditTaxZone extends EditRecord
         return $this->getCachedActions();
     }
 
-    /** @param TaxZone $record */
+    /** @param  TaxZone  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(fn () => app(UpdateTaxZoneAction::class)->execute($record, TaxZoneData::formArray($data)));

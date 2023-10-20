@@ -4,27 +4,27 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use Closure;
-use Exception;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Support\Str;
-use Domain\Site\Models\Site;
-use Filament\Resources\Form;
-use Filament\Resources\Table;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use App\FilamentTenant\Resources\FormResource\Pages;
+use App\FilamentTenant\Resources\FormResource\RelationManagers\FormSubmissionsRelationManager;
+use App\FilamentTenant\Support\SchemaInterpolations;
 use App\Settings\FormSettings;
-use Filament\Resources\Resource;
-use Illuminate\Support\Facades\Auth;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Closure;
 use Domain\Blueprint\Models\Blueprint;
-use Illuminate\Database\Eloquent\Builder;
 use Domain\Form\Models\Form as FormModel;
 use Domain\Internationalization\Models\Locale;
-use App\FilamentTenant\Resources\FormResource\Pages;
-use App\FilamentTenant\Support\SchemaInterpolations;
+use Domain\Site\Models\Site;
+use Exception;
+use Filament\Forms;
+use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationGroup;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Resources\FormResource\RelationManagers\FormSubmissionsRelationManager;
+use Filament\Resources\Resource;
+use Filament\Resources\Table;
+use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
 
 class FormResource extends Resource
@@ -114,7 +114,7 @@ class FormResource extends Resource
                                     ->toArray()
                             )
                             ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?FormModel $record): void {
-                                if ( ! $record) {
+                                if (! $record) {
                                     $component->state([]);
 
                                     return;
@@ -265,7 +265,7 @@ class FormResource extends Resource
                     ->icon('heroicon-s-mail')
                     ->color(fn (FormModel $record) => $record->store_submission ? 'success' : 'secondary'),
                 Tables\Columns\TagsColumn::make('sites.name')
-                    ->toggleable(isToggledHiddenByDefault:true),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -288,11 +288,11 @@ class FormResource extends Resource
     /** @return Builder<\Domain\Form\Models\Form> */
     public static function getEloquentQuery(): Builder
     {
-        if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
             return static::getModel()::query();
         }
 
-        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
             Auth::user()?->can('site.siteManager') &&
             ! (Auth::user()->hasRole(config('domain.role.super_admin')))
         ) {

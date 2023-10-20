@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Livewire\Auth;
 
+use Closure;
 use Domain\Auth\Actions\AuthenticateTwoFactorAction;
 use Domain\Auth\DataTransferObjects\TwoFactorData;
 use Filament\Facades\Filament;
@@ -17,7 +18,6 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\Redirector;
-use Closure;
 
 /**
  * @property \Filament\Forms\ComponentContainer $form
@@ -34,7 +34,7 @@ class TwoFactorAuthentication extends Component implements HasForms
 
     public function mount(): void
     {
-        if ( ! Session::has('login.id')) {
+        if (! Session::has('login.id')) {
             redirect()->intended(Filament::getUrl());
         }
 
@@ -50,7 +50,7 @@ class TwoFactorAuthentication extends Component implements HasForms
     {
         $result = app(AuthenticateTwoFactorAction::class)->execute($this->buildTwoFactorData());
 
-        if ( ! $result) {
+        if (! $result) {
             throw ValidationException::withMessages([
                 'code' => trans('Invalid code.'),
                 'recovery_code' => trans('Invalid code.'),

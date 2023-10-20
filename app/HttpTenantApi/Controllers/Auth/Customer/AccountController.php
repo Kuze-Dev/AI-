@@ -24,7 +24,7 @@ use Throwable;
 
 #[
     Prefix('account'),
-    Middleware(['auth:sanctum', 'feature.tenant:' . CustomerBase::class])
+    Middleware(['auth:sanctum', 'feature.tenant:'.CustomerBase::class])
 ]
 class AccountController extends Controller
 {
@@ -54,7 +54,7 @@ class AccountController extends Controller
                 'max:255',
             ],
             'gender' => ['required', Rule::enum(Gender::class)],
-            'mobile' => ['required', 'string' => 'max:255',  Rule::unique(Customer::class)->ignoreModel($customer), ],
+            'mobile' => ['required', 'string' => 'max:255',  Rule::unique(Customer::class)->ignoreModel($customer)],
             'birth_date' => 'required|date',
         ]);
 

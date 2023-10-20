@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Customer|null $customer
  * @property-read Product|null $product
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Favorite newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Favorite newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Favorite query()
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Favorite whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Favorite whereProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Favorite whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Favorite extends Model

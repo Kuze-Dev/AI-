@@ -8,12 +8,12 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\CustomerResource;
 use Domain\Customer\Actions\CreateCustomerAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
+use Exception;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Throwable;
-use Exception;
 
 class CreateCustomer extends CreateRecord
 {

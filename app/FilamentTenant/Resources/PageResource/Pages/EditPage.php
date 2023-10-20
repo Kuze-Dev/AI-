@@ -9,28 +9,28 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\PageResource;
 use App\Settings\CMSSettings;
 use App\Settings\SiteSettings;
-use Domain\Page\Actions\DeletePageAction;
 use Closure;
 use Domain\Page\Actions\CreatePageDraftAction;
+use Domain\Page\Actions\DeletePageAction;
 use Domain\Page\Actions\PublishedPageDraftAction;
 use Domain\Page\Actions\UpdatePageAction;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Domain\Site\Models\Site;
-use Filament\Pages\Actions;
-use Filament\Resources\Pages\EditRecord;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Throwable;
 use Exception;
 use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
+use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
-use Illuminate\Support\Facades\URL;
-use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use Livewire\Redirector;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Throwable;
 
 /**
  * @property \Domain\Page\Models\Page $record
@@ -59,7 +59,7 @@ class EditPage extends EditRecord
                     ->action('draft')
                     ->hidden(function () {
 
-                        if($this->record->draftable_id != null) {
+                        if ($this->record->draftable_id != null) {
                             return true;
                         }
 
@@ -105,7 +105,7 @@ class EditPage extends EditRecord
                     ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
                         $domain = $siteSettings->front_end_domain ?? $cmsSettings->front_end_domain;
 
-                        if ( ! $domain) {
+                        if (! $domain) {
                             return null;
                         }
 
@@ -211,7 +211,8 @@ class EditPage extends EditRecord
     }
 
     /**
-     * @param \Domain\Page\Models\Page $record
+     * @param  \Domain\Page\Models\Page  $record
+     *
      * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
@@ -281,9 +282,9 @@ class EditPage extends EditRecord
 
         $pageData = PageData::fromArray($data);
 
-        #check if page has existing draft
+        //check if page has existing draft
 
-        if( ! is_null($record->pageDraft)) {
+        if (! is_null($record->pageDraft)) {
 
             Notification::make()
                 ->danger()

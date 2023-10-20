@@ -8,9 +8,9 @@ use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Laravel\Sanctum\Console\Commands\PruneExpired as SanctumPruneExpired;
-use Support\Excel\Commands\PruneExcelCommand;
 use Spatie\Health\Commands\DispatchQueueCheckJobsCommand;
 use Spatie\Health\Commands\ScheduleCheckHeartbeatCommand;
+use Support\Excel\Commands\PruneExcelCommand;
 
 class Kernel extends ConsoleKernel
 {

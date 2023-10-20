@@ -40,7 +40,7 @@ class EditAdmin extends EditRecord
         return $this->getCachedActions();
     }
 
-    /** @param Admin $record
+    /** @param  Admin  $record
      * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model

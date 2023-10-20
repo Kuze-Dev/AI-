@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Filament\Facades\Filament;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
-use Domain\Content\Database\Factories\ContentFactory;
 use Domain\Content\Database\Factories\ContentEntryFactory;
+use Domain\Content\Database\Factories\ContentFactory;
+use Filament\Facades\Filament;
 
 beforeEach(function () {
     testInTenantContext();

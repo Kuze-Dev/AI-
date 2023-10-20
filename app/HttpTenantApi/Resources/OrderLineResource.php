@@ -16,7 +16,7 @@ class OrderLineResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
-        return  [
+        return [
             'purchasable_id' => $this->purchasable_id,
             'purchasable_sku' => $this->purchasable_sku,
             'name' => $this->name,
@@ -28,7 +28,7 @@ class OrderLineResource extends JsonApiResource
             'total' => number_format((float) $this->total, 2, '.', ','),
             'reviewed_at' => $this->reviewed_at,
             'purchasable' => function () {
-                if ( ! isset($this->purchasable_data['product'])) {
+                if (! isset($this->purchasable_data['product'])) {
                     /** @var array */
                     $productArray = $this->purchasable_data;
 

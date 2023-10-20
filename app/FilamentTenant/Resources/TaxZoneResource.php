@@ -143,7 +143,7 @@ class TaxZoneResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('percentage')
-                    ->formatStateUsing(fn (float $state) => $state . '%')
+                    ->formatStateUsing(fn (float $state) => $state.'%')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type')
                     ->formatStateUsing(fn (TaxZone $record) => match ($record->type) {

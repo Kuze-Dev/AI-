@@ -11,9 +11,6 @@ class SanitizeCartListener
 {
     /**
      * Handle the event.
-     *
-     * @param  \Domain\Cart\Events\SanitizeCartEvent  $event
-     * @return void
      */
     public function handle(SanitizeCartEvent $event): void
     {

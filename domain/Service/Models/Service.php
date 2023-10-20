@@ -14,14 +14,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
-use Support\MetaData\HasMetaData;
 use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
-use Spatie\MediaLibrary\HasMedia;
+use Support\MetaData\HasMetaData;
 use Support\MetaData\Models\MetaData;
 
 /**
@@ -52,6 +52,7 @@ use Support\MetaData\Models\MetaData;
  * @property-read MetaData|null $metaData
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Service newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Service newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Service onlyTrashed()
@@ -74,15 +75,16 @@ use Support\MetaData\Models\MetaData;
  * @method static \Illuminate\Database\Eloquent\Builder|Service whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Service withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Service withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['metaData, taxonomyTerms'])]
-class Service extends Model implements HasMetaDataContract, HasMedia
+class Service extends Model implements HasMedia, HasMetaDataContract
 {
-    use LogsActivity;
+    use ConstraintsRelationships;
     use HasMetaData;
     use InteractsWithMedia;
-    use ConstraintsRelationships;
+    use LogsActivity;
     use SoftDeletes;
 
     protected $fillable = [

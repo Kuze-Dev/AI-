@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Domain\Globals\Models;
 
-use Domain\Site\Traits\Sites;
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
-use Spatie\Activitylog\LogOptions;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Site\Traits\Sites;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
@@ -28,6 +28,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Blueprint $blueprint
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Globals newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Globals newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Globals query()
@@ -38,16 +39,18 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @method static \Illuminate\Database\Eloquent\Builder|Globals whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Globals whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Globals whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Globals extends Model
 {
-    use LogsActivity;
-    use HasSlug;
     use ConstraintsRelationships;
+    use HasSlug;
+    use LogsActivity;
     use Sites;
 
     protected $table = 'globals';
+
     /**
      * Declare columns
      * that are mass assignable.
@@ -63,7 +66,6 @@ class Globals extends Model
         'data' => 'array',
     ];
 
-    /** @return LogOptions */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -92,7 +94,6 @@ class Globals extends Model
         return 'slug';
     }
 
-    /** @return SlugOptions */
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()

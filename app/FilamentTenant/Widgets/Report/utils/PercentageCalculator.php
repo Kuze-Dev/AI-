@@ -26,7 +26,7 @@ class PercentageCalculator
         $formattedProductNames = [];
 
         for ($i = 0; $i < count($productNames); $i++) {
-            $formattedName = $productNames[$i] . ' ' . $percentages[$i] . '%';
+            $formattedName = $productNames[$i].' '.$percentages[$i].'%';
             $formattedProductNames[] = $formattedName;
         }
 

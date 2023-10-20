@@ -9,15 +9,19 @@ use Spatie\LaravelSettings\Settings;
 class ShippingSettings extends Settings
 {
     public bool $usps_production_mode;
+
     public bool $ups_production_mode;
 
     /** usps */
     public ?string $usps_username = null;
+
     public ?string $usps_password = null;
 
     /** ups */
     public ?string $ups_client_id = null;
+
     public ?string $ups_client_secret = null;
+
     public ?string $ups_shipper_account = null;
 
     /** auspost */

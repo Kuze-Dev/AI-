@@ -12,10 +12,10 @@ use Domain\Favorite\Models\Favorite;
 use Domain\Favorite\Requests\FavoriteStoreRequest;
 use Illuminate\Auth\AuthenticationException;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
-use Spatie\RouteAttributes\Attributes\Middleware;
 
 #[
     Resource('favorites', apiResource: true, except: ['update', 'show']),
@@ -26,7 +26,7 @@ class FavoriteController
     public function index(): JsonApiResourceCollection
     {
         $customer = auth()->user();
-        if ( ! $customer) {
+        if (! $customer) {
             throw new AuthenticationException();
         }
 
@@ -47,7 +47,7 @@ class FavoriteController
     public function store(FavoriteStoreRequest $request, CreateFavoriteAction $createFavoriteAction): JsonResponse
     {
         $customer = auth()->user();
-        if ( ! $customer) {
+        if (! $customer) {
             throw new AuthenticationException();
         }
 
@@ -68,7 +68,7 @@ class FavoriteController
     public function destroy(int $favorite, DestroyFavoriteAction $destroyFavoriteAction): JsonResponse
     {
         $customer = auth()->user();
-        if ( ! $customer) {
+        if (! $customer) {
             throw new AuthenticationException();
         }
 

@@ -8,11 +8,11 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ContentResource;
 use Domain\Content\Actions\CreateContentAction;
 use Domain\Content\DataTransferObjects\ContentData;
+use Domain\Content\Enums\PublishBehavior;
+use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Domain\Content\Enums\PublishBehavior;
-use Filament\Pages\Actions\Action;
 
 class CreateContent extends CreateRecord
 {

@@ -18,9 +18,6 @@ class OrderPaymentUpdatedListener
 {
     /**
      * Handle the event.
-     *
-     * @param  \Domain\Payments\Events\PaymentProcessEvent  $event
-     * @return void
      */
     public function handle(PaymentProcessEvent $event): void
     {

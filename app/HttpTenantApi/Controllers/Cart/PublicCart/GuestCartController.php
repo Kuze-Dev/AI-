@@ -13,15 +13,15 @@ use Domain\Cart\Helpers\PublicCart\AuthorizeGuestCart;
 use Domain\Cart\Models\Cart;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
-use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
 
 #[
     Resource('guest/carts', apiResource: true, only: ['index', 'destroy'], names: 'guest.carts'),
-    Middleware(['feature.tenant:' . AllowGuestOrder::class])
+    Middleware(['feature.tenant:'.AllowGuestOrder::class])
 ]
 class GuestCartController extends Controller
 {
@@ -63,14 +63,14 @@ class GuestCartController extends Controller
 
         $allowed = app(AuthorizeGuestCart::class)->execute($cart, $sessionId);
 
-        if ( ! $allowed) {
+        if (! $allowed) {
             abort(403);
         }
 
         $result = app(DestroyCartAction::class)
             ->execute($cart);
 
-        if ( ! $result) {
+        if (! $result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

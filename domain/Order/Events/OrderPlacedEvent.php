@@ -14,7 +14,9 @@ class OrderPlacedEvent
     use SerializesModels;
 
     public Order $order;
+
     public PreparedOrderData $preparedOrderData;
+
     public PlaceOrderData $placeOrderData;
 
     public function __construct(

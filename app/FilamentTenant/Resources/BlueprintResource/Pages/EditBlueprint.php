@@ -46,7 +46,7 @@ class EditBlueprint extends EditRecord
         return $this->getCachedActions();
     }
 
-    /** @param Blueprint $record */
+    /** @param  Blueprint  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(fn () => app(UpdateBlueprintAction::class)
@@ -62,12 +62,12 @@ class EditBlueprint extends EditRecord
     protected function afterSave(): void
     {
         $blueprinDataCollection = ModelsBlueprintData::where('blueprint_id', $this->record->getRouteKey())->with('media')->get();
-        foreach($blueprinDataCollection as $blueprintData) {
+        foreach ($blueprinDataCollection as $blueprintData) {
             $mediaCollection = $blueprintData->media;
             $sections = $this->record->getAttribute('schema')->sections;
             foreach ($sections as $section) {
                 foreach ($section->fields as $field) {
-                    $this->extractSchema($field, $section->state_name, $blueprintData->state_path,  $mediaCollection);
+                    $this->extractSchema($field, $section->state_name, $blueprintData->state_path, $mediaCollection);
                 }
             }
         }
@@ -81,43 +81,39 @@ class EditBlueprint extends EditRecord
     }
 
     /**
-     * @param RepeaterFieldData|FieldData $field
-     * @param string $currentpath
-     * @param string $state_path
-     * @param \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $mediaCollection
-     * @return void
+     * @param  \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media>  $mediaCollection
      */
     protected function extractSchema(RepeaterFieldData|FieldData $field, string $currentpath, string $state_path, MediaCollection $mediaCollection): void
     {
 
-        $statePath = $currentpath . '.' . $field->state_name;
-        if($field->type === FieldType::REPEATER) {
+        $statePath = $currentpath.'.'.$field->state_name;
+        if ($field->type === FieldType::REPEATER) {
             if (property_exists($field, 'fields') && is_array($field->fields)) {
-                foreach($field->fields as $repeaterFields) {
+                foreach ($field->fields as $repeaterFields) {
                     $this->extractSchema($repeaterFields, $statePath, $state_path, $mediaCollection);
                 }
             }
         }
         if ($field->type === FieldType::MEDIA) {
             $arrayStatepath = explode('.', $state_path);
-            foreach($arrayStatepath as $newStatepath) {
-                if(is_numeric($newStatepath)) {
+            foreach ($arrayStatepath as $newStatepath) {
+                if (is_numeric($newStatepath)) {
                     $arrayStatepath = array_diff($arrayStatepath, [$newStatepath]);
                 }
             }
             $newStatepath = implode('.', $arrayStatepath);
             if ($statePath === $newStatepath) {
                 $newMediaConversion = [];
-                foreach($mediaCollection as $media) {
-                    if(property_exists($field, 'conversions')) {
-                        foreach($field->conversions as $conversion) {
-                            if(array_key_exists($conversion->name, $media->generated_conversions)) {
+                foreach ($mediaCollection as $media) {
+                    if (property_exists($field, 'conversions')) {
+                        foreach ($field->conversions as $conversion) {
+                            if (array_key_exists($conversion->name, $media->generated_conversions)) {
                                 $newMediaConversion[$conversion->name] = true;
                             }
                         }
                     }
                 }
-                foreach($mediaCollection as $media) {
+                foreach ($mediaCollection as $media) {
                     $media->generated_conversions = $newMediaConversion;
                     $media->save();
                 }

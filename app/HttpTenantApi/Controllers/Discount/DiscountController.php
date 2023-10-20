@@ -16,7 +16,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('discounts', only: ['index', 'show']),
-    Middleware('feature.tenant:' . ECommerceBase::class)
+    Middleware('feature.tenant:'.ECommerceBase::class)
 ]
 class DiscountController extends Controller
 {

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use Illuminate\Auth\Access\Response;
-use Illuminate\Foundation\Auth\User;
 use App\Features\CMS\SitesManagement;
 use App\Policies\Concerns\ChecksWildcardPermissions;
+use Illuminate\Auth\Access\Response;
+use Illuminate\Foundation\Auth\User;
 
 class SitePolicy
 {

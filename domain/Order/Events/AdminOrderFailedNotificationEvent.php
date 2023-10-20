@@ -11,6 +11,7 @@ class AdminOrderFailedNotificationEvent
     use SerializesModels;
 
     public string $body;
+
     public string $permission;
 
     public function __construct(

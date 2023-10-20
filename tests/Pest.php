@@ -11,9 +11,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\ParallelTesting;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Fixtures\User;
 
@@ -33,7 +33,7 @@ uses(
         }
 
         Event::listen(MigrationsEnded::class, function () {
-            if ( ! tenancy()->initialized) {
+            if (! tenancy()->initialized) {
                 seed([
                     PermissionSeeder::class,
                     RoleSeeder::class,

@@ -8,13 +8,13 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\PaymentMethodResource;
 use Domain\PaymentMethod\Actions\UpdatePaymentMethodAction;
 use Domain\PaymentMethod\DataTransferObjects\PaymentMethodData;
+use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\Payments\Actions\GetAvailablePaymentDriverAction;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Domain\PaymentMethod\Models\PaymentMethod;
-use Domain\Payments\Actions\GetAvailablePaymentDriverAction;
 use Throwable;
 
 class EditPaymentMethod extends EditRecord
@@ -51,7 +51,8 @@ class EditPaymentMethod extends EditRecord
     }
 
     /**
-     * @param PaymentMethod $record
+     * @param  PaymentMethod  $record
+     *
      * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model

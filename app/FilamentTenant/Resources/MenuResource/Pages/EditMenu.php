@@ -36,7 +36,7 @@ class EditMenu extends EditRecord
         return $this->getCachedActions();
     }
 
-    /** @param \Domain\Menu\Models\Menu $record */
+    /** @param  \Domain\Menu\Models\Menu  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(fn () => app(UpdateMenuAction::class)->execute($record, MenuData::fromArray($data)));

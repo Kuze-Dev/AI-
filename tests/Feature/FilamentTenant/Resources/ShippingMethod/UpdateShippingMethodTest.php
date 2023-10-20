@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Features\ECommerce\ECommerceBase;
+use App\Features\ECommerce\ShippingStorePickup;
 use App\FilamentTenant\Resources\ShippingmethodResource\Pages\EditShippingmethod;
 use Domain\Address\Database\Factories\StateFactory;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use Domain\ShippingMethod\Models\ShippingMethod;
-use App\Features\ECommerce\ECommerceBase;
-use App\Features\ECommerce\ShippingStorePickup;
 use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;

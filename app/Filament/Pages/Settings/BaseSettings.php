@@ -6,12 +6,12 @@ namespace App\Filament\Pages\Settings;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\Filament\Resources\RoleResource\Support\PermissionGroup;
-use Filament\Pages\SettingsPage;
-use Illuminate\Support\Facades\Route;
 use Closure;
 use Filament\Pages\Actions\Action;
+use Filament\Pages\SettingsPage;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
@@ -63,11 +63,11 @@ abstract class BaseSettings extends SettingsPage
             return true;
         }
 
-        if ( ! PermissionGroup::make($settingsPermissions)->getParts()->contains(self::getSlug())) {
+        if (! PermissionGroup::make($settingsPermissions)->getParts()->contains(self::getSlug())) {
             return true;
         }
 
-        return Auth::user()?->can('settings.' . self::getSlug()) ?? false;
+        return Auth::user()?->can('settings.'.self::getSlug()) ?? false;
     }
 
     public static function getSlug(): string
@@ -77,7 +77,7 @@ abstract class BaseSettings extends SettingsPage
 
     public static function getRouteName(): string
     {
-        return 'filament.pages.settings.' . self::getSlug();
+        return 'filament.pages.settings.'.self::getSlug();
     }
 
     protected function getBreadcrumb(): Htmlable|string
@@ -100,9 +100,9 @@ abstract class BaseSettings extends SettingsPage
         return function () {
             $slug = self::getSlug();
 
-            Route::get('settings/' . $slug, static::class)
+            Route::get('settings/'.$slug, static::class)
                 ->middleware(static::getMiddlewares())
-                ->name('settings.' . $slug);
+                ->name('settings.'.$slug);
         };
     }
 }

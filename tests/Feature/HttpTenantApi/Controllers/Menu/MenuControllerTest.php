@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-use Illuminate\Testing\Fluent\AssertableJson;
 use Domain\Menu\Database\Factories\MenuFactory;
 use Domain\Menu\Database\Factories\NodeFactory;
-
 use Domain\Site\Database\Factories\SiteFactory;
+use Illuminate\Testing\Fluent\AssertableJson;
 
 use function Pest\Laravel\getJson;
 
@@ -48,7 +47,7 @@ it('can filter pages', function ($attribute) {
         ->create();
 
     foreach ($menus as $menu) {
-        getJson('api/menus?' . http_build_query(['filter' => [$attribute => $menu->$attribute]]))
+        getJson('api/menus?'.http_build_query(['filter' => [$attribute => $menu->$attribute]]))
             ->assertOk()
             ->assertJson(function (AssertableJson $json) use ($menu) {
                 $json
@@ -69,7 +68,7 @@ it('can show menu', function () {
         )
         ->createOne(['name' => 'Test Main Menu']);
 
-    getJson('api/menus/' . $menu->getRouteKey())
+    getJson('api/menus/'.$menu->getRouteKey())
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($menu) {
             $json
@@ -88,7 +87,7 @@ it('can show menu with includes', function (string $include) {
         )
         ->createOne(['name' => 'Test Main Menu']);
 
-    getJson("api/menus/{$menu->getRouteKey()}?" . http_build_query(['include' => $include]))
+    getJson("api/menus/{$menu->getRouteKey()}?".http_build_query(['include' => $include]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($menu, $include) {
             $json

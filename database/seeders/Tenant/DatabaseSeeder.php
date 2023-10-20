@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             Tier\TierSeeder::class,
         ]);
 
-        if ( ! app()->runningUnitTests()) {
+        if (! app()->runningUnitTests()) {
             $this->call([
                 Address\CountrySeeder::class,
                 DiscountSeeder::class,

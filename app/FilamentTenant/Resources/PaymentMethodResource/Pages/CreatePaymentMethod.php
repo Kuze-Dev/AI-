@@ -8,8 +8,8 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\PaymentMethodResource;
 use Domain\PaymentMethod\Actions\CreatePaymentMethodAction;
 use Domain\PaymentMethod\DataTransferObjects\PaymentMethodData;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Pages\Actions\Action;
+use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
