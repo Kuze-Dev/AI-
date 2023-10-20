@@ -23,6 +23,7 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Throwable;
 use Exception;
 use Filament\Notifications\Notification;
+use Illuminate\Http\RedirectResponse;
 use Livewire\Redirector;
 
 class EditCustomer extends EditRecord
@@ -89,10 +90,11 @@ class EditCustomer extends EditRecord
         );
     }
 
-    public function deleteIfRejectedCustomer(): Redirector
+    public function deleteIfRejectedCustomer(): Redirector|RedirectResponse
     {
         $data = $this->form->getState();
 
+        /** @var \Domain\Customer\Models\Customer $record */
         $record = $this->record;
 
         if($data['tier_approval_status'] === TierApprovalStatus::REJECTED->value) {
