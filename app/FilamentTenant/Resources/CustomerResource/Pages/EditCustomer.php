@@ -10,6 +10,7 @@ use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Actions\EditCustomerAction;
 use Domain\Customer\Actions\ForceDeleteCustomerAction;
 use Domain\Customer\Actions\RestoreCustomerAction;
+use Domain\Customer\Actions\SendRejectedEmailAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Enums\TierApprovalStatus;
@@ -35,7 +36,7 @@ class EditCustomer extends EditRecord
     {
         return [
 
-            Action::make('deleteIfRejectedCustomer')
+            Action::make('save')
                 ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->requiresConfirmation(function ($livewire) {
 
@@ -43,14 +44,10 @@ class EditCustomer extends EditRecord
 
                 })
                 ->modalHeading(fn ($livewire) => $livewire->data['tier_approval_status'] ? 'Warning' : null)
-                ->modalSubheading(fn ($livewire) => $livewire->data['tier_approval_status'] ? 'The Suspend Option is enabled Please Proceed with Caution. would  you like to continue?' : null)
-                ->action('deleteIfRejectedCustomer')
+                ->modalSubheading(fn ($livewire) => $livewire->data['tier_approval_status'] ? 'Rejecting will delete this customer. Would  you like to continue?' : null)
+                ->action(fn ($livewire) => $livewire->data['tier_approval_status'] == TierApprovalStatus::REJECTED->value ? $this->deleteIfRejectedCustomer() : $this->save())
                 ->keyBindings(['mod+s']),
 
-            Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
-                ->action('save')
-                ->keyBindings(['mod+s']),
             Actions\DeleteAction::make()
                 ->using(function (Customer $record) {
                     try {
@@ -97,13 +94,17 @@ class EditCustomer extends EditRecord
         $data = $this->form->getState();
 
         $record = $this->record;
-        if($data['tier_approval_status'] == TierApprovalStatus::REJECTED->value){
+
+        if($data['tier_approval_status'] === TierApprovalStatus::REJECTED->value) {
+
             app(ForceDeleteCustomerAction::class)->execute($record);
 
             Notification::make()
-            ->warning()
-            ->title(trans('Customer Deleted'))
-            ->send();
+                ->warning()
+                ->title(trans('Customer Deleted'))
+                ->send();
+
+            app(SendRejectedEmailAction::class)->execute($record);
 
             return redirect(CustomerResource::getUrl('index'));
         }
