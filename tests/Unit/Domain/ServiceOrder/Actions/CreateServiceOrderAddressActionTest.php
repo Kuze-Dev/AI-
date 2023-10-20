@@ -30,6 +30,7 @@ beforeEach(function () {
 
 it('can create service order addresses', function () {
     $service = ServiceFactory::new()
+        ->isActive()
         ->withDummyBlueprint()
         ->createOne();
 

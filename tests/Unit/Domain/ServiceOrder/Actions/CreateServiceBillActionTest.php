@@ -40,6 +40,7 @@ beforeEach(function () {
 
     $this->service_id = ServiceFactory::new()
         ->withDummyBlueprint()
+        ->isActive()
         ->createOne()
         ->id;
 });
@@ -66,7 +67,7 @@ it('can create', function () {
     assertInstanceOf(ServiceBill::class, $serviceBill);
 });
 
-it('can create will billing and due dates', function () {
+it('can create bill billing and due dates', function () {
     $serviceOrderData = new ServiceOrderData(
         customer_id: $this->customer_id,
         service_id: $this->service_id,
