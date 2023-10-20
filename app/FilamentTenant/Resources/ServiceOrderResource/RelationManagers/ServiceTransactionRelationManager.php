@@ -60,31 +60,35 @@ class ServiceTransactionRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\Action::make('print')
                     ->translateLabel()
-                    ->requiresConfirmation()
+                    // ->requiresConfirmation()
                     ->button()
                     ->icon('heroicon-o-download')
                     ->action(function (ServiceTransaction $record, Tables\Actions\Action $action) {
                         try {
                             /** @var \Illuminate\Support\Carbon $createdAt */
-                            $createdAt = $record->created_at->format('m_Y');
+                            $createdAt = $record->created_at;
+
+                            /** @var \Domain\Customer\Models\Customer $customer */
+                            $customer = $record->serviceOrder->customer;
 
                             $filename =
                                 $record->getKey().'-'.
                                 $record->serviceOrder
-                                    ->getKey().'-'.
-                                $record->serviceOrder
-                                    ->customer
+                                    ->getKey().
+                                $customer
                                     ->getKey().DIRECTORY_SEPARATOR.
                                 Str::snake(app(SiteSettings::class)->name).
                                 '_'.
-                                $createdAt.
+                                $createdAt->format('m_Y').
                                 '.pdf';
 
-                            Pdf::loadHTML(view('web.layouts.service-order.receipts.default', ['transaction' => $record])->render())
+                            Pdf::loadView(
+                                'web.layouts.service-order.receipts.default',
+                                ['transaction' => $record]
+                            )
                                 ->save($filename, 'receipt-files');
 
-                            $record->serviceOrder
-                                ->customer
+                            $customer
                                 ->addMedia(Storage::disk('receipt-files')->path($filename))
                                 ->toMediaCollection('receipts');
 

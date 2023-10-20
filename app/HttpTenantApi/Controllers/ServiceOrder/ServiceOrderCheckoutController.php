@@ -7,6 +7,7 @@ namespace App\HttpTenantApi\Controllers\ServiceOrder;
 use Domain\ServiceOrder\Actions\CheckoutServiceOrderAction;
 use Domain\ServiceOrder\Exceptions\InvalidServiceTransactionException;
 use Domain\ServiceOrder\Requests\ServiceTransactionStoreRequest;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -19,20 +20,32 @@ class ServiceOrderCheckoutController
 {
     public function store(ServiceTransactionStoreRequest $request, CheckoutServiceOrderAction $checkoutServiceOrderAction): JsonResponse
     {
-        $validatedData = $request->validated();
+        try {
+            $validatedData = $request->validated();
 
-        $data = $checkoutServiceOrderAction->execute($validatedData);
+            $data = $checkoutServiceOrderAction->execute($validatedData);
 
-        if ( ! $data) {
-            throw new InvalidServiceTransactionException();
+            if ( ! $data) {
+                throw new InvalidServiceTransactionException();
+            }
+
+            return response()->json(
+                [
+                    'message' => 'Proceed to payment',
+                    'data' => $data,
+                ],
+                201
+            );
+        } catch (InvalidServiceTransactionException) {
+            return response()->json([
+                'message' => 'Invalid Service Transaction',
+            ], 404);
+        } catch (Exception $e) {
+            info($e->getMessage());
+
+            return response()->json([
+                'message' => 'Something went wrong!',
+            ], 404);
         }
-
-        return response()->json(
-            [
-                'message' => 'Proceed to payment',
-                'data' => $data,
-            ],
-            201
-        );
     }
 }

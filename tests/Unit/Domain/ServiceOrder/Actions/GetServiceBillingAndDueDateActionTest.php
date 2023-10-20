@@ -23,7 +23,7 @@ $now = now();
 $dataSets = [
     /** daily billing cycle */
     [
-        BillingCycleEnum::DAILY,        // billing cycle
+        BillingCycleEnum::DAILY,    // billing cycle
         5,                          // current due date every
         $now->parse('2023-01-01'),  // ordered date
         $now->parse('2023-01-02'),  // current bill date
@@ -33,7 +33,7 @@ $dataSets = [
     ],
     /** monthly billing cycle */
     [
-        BillingCycleEnum::MONTHLY,      // billing cycle
+        BillingCycleEnum::MONTHLY,  // billing cycle
         13,                         // current due date every
         $now->parse('2023-01-31'),  // ordered date
         $now->parse('2023-02-28'),  // current bill date
@@ -42,7 +42,7 @@ $dataSets = [
         $now->parse('2023-04-10'),  // next due date
     ],
     [
-        BillingCycleEnum::MONTHLY,      // billing cycle
+        BillingCycleEnum::MONTHLY,  // billing cycle
         8,                          // current due date every
         $now->parse('2023-01-13'),  // ordered date
         $now->parse('2023-02-13'),  // current bill date
@@ -51,7 +51,7 @@ $dataSets = [
         $now->parse('2023-03-21'),  // next due date
     ],
     [
-        BillingCycleEnum::MONTHLY,      // billing cycle
+        BillingCycleEnum::MONTHLY,  // billing cycle
         15,                         // current due date every
         $now->parse('2023-03-28'),  // ordered date
         $now->parse('2023-04-28'),  // current bill date
@@ -61,7 +61,7 @@ $dataSets = [
     ],
     /** yearly billing cycle */
     [
-        BillingCycleEnum::YEARLY,       // billing cycle
+        BillingCycleEnum::YEARLY,   // billing cycle
         15,                         // current due date every
         $now->parse('2023-01-01'),  // ordered date
         $now->parse('2024-01-01'),  // current bill date
@@ -70,7 +70,7 @@ $dataSets = [
         $now->parse('2025-01-16'),  // next due date
     ],
     [
-        BillingCycleEnum::YEARLY,       // billing cycle
+        BillingCycleEnum::YEARLY,   // billing cycle
         16,                         // current due date every
         $now->parse('2024-02-29'),  // ordered date
         $now->parse('2025-02-28'),  // current bill date

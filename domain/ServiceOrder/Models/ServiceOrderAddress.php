@@ -6,6 +6,7 @@ namespace Domain\ServiceOrder\Models;
 
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
@@ -58,6 +59,26 @@ class ServiceOrderAddress extends Model
         'label_as' => AddressLabelAs::class,
         'type' => ServiceOrderAddressType::class,
     ];
+
+    /** @return Attribute<string, never> */
+    protected function fullAddress(): Attribute
+    {
+        return Attribute::get(
+            fn ($value): string => implode(
+                ' ',
+                array_filter(
+                    [
+                        $this->label_as->value.': ',
+                        $this->address_line_1,
+                        $this->city,
+                        $this->state,
+                        $this->country.', ',
+                        $this->zip_code,
+                    ]
+                )
+            )
+        );
+    }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ServiceOrder\Models\ServiceOrder, \Domain\ServiceOrder\Models\ServiceOrderAddress> */
     public function serviceOrder(): BelongsTo

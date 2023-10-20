@@ -1,75 +1,273 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Document</title>
 
-    <title>Halcyon Laravel | Tall Boilerplate</title>
+<style type="text/css">
+    @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700);
+    * {
+        font-family: "Open Sans", Arial, sans-serif;
+    }
+    table{
+        font-size: x-small;
+        margin: 0px auto;
+    }
+    tfoot tr td{
+        font-weight: bold;
+        font-size: x-small;
+    }
+    h2 {
+        color: #2F3843;
+    }
+    hr {
+        color: #B5BBC3;
+    }
+    hr {
+        background: #EBEEF1;
+        border: 0.5px solid #EBEEF1;
+    }
+    .gray {
+        color: #B5BBC3;
+    }
+    .blue {
+        color: #01648D;
+    }
+</style>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap" rel="stylesheet">
-
-    @vite('resources/css/web/app.css')
 </head>
+<body>
 
-<body class="bg-gradient-to-r from-gray-100 via-white to-gray-100">
+  <table width="90%">
+    <tr>
+        <td valign="top">
+            <h1>{{ app(\App\Settings\SiteSettings::class)->name }}</h1>
+        </td>
+        <td align="right">
+            <img src="{{ app(\App\Settings\SiteSettings::class)->logo }}" alt=""/>
+        </td>
+    </tr>
+    <tr>
+        <td><br></td>
+    </tr>
+    <tr>
+        <td><br></td>
+    </tr>
+    <tr>
+        <td valign="top">
+            <h3 class="gray">{{ trans('Receipt for') }}</h3>
+            <h2>
+                {{
+                    $transaction->serviceOrder
+                        ->customer_first_name.
+                    " ".
+                    $transaction->serviceOrder
+                        ->customer_last_name
+                }}
+            </h2>
+        </td>
+        <td align="right">
+            <h3 class="gray">{{ trans('Date') }}</h3>
+            <h2>
+                {{
+                    $transaction->created_at
+                        ->format('M. d, Y')
+                }}
+            </h2>
+        </td>
+    </tr>
+    <tr>
+        <td><br></td>
+    </tr>
+    <tr>
+        <td colspan="2"><hr></td>
+    </tr>
+  </table>
+
+  <table width="90%">
+    <tr>
+        <td><br></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <h2 class="blue">
+                {{ trans('Service Summary') }}
+            </h2>
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><h3 class="gray">{{ trans('Description') }}</h3></td>
+        <td align="right">
+            <h3 class="gray">{{ trans('Amount') }}</h3>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"><hr></td>
+    </tr>
+    <tr>
+        <td>
+            <h3>
+                {{
+                    $transaction->serviceOrder
+                        ->service_name
+                }}
+            </h3>
+        </td>
+        @php
+            $service_price = money(
+                $transaction->serviceBill
+                    ->service_price
+            )
+            ->multiply(100);
+
+            $total_amount = money(
+                $transaction->serviceBill
+                    ->total_amount
+            )
+            ->multiply(100);
+        @endphp
+        <td align="right">
+            {{
+                money(
+                    $service_price,
+                    $transaction->serviceOrder
+                        ->currency_code
+                )
+                    ->format()
+            }}
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"><hr></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td scope="row" align="right">{{ trans('Subtotal') }}</td>
+        <td align="right">
+            <strong>
+                {{
+                    money(
+                        $service_price,
+                        $transaction->serviceOrder
+                            ->currency_code
+                    )
+                        ->format()
+                }}
+            </strong>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"><hr></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td scope="row" align="right">{{ trans('Additional Charges') }}</td>
+        <td align="right">
+            <strong>
+                {{
+                    money(
+                        $transaction->serviceBill
+                            ->getTotalAdditionalCharges->multiply(100),
+                        $transaction->serviceOrder
+                            ->currency_code
+                    )->format()
+                }}
+            </strong>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"><hr></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td scope="row" align="right">{{ trans('Tax') }}</td>
+        <td align="right"><strong>$9.99</strong></td>
+    </tr>
+    <tr>
+        <td scope="row" colspan="2"><hr></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td scope="row" align="right">{{ trans('Total') }}</td>
+        <td align="right">
+            <strong class="blue">
+                {{
+                    money(
+                        $total_amount,
+                        $transaction->serviceOrder
+                            ->currency_code
+                    )
+                        ->format()
+                }}
+            </strong>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"><br></td>
+    </tr>
+    <tr>
+        <td colspan="2"><hr></td>
+    </tr>
+  </table>
+
+  <table width="90%">
+    <tr>
+        <tr>
+            <td colspan="2">
+                <h2 class="blue">
+                    {{ trans('Payment Details') }}
+                </h2>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><h3 class="gray">{{ trans('Payment Method') }}</h3></td>
+            <td align="right">
+                <h3 class="gray">{{ trans('Amount') }}</h3>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><hr></td>
+        </tr>
+        <tr>
+            <td>
+                <h3>
+                    {{
+                        $transaction->payment_method
+                            ->title
+                    }}
+                </h3>
+            </td>
+            @php
+                $total_amount = money(
+                    $transaction->total_amount
+                )
+                ->multiply(100);
+            @endphp
+            <td align="right">
+                <strong>
+                    {{
+                        money(
+                            $total_amount,
+                            $transaction->currency
+                        )
+                            ->format()
+                    }}
+                </strong>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td align="right" class="blue"><strong>{{ trans('PAID') }}</strong></td>
+        </tr>
+    </tr>
+    <tr>
+  </table>
 
 </body>
-<div class="bg-white rounded-lg shadow-lg px-8 py-10 max-w-xl mx-auto">
-    <div class="flex items-center justify-between mb-8">
-        <div class="flex items-center">
-            <img class="h-8 w-8 mr-2" src="{{ app(\App\Settings\SiteSettings::class)->logo }}"
-                alt="Logo" />
-            <div class="text-gray-700 font-semibold text-lg">{{ app(\App\Settings\SiteSettings::class)->name }}</div>
-        </div>
-        <div class="text-gray-700">
-            <div class="font-bold text-xl mb-2">{{ trans('RECEIPT') }}</div>
-            {{--TODO <div class="text-sm">{{  trans('DATE ') . $transaction->created_at->toDateString() }} </div>
-            <div class="text-sm">{{ trans('Receipt') . '#: ' . $transaction->id }}</div> --}}
-        </div>
-    </div>
-    <div class="border-b-2 border-gray-300 pb-8 mb-8">
-        <h2 class="text-2xl font-bold mb-4">Customer:</h2>
-        {{-- <div class="text-gray-700 mb-2">{{ $service_order->customer_first_name }}</div> --}}
-        {{-- <div class="text-gray-700 mb-2">{{ $transaction->serviceOrder->customer_email }}</div> --}}
-        {{-- <div class="text-gray-700 mb-2">{{ $transaction->serviceOrder->serviceBillingAddress()->id }}</div> --}}
-    </div>
-    <table class="w-full text-left mb-8">
-        <thead>
-            <tr>
-                <th class="text-gray-700 font-bold uppercase py-2">Service Bill Ref.</th>
-                <th class="text-gray-700 font-bold uppercase py-2">Amount</th>
-                <th class="text-gray-700 font-bold uppercase py-2">Payment Method</th>
-                <th class="text-gray-700 font-bold uppercase py-2">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td class="py-4 text-gray-700">Product 1</td>
-                <td class="py-4 text-gray-700">1</td>
-                <td class="py-4 text-gray-700">$100.00</td>
-                <td class="py-4 text-gray-700">$100.00</td>
-            </tr>
-        </tbody>
-    </table>
-    <div class="flex justify-end mb-8">
-        <div class="text-gray-700 mr-2">Subtotal:</div>
-        <div class="text-gray-700">$425.00</div>
-    </div>
-    <div class="text-right mb-8">
-        <div class="text-gray-700 mr-2">Tax:</div>
-        <div class="text-gray-700">$25.50</div>
-
-    </div>
-    <div class="flex justify-end mb-8">
-        <div class="text-gray-700 mr-2">Total:</div>
-        <div class="text-gray-700 font-bold text-xl">$450.50</div>
-    </div>
-    <div class="border-t-2 border-gray-300 pt-8 mb-8">
-        <div class="text-gray-700 mb-2">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sint, repellendus!.</div>
-    </div>
-</div>
 </html>

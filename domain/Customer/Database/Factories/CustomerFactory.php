@@ -97,4 +97,9 @@ class CustomerFactory extends Factory
     {
         return $this->state(['register_status' => RegisterStatus::UNREGISTERED]);
     }
+
+    public function withAddress(): self
+    {
+        return $this->has(AddressFactory::new());
+    }
 }

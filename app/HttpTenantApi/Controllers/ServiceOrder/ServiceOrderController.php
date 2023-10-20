@@ -16,6 +16,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
+use Exception;
 
 #[
     ApiResource('service-order', except: ['destroy']),
@@ -40,22 +41,32 @@ class ServiceOrderController
 
     public function store(ServiceOrderStoreRequest $request, PlaceServiceOrderAction $placeServiceOrderAction): JsonResponse
     {
-        $validatedData = $request->validated();
+        try {
+            $validatedData = $request->validated();
 
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
+            /** @var \Domain\Customer\Models\Customer $customer */
+            $customer = auth()->user();
 
-        $serviceBill = $placeServiceOrderAction->execute($validatedData, $customer->id, null);
+            $serviceBill = $placeServiceOrderAction->execute($validatedData, $customer->id, null);
 
-        if ( ! $serviceBill instanceof ServiceBill) {
-            throw new InvalidServiceBillException();
+            if ( ! $serviceBill instanceof ServiceBill) {
+                throw new InvalidServiceBillException();
+            }
+
+            app(ChangeServiceOrderStatusAction::class)->execute($serviceBill->serviceOrder);
+
+            return response()->json([
+                'message' => 'Service order placed successfully',
+                'data' => $serviceBill,
+            ], 201);
+        } catch (InvalidServiceBillException) {
+            return response()->json([
+                'message' => 'Invalid Service Bill',
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong!',
+            ], 404);
         }
-
-        app(ChangeServiceOrderStatusAction::class)->execute($serviceBill->serviceOrder);
-
-        return response()->json([
-            'message' => 'Service order placed successfully',
-            'data' => $serviceBill,
-        ], 201);
     }
 }

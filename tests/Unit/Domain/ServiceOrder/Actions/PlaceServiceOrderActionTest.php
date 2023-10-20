@@ -29,6 +29,7 @@ beforeEach(function () {
 
     $this->service = ServiceFactory::new()
         ->withDummyBlueprint()
+        ->isActive()
         ->createOne();
 
     $this->customer = CustomerFactory::new()->createOne();
