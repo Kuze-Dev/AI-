@@ -90,7 +90,7 @@ it('can filter services', function ($attribute) {
     'status',
     'needs_approval',
     'taxonomies',
-])->only();
+]);
 
 it("can't list inactive services", function () {
     ServiceFactory::new()

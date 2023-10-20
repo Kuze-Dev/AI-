@@ -12,7 +12,7 @@ return new class () extends Migration {
     public function up(): void
     {
         Schema::table('services', function (Blueprint $table) {
-            $table->uuid()->after('id');
+            $table->uuid()->nullable()->after('id');
         });
 
         DB::table((new Service())->getTable())
