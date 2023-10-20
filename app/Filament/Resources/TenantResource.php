@@ -140,7 +140,18 @@ class TenantResource extends Resource
                                     'extras' => [],
                                 ],
                             ]),
-                    ]),
+                    ])->hidden(
+                        fn () => ! auth()->user()?->can('updateFeatures')
+                    ),
+                Forms\Components\Section::make(trans('Suspension Option'))
+                    ->view('filament.forms.components.redbgheading-section')
+                    ->collapsed(fn (string $context) => $context === 'edit')
+                    ->schema([
+                        Forms\Components\Toggle::make('is_suspended')
+                            ->label('Suspended')
+                            ->helpertext('Warning this will suspend the current tenant are you sure with this action?')
+                            ->inline(false),
+                    ])->hidden(fn () => ! auth()->user()?->can('canSuspendTenant')),
             ])->columns(2);
     }
 
@@ -152,6 +163,13 @@ class TenantResource extends Resource
                     ->searchable(),
                 Tables\Columns\TagsColumn::make('domains.domain'),
                 Tables\Columns\TextColumn::make('total_api_request'),
+                Tables\Columns\IconColumn::make('is_suspended')
+                    ->label(trans('Active'))
+                    ->options([
+                        'heroicon-o-check-circle' => fn ($state) => $state == false,
+                        'heroicon-o-x-circle' => fn ($state) => $state === true,
+                    ])
+                    ->color(fn ($state) => $state == false ? 'success' : 'danger'),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),

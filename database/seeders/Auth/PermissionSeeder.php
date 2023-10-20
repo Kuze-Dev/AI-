@@ -12,7 +12,14 @@ class PermissionSeeder extends BasePermissionSeeder
     {
         return [
             'admin' => [
-                ...$this->generateFilamentResourcePermissions('tenant', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions(
+                    'tenant',
+                    except: ['deleteAny'],
+                    customPermissions: [
+                        'updateFeatures',
+                        'canSuspendTenant',
+                    ]
+                ),
                 ...$this->generateFilamentResourcePermissions(
                     'admin',
                     except: [

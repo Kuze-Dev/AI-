@@ -30,6 +30,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
         protected readonly FormEmailNotification $formEmailNotification,
         protected readonly array $data,
         protected readonly ?array $form_attachments = [],
+        protected readonly ?int $form_submission_id = null,
     ) {
     }
 
@@ -48,7 +49,8 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
     protected function interpolateStringWithData(string $string): string
     {
         if ($string !== $compiledString = Blade::compileEchos($string)) {
-            return Blade::render($compiledString, $this->data);
+
+            return Blade::render($compiledString, $this->getMailVariables());
         }
 
         return $string;
@@ -69,11 +71,11 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
 
         $compiledTemplate = Blade::compileString($this->getNormalizedTemplate());
 
-        $contents = Blade::render($compiledTemplate, $this->data);
+        $contents = Blade::render($compiledTemplate, $this->getMailVariables());
 
         return new HtmlString((new CssToInlineStyles())->convert(
             $contents,
-            View::make($this->getTheme(), $this->data)->render()
+            View::make($this->getTheme(), $this->getMailVariables())->render()
         ));
     }
 
@@ -84,7 +86,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
 
         $compiledTemplate = Blade::compileString($this->getNormalizedTemplate());
 
-        $contents = Blade::render($compiledTemplate, $this->data);
+        $contents = Blade::render($compiledTemplate, $this->getMailVariables());
 
         return new HtmlString(html_entity_decode(preg_replace("/[\r\n]{2,}/", "\n\n", $contents) ?? '', ENT_QUOTES, 'UTF-8'));
     }
@@ -145,5 +147,10 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
 
         return $attach;
 
+    }
+
+    private function getMailVariables(): array
+    {
+        return array_merge($this->data, ['form_submission_id' => $this->form_submission_id]);
     }
 }
