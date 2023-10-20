@@ -238,7 +238,7 @@
     </tr>
   </table>
 
-  {{-- <table width="90%">
+  <table width="90%">
     <tr>
         <tr>
             <td colspan="2">
@@ -290,7 +290,7 @@
         </tr>
     </tr>
     <tr>
-  </table> --}}
+  </table>
 
 </body>
 </html>
