@@ -47,7 +47,7 @@ class ServiceOrderResource extends Resource
 
     protected static ?string $model = ServiceOrder::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-ticket';
 
     protected static ?string $navigationGroup = 'Service Management';
 
