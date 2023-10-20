@@ -20,8 +20,12 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string $reference
  * @property \Illuminate\Support\Carbon|null $bill_date
  * @property \Illuminate\Support\Carbon|null $due_date
+ * @property string $tax_display
  * @property float $service_price
  * @property array $additional_charges
+ * @property float $tax_percentage
+ * @property float $sub_total
+ * @property float $tax_total
  * @property float $total_amount
  * @property ServiceBillStatus $status
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -56,6 +60,10 @@ class ServiceBill extends Model implements PayableInterface
         'reference',
         'service_price',
         'additional_charges',
+        'sub_total',
+        'tax_display',
+        'tax_percentage',
+        'tax_total',
         'total_amount',
         'status',
     ];
@@ -65,6 +73,9 @@ class ServiceBill extends Model implements PayableInterface
         'due_date' => 'datetime',
         'additional_charges' => 'array',
         'service_price' => 'float',
+        'sub_total' => 'float',
+        'tax_percentage' => 'float',
+        'tax_total' => 'float',
         'total_amount' => 'float',
         'status' => ServiceBillStatus::class,
     ];

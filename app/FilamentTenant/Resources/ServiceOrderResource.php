@@ -24,6 +24,7 @@ use Domain\Service\Models\Service;
 use Domain\ServiceOrder\Actions\ChangeServiceOrderStatusAction;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
+use Domain\Taxation\Enums\PriceDisplay;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DateTimePicker;
@@ -420,6 +421,24 @@ class ServiceOrderResource extends Resource
                     ->size('md')
                     ->inline()
                     ->readOnly(),
+                Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
+                    TextLabel::make('')
+                        ->label(fn ($record) => trans('Tax (') . $record->tax_percentage . '%)')
+                        ->alignLeft()
+                        ->size('md')
+                        ->inline()
+                        ->readOnly(),
+                    TextLabel::make('')
+                        ->label(fn ($record) => $record->tax_display == PriceDisplay::INCLUSIVE->value ? 'Inclusive' : $record->currency_symbol . ' ' .$record->tax_total)
+                        ->alignRight()
+                        ->size('md')
+                        ->inline()
+                        ->readOnly(),
+                ])  ->visible(
+                    function (array $state) {
+                        return isset($state['tax_display']);
+                    }
+                ),
                 TextLabel::make('')
                     ->label(trans('Total Price'))
                     ->alignLeft()
@@ -494,7 +513,6 @@ class ServiceOrderResource extends Resource
 
                                     return;
                                 }
-
                             }
 
                             $status = $data['status_options'];

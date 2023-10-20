@@ -39,6 +39,10 @@ return new class () extends Migration {
             $table->dateTime('schedule');
             $table->string('status');
             $table->string('cancelled_reason')->nullable()->default(null);
+            $table->decimal('sub_total', 10, 2)->index();
+            $table->string('tax_display')->nullable();
+            $table->decimal('tax_percentage', 7, 2)->index();
+            $table->decimal('tax_total', 10, 2)->index();
             $table->decimal('total_price', 10, 2)->index();
 
             $table->timestamps();
@@ -68,6 +72,10 @@ return new class () extends Migration {
             $table->dateTime('due_date')->nullable()->index();
             $table->decimal('service_price', 10, 2);
             $table->json('additional_charges');
+            $table->decimal('sub_total', 10, 2)->index();
+            $table->string('tax_display')->nullable();
+            $table->decimal('tax_percentage', 7, 2)->index();
+            $table->decimal('tax_total', 10, 2)->index();
             $table->decimal('total_amount', 10, 2);
             $table->string('status')->index();
 

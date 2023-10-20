@@ -34,6 +34,10 @@ class CreateServiceBillAction
             'reference' => $uniqueReference,
             'service_price' => $serviceBillData->service_price,
             'additional_charges' => $serviceBillData->additional_charges,
+            'sub_total' => $serviceBillData->sub_total,
+            'tax_percentage' => $serviceBillData->tax_percentage,
+            'tax_display' => $serviceBillData->tax_display,
+            'tax_total' => $serviceBillData->tax_total,
             'total_amount' => $serviceBillData->total_amount,
             'status' => $serviceBillData->status,
         ];

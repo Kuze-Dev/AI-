@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Actions;
 
+use Domain\Address\Models\Address;
 use Domain\Currency\Models\Currency;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
@@ -18,6 +19,7 @@ class CreateServiceOrderAction
 {
     public function __construct(
         private CalculateServiceOrderTotalPriceAction $calculateServiceOrderTotalPriceAction,
+        private GetTaxableInfoAction $getTaxableInfoAction,
     ) {
     }
 
@@ -63,7 +65,7 @@ class CreateServiceOrderAction
             $status = ServiceOrderStatus::INPROGRESS;
         }
 
-        $totalPrice = $this->calculateServiceOrderTotalPriceAction
+        $subTotal = $this->calculateServiceOrderTotalPriceAction
             ->execute(
                 $service->selling_price,
                 array_filter(
@@ -83,6 +85,12 @@ class CreateServiceOrderAction
                 )
             )
             ->getAmount();
+
+        //tax
+        $billingAddressId = $serviceOrderData->is_same_as_billing ? $serviceOrderData->service_address_id : $serviceOrderData->billing_address_id;
+        $billingAddressData = Address::whereId($billingAddressId)->first();
+
+        $taxableInfo = $this->getTaxableInfoAction->execute($subTotal, $billingAddressData);
 
         $serviceOrder = ServiceOrder::create([
             'admin_id' => $adminId,
@@ -104,7 +112,11 @@ class CreateServiceOrderAction
             'reference' => $uniqueReference,
             'status' => $status,
             'additional_charges' => $serviceOrderData->additional_charges,
-            'total_price' => $totalPrice,
+            'sub_total' => $taxableInfo['subTotal'],
+            'tax_display' => $taxableInfo['taxDisplay'],
+            'tax_percentage' => $taxableInfo['taxPercentage'],
+            'tax_total' => $taxableInfo['taxTotal'],
+            'total_price' => $taxableInfo['totalPrice'],
         ]);
 
         return $serviceOrder;

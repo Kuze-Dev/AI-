@@ -6,6 +6,7 @@ namespace Domain\ServiceOrder\DataTransferObjects;
 
 use Carbon\Carbon;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
+use Domain\Taxation\Enums\PriceDisplay;
 
 class ServiceBillData
 {
@@ -16,6 +17,10 @@ class ServiceBillData
         public readonly ?Carbon $due_date,
         public readonly float $service_price,
         public readonly array $additional_charges,
+        public readonly float $sub_total,
+        public readonly float $tax_percentage,
+        public readonly float $tax_total,
+        public readonly ?PriceDisplay $tax_display,
         public readonly float $total_amount,
         public readonly ServiceBillStatus $status,
     ) {
@@ -30,6 +35,10 @@ class ServiceBillData
             due_date: null,
             service_price: $data['service_price'],
             additional_charges: $data['additional_charges'],
+            sub_total: $data['sub_total'],
+            tax_display: $data['tax_display'],
+            tax_percentage: $data['tax_percentage'],
+            tax_total: $data['tax_total'],
             total_amount: $data['total_price'],
             status: ServiceBillStatus::PENDING,
         );
