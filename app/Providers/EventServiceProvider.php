@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use Domain\Cart\Events\SanitizeCartEvent;
 use Domain\Cart\Listeners\SanitizeCartListener;
+
 use Domain\Order\Events\AdminOrderBankPaymentEvent;
 use Domain\Order\Events\AdminOrderFailedNotificationEvent;
 use Domain\Order\Events\OrderPlacedEvent;
@@ -20,6 +21,8 @@ use Domain\Order\Listeners\OrderPaymentUpdatedListener;
 use Domain\Order\Listeners\OrderStatusUpdatedListener;
 use Domain\Order\Listeners\PublicOrder\GuestOrderPlacedListener;
 use Domain\Payments\Events\PaymentProcessEvent;
+use Domain\Tier\Events\TierRequestRejectedEvent;
+use Domain\Tier\Listeners\TierRequestRejectedListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -58,6 +61,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         GuestOrderPlacedEvent::class => [
             GuestOrderPlacedListener::class,
+        ],
+        TierRequestRejectedEvent::class => [
+            TierRequestRejectedListener::class,
         ],
     ];
 

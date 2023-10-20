@@ -66,7 +66,7 @@ final class CustomerData
             gender: Gender::from($validated['gender']),
             birth_date: now()->parse($validated['birth_date']),
             status: Status::ACTIVE,
-            tier_id:  isset($validated['tier_id']) ? (int) $validated['tier_id'] : $defaultTier->getKey(),
+            tier_id:  is_null($validated['tier_id']) ? $defaultTier->getKey() : (int) $validated['tier_id'],
             email: $validated['email'],
             password: $validated['password'],
             image: $validated['profile_image'] ?? null,

@@ -9,7 +9,9 @@ use App\HttpTenantApi\Requests\Auth\Customer\CustomerRegisterRequest;
 use App\HttpTenantApi\Resources\CustomerResource;
 use App\Notifications\Customer\NewRegisterNotification;
 use Domain\Customer\Actions\CreateCustomerAction;
+use Domain\Customer\Actions\SendForApprovalRegistrationAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
+use Domain\Tier\Models\Tier;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -30,6 +32,12 @@ class RegisterController
         );
 
         Notification::send($customer, new NewRegisterNotification($customer));
+
+        $tier = Tier::whereId($customer->tier_id)->first();
+
+        if($tier?->has_approval) {
+            app(SendForApprovalRegistrationAction::class)->execute($customer);
+        }
 
         return CustomerResource::make($customer);
     }
