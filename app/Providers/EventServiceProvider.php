@@ -62,9 +62,9 @@ class EventServiceProvider extends ServiceProvider
         GuestOrderPlacedEvent::class => [
             GuestOrderPlacedListener::class,
         ],
-        TierRequestRejectedEvent::class => [
-            TierRequestRejectedListener::class,
-        ],
+        // TierRequestRejectedEvent::class => [
+        //     TierRequestRejectedListener::class,
+        // ],
     ];
 
     /** Register any events for your application. */

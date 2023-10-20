@@ -12,6 +12,7 @@ use Domain\Customer\Actions\ForceDeleteCustomerAction;
 use Domain\Customer\Actions\RestoreCustomerAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Models\Customer;
+use Domain\Tier\Enums\TierApprovalStatus;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
@@ -20,6 +21,8 @@ use Illuminate\Support\Facades\DB;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Throwable;
 use Exception;
+use Filament\Notifications\Notification;
+use Livewire\Redirector;
 
 class EditCustomer extends EditRecord
 {
@@ -31,6 +34,19 @@ class EditCustomer extends EditRecord
     protected function getActions(): array
     {
         return [
+
+            Action::make('deleteIfRejectedCustomer')
+                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->requiresConfirmation(function ($livewire) {
+
+                    return $livewire->data['tier_approval_status'] == TierApprovalStatus::REJECTED->value ? true : false;
+
+                })
+                ->modalHeading(fn ($livewire) => $livewire->data['tier_approval_status'] ? 'Warning' : null)
+                ->modalSubheading(fn ($livewire) => $livewire->data['tier_approval_status'] ? 'The Suspend Option is enabled Please Proceed with Caution. would  you like to continue?' : null)
+                ->action('deleteIfRejectedCustomer')
+                ->keyBindings(['mod+s']),
+
             Action::make('save')
                 ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
@@ -74,5 +90,25 @@ class EditCustomer extends EditRecord
             fn () => app(EditCustomerAction::class)
                 ->execute($record, CustomerData::fromArrayEditByAdmin($record, $data))
         );
+    }
+
+    public function deleteIfRejectedCustomer(): Redirector
+    {
+        $data = $this->form->getState();
+
+        $record = $this->record;
+        if($data['tier_approval_status'] == TierApprovalStatus::REJECTED->value){
+            app(ForceDeleteCustomerAction::class)->execute($record);
+
+            Notification::make()
+            ->warning()
+            ->title(trans('Customer Deleted'))
+            ->send();
+
+            return redirect(CustomerResource::getUrl('index'));
+        }
+
+        return redirect(CustomerResource::getUrl('edit', ['record' => $record]));
+
     }
 }
