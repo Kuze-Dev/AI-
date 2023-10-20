@@ -6,12 +6,12 @@ namespace App\Filament\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\DataAwareRule;
-use Illuminate\Contracts\Validation\InvokableRule;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Arr;
 use PDOException;
 
-class CheckDatabaseConnection implements DataAwareRule, InvokableRule
+class CheckDatabaseConnection implements DataAwareRule, ValidationRule
 {
     protected array $data = [];
 
@@ -29,11 +29,9 @@ class CheckDatabaseConnection implements DataAwareRule, InvokableRule
     }
 
     /**
-     * @param  string  $attribute
-     * @param  mixed  $value
      * @param  Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
-    public function __invoke($attribute, $value, $fail): void
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (config("database.connections.{$this->connectionTemplate}.driver") === 'sqlite') {
             return;

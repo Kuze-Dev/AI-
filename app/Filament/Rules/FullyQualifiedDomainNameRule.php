@@ -5,18 +5,14 @@ declare(strict_types=1);
 namespace App\Filament\Rules;
 
 use Closure;
-use Illuminate\Contracts\Validation\InvokableRule;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class FullyQualifiedDomainNameRule implements InvokableRule
+class FullyQualifiedDomainNameRule implements ValidationRule
 {
     /**
-     * Run the validation rule.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
      * @param  Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
-    public function __invoke($attribute, $value, $fail): void
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value)) {
             $fail('The :attribute is invalid.');
