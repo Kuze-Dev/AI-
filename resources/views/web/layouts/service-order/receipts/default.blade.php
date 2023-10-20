@@ -125,6 +125,18 @@
             )
             ->multiply(100);
 
+            $sub_total = money(
+                $transaction->serviceOrder
+                    ->sub_total
+            )
+            ->multiply(100);
+
+            $tax_total = money(
+                $transaction->serviceOrder
+                    ->tax_total
+            )
+            ->multiply(100);
+
             $total_amount = money(
                 $transaction->serviceBill
                     ->total_amount
@@ -152,7 +164,7 @@
             <strong>
                 {{
                     money(
-                        $service_price,
+                        $sub_total,
                         $transaction->serviceOrder
                             ->currency_code
                     )
@@ -172,7 +184,8 @@
                 {{
                     money(
                         $transaction->serviceBill
-                            ->getTotalAdditionalCharges->multiply(100),
+                            ->getTotalAdditionalCharges
+                            ->multiply(100),
                         $transaction->serviceOrder
                             ->currency_code
                     )->format()
@@ -185,8 +198,18 @@
         <td></td>
     </tr>
     <tr>
-        <td scope="row" align="right">{{ trans('Tax') }}</td>
-        <td align="right"><strong>$9.99</strong></td>
+        <td scope="row" align="right">{{ trans('Tax') }} ({{$transaction->serviceOrder->tax_percentage}}%)</td>
+        <td align="right">
+            <strong>
+                {{
+                    money(
+                        $tax_total,
+                        $transaction->serviceOrder
+                            ->currency_code
+                    )->format()
+                }}
+            </strong>
+        </td>
     </tr>
     <tr>
         <td scope="row" colspan="2"><hr></td>
@@ -215,7 +238,7 @@
     </tr>
   </table>
 
-  <table width="90%">
+  {{-- <table width="90%">
     <tr>
         <tr>
             <td colspan="2">
@@ -267,7 +290,7 @@
         </tr>
     </tr>
     <tr>
-  </table>
+  </table> --}}
 
 </body>
 </html>

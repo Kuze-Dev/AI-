@@ -107,8 +107,8 @@ class ServiceBill extends Model implements PayableInterface
             function ($value) use ($total) {
                 foreach ($this->additional_charges as $additional_charge) {
                     $total = $total->add(
-                        money($additional_charge['price'])
-                            ->multiply($additional_charge['quantity'])
+                        money((int) $additional_charge['price'])
+                            ->multiply((int) $additional_charge['quantity'])
                     );
                 }
 
