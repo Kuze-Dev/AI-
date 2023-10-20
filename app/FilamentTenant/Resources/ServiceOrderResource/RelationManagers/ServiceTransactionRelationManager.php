@@ -72,7 +72,7 @@ class ServiceTransactionRelationManager extends RelationManager
                             $customer = $record->serviceOrder->customer;
 
                             $filename =
-                                $record->getKey().
+                                $record->getKey().'-'.
                                 $record->serviceOrder
                                     ->getKey().
                                 $customer
