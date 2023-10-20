@@ -27,6 +27,15 @@ class EditTenant extends EditRecord
         return [
             Action::make('save')
                 ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->requiresConfirmation(function ($livewire) {
+
+                    // dd($livewire->data['is_suspended']);
+
+                    return $livewire->data['is_suspended'] == true ? true : false;
+
+                })
+                ->modalHeading(fn ($livewire) => $livewire->data['is_suspended'] ? 'Warning' : null)
+                ->modalSubheading(fn ($livewire) => $livewire->data['is_suspended'] ? 'The Suspend Option is enabled Please Proceed with Caution. woul\'d  you like to continue?' : null)
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
