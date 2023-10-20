@@ -53,6 +53,7 @@ use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Internationalization\Models\Locale;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
+use Domain\ServiceOrder\Models\ServiceTransaction;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -145,6 +146,7 @@ class AppServiceProvider extends ServiceProvider
             ServiceOrder::class,
             ServiceBill::class,
             TenantApiCall::class,
+            ServiceTransaction::class,
         ]);
 
         Password::defaults(

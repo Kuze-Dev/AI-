@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers;
 
+use App\Settings\SiteSettings;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Models\ServiceTransaction;
+use Exception;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ServiceTransactionRelationManager extends RelationManager
 {
@@ -51,6 +56,53 @@ class ServiceTransactionRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Updated at')
                     ->sortable(),
+            ])
+            ->actions([
+                Tables\Actions\Action::make('print')
+                    ->translateLabel()
+                    ->requiresConfirmation()
+                    ->button()
+                    ->icon('heroicon-o-download')
+                    ->action(function (ServiceTransaction $record, Tables\Actions\Action $action) {
+                        try {
+                            /** @var \Illuminate\Support\Carbon $createdAt */
+                            $createdAt = $record->created_at->format('m_Y');
+
+                            $filename =
+                                $record->getKey().'-'.
+                                $record->serviceOrder
+                                    ->getKey().'-'.
+                                $record->serviceOrder
+                                    ->customer
+                                    ->getKey().DIRECTORY_SEPARATOR.
+                                Str::snake(app(SiteSettings::class)->name).
+                                '_'.
+                                $createdAt.
+                                '.pdf';
+
+                            Pdf::loadHTML(view('web.layouts.service-order.receipts.default', ['transaction' => $record])->render())
+                                ->save($filename, 'receipt-files');
+
+                            $record->serviceOrder
+                                ->customer
+                                ->addMedia(Storage::disk('receipt-files')->path($filename))
+                                ->toMediaCollection('receipts');
+
+                            $action
+                                ->successNotificationTitle(trans('Success'))
+                                ->success();
+
+                        } catch (Exception $e) {
+                            $action
+                                ->failureNotificationTitle($e->getMessage())
+                                // ->failureNotificationTitle(trans('Something went wrong.'))
+                                ->failure();
+
+                            report($e);
+                        }
+                    })
+                    ->withActivityLog()
+                    ->authorize('customerPrintReceipt'),
             ])
             ->bulkActions([])
             ->defaultSort('updated_at', 'desc');

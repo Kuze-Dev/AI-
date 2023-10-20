@@ -11,6 +11,7 @@ use Domain\Customer\Models\Customer;
 use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Service\Models\Service;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
+use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
 use Domain\ServiceOrder\Queries\ServiceOrderQueryBuilder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -197,5 +198,12 @@ class ServiceOrder extends Model
         return filled($serviceBill) && $serviceBill->status === ServiceBillStatus::FORPAYMENT
             ? $serviceBill
             : null;
+    }
+
+    public function serviceBillingAddress(): ?ServiceOrderAddress
+    {
+        return $this->serviceOrderAddress
+            ->where('type', ServiceOrderAddressType::BILLING_ADDRESS)
+            ->first();
     }
 }

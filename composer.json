@@ -10,6 +10,7 @@
         "awcodes/drop-in-action": "^0.2.2",
         "aws/aws-sdk-php": "^3.252",
         "bacon/bacon-qr-code": "^2.0",
+        "barryvdh/laravel-dompdf": "^2.0",
         "fakerphp/faker": "^1.21",
         "filament/filament": "^2.16.6",
         "filament/spatie-laravel-media-library-plugin": "^2.17",
