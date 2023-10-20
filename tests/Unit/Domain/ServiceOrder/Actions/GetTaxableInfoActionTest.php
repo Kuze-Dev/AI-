@@ -8,7 +8,6 @@ use Domain\Address\Database\Factories\StateFactory;
 use Domain\ServiceOrder\Actions\GetTaxableInfoAction;
 use Domain\Taxation\Database\Factories\TaxZoneFactory;
 use Domain\Taxation\Enums\PriceDisplay;
-use Domain\Taxation\Facades\Taxation;
 
 beforeEach(function () {
     testInTenantContext();
