@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Resources\AdminResource\Pages;
+use App\Filament\Resources\AdminResource\RelationManagers\CauserRelationManager;
 use Domain\Admin\Models\Admin;
 use Domain\Auth\Actions\ForgotPasswordAction;
 use Exception;
@@ -290,6 +291,7 @@ class AdminResource extends Resource
     {
         return [
             ActivitiesRelationManager::class,
+            CauserRelationManager::class,
         ];
     }
 }

@@ -10,7 +10,7 @@ class RestoreAdminAction
 {
     public function execute(Admin $admin): ?bool
     {
-        if ( ! $admin->trashed()) {
+        if (! $admin->trashed()) {
             return null;
         }
 

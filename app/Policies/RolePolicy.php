@@ -11,10 +11,10 @@ use Illuminate\Foundation\Auth\User;
 
 class RolePolicy
 {
-    use HandlesAuthorization;
     use ChecksWildcardPermissions;
+    use HandlesAuthorization;
 
-    public function before(?User $user, string $ability, mixed $role = null): bool|null
+    public function before(?User $user, string $ability, mixed $role = null): ?bool
     {
         if ($role instanceof Role && $role->name === config('domain.role.super_admin')) {
             return false;

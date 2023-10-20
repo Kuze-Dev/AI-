@@ -25,7 +25,7 @@ class NotificationController
     #[Get('/')]
     public function index(): JsonApiResourceCollection
     {
-        if ( ! $user = Auth::user()) {
+        if (! $user = Auth::user()) {
             throw new AuthenticationException();
         }
 

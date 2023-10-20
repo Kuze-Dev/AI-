@@ -9,6 +9,8 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Laravel\Sanctum\Console\Commands\PruneExpired as SanctumPruneExpired;
 use Support\Excel\Commands\PruneExcelCommand;
+use Spatie\Health\Commands\DispatchQueueCheckJobsCommand;
+use Spatie\Health\Commands\ScheduleCheckHeartbeatCommand;
 
 class Kernel extends ConsoleKernel
 {
@@ -23,6 +25,13 @@ class Kernel extends ConsoleKernel
 
         $schedule->command(SanctumPruneExpired::class, ['--hours' => 24])
             ->daily();
+
+        // $schedule->command(DispatchQueueCheckJobsCommand::class)->everyMinute();
+
+        // We recommend to put this command as the very last command in your schedule.
+        // https://spatie.be/docs/laravel-health/available-checks/schedule
+        // $schedule->command(ScheduleCheckHeartbeatCommand::class)->everyMinute();
+
     }
 
     /** Register the commands for the application. */
