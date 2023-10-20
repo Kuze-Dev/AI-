@@ -30,6 +30,9 @@ class ServiceBillFactory extends Factory
             'additional_charges' => [],
             'total_amount' => $this->faker->randomFloat(2, 1, 100),
             'status' => ServiceBillStatus::PENDING,
+            'sub_total' => $this->faker->randomFloat(2, 1, 100),
+            'tax_percentage' => $this->faker->randomFloat(2, 1, 100),
+            'tax_total' => $this->faker->randomFloat(2, 1, 100),
         ];
     }
 

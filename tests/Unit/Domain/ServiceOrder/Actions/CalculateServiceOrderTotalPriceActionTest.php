@@ -10,7 +10,7 @@ beforeEach(function () {
     testInTenantContext();
 });
 
-it('can test', function () {
+it('can calculate', function () {
     $servicePrice = ServiceOrderFactory::new()
         ->createOne()
         ->total_price;

@@ -43,6 +43,9 @@ class ServiceOrderFactory extends Factory
             'status' => ServiceOrderStatus::PENDING,
             'cancelled_reason' => null,
             'total_price' => $this->faker->randomFloat(2, 1, 100),
+            'sub_total' => $this->faker->randomFloat(2, 1, 100),
+            'tax_percentage' => $this->faker->randomFloat(2, 1, 100),
+            'tax_total' => $this->faker->randomFloat(2, 1, 100),
         ];
     }
 
@@ -72,5 +75,10 @@ class ServiceOrderFactory extends Factory
     public function closed(): self
     {
         return $this->state(['status' => ServiceOrderStatus::CLOSED]);
+    }
+
+    public function forPayment(): self
+    {
+        return $this->state(['status' => ServiceOrderStatus::FORPAYMENT]);
     }
 }
