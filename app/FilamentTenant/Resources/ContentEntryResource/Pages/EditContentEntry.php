@@ -80,13 +80,13 @@ class EditContentEntry extends EditRecord
         return [
             'content_entries_group_actions' => CustomPageActionGroup::make([
                 Action::make('published')
-                    ->label(__('Published Draft'))
+                    ->label(trans('Published Draft'))
                     ->action('published')
                     ->hidden(function () {
                         return $this->record->draftable_id == null ? true : false;
                     }),
                 Action::make('draft')
-                    ->label(__('Save As Draft'))
+                    ->label(trans('Save As Draft'))
                     ->action('draft')
                     ->hidden(function () {
 
@@ -97,14 +97,14 @@ class EditContentEntry extends EditRecord
                         return ($this->record->draftable_id == null && $this->record->pageDraft) ? true : false;
                     }),
                 Action::make('overwriteDraft')
-                    ->label(__('Save As Draft'))
+                    ->label(trans('Save As Draft'))
                     ->action('overwriteDraft')
                     ->requiresConfirmation()
                     ->modalHeading('Draft for this content already exists')
                     ->modalSubheading('You have an existing draft for this content. Do you want to overwrite the existing draft?')
                     ->modalCancelAction(function () {
                         return Action::makeModalAction('redirect')
-                            ->label(__('Edit Existing Draft'))
+                            ->label(trans('Edit Existing Draft'))
                             ->color('secondary')
                             ->url(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $this->record->pageDraft]));
                     })
@@ -113,15 +113,15 @@ class EditContentEntry extends EditRecord
                         return ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true;
                     }),
                 Action::make('save')
-                    ->label(__('Save and Continue Editing'))
+                    ->label(trans('Save and Continue Editing'))
                     ->action('save')
                     ->keyBindings(['mod+s']),
             ])
                 ->view('filament.pages.actions.custom-action-group.index')
                 ->setName('page_draft_actions')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label')),
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label')),
             // Action::make('save')
-            //     ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+            //     ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
             //     ->action('save')
             //     ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
@@ -129,7 +129,7 @@ class EditContentEntry extends EditRecord
                 Action::make('preview')
                     ->color('secondary')
                     ->hidden((bool) tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
-                    ->label(__('Preview Page'))
+                    ->label(trans('Preview Page'))
                     ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
                         $domain = $siteSettings->front_end_domain ?? $cmsSettings->front_end_domain;
 

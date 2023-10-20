@@ -46,8 +46,8 @@ final class DiscountHelperFunctions
             return DiscountMessagesData::fromArray(['message' => 'This discount code is invalid.']);
         }
 
-        $discountAmount = optional(DiscountRequirement::whereBelongsTo($discount)->first());
-        $discountCondition = optional(DiscountCondition::whereBelongsTo($discount)->first());
+        $discountAmount = DiscountRequirement::whereBelongsTo($discount)->first();
+        $discountCondition = DiscountCondition::whereBelongsTo($discount)->first();
 
         $validationChecks = [
             'status' => [
@@ -67,8 +67,8 @@ final class DiscountHelperFunctions
                 'message' => 'This discount code max usage limit has been reached.',
             ],
             'grandTotal' => [
-                'condition' => $grandTotal < $discountAmount->minimum_amount,
-                'message' => 'You need to purchase at least '.$discountAmount->minimum_amount.' to apply this discount',
+                'condition' => $grandTotal < $discountAmount?->minimum_amount,
+                'message' => 'You need to purchase at least '.$discountAmount?->minimum_amount.' to apply this discount',
             ],
         ];
 
@@ -81,9 +81,9 @@ final class DiscountHelperFunctions
         return DiscountMessagesData::fromArray([
             'status' => 'valid',
             'message' => 'Discount code applied',
-            'amount_type' => $discountCondition->amount_type,
-            'amount' => $discountCondition->amount,
-            'discount_type' => $discountCondition->discount_type,
+            'amount_type' => $discountCondition?->amount_type,
+            'amount' => $discountCondition?->amount,
+            'discount_type' => $discountCondition?->discount_type,
         ]);
     }
 

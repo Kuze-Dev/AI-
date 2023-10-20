@@ -48,6 +48,8 @@ trait ConstraintsRelationships
      *
      * @param  class-string<T>  $attributeClass
      * @return ?T
+     *
+     * @phpstan-ignore-next-line Model property accessors should not be used.
      */
     protected function getClassAttribute(string $attributeClass): ?object
     {

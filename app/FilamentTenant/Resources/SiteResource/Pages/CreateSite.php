@@ -20,7 +20,7 @@ class CreateSite extends CreateRecord
     {
         return [
             Action::make('create')
-                ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];

@@ -33,7 +33,7 @@ class EditProduct extends EditRecord implements HasProductOptionsContracts, HasP
     {
         return [
             Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             ProductOptionFormAction::make(),

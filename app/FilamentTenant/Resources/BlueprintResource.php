@@ -553,7 +553,11 @@ class BlueprintResource extends Resource
                                                     ->translateLabel()
                                                     ->options($Fitoptions)
                                                     ->formatStateUsing(fn () => $stateData($manipulationType))
-                                                    ->hint(str('[Documentation](https://spatie.be/docs/image/v1/image-manipulations/resizing-images)')->inlineMarkdown()->toHtmlString())
+                                                    ->hint(
+                                                        Str::of('[Documentation](https://spatie.be/docs/image/v1/image-manipulations/resizing-images)')
+                                                            ->inlineMarkdown()
+                                                            ->toHtmlString()
+                                                    )
                                                     ->hintColor('primary')
                                                     ->hintIcon('heroicon-s-question-mark-circle'),
                                             ]),

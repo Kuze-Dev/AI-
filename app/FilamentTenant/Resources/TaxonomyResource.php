@@ -81,7 +81,7 @@ class TaxonomyResource extends Resource
                 ]),
                 Forms\Components\Select::make('locale')
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
-                    ->default((string) optional(Locale::where('is_default', true)->first())->code)
+                    ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->required(),

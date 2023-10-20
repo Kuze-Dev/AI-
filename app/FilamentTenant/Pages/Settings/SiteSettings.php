@@ -11,6 +11,7 @@ use Filament\Forms\Components\Card;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Illuminate\Support\Facades\Cache;
 use Livewire\TemporaryUploadedFile;
 
 class SiteSettings extends TenantBaseSettings
@@ -65,6 +66,6 @@ class SiteSettings extends TenantBaseSettings
 
     protected function afterSave(): void
     {
-        cache()->flush();
+        Cache::flush();
     }
 }

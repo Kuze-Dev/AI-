@@ -33,7 +33,7 @@ class EditShippingmethod extends EditRecord
         if (array_key_exists($model->driver->value, $drivers)) {
             return [
                 Action::make('save')
-                    ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                    ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
                     ->action('save')
                     ->keyBindings(['mod+s']),
                 Actions\DeleteAction::make(),

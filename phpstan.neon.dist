@@ -9,10 +9,10 @@ services:
      class: Vural\LarastanStrictRules\Rules\NoPropertyAccessorRule
      tags:
          - phpstan.rules.rule
-    -
-     class: Vural\LarastanStrictRules\Rules\NoValidationInControllerRule
-     tags:
-         - phpstan.rules.rule
+#    -
+#     class: Vural\LarastanStrictRules\Rules\NoValidationInControllerRule
+#     tags:
+#         - phpstan.rules.rule
     -
      class: Vural\LarastanStrictRules\Rules\NoGlobalLaravelFunctionRule
      tags:
@@ -65,6 +65,10 @@ services:
             - session
             - data_get
             - dispatch
+            # saas-platform
+            - auth
+            - request
+            - data_set
 
 parameters:
 
@@ -86,7 +90,7 @@ parameters:
     level: 8
 
     ignoreErrors:
-        - '#Access to property \$value on an unknown class StringBackedEnum.#'
+        #- '#Access to property \$value on an unknown class StringBackedEnum.#'
 
     excludePaths:
         # - ./*/*/FileToBeExcluded.php
