@@ -6,7 +6,6 @@ namespace App\Providers;
 
 use Domain\Cart\Events\SanitizeCartEvent;
 use Domain\Cart\Listeners\SanitizeCartListener;
-
 use Domain\Order\Events\AdminOrderBankPaymentEvent;
 use Domain\Order\Events\AdminOrderFailedNotificationEvent;
 use Domain\Order\Events\OrderPlacedEvent;
