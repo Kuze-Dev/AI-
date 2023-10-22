@@ -16,8 +16,6 @@ use function PHPUnit\Framework\assertInstanceOf;
 beforeEach(function () {
     testInTenantContext();
 
-    Filament::setContext('filament-tenant');
-
     $this->admin = loginAsSuperAdmin();
 
     CurrencyFactory::new()->createOne([
@@ -33,7 +31,13 @@ it('can create service order', function () {
         ->withDummyBlueprint()
         ->createOne();
 
-    $customer = CustomerFactory::new()->createOne();
+    $customer = CustomerFactory::new()
+        ->withAddress()
+        ->createOne();
+
+    $address = $customer
+        ->addresses
+        ->first();
 
     $serviceOrder = ServiceOrderFactory::new()->definition();
 
@@ -41,8 +45,8 @@ it('can create service order', function () {
         customer_id: $customer->id,
         service_id: $service->id,
         schedule: $serviceOrder['schedule'],
-        service_address_id: null,
-        billing_address_id: null,
+        service_address_id: $address->id,
+        billing_address_id: $address->id,
         is_same_as_billing: true,
         additional_charges: $serviceOrder['additional_charges'],
         form: $serviceOrder['customer_form'],

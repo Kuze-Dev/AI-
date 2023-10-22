@@ -16,8 +16,6 @@ use function PHPUnit\Framework\assertInstanceOf;
 beforeEach(function () {
     testInTenantContext();
 
-    Filament::setContext('filament-tenant');
-
     $this->admin = loginAsSuperAdmin();
 
     CurrencyFactory::new()->createOne([
@@ -32,7 +30,13 @@ beforeEach(function () {
         ->isActive()
         ->createOne();
 
-    $this->customer = CustomerFactory::new()->createOne();
+    $this->customer = CustomerFactory::new()
+        ->withAddress()
+        ->createOne();
+
+    $address = $this->customer
+        ->addresses
+        ->first();
 
     $this->serviceOrder = ServiceOrderFactory::new()->definition();
 
@@ -42,8 +46,8 @@ beforeEach(function () {
         'schedule' => now()
             ->parse($this->serviceOrder['schedule'])
             ->toString(),
-        'service_address_id' => null,
-        'billing_address_id' => null,
+        'service_address_id' => $address->id,
+        'billing_address_id' => $address->id,
         'is_same_as_billing' => true,
         'additional_charges' => $this->serviceOrder['additional_charges'],
         'form' => $this->serviceOrder['customer_form'],

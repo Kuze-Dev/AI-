@@ -21,8 +21,6 @@ use function PHPUnit\Framework\assertInstanceOf;
 beforeEach(function () {
     testInTenantContext();
 
-    Filament::setContext('filament-tenant');
-
     $this->admin = loginAsSuperAdmin();
 
     CurrencyFactory::new()->createOne([
@@ -34,24 +32,27 @@ beforeEach(function () {
 
     $this->serviceOrder = ServiceOrderFactory::new()->createOne();
 
-    $this->customer_id = CustomerFactory::new()
-        ->createOne()
-        ->id;
+    $this->customer = CustomerFactory::new()
+        ->withAddress()
+        ->createOne();
 
-    $this->service_id = ServiceFactory::new()
+    $this->address = $this->customer
+        ->addresses
+        ->first();
+
+    $this->service = ServiceFactory::new()
         ->withDummyBlueprint()
         ->isActive()
-        ->createOne()
-        ->id;
+        ->createOne();
 });
 
 it('can create', function () {
     $serviceOrderData = new ServiceOrderData(
-        customer_id: $this->customer_id,
-        service_id: $this->service_id,
+        customer_id: $this->customer->id,
+        service_id: $this->service->id,
         schedule: $this->serviceOrder->schedule,
-        service_address_id: null,
-        billing_address_id: null,
+        service_address_id: $this->address->id,
+        billing_address_id: $this->address->id,
         is_same_as_billing: true,
         additional_charges: $this->serviceOrder->additional_charges,
         form: $this->serviceOrder->customer_form,
@@ -69,11 +70,11 @@ it('can create', function () {
 
 it('can create bill billing and due dates', function () {
     $serviceOrderData = new ServiceOrderData(
-        customer_id: $this->customer_id,
-        service_id: $this->service_id,
+        customer_id: $this->customer->id,
+        service_id: $this->service->id,
         schedule: $this->serviceOrder->schedule,
-        service_address_id: null,
-        billing_address_id: null,
+        service_address_id: $this->address->id,
+        billing_address_id: $this->address->id,
         is_same_as_billing: true,
         additional_charges: $this->serviceOrder->additional_charges,
         form: $this->serviceOrder->customer_form,

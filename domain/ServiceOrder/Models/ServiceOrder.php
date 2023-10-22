@@ -80,27 +80,23 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ServiceOrder extends Model
 {
     protected $fillable = [
-        'created_by',
         'service_id',
         'customer_id',
         'admin_id',
+        'reference',
         'customer_first_name',
         'customer_last_name',
         'customer_email',
         'customer_mobile',
         'customer_form',
-        'reference',
-        'service_address',
         'additional_charges',
         'currency_code',
-        'billing_cycle',
-        'due_date_every',
         'currency_name',
         'currency_symbol',
-        'service_name',
-        'service_price',
         'billing_cycle',
         'due_date_every',
+        'service_name',
+        'service_price',
         'schedule',
         'status',
         'cancelled_reason',
@@ -109,9 +105,6 @@ class ServiceOrder extends Model
         'tax_percentage',
         'tax_total',
         'total_price',
-        'service_address_id',
-        'billing_address_id',
-        'is_same_as_billing',
     ];
 
     protected $casts = [

@@ -57,5 +57,4 @@ it('can create product', function () {
         ->assertOk()
         ->instance()
         ->record;
-})
-    ->only();
+});
