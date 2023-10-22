@@ -43,14 +43,9 @@ it('can show cart', function () {
                     'id' => $this->cart->uuid,
                     'coupon_code' => null,
                 ],
-                'relationships' => [],
-                'meta' => [],
-                'links' => [],
             ],
-            'included' => [],
             'jsonapi' => [
                 'version' => '1.0',
-                'meta' => [],
             ],
         ])
         ->assertOk();
