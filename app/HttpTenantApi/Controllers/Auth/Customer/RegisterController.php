@@ -25,13 +25,7 @@ class RegisterController
     #[Post('register', name: 'customer.register')]
     public function __invoke(CustomerRegisterRequest $request): CustomerResource
     {
-        // $tier = null;
 
-        // if (isset($validated['tier_id'])) {
-
-        //     /** @var \Domain\Tier\Models\Tier $tier */
-        //     $tier = Tier::whereId($validated['tier_id'])->first();
-        // }
         $customerTier = Tier::whereId($request->tier_id)->first();
 
         /** @var \Domain\Tier\Models\Tier $defaultTier */
