@@ -15,7 +15,6 @@ class SendRegisterInvitationAction
         if ($customer->register_status === RegisterStatus::REGISTERED) {
             return false;
         }
-
         $customer->notify(new RegisterInvitationNotification());
 
         $customer->update([

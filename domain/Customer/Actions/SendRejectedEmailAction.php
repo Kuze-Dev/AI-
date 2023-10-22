@@ -7,7 +7,6 @@ namespace Domain\Customer\Actions;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Models\Customer;
 use Domain\Customer\Notifications\RejectedRegistrationNotification;
-use Domain\Tier\Events\TierRequestRejectedEvent;
 
 class SendRejectedEmailAction
 {
@@ -18,8 +17,6 @@ class SendRejectedEmailAction
         }
 
         $customer->notify(new RejectedRegistrationNotification());
-
-        event(new TierRequestRejectedEvent($customer));
 
         return true;
     }

@@ -131,14 +131,9 @@ class CustomerResource extends Resource
                         ])
                         ->hidden(function ($record, $context) {
 
-                            $wholesaler_domestic = Tier::whereName(config('domain.tier.wholesaler-domestic'))->first();
-
-                            $wholesaler_international = Tier::whereName(config('domain.tier.wholesaler-international'))->first();
-
                             /** @var \Domain\Tier\Models\Tier $tier */
-                            $tier = Tier::whereName(config('domain.tier.default'))->first();
-
-                            if ( ! $wholesaler_domestic || ! $wholesaler_international) {
+                            $tier = Tier::whereId($record?->tier_id)->first();
+                            if ( ! $tier->has_approval) {
                                 return true;
                             }
 
@@ -146,18 +141,11 @@ class CustomerResource extends Resource
                                 return true;
                             }
 
-                            if ($record !== null && ($record->tier_approval_status === TierApprovalStatus::APPROVED || ($tier !== null && $record->tier_id == $tier->getKey()))) {
+                            if ($record !== null && ($record->tier_approval_status === TierApprovalStatus::APPROVED)) {
                                 return true;
                             }
 
-                            if ($record !== null && ($record->tier_id === ($wholesaler_domestic->getKey()) && ($wholesaler_domestic->has_approval) == 1)) {
-                                return false;
-                            }
-
-                            if ($record !== null && ($record->tier_id === ($wholesaler_international->getKey()) && ($wholesaler_international->has_approval) == 1)) {
-                                return false;
-                            }
-
+                            return (bool) ($record !== null && $tier->isDefault());
                         }),
 
                     Forms\Components\TextInput::make('password')

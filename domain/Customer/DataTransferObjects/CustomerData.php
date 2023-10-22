@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Customer\DataTransferObjects;
 
+use App\Features\Customer\TierBase;
 use App\HttpTenantApi\Requests\Auth\Customer\CustomerRegisterRequest;
 use Carbon\Carbon;
 use Domain\Address\DataTransferObjects\AddressData;
@@ -39,23 +40,21 @@ final class CustomerData
     }
 
     public static function fromRegistrationRequest(
-        CustomerRegisterRequest $request
+        CustomerRegisterRequest $request,
+        Tier $customerTier = null,
+        Tier $defaultTier
     ): self {
 
         $validated = $request->validated();
         $sameAsShipping = $request->boolean('billing.same_as_shipping');
 
-        $tier = null;
-
-        if (isset($validated['tier_id'])) {
-            /** @var \Domain\Tier\Models\Tier $tier */
-            $tier = Tier::whereId($validated['tier_id'])->first();
+        if( ! $customerTier || ! tenancy()->tenant?->features()->active(TierBase::class)) {
+            $registerStatus = self::getStatus($defaultTier, null, null);
+            $tierId = $defaultTier->getKey();
+        } else {
+            $registerStatus = self::getStatus($customerTier, null, null);
+            $tierId = $customerTier->getKey();
         }
-
-        $register_status = self::getStatus( ! isset($validated['tier_id']) ? null : $tier, $validated, null);
-
-        /** @var \Domain\Tier\Models\Tier $defaultTier */
-        $defaultTier = Tier::whereName(config('domain.tier.default'))->first();
 
         unset($request);
 
@@ -66,7 +65,7 @@ final class CustomerData
             gender: Gender::from($validated['gender']),
             birth_date: now()->parse($validated['birth_date']),
             status: Status::ACTIVE,
-            tier_id:  is_null($validated['tier_id']) ? $defaultTier->getKey() : (int) $validated['tier_id'],
+            tier_id:  $tierId,
             email: $validated['email'],
             password: $validated['password'],
             image: $validated['profile_image'] ?? null,
@@ -93,7 +92,7 @@ final class CustomerData
             email_verification_type: isset($validated['email_verification_type'])
                 ? EmailVerificationType::from($validated['email_verification_type'])
                 : EmailVerificationType::LINK,
-            register_status: $register_status,
+            register_status: $registerStatus,
             tier_approval_status: null,
             through_api_registration: true,
         );
@@ -130,11 +129,12 @@ final class CustomerData
         );
     }
 
-    public static function fromArrayEditByAdmin(Customer $customer, array $data): self
+    public static function fromArrayEditByAdmin(Customer $customer, array $data, Tier $tier = null): self
     {
 
-        $tier = Tier::whereId($data['tier_id'])->first();
-        $registerStatus = self::getStatus($tier, $data, $customer);
+        $tierApprovalStatus = ! isset($data['tier_approval_status']) ? null : TierApprovalStatus::from($data['tier_approval_status']);
+
+        $registerStatus = self::getStatus($tier, $tierApprovalStatus, $customer);
 
         return new self(
             first_name: $data['first_name'],
@@ -166,56 +166,40 @@ final class CustomerData
         );
     }
 
-    private static function getStatus(Tier $tier = null, array $data = null, Customer $customer = null): RegisterStatus
-    {
+    private static function getStatus(
+        Tier $tier = null,
+        TierApprovalStatus $tierApprovalStatus = null,
+        Customer $customer = null
+    ): RegisterStatus {
 
-        $isTierWholesaler = in_array(
-            $tier?->name,
-            [
-                config('domain.tier.wholesaler-domestic'),
-                config('domain.tier.wholesaler-international'),
-            ]
-        );
+        if( ! tenancy()->tenant?->features()->active(TierBase::class)) {
+            return  RegisterStatus::REGISTERED;
+        }
 
-        $registerStatus = RegisterStatus::UNREGISTERED;
+        if ($tierApprovalStatus !== null) {
+            if(
+                $tier?->has_approval &&
+                $tierApprovalStatus === TierApprovalStatus::APPROVED &&
+                $customer?->register_status == RegisterStatus::UNREGISTERED
 
-        $unregistered_customer = Customer::whereEmail($customer?->email)->first();
-
-        if ( ! is_null($data) && array_key_exists('tier_approval_status', $data)) {
-            if ($data['tier_approval_status'] == TierApprovalStatus::REJECTED->value) {
-                return $registerStatus = RegisterStatus::REJECTED;
-            }
-            //if the customer was created in admin but was not yet sent an invitation or the customer registered and picked wholesaler as tier and waiting to be approved,
-            // initial register status of a customer
-            if( ! isset($data['tier_approval_status']) && $isTierWholesaler) {
-                return $registerStatus;
-            }
-
-            if($data['tier_approval_status'] == TierApprovalStatus::REJECTED->value) {
-                return $registerStatus = RegisterStatus::REJECTED;
-            }
-
-            //if the customer registered through api and picked wholesaler as tier and was approved by admin, the initial register status was unregistered,
-            //but since approved, now registered.
-            if($isTierWholesaler && $data['tier_approval_status'] == TierApprovalStatus::APPROVED->value && $customer?->register_status == RegisterStatus::UNREGISTERED) {
-                return $registerStatus = RegisterStatus::REGISTERED;
-            }
-
-            if($isTierWholesaler && $data['tier_approval_status'] == TierApprovalStatus::APPROVED->value && $customer?->register_status == RegisterStatus::REJECTED) {
-                return $registerStatus = RegisterStatus::REGISTERED;
+            ) {
+                return  RegisterStatus::REGISTERED;
             }
 
         }
-        //if customer registered through api but no tier indicated or if default was picked
-        if((is_null($tier) || $tier->name == config('domain.tier.default')) && is_null($unregistered_customer)) {
-            return $registerStatus = RegisterStatus::REGISTERED;
+
+        if($tier?->isDefault() === null && $customer === null) {
+            return  RegisterStatus::REGISTERED;
         }
 
-        //if customer was created in admin and was sent an invitation and the tier selected by the admin is wholesaler
-        if($isTierWholesaler && $customer?->tier_approval_status == TierApprovalStatus::APPROVED->value && ($customer?->register_status == RegisterStatus::INVITED)) {
-            return $registerStatus = RegisterStatus::REGISTERED;
+        if (
+            $tier?->has_approval &&
+            $customer?->tier_approval_status == TierApprovalStatus::APPROVED &&
+            $customer?->register_status == RegisterStatus::INVITED
+        ) {
+            return  RegisterStatus::REGISTERED;
         }
 
-        return $registerStatus;
+        return RegisterStatus::UNREGISTERED;
     }
 }

@@ -25,17 +25,26 @@ class RegisterController
     #[Post('register', name: 'customer.register')]
     public function __invoke(CustomerRegisterRequest $request): CustomerResource
     {
+        // $tier = null;
+
+        // if (isset($validated['tier_id'])) {
+
+        //     /** @var \Domain\Tier\Models\Tier $tier */
+        //     $tier = Tier::whereId($validated['tier_id'])->first();
+        // }
+        $customerTier = Tier::whereId($request->tier_id)->first();
+
+        /** @var \Domain\Tier\Models\Tier $defaultTier */
+        $defaultTier = Tier::whereName(config('domain.tier.default'))->first();
 
         $customer = DB::transaction(
             fn () => app(CreateCustomerAction::class)
-                ->execute(CustomerData::fromRegistrationRequest($request))
+                ->execute(CustomerData::fromRegistrationRequest($request, $customerTier, $defaultTier))
         );
 
         Notification::send($customer, new NewRegisterNotification($customer));
 
-        $tier = Tier::whereId($customer->tier_id)->first();
-
-        if($tier?->has_approval) {
+        if($customerTier?->has_approval) {
             app(SendForApprovalRegistrationAction::class)->execute($customer);
         }
 

@@ -21,8 +21,6 @@ use Domain\Order\Listeners\OrderPaymentUpdatedListener;
 use Domain\Order\Listeners\OrderStatusUpdatedListener;
 use Domain\Order\Listeners\PublicOrder\GuestOrderPlacedListener;
 use Domain\Payments\Events\PaymentProcessEvent;
-use Domain\Tier\Events\TierRequestRejectedEvent;
-use Domain\Tier\Listeners\TierRequestRejectedListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;

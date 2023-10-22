@@ -14,6 +14,7 @@ use Domain\Customer\Actions\SendRejectedEmailAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Enums\TierApprovalStatus;
+use Domain\Tier\Models\Tier;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
@@ -41,12 +42,15 @@ class EditCustomer extends EditRecord
                 ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->requiresConfirmation(function ($livewire) {
 
-                    return $livewire->data['tier_approval_status'] == TierApprovalStatus::REJECTED->value ? true : false;
+                    return $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value ? true : false;
 
                 })
-                ->modalHeading(fn ($livewire) => $livewire->data['tier_approval_status'] ? 'Warning' : null)
-                ->modalSubheading(fn ($livewire) => $livewire->data['tier_approval_status'] ? 'Rejecting will delete this customer. Would  you like to continue?' : null)
-                ->action(fn ($livewire) => $livewire->data['tier_approval_status'] == TierApprovalStatus::REJECTED->value ? $this->deleteIfRejectedCustomer() : $this->save())
+                ->modalHeading(fn ($livewire) => $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value ?
+                    'Warning' : null)
+                ->modalSubheading(fn ($livewire) => $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value ?
+                    'Rejecting will delete this customer. Would  you like to continue?' : null)
+                ->action(fn ($livewire) => $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value ?
+                    $this->deleteIfRejectedCustomer() : $this->save())
                 ->keyBindings(['mod+s']),
 
             Actions\DeleteAction::make()
@@ -84,9 +88,14 @@ class EditCustomer extends EditRecord
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
+        $customerTier = null;
+        if(isset($data['tier_id'])) {
+            $customerTier = Tier::whereId($data['tier_id'])->first();
+        }
+
         return DB::transaction(
             fn () => app(EditCustomerAction::class)
-                ->execute($record, CustomerData::fromArrayEditByAdmin($record, $data))
+                ->execute($record, CustomerData::fromArrayEditByAdmin($record, $data, $customerTier))
         );
     }
 
