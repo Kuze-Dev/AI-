@@ -42,23 +42,25 @@ class EditCustomer extends EditRecord
                 ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->requiresConfirmation(function ($livewire) {
 
-                    return $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value ? true : false;
+                    return $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value
+                        ? true
+                        : false;
 
                 })
-                ->modalHeading
-                (
-                    fn ($livewire) => $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value ?
-                    'Warning' : null
+                ->modalHeading(
+                    fn ($livewire) => $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value
+                        ? 'Warning'
+                        : null
                 )
-                ->modalSubheading
-                (
-                    fn ($livewire) => $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value ?
-                    'Rejecting will delete this customer. Would  you like to continue?' : null
+                ->modalSubheading(
+                    fn ($livewire) => $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value
+                        ? 'Rejecting will delete this customer. Would  you like to continue?'
+                        : null
                 )
-                ->action
-                (
-                    fn ($livewire) => $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value ?
-                    $this->deleteIfRejectedCustomer() : $this->save()
+                ->action(
+                    fn ($livewire) => $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value
+                        ? $this->deleteIfRejectedCustomer()
+                        : $this->save()
                 )
                 ->keyBindings(['mod+s']),
 
