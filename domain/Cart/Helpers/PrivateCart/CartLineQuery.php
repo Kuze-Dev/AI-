@@ -7,6 +7,7 @@ namespace Domain\Cart\Helpers\PrivateCart;
 use Domain\Cart\Models\CartLine;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
+use Domain\Tier\Models\Tier;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -19,7 +20,7 @@ class CartLineQuery
         $customer = auth()->user();
 
         /** @var \Domain\Tier\Models\Tier $tier */
-        $tier = $customer->tier;
+        $tier = $customer->tier ?? Tier::query()->where('name', config('domain.tier.default'))->first();
 
         $cartLines = CartLine::query()
             ->with(['purchasable' => function ($query) use ($tier) {

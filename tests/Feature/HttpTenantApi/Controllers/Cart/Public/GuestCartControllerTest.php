@@ -6,6 +6,7 @@ use Domain\Cart\Database\Factories\CartFactory;
 use Domain\Cart\Database\Factories\CartLineFactory;
 use Domain\Product\Database\Factories\ProductFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
+use App\Features\ECommerce\AllowGuestOrder;
 
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
@@ -13,6 +14,8 @@ use function Pest\Laravel\withHeader;
 
 beforeEach(function () {
     testInTenantContext();
+
+    tenancy()->tenant->features()->activate(AllowGuestOrder::class);
 
     ProductFactory::new()
         ->createOne([

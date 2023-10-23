@@ -121,7 +121,8 @@ class PaymentMethodResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->hidden(fn (PaymentMethod $record) => $record->trashed()),
                 Tables\Actions\RestoreAction::make(),
                 // Tables\Actions\ActionGroup::make([
                 //     Tables\Actions\DeleteAction::make()

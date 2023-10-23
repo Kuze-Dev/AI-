@@ -22,11 +22,11 @@ use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
 use Illuminate\Database\Eloquent\Collection;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 use Domain\Shipment\DataTransferObjects\ReceiverData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\Shipment\Enums\UnitEnum;
+use Domain\Taxation\Enums\PriceDisplay;
 
 class CartSummaryAction
 {
@@ -43,6 +43,10 @@ class CartSummaryAction
         $tax = $this->getTax($cartSummaryTaxData->countryId, $cartSummaryTaxData->stateId);
 
         $taxTotal = $tax['taxPercentage'] ? round($initialSubTotal * $tax['taxPercentage'] / 100, 2) : 0;
+
+        if ($tax['taxDisplay'] == PriceDisplay::INCLUSIVE) {
+            $taxTotal = 0;
+        }
 
         $initialShippingTotal = 0;
 
@@ -297,7 +301,6 @@ class CartSummaryAction
                 'taxDisplay' => null,
                 'taxPercentage' => null,
             ];
-            // throw new BadRequestHttpException('No tax zone found');
         }
 
         $taxPercentage = (float) $taxZone->percentage;

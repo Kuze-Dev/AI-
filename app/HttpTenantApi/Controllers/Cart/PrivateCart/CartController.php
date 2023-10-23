@@ -10,6 +10,7 @@ use Domain\Cart\Actions\DestroyCartAction;
 use Domain\Cart\Models\Cart;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
+use Domain\Tier\Models\Tier;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -28,7 +29,7 @@ class CartController extends Controller
         $customer = auth()->user();
 
         /** @var \Domain\Tier\Models\Tier $tier */
-        $tier = $customer->tier;
+        $tier = $customer->tier ?? Tier::query()->where('name', config('domain.tier.default'))->first();
 
         $model = QueryBuilder::for(
             Cart::with([

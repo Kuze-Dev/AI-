@@ -27,6 +27,7 @@ class ContentEntryResource extends JsonApiResource
             'published_at' => $this->published_at,
             'route_url' => $this->activeRouteUrl?->url,
             'locale' => $this->locale,
+            'blueprintData' => fn () => BlueprintDataResource::collection($this->blueprintData),
         ];
     }
 
@@ -38,6 +39,7 @@ class ContentEntryResource extends JsonApiResource
             'routeUrls' => fn () => RouteUrlResource::make($this->routeUrls),
             'metaData' => fn () => MetaDataResource::make($this->metaData),
             'content' => fn () => ContentResource::make($this->content),
+            'blueprintData' => fn () => BlueprintDataResource::collection($this->blueprintData),
         ];
     }
 

@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Features\Customer\AddressBase;
+use App\Features\Customer\CustomerBase;
+use App\Features\Customer\TierBase;
 use Domain\Address\Database\Factories\StateFactory;
 use Domain\Address\Models\Address;
 use Domain\Customer\Enums\RegisterStatus;
@@ -22,7 +24,10 @@ use function Pest\Laravel\travelTo;
 uses()->group('customer');
 
 beforeEach(function () {
-    testInTenantContext();
+    $tenant = testInTenantContext();
+    $tenant->features()->activate(CustomerBase::class);
+    $tenant->features()->activate(AddressBase::class);
+    $tenant->features()->activate(TierBase::class);
     if( ! Tier::whereName(config('domain.tier.default'))->first()) {
         TierFactory::createDefault();
     }
