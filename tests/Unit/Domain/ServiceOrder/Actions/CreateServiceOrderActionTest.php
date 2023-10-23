@@ -9,7 +9,6 @@ use Domain\ServiceOrder\Actions\CreateServiceOrderAction;
 use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Models\ServiceOrder;
-use Filament\Facades\Filament;
 
 use function PHPUnit\Framework\assertInstanceOf;
 

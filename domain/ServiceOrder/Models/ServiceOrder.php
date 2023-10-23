@@ -105,7 +105,7 @@ class ServiceOrder extends Model
         'tax_percentage',
         'tax_total',
         'total_price',
-        'terminate_on_expiry'
+        'terminate_on_expiry',
     ];
 
     protected $casts = [
@@ -119,7 +119,7 @@ class ServiceOrder extends Model
         'tax_total' => 'float',
         'total_price' => 'float',
         'status' => ServiceOrderStatus::class,
-        'terminate_on_expiry' => 'boolean'
+        'terminate_on_expiry' => 'boolean',
     ];
 
     public function getRouteKeyName(): string
