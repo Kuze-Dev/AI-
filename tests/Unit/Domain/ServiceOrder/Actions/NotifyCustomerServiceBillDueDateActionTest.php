@@ -206,3 +206,27 @@ it('cannot dispatch active service order with bill already paid', function () {
 
     QueueableActionFake::assertNotPushed(SendToCustomerServiceBillDueDateEmailAction::class);
 });
+
+it('cannot dispatch expired notification to non-automatic termination service', function () {
+    CustomerFactory::new()
+        ->active()
+        ->registered()
+        ->has(
+            ServiceOrderFactory::new()
+                ->active()
+                ->continueOnExpiry()
+                ->for(
+                    ServiceFactory::new()
+                        ->isSubscription()
+                        ->withDummyBlueprint()
+                )
+                ->has(ServiceBillFactory::new()->dueDate(now())->forPayment())
+        )
+        ->createOne();
+
+    now()->setTestNow(now()->addDay());
+
+    app(NotifyCustomerServiceBillDueDateAction::class)->execute();
+
+    QueueableActionFake::assertNotPushed(ExpiredServiceOrderAction::class);
+});

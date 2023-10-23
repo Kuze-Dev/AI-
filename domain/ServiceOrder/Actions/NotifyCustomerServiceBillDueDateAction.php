@@ -37,7 +37,7 @@ class NotifyCustomerServiceBillDueDateAction
 
                         if (
                             $latestForPaymentServiceBill->bill_date &&
-                            $latestForPaymentServiceBill->bill_date
+                            now()->parse($latestForPaymentServiceBill->bill_date)
                                 ->toDateString() === now()->toDateString()
                         ) {
                             $this->sendToCustomerServiceBillDueDateAction
@@ -49,8 +49,9 @@ class NotifyCustomerServiceBillDueDateAction
                         }
 
                         if (
+                            $serviceOrder->terminate_on_expiry &&
                             $latestForPaymentServiceBill->due_date &&
-                            $latestForPaymentServiceBill->due_date
+                            now()->parse($latestForPaymentServiceBill->due_date)
                                 ->toDateString() < now()->toDateString()
                         ) {
                             $this->expiredServiceOrderAction

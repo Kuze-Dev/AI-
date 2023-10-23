@@ -44,6 +44,7 @@ return new class () extends Migration {
             $table->decimal('tax_percentage', 7, 2)->index();
             $table->decimal('tax_total', 10, 2)->index();
             $table->decimal('total_price', 10, 2)->index();
+            $table->boolean('terminate_on_expiry')->default(true);
 
             $table->timestamps();
         });

@@ -46,6 +46,7 @@ class ServiceOrderFactory extends Factory
             'sub_total' => $this->faker->randomFloat(2, 1, 100),
             'tax_percentage' => $this->faker->randomFloat(2, 1, 100),
             'tax_total' => $this->faker->randomFloat(2, 1, 100),
+            'terminate_on_expiry' => true,
         ];
     }
 
@@ -80,5 +81,10 @@ class ServiceOrderFactory extends Factory
     public function forPayment(): self
     {
         return $this->state(['status' => ServiceOrderStatus::FORPAYMENT]);
+    }
+
+    public function continueOnExpiry(): self
+    {
+        return $this->state(['terminate_on_expiry' => false]);
     }
 }
