@@ -15,7 +15,6 @@ class CreateServiceBillCommand extends Command
     /** @var string */
     protected $description = 'Generate service bill for customer';
 
-    /** TODO: to be removed will be replaced with trigger on customer payment. */
     public function handle(CreateServiceBillingsAction $createServiceBillingsAction): int
     {
         $createServiceBillingsAction->execute();
