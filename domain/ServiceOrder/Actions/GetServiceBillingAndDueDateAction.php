@@ -19,12 +19,8 @@ class GetServiceBillingAndDueDateAction
     /** @throws Throwable */
     public function execute(
         ServiceBill $serviceBill,
-        ServiceTransaction $serviceTransaction
+        ?ServiceTransaction $serviceTransaction
     ): mixed {
-
-        if ($serviceBill->status != ServiceBillStatus::PAID) {
-            throw new ServiceBillStatusMusBePaidException();
-        }
 
         /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
         $serviceOrder = $serviceBill->serviceOrder;
@@ -35,15 +31,17 @@ class GetServiceBillingAndDueDateAction
         /** @var int $dueDateEvery */
         $dueDateEvery = $serviceOrder->due_date_every;
 
-        /** @var \Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData $serviceTransactionComputedBillingCycle */
-        $serviceTransactionComputedBillingCycle = $this->computeBillingCycle(
-            $billingCycle,
-            $dueDateEvery,
-            /** @phpstan-ignore-next-line */
-            $serviceTransaction->created_at,
-        );
+        if ($serviceTransaction) {
+            /** @var \Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData $serviceTransactionComputedBillingCycle */
+            $serviceTransactionComputedBillingCycle = $this->computeBillingCycle(
+                $billingCycle,
+                $dueDateEvery,
+                /** @phpstan-ignore-next-line */
+                $serviceTransaction->created_at,
+            );
 
-        $referenceDate = $serviceTransactionComputedBillingCycle->bill_date;
+            $referenceDate = $serviceTransactionComputedBillingCycle->bill_date;
+        }
 
         if ($serviceBill->due_date && $serviceBill->due_date >= now()) {
             $referenceDate = $serviceBill->bill_date;

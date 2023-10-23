@@ -80,24 +80,6 @@ $dataSets = [
     ],
 ];
 
-it('cannot execute', function () {
-    $serviceOrder = ServiceOrderFactory::new()
-        ->has(
-            ServiceBillFactory::new()
-                ->forPayment()
-                ->has(ServiceTransactionFactory::new())
-        )
-        ->createOne();
-
-    $serviceBill = $serviceOrder->serviceBills->first();
-
-    $this->getServiceBillingAndDueDateAction->execute(
-        $serviceBill,
-        $serviceBill->serviceTransaction
-    );
-})
-    ->throws(ServiceBillStatusMusBePaidException::class);
-
 it(
     'can get billing dates based on service transaction',
     function (
