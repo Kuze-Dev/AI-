@@ -16,7 +16,7 @@
         "filament/spatie-laravel-settings-plugin": "^2.0",
         "flowframe/laravel-trend": "^0.1.5",
         "guzzlehttp/guzzle": "^7.2",
-        "ibrahimbougaoua/filament-menu-scroll-fix": "^1.0",
+        "ibrahimbougaoua/filament-menu-scroll-fix": "<1.0.2",
         "laravel/framework": "^10.15",
         "laravel/pennant": "^1.3",
         "laravel/sanctum": "^3.2",
