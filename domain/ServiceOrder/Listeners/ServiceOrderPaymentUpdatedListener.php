@@ -49,7 +49,7 @@ class ServiceOrderPaymentUpdatedListener
         ]);
 
         if($serviceBill->serviceOrder->service->is_subscription) {
-            $serviceBillingDate = app(GetServiceBillingAndDueDateAction::class)->execute($serviceBill, $serviceTransaction);
+            $serviceBillingDate = app(GetServiceBillingAndDueDateAction::class)->execute($serviceBill);
             app(CreateServiceBillAction::class)->execute(ServiceBillData::fromCreatedServiceOrder($serviceBill->serviceOrder->toArray()), $serviceBillingDate);
         }
 

@@ -87,10 +87,8 @@ it('can create bill billing and due dates', function () {
     $serviceOrder = app(CreateServiceOrderAction::class)
         ->execute($serviceOrderData, $this->admin->id);
 
-    $serviceOrderBillingAndDueDateData = app(GetServiceBillingAndDueDateAction::class)->execute(
-        $serviceBill,
-        $serviceBill->serviceTransaction
-    );
+    $serviceOrderBillingAndDueDateData = app(GetServiceBillingAndDueDateAction::class)
+        ->execute($serviceBill);
 
     $serviceBill = app(CreateServiceBillAction::class)->execute(
         ServiceBillData::fromCreatedServiceOrder($serviceOrder->toArray()),

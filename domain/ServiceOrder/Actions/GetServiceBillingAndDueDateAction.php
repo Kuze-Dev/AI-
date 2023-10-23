@@ -17,10 +17,8 @@ use Throwable;
 class GetServiceBillingAndDueDateAction
 {
     /** @throws Throwable */
-    public function execute(
-        ServiceBill $serviceBill,
-        ?ServiceTransaction $serviceTransaction
-    ): mixed {
+    public function execute(ServiceBill $serviceBill): mixed 
+    {
 
         /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
         $serviceOrder = $serviceBill->serviceOrder;
@@ -30,6 +28,9 @@ class GetServiceBillingAndDueDateAction
 
         /** @var int $dueDateEvery */
         $dueDateEvery = $serviceOrder->due_date_every;
+
+        /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
+        $serviceTransaction = $serviceBill->serviceTransaction;
 
         if ($serviceTransaction) {
             /** @var \Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData $serviceTransactionComputedBillingCycle */

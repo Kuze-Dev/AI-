@@ -110,10 +110,8 @@ it(
 
         $serviceBill = $serviceOrder->serviceBills->first();
 
-        $dates = $this->getServiceBillingAndDueDateAction->execute(
-            $serviceBill,
-            $serviceBill->serviceTransaction
-        );
+        $dates = $this->getServiceBillingAndDueDateAction
+            ->execute($serviceBill);
 
         expect($dates->bill_date)
             ->toBeGreaterThan($nextBillDate);
@@ -153,10 +151,8 @@ it(
 
         $serviceBill = $serviceOrder->serviceBills->first();
 
-        $dates = $this->getServiceBillingAndDueDateAction->execute(
-            $serviceBill,
-            $serviceBill->serviceTransaction
-        );
+        $dates = $this->getServiceBillingAndDueDateAction
+            ->execute($serviceBill);
 
         expect($dates->bill_date->format($this->dateFormat))
             ->toBe($nextBillDate->format($this->dateFormat));
@@ -196,10 +192,8 @@ it(
 
         $serviceBill = $serviceOrder->serviceBills->first();
 
-        $dates = $this->getServiceBillingAndDueDateAction->execute(
-            $serviceBill,
-            $serviceBill->serviceTransaction
-        );
+        $dates = $this->getServiceBillingAndDueDateAction
+            ->execute($serviceBill);
 
         expect($dates->bill_date)
             ->toBeGreaterThan($nextBillDate);
