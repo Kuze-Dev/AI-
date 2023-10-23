@@ -45,12 +45,21 @@ class EditCustomer extends EditRecord
                     return $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value ? true : false;
 
                 })
-                ->modalHeading(fn ($livewire) => $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value ?
-                    'Warning' : null)
-                ->modalSubheading(fn ($livewire) => $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value ?
-                    'Rejecting will delete this customer. Would  you like to continue?' : null)
-                ->action(fn ($livewire) => $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value ?
-                    $this->deleteIfRejectedCustomer() : $this->save())
+                ->modalHeading
+                (
+                    fn ($livewire) => $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value ?
+                    'Warning' : null
+                )
+                ->modalSubheading
+                (
+                    fn ($livewire) => $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value ?
+                    'Rejecting will delete this customer. Would  you like to continue?' : null
+                )
+                ->action
+                (
+                    fn ($livewire) => $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value ?
+                    $this->deleteIfRejectedCustomer() : $this->save()
+                )
                 ->keyBindings(['mod+s']),
 
             Actions\DeleteAction::make()

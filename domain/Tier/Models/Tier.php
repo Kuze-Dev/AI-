@@ -82,6 +82,6 @@ class Tier extends Model
 
     public function isDefault(): bool
     {
-        return $this->name == config('domain.tier.default');
+        return $this->name === config('domain.tier.default');
     }
 }
