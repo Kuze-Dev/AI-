@@ -47,7 +47,6 @@ it('can show cart', function () {
                     'coupon_code' => null,
                 ],
             ],
-            'included' => [],
             'jsonapi' => [
                 'version' => '1.0',
             ],
