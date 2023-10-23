@@ -46,7 +46,7 @@ use Support\MetaData\Models\MetaData;
  * @property int $is_subscription
  * @property int $status
  * @property int $needs_approval
- * @property int $auto_generate_bill
+ * @property bool $auto_generate_bill
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
@@ -85,7 +85,7 @@ use Support\MetaData\Models\MetaData;
  * @method static Builder|Service withoutTrashed()
  * @mixin Eloquent
  */
-#[OnDeleteCascade(['metaData, taxonomyTerms'])]
+#[OnDeleteCascade(['metaData, taxonomyTerms', 'media'])]
 class Service extends Model implements HasMetaDataContract, HasMedia
 {
     use LogsActivity;
