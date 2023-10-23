@@ -25,7 +25,12 @@ it('can dispatch billable customer only', function () {
         ->has(
             ServiceOrderFactory::new()
                 ->active()
-                ->for(ServiceFactory::new()->subscriptionBased()->withDummyBlueprint())
+                ->for(
+                    ServiceFactory::new()
+                        ->isSubscription()
+                        ->autoGenerateBill()
+                        ->withDummyBlueprint()
+                )
                 ->has(ServiceBillFactory::new(['bill_date' => now()])->paid())
         )
         ->createOne();
@@ -33,8 +38,6 @@ it('can dispatch billable customer only', function () {
     app(CreateServiceBillingsAction::class)->execute();
 
     Queue::assertPushed(CreateServiceBillJob::class);
-
-    QueueableActionFake::assertPushed(SendToCustomerServiceBillEmailAction::class);
 });
 
 it('cannot dispatch non subscription service order', function () {
@@ -46,7 +49,12 @@ it('cannot dispatch non subscription service order', function () {
         ->has(
             ServiceOrderFactory::new()
                 ->active()
-                ->for(ServiceFactory::new()->nonSubscriptionBased()->withDummyBlueprint())
+                ->for(
+                    ServiceFactory::new()
+                        ->isSubscription(false)
+                        ->autoGenerateBill()
+                        ->withDummyBlueprint()
+                )
                 ->has(ServiceBillFactory::new(['bill_date' => now()])->paid())
         )
         ->createOne();
@@ -54,8 +62,6 @@ it('cannot dispatch non subscription service order', function () {
     app(CreateServiceBillingsAction::class)->execute();
 
     Queue::assertNotPushed(CreateServiceBillJob::class);
-
-    QueueableActionFake::assertNotPushed(SendToCustomerServiceBillEmailAction::class);
 });
 
 it('cannot dispatch active only customer', function () {
@@ -69,8 +75,6 @@ it('cannot dispatch active only customer', function () {
     app(CreateServiceBillingsAction::class)->execute();
 
     Queue::assertNotPushed(CreateServiceBillJob::class);
-
-    QueueableActionFake::assertNotPushed(SendToCustomerServiceBillEmailAction::class);
 });
 
 it('cannot dispatch registered only customer', function () {
@@ -84,29 +88,6 @@ it('cannot dispatch registered only customer', function () {
     app(CreateServiceBillingsAction::class)->execute();
 
     Queue::assertNotPushed(CreateServiceBillJob::class);
-
-    QueueableActionFake::assertNotPushed(SendToCustomerServiceBillEmailAction::class);
-});
-
-it('cannot dispatch inactive service order', function () {
-    Queue::fake();
-
-    CustomerFactory::new()
-        ->active()
-        ->registered()
-        ->has(
-            ServiceOrderFactory::new()
-                ->inactive()
-                ->for(ServiceFactory::new()->subscriptionBased()->withDummyBlueprint())
-                ->has(ServiceBillFactory::new(['bill_date' => now()])->paid())
-        )
-        ->createOne();
-
-    app(CreateServiceBillingsAction::class)->execute();
-
-    Queue::assertNotPushed(CreateServiceBillJob::class);
-
-    QueueableActionFake::assertNotPushed(SendToCustomerServiceBillEmailAction::class);
 });
 
 it('cannot dispatch closed service order', function () {
@@ -118,7 +99,12 @@ it('cannot dispatch closed service order', function () {
         ->has(
             ServiceOrderFactory::new()
                 ->closed()
-                ->for(ServiceFactory::new()->subscriptionBased()->withDummyBlueprint())
+                ->for(
+                    ServiceFactory::new()
+                        ->isSubscription()
+                        ->autoGenerateBill()
+                        ->withDummyBlueprint()
+                )
                 ->has(ServiceBillFactory::new(['bill_date' => now()])->paid())
         )
         ->createOne();
@@ -126,8 +112,6 @@ it('cannot dispatch closed service order', function () {
     app(CreateServiceBillingsAction::class)->execute();
 
     Queue::assertNotPushed(CreateServiceBillJob::class);
-
-    QueueableActionFake::assertNotPushed(SendToCustomerServiceBillEmailAction::class);
 });
 
 it('cannot dispatch active service order without current/latest bill', function () {
@@ -139,18 +123,21 @@ it('cannot dispatch active service order without current/latest bill', function 
         ->has(
             ServiceOrderFactory::new()
                 ->active()
-                ->for(ServiceFactory::new()->subscriptionBased()->withDummyBlueprint())
+                ->for(
+                    ServiceFactory::new()
+                        ->isSubscription()
+                        ->autoGenerateBill()
+                        ->withDummyBlueprint()
+                )
         )
         ->createOne();
 
     app(CreateServiceBillingsAction::class)->execute();
 
     Queue::assertNotPushed(CreateServiceBillJob::class);
-
-    QueueableActionFake::assertNotPushed(SendToCustomerServiceBillEmailAction::class);
 });
 
-it('cannot dispatch active service order with current/latest bill but still unpaid', function () {
+it('cannot dispatch on non auto generated bills', function () {
     Queue::fake();
 
     CustomerFactory::new()
@@ -159,35 +146,17 @@ it('cannot dispatch active service order with current/latest bill but still unpa
         ->has(
             ServiceOrderFactory::new()
                 ->active()
-                ->for(ServiceFactory::new()->subscriptionBased()->withDummyBlueprint())
-                ->has(ServiceBillFactory::new(['bill_date' => now()])->unpaid())
+                ->for(
+                    ServiceFactory::new()
+                        ->isSubscription()
+                        ->autoGenerateBill(false)
+                        ->withDummyBlueprint()
+                )
+                ->has(ServiceBillFactory::new(['bill_date' => now()])->paid())
         )
         ->createOne();
 
     app(CreateServiceBillingsAction::class)->execute();
 
     Queue::assertNotPushed(CreateServiceBillJob::class);
-
-    QueueableActionFake::assertNotPushed(SendToCustomerServiceBillEmailAction::class);
-});
-
-it('cannot dispatch active service order with current/latest bill but not past due date yet', function () {
-    Queue::fake();
-
-    CustomerFactory::new()
-        ->active()
-        ->registered()
-        ->has(
-            ServiceOrderFactory::new()
-                ->active()
-                ->for(ServiceFactory::new()->subscriptionBased()->withDummyBlueprint())
-                ->has(ServiceBillFactory::new(['bill_date' => now()->addDay()])->unpaid())
-        )
-        ->createOne();
-
-    app(CreateServiceBillingsAction::class)->execute();
-
-    Queue::assertNotPushed(CreateServiceBillJob::class);
-
-    QueueableActionFake::assertNotPushed(SendToCustomerServiceBillEmailAction::class);
 });

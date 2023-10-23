@@ -6,6 +6,7 @@ namespace Domain\ServiceOrder\Jobs;
 
 use Domain\Customer\Models\Customer;
 use Domain\ServiceOrder\Actions\CreateServiceBillAction;
+use Domain\ServiceOrder\Actions\GetServiceBillingAndDueDateAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
@@ -39,14 +40,21 @@ class CreateServiceBillJob implements ShouldQueue, ShouldBeUnique
         return $this->serviceOrder->reference;
     }
 
-    public function handle(CreateServiceBillAction $createServiceBillAction): void
+    public function handle(
+        CreateServiceBillAction $createServiceBillAction,
+        GetServiceBillingAndDueDateAction $getServiceBillingAndDueDateAction
+    ): void
     {
-        $serviceBillData = ServiceBillData::fromArray($this->serviceBill->toArray());
+        $serviceBillData = ServiceBillData::fromArray(
+            $this->serviceBill->toArray()
+        );
 
-        $createServiceBillAction
-            ->execute(
-                $this->serviceBill,
-                $serviceBillData
-            );
+        $serviceOrderBillingAndDueDateData = $getServiceBillingAndDueDateAction
+            ->execute($this->serviceBill);
+
+        $createServiceBillAction->execute(
+            $serviceBillData,
+            $serviceOrderBillingAndDueDateData
+        );
     }
 }

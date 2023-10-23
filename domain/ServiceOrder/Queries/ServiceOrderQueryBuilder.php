@@ -21,4 +21,11 @@ class ServiceOrderQueryBuilder extends Builder
             $nestedQuery->where('is_subscription', true);
         });
     }
+
+    public function whereAutoGenerateBills(): self
+    {
+        return $this->whereHas('service', function ($nestedQuery) {
+            $nestedQuery->where('auto_generate_bill', true);
+        });
+    }
 }

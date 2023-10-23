@@ -43,4 +43,22 @@ class ServiceBillData
             status: ServiceBillStatus::PENDING,
         );
     }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            service_order_id: $data['service_order_id'],
+            reference: $data['reference'],
+            bill_date: $data['bill_date'],
+            due_date: $data['due_date'],
+            service_price: $data['service_price'],
+            additional_charges: $data['additional_charges'],
+            sub_total: $data['sub_total'],
+            tax_display: $data['tax_display'],
+            tax_percentage: $data['tax_percentage'],
+            tax_total: $data['tax_total'],
+            total_amount: $data['total_price'],
+            status: $data['status'],
+        );
+    }
 }

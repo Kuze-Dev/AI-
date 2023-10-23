@@ -21,9 +21,9 @@ class Kernel extends ConsoleKernel
             ->daily()
             ->sentryMonitor();
 
-        // $schedule->command(CreateServiceBillCommand::class)
-        //     ->daily()
-        //     ->sentryMonitor();
+        $schedule->command(CreateServiceBillCommand::class)
+            ->daily()
+            ->sentryMonitor();
 
         $schedule->command(PruneExcelCommand::class)
             ->daily();

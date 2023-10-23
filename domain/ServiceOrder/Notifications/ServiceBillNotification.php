@@ -32,13 +32,14 @@ class ServiceBillNotification extends Notification implements ShouldQueue
         $this->serviceBill = $serviceBill;
 
         $this->logo = app(SiteSettings::class)->getLogoUrl();
+
         $this->title = app(SiteSettings::class)->name;
+
         $this->description = app(SiteSettings::class)->description;
 
         $this->from = app(ServiceSettings::class)->email_sender_name;
 
-        $sanitizedReplyToEmails = $this->sanitizeEmailArray(app(ServiceSettings::class)->email_reply_to ?? []);
-        $this->replyTo = $sanitizedReplyToEmails;
+        $this->replyTo = app(ServiceSettings::class)->email_reply_to ?? [];
 
         $this->footer = app(ServiceSettings::class)->email_footer;
     }
@@ -54,39 +55,27 @@ class ServiceBillNotification extends Notification implements ShouldQueue
         $admin = Admin::first();
 
         return (new MailMessage())
-            ->subject('Service Bill')
             ->replyTo($this->replyTo)
             ->from($this->from)
-            ->view('filament.emails.serviceOrder.created', [
-                'logo' => $this->logo,
-                'title' => $this->title,
-                'description' => $this->description,
-                'timezone' => $admin?->timezone,
-                'serviceBill' => $this->serviceBill,
-                'customer' => $notifiable,
-                'footer' => $this->footer,
-                'url' => $this->url,
-            ]);
+            ->subject('Latest Service Bill')
+            ->line(trans('Please click the button below to register your email address.'));
+
+            // TODO: use custom template
+            // ->view('filament.emails.serviceOrder.created', [
+            //     'logo' => $this->logo,
+            //     'title' => $this->title,
+            //     'description' => $this->description,
+            //     'timezone' => $admin?->timezone,
+            //     'serviceBill' => $this->serviceBill,
+            //     'customer' => $notifiable,
+            //     'footer' => $this->footer,
+            //     'url' => $this->url,
+            // ]);
     }
 
     /** @return array<string, mixed> */
     public function toArray(object $notifiable): array
     {
         return [];
-    }
-
-    private function sanitizeEmailArray(array $emailArray): array
-    {
-        $sanitizedEmails = [];
-
-        foreach ($emailArray as $email) {
-            $email = trim($email);
-
-            if ( ! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $sanitizedEmails[] = $email;
-            }
-        }
-
-        return $sanitizedEmails;
     }
 }

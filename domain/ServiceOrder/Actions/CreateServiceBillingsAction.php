@@ -6,11 +6,14 @@ namespace Domain\ServiceOrder\Actions;
 
 use Domain\Customer\Models\Customer;
 use Domain\ServiceOrder\Jobs\CreateServiceBillJob;
+use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
 use Domain\ServiceOrder\Models\ServiceOrder;
 
 class CreateServiceBillingsAction
 {
-    public function __construct(private SendToCustomerServiceBillEmailAction $sendToCustomerServiceBillEmailAction)
+    public function __construct(
+        private SendToCustomerServiceBillEmailAction $sendToCustomerServiceBillEmailAction
+    )
     {
     }
 
@@ -19,15 +22,15 @@ class CreateServiceBillingsAction
         $customers = Customer::query()
             ->with([
                 'serviceOrders' => function ($query) {
-                    $query
-                        ->whereActive()
+                    $query->whereActive()
+                        ->whereAutoGenerateBills()
                         ->whereSubscriptionBased();
                 },
                 'serviceOrders.serviceBills',
             ])
             ->whereActive()
             ->whereRegistered()
-            ->whereHas('serviceOrders')
+            ->whereHas('serviceOrders', fn ($query) => $query->has('serviceBills'))
             ->get();
 
         $customers
@@ -35,25 +38,23 @@ class CreateServiceBillingsAction
                 $customer
                     ->serviceOrders
                     ->each(function (ServiceOrder $serviceOrder) use ($customer) {
-                        /** @var \Domain\ServiceOrder\Models\ServiceBill|null $latestPaidServiceBill */
-                        $latestPaidServiceBill = $serviceOrder->latestPaidServiceBill();
+                        /** @var \Domain\ServiceOrder\Models\ServiceBill $latestServiceBill */
+                        $latestServiceBill = $serviceOrder->latestServiceBill();
 
-                        if ($latestPaidServiceBill && $latestPaidServiceBill->bill_date <= now()) {
+                        if (
+                            now()->parse($latestServiceBill->bill_date)
+                                ->toDateString() === now()->toDateString()
+                        ) {
                             CreateServiceBillJob::dispatch(
                                 $customer,
                                 $serviceOrder,
-                                $latestPaidServiceBill
-                            );
-
-                            /** @var \Domain\ServiceOrder\Models\ServiceBill $serviceBill */
-                            $serviceBill = $serviceOrder->refresh()->latestForPaymentServiceBill();
-
-                            $this->sendToCustomerServiceBillEmailAction
-                                ->onQueue()
-                                ->execute(
+                                $latestServiceBill
+                            )->chain([
+                                new NotifyCustomerLatestServiceBillJob(
                                     $customer,
-                                    $serviceBill
-                                );
+                                    $serviceOrder
+                                )
+                            ]);
                         }
                     });
             });
