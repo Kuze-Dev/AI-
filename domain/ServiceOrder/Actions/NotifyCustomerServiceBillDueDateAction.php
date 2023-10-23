@@ -52,7 +52,6 @@ class NotifyCustomerServiceBillDueDateAction
                         }
 
                         if (
-                            $serviceOrder->terminate_on_expiry &&
                             $latestForPaymentServiceBill->due_date &&
                             now()->parse($latestForPaymentServiceBill->due_date)
                                 ->toDateString() < now()->toDateString()
