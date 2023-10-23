@@ -28,6 +28,7 @@ beforeEach(function () {
     CurrencyFactory::new()->createOne([
         'enabled' => true,
     ]);
+
 });
 
 it('can render page', function () {

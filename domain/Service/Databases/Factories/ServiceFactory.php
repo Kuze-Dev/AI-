@@ -11,6 +11,7 @@ use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Service>
@@ -22,6 +23,7 @@ class ServiceFactory extends Factory
     public function definition(): array
     {
         return [
+            'uuid' => (string) Str::uuid(),
             'name' => $this->faker->name,
             'description' => $this->faker->sentence,
             'retail_price' => $this->faker->numberBetween(1, 99_999),
@@ -34,6 +36,7 @@ class ServiceFactory extends Factory
             'is_subscription' => $this->faker->boolean(),
             'status' => $this->faker->boolean(),
             'needs_approval' => $this->faker->boolean(),
+            'auto_generate_bill' => $this->faker->boolean(),
         ];
     }
 
@@ -76,6 +79,13 @@ class ServiceFactory extends Factory
     {
         return $this->state([
             'needs_approval' => $needsApproval,
+        ]);
+    }
+
+    public function autoGenerateBill(bool $autoGenerateBill = true): self
+    {
+        return $this->state([
+            'auto_generate_bill' => $autoGenerateBill,
         ]);
     }
 

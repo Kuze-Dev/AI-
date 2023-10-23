@@ -81,54 +81,10 @@ class ServiceResource extends Resource
                                 ->translateLabel()
                                 ->mediaLibraryCollection('image')
                                 ->image()
-                                ->multiple(),
+                                ->multiple()
+                                ->required(),
                         ]),
-                        Forms\Components\Section::make('Service Price')
-                            ->translateLabel()
-                            ->schema([
-                                Forms\Components\Toggle::make('pay_upfront'),
-                                Forms\Components\TextInput::make('retail_price')
-                                    ->translateLabel()
-                                    ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
-                                        prefix: Currency::whereEnabled(true)->firstOrFail()->symbol,
-                                        thousandsSeparator: ',',
-                                        decimalPlaces: 2,
-                                        isSigned: false
-                                    ))
-                                    ->rules([
-                                        function () {
-                                            return function (string $attribute, mixed $value, Closure $fail) {
-                                                if ($value <= 0) {
-                                                    $attributeName = ucfirst(explode('.', $attribute)[1]);
-                                                    $fail("{$attributeName} must be above zero.");
-                                                }
-                                            };
-                                        },
-                                    ])
-                                    ->dehydrateStateUsing(fn ($state) => (float) $state)
-                                    ->required(),
-                                Forms\Components\TextInput::make('selling_price')
-                                    ->translateLabel()
-                                    // Put custom rule to validate minimum value
-                                    ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
-                                        prefix: Currency::whereEnabled(true)->firstOrFail()->symbol,
-                                        thousandsSeparator: ',',
-                                        decimalPlaces: 2,
-                                        isSigned: false
-                                    ))
-                                    ->rules([
-                                        function () {
-                                            return function (string $attribute, mixed $value, Closure $fail) {
-                                                if ($value <= 0) {
-                                                    $attributeName = ucfirst(explode('.', $attribute)[1]);
-                                                    $fail("{$attributeName} must be above zero.");
-                                                }
-                                            };
-                                        },
-                                    ])
-                                    ->dehydrateStateUsing(fn ($state) => (float) $state)
-                                    ->required(),
-                            ]),
+                        self::servicePriceSection(),
                         Forms\Components\Section::make('Section Display')
                             ->translateLabel()
                             ->schema([
@@ -137,7 +93,7 @@ class ServiceResource extends Resource
                                 Forms\Components\Toggle::make('is_featured')
                                     ->label(trans('Featured Service')),
                             ])
-                            ->columns(2),
+                            ->columns(),
                         Forms\Components\Section::make('Dynamic Form Builder')
                             ->schema([
                                 Forms\Components\Select::make('blueprint_id')
@@ -156,47 +112,18 @@ class ServiceResource extends Resource
                             ])
                             ->columnSpan(2),
                     ])->columnSpan(2),
-                Forms\Components\Group::make()->schema([
-                    Forms\Components\Section::make('Status')
-                        ->translateLabel()
-                        ->schema([
-                            Forms\Components\Toggle::make('status')
-                                ->label(
-                                    fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value))
-                                        : ucfirst(trans(Status::INACTIVE->value))
-                                ),
-                            Forms\Components\Toggle::make('is_subscription')
-                                ->label(trans('Subscription-based'))
-                                ->reactive()
-                                ->helperText('Fields below are only available on subscription'),
-                            Forms\Components\Card::make([
-                                Forms\Components\Select::make('billing_cycle')
-                                    ->options(function () {
-                                        $billing = [];
-                                        foreach (BillingCycleEnum::cases() as $billingCycle) {
-                                            $billing[$billingCycle->value] = $billingCycle->name;
-                                        }
-
-                                        return $billing;
-                                    })
-                                    ->required(fn (Closure $get) => $get('is_subscription') === true),
-                                Forms\Components\Select::make('due_date_every')
-                                    ->reactive()
-                                    ->options(fn () => range(1, now()->daysInMonth))
-                                    ->disabled(fn (Closure $get) => $get('billing_cycle') === false)
-                                    ->required(fn (Closure $get) => $get('is_subscription') === true),
-                            ])
-                                ->reactive()
-                                ->hidden(fn (Closure $get) => $get('is_subscription') === false),
-                            Forms\Components\Toggle::make('needs_approval')
-                                ->label(trans('Approval')),
-                        ]),
-                    MetaDataForm::make('Meta Data'),
-                ])->columnSpan(1),
+                Forms\Components\Group::make()
+                    ->schema([
+                        self::statusSection(),
+                        MetaDataForm::make('Meta Data'),
+                    ])->columnSpan(1),
             ])
             ->columns(3);
     }
 
+    /**
+     * @throws \Exception
+     */
     public static function table(Table $table): Table
     {
         return $table
@@ -204,9 +131,7 @@ class ServiceResource extends Resource
                 SpatieMediaLibraryImageColumn::make('image')
                     ->collection('image')
                     ->default(
-                        fn (Service $record) => $record->getFirstMedia('image') === null
-                            ? 'https://via.placeholder.com/500x300/333333/fff?text=No+preview+available'
-                            : null
+                        fn (Service $record) => $record->getFirstMedia('image') === null ? 'https://via.placeholder.com/500x300/333333/fff?text=No+preview+available' : null
                     )
                     ->extraImgAttributes(['class' => 'aspect-[5/3] object-fill']),
                 Tables\Columns\TextColumn::make('name')
@@ -233,9 +158,7 @@ class ServiceResource extends Resource
                     ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->translateLabel()
-                    ->formatStateUsing(fn ($state) => $state
-                        ? ucfirst(STATUS::ACTIVE->value)
-                        : ucfirst(STATUS::INACTIVE->value))
+                    ->formatStateUsing(fn ($state) => $state ? ucfirst(STATUS::ACTIVE->value) : ucfirst(STATUS::INACTIVE->value))
                     ->color(fn (Service $record) => $record->status ? 'success' : 'secondary')
                     ->sortable(),
             ])
@@ -264,7 +187,7 @@ class ServiceResource extends Resource
                         ->using(function (Service $record) {
                             try {
                                 return app(DeleteServiceAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         })
@@ -291,5 +214,118 @@ class ServiceResource extends Resource
             'create' => CreateService::route('/create'),
             'edit' => EditService::route('/{record}/edit'),
         ];
+    }
+
+    public static function servicePriceSection(): Forms\Components\Section
+    {
+        return Forms\Components\Section::make('Service Price')
+            ->translateLabel()
+            ->schema([
+                Forms\Components\Toggle::make('pay_upfront')
+                    ->reactive()
+                    ->disabled(fn (Closure $get) => $get('is_subscription') === true),
+                Forms\Components\TextInput::make('retail_price')
+                    ->translateLabel()
+                    ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
+                        prefix: Currency::whereEnabled(true)->firstOrFail()->symbol,
+                        isSigned: false
+                    ))
+                    ->rules([
+                        function () {
+                            return function (string $attribute, mixed $value, Closure $fail) {
+                                if ($value <= 0) {
+                                    $attributeName = ucfirst(explode('.', $attribute)[1]);
+                                    $fail("$attributeName must be above zero.");
+                                }
+                            };
+                        },
+                    ])
+                    ->dehydrateStateUsing(fn ($state) => (float) $state)
+                    ->required(),
+                Forms\Components\TextInput::make('selling_price')
+                    ->translateLabel()
+                    // Put custom rule to validate minimum value
+                    ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
+                        prefix: Currency::whereEnabled(true)->firstOrFail()->symbol,
+                        isSigned: false
+                    ))
+                    ->rules([
+                        function () {
+                            return function (string $attribute, mixed $value, Closure $fail) {
+                                if ($value <= 0) {
+                                    $attributeName = ucfirst(explode('.', $attribute)[1]);
+                                    $fail("$attributeName must be above zero.");
+                                }
+                            };
+                        },
+                    ])
+                    ->dehydrateStateUsing(fn ($state) => (float) $state)
+                    ->required(),
+            ]);
+    }
+
+    public static function statusSection(): Forms\Components\Section
+    {
+        return Forms\Components\Section::make('Status')
+            ->translateLabel()
+            ->schema([
+                Forms\Components\Toggle::make('status')
+                    ->label(fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value)))
+                    ->reactive()
+                    ->lazy()
+                    ->afterStateUpdated(
+                        fn (Forms\Components\Toggle $component) => $component->dispatchEvent('status::update')
+                    ),
+                Forms\Components\Toggle::make('is_subscription')
+                    ->afterStateUpdated(fn (Closure $set, $state) => $set('pay_upfront', $state))
+                    ->label(trans('Subscription Based'))
+                    ->reactive()
+                    ->helperText(fn (Closure $get) => $get('is_subscription') === true
+                        ? "Please provide values on 'billing cycle' and 'due date every' fields" : ''),
+                Forms\Components\Select::make('billing_cycle')
+                    ->options(function () {
+                        $billing = [];
+                        foreach (BillingCycleEnum::cases() as $billingCycle) {
+                            $billing[$billingCycle->value] = $billingCycle->name;
+                        }
+
+                        return $billing;
+                    })
+                    ->reactive()
+                    ->hidden(fn (Closure $get) => $get('is_subscription') === false)
+                    ->required(fn (Closure $get) => $get('is_subscription') === true),
+                Forms\Components\Toggle::make('auto_generate_bill')
+                    ->label(trans('Auto Generate Bill'))
+                    ->reactive()
+                    ->hidden(fn (Closure $get) => $get('is_subscription') === false)
+                    ->afterStateUpdated(
+                        fn (Forms\Components\Toggle $component, Closure $get, Closure $set) => $set('due_date_every', $component->getState() === false ? null : $get('due_date_every'))
+                    ),
+                Forms\Components\Select::make('due_date_every')
+                    ->reactive()
+                    ->options(fn () => range(1, now()->daysInMonth))
+                    ->formatStateUsing(
+                        fn (?Service $record, Closure $set) => $record?->auto_generate_bill === true ? $record->due_date_every : null
+                    )
+                    ->hidden(fn (Closure $get) => $get('is_subscription') === false)
+                    ->disabled(
+                        fn (Closure $get) => $get('auto_generate_bill') === false
+                    )
+                    ->required(fn (Closure $get) => $get('auto_generate_bill') === true),
+                Forms\Components\Toggle::make('needs_approval')
+                    ->label(trans('Needs Approval')),
+            ])
+            ->registerListeners([
+                'status::update' => [
+                    function (Forms\Components\Section $component): void {
+                        $component->evaluate(function (Closure $get, Closure $set) {
+                            if($get('status')) {
+                                $set('status')
+                                    ->label(fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value)));
+                            }
+                        });
+                    },
+                ],
+            ]);
     }
 }

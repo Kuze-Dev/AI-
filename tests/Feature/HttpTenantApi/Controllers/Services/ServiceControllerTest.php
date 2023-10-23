@@ -79,7 +79,18 @@ it('can filter services', function ($attribute) {
                     ->etc();
             });
     }
-})->with(['name', 'retail_price', 'selling_price', 'is_featured', 'is_special_offer', 'pay_upfront', 'is_subscription', 'status', 'needs_approval']);
+})->with([
+    'name',
+    'retail_price',
+    'selling_price',
+    'is_featured',
+    'is_special_offer',
+    'pay_upfront',
+    'is_subscription',
+    'status',
+    'needs_approval',
+    'taxonomies',
+]);
 
 it("can't list inactive services", function () {
     ServiceFactory::new()

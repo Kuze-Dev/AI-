@@ -7,12 +7,16 @@ namespace Domain\Service\Models;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
@@ -28,6 +32,7 @@ use Support\MetaData\Models\MetaData;
  * Domain\Service\Models\Service
  *
  * @property int $id
+ * @property string $uuid
  * @property string $blueprint_id
  * @property string $name
  * @property string|null $description
@@ -41,40 +46,44 @@ use Support\MetaData\Models\MetaData;
  * @property int $is_subscription
  * @property int $status
  * @property int $needs_approval
+ * @property int $auto_generate_bill
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Blueprint|null $blueprint
  * @property-read MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @property-read MetaData|null $metaData
- * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
+ * @property-read Collection<int, TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
- * @method static \Illuminate\Database\Eloquent\Builder|Service newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Service newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Service onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|Service query()
- * @method static \Illuminate\Database\Eloquent\Builder|Service whereBillingCycle($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service whereBlueprintId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service whereDueDateEvery($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service whereIsFeatured($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service whereIsSpecialOffer($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service whereIsSubscription($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service wherePayUpfront($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service whereRetailPrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service whereSellingPrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Service withTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|Service withoutTrashed()
- * @mixin \Eloquent
+ * @method static Builder|Service newModelQuery()
+ * @method static Builder|Service newQuery()
+ * @method static Builder|Service onlyTrashed()
+ * @method static Builder|Service query()
+ * @method static Builder|Service whereAutoGenerateBill($value)
+ * @method static Builder|Service whereBillingCycle($value)
+ * @method static Builder|Service whereBlueprintId($value)
+ * @method static Builder|Service whereCreatedAt($value)
+ * @method static Builder|Service whereDeletedAt($value)
+ * @method static Builder|Service whereDescription($value)
+ * @method static Builder|Service whereDueDateEvery($value)
+ * @method static Builder|Service whereId($value)
+ * @method static Builder|Service whereIsFeatured($value)
+ * @method static Builder|Service whereIsSpecialOffer($value)
+ * @method static Builder|Service whereIsSubscription($value)
+ * @method static Builder|Service whereName($value)
+ * @method static Builder|Service whereNeedsApproval($value)
+ * @method static Builder|Service wherePayUpfront($value)
+ * @method static Builder|Service whereRetailPrice($value)
+ * @method static Builder|Service whereSellingPrice($value)
+ * @method static Builder|Service whereStatus($value)
+ * @method static Builder|Service whereUpdatedAt($value)
+ * @method static Builder|Service whereUuid($value)
+ * @method static Builder|Service withTrashed()
+ * @method static Builder|Service withoutTrashed()
+ * @mixin Eloquent
  */
 #[OnDeleteCascade(['metaData, taxonomyTerms'])]
 class Service extends Model implements HasMetaDataContract, HasMedia
@@ -86,6 +95,7 @@ class Service extends Model implements HasMetaDataContract, HasMedia
     use SoftDeletes;
 
     protected $fillable = [
+        'uuid',
         'blueprint_id',
         'name',
         'description',
@@ -99,19 +109,27 @@ class Service extends Model implements HasMetaDataContract, HasMedia
         'is_subscription',
         'status',
         'needs_approval',
+        'auto_generate_bill',
     ];
 
     protected $casts = [
         'billing_cycle' => BillingCycleEnum::class,
+        'is_featured' => 'bool',
+        'is_special_offer' => 'bool',
+        'pay_upfront' => 'bool',
+        'is_subscription' => 'bool',
+        'status' => 'bool',
+        'needs_approval' => 'bool',
+        'auto_generate_bill' => 'bool',
     ];
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm> */
+    /** @return BelongsToMany<TaxonomyTerm> */
     public function taxonomyTerms(): BelongsToMany
     {
         return $this->belongsToMany(TaxonomyTerm::class, 'service_taxonomy_terms');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Service\Models\Service> */
+    /** @return BelongsTo<Blueprint, Service> */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
@@ -122,6 +140,11 @@ class Service extends Model implements HasMetaDataContract, HasMedia
         return [
             'title' => $this->name,
         ];
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
     }
 
     public function getActivitylogOptions(): LogOptions

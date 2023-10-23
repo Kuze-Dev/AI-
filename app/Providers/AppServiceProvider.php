@@ -186,5 +186,6 @@ class AppServiceProvider extends ServiceProvider
         Feature::discover('App\\Features\\CMS', app_path('Features/CMS'));
         Feature::discover('App\\Features\\ECommerce', app_path('Features/ECommerce'));
         Feature::discover('App\\Features\\Customer', app_path('Features/Customer'));
+        Feature::discover('App\\Features\\Service', app_path('Features/Service'));
     }
 }
