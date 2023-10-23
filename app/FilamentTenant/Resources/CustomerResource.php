@@ -131,9 +131,8 @@ class CustomerResource extends Resource
                         ])
                         ->hidden(function ($record, $context) {
 
-                            /** @var \Domain\Tier\Models\Tier $tier */
                             $tier = Tier::whereId($record?->tier_id)->first();
-                            if ( ! $tier->has_approval) {
+                            if ( ! $tier?->has_approval) {
                                 return true;
                             }
 

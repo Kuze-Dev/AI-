@@ -44,18 +44,22 @@ final class CustomerData
         Tier $customerTier = null,
         Tier $defaultTier
     ): self {
-
+        $registerStatus = RegisterStatus::REGISTERED;
+        $tierId = null;
         $validated = $request->validated();
         $sameAsShipping = $request->boolean('billing.same_as_shipping');
+        if($customerTier?->isDefault() || ! tenancy()->tenant?->features()->active(TierBase::class)) {
 
-        if( ! $customerTier || ! tenancy()->tenant?->features()->active(TierBase::class)) {
             $registerStatus = self::getStatus($defaultTier, null, null);
+            /** @var \Domain\Tier\Models\Tier $defaultTier */
             $tierId = $defaultTier->getKey();
-        } else {
+        }
+        /** @var \Domain\Tier\Models\Tier $customerTier */
+        if($customerTier->has_approval && ! $customerTier->isDefault()) {
+
             $registerStatus = self::getStatus($customerTier, null, null);
             $tierId = $customerTier->getKey();
         }
-
         unset($request);
 
         return new self(
@@ -188,7 +192,7 @@ final class CustomerData
 
         }
 
-        if($tier?->isDefault() === null && $customer === null) {
+        if($tier?->isDefault()) {
             return  RegisterStatus::REGISTERED;
         }
 
