@@ -37,6 +37,7 @@ class UpdateServiceAction
             'is_subscription' => $serviceData->is_subscription,
             'status' => $serviceData->status,
             'needs_approval' => $serviceData->needs_approval,
+            'auto_generate_bill' => $serviceData->auto_generate_bill,
         ]);
 
         $service->taxonomyTerms()->sync([$serviceData->taxonomy_term_id]);

@@ -46,6 +46,7 @@ use Support\MetaData\Models\MetaData;
  * @property int $is_subscription
  * @property int $status
  * @property int $needs_approval
+ * @property int $auto_generate_bill
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
@@ -61,6 +62,7 @@ use Support\MetaData\Models\MetaData;
  * @method static Builder|Service newQuery()
  * @method static Builder|Service onlyTrashed()
  * @method static Builder|Service query()
+ * @method static Builder|Service whereAutoGenerateBill($value)
  * @method static Builder|Service whereBillingCycle($value)
  * @method static Builder|Service whereBlueprintId($value)
  * @method static Builder|Service whereCreatedAt($value)
@@ -72,11 +74,13 @@ use Support\MetaData\Models\MetaData;
  * @method static Builder|Service whereIsSpecialOffer($value)
  * @method static Builder|Service whereIsSubscription($value)
  * @method static Builder|Service whereName($value)
+ * @method static Builder|Service whereNeedsApproval($value)
  * @method static Builder|Service wherePayUpfront($value)
  * @method static Builder|Service whereRetailPrice($value)
  * @method static Builder|Service whereSellingPrice($value)
  * @method static Builder|Service whereStatus($value)
  * @method static Builder|Service whereUpdatedAt($value)
+ * @method static Builder|Service whereUuid($value)
  * @method static Builder|Service withTrashed()
  * @method static Builder|Service withoutTrashed()
  * @mixin Eloquent
@@ -105,6 +109,7 @@ class Service extends Model implements HasMetaDataContract, HasMedia
         'is_subscription',
         'status',
         'needs_approval',
+        'auto_generate_bill',
     ];
 
     protected $casts = [
@@ -115,6 +120,7 @@ class Service extends Model implements HasMetaDataContract, HasMedia
         'is_subscription' => 'bool',
         'status' => 'bool',
         'needs_approval' => 'bool',
+        'auto_generate_bill' => 'bool',
     ];
 
     /** @return BelongsToMany<TaxonomyTerm> */
