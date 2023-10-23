@@ -178,10 +178,13 @@ class ServiceResource extends Resource
                             });
                         });
                     }),
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make()
+                        ->translateLabel()
+                        ->authorize('update'),
                     Tables\Actions\DeleteAction::make()
                         ->translateLabel()
                         ->using(function (Service $record) {
@@ -192,11 +195,16 @@ class ServiceResource extends Resource
                             }
                         })
                         ->authorize('delete'),
+                    Tables\Actions\RestoreAction::make()
+                        ->translateLabel()
+                    ->authorize('restore'),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
                     ->translateLabel(),
+                Tables\Actions\RestoreBulkAction::make()
+                ->translateLabel(),
             ]);
     }
 
@@ -297,17 +305,32 @@ class ServiceResource extends Resource
                 Forms\Components\Toggle::make('auto_generate_bill')
                     ->label(trans('Auto Generate Bill'))
                     ->reactive()
-                    ->hidden(fn (Closure $get) => $get('is_subscription') === false)
+                    ->hidden(fn (Closure $get, $state) => $get('is_subscription') === false)
                     ->afterStateUpdated(
                         fn (Forms\Components\Toggle $component, Closure $get, Closure $set) => $set('due_date_every', $component->getState() === false ? null : $get('due_date_every'))
                     ),
                 Forms\Components\Select::make('due_date_every')
                     ->reactive()
-                    ->options(fn () => range(1, now()->daysInMonth))
+                    ->options(function (Closure $get) {
+                        $options=[];
+                        switch ($get('billing_cycle')) {
+                            case BillingCycleEnum::MONTHLY->value:
+                                $options = range(1, now()->daysInMonth);
+                                break;
+                            case BillingCycleEnum::YEARLY->value:
+                                $options = range(1,12);
+                                break;
+                        }
+
+                        return $options;
+                    })
                     ->formatStateUsing(
-                        fn (?Service $record, Closure $set) => $record?->auto_generate_bill === true ? $record->due_date_every : null
+                        fn (?Service $record) => $record?->auto_generate_bill === true ? $record?->due_date_every : null
                     )
-                    ->hidden(fn (Closure $get) => $get('is_subscription') === false)
+                    ->hidden(fn (Closure $get) => ($get('is_subscription') === false
+                        || $get('billing_cycle') === BillingCycleEnum::DAILY->value
+                        || $get('billing_cycle') === null )
+                    )
                     ->disabled(
                         fn (Closure $get) => $get('auto_generate_bill') === false
                     )
