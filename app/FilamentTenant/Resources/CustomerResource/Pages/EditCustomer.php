@@ -40,13 +40,10 @@ class EditCustomer extends EditRecord
 
             Action::make('save')
                 ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
-                ->requiresConfirmation(function ($livewire) {
-
-                    return $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value
-                        ? true
-                        : false;
-
-                })
+                ->requiresConfirmation(
+                    fn ($livewire) => $livewire
+                        ->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value
+                )
                 ->modalHeading(
                     fn ($livewire) => $livewire->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value
                         ? 'Warning'
