@@ -27,8 +27,6 @@ class ServiceBillQueryBuilder extends Builder
 
     public function whereNotifiable(): self
     {
-        return $this->whereForPaymentStatus()
-            ->whereHasBillingDate()
-            ->whereHasDueDate();
+        return $this->whereHasBillingDate()->whereHasDueDate();
     }
 }
