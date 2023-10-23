@@ -10,6 +10,7 @@ use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
+use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Support\Str;
@@ -57,40 +58,32 @@ class CreateServiceOrderAction
             throw new BadRequestHttpException('inactive service found');
         }
 
-        $status = ServiceOrderStatus::FORPAYMENT;
-
-        if($service->needs_approval) {
-            $status = ServiceOrderStatus::PENDING;
-        } elseif( ! $service->pay_upfront && ! $service->is_subscription) {
-            $status = ServiceOrderStatus::INPROGRESS;
-        }
-
+        /** @var int|float $subTotal */
         $subTotal = $this->calculateServiceOrderTotalPriceAction
             ->execute(
                 $service->selling_price,
                 array_filter(
-                    array_map(function ($additionalCharge) {
-                        if (
-                            isset($additionalCharge['price']) &&
-                            is_numeric($additionalCharge['price']) &&
-                            isset($additionalCharge['quantity']) &&
-                            is_numeric($additionalCharge['quantity'])
-                        ) {
-                            return new ServiceOrderAdditionalChargeData(
-                                (float) $additionalCharge['price'],
-                                (int) $additionalCharge['quantity']
-                            );
-                        }
-                    }, isset($serviceOrderData->additional_charges) ? $serviceOrderData->additional_charges : [])
+                    array_map(
+                        function ($additionalCharge) {
+                            if (
+                                isset($additionalCharge['price']) &&
+                                is_numeric($additionalCharge['price']) &&
+                                isset($additionalCharge['quantity']) &&
+                                is_numeric($additionalCharge['quantity'])
+                            ) {
+                                return new ServiceOrderAdditionalChargeData(
+                                    (float) $additionalCharge['price'],
+                                    (int) $additionalCharge['quantity']
+                                );
+                            }
+                        },
+                        $serviceOrderData->additional_charges ?? []
+                    )
                 )
             )
             ->getAmount();
 
-        //tax
-        $billingAddressId = $serviceOrderData->is_same_as_billing ? $serviceOrderData->service_address_id : $serviceOrderData->billing_address_id;
-        $billingAddressData = Address::whereId($billingAddressId)->first();
-
-        $taxableInfo = $this->getTaxableInfoAction->execute($subTotal, $billingAddressData);
+        $taxableInfo = $this->getTax($serviceOrderData, $subTotal);
 
         $serviceOrder = ServiceOrder::create([
             'admin_id' => $adminId,
@@ -110,15 +103,43 @@ class CreateServiceOrderAction
             'due_date_every' => $service->due_date_every,
             'schedule' => $serviceOrderData->schedule,
             'reference' => $uniqueReference,
-            'status' => $status,
+            'status' => $this->getStatus($service),
             'additional_charges' => $serviceOrderData->additional_charges,
-            'sub_total' => $taxableInfo['subTotal'],
-            'tax_display' => $taxableInfo['taxDisplay'],
-            'tax_percentage' => $taxableInfo['taxPercentage'],
-            'tax_total' => $taxableInfo['taxTotal'],
-            'total_price' => $taxableInfo['totalPrice'],
+            'sub_total' => $taxableInfo->sub_total,
+            'tax_display' => $taxableInfo->tax_display,
+            'tax_percentage' => $taxableInfo->tax_percentage,
+            'tax_total' => $taxableInfo->tax_total,
+            'total_price' => $taxableInfo->total_price,
         ]);
 
         return $serviceOrder;
+    }
+
+    public function getStatus(Service $service): ServiceOrderStatus
+    {
+        $status = ServiceOrderStatus::FORPAYMENT;
+
+        if($service->needs_approval) {
+            $status = ServiceOrderStatus::PENDING;
+        } elseif( ! $service->pay_upfront && ! $service->is_subscription) {
+            $status = ServiceOrderStatus::INPROGRESS;
+        }
+
+        return $status;
+    }
+
+    public function getTax(
+        ServiceOrderData $serviceOrderData,
+        int|float $subTotal
+    ): ServiceOrderTaxData {
+        $billingAddressId = $serviceOrderData->is_same_as_billing
+            ? $serviceOrderData->service_address_id
+            : $serviceOrderData->billing_address_id;
+
+        $billingAddressData = Address::whereId($billingAddressId)
+            ->firstOrFail();
+
+        return $this->getTaxableInfoAction
+            ->execute($subTotal, $billingAddressData);
     }
 }
