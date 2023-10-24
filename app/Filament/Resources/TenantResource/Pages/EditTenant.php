@@ -30,8 +30,15 @@ class EditTenant extends EditRecord
                 ->requiresConfirmation(function ($livewire) {
                     return $livewire->data['is_suspended'] == true ? true : false;
                 })
+                ->modalCancelAction(function ($livewire) {
+
+                    return Action::makeModalAction('redirect')
+                        ->label(__('Cancel & Revert Changes'))
+                        ->color('secondary')
+                        ->url(TenantResource::getUrl('edit', [$this->record]));
+                })
                 ->modalHeading(fn ($livewire) => $livewire->data['is_suspended'] ? 'Warning' : null)
-                ->modalSubheading(fn ($livewire) => $livewire->data['is_suspended'] ? 'The Suspend Option is enabled Please Proceed with Caution. woul\'d  you like to continue?' : null)
+                ->modalSubheading(fn ($livewire) => $livewire->data['is_suspended'] ? 'The suspend option is enabled. Please proceed with caution as this action will suspend the tenant. Would you like to proceed ?' : null)
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
