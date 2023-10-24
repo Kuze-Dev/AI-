@@ -77,7 +77,7 @@ class ServiceResource extends Resource
                                 )
                                 ->statePath('taxonomy_term_id')
                                 ->required(),
-                            Forms\Components\FileUpload::make('media')
+                            Forms\Components\FileUpload::make('images')
                                 ->statePath('images')
                                 ->translateLabel()
                                 ->mediaLibraryCollection('image')
