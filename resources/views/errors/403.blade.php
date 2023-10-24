@@ -24,8 +24,8 @@
           </svg>
         </div>
         
-        <h1 class="my-10 text-5xl">Access to this page is restricted</h1>
-        <p class="text-2xl">Please check with the site admin if you believe this is a mistake.</p>
+        <h1 class="my-10 text-5xl">ACCESS TO THIS PAGE IS RESTRICTED</h1>
+        <p class="text-2xl">Please check with the site admin if you believe this is a mistake. to Please contact the administrator.</p>
       </div>
     </div>
 </body>
