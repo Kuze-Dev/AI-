@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Jobs;
 
 use Domain\Customer\Models\Customer;
-use Domain\ServiceOrder\Actions\CreateServiceBillAction;
 use Domain\ServiceOrder\Actions\SendToCustomerServiceBillEmailAction;
-use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
-use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -27,8 +24,7 @@ class NotifyCustomerLatestServiceBillJob implements ShouldQueue, ShouldBeUnique
     public function __construct(
         private Customer $customer,
         private ServiceOrder $serviceOrder
-    )
-    {
+    ) {
     }
 
     public function uniqueId(): string
@@ -38,11 +34,13 @@ class NotifyCustomerLatestServiceBillJob implements ShouldQueue, ShouldBeUnique
 
     public function handle(
         SendToCustomerServiceBillEmailAction $sendToCustomerServiceBillEmailAction
-    ): void
-    {
+    ): void {
+        /** @var \Domain\ServiceOrder\Models\ServiceBill $latestServiceBill */
+        $latestServiceBill = $this->serviceOrder->latestServiceBill();
+
         $sendToCustomerServiceBillEmailAction->execute(
             $this->customer,
-            $this->serviceOrder->latestServiceBill()
+            $latestServiceBill
         );
     }
 }

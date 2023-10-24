@@ -60,17 +60,17 @@ class ServiceBillNotification extends Notification implements ShouldQueue
             ->subject('Latest Service Bill')
             ->line(trans('Please click the button below to register your email address.'));
 
-            // TODO: use custom template
-            // ->view('filament.emails.serviceOrder.created', [
-            //     'logo' => $this->logo,
-            //     'title' => $this->title,
-            //     'description' => $this->description,
-            //     'timezone' => $admin?->timezone,
-            //     'serviceBill' => $this->serviceBill,
-            //     'customer' => $notifiable,
-            //     'footer' => $this->footer,
-            //     'url' => $this->url,
-            // ]);
+        // TODO: use custom template
+        // ->view('filament.emails.serviceOrder.created', [
+        //     'logo' => $this->logo,
+        //     'title' => $this->title,
+        //     'description' => $this->description,
+        //     'timezone' => $admin?->timezone,
+        //     'serviceBill' => $this->serviceBill,
+        //     'customer' => $notifiable,
+        //     'footer' => $this->footer,
+        //     'url' => $this->url,
+        // ]);
     }
 
     /** @return array<string, mixed> */

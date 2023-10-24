@@ -5,12 +5,10 @@ declare(strict_types=1);
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Service\Databases\Factories\ServiceFactory;
 use Domain\ServiceOrder\Actions\CreateServiceBillingsAction;
-use Domain\ServiceOrder\Actions\SendToCustomerServiceBillEmailAction;
 use Domain\ServiceOrder\Database\Factories\ServiceBillFactory;
 use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
 use Domain\ServiceOrder\Jobs\CreateServiceBillJob;
 use Illuminate\Support\Facades\Queue;
-use Spatie\QueueableAction\Testing\QueueableActionFake;
 
 beforeEach(function () {
     testInTenantContext();
