@@ -28,6 +28,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Exception;
 
 class ServiceResource extends Resource
 {
@@ -121,9 +122,7 @@ class ServiceResource extends Resource
             ->columns(3);
     }
 
-    /**
-     * @throws \Exception
-     */
+    /** @throws Exception */
     public static function table(Table $table): Table
     {
         return $table
@@ -197,14 +196,14 @@ class ServiceResource extends Resource
                         ->authorize('delete'),
                     Tables\Actions\RestoreAction::make()
                         ->translateLabel()
-                    ->authorize('restore'),
+                        ->authorize('restore'),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
                     ->translateLabel(),
                 Tables\Actions\RestoreBulkAction::make()
-                ->translateLabel(),
+                    ->translateLabel(),
             ]);
     }
 
@@ -302,7 +301,7 @@ class ServiceResource extends Resource
                     ->reactive()
                     ->hidden(fn (Closure $get) => $get('is_subscription') === false)
                     ->required(fn (Closure $get) => $get('is_subscription') === true),
-                Forms\Components\Toggle::make('auto_generate_bill')
+                Forms\Components\Toggle::make('is_auto_generated_bill')
                     ->label(trans('Auto Generate Bill'))
                     ->reactive()
                     ->hidden(fn (Closure $get, $state) => $get('is_subscription') === false)
@@ -312,29 +311,31 @@ class ServiceResource extends Resource
                 Forms\Components\Select::make('due_date_every')
                     ->reactive()
                     ->options(function (Closure $get) {
-                        $options=[];
+                        $options = [];
                         switch ($get('billing_cycle')) {
                             case BillingCycleEnum::MONTHLY->value:
                                 $options = range(1, now()->daysInMonth);
+
                                 break;
                             case BillingCycleEnum::YEARLY->value:
-                                $options = range(1,12);
+                                $options = range(1, 12);
+
                                 break;
                         }
 
                         return $options;
                     })
                     ->formatStateUsing(
-                        fn (?Service $record) => $record?->auto_generate_bill === true ? $record?->due_date_every : null
+                        fn ($record, Closure $get) => $get('is_auto_generated_bill') === true ? $record->due_date_every : null
                     )
-                    ->hidden(fn (Closure $get) => ($get('is_subscription') === false
-                        || $get('billing_cycle') === BillingCycleEnum::DAILY->value
-                        || $get('billing_cycle') === null )
+                    ->hidden(
+                        fn (Closure $get) => ($get('is_subscription') === false
+                        || $get('billing_cycle') === BillingCycleEnum::DAILY->value)
                     )
                     ->disabled(
-                        fn (Closure $get) => $get('auto_generate_bill') === false
+                        fn (Closure $get) => $get('is_auto_generated_bill') === false
                     )
-                    ->required(fn (Closure $get) => $get('auto_generate_bill') === true),
+                    ->required(fn (Closure $get) => $get('is_auto_generated_bill') === true),
                 Forms\Components\Toggle::make('needs_approval')
                     ->label(trans('Needs Approval')),
             ])

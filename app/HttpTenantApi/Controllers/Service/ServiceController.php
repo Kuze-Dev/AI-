@@ -35,7 +35,7 @@ class ServiceController
                     'pay_upfront',
                     'status',
                     'needs_approval',
-                    'auto_generate_bill',
+                    'is_auto_generated_bill',
                     AllowedFilter::callback(
                         'taxonomies',
                         function (Builder $query, array $value) {

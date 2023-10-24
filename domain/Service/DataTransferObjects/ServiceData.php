@@ -21,7 +21,7 @@ class ServiceData
         public readonly bool $is_subscription = false,
         public readonly bool $status = false,
         public readonly bool $needs_approval = false,
-        public readonly bool $auto_generate_bill = false,
+        public readonly bool $is_auto_generated_bill = false,
         public readonly ?array $meta_data = [],
         public readonly ?array $media_collection = [],
     ) {
@@ -46,7 +46,7 @@ class ServiceData
             is_subscription: $data['is_subscription'],
             status: $data['status'],
             needs_approval: $data['needs_approval'],
-            auto_generate_bill:  $data['auto_generate_bill'] ?? false,
+            is_auto_generated_bill:  $data['is_auto_generated_bill'] ?? false,
             meta_data: $data['meta_data'],
             media_collection: ['collection' => 'image', 'media' => $data['images']],
         );

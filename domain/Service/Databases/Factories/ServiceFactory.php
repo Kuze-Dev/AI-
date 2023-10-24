@@ -36,7 +36,7 @@ class ServiceFactory extends Factory
             'is_subscription' => $this->faker->boolean(),
             'status' => $this->faker->boolean(),
             'needs_approval' => $this->faker->boolean(),
-            'auto_generate_bill' => $this->faker->boolean(),
+            'is_auto_generated_bill' => $this->faker->boolean(),
         ];
     }
 
@@ -85,7 +85,7 @@ class ServiceFactory extends Factory
     public function autoGenerateBill(bool $autoGenerateBill = true): self
     {
         return $this->state([
-            'auto_generate_bill' => $autoGenerateBill,
+            'is_auto_generated_bill' => $autoGenerateBill,
         ]);
     }
 
