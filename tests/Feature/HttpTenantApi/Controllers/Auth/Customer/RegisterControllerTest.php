@@ -236,7 +236,7 @@ it('can register with default tier when tier feature is disabled', function () {
         'mobile' => $data['mobile'],
         'gender' => $data['gender'],
         'status' => Status::ACTIVE->value,
-        'birth_date' => $data['birth_date'] . ' 00:00:00',
+        'birth_date' => $data['birth_date'].' 00:00:00',
         'register_status' => RegisterStatus::REGISTERED,
         'tier_id' => Tier::whereName(config('domain.tier.default'))->first()->getKey(),
     ]);

@@ -38,7 +38,7 @@ class RegisterController
 
         Notification::send($customer, new NewRegisterNotification($customer));
 
-        if($customerTier?->has_approval) {
+        if ($customerTier?->has_approval) {
             app(SendForApprovalRegistrationAction::class)->execute($customer);
         }
 
