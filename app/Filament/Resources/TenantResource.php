@@ -148,7 +148,7 @@ class TenantResource extends Resource
                     ->collapsed(fn (string $context) => $context === 'edit')
                     ->schema([
                         Forms\Components\Toggle::make('is_suspended')
-                            ->label('Suspended')
+                            ->label('Suspend')
                             ->helpertext('Warning this will suspend the current tenant are you sure with this action?')
                             ->inline(false),
                     ])->hidden(fn () => ! auth()->user()?->can('canSuspendTenant')),
