@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Service\Models\Service;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -22,7 +23,11 @@ return new class () extends Migration {
             ->each(
                 fn ($row) => DB::table((new Service())->getTable())
                     ->where('id', $row->id)
-                    ->update(['uuid' => (string) \Illuminate\Support\Str::uuid()])
+                    ->update([
+                        'uuid' => (string) \Illuminate\Support\Str::uuid(),
+                        'due_date_every' => $row->billing_cycle === BillingCycleEnum::YEARLY->value
+                            ? min($row->due_date_every, 12) : $row->due_date_every,
+                    ])
             );
     }
 

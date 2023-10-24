@@ -77,11 +77,14 @@ class ServiceResource extends Resource
                                 )
                                 ->statePath('taxonomy_term_id')
                                 ->required(),
-                            Forms\Components\FileUpload::make('images')
-                                ->statePath('images')
+                            Forms\Components\FileUpload::make('media')
+                                ->statePath('media')
                                 ->translateLabel()
-                                ->mediaLibraryCollection('image')
-                                ->image()
+                                ->mediaLibraryCollection('media')
+                                ->acceptedFileTypes([
+                                    'video/*',
+                                    'image/*',
+                                ])
                                 ->multiple()
                                 ->required(),
                         ]),
@@ -180,10 +183,10 @@ class ServiceResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
+                Tables\Actions\EditAction::make()
+                    ->translateLabel()
+                    ->authorize('update'),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\EditAction::make()
-                        ->translateLabel()
-                        ->authorize('update'),
                     Tables\Actions\DeleteAction::make()
                         ->translateLabel()
                         ->using(function (Service $record) {
@@ -326,7 +329,8 @@ class ServiceResource extends Resource
                         return $options;
                     })
                     ->formatStateUsing(
-                        fn ($record, Closure $get) => $get('is_auto_generated_bill') === true ? $record->due_date_every : null
+                        fn ($record, Closure $get, Closure $set) => $get('is_auto_generated_bill') === true
+                            ? $record->due_date_every : null
                     )
                     ->hidden(
                         fn (Closure $get) => ($get('is_subscription') === false

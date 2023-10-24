@@ -65,7 +65,7 @@ it('can create service', function () {
             'billing_cycle' => 'daily',
             'due_date_every' => 20,
             'taxonomy_term_id' => $taxonomyTerm->id,
-            'images.0' => $image,
+            'media.0' => $image,
             'meta_data' => $metaData,
             'meta_data.image.0' => $image,
         ])
@@ -123,7 +123,7 @@ it('cannot create service with same name', function () {
             'retail_price' => 99.99,
             'selling_price' => 99.69,
             'billing_cycle' => 'daily',
-            'images.0' => $image,
+            'media.0' => $image,
         ])
         ->call('create')
         ->assertHasFormErrors(['name' => 'unique'])
@@ -158,7 +158,7 @@ it('can create service with metadata', function () {
             'due_date_every' => 20,
             'meta_data' => $metaData,
             'taxonomy_term_id' => $taxonomyTerm->id,
-            'images.0' => $image,
+            'media.0' => $image,
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -199,7 +199,7 @@ it('can create different types of service', function ($attribute) {
             'billing_cycle' => $attribute !== 'once' ? $attribute : null,
             'due_date_every' => $attribute !== ('once' || 'daily') ? 20 : null,
             'taxonomy_term_id' => $taxonomyTerm->id,
-            'images.0' => $image,
+            'media.0' => $image,
         ])
         ->call('create')
         ->assertHasNoFormErrors()
