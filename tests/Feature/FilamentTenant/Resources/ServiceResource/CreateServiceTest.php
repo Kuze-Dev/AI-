@@ -202,5 +202,4 @@ it('can create different types of service', function ($attribute) {
         'is_subscription' => $attribute !== 'once',
         'billing_cycle' => $attribute !== 'once' ? $attribute : null,
     ]);
-
 })->with(['daily', 'monthly', 'yearly', 'once']);
