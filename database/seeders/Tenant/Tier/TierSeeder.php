@@ -13,7 +13,7 @@ class TierSeeder extends Seeder
     {
         TierFactory::new()
             ->sequence(
-                ['name' => config('domain.tier.default')],
+                ['name' => config('domain.tier.default'), 'has_approval' => false],
                 ['name' => config('domain.tier.wholesaler-domestic')],
                 ['name' => config('domain.tier.wholesaler-international')],
             )
