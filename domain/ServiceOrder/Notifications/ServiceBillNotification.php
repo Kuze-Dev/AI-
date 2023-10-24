@@ -7,6 +7,7 @@ namespace Domain\ServiceOrder\Notifications;
 use App\Settings\ServiceSettings;
 use App\Settings\SiteSettings;
 use Domain\Admin\Models\Admin;
+use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -23,7 +24,7 @@ class ServiceBillNotification extends Notification implements ShouldQueue
     private string $title;
     private string $description;
     private string $from;
-    private string $url = 'http://tenant.saas-platform.test/admin/service-orders';
+    private string $url;
     private array $replyTo;
     private ?string $footer = null;
 
@@ -39,6 +40,8 @@ class ServiceBillNotification extends Notification implements ShouldQueue
 
         $this->from = app(ServiceSettings::class)->email_sender_name;
 
+        $this->url = app(SiteSettings::class)->front_end_domain;
+
         $this->replyTo = app(ServiceSettings::class)->email_reply_to ?? [];
 
         $this->footer = app(ServiceSettings::class)->email_footer;
@@ -52,25 +55,19 @@ class ServiceBillNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $admin = Admin::first();
-
         return (new MailMessage())
             ->replyTo($this->replyTo)
             ->from($this->from)
-            ->subject('Latest Service Bill')
-            ->line(trans('Please click the button below to register your email address.'));
-
-        // TODO: use custom template
-        // ->view('filament.emails.serviceOrder.created', [
-        //     'logo' => $this->logo,
-        //     'title' => $this->title,
-        //     'description' => $this->description,
-        //     'timezone' => $admin?->timezone,
-        //     'serviceBill' => $this->serviceBill,
-        //     'customer' => $notifiable,
-        //     'footer' => $this->footer,
-        //     'url' => $this->url,
-        // ]);
+            ->subject('New Service Bill')
+            ->view('filament.emails.serviceBill.created', [
+                'logo' => $this->logo,
+                'title' => $this->title,
+                'description' => $this->description,
+                'serviceBill' => $this->serviceBill,
+                'customer' => $notifiable,
+                'url' => $this->url,
+                'footer' => $this->footer,
+            ]);
     }
 
     /** @return array<string, mixed> */
