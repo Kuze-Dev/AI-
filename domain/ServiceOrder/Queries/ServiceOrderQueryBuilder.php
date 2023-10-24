@@ -25,7 +25,7 @@ class ServiceOrderQueryBuilder extends Builder
     public function whereAutoGenerateBills(): self
     {
         return $this->whereHas('service', function ($nestedQuery) {
-            $nestedQuery->where('auto_generate_bill', true);
+            $nestedQuery->where('is_auto_generated_bill', true);
         });
     }
 }
