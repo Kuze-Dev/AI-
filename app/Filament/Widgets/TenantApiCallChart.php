@@ -6,7 +6,6 @@ namespace App\Filament\Widgets;
 
 use Domain\Tenant\Models\Tenant;
 use Filament\Widgets\BarChartWidget;
-use Filament\Widgets\LineChartWidget;
 
 class TenantApiCallChart extends BarChartWidget
 {
