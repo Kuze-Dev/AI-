@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\Customer\TierBase;
 use App\FilamentTenant\Resources\TierResource\Pages\EditTier;
 use Domain\Tier\Database\Factories\TierFactory;
 use Domain\Tier\Models\Tier;
@@ -13,7 +14,8 @@ use function Pest\Livewire\livewire;
 uses()->group('customer');
 
 beforeEach(function () {
-    testInTenantContext();
+    $tenant = testInTenantContext();
+    $tenant->features()->activate(TierBase::class);
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 });

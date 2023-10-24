@@ -29,7 +29,7 @@ class LoginController extends Controller
         ]);
 
         if ( ! Auth::guard('api')->attempt($validated)) {
-            throw new AuthenticationException(trans('Invalid credentials.'));
+            throw new AuthenticationException(trans('These credentials do not match our records.'));
         }
 
         $customer = Customer::whereEmail($validated['email'])
@@ -38,7 +38,7 @@ class LoginController extends Controller
             ->first();
 
         if ($customer === null) {
-            throw new AuthenticationException(trans('Invalid credentials.'));
+            throw new AuthenticationException(trans('These credentials do not match our records.'));
         }
 
         return response([

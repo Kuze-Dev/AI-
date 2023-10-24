@@ -75,6 +75,7 @@ class ContentEntryController
                     'taxonomyTerms.taxonomy',
                     'routeUrls',
                     'metaData',
+                    'blueprintData',
                 ])
                 ->jsonPaginate()
         );
@@ -92,6 +93,7 @@ class ContentEntryController
                     'taxonomyTerms.taxonomy',
                     'routeUrls',
                     'metaData',
+                    'blueprintData',
                 ])
                 ->firstOrFail()
         );

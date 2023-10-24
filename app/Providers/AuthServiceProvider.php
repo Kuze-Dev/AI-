@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Settings\ECommerceSettings;
+use App\Settings\FormSettings;
 use App\Settings\SiteSettings;
 use Domain\Admin\Models\Admin;
 use Domain\Auth\Contracts\HasEmailVerificationOTP;
@@ -55,6 +56,7 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Taxation\Models\TaxZone::class => \App\Policies\TaxZonePolicy::class,
         \Domain\Internationalization\Models\Locale::class => \App\Policies\LocalePolicy::class,
         \Domain\Site\Models\Site::class => \App\Policies\SitePolicy::class,
+        \Domain\Service\Models\Service::class => \App\Policies\ServicePolicy::class,
     ];
 
     /** Register any authentication / authorization services. */
@@ -72,6 +74,11 @@ class AuthServiceProvider extends ServiceProvider
 
             if ($notifiable instanceof HasEmailVerificationOTP && $notifiable->isEmailVerificationUseOTP()) {
                 return (new MailMessage())
+                    ->from(
+                        tenancy()->tenant ?
+                        (app(FormSettings::class)->sender_email ? config('mail.from.address') : config('mail.from.address')) :
+                        config('mail.from.address')
+                    )
                     ->subject(trans('Verify Email Address'))
                     ->line(trans('Please copy OTP below to verify your email address.'))
                     ->line('OTP: ' . $notifiable->generateEmailVerificationOTP())
@@ -81,6 +88,11 @@ class AuthServiceProvider extends ServiceProvider
             // copied from \Illuminate\Auth\Notifications\VerifyEmail::buildMailMessage($url)
             // https://github.com/laravel/framework/blob/v10.16.1/src/Illuminate/Auth/Notifications/VerifyEmail.php#L62
             return (new MailMessage())
+                ->from(
+                    tenancy()->tenant ?
+                    (app(FormSettings::class)->sender_email ? config('mail.from.address') : config('mail.from.address')) :
+                    config('mail.from.address')
+                )
                 ->subject(trans('Verify Email Address'))
                 ->line(trans('Please click the button below to verify your email address.'))
                 ->action(trans('Verify Email Address'), $url)
@@ -133,7 +145,6 @@ class AuthServiceProvider extends ServiceProvider
                 );
             }
         });
-
         ResetPasswordNotification::createUrlUsing(function (mixed $notifiable, string $token) {
 
             if ($notifiable instanceof Customer) {
