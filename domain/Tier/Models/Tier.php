@@ -79,4 +79,9 @@ class Tier extends Model
     {
         return $this->belongsToMany(Product::class);
     }
+
+    public function isDefault(): bool
+    {
+        return $this->name === config('domain.tier.default');
+    }
 }

@@ -214,3 +214,31 @@ it('can register without address', function () {
     ]);
 
 });
+
+it('can register with default tier when tier feature is disabled', function () {
+
+    tenancy()->tenant->features()->deactivate(TierBase::class);
+
+    $state = StateFactory::new()->createOne();
+    $data = CustomerRegistrationRequestFactory::new()
+        ->withShippingAddress($state)
+        ->withBillingAddress($state)
+        ->create();
+
+    postJson('api/register', $data)
+        ->assertValid()
+        ->assertCreated();
+
+    assertDatabaseHas(Customer::class, [
+        'first_name' => $data['first_name'],
+        'last_name' => $data['last_name'],
+        'email' => $data['email'],
+        'mobile' => $data['mobile'],
+        'gender' => $data['gender'],
+        'status' => Status::ACTIVE->value,
+        'birth_date' => $data['birth_date'] . ' 00:00:00',
+        'register_status' => RegisterStatus::REGISTERED,
+        'tier_id' => Tier::whereName(config('domain.tier.default'))->first()->getKey(),
+    ]);
+
+});
