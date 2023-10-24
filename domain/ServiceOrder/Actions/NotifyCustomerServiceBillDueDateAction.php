@@ -58,7 +58,7 @@ class NotifyCustomerServiceBillDueDateAction
                         ) {
                             $this->expiredServiceOrderAction
                                 ->onQueue()
-                                ->execute($latestForPaymentServiceBill);
+                                ->execute($serviceOrder);
                         }
                     });
             });

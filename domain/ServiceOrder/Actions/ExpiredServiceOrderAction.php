@@ -6,6 +6,7 @@ namespace Domain\ServiceOrder\Actions;
 
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
+use Domain\ServiceOrder\Models\ServiceOrder;
 use Spatie\QueueableAction\QueueableAction;
 
 class ExpiredServiceOrderAction
@@ -18,15 +19,13 @@ class ExpiredServiceOrderAction
     }
 
     public function execute(
-        ServiceBill $serviceBill,
-    ): ServiceBill {
+        ServiceOrder $serviceOrder,
+    ): void {
 
-        $serviceBill->serviceOrder->update([
+        $serviceOrder->update([
             'status' => ServiceOrderStatus::INACTIVE,
         ]);
 
-        $this->changeServiceOrderStatusAction->execute($serviceBill->serviceOrder);
-
-        return $serviceBill;
+        $this->changeServiceOrderStatusAction->execute($serviceOrder);
     }
 }
