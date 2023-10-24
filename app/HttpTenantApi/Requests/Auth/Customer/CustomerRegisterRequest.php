@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Requests\Auth\Customer;
 
 use App\Features\Customer\AddressBase;
+use App\Features\Customer\TierBase;
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
@@ -38,13 +39,14 @@ class CustomerRegisterRequest extends FormRequest
                 'required',
                 Rule::email(),
                 Rule::unique(Customer::class)
-                    ->where('register_status', RegisterStatus::REGISTERED),
+                    ->where('register_status', RegisterStatus::REGISTERED)
+                    ->where('register_status', RegisterStatus::UNREGISTERED),
                 'max:255',
             ],
             'mobile' => 'required|string|max:255|unique:customers,mobile',
             'gender' => ['required', Rule::enum(Gender::class)],
             'tier_id' => [
-                'nullable',
+                Rule::when((bool) tenancy()->tenant?->features()->active(TierBase::class), 'required', 'nullable'),
                 Rule::exists(Tier::class, (new Tier())->getRouteKeyName()),
             ],
             'birth_date' => 'required|date',
