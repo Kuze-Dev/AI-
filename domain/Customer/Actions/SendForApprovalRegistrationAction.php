@@ -6,20 +6,17 @@ namespace Domain\Customer\Actions;
 
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Models\Customer;
-use Domain\Customer\Notifications\RegisterInvitationNotification;
+use Domain\Customer\Notifications\ForApprovalRegistrationNotification;
 
-class SendRegisterInvitationAction
+class SendForApprovalRegistrationAction
 {
     public function execute(Customer $customer): bool
     {
         if ($customer->register_status === RegisterStatus::REGISTERED) {
             return false;
         }
-        $customer->notify(new RegisterInvitationNotification());
 
-        $customer->update([
-            'register_status' => RegisterStatus::INVITED,
-        ]);
+        $customer->notify(new ForApprovalRegistrationNotification());
 
         return true;
     }
