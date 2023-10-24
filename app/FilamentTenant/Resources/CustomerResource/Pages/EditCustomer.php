@@ -39,7 +39,7 @@ class EditCustomer extends EditRecord
         return [
 
             Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->requiresConfirmation(
                     fn ($livewire) => $livewire
                         ->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value
