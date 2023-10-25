@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\DB;
 
-class UniqueDomainRule implements Rule
+class UniqueDomainRule implements ValidationRule
 {
     public function __construct(
         protected readonly string $table,
@@ -15,20 +16,18 @@ class UniqueDomainRule implements Rule
     ) {
     }
 
-    public function passes($attribute, $value)
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-
         // Remove http:// or https:// and www. if they're present
         $value = preg_replace('/^(http:\/\/|https:\/\/|www\.)/i', '', $value);
 
         // Check if the domain exists in the database
-        return DB::table($this->table)
+        $passed = DB::table($this->table)
             ->whereRaw("REPLACE(REPLACE(REPLACE({$this->column}, 'http://', ''), 'https://', ''), 'www.', '') = ?", [$value])
             ->count() === 0;
-    }
 
-    public function message()
-    {
-        return 'The domain has already been taken.';
+        if (! $passed) {
+            $fail(trans('The domain has already been taken.'));
+        }
     }
 }

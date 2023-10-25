@@ -53,7 +53,7 @@ class FeatureSelector extends Field
 
                                 if (count($unGroupOptions) > 0) {
 
-                                    $fields[] = CheckboxList::make($statePath . '_extras')
+                                    $fields[] = CheckboxList::make($statePath.'_extras')
                                         ->disableLabel()
                                         ->options($unGroupOptions)
                                         ->formatStateUsing(
@@ -78,7 +78,7 @@ class FeatureSelector extends Field
                                         $fields[] = Fieldset::make($label)
                                             ->label(ucfirst(trans($label)))
                                             ->schema([
-                                                CheckboxList::make($statePath .'_'.$label. '_extras')
+                                                CheckboxList::make($statePath.'_'.$label.'_extras')
                                                     ->disableLabel()
                                                     ->bulkToggleable()
                                                     ->options($value)
@@ -113,7 +113,7 @@ class FeatureSelector extends Field
             fn (self $component, Closure $get) => collect($component->getOptions())
                 ->reduce(
                     function (array $state, array $data, string $key) use ($component, $get) {
-                        $statePath = $component->getStatePath(false) . '.' . class_basename($key);
+                        $statePath = $component->getStatePath(false).'.'.class_basename($key);
 
                         $mutateState = [];
 
@@ -121,7 +121,7 @@ class FeatureSelector extends Field
                             if (is_array($value) && $get($statePath)) {
 
                                 /** @var array */
-                                $checkboxState = is_array($get($statePath . '_'.$xkey.'_extras')) ? $get($statePath . '_'.$xkey.'_extras') : ($get($statePath . '_'.$xkey.'_extras') ? [$get($statePath . '_'.$xkey.'_extras')] : []);
+                                $checkboxState = is_array($get($statePath.'_'.$xkey.'_extras')) ? $get($statePath.'_'.$xkey.'_extras') : ($get($statePath.'_'.$xkey.'_extras') ? [$get($statePath.'_'.$xkey.'_extras')] : []);
 
                                 $mutateState = array_merge($mutateState, $checkboxState);
 
@@ -134,13 +134,13 @@ class FeatureSelector extends Field
                             return array_merge(
                                 $state,
                                 $mutateState,
-                                $get($statePath . '_extras') ?: [],
+                                $get($statePath.'_extras') ?: [],
                                 [$key]
                             );
                         }
 
                         /** @var array */
-                        $checkboxExtras = is_array($get($statePath . '_extras')) ? $get($statePath . '_extras') : ($get($statePath . '_extras') ? [$get($statePath . '_extras')] : []);
+                        $checkboxExtras = is_array($get($statePath.'_extras')) ? $get($statePath.'_extras') : ($get($statePath.'_extras') ? [$get($statePath.'_extras')] : []);
 
                         return array_merge(
                             $state,

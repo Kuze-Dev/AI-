@@ -138,9 +138,9 @@ trait LogsFormActivity
                 return $this->getRecord()->getAttribute($this->getResource()::getRecordTitleAttribute());
             }
 
-            return Str::headline($this->getResource()::getModelLabel()) . ' ' . $event;
+            return Str::headline($this->getResource()::getModelLabel()).' '.$event;
         }
 
-        return Str::of($this::class)->classBasename()->headline()->toString() . ' ' . $event;
+        return Str::of($this::class)->classBasename()->headline()->toString().' '.$event;
     }
 }

@@ -30,7 +30,7 @@ class CheckForTwoFactorAuthentication
     {
         $user = $this->validateCredentials($loginData);
 
-        if ( ! $user instanceof TwoFactorAuthenticatable || ! $user->hasEnabledTwoFactorAuthentication()) {
+        if (! $user instanceof TwoFactorAuthenticatable || ! $user->hasEnabledTwoFactorAuthentication()) {
             return $next($loginData);
         }
 
@@ -53,7 +53,7 @@ class CheckForTwoFactorAuthentication
         $guard = $loginData->guard ?? config('auth.defaults.guard');
         $userProvider = Auth::createUserProvider(config("auth.guards.{$guard}.provider"));
 
-        if ( ! $userProvider instanceof EloquentUserProvider) {
+        if (! $userProvider instanceof EloquentUserProvider) {
             throw new UserProviderNotSupportedException($guard);
         }
 

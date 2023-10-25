@@ -26,6 +26,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Customer> $customers
  * @property-read int|null $customers_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Tier newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Tier newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Tier onlyTrashed()
@@ -38,12 +39,13 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|Tier whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Tier withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Tier withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Tier extends Model
 {
-    use SoftDeletes;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $fillable = [
         'name',

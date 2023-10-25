@@ -4,34 +4,34 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use Closure;
-use Carbon\Carbon;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Support\Arr;
-use Filament\Resources\Form;
-use Filament\Resources\Table;
-use Illuminate\Support\Str;
-use Filament\Facades\Filament;
-use Filament\Resources\Resource;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
-use Domain\Taxonomy\Models\Taxonomy;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
-use Domain\Content\Models\ContentEntry;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Validation\Rules\Unique;
-use Domain\Taxonomy\Models\TaxonomyTerm;
-use Filament\Forms\Components\Component;
-use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\MetaDataForm;
-use Domain\Internationalization\Models\Locale;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
-use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Carbon\Carbon;
+use Closure;
+use Domain\Content\Models\Builders\ContentEntryBuilder;
+use Domain\Content\Models\ContentEntry;
+use Domain\Internationalization\Models\Locale;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
+use Filament\Facades\Filament;
+use Filament\Forms;
+use Filament\Forms\Components\Component;
+use Filament\Resources\Form;
+use Filament\Resources\Resource;
+use Filament\Resources\Table;
+use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Unique;
 use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class ContentEntryResource extends Resource
 {
@@ -47,7 +47,7 @@ class ContentEntryResource extends Resource
 
     public static function getRouteBaseName(): string
     {
-        return Filament::currentContext() . '.resources.contents.entries';
+        return Filament::currentContext().'.resources.contents.entries';
     }
 
     public static function getRoutes(): Closure
@@ -66,14 +66,14 @@ class ContentEntryResource extends Resource
         };
     }
 
-    /** @param ContentEntry $record */
+    /** @param  ContentEntry  $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         /** @phpstan-ignore-next-line */
         return [trans('Content') => $record->content->name];
     }
 
-    /** @param ContentEntry $record */
+    /** @param  ContentEntry  $record */
     public static function getGlobalSearchResultUrl(Model $record): ?string
     {
         return self::getUrl('edit', [$record->content, $record]);
@@ -96,7 +96,7 @@ class ContentEntryResource extends Resource
                             ->unique(
                                 callback: function ($livewire, Unique $rule) {
 
-                                    if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+                                    if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
 
                                         return false;
                                     }
@@ -122,7 +122,7 @@ class ContentEntryResource extends Resource
                             }),
                         Forms\Components\Select::make('locale')
                             ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
-                            ->default((string) optional(Locale::where('is_default', true)->first())->code)
+                            ->default((string) Locale::where('is_default', true)->first()?->code)
                             ->searchable()
                             ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                             ->reactive()
@@ -155,7 +155,7 @@ class ContentEntryResource extends Resource
                                     ->toArray();
                             })
                             ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?ContentEntry $record): void {
-                                if ( ! $record) {
+                                if (! $record) {
                                     $component->state([]);
 
                                     return;
@@ -246,7 +246,7 @@ class ContentEntryResource extends Resource
                     ->limit()
                     ->searchable(),
                 Tables\Columns\TagsColumn::make('sites.name')
-                    ->toggleable(isToggledHiddenByDefault:true),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable()
@@ -344,10 +344,9 @@ class ContentEntryResource extends Resource
         $maxLength = 60; // Maximum length for the title before truncating
         $truncatedTitle = Str::limit($recordTitle, $maxLength, '...');
 
-        return $truncatedTitle . ''. $status;
+        return $truncatedTitle.''.$status;
     }
 
-    /** @return array */
     public static function getRelations(): array
     {
         return [
@@ -355,7 +354,6 @@ class ContentEntryResource extends Resource
         ];
     }
 
-    /** @return array */
     public static function getPages(): array
     {
         return [

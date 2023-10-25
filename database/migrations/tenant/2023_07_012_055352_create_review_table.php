@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-use Domain\Product\Models\Product;
 use Domain\Customer\Models\Customer;
 use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderLine;
+use Domain\Product\Models\Product;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('reviews', function (Blueprint $table) {

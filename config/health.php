@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 return [
 
     /*
@@ -58,10 +60,10 @@ return [
         'throttle_notifications_key' => 'health:latestNotificationSentAt:',
 
         'mail' => [
-            'to' => 'your@'.str(env('APP_NAME'))->headline()->kebab().'.com',
+            'to' => 'your@'.Str::of(env('APP_NAME'))->headline()->kebab().'.com',
 
             'from' => [
-                'address' => env('MAIL_FROM_ADDRESS', 'hello@'.str(env('APP_NAME'))->headline()->kebab().'.com'),
+                'address' => env('MAIL_FROM_ADDRESS', 'hello@'.Str::of(env('APP_NAME'))->headline()->kebab().'.com'),
                 'name' => env('MAIL_FROM_NAME', env('APP_NAME')),
             ],
         ],

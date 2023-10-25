@@ -10,12 +10,12 @@ use Domain\Service\Actions\DeleteServiceAction;
 use Domain\Service\Actions\UpdateServiceAction;
 use Domain\Service\DataTransferObjects\ServiceData;
 use Domain\Service\Models\Service;
+use Exception;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Exception;
 use Throwable;
 
 class EditService extends EditRecord
@@ -25,9 +25,8 @@ class EditService extends EditRecord
     protected static string $resource = ServiceResource::class;
 
     /**
-     * @param Service $record
-     * @param array $data
-     * @return Model
+     * @param  Service  $record
+     *
      * @throws Throwable
      */
     public function handleRecordUpdate(Model $record, array $data): Model
@@ -41,7 +40,7 @@ class EditService extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make()

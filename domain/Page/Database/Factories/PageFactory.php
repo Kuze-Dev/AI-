@@ -6,13 +6,13 @@ namespace Domain\Page\Database\Factories;
 
 use Carbon\Carbon;
 use Domain\Page\Enums\Visibility;
-use Domain\Page\Models\Page;
 use Domain\Page\Models\Block;
-use Support\MetaData\Database\Factories\MetaDataFactory;
-use Support\RouteUrl\Database\Factories\RouteUrlFactory;
+use Domain\Page\Models\Page;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\Relationship;
 use Illuminate\Support\Arr;
+use Support\MetaData\Database\Factories\MetaDataFactory;
+use Support\RouteUrl\Database\Factories\RouteUrlFactory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Page\Models\Page>
@@ -47,11 +47,11 @@ class PageFactory extends Factory
     public function configure(): self
     {
         return $this->afterCreating(function (Page $model) {
-            if ( ! $model->metaData) {
+            if (! $model->metaData) {
                 (new Relationship(MetaDataFactory::new(), 'metaData'))->recycle($this->recycle)->createFor($model);
             }
 
-            if ( ! $model->activeRouteUrl) {
+            if (! $model->activeRouteUrl) {
                 (new Relationship(RouteUrlFactory::new(), 'routeUrls'))->recycle($this->recycle)->createFor($model);
             }
         });

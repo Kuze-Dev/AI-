@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Domain\Role\Models;
 
-use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Role\Models\Role
@@ -25,6 +25,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property-read int|null $permissions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Admin\Models\Admin> $users
  * @property-read int|null $users_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Role newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Role newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Role permission($permissions)
@@ -34,6 +35,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|Role whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Role whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Role whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 #[
@@ -42,8 +44,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
 ]
 class Role extends \Spatie\Permission\Models\Role
 {
-    use LogsActivity;
     use ConstraintsRelationships;
+    use LogsActivity;
 
     public function getActivitylogOptions(): LogOptions
     {

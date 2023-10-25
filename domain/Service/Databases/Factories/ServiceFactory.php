@@ -53,7 +53,7 @@ class ServiceFactory extends Factory
 
     public function isSubscription(bool $isSubscription = true): self
     {
-        if($isSubscription === false) {
+        if ($isSubscription === false) {
             $this->state([
                 'billing_cycle' => null,
                 'due_date_every' => null,

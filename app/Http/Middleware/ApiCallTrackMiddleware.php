@@ -6,10 +6,10 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Support\ApiCall\Actions\CreateApiCallLogAction;
 use Support\ApiCall\DataTransferObjects\ApiCallData;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Support\Str;
 
 class ApiCallTrackMiddleware
 {

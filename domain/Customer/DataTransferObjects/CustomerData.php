@@ -48,14 +48,14 @@ final class CustomerData
         $tierId = null;
         $validated = $request->validated();
         $sameAsShipping = $request->boolean('billing.same_as_shipping');
-        if($customerTier?->isDefault() || ! tenancy()->tenant?->features()->active(TierBase::class)) {
+        if ($customerTier?->isDefault() || ! tenancy()->tenant?->features()->active(TierBase::class)) {
 
             $registerStatus = self::getStatus($defaultTier, null, null);
             /** @var \Domain\Tier\Models\Tier $defaultTier */
             $tierId = $defaultTier->getKey();
         }
         /** @var \Domain\Tier\Models\Tier $customerTier */
-        if($customerTier->has_approval && ! $customerTier->isDefault()) {
+        if ($customerTier->has_approval && ! $customerTier->isDefault()) {
 
             $registerStatus = self::getStatus($customerTier, null, null);
             $tierId = $customerTier->getKey();
@@ -69,7 +69,7 @@ final class CustomerData
             gender: Gender::from($validated['gender']),
             birth_date: now()->parse($validated['birth_date']),
             status: Status::ACTIVE,
-            tier_id:  $tierId,
+            tier_id: $tierId,
             email: $validated['email'],
             password: $validated['password'],
             image: $validated['profile_image'] ?? null,
@@ -176,24 +176,24 @@ final class CustomerData
         Customer $customer = null
     ): RegisterStatus {
 
-        if( ! tenancy()->tenant?->features()->active(TierBase::class)) {
-            return  RegisterStatus::REGISTERED;
+        if (! tenancy()->tenant?->features()->active(TierBase::class)) {
+            return RegisterStatus::REGISTERED;
         }
 
         if ($tierApprovalStatus !== null) {
-            if(
+            if (
                 $tier?->has_approval &&
                 $tierApprovalStatus === TierApprovalStatus::APPROVED &&
                 $customer?->register_status == RegisterStatus::UNREGISTERED
 
             ) {
-                return  RegisterStatus::REGISTERED;
+                return RegisterStatus::REGISTERED;
             }
 
         }
 
-        if($tier?->isDefault()) {
-            return  RegisterStatus::REGISTERED;
+        if ($tier?->isDefault()) {
+            return RegisterStatus::REGISTERED;
         }
 
         if (
@@ -201,7 +201,7 @@ final class CustomerData
             $customer?->tier_approval_status == TierApprovalStatus::APPROVED &&
             $customer?->register_status == RegisterStatus::INVITED
         ) {
-            return  RegisterStatus::REGISTERED;
+            return RegisterStatus::REGISTERED;
         }
 
         return RegisterStatus::UNREGISTERED;

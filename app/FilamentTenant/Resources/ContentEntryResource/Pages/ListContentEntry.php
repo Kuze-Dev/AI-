@@ -11,8 +11,8 @@ use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ListContentEntry extends ListRecords
 {
@@ -46,7 +46,7 @@ class ListContentEntry extends ListRecords
 
     protected function getTitle(): string
     {
-        return $this->ownerRecord->name . ' ' . Str::headline(static::getResource()::getPluralModelLabel());
+        return $this->ownerRecord->name.' '.Str::headline(static::getResource()::getPluralModelLabel());
     }
 
     protected function getBreadcrumbs(): array
@@ -74,11 +74,11 @@ class ListContentEntry extends ListRecords
     protected function getTableQuery(): Builder
     {
 
-        if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
             return $this->ownerRecord->contentEntries()->getQuery();
         }
 
-        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
             Auth::user()?->can('site.siteManager') &&
             ! (Auth::user()->hasRole(config('domain.role.super_admin')))
         ) {

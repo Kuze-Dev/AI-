@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace Domain\Order\Listeners;
 
+use Domain\Admin\Models\Admin;
 use Domain\Order\Events\AdminOrderFailedNotificationEvent;
 use Filament\Notifications\Notification;
-use Domain\Admin\Models\Admin;
 
 class AdminOrderFailedNotificationListener
 {
     /**
      * Handle the event.
-     *
-     * @param  \Domain\Order\Events\AdminOrderFailedNotificationEvent  $event
-     * @return void
      */
     public function handle(AdminOrderFailedNotificationEvent $event): void
     {

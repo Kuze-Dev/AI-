@@ -27,7 +27,7 @@ class CreateOrUpdateRouteUrlAction
             ->where('model_id', $model->id)
             ->first();
 
-        if ( ! $routeUrl) {
+        if (! $routeUrl) {
 
             return $model->routeUrls()
                 ->create([

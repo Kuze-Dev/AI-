@@ -12,8 +12,8 @@ use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentRefund;
 use Domain\Payments\Enums\PaymentStatus;
 use Domain\Payments\Events\PaymentProcessEvent;
 use Domain\Payments\Models\Payment as ModelsPayment;
-use Throwable;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
+use Throwable;
 
 class PaypalProvider extends Provider
 {

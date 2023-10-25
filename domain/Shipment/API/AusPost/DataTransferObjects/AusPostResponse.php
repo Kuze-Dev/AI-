@@ -27,11 +27,11 @@ class AusPostResponse implements RateResponse
         return get_object_vars($this);
     }
 
-    public function getRate(int|string|null $serviceID = null): float
+    public function getRate(int|string $serviceID = null): float
     {
 
         foreach ($this->package['service'] as $service) {
-            if($service['code'] == $serviceID) {
+            if ($service['code'] == $serviceID) {
                 return (float) $service['price'];
             }
         }

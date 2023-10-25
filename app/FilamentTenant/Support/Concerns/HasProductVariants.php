@@ -42,7 +42,7 @@ trait HasProductVariants
 
     public function getProductVariantComponent(): ProductVariant
     {
-        if ( ! isset($this->productVariantComponent)) {
+        if (! isset($this->productVariantComponent)) {
             $this->cacheProductVariantComponent();
         }
 

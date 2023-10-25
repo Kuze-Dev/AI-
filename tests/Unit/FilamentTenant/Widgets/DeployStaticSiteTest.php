@@ -3,10 +3,8 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Widgets\DeployStaticSite;
-
 use App\Settings\CMSSettings;
 use Filament\Facades\Filament;
-
 use Spatie\Activitylog\ActivitylogServiceProvider;
 
 use function Pest\Laravel\assertDatabaseCount;

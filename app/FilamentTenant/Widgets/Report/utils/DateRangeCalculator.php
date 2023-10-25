@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DateRangeCalculator
 {
-    public static function calculateDateRange(string|null $activeFilter): array
+    public static function calculateDateRange(?string $activeFilter): array
     {
         $startDate = null;
         $endDate = null;
@@ -32,7 +32,7 @@ class DateRangeCalculator
     }
 
     /** @return Builder<Model> */
-    public static function pieDateRange(Builder $query, string|null $activeFilter): Builder // @phpstan-ignore-line
+    public static function pieDateRange(Builder $query, ?string $activeFilter): Builder // @phpstan-ignore-line
     {
 
         if ($activeFilter === 'thisYear') {

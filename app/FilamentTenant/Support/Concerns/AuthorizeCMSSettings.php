@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Support\Concerns;
 
+use App\Filament\Resources\RoleResource\Support\PermissionGroup;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
-use App\Filament\Resources\RoleResource\Support\PermissionGroup;
-use Illuminate\Support\Facades\Auth;
 
 trait AuthorizeCMSSettings
 {
@@ -22,10 +22,10 @@ trait AuthorizeCMSSettings
             return true;
         }
 
-        if ( ! PermissionGroup::make($settingsPermissions)->getParts()->contains(self::getSlug())) {
+        if (! PermissionGroup::make($settingsPermissions)->getParts()->contains(self::getSlug())) {
             return true;
         }
 
-        return Auth::user()?->can('cmsSettings.' . self::getSlug()) ?? false;
+        return Auth::user()?->can('cmsSettings.'.self::getSlug()) ?? false;
     }
 }

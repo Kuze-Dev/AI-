@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
-use TiMacDonald\JsonApi\JsonApiResourceCollection;
 use Spatie\RouteAttributes\Attributes\Resource;
+use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     Resource('notifications', apiResource: true, only: ['index']),
@@ -23,7 +23,7 @@ class NotificationController
 {
     public function index(): JsonApiResourceCollection
     {
-        if ( ! $user = Auth::user()) {
+        if (! $user = Auth::user()) {
             throw new AuthenticationException();
         }
 

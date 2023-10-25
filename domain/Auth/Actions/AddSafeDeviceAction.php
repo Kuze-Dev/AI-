@@ -15,7 +15,7 @@ class AddSafeDeviceAction
 {
     public function execute(TwoFactorAuthenticatable $authenticatable, SafeDeviceData $safeDeviceData): TwoFactorAuthenticatable
     {
-        if ( ! $authenticatable->hasEnabledTwoFactorAuthentication()) {
+        if (! $authenticatable->hasEnabledTwoFactorAuthentication()) {
             return $authenticatable;
         }
 

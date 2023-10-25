@@ -13,9 +13,13 @@ class AdminOrderStatusUpdatedEvent
     use SerializesModels;
 
     public ?Customer $customer;
+
     public Order $order;
+
     public bool $shouldSendEmail;
+
     public string $status;
+
     public ?string $emailRemarks;
 
     public function __construct(
@@ -23,7 +27,7 @@ class AdminOrderStatusUpdatedEvent
         bool $shouldSendEmail,
         string $status,
         ?string $emailRemarks,
-        ?Customer $customer = null
+        Customer $customer = null
     ) {
         $this->order = $order;
         $this->shouldSendEmail = $shouldSendEmail;

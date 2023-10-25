@@ -7,10 +7,10 @@ namespace Domain\Content\Actions;
 use Domain\Blueprint\Actions\UpdateBlueprintDataAction;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\ContentEntry;
+use Domain\Internationalization\Models\Locale;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\MetaData\Actions\UpdateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
-use Domain\Internationalization\Models\Locale;
 
 class UpdateContentEntryAction
 {

@@ -24,7 +24,7 @@ class CartLinesRemoveController
         $result = app(BulkDestroyCartLineAction::class)
             ->execute($cartLineIds);
 
-        if ( ! $result) {
+        if (! $result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

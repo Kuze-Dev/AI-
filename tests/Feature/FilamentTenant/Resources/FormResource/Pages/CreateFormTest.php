@@ -9,9 +9,9 @@ use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Site\Database\Factories\SiteFactory;
-use Support\Captcha\CaptchaProvider;
 use Filament\Facades\Filament;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
+use Support\Captcha\CaptchaProvider;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;

@@ -13,7 +13,7 @@ class DeactivateAccountAction
 {
     public function execute(User&HasActiveState $user): ?bool
     {
-        if ( ! $user->isActive()) {
+        if (! $user->isActive()) {
             return null;
         }
 

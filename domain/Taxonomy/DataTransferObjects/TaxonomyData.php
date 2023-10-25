@@ -6,7 +6,7 @@ namespace Domain\Taxonomy\DataTransferObjects;
 
 class TaxonomyData
 {
-    /** @param \Domain\Taxonomy\DataTransferObjects\TaxonomyTermData[] $terms */
+    /** @param  \Domain\Taxonomy\DataTransferObjects\TaxonomyTermData[]  $terms */
     public function __construct(
         public readonly string $name,
         public readonly string $blueprint_id,

@@ -5,10 +5,10 @@ declare(strict_types=1);
 use App\Features\Customer\AddressBase;
 use App\Features\Customer\CustomerBase;
 use App\Features\Customer\TierBase;
-use Domain\Address\Models\Country;
 use App\Features\ECommerce\AllowGuestOrder;
 use App\Features\ECommerce\ECommerceBase;
 use App\Features\ECommerce\ShippingStorePickup;
+use Domain\Address\Models\Country;
 use Domain\Cart\Database\Factories\CartFactory;
 use Domain\Cart\Database\Factories\CartLineFactory;
 use Domain\Cart\Models\CartLine;
@@ -62,7 +62,7 @@ beforeEach(function () {
 
     $uuid = uuid_create(UUID_TYPE_RANDOM);
 
-    $sessionId = time() . $uuid;
+    $sessionId = time().$uuid;
 
     $cart = CartFactory::new()->setGuestId($sessionId)->createOne();
 
@@ -72,7 +72,7 @@ beforeEach(function () {
             $cartLine->save();
         })->create();
 
-    withHeader('Authorization', 'Bearer ' . $sessionId);
+    withHeader('Authorization', 'Bearer '.$sessionId);
 
     $this->cart = $cart;
     $this->shippingMethod = $shippingMethod;

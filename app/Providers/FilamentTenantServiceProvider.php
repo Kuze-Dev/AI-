@@ -69,10 +69,10 @@ class FilamentTenantServiceProvider extends ContextServiceProvider
 
     protected function registerRoutes(): void
     {
-        Route::middleware(array_merge([ApplyContext::class . ':' . static::$name], $this->contextConfig('middleware.base')))
+        Route::middleware(array_merge([ApplyContext::class.':'.static::$name], $this->contextConfig('middleware.base')))
             ->domain($this->contextConfig('domain'))
             ->prefix('admin')
-            ->name(static::$name . '.auth.')
+            ->name(static::$name.'.auth.')
             ->group(function () {
                 Route::get('login', Auth\Login::class)
                     ->middleware('guest:admin')
@@ -115,7 +115,7 @@ class FilamentTenantServiceProvider extends ContextServiceProvider
                             $request->session()->invalidate();
                             $request->session()->regenerateToken();
 
-                            return redirect()->route(static::$name . '.auth.login');
+                            return redirect()->route(static::$name.'.auth.login');
                         })->name('logout');
                     });
             });

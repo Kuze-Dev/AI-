@@ -4,28 +4,28 @@ declare(strict_types=1);
 
 namespace Domain\Content\Models;
 
-use Illuminate\Support\Str;
-use Domain\Site\Traits\Sites;
-use Spatie\Sluggable\HasSlug;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\BlueprintData;
-use Spatie\Sluggable\SlugOptions;
-use Support\MetaData\HasMetaData;
-use Support\RouteUrl\HasRouteUrl;
-use Spatie\Activitylog\LogOptions;
-use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Models\Activity;
-use Domain\Taxonomy\Models\TaxonomyTerm;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
+use Domain\Site\Traits\Sites;
+use Domain\Taxonomy\Models\TaxonomyTerm;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Illuminate\Support\Str;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
+use Support\MetaData\HasMetaData;
+use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
+use Support\RouteUrl\HasRouteUrl;
 
 /**
  * Domain\Content\Models\ContentEntry
@@ -53,6 +53,7 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
  * @property-read ContentEntry|null $pageDraft
+ *
  * @method static ContentEntryBuilder|ContentEntry newModelQuery()
  * @method static ContentEntryBuilder|ContentEntry newQuery()
  * @method static ContentEntryBuilder|ContentEntry query()
@@ -70,16 +71,17 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @method static ContentEntryBuilder|ContentEntry whereTaxonomyTerms(string $taxonomy, array $terms)
  * @method static ContentEntryBuilder|ContentEntry whereTitle($value)
  * @method static ContentEntryBuilder|ContentEntry whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['taxonomyTerms', 'metaData', 'routeUrls'])]
 class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlContact
 {
-    use LogsActivity;
-    use HasSlug;
-    use HasRouteUrl;
-    use HasMetaData;
     use ConstraintsRelationships;
+    use HasMetaData;
+    use HasRouteUrl;
+    use HasSlug;
+    use LogsActivity;
     use Sites;
 
     /**
@@ -109,7 +111,6 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
         'sites',
     ];
 
-    /** @return LogOptions */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -121,8 +122,6 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
     /**
      * Define default reference
      * for meta data properties.
-     *
-     * @return array
      */
     public function defaultMetaData(): array
     {
@@ -131,7 +130,7 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
         ];
     }
 
-    #create a name Attribute For title field if draftable_id is not null add (Draft) to the end of the title
+    //create a name Attribute For title field if draftable_id is not null add (Draft) to the end of the title
     public function getNameAttribute(): string
     {
         return $this->draftable_id ? $this->title.' (Draft)' : $this->title;
@@ -151,7 +150,7 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
     /** @return MorphMany<BlueprintData> */
     public function blueprintData(): MorphMany
     {
-        return $this->morphMany(BlueprintData::class,  'model');
+        return $this->morphMany(BlueprintData::class, 'model');
     }
 
     /**
@@ -165,7 +164,6 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
         return $this->belongsToMany(TaxonomyTerm::class);
     }
 
-    /** @return SlugOptions */
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
@@ -190,10 +188,10 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
         return new ContentEntryBuilder($query);
     }
 
-    /** @param self $model */
+    /** @param  self  $model */
     public static function generateRouteUrl(Model $model, array $attributes): string
     {
-        return Str::start($model->content->prefix, '/') . Str::of($attributes['title'])->slug()->start('/');
+        return Str::start($model->content->prefix, '/').Str::of($attributes['title'])->slug()->start('/');
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\HasOne<self> */

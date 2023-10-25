@@ -16,7 +16,7 @@ class PageResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
-        return  [
+        return [
             'name' => $this->name,
             'route_url' => $this->activeRouteUrl?->url,
             'visibility' => $this->visibility,

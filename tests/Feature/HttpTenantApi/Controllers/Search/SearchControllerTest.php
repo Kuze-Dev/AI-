@@ -28,7 +28,7 @@ it('can search', function () {
         ->count(5)
         ->sequence(...iterator_to_array((function () {
             foreach (range(1, 5) as $count) {
-                yield ['name' => 'foo ' . $count];
+                yield ['name' => 'foo '.$count];
             }
         })()))
         ->create();
@@ -51,12 +51,12 @@ it('can search', function () {
         ->count(5)
         ->sequence(...iterator_to_array((function () {
             foreach (range(1, 5) as $count) {
-                yield ['title' => 'foo ' . $count];
+                yield ['title' => 'foo '.$count];
             }
         })()))
         ->create();
 
-    getJson('api/search?' . http_build_query(['query' => 'foo']))
+    getJson('api/search?'.http_build_query(['query' => 'foo']))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json->has('data', 10)
@@ -71,7 +71,7 @@ it('can search pages', function (string $model) {
         ->count(5)
         ->sequence(...iterator_to_array((function () {
             foreach (range(1, 5) as $count) {
-                yield ['name' => 'foo ' . $count];
+                yield ['name' => 'foo '.$count];
             }
         })()))
         ->create();
@@ -84,12 +84,12 @@ it('can search pages', function (string $model) {
         ->count(5)
         ->sequence(...iterator_to_array((function () {
             foreach (range(1, 5) as $count) {
-                yield ['title' => 'foo ' . $count];
+                yield ['title' => 'foo '.$count];
             }
         })()))
         ->create();
 
-    getJson('api/search?' . http_build_query(['query' => 'foo', 'filter' => ['models' => $model]]))
+    getJson('api/search?'.http_build_query(['query' => 'foo', 'filter' => ['models' => $model]]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($model) {
             $json->has('data', 5)
@@ -109,7 +109,7 @@ it('can search content entries from specific content', function () {
         ->count(5)
         ->sequence(...iterator_to_array((function () {
             foreach (range(1, 5) as $count) {
-                yield ['title' => 'foo ' . $count];
+                yield ['title' => 'foo '.$count];
             }
         })()))
         ->create();
@@ -122,12 +122,12 @@ it('can search content entries from specific content', function () {
         ->count(5)
         ->sequence(...iterator_to_array((function () {
             foreach (range(1, 5) as $count) {
-                yield ['title' => 'foo ' . $count];
+                yield ['title' => 'foo '.$count];
             }
         })()))
         ->create();
 
-    getJson('api/search?' . http_build_query(['query' => 'foo', 'filter' => ['models' => 'contentEntry', 'content_ids' => $content->getKey()]]))
+    getJson('api/search?'.http_build_query(['query' => 'foo', 'filter' => ['models' => 'contentEntry', 'content_ids' => $content->getKey()]]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json->has('data', 5)

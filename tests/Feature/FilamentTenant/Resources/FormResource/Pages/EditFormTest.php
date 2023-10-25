@@ -62,12 +62,12 @@ it('can edit form', function () {
         ->assertOk()
         ->assertHasNoFormErrors();
 
-    assertDatabaseHas(Form::class,  [
+    assertDatabaseHas(Form::class, [
         'id' => $form->id,
         'name' => 'Foo',
         'store_submission' => false,
     ]);
-    assertDatabaseHas(FormEmailNotification::class,  [
+    assertDatabaseHas(FormEmailNotification::class, [
         'form_id' => $form->id,
         'to' => ['test@user'],
         'sender' => 'test@user',

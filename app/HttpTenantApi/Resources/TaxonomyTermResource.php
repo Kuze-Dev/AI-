@@ -7,8 +7,8 @@ namespace App\HttpTenantApi\Resources;
 use App\HttpTenantApi\Resources\Concerns\TransformsSchemaPayload;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
 use Illuminate\Http\Request;
-use TiMacDonald\JsonApi\JsonApiResource;
 use RuntimeException;
+use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
  * @mixin \Domain\Taxonomy\Models\TaxonomyTerm
@@ -19,7 +19,7 @@ class TaxonomyTermResource extends JsonApiResource
 
     public function toAttributes(Request $request): array
     {
-        return  [
+        return [
             'name' => $this->name,
             'data' => $this->transformSchemaPayload($this->data),
             'order' => $this->order,

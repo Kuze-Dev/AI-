@@ -42,7 +42,7 @@ trait HasProductOptions
 
     public function getProductOptionComponent(): ProductOption
     {
-        if ( ! isset($this->productOptionComponent)) {
+        if (! isset($this->productOptionComponent)) {
             $this->cacheProductOptionComponent();
         }
 

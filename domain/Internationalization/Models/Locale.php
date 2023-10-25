@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Internationalization\Models;
 
-use Spatie\Activitylog\LogOptions;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
+use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -21,6 +21,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities
  * @property-read int|null $activities_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Locale newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Locale newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Locale query()
@@ -28,12 +29,13 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @method static \Illuminate\Database\Eloquent\Builder|Locale whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Locale whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Locale whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Locale extends Model
 {
-    use LogsActivity;
     use ConstraintsRelationships;
+    use LogsActivity;
 
     protected $table = 'locales';
 
@@ -58,7 +60,6 @@ class Locale extends Model
         });
     }
 
-    /** @return LogOptions */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

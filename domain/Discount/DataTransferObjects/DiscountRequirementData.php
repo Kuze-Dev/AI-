@@ -9,7 +9,7 @@ use Domain\Discount\Enums\DiscountRequirementType;
 class DiscountRequirementData
 {
     public function __construct(
-        public readonly ?DiscountRequirementType $discount_requirement_type = null,
+        public readonly ?DiscountRequirementType $discount_requirement_type,
         public readonly float|int|null $minimum_amount,
     ) {
     }

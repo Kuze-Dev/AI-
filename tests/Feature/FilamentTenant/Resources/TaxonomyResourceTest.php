@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\TaxonomyResource;
-use Filament\Facades\Filament;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
+use Filament\Facades\Filament;
 
 beforeEach(function () {
     testInTenantContext();

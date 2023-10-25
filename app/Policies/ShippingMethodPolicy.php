@@ -18,7 +18,7 @@ class ShippingMethodPolicy
 
     public function before(): ?Response
     {
-        if ( ! tenancy()->tenant?->features()->someAreActive([
+        if (! tenancy()->tenant?->features()->someAreActive([
             ShippingUsps::class,
             ShippingUps::class,
             ShippingStorePickup::class,

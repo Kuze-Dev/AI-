@@ -98,7 +98,7 @@ class TenancyServiceProvider extends ServiceProvider
             Events\TenancyBootstrapped::class => [
                 function (Events\TenancyBootstrapped $event) {
                     if ($event->tenancy->tenant) {
-                        \Spatie\Permission\PermissionRegistrar::$cacheKey = 'spatie.permission.cache.tenant.' . $event->tenancy->tenant->getAttribute('id');
+                        \Spatie\Permission\PermissionRegistrar::$cacheKey = 'spatie.permission.cache.tenant.'.$event->tenancy->tenant->getAttribute('id');
                     }
                 },
             ],

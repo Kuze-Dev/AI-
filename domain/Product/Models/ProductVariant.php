@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Product\Models;
 
-use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Product\Models\ProductVariant
@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Domain\Product\Models\Product|null $product
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant query()
@@ -35,6 +36,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereStock($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ProductVariant extends Model

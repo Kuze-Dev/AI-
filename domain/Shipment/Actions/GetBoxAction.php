@@ -22,7 +22,6 @@ class GetBoxAction
     ): BoxResponseData {
 
         /** Store Pickup */
-
         if ($shippingMethod->driver === Driver::STORE_PICKUP) {
 
             return new BoxResponseData(
@@ -42,7 +41,6 @@ class GetBoxAction
          * Check number of items in box if one
          * return the product dimension provided.
          */
-
         if (count($boxData->boxitems) === 1) {
 
             return new BoxResponseData(

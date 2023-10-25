@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-use Illuminate\Testing\Fluent\AssertableJson;
-
 use Domain\Form\Database\Factories\FormFactory;
-
 use Domain\Site\Database\Factories\SiteFactory;
+use Illuminate\Testing\Fluent\AssertableJson;
 
 use function Pest\Laravel\getJson;
 
@@ -34,7 +32,7 @@ it('can list forms with blueprint', function () {
         ->count(10)
         ->create();
 
-    getJson('api/forms?' . http_build_query(['include' => 'blueprint']))
+    getJson('api/forms?'.http_build_query(['include' => 'blueprint']))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json->count('included', 1)
@@ -50,7 +48,7 @@ it('can show form', function () {
         ->withDummyBlueprint()
         ->createOne();
 
-    getJson('api/forms/' . $form->getRouteKey())
+    getJson('api/forms/'.$form->getRouteKey())
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($form) {
             $json->where('data.type', 'forms')
@@ -64,7 +62,7 @@ it('can show form with blueprint', function () {
         ->withDummyBlueprint()
         ->createOne();
 
-    getJson('api/forms/' . $form->getRouteKey() . '?' . http_build_query(['include' => 'blueprint']))
+    getJson('api/forms/'.$form->getRouteKey().'?'.http_build_query(['include' => 'blueprint']))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($form) {
             $json->count('included', 1)
@@ -84,7 +82,7 @@ it('can list forms and filter by name', function () {
         ->withDummyBlueprint()
         ->create(['name' => 'Foo']);
 
-    getJson('api/forms?' . http_build_query(['filter' => ['name' => $form->name]]))
+    getJson('api/forms?'.http_build_query(['filter' => ['name' => $form->name]]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($form) {
             $json->count('data', 1)

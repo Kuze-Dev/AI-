@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Order\Actions\PublicOrder;
 
+use App\Settings\OrderSettings;
+use App\Settings\SiteSettings;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Cart\Models\CartLine;
@@ -18,17 +20,15 @@ use Domain\Order\Exceptions\OrderEmailSettingsException;
 use Domain\Order\Exceptions\OrderEmailSiteSettingsException;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Product\Models\ProductVariant;
+use Domain\Shipment\DataTransferObjects\ReceiverData;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use App\Settings\OrderSettings;
-use App\Settings\SiteSettings;
-use Domain\Shipment\DataTransferObjects\ReceiverData;
-use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 
 class GuestPrepareOrderAction
 {
@@ -116,7 +116,7 @@ class GuestPrepareOrderAction
     {
         $currency = Currency::where('enabled', true)->first();
 
-        if ( ! $currency instanceof Currency) {
+        if (! $currency instanceof Currency) {
 
             throw new BadRequestHttpException('No currency found');
         }
@@ -125,7 +125,6 @@ class GuestPrepareOrderAction
     }
 
     /**
-     * @param GuestPlaceOrderData $guestPlaceOrderData
      * @return Collection<int, CartLine>
      */
     public function prepareCartLines(GuestPlaceOrderData $guestPlaceOrderData): Collection
@@ -143,7 +142,7 @@ class GuestPrepareOrderAction
     {
         $taxZone = Taxation::getTaxZone($country->id, $state->id);
 
-        if ( ! $taxZone instanceof TaxZone) {
+        if (! $taxZone instanceof TaxZone) {
             return null;
         }
 
@@ -213,7 +212,7 @@ class GuestPrepareOrderAction
     {
         $paymentMethod = PaymentMethod::whereSlug($guestPlaceOrderData->payment_method)->first();
 
-        if ( ! $paymentMethod instanceof PaymentMethod) {
+        if (! $paymentMethod instanceof PaymentMethod) {
 
             throw new BadRequestHttpException('No paymentMethod found');
         }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\TaxZoneResource\Pages\ListTaxZones;
 use Domain\Taxation\Database\Factories\TaxZoneFactory;
 use Filament\Facades\Filament;
-
 use Filament\Pages\Actions\DeleteAction;
 
 use function Pest\Laravel\assertModelMissing;

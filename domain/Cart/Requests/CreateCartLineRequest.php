@@ -49,7 +49,7 @@ class CreateCartLineRequest extends FormRequest
                     $purchasableId = $this->input('purchasable_id');
                     $variantId = $this->input('variant_id') ?? null;
 
-                    if ( ! $purchasableId) {
+                    if (! $purchasableId) {
                         $fail('Invalid product.');
                     }
 
@@ -90,7 +90,7 @@ class CreateCartLineRequest extends FormRequest
 
                     $product = Product::where((new Product())->getRouteKeyName(), $purchasableId)->first();
 
-                    if ( ! $product) {
+                    if (! $product) {
                         $fail('Invalid product.');
 
                         return;
@@ -116,7 +116,7 @@ class CreateCartLineRequest extends FormRequest
 
                     $product = Product::where((new Product())->getRouteKeyName(), $purchasableId)->first();
 
-                    if ( ! $product) {
+                    if (! $product) {
                         $fail('Invalid product.');
 
                         return;

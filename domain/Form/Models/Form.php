@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Domain\Form\Models;
 
-use Domain\Site\Traits\Sites;
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
-use Spatie\Activitylog\LogOptions;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Site\Traits\Sites;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Form\Models\Form
@@ -35,6 +35,7 @@ use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
  * @property-read int|null $form_email_notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Form\Models\FormSubmission> $formSubmissions
  * @property-read int|null $form_submissions_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Form newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Form newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Form query()
@@ -46,14 +47,15 @@ use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
  * @method static \Illuminate\Database\Eloquent\Builder|Form whereStoreSubmission($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Form whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Form whereUsesCaptcha($value)
+ *
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['formEmailNotifications', 'formSubmissions'])]
 class Form extends Model
 {
+    use ConstraintsRelationships;
     use HasSlug;
     use LogsActivity;
-    use ConstraintsRelationships;
     use Sites;
 
     protected $fillable = [

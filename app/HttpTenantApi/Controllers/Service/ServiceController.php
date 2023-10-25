@@ -15,7 +15,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('services', only: ['index', 'show']),
-    Middleware('feature.tenant:' . ServiceBase::class)
+    Middleware('feature.tenant:'.ServiceBase::class)
 ]
 class ServiceController
 {

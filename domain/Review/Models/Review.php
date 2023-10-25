@@ -9,8 +9,8 @@ use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\Product;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
@@ -37,6 +37,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read Product|null $product
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Review\Models\ReviewLike> $review_likes
  * @property-read int|null $review_likes_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Review newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Review newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Review query()
@@ -53,6 +54,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereRating($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Review whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Review extends Model implements HasMedia

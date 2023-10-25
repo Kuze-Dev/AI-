@@ -14,11 +14,11 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 /**
  * @template TModelClass of \Illuminate\Database\Eloquent\Model
  */
-class DefaultExport implements FromQuery, WithHeadings, WithMapping, WithCustomChunkSize
+class DefaultExport implements FromQuery, WithCustomChunkSize, WithHeadings, WithMapping
 {
     /**
-     * @param class-string<\Illuminate\Database\Eloquent\Model> $modelClass
-     * @param array<int, string> $headings
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
+     * @param  array<int, string>  $headings
      */
     public function __construct(
         private readonly string $modelClass,

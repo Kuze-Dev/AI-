@@ -29,6 +29,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingBox newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingBox newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingBox query()
@@ -46,12 +47,13 @@ use Spatie\Sluggable\SlugOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingBox whereVolume($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingBox whereWeightUnits($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingBox whereWidth($value)
+ *
  * @mixin \Eloquent
  */
 class ShippingBox extends Model
 {
-    use LogsActivity;
     use HasSlug;
+    use LogsActivity;
 
     protected $fillable = [
         'name',
@@ -83,7 +85,6 @@ class ShippingBox extends Model
         return 'slug';
     }
 
-    /** @return SlugOptions */
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()

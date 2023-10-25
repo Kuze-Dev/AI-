@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Resources;
 
 use App\HttpTenantApi\Resources\Concerns\TransformsSchemaPayload;
-use Illuminate\Http\Request;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
+use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
@@ -18,7 +18,7 @@ class GlobalsResource extends JsonApiResource
 
     public function toAttributes(Request $request): array
     {
-        return  [
+        return [
             'name' => $this->name,
             'slug' => $this->slug,
             'data' => $this->transformSchemaPayload($this->data ?? []),

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\FilamentTenant\Resources\CurrencyResource\Pages;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Currency\Actions\UpdateCurrencyEnabledAction;
 use Domain\Currency\Models\Currency;
+use Exception;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Exception;
-use App\FilamentTenant\Resources\CurrencyResource\Pages;
 
 class CurrencyResource extends Resource
 {

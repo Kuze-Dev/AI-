@@ -5,11 +5,10 @@ declare(strict_types=1);
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Form\Database\Factories\FormFactory;
-
 use Domain\Form\Models\FormSubmission;
+use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Support\Captcha\CaptchaProvider;
 use Support\Captcha\Facades\Captcha;
-use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\postJson;

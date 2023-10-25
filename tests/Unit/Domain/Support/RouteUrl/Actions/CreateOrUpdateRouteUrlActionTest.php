@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Schema\Blueprint;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 use Support\RouteUrl\DataTransferObjects\RouteUrlData;
 use Support\RouteUrl\Models\RouteUrl;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Schema\Blueprint;
 use Tests\Fixtures\TestModelForRouteUrl;
 
 use function Pest\Laravel\assertDatabaseHas;

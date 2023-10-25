@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @template TModelClass of \Domain\Product\Models\Product
+ *
  * @extends Builder<TModelClass>
  */
 class ProductBuilder extends Builder

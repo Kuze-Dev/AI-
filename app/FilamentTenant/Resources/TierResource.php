@@ -83,7 +83,7 @@ class TierResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
                         ->before(function (DeleteAction $action, Tier $record) {
-                            if($record->customers()->exists()) {
+                            if ($record->customers()->exists()) {
                                 Notification::make()
                                     ->warning()
                                     ->title('Customers exists in this tier!')

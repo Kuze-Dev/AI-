@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
-use Support\RouteUrl\DataTransferObjects\RouteUrlData;
-use Support\RouteUrl\Rules\UniqueActiveRouteUrlRule;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
+use Support\RouteUrl\DataTransferObjects\RouteUrlData;
+use Support\RouteUrl\Rules\UniqueActiveRouteUrlRule;
 use Tests\Fixtures\TestModelForRouteUrl;
 
 use function Pest\Laravel\travelTo;
