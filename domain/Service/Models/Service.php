@@ -93,6 +93,7 @@ class Service extends Model implements HasMedia, HasMetaDataContract
     use SoftDeletes;
 
     protected $fillable = [
+        'uuid',
         'blueprint_id',
         'name',
         'description',
