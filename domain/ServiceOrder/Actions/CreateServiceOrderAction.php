@@ -24,14 +24,18 @@ class CreateServiceOrderAction
     ) {
     }
 
-    public function execute(ServiceOrderData $serviceOrderData, int|null $adminId): ServiceOrder
-    {
+    public function execute(
+        ServiceOrderData $serviceOrderData,
+        int|null $adminId
+    ): ServiceOrder {
+
         $uniqueReference = null;
 
         do {
             $referenceNumber = Str::upper(Str::random(12));
 
-            $existingReference = ServiceOrder::where('reference', $referenceNumber)->first();
+            $existingReference = ServiceOrder::where('reference', $referenceNumber)
+                ->first();
 
             if ( ! $existingReference) {
                 $uniqueReference = $referenceNumber;
@@ -40,9 +44,11 @@ class CreateServiceOrderAction
             }
         } while (true);
 
-        $customer = Customer::whereId($serviceOrderData->customer_id)->first();
+        $customer = Customer::whereId($serviceOrderData->customer_id)
+            ->first();
 
-        $service = Service::whereId($serviceOrderData->service_id)->first();
+        $service = Service::whereId($serviceOrderData->service_id)
+            ->first();
 
         $currency = Currency::whereEnabled(true)->first();
 
@@ -101,6 +107,10 @@ class CreateServiceOrderAction
             'service_price' => $service->selling_price,
             'billing_cycle' => $service->billing_cycle,
             'due_date_every' => $service->due_date_every,
+            'pay_upfront' => $service->pay_upfront,
+            'is_subscription' => $service->is_subscription,
+            'needs_approval' => $service->needs_approval,
+            'is_auto_generated_bill' => $service->is_auto_generated_bill,
             'schedule' => $serviceOrderData->schedule,
             'reference' => $uniqueReference,
             'status' => $this->getStatus($service),
@@ -119,9 +129,11 @@ class CreateServiceOrderAction
     {
         $status = ServiceOrderStatus::FORPAYMENT;
 
-        if($service->needs_approval) {
+        if ($service->needs_approval) {
             $status = ServiceOrderStatus::PENDING;
-        } elseif( ! $service->pay_upfront && ! $service->is_subscription) {
+        } elseif (
+            ! $service->pay_upfront && ! $service->is_subscription
+        ) {
             $status = ServiceOrderStatus::INPROGRESS;
         }
 

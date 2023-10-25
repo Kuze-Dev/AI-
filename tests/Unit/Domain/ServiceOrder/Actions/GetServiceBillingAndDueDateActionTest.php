@@ -245,7 +245,7 @@ it('can can get billing dates (daily billing cycle)', function () {
 
     expect($dates->due_date)
         ->toEqual($dates->bill_date);
-})->only();
+});
 
 it('can cannot get billing dates', function () {
     $serviceOrder = ServiceOrderFactory::new()
