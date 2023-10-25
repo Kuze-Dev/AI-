@@ -36,6 +36,10 @@ return new class () extends Migration {
             $table->decimal('service_price', 10, 2);
             $table->string('billing_cycle')->nullable();
             $table->integer('due_date_every')->nullable();
+            $table->boolean('pay_upfront');
+            $table->boolean('is_subscription');
+            $table->boolean('needs_approval');
+            $table->boolean('is_auto_generated_bill');
             $table->dateTime('schedule');
             $table->string('status');
             $table->string('cancelled_reason')->nullable()->default(null);
