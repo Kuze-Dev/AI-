@@ -68,4 +68,12 @@ class ServiceOrderFactory extends Factory
     {
         return $this->state(['status' => ServiceOrderStatus::FORPAYMENT]);
     }
+
+    public function dailyBillingCycle(): self
+    {
+        return $this->state([
+            'billing_cycle' => BillingCycleEnum::DAILY,
+            'due_date_every' => null,
+        ]);
+    }
 }

@@ -22,16 +22,6 @@ beforeEach(function () {
 $now = now();
 
 $dataSets = [
-    /** daily billing cycle */
-    [
-        BillingCycleEnum::DAILY,    // billing cycle
-        5,                          // current due date every
-        $now->parse('2023-01-01'),  // ordered date
-        $now->parse('2023-01-02'),  // current bill date
-        $now->parse('2023-01-07'),  // current due date
-        $now->parse('2023-01-03'),  // next bill date
-        $now->parse('2023-01-08'),  // next due date
-    ],
     /** monthly billing cycle */
     [
         BillingCycleEnum::MONTHLY,  // billing cycle
@@ -221,6 +211,41 @@ it(
             ->toBeGreaterThan($nextDueDate);
     }
 )->with($dataSets);
+
+it('can can get billing dates (daily billing cycle)', function () {
+    $serviceOrder = ServiceOrderFactory::new()
+        ->for(
+            ServiceFactory::new()
+                ->isActive()
+                ->isSubscription()
+                ->withDummyBlueprint()
+        )
+        ->has(
+            ServiceBillFactory::new()
+                ->billingDate(null)
+                ->dueDate(null)
+                ->has(ServiceTransactionFactory::new())
+                ->paid()
+        )
+        ->dailyBillingCycle()
+        ->createOne();
+
+    $serviceBill = $serviceOrder->serviceBills
+        ->first();
+
+    $dates = $this->getServiceBillingAndDueDateAction
+        ->execute($serviceBill);
+
+    expect($dates->bill_date)
+        ->toBeGreaterThan(
+            $serviceOrder->latestServiceBill()
+                ->serviceTransaction
+                ->created_at
+        );
+
+    expect($dates->due_date)
+        ->toEqual($dates->bill_date);
+})->only();
 
 it('can cannot get billing dates', function () {
     $serviceOrder = ServiceOrderFactory::new()

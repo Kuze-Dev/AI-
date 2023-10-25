@@ -36,7 +36,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $service_name
  * @property float $service_price
  * @property BillingCycleEnum $billing_cycle
- * @property int $due_date_every
+ * @property int|null $due_date_every
  * @property \Illuminate\Support\Carbon $schedule
  * @property ServiceOrderStatus $status
  * @property string|null $cancelled_reason
