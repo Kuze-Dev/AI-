@@ -324,19 +324,11 @@ class ServiceResource extends Resource
                 Forms\Components\Select::make('due_date_every')
                     ->reactive()
                     ->options(function (Closure $get) {
-                        $options = [];
-                        switch ($get('billing_cycle')) {
-                            case BillingCycleEnum::MONTHLY->value:
-                                $options = range(1, now()->daysInMonth);
-
-                                break;
-                            case BillingCycleEnum::YEARLY->value:
-                                $options = range(1, 12);
-
-                                break;
+                        if($get('billing_cycle') !== BillingCycleEnum::DAILY->value) {
+                            return range(1, 31);
                         }
 
-                        return $options;
+                        return null;
                     })
                     ->formatStateUsing(
                         fn ($record, Closure $get, Closure $set) => $get('is_auto_generated_bill') === true

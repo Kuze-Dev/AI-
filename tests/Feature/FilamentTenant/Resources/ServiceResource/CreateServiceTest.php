@@ -62,7 +62,7 @@ it('can create service', function () {
             'blueprint_id' => $blueprint->getKey(),
             'retail_price' => 99.99,
             'selling_price' => 99.69,
-            'billing_cycle' => 'daily',
+            'billing_cycle' => 'monthly',
             'due_date_every' => 20,
             'taxonomy_term_id' => $taxonomyTerm->id,
             'media.0' => $image,

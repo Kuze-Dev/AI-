@@ -98,4 +98,15 @@ class ServiceFactory extends Factory
     {
         return $this->hasAttached(TaxonomyTermFactory::new()->for(TaxonomyFactory::new()->withDummyBlueprint()));
     }
+
+    public function withBillingCycle(): self
+    {
+        $billing_cycle = Arr::random(BillingCycleEnum::cases());
+
+        return $this->state([
+            'billing_cycle' => $billing_cycle,
+            'due_date_every' => $billing_cycle !== BillingCycleEnum::DAILY
+                ? Arr::random(range(1, now()->daysInMonth)) : null,
+        ]);
+    }
 }
