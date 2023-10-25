@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
-use App\Features\Customer\CustomerBase;
+use App\Features\Customer\TierBase;
 use App\HttpTenantApi\Resources\TierResource;
 use Domain\Tier\Models\Tier;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -14,7 +14,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('tiers', only: ['index']),
-    Middleware('feature.tenant:' . CustomerBase::class)
+    Middleware('feature.tenant:' . TierBase::class)
 ]
 class TierController
 {
