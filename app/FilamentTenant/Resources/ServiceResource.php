@@ -227,6 +227,7 @@ class ServiceResource extends Resource
         ];
     }
 
+    /** @return Builder<\Domain\Service\Models\Service> */
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
