@@ -13,13 +13,15 @@ class OrderStatusUpdatedEvent
     use SerializesModels;
 
     public ?Customer $customer = null;
+
     public Order $order;
+
     public string $status;
 
     public function __construct(
         Order $order,
         string $status,
-        ?Customer $customer = null
+        Customer $customer = null
     ) {
         $this->customer = $customer;
         $this->order = $order;

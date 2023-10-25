@@ -42,12 +42,12 @@ function loginAsUser(Admin $user = null): Admin
 }
 
 function assertActivityLogged(
-    string|null $logName = null,
-    string|null $event = null,
-    string|null $description = null,
-    array|null $properties = null,
-    Model|null $causedBy = null,
-    Model|null $subject = null,
+    string $logName = null,
+    string $event = null,
+    string $description = null,
+    array $properties = null,
+    Model $causedBy = null,
+    Model $subject = null,
 ): void {
     assertDatabaseHas(
         ActivitylogServiceProvider::determineActivityModel(),
@@ -69,14 +69,14 @@ function testInTenantContext(): Tenant
     /** @var Tenant */
     $tenant = TenantFactory::new()->createOne(['name' => 'testing']);
 
-    $domain = 'test.' . parse_url(config('app.url'), PHP_URL_HOST);
+    $domain = 'test.'.parse_url(config('app.url'), PHP_URL_HOST);
 
     $tenant->createDomain(['domain' => $domain]);
 
     $tenant->features()->activate(CMSBase::class);
     $tenant->features()->activate(ECommerceBase::class);
 
-    URL::forceRootUrl(Request::getScheme() . '://' . $domain);
+    URL::forceRootUrl(Request::getScheme().'://'.$domain);
 
     tenancy()->initialize($tenant);
 

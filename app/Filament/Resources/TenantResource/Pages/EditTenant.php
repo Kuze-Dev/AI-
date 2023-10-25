@@ -26,14 +26,14 @@ class EditTenant extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->requiresConfirmation(function ($livewire) {
                     return $livewire->data['is_suspended'] == true ? true : false;
                 })
                 ->modalCancelAction(function ($livewire) {
 
                     return Action::makeModalAction('redirect')
-                        ->label(__('Cancel & Revert Changes'))
+                        ->label(trans('Cancel & Revert Changes'))
                         ->color('secondary')
                         ->url(TenantResource::getUrl('edit', [$this->record]));
                 })
@@ -66,7 +66,8 @@ class EditTenant extends EditRecord
     }
 
     /**
-     * @param Tenant $record
+     * @param  Tenant  $record
+     *
      * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model

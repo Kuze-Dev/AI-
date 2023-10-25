@@ -6,7 +6,7 @@ namespace Domain\Form\DataTransferObjects;
 
 class FormData
 {
-    /** @param \Domain\Form\DataTransferObjects\FormEmailNotificationData[] $form_email_notifications */
+    /** @param  \Domain\Form\DataTransferObjects\FormEmailNotificationData[]  $form_email_notifications */
     public function __construct(
         public readonly string $blueprint_id,
         public readonly string $name,

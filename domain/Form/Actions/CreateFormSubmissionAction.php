@@ -34,9 +34,9 @@ class CreateFormSubmissionAction
                 foreach ($filesFields as $fieldkey) {
                     $value = ($fields[$fieldkey]);
 
-                    if ( ! is_null($value)) {
+                    if (! is_null($value)) {
 
-                        if ( ! Storage::disk('s3')->exists($value)) {
+                        if (! Storage::disk('s3')->exists($value)) {
                             abort(422, 'File '.$value.' Not Found');
                         } else {
 

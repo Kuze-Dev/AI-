@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\CountryResource\Pages\ListCountry;
-use Filament\Facades\Filament;
 use Domain\Address\Database\Factories\CountryFactory;
+use Filament\Facades\Filament;
 
 use function Pest\Livewire\livewire;
 

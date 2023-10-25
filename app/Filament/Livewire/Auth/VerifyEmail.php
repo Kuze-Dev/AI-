@@ -20,7 +20,7 @@ class VerifyEmail extends Component
     {
         $user = $request->user();
 
-        if ( ! $user instanceof MustVerifyEmail) {
+        if (! $user instanceof MustVerifyEmail) {
             throw new AuthorizationException();
         }
 

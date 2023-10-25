@@ -25,12 +25,12 @@ class ExcelServiceProvider extends EventServiceProvider
     {
         parent::register();
 
-        $this->mergeConfigFrom(__DIR__ . '/config/excel.php', 'support.excel');
+        $this->mergeConfigFrom(__DIR__.'/config/excel.php', 'support.excel');
     }
 
     public function boot(): void
     {
-        Route::get(config('support.excel.path') . '/{path}', DownloadExportController::class)
+        Route::get(config('support.excel.path').'/{path}', DownloadExportController::class)
             ->middleware(array_merge(
                 config('filament.middleware.auth'),
                 config('filament.middleware.base'),

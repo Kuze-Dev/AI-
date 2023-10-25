@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Database\Seeders\Tenant\Page;
 
 use Domain\Page\Database\Factories\PageFactory;
+use Illuminate\Database\Seeder;
 use Support\MetaData\Database\Factories\MetaDataFactory;
 use Support\RouteUrl\Database\Factories\RouteUrlFactory;
-use Illuminate\Database\Seeder;
 
 class PageSeeder extends Seeder
 {

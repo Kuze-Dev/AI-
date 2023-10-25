@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use Closure;
-use Filament\Forms;
-use Filament\Tables;
-use Domain\Site\Models\Site;
-use Filament\Resources\Form;
-use Filament\Resources\Table;
-use Filament\Resources\Resource;
-use Domain\Globals\Models\Globals;
-use Illuminate\Support\Facades\Auth;
-use Domain\Blueprint\Models\Blueprint;
-use Illuminate\Database\Eloquent\Builder;
-use Domain\Internationalization\Models\Locale;
-use App\FilamentTenant\Support\SchemaFormBuilder;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use App\FilamentTenant\Resources\GlobalsResource\Pages\CreateGlobals;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\EditGlobals;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\ListGlobals;
+use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use App\FilamentTenant\Resources\GlobalsResource\Pages\CreateGlobals;
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use Closure;
+use Domain\Blueprint\Models\Blueprint;
+use Domain\Globals\Models\Globals;
+use Domain\Internationalization\Models\Locale;
+use Domain\Site\Models\Site;
+use Filament\Forms;
+use Filament\Resources\Form;
+use Filament\Resources\Resource;
+use Filament\Resources\Table;
+use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Unique;
 
 class GlobalsResource extends Resource
@@ -66,7 +66,7 @@ class GlobalsResource extends Resource
                     ->reactive(),
                 Forms\Components\Select::make('locale')
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
-                    ->default((string) optional(Locale::where('is_default', true)->first())->code)
+                    ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->required(),
@@ -133,7 +133,7 @@ class GlobalsResource extends Resource
                     ->searchable()
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\TagsColumn::make('sites.name')
-                    ->toggleable(isToggledHiddenByDefault:true),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -163,11 +163,11 @@ class GlobalsResource extends Resource
     /** @return Builder<\Domain\Globals\Models\Globals> */
     public static function getEloquentQuery(): Builder
     {
-        if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
             return static::getModel()::query();
         }
 
-        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
             Auth::user()?->can('site.siteManager') &&
             ! (Auth::user()->hasRole(config('domain.role.super_admin')))
         ) {

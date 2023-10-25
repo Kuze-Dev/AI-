@@ -14,8 +14,8 @@ use Illuminate\Support\Str;
 class RelatedResourceFieldData extends FieldData
 {
     /**
-     * @param array<string> $rules
-     * @param array<string, mixed> $relation_scopes
+     * @param  array<string>  $rules
+     * @param  array<string, mixed>  $relation_scopes
      */
     public function __construct(
         public readonly string $title,
@@ -33,7 +33,7 @@ class RelatedResourceFieldData extends FieldData
 
     public static function fromArray(array $data): self
     {
-        if ( ! $data['type'] instanceof FieldType) {
+        if (! $data['type'] instanceof FieldType) {
             $data['type'] = FieldType::from($data['type']);
         }
 
@@ -70,7 +70,7 @@ class RelatedResourceFieldData extends FieldData
         $modelClass = $this->getRelatedModelClass();
 
         /** @var Model */
-        return (new $modelClass());
+        return new $modelClass();
     }
 
     /** @return Collection<array-key, Model>|Model|null */

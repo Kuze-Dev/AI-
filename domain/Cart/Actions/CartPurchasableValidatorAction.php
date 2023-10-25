@@ -41,11 +41,11 @@ class CartPurchasableValidatorAction
         }
 
         //stock control
-        if ( ! $product->allow_stocks) {
+        if (! $product->allow_stocks) {
             return;
         }
 
-        $this->validateStockControl($product,  $quantity, $cartLine);
+        $this->validateStockControl($product, $quantity, $cartLine);
     }
 
     public function validateProductVariant(
@@ -86,7 +86,7 @@ class CartPurchasableValidatorAction
         }
 
         //stock control
-        if ( ! $product->allow_stocks) {
+        if (! $product->allow_stocks) {
             return;
         }
         $this->validateStockControl($productVariant, $quantity, $cartLine);
@@ -98,7 +98,7 @@ class CartPurchasableValidatorAction
             $this->validatePurchasable($purchasable);
             // $this->validateMinimumQuantity($purchasable, $quantity);
 
-            if ( ! $purchasable->allow_stocks) {
+            if (! $purchasable->allow_stocks) {
                 return;
             }
         } elseif ($purchasable instanceof ProductVariant) {
@@ -108,7 +108,7 @@ class CartPurchasableValidatorAction
             $this->validatePurchasable($product);
             // $this->validateMinimumQuantity($product, $quantity);
 
-            if ( ! $product->allow_stocks) {
+            if (! $product->allow_stocks) {
                 return;
             }
         }
@@ -145,7 +145,7 @@ class CartPurchasableValidatorAction
                     $this->validatePurchasableByGuest($product);
                 }
 
-                if ( ! $product->allow_stocks) {
+                if (! $product->allow_stocks) {
                     $count++;
                 } else {
                     if ($product->stock >= $cartLine->quantity) {
@@ -187,27 +187,27 @@ class CartPurchasableValidatorAction
 
     public function validatePurchasable(Product|ProductVariant $purchasable): void
     {
-        if ( ! $purchasable->status) {
+        if (! $purchasable->status) {
             throw new InvalidPurchasableException('Inactive purchasable.');
         }
     }
 
-    public function validateMinimumQuantity(Product $product, int $quantity, ?CartLine $cartLine = null): void
+    public function validateMinimumQuantity(Product $product, int $quantity, CartLine $cartLine = null): void
     {
         //minimum order quantity
-        if ( ! is_null($cartLine)) {
+        if (! is_null($cartLine)) {
             $payloadQuantity = $cartLine->quantity + $quantity;
             if ($payloadQuantity < $product->minimum_order_quantity) {
-                throw new InvalidPurchasableException('Minimum order quantity must be ' . $product->minimum_order_quantity . '.');
+                throw new InvalidPurchasableException('Minimum order quantity must be '.$product->minimum_order_quantity.'.');
             }
         } else {
             if ($quantity < $product->minimum_order_quantity) {
-                throw new InvalidPurchasableException('Minimum order quantity must be ' . $product->minimum_order_quantity . '.');
+                throw new InvalidPurchasableException('Minimum order quantity must be '.$product->minimum_order_quantity.'.');
             }
         }
     }
 
-    public function validateStockControl(Product|ProductVariant $purchasable, int $quantity, ?CartLine $cartLine = null): void
+    public function validateStockControl(Product|ProductVariant $purchasable, int $quantity, CartLine $cartLine = null): void
     {
         if ($quantity > $purchasable->stock) {
             throw new InvalidPurchasableException('The quantity exceeds the available quantity of the purchasable.');
@@ -216,7 +216,7 @@ class CartPurchasableValidatorAction
         if ($cartLine) {
             $payloadQuantity = $cartLine->quantity + $quantity;
             if ($payloadQuantity > $purchasable->stock) {
-                throw new InvalidPurchasableException($quantity . ' can not be added to cart. The quantity is limited to ' . $purchasable->stock);
+                throw new InvalidPurchasableException($quantity.' can not be added to cart. The quantity is limited to '.$purchasable->stock);
             }
         }
     }
@@ -238,7 +238,7 @@ class CartPurchasableValidatorAction
 
     public function validatePurchasableByGuest(Product $product): void
     {
-        if ( ! $product->allow_guest_purchase) {
+        if (! $product->allow_guest_purchase) {
             throw new InvalidPurchasableException("This product can't be purchased by guests.");
         }
     }

@@ -12,9 +12,9 @@ use Domain\Cart\Requests\CheckoutRequest;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Spatie\RouteAttributes\Attributes\Middleware;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
 
 #[

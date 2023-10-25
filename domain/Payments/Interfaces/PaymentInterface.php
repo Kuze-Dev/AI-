@@ -15,8 +15,6 @@ interface PaymentInterface
 
     /**
      * Authorize the payment.
-     *
-     * @return PaymentAuthorize
      */
     public function authorize(): PaymentAuthorize;
 

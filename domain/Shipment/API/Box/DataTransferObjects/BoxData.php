@@ -8,7 +8,7 @@ use Domain\Shipment\Enums\UnitEnum;
 
 class BoxData
 {
-    /** @param \Domain\Shipment\API\Box\DataTransferObjects\BoxItem[] $boxitems*/
+    /** @param  \Domain\Shipment\API\Box\DataTransferObjects\BoxItem[]  $boxitems*/
     public function __construct(
         public readonly array $boxitems = [],
     ) {

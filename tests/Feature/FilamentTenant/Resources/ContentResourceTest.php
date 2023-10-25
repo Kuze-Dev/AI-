@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Filament\Facades\Filament;
 use Domain\Content\Database\Factories\ContentFactory;
+use Filament\Facades\Filament;
 
 beforeEach(function () {
     testInTenantContext();

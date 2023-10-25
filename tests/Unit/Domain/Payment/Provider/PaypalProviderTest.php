@@ -17,8 +17,8 @@ use Domain\Payments\DataTransferObjects\TransactionData;
 use Domain\Payments\Providers\PaypalProvider;
 use Mockery\MockInterface;
 
-use function PHPUnit\Framework\assertInstanceOf;
 use function Pest\Livewire\livewire;
+use function PHPUnit\Framework\assertInstanceOf;
 
 beforeEach(function () {
 

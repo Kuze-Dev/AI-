@@ -14,7 +14,7 @@ class RouteUrlResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
-        return  [
+        return [
             'url' => $this->url,
             'is_override' => $this->is_override,
         ];

@@ -7,8 +7,8 @@ namespace Domain\Auth;
 use Domain\Auth\Actions\GenerateOTPForEmailVerificationAction;
 use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Auth\Model\EmailVerificationOneTimePassword;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Exception;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
  * @property-read \Domain\Auth\Model\EmailVerificationOneTimePassword|null $emailVerificationOneTimePassword

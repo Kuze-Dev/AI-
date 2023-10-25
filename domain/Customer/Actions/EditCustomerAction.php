@@ -50,11 +50,11 @@ class EditCustomerAction
             $customer->sendEmailVerificationNotification();
         }
 
-        if($customer->register_status == RegisterStatus::REJECTED) {
+        if ($customer->register_status == RegisterStatus::REJECTED) {
             app(SendRejectedEmailAction::class)->execute($customer);
         }
 
-        if($customer->tier_approval_status == TierApprovalStatus::APPROVED) {
+        if ($customer->tier_approval_status == TierApprovalStatus::APPROVED) {
             app(SendApprovedEmailAction::class)->execute($customer);
         }
 

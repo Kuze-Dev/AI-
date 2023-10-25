@@ -11,8 +11,8 @@ use Spatie\Activitylog\Models\Activity;
 
 class ActivityPolicy
 {
-    use HandlesAuthorization;
     use ChecksWildcardPermissions;
+    use HandlesAuthorization;
 
     public function viewAny(User $user): bool
     {

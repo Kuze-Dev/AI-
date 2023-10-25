@@ -11,7 +11,7 @@ beforeEach(function () {
     testInTenantContext();
     $customer = CustomerFactory::new()->createOne();
 
-    withHeader('Authorization', 'Bearer ' . $customer
+    withHeader('Authorization', 'Bearer '.$customer
         ->createToken('testing-auth')
     ->plainTextToken);
 

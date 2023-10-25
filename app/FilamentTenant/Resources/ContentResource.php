@@ -4,41 +4,37 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use Domain\Content\Enums\PublishBehavior;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Closure;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Content\Actions\DeleteContentAction;
+use Domain\Content\Enums\PublishBehavior;
 use Domain\Content\Models\Content;
+use Domain\Site\Models\Site;
+use Domain\Taxonomy\Models\Taxonomy;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Closure;
-use Domain\Content\Actions\DeleteContentAction;
-use Domain\Site\Models\Site;
-use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
-use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Model;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class ContentResource extends Resource
 {
     use ContextualResource;
 
-    /** @var string|null */
     protected static ?string $model = Content::class;
 
-    /** @var string|null */
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
-    /** @var string|null */
     protected static ?string $navigationGroup = 'CMS';
 
-    /** @var string|null */
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function getGloballySearchableAttributes(): array
@@ -52,18 +48,13 @@ class ContentResource extends Resource
         return parent::getGlobalSearchEloquentQuery()->withCount('contentEntries');
     }
 
-    /** @param Content $record */
+    /** @param  Content  $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         /** @phpstan-ignore-next-line */
         return [trans('Total Entries') => $record->content_entries_count];
     }
 
-    /**
-     * @param Form $form
-     *
-     * @return Form
-     */
     public static function form(Form $form): Form
     {
         return $form
@@ -197,7 +188,7 @@ class ContentResource extends Resource
                     ->searchable()
                     ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
                 Tables\Columns\TagsColumn::make('sites.name')
-                    ->toggleable(isToggledHiddenByDefault:true),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -235,7 +226,6 @@ class ContentResource extends Resource
             ->defaultSort('updated_at', 'desc');
     }
 
-    /** @return array */
     public static function getRelations(): array
     {
         return [
@@ -246,11 +236,11 @@ class ContentResource extends Resource
     /** @return Builder<\Domain\Content\Models\Content> */
     public static function getEloquentQuery(): Builder
     {
-        if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
             return static::getModel()::query();
         }
 
-        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
             Auth::user()?->can('site.siteManager') &&
             ! (Auth::user()->hasRole(config('domain.role.super_admin')))
         ) {
@@ -263,7 +253,6 @@ class ContentResource extends Resource
 
     }
 
-    /** @return array */
     public static function getPages(): array
     {
         return [

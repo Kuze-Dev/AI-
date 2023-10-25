@@ -8,18 +8,18 @@ use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
 use Domain\Payments\Actions\CreatePaymentLink;
 use Domain\Payments\Actions\UploadProofofPaymentAction;
-use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
-use Domain\Payments\DataTransferObjects\ProofOfPaymentData;
-use Illuminate\Http\UploadedFile;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Domain\Payments\Models\Payment;
-use Illuminate\Database\Eloquent\Builder;
+use Domain\Payments\DataTransferObjects\AmountData;
 use Domain\Payments\DataTransferObjects\CreatepaymentData;
 use Domain\Payments\DataTransferObjects\PaymentDetailsData;
-use Domain\Payments\DataTransferObjects\AmountData;
+use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
+use Domain\Payments\DataTransferObjects\ProofOfPaymentData;
 use Domain\Payments\DataTransferObjects\TransactionData;
+use Domain\Payments\Models\Payment;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class UpdateOrderPaymentAction
 {
@@ -29,7 +29,7 @@ class UpdateOrderPaymentAction
     ) {
     }
 
-    public function status(Order $order, string|OrderStatuses $status, ?string $notes = null): Order
+    public function status(Order $order, string|OrderStatuses $status, string $notes = null): Order
     {
         $orderData = [
             'status' => $status,
@@ -57,7 +57,7 @@ class UpdateOrderPaymentAction
     public function bankTransfer(
         Order $order,
         string $proofOfPayment,
-        ?string $notes = null
+        string $notes = null
     ): void {
         /** @var \Domain\Payments\Models\Payment $payment */
         $payment = $order->payments->first();
@@ -107,7 +107,7 @@ class UpdateOrderPaymentAction
             $query->where('payable_id', $order->id);
         })->whereNot('status', 'paid')->first();
 
-        if ( ! $payment) {
+        if (! $payment) {
             throw new BadRequestHttpException('Your order is already paid');
         }
 

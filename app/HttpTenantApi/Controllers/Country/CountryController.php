@@ -14,7 +14,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('countries', only: ['index', 'show']),
-    Middleware('feature.tenant:' . ECommerceBase::class)
+    Middleware('feature.tenant:'.ECommerceBase::class)
 ]
 class CountryController
 {

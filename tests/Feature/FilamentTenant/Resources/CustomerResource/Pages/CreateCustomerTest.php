@@ -12,7 +12,6 @@ use Domain\Customer\Models\Customer;
 use Domain\Tier\Database\Factories\TierFactory;
 use Domain\Tier\Models\Tier;
 use Filament\Facades\Filament;
-
 use Tests\RequestFactories\CustomerRequestFactory;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -27,7 +26,7 @@ beforeEach(function () {
     $tenant->features()->activate(AddressBase::class);
     $tenant->features()->activate(TierBase::class);
     Filament::setContext('filament-tenant');
-    if( ! Tier::whereName(config('domain.tier.default'))->first()) {
+    if (! Tier::whereName(config('domain.tier.default'))->first()) {
         TierFactory::createDefault();
     }
     loginAsSuperAdmin();

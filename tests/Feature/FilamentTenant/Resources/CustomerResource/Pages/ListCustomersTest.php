@@ -9,8 +9,8 @@ use App\FilamentTenant\Resources\CustomerResource\Pages\ListCustomers;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
-use Filament\Pages\Actions\RestoreAction;
 use Filament\Pages\Actions\ForceDeleteAction;
+use Filament\Pages\Actions\RestoreAction;
 
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Laravel\assertNotSoftDeleted;

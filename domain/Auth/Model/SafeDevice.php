@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $remember_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|SafeDevice newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|SafeDevice newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|SafeDevice query()
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|SafeDevice whereTwoFactorAuthenticationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SafeDevice whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SafeDevice whereUserAgent($value)
+ *
  * @mixin \Eloquent
  */
 class SafeDevice extends Model

@@ -15,7 +15,7 @@ class EnsureAccountIsActive
     {
         $user = $request->user();
 
-        if ( ! $user || ($user instanceof HasActiveState && ! $user->isActive())) {
+        if (! $user || ($user instanceof HasActiveState && ! $user->isActive())) {
             return $request->expectsJson()
                 ? abort(403, 'Your account is deactivated.')
                 : redirect()->guest(route($redirectTo ?: 'activation.notice'));

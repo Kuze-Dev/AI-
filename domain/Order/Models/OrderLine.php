@@ -44,6 +44,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read int|null $media_count
  * @property-read \Domain\Order\Models\Order|null $order
  * @property-read Review|null $review
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine query()
@@ -69,12 +70,13 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereUnitPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderLine whereUuid($value)
+ *
  * @mixin \Eloquent
  */
 class OrderLine extends Model implements HasMedia
 {
-    use LogsActivity;
     use InteractsWithMedia;
+    use LogsActivity;
 
     protected $fillable = [
         'uuid',

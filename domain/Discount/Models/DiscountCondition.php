@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Domain\Discount\Models\Discount|null $discount
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountCondition newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountCondition newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountCondition onlyTrashed()
@@ -36,6 +37,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountCondition whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountCondition withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountCondition withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class DiscountCondition extends Model

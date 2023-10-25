@@ -8,11 +8,11 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ContentResource;
 use Domain\Content\Actions\CreateContentAction;
 use Domain\Content\DataTransferObjects\ContentData;
+use Domain\Content\Enums\PublishBehavior;
+use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Domain\Content\Enums\PublishBehavior;
-use Filament\Pages\Actions\Action;
 
 class CreateContent extends CreateRecord
 {
@@ -24,7 +24,7 @@ class CreateContent extends CreateRecord
     {
         return [
             Action::make('create')
-                ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];

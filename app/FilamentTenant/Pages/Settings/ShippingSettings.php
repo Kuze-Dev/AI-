@@ -34,7 +34,7 @@ class ShippingSettings extends TenantBaseSettings
                             ->label(fn ($state) => trans('Usps (:value)', ['value' => $state ? 'Live' : 'Sandbox']))
                             ->helperText(
                                 trans(
-                                    'If the feature is activated, it is necessary to provide production keys. ' .
+                                    'If the feature is activated, it is necessary to provide production keys. '.
                                         'However, if the feature is deactivated, payment processing will occur in sandbox mode'
                                 )
                             )
@@ -56,7 +56,7 @@ class ShippingSettings extends TenantBaseSettings
                             ->label(fn ($state) => trans('Usps (:value)', ['value' => $state ? 'Live' : 'Sandbox']))
                             ->helperText(
                                 trans(
-                                    'If the feature is activated, it is necessary to provide production keys. ' .
+                                    'If the feature is activated, it is necessary to provide production keys. '.
                                         'However, if the feature is deactivated, payment processing will occur in sandbox mode'
                                 )
                             )

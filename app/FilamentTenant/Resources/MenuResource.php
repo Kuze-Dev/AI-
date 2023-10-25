@@ -4,30 +4,30 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use App\FilamentTenant\Resources\MenuResource\Pages;
+use App\FilamentTenant\Support\Tree;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Support\Str;
+use Domain\Content\Models\Content;
+use Domain\Content\Models\ContentEntry;
+use Domain\Internationalization\Models\Locale;
+use Domain\Menu\Enums\NodeType;
+use Domain\Menu\Enums\Target;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
 use Domain\Page\Models\Page;
 use Domain\Site\Models\Site;
+use Filament\Forms;
 use Filament\Resources\Form;
-use Domain\Menu\Enums\Target;
-use Filament\Resources\Table;
-use Domain\Menu\Enums\NodeType;
 use Filament\Resources\Resource;
-use Domain\Content\Models\Content;
-use App\FilamentTenant\Support\Tree;
-use Illuminate\Support\Facades\Auth;
-use Domain\Content\Models\ContentEntry;
-use Illuminate\Database\Eloquent\Model;
+use Filament\Resources\Table;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use Domain\Internationalization\Models\Locale;
-use App\FilamentTenant\Resources\MenuResource\Pages;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
 
 class MenuResource extends Resource
@@ -53,7 +53,7 @@ class MenuResource extends Resource
         return parent::getGlobalSearchEloquentQuery()->withCount('nodes');
     }
 
-    /** @param Menu $record */
+    /** @param  Menu  $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         /** @phpstan-ignore-next-line */
@@ -82,7 +82,7 @@ class MenuResource extends Resource
                                 }
                                 if (tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
                                     $exist = Menu::whereName($state)->whereLocale($get('locale'))->whereNot('id', $record?->id)->count();
-                                    if ( ! $exist) {
+                                    if (! $exist) {
                                         return false;
                                     }
                                 }
@@ -139,7 +139,7 @@ class MenuResource extends Resource
                     ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
                 Forms\Components\Select::make('locale')
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
-                    ->default((string) optional(Locale::where('is_default', true)->first())->code)
+                    ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->required(),
@@ -244,7 +244,7 @@ class MenuResource extends Resource
                     ->searchable()
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\TagsColumn::make('sites.name')
-                    ->toggleable(isToggledHiddenByDefault:true),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -269,11 +269,11 @@ class MenuResource extends Resource
     /** @return Builder<\Domain\Menu\Models\Menu> */
     public static function getEloquentQuery(): Builder
     {
-        if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
             return static::getModel()::query();
         }
 
-        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
             Auth::user()?->can('site.siteManager') &&
             ! (Auth::user()->hasRole(config('domain.role.super_admin')))
         ) {

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Domain\Tenant\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Stancl\Tenancy\Database\Models\Domain;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Tenant\Models\TenantApiCall
@@ -24,6 +24,7 @@ use Stancl\Tenancy\Database\Models\Domain;
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Domain> $domains
  * @property-read int|null $domains_count
+ *
  * @method static \Stancl\Tenancy\Database\TenantCollection<int, static> all($columns = ['*'])
  * @method static \Stancl\Tenancy\Database\TenantCollection<int, static> get($columns = ['*'])
  * @method static \Illuminate\Database\Eloquent\Builder|Tenant newModelQuery()
@@ -34,13 +35,14 @@ use Stancl\Tenancy\Database\Models\Domain;
  * @method static \Illuminate\Database\Eloquent\Builder|Tenant whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Tenant whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Tenant whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['domains'])]
 class TenantApiCall extends Model
 {
-    use LogsActivity;
     use ConstraintsRelationships;
+    use LogsActivity;
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -55,5 +57,4 @@ class TenantApiCall extends Model
         'date',
         'count',
     ];
-
 }

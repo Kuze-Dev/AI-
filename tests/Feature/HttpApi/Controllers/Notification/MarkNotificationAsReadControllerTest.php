@@ -21,7 +21,7 @@ it('mark as read', function () {
 
     assertTrue($notification->unread());
 
-    patchJson('api/notifications/' . $notification->getRouteKey() . '/mark-as-read')
+    patchJson('api/notifications/'.$notification->getRouteKey().'/mark-as-read')
         ->assertOk()
         ->assertValid();
 
