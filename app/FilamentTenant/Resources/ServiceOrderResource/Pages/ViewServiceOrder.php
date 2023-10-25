@@ -4,29 +4,76 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ServiceOrderResource\Pages;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
+use App\FilamentTenant\Pages\Settings\ServiceSettings;
 use App\FilamentTenant\Resources\ServiceOrderResource;
+use App\FilamentTenant\Support\BadgeLabel;
+use App\FilamentTenant\Support\Divider;
 use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
-use Filament\Resources\Pages\ViewRecord;
 use App\FilamentTenant\Support;
 use App\FilamentTenant\Support\SchemaFormBuilder;
+use App\FilamentTenant\Support\TextLabel;
 use Carbon\Carbon;
 use DateTimeZone;
 use Domain\Admin\Models\Admin;
+use Domain\ServiceOrder\Actions\ChangeServiceOrderStatusAction;
+use Domain\ServiceOrder\Actions\UpdateServiceOrderAction;
+use Domain\ServiceOrder\DataTransferObjects\UpdateServiceOrderData;
 use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
+use Domain\ServiceOrder\Enums\ServiceOrderStatus;
+use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Models\ServiceOrderAddress;
+use Domain\Taxation\Enums\PriceDisplay;
+use Filament\Pages\Actions\Action;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
-class ViewServiceOrder extends ViewRecord
+class ViewServiceOrder extends EditRecord
 {
+    use LogsFormActivity;
     protected static string $resource = ServiceOrderResource::class;
 
     protected function getHeading(): string|Htmlable
     {
         return trans('Service Order Details #') . $this->record->reference;
+    }
+
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        return DB::transaction(fn () => app(UpdateServiceOrderAction::class)
+            ->execute(
+                $record,
+                new UpdateServiceOrderData(
+                    additional_charges: $data['additional_charges'],
+                    customer_form: $data['customer_form'],
+                )
+            ));
+    }
+
+    protected function getActions(): array
+    {
+        return [
+            Action::make('save')
+                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->action('save')
+                ->keyBindings(['mod+s']),
+        ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return $this->getCachedActions();
     }
 
     protected function getFormSchema(): array
@@ -36,7 +83,144 @@ class ViewServiceOrder extends ViewRecord
                 ->schema([
                     Forms\Components\Group::make()
                         ->schema($this->getSection())->columnSpan(2),
-                    ServiceOrderResource::summaryCard()->columnSpan(1),
+                    Section::make(trans('Summary'))->columnSpan(1)->schema([
+                        Forms\Components\Group::make()->columns(2)
+                            ->schema([
+                                BadgeLabel::make(trans('status'))->formatStateUsing(function (string $state): string {
+                                    if ($state == ServiceOrderStatus::FORPAYMENT->value) {
+                                        return trans('For Payment');
+                                    }
+                                    if ($state == ServiceOrderStatus::INPROGRESS->value) {
+                                        return trans('In Progress');
+                                    }
+
+                                    return ucfirst($state);
+                                })
+                                    ->color(function ($state) {
+                                        $newState = str_replace(' ', '_', strtolower($state));
+
+                                        return match ($newState) {
+                                            ServiceOrderStatus::PENDING->value, ServiceOrderStatus::INPROGRESS->value => 'warning',
+                                            ServiceOrderStatus::CLOSED->value, ServiceOrderStatus::INACTIVE->value, ServiceOrderStatus::CLOSED->value => 'danger',
+                                            ServiceOrderStatus::COMPLETED->value, ServiceOrderStatus::ACTIVE->value => 'success',
+                                            default => 'secondary',
+                                        };
+                                    })->inline()
+                                    ->alignLeft(),
+                                self::summaryEditButton(),
+                            ]),
+                        Forms\Components\Group::make()->columns(2)->schema([
+                            TextLabel::make('')
+                                ->label(trans('Created By'))
+                                ->alignLeft()
+                                ->size('md')
+                                ->inline()
+                                ->readOnly(),
+                            TextLabel::make('')
+                                ->label(fn ($record) => $record->admin->first_name . ' ' . $record->admin->last_name)
+                                ->alignRight()
+                                ->size('md')
+                                ->inline()
+                                ->readOnly(),
+                        ]),
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                TextLabel::make('')
+                                    ->label(trans('Order Date'))
+                                    ->alignLeft()
+                                    ->size('md')
+                                    ->inline()
+                                    ->readOnly(),
+                                TextLabel::make('created_at')
+                                    ->alignRight()
+                                    ->size('md')
+                                    ->inline()
+                                    ->formatStateUsing(function ($state) {
+                                        /** @var string */
+                                        $timeZone = Auth::user()?->timezone;
+
+                                        $formattedState = Carbon::parse($state)
+                                            ->setTimezone($timeZone)
+                                            ->translatedFormat('F d, Y g:i A');
+
+                                        return $formattedState;
+                                    }),
+                            ]),
+                        Divider::make(''),
+                        Forms\Components\Group::make()->columns(2)->schema([
+                            TextLabel::make('')
+                                ->label(trans('Service Price'))
+                                ->alignLeft()
+                                ->size('md')
+                                ->inline()
+                                ->readOnly(),
+                            TextLabel::make('')
+                                ->label(fn ($record) => $record->currency_symbol . ' ' . $record->service_price)
+                                ->alignRight()
+                                ->size('md')
+                                ->inline()
+                                ->readOnly(),
+                            TextLabel::make('')
+                                ->label(trans('Additional Charges'))
+                                ->alignLeft()
+                                ->size('md')
+                                ->inline()
+                                ->readOnly(),
+                            TextLabel::make('')
+                                ->label(fn ($record, Closure $get) => $record->currency_symbol . ' ' . array_reduce($get('additional_charges'), function ($carry, $data) {
+                                    if (isset($data['price']) && is_numeric($data['price']) && isset($data['quantity']) && is_numeric($data['quantity'])) {
+                                        return $carry + ($data['price'] * $data['quantity']);
+                                    }
+
+                                    return $carry;
+                                }, 0))
+                                ->alignRight()
+                                ->size('md')
+                                ->inline()
+                                ->readOnly(),
+                            Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
+                                TextLabel::make('')
+                                    ->label(fn ($record) => trans('Tax (') . $record->tax_percentage . '%)')
+                                    ->alignLeft()
+                                    ->size('md')
+                                    ->inline()
+                                    ->readOnly(),
+                                TextLabel::make('')
+                                    ->label(fn (ServiceOrder $record, Closure $get) => $record->tax_display == PriceDisplay::INCLUSIVE->value ? 'Inclusive' : $record->currency_symbol . ' ' .  (ServiceOrderResource::getTax(
+                                        $record->service->selling_price ?? 0,
+                                        $get('additional_charges'),
+                                        ServiceOrderAddress::whereType('billing_address')->whereServiceOrderId($record->id)->first()->service_order_id
+                                    )->tax_total))
+                                    ->alignRight()
+                                    ->size('md')
+                                    ->inline()
+                                    ->readOnly(),
+                            ])->visible(
+                                function (array $state) {
+                                    return isset($state['tax_display']);
+                                }
+                            ),
+                            TextLabel::make('')
+                                ->label(trans('Total Price'))
+                                ->alignLeft()
+                                ->size('md')
+                                ->inline()
+                                ->readOnly()
+                                ->color('primary'),
+                            TextLabel::make('')
+                                ->label(fn (ServiceOrder $record, Closure $get) => $record->currency_symbol . ' ' .  (ServiceOrderResource::getTax(
+                                    $record->service->selling_price ?? 0,
+                                    $get('additional_charges'),
+                                    ServiceOrderAddress::whereType('billing_address')->whereServiceOrderId($record->id)->first()->service_order_id
+                                )->total_price))
+                                ->alignRight()
+                                ->size('md')
+                                ->inline()
+                                ->readOnly()
+                                ->color('primary'),
+                        ]),
+
+                    ]),
                 ])->columns(3),
         ];
     }
@@ -45,24 +229,25 @@ class ViewServiceOrder extends ViewRecord
     {
         $admin = Admin::first();
 
-        return [Section::make(trans('Service'))->schema([
-            Grid::make(2)->schema([
-                Placeholder::make('service')
-                    ->content(fn ($record) => $record->service_name),
-                Placeholder::make('service Price')
-                    ->content(fn ($record) => $record->service_price),
-                Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
-                    Placeholder::make('BillingCycle')
-                        ->content(fn ($record) => $record->service->billing_cycle),
-                    Placeholder::make('Due date every')
-                        ->content(fn ($record) => $record->service->due_date_every),
-                ])->visible(fn ($record) => $record->service->is_subscription),
-                Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
-                    Placeholder::make('schedule')
-                        ->content(fn ($record) => Carbon::parse($record->schedule)->timezone(new DateTimeZone($admin?->timezone))->format('F j Y g:i A')),
-                ])->visible(fn ($record) => ! $record->service->is_subscription),
+        return [
+            Section::make(trans('Service'))->schema([
+                Grid::make(2)->schema([
+                    Placeholder::make('service')
+                        ->content(fn ($record) => $record->service_name),
+                    Placeholder::make('service Price')
+                        ->content(fn ($record) => $record->service_price),
+                    Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
+                        Placeholder::make('BillingCycle')
+                            ->content(fn ($record) => $record->service->billing_cycle),
+                        Placeholder::make('Due date every')
+                            ->content(fn ($record) => $record->service->due_date_every),
+                    ])->visible(fn ($record) => $record->service->is_subscription),
+                    Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
+                        Placeholder::make('schedule')
+                            ->content(fn ($record) => Carbon::parse($record->schedule)->timezone(new DateTimeZone($admin?->timezone))->format('F j Y g:i A')),
+                    ])->visible(fn ($record) => ! $record->service->is_subscription),
+                ]),
             ]),
-        ]),
             Section::make(trans('Customer'))
                 ->schema([
                     Forms\Components\Group::make()->columns(2)->schema([
@@ -108,11 +293,28 @@ class ViewServiceOrder extends ViewRecord
                             ->content(fn ($record) => ServiceOrderAddress::whereServiceOrderId($record->id)->whereType(ServiceOrderAddressType::BILLING_ADDRESS)->first()->zip_code ?? null),
                     ]),
                 ]),
+            Group::make()->columns(2)->columnSpan(2)->schema([
+                TextLabel::make('')
+                    ->label(trans('Additional Charges'))
+                    ->alignLeft()
+                    ->size('xl')
+                    ->weight('bold')
+                    ->inline()
+                    ->readOnly(),
+                Repeater::make('additional_charges')
+                    ->label('')
+                    ->createItemButtonLabel('Additional Charges')
+                    ->columnSpan(2)
+                    ->defaultItems(0)
+                    ->schema([
+                        TextInput::make('name')->required(),
+                        TextInput::make('quantity')->required()->numeric()->reactive()->default(1),
+                        TextInput::make('price')->required()->numeric()->reactive(),
+                    ])
+                    ->maxItems(3)
+                    ->columns(3),
 
-            Section::make(trans('Additional Charges'))
-                ->schema([
-                    Forms\Components\Group::make()->schema($this->getAdditionalCharges()),
-                ])->visible(fn ($record) => ! empty($record->additional_charges)),
+            ]),
 
             Section::make(trans('Service Fill-up Form'))
                 ->schema([
@@ -121,60 +323,92 @@ class ViewServiceOrder extends ViewRecord
                 ])
                 ->hidden(fn (Closure $get) => $get('service_id') === null)
                 ->columnSpan(2),
-
         ];
     }
 
-    private function getAdditionalCharges(): array
+    private static function summaryEditButton(): Support\ButtonAction
     {
-        $schema = [];
-        $schema[] = Forms\Components\Group::make()->columns(3)->schema([
-            Support\TextLabel::make('')
-                ->label(trans('Name'))
-                ->alignLeft()
-                ->size('sm')
-                ->inline()
-                ->readOnly(),
-            Support\TextLabel::make('')
-                ->label(trans('Quantity'))
-                ->alignLeft()
-                ->size('sm')
-                ->inline()
-                ->readOnly(),
-            Support\TextLabel::make('')
-                ->label(trans('Price'))
-                ->alignLeft()
-                ->size('sm')
-                ->inline()
-                ->readOnly(),
+        return Support\ButtonAction::make('Edit')
+            ->execute(function (ServiceOrder $record, Closure $get, Closure $set) {
+                return Forms\Components\Actions\Action::make(trans('edit'))
+                    ->color('primary')
+                    ->label('Edit')
+                    ->size('sm')
+                    ->modalHeading(trans('Edit Status'))
+                    ->modalWidth('xl')
+                    ->form([
+                        Forms\Components\Select::make('status_options')
+                            ->label('')
+                            ->options(function () use ($record) {
+                                $options = [
+                                    ServiceOrderStatus::PENDING->value => trans('Pending'),
+                                    ServiceOrderStatus::FORPAYMENT->value => trans('For payment'),
+                                    ServiceOrderStatus::INPROGRESS->value => trans('In progress'),
+                                    ServiceOrderStatus::COMPLETED->value => trans('Completed'),
+                                ];
+                                if (isset($record->billing_cycle)) {
+                                    $options = [
+                                        ServiceOrderStatus::PENDING->value => trans('Pending'),
+                                        ServiceOrderStatus::FORPAYMENT->value => trans('For payment'),
+                                        ServiceOrderStatus::ACTIVE->value => trans('Active'),
+                                        ServiceOrderStatus::CLOSED->value => trans('Closed'),
+                                    ];
+                                }
 
-            Support\Divider::make('')->columnSpan(3),
-        ]);
-        foreach($this->record->additional_charges as $additionalcharge) {
-            $schema[] = Forms\Components\Group::make()->columns(3)->schema([
-                Support\TextLabel::make('')
-                    ->label($additionalcharge['name'])
-                    ->alignLeft()
-                    ->size('md')
-                    ->inline()
-                    ->readOnly(),
-                Support\TextLabel::make('')
-                    ->label('' .$additionalcharge['quantity'])
-                    ->alignLeft()
-                    ->size('md')
-                    ->inline()
-                    ->readOnly(),
-                Support\TextLabel::make('')
-                    ->label($this->record->currency_symbol .$additionalcharge['price'])
-                    ->alignLeft()
-                    ->size('md')
-                    ->inline()
-                    ->readOnly(),
-                Support\Divider::make('')->columnSpan(3),
-            ]);
-        }
+                                return $options;
+                            })
+                            ->disablePlaceholderSelection()
+                            ->formatStateUsing(function () use ($record) {
+                                return $record->status;
+                            }),
+                        Forms\Components\Toggle::make('send_email')
+                            ->label(trans('Send email notification'))
+                            ->default(false)
+                            ->reactive(),
+                    ])
+                    ->action(
+                        function (array $data, $livewire) use ($record, $set) {
 
-        return $schema;
+                            $shouldSendEmail = $livewire->mountedFormComponentActionData['send_email'];
 
+                            if ($shouldSendEmail) {
+                                $fromEmail = app(ServiceSettings::class)->email_sender_name;
+                                if (empty($fromEmail)) {
+                                    Notification::make()
+                                        ->title(trans('Email sender not found, please update your order settings.'))
+                                        ->warning()
+                                        ->send();
+
+                                    return;
+                                }
+                            }
+
+                            $status = $data['status_options'];
+                            $updateData = ['status' => $status];
+
+                            $result = $record->update($updateData);
+
+                            if ($result) {
+                                $set('status', ucfirst($data['status_options']));
+                                Notification::make()
+                                    ->title(trans('Service Order updated successfully'))
+                                    ->success()
+                                    ->send();
+                            }
+
+                            if ($shouldSendEmail) {
+                                app(ChangeServiceOrderStatusAction::class)->execute($record);
+                            }
+                        }
+                    );
+            })
+            ->disableLabel()
+            ->columnSpan(1)
+            ->alignRight()
+            ->size('sm')
+            ->hidden(function (ServiceOrder $record) {
+                return $record->status == ServiceOrderStatus::FORPAYMENT ||
+                    $record->status == ServiceOrderStatus::COMPLETED;
+            });
     }
 }
