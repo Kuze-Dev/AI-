@@ -3,11 +3,13 @@
 declare(strict_types=1);
 
 use Carbon\Carbon;
+use Domain\Service\Databases\Factories\ServiceFactory;
 use Domain\Service\Enums\BillingCycleEnum;
 use Domain\ServiceOrder\Actions\GetServiceBillingAndDueDateAction;
 use Domain\ServiceOrder\Database\Factories\ServiceBillFactory;
 use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
 use Domain\ServiceOrder\Database\Factories\ServiceTransactionFactory;
+use Domain\ServiceOrder\Exceptions\InvalidServiceBillException;
 
 beforeEach(function () {
     testInTenantContext();
@@ -94,6 +96,12 @@ it(
         now()->setTestNow(now()->parse($createdAt)->addDay());
 
         $serviceOrder = ServiceOrderFactory::new()
+            ->for(
+                ServiceFactory::new()
+                    ->isActive()
+                    ->isSubscription()
+                    ->withDummyBlueprint()
+            )
             ->has(
                 ServiceBillFactory::new([
                     'bill_date' => null,
@@ -107,7 +115,7 @@ it(
                 'due_date_every' => $dueDateEvery,
             ]);
 
-        $serviceBill = $serviceOrder->serviceBills->first();
+        $serviceBill = $serviceOrder->latestServiceBill();
 
         $dates = $this->getServiceBillingAndDueDateAction
             ->execute($serviceBill);
@@ -135,6 +143,12 @@ it(
         now()->setTestNow(now()->parse($dueDate)->subDay());
 
         $serviceOrder = ServiceOrderFactory::new()
+            ->for(
+                ServiceFactory::new()
+                    ->isActive()
+                    ->isSubscription()
+                    ->withDummyBlueprint()
+            )
             ->has(
                 ServiceBillFactory::new([
                     'bill_date' => $billDate,
@@ -176,6 +190,12 @@ it(
         now()->setTestNow(now()->parse($dueDate)->addDay());
 
         $serviceOrder = ServiceOrderFactory::new()
+            ->for(
+                ServiceFactory::new()
+                    ->isActive()
+                    ->isSubscription()
+                    ->withDummyBlueprint()
+            )
             ->has(
                 ServiceBillFactory::new([
                     'bill_date' => $billDate,
@@ -201,3 +221,27 @@ it(
             ->toBeGreaterThan($nextDueDate);
     }
 )->with($dataSets);
+
+it('can cannot get billing dates', function () {
+    $serviceOrder = ServiceOrderFactory::new()
+        ->for(
+            ServiceFactory::new()
+                ->isActive()
+                ->isSubscription()
+                ->withDummyBlueprint()
+        )
+        ->has(
+            ServiceBillFactory::new([
+                'bill_date' => null,
+                'due_date' => null,
+            ])->unpaid()
+        )
+        ->createOne();
+
+    $serviceBill = $serviceOrder->serviceBills
+        ->first();
+
+    $this->getServiceBillingAndDueDateAction
+        ->execute($serviceBill);
+})
+    ->throws(InvalidServiceBillException::class);
