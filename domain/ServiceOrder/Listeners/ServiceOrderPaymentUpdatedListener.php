@@ -27,10 +27,11 @@ class ServiceOrderPaymentUpdatedListener
     {
         if ($event->payment->payable instanceof ServiceBill) {
             $status = $event->payment->status;
-            $order = $event->payment->payable;
+
+            $serviceBill = $event->payment->payable;
 
             match ($status) {
-                'paid' => $this->onServiceBillPaid($order),
+                'paid' => $this->onServiceBillPaid($serviceBill),
                 default => null
             };
         }
@@ -48,21 +49,34 @@ class ServiceOrderPaymentUpdatedListener
             'status' => ServiceBillStatus::PAID,
         ]);
 
-        if($serviceBill->serviceOrder->service->is_subscription) {
-            $serviceBillingDate = app(GetServiceBillingAndDueDateAction::class)->execute($serviceBill);
-            app(CreateServiceBillAction::class)->execute(ServiceBillData::fromCreatedServiceOrder($serviceBill->serviceOrder->toArray()), $serviceBillingDate);
+        /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
+        $serviceOrder = $serviceBill->serviceOrder;
+
+        /** @var \Domain\Service\Models\Service $service */
+        $service = $serviceOrder->service;
+
+        if (
+            $service->is_subscription &&
+            ! $service->is_auto_generated_bill
+        ) {
+            $serviceBillingDate = app(GetServiceBillingAndDueDateAction::class)
+                ->execute($serviceBill);
+
+            app(CreateServiceBillAction::class)
+                ->execute(
+                    ServiceBillData::fromCreatedServiceOrder(
+                        $serviceOrder->toArray()
+                    ),
+                    $serviceBillingDate
+                );
         }
 
-        if ($serviceBill->serviceOrder->service->is_subscription) {
-            $serviceBill->serviceOrder->update([
-                'status' => ServiceOrderStatus::ACTIVE,
-            ]);
-        } else {
-            $serviceBill->serviceOrder->update([
-                'status' => ServiceOrderStatus::PENDING,
-            ]);
-        }
+        $serviceOrder->update([
+            'status' => $service->is_subscription
+                ? ServiceOrderStatus::ACTIVE
+                : ServiceOrderStatus::PENDING,
+        ]);
 
-        app(ChangeServiceOrderStatusAction::class)->execute($serviceBill->serviceOrder);
+        app(ChangeServiceOrderStatusAction::class)->execute($serviceOrder);
     }
 }
