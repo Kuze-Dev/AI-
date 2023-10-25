@@ -30,7 +30,7 @@ class ServiceResource extends JsonApiResource
             'pay_upfront' => $this->pay_upfront,
             'status' => $this->status,
             'needs_approval' => $this->needs_approval,
-            'auto_generate_bill' => $this->auto_generate_bill
+            'is_auto_generated_bill' => $this->is_auto_generated_bill,
         ];
     }
 

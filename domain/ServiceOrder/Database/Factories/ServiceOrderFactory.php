@@ -49,19 +49,6 @@ class ServiceOrderFactory extends Factory
         ];
     }
 
-    // TODO: to be removed. Re-implement test: create and use state method.
-    // public function configure(): self
-    // {
-    //     return $this
-    //         ->afterCreating(function (ServiceOrder $serviceOrder) {
-    //             ServiceBillFactory::new()
-    //                 ->createOne([
-    //                     'service_order_id' => $serviceOrder->id,
-    //                     'reference' => $serviceOrder->reference
-    //                 ]);
-    //         });
-    // }
-
     public function active(): self
     {
         return $this->state(['status' => ServiceOrderStatus::ACTIVE]);
@@ -80,5 +67,13 @@ class ServiceOrderFactory extends Factory
     public function forPayment(): self
     {
         return $this->state(['status' => ServiceOrderStatus::FORPAYMENT]);
+    }
+
+    public function dailyBillingCycle(): self
+    {
+        return $this->state([
+            'billing_cycle' => BillingCycleEnum::DAILY,
+            'due_date_every' => null,
+        ]);
     }
 }

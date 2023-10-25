@@ -15,11 +15,7 @@ class CreateServiceBillingsAction
     {
         $customers = Customer::query()
             ->with([
-                'serviceOrders' => function ($query) {
-                    $query->whereActive()
-                        ->whereAutoGenerateBills()
-                        ->whereSubscriptionBased();
-                },
+                'serviceOrders' => fn ($query) => $query->whereShouldAutoGenerateBill(),
                 'serviceOrders.serviceBills',
             ])
             ->whereActive()

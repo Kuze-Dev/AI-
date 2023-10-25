@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Actions;
 
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
+use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Notifications\ActivatedServiceOrderNotification;
 use Domain\ServiceOrder\Notifications\ClosedServiceOrderNotification;
@@ -13,11 +14,12 @@ use Domain\ServiceOrder\Notifications\ForPaymentNotification;
 
 class ChangeServiceOrderStatusAction
 {
-    private $serviceBill;
+    private ServiceBill $serviceBill;
 
     public function execute(ServiceOrder $serviceOrder): void
     {
-        $this->serviceBill = $serviceOrder->serviceBills()->latest()->first();
+        $this->serviceBill = $serviceOrder->latestServiceBill();
+
         match ($serviceOrder->status) {
             ServiceOrderStatus::ACTIVE => $this->onActive($serviceOrder),
             ServiceOrderStatus::INACTIVE => $this->onInactive($serviceOrder),

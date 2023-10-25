@@ -95,7 +95,7 @@ it('can edit service', function () {
             'status' => ! $service->status,
             'needs_approval' => ! $service->needs_approval,
             'taxonomy_term_id' => $taxonomyTerm->id,
-            'images.0' => $image,
+            'media.0' => $image,
             'meta_data' => $metaData,
             'meta_data.image.0' => $image,
         ])

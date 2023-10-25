@@ -89,6 +89,7 @@ it('can filter services', function ($attribute) {
     'is_subscription',
     'status',
     'needs_approval',
+    'is_auto_generated_bill',
     'taxonomies',
 ]);
 

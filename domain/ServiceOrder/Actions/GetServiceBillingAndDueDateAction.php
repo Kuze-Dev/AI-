@@ -33,7 +33,7 @@ class GetServiceBillingAndDueDateAction
         $billingCycle = $serviceOrder->billing_cycle;
 
         /** @var int $dueDateEvery */
-        $dueDateEvery = $serviceOrder->due_date_every;
+        $dueDateEvery = $serviceOrder->due_date_every ?? 0;
 
         /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
         $serviceTransaction = $serviceBill->serviceTransaction;
