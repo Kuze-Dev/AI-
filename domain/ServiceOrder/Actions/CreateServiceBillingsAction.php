@@ -11,12 +11,6 @@ use Domain\ServiceOrder\Models\ServiceOrder;
 
 class CreateServiceBillingsAction
 {
-    public function __construct(
-        private SendToCustomerServiceBillEmailAction $sendToCustomerServiceBillEmailAction
-    )
-    {
-    }
-
     public function execute(): void
     {
         $customers = Customer::query()
@@ -53,7 +47,7 @@ class CreateServiceBillingsAction
                                 new NotifyCustomerLatestServiceBillJob(
                                     $customer,
                                     $serviceOrder
-                                )
+                                ),
                             ]);
                         }
                     });

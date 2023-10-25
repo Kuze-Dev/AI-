@@ -7,18 +7,24 @@ namespace Domain\ServiceOrder\Actions;
 use Carbon\Carbon;
 use Domain\Service\Enums\BillingCycleEnum;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData;
-use Domain\ServiceOrder\Enums\ServiceBillStatus;
+use Domain\ServiceOrder\Exceptions\InvalidServiceBillException;
 use Domain\ServiceOrder\Exceptions\InvalidServiceBillingCycleException;
-use Domain\ServiceOrder\Exceptions\ServiceBillStatusMusBePaidException;
+use Domain\ServiceOrder\Exceptions\NonSubscriptionNotAllowedException;
 use Domain\ServiceOrder\Models\ServiceBill;
-use Domain\ServiceOrder\Models\ServiceTransaction;
 use Throwable;
 
 class GetServiceBillingAndDueDateAction
 {
     /** @throws Throwable */
-    public function execute(ServiceBill $serviceBill): mixed 
+    public function execute(ServiceBill $serviceBill): mixed
     {
+        /** @var \Domain\Service\Models\Service $service */
+        $service = $serviceBill->serviceOrder
+            ->service;
+
+        if ((bool) $service->is_subscription === false) {
+            throw new NonSubscriptionNotAllowedException();
+        }
 
         /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
         $serviceOrder = $serviceBill->serviceOrder;
@@ -32,6 +38,9 @@ class GetServiceBillingAndDueDateAction
         /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
         $serviceTransaction = $serviceBill->serviceTransaction;
 
+        /** @var \Illuminate\Support\Carbon|null $referenceDate */
+        $referenceDate = $serviceBill->bill_date;
+
         if ($serviceTransaction) {
             /** @var \Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData $serviceTransactionComputedBillingCycle */
             $serviceTransactionComputedBillingCycle = $this->computeBillingCycle(
@@ -41,11 +50,17 @@ class GetServiceBillingAndDueDateAction
                 $serviceTransaction->created_at,
             );
 
-            $referenceDate = $serviceTransactionComputedBillingCycle->bill_date;
+            if (
+                is_null($serviceBill->due_date) ||
+                $serviceBill->due_date < now()
+            ) {
+                $referenceDate = $serviceTransactionComputedBillingCycle
+                    ->bill_date;
+            }
         }
 
-        if ($serviceBill->due_date && $serviceBill->due_date >= now()) {
-            $referenceDate = $serviceBill->bill_date;
+        if (is_null($referenceDate)) {
+            throw new InvalidServiceBillException();
         }
 
         return $this->computeBillingCycle(

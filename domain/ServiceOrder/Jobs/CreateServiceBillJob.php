@@ -43,8 +43,7 @@ class CreateServiceBillJob implements ShouldQueue, ShouldBeUnique
     public function handle(
         CreateServiceBillAction $createServiceBillAction,
         GetServiceBillingAndDueDateAction $getServiceBillingAndDueDateAction
-    ): void
-    {
+    ): void {
         $serviceBillData = ServiceBillData::fromArray(
             $this->serviceBill->toArray()
         );
