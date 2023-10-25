@@ -27,6 +27,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Exception;
 
@@ -167,7 +168,7 @@ class ServiceResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->translateLabel()
-                    ->options(['1' => Status::ACTIVE->value, '0' => Status::INACTIVE->value])
+                    ->options(['1' => ucfirst(Status::ACTIVE->value), '0' => ucfirst(Status::INACTIVE->value)])
                     ->query(function (Builder $query, array $data) {
                         $query->when(filled($data['value']), function (Builder $query) use ($data) {
                             $query->when(filled($data['value']), function (Builder $query) use ($data) {
@@ -224,6 +225,14 @@ class ServiceResource extends Resource
             'create' => CreateService::route('/create'),
             'edit' => EditService::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 
     public static function servicePriceSection(): Forms\Components\Section
