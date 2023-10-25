@@ -22,6 +22,7 @@ use DateTimeZone;
 use Domain\Admin\Models\Admin;
 use Domain\ServiceOrder\Actions\ChangeServiceOrderStatusAction;
 use Domain\ServiceOrder\Actions\UpdateServiceOrderAction;
+use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
 use Domain\ServiceOrder\DataTransferObjects\UpdateServiceOrderData;
 use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
@@ -155,7 +156,7 @@ class ViewServiceOrder extends EditRecord
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(fn ($record) => $record->currency_symbol . ' ' . $record->service_price)
+                                ->label(fn ($record) => $record->currency_symbol . ' ' . number_format($record->service_price, 2, '.', ','))
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()
@@ -167,13 +168,13 @@ class ViewServiceOrder extends EditRecord
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(fn ($record, Closure $get) => $record->currency_symbol . ' ' . array_reduce($get('additional_charges'), function ($carry, $data) {
+                                ->label(fn ($record, Closure $get) => $record->currency_symbol . ' ' . number_format(array_reduce($get('additional_charges'), function ($carry, $data) {
                                     if (isset($data['price']) && is_numeric($data['price']) && isset($data['quantity']) && is_numeric($data['quantity'])) {
                                         return $carry + ($data['price'] * $data['quantity']);
                                     }
 
                                     return $carry;
-                                }, 0))
+                                }, 0), 2, '.', ','))
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()
@@ -186,11 +187,9 @@ class ViewServiceOrder extends EditRecord
                                     ->inline()
                                     ->readOnly(),
                                 TextLabel::make('')
-                                    ->label(fn (ServiceOrder $record, Closure $get) => $record->tax_display == PriceDisplay::INCLUSIVE->value ? 'Inclusive' : $record->currency_symbol . ' ' .  (ServiceOrderResource::getTax(
-                                        $record->service->selling_price ?? 0,
-                                        $get('additional_charges'),
-                                        ServiceOrderAddress::whereType('billing_address')->whereServiceOrderId($record->id)->first()->service_order_id
-                                    )->tax_total))
+                                    ->label(fn (ServiceOrder $record, Closure $get) => $record->tax_display == PriceDisplay::INCLUSIVE->value ? 'Inclusive'
+                                        :
+                                        $record->currency_symbol . ' ' .  number_format(self::calculateTaxInfo($record, $get('additional_charges'))->total_price, 2, '.', '.'))
                                     ->alignRight()
                                     ->size('md')
                                     ->inline()
@@ -208,11 +207,7 @@ class ViewServiceOrder extends EditRecord
                                 ->readOnly()
                                 ->color('primary'),
                             TextLabel::make('')
-                                ->label(fn (ServiceOrder $record, Closure $get) => $record->currency_symbol . ' ' .  (ServiceOrderResource::getTax(
-                                    $record->service->selling_price ?? 0,
-                                    $get('additional_charges'),
-                                    ServiceOrderAddress::whereType('billing_address')->whereServiceOrderId($record->id)->first()->service_order_id
-                                )->total_price))
+                                ->label(fn (ServiceOrder $record, Closure $get) => $record->currency_symbol . ' ' . number_format(self::calculateTaxInfo($record, $get('additional_charges'))->total_price, 2, '.', '.'))
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()
@@ -235,12 +230,12 @@ class ViewServiceOrder extends EditRecord
                     Placeholder::make('service')
                         ->content(fn ($record) => $record->service_name),
                     Placeholder::make('service Price')
-                        ->content(fn ($record) => $record->service_price),
+                        ->content(fn ($record) => $record->currency_symbol . ' ' . number_format($record->service_price, 2, '.', ',')),
                     Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
                         Placeholder::make('BillingCycle')
-                            ->content(fn ($record) => $record->service->billing_cycle),
+                            ->content(fn ($record) => $record->billing_cycle),
                         Placeholder::make('Due date every')
-                            ->content(fn ($record) => $record->service->due_date_every),
+                            ->content(fn ($record) => $record->due_date_every),
                     ])->visible(fn ($record) => $record->service->is_subscription),
                     Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
                         Placeholder::make('schedule')
@@ -410,5 +405,24 @@ class ViewServiceOrder extends EditRecord
                 return $record->status == ServiceOrderStatus::FORPAYMENT ||
                     $record->status == ServiceOrderStatus::COMPLETED;
             });
+    }
+
+    public static function calculateTaxInfo(ServiceOrder $record, $additionalCharges)
+    {
+        $subTotal = ServiceOrderResource::getSubtotal($record->service_price, $additionalCharges);
+        $totalPrice = $subTotal;
+        $taxTotal = 0;
+        if ($record->tax_display === PriceDisplay::EXCLUSIVE->value) {
+            $taxTotal = $subTotal * ($record->tax_percentage / 100.0);
+            $totalPrice = $subTotal + $taxTotal;
+        }
+
+        return new ServiceOrderTaxData(
+            sub_total: $subTotal,
+            tax_display: $record->tax_display,
+            tax_percentage: $record->tax_percentage,
+            tax_total: $taxTotal,
+            total_price: $totalPrice
+        );
     }
 }
