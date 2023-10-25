@@ -33,7 +33,7 @@ class EditTenant extends EditRecord
                 ->modalCancelAction(function ($livewire) {
 
                     return Action::makeModalAction('redirect')
-                        ->label(__('Cancel & Revert Changes'))
+                        ->label(trans('Cancel & Revert Changes'))
                         ->color('secondary')
                         ->url(TenantResource::getUrl('edit', [$this->record]));
                 })
