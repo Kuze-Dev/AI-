@@ -11,7 +11,6 @@ class NotifyCustomerServiceBillDueDateAction
 {
     public function __construct(
         private SendToCustomerServiceBillDueDateEmailAction $sendToCustomerServiceBillDueDateAction,
-        private ExpiredServiceOrderAction $expiredServiceOrderAction
     ) {
     }
 
