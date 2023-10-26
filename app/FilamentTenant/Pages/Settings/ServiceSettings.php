@@ -34,6 +34,10 @@ class ServiceSettings extends TenantBaseSettings
                     ->placeholder(trans('Select Category'))
                     ->options(Taxonomy::pluck('name', 'id'))
                     ->columnSpan('full'),
+                Forms\Components\TextInput::make('domain_path_segment')
+                    ->label(trans('Domain Path Segment'))
+                    ->required()
+                    ->dehydrateStateUsing(fn (string|null $state) => is_null($state) ? '' : $state),
             ]),
             Forms\Components\Card::make([
                 Forms\Components\Section::make('Admin Email Notification')

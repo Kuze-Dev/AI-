@@ -8,6 +8,7 @@ return new class () extends SettingsMigration {
     public function up(): void
     {
         $this->migrator->add('service.service_category');
+        $this->migrator->add('service.domain_path_segment');
         $this->migrator->add('service.admin_should_receive', false);
         $this->migrator->add('service.admin_main_receiver', '');
         $this->migrator->add('service.admin_cc', null);

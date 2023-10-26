@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Models;
 
+use Barryvdh\Reflection\DocBlock\Type\Collection;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Illuminate\Database\Eloquent\Model;
 use Domain\Admin\Models\Admin;
@@ -15,6 +16,9 @@ use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
 use Domain\ServiceOrder\Queries\ServiceOrderQueryBuilder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\Contracts\Activity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * Domain\ServiceOrder\Models\ServiceOrder
@@ -47,6 +51,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property float $total_price
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read Collection<int, Activity> $activities
  * @property-read Admin|null $admin
  * @property-read Customer|null $customer
  * @property-read Service|null $service
@@ -83,6 +88,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class ServiceOrder extends Model
 {
+    use LogsActivity;
     protected $fillable = [
         'service_id',
         'customer_id',
@@ -210,5 +216,14 @@ class ServiceOrder extends Model
         return $this->serviceOrderAddress
             ->where('type', ServiceOrderAddressType::BILLING_ADDRESS)
             ->first();
+    }
+
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

@@ -34,7 +34,7 @@ class ClosedServiceOrderNotification extends Notification implements ShouldQueue
         $this->logo = app(SiteSettings::class)->getLogoUrl();
         $this->title = app(SiteSettings::class)->name;
         $this->description = app(SiteSettings::class)->description;
-        $this->url = app(SiteSettings::class)->front_end_domain;
+        $this->url = 'http://' . app(SiteSettings::class)->front_end_domain . '/' . app(ServiceSettings::class)->domain_path_segment .'/'. $serviceBill->reference;
 
         $this->from = app(ServiceSettings::class)->email_sender_name;
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\CreateServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ViewServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ListServiceOrder;
@@ -42,12 +43,15 @@ use Str;
 class ServiceOrderResource extends Resource
 {
     use ContextualResource;
+    use LogsFormActivity;
 
     protected static ?string $model = ServiceOrder::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-ticket';
 
     protected static ?string $navigationGroup = 'Service Management';
+
+    protected static ?string $recordTitleAttribute = 'reference';
 
     public static function form(Form $form): Form
     {
@@ -328,7 +332,14 @@ class ServiceOrderResource extends Resource
                                     ->readOnly(),
                             ])->visible(
                                 function (array $state) {
-                                    return (isset($state['service_address_id']) && $state['is_same_as_billing']) || isset($state['billing_address_id']);
+                                    return (isset(self::getTax(
+                                        Service::whereId($state['service_id'])->first()?->selling_price ?? 0,
+                                        $state['additional_charges'],
+                                        $state['is_same_as_billing'] ? $state['service_address_id'] :
+                                            $state['billing_address_id']
+                                    )->tax_display) ?? isset($state['service_address_id'])
+                                    && $state['is_same_as_billing'])
+                                    || isset($state['billing_address_id']);
                                 }
                             ),
                             TextLabel::make('')
