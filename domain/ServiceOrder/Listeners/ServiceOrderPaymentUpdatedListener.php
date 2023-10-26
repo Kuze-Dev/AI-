@@ -52,12 +52,9 @@ class ServiceOrderPaymentUpdatedListener
         /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
         $serviceOrder = $serviceBill->serviceOrder;
 
-        /** @var \Domain\Service\Models\Service $service */
-        $service = $serviceOrder->service;
-
         if (
-            $service->is_subscription &&
-            ! $service->is_auto_generated_bill
+            $serviceOrder->is_subscription &&
+            ! $serviceOrder->is_auto_generated_bill
         ) {
             $serviceBillingDate = app(GetServiceBillingAndDueDateAction::class)
                 ->execute($serviceBill);
@@ -72,7 +69,7 @@ class ServiceOrderPaymentUpdatedListener
         }
 
         $serviceOrder->update([
-            'status' => $service->is_subscription
+            'status' => $serviceOrder->is_subscription
                 ? ServiceOrderStatus::ACTIVE
                 : ServiceOrderStatus::PENDING,
         ]);
