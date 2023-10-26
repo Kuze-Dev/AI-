@@ -38,6 +38,7 @@ class NotifyCustomerServiceBillDueDateAction
                         /** @var \Domain\ServiceOrder\Models\ServiceBill $latestForPaymentServiceBill */
                         $latestForPaymentServiceBill = $serviceOrder->serviceBills->first();
 
+                        /** TODO: add config in service settings, notify customer before x day/s. */
                         if (
                             $latestForPaymentServiceBill->bill_date &&
                             now()->parse($latestForPaymentServiceBill->bill_date)
@@ -49,16 +50,6 @@ class NotifyCustomerServiceBillDueDateAction
                                     $customer,
                                     $latestForPaymentServiceBill
                                 );
-                        }
-
-                        if (
-                            $latestForPaymentServiceBill->due_date &&
-                            now()->parse($latestForPaymentServiceBill->due_date)
-                                ->toDateString() < now()->toDateString()
-                        ) {
-                            $this->expiredServiceOrderAction
-                                ->onQueue()
-                                ->execute($serviceOrder);
                         }
                     });
             });
