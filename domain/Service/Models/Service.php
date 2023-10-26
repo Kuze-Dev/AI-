@@ -7,25 +7,21 @@ namespace Domain\Service\Models;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Taxonomy\Models\TaxonomyTerm;
-use Eloquent;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
-use Support\MetaData\HasMetaData;
 use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
-use Spatie\MediaLibrary\HasMedia;
+use Support\MetaData\HasMetaData;
 use Support\MetaData\Models\MetaData;
 
 /**
@@ -50,14 +46,15 @@ use Support\MetaData\Models\MetaData;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
- * @property-read Collection<int, Activity> $activities
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Blueprint|null $blueprint
  * @property-read MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @property-read MetaData|null $metaData
- * @property-read Collection<int, TaxonomyTerm> $taxonomyTerms
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
+ *
  * @method static Builder|Service newModelQuery()
  * @method static Builder|Service newQuery()
  * @method static Builder|Service onlyTrashed()
@@ -83,15 +80,16 @@ use Support\MetaData\Models\MetaData;
  * @method static Builder|Service whereUuid($value)
  * @method static Builder|Service withTrashed()
  * @method static Builder|Service withoutTrashed()
- * @mixin Eloquent
+ *
+ * @mixin \Eloquent
  */
-#[OnDeleteCascade(['metaData, taxonomyTerms', 'media'])]
-class Service extends Model implements HasMetaDataContract, HasMedia
+#[OnDeleteCascade(['metaData, taxonomyTerms'])]
+class Service extends Model implements HasMedia, HasMetaDataContract
 {
-    use LogsActivity;
+    use ConstraintsRelationships;
     use HasMetaData;
     use InteractsWithMedia;
-    use ConstraintsRelationships;
+    use LogsActivity;
     use SoftDeletes;
 
     protected $fillable = [
@@ -123,13 +121,13 @@ class Service extends Model implements HasMetaDataContract, HasMedia
         'is_auto_generated_bill' => 'bool',
     ];
 
-    /** @return BelongsToMany<TaxonomyTerm> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm> */
     public function taxonomyTerms(): BelongsToMany
     {
         return $this->belongsToMany(TaxonomyTerm::class, 'service_taxonomy_terms');
     }
 
-    /** @return BelongsTo<Blueprint, Service> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Service\Models\Service> */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);

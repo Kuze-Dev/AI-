@@ -17,9 +17,6 @@ class OrderStatusUpdatedListener
 {
     /**
      * Handle the event.
-     *
-     * @param  \Domain\Order\Events\OrderStatusUpdatedEvent  $event
-     * @return void
      */
     public function handle(OrderStatusUpdatedEvent $event): void
     {

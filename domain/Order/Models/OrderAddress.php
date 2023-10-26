@@ -26,6 +26,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Domain\Order\Models\Order|null $order
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress query()
@@ -40,6 +41,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderAddress whereZipCode($value)
+ *
  * @mixin \Eloquent
  */
 class OrderAddress extends Model

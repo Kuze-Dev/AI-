@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Common;
 
 use App\HttpTenantApi\Requests\Common\PresignedUploadUrlRequest;
-use Spatie\RouteAttributes\Attributes\Post;
 use Illuminate\Http\JsonResponse;
+use Spatie\RouteAttributes\Attributes\Post;
 use Support\Common\Actions\CreateS3PresignUploadUrlAction;
 use Support\Common\DataTransferObjects\CreatePresignUploadUrlData;
 use Throwable;

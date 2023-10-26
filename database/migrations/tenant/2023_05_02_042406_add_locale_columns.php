@@ -6,7 +6,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class extends Migration
+{
     public array $tables = ['pages', 'content_entries', 'menus', 'forms', 'taxonomies', 'globals'];
 
     /** Run the migrations. */

@@ -22,7 +22,7 @@ class ProductVariantFormAction extends Action
         parent::setUp();
 
         $this->modalHeading(function (HasProductVariants $livewire) {
-            if ( ! $activeProductVariantStatePath = $livewire->getActiveProductVariantItemStatePath()) {
+            if (! $activeProductVariantStatePath = $livewire->getActiveProductVariantItemStatePath()) {
                 return;
             }
 
@@ -38,7 +38,7 @@ class ProductVariantFormAction extends Action
         $this->slideOver(true);
 
         $this->mountUsing(function (HasProductVariants $livewire, ComponentContainer $form) {
-            if ( ! $activeProductVariantStatePath = $livewire->getActiveProductVariantItemStatePath()) {
+            if (! $activeProductVariantStatePath = $livewire->getActiveProductVariantItemStatePath()) {
                 return;
             }
 
@@ -49,7 +49,7 @@ class ProductVariantFormAction extends Action
         $this->form(fn (HasProductVariants $livewire) => $livewire->getProductVariantFormSchema());
 
         $this->action(function (HasProductVariants $livewire, array $data) {
-            if ( ! $activeProductVariantStatePath = $livewire->getActiveProductVariantItemStatePath()) {
+            if (! $activeProductVariantStatePath = $livewire->getActiveProductVariantItemStatePath()) {
                 return;
             }
 

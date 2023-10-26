@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\FormResource;
-use Filament\Facades\Filament;
 use Domain\Form\Database\Factories\FormFactory;
+use Filament\Facades\Filament;
 
 beforeEach(function () {
     testInTenantContext();

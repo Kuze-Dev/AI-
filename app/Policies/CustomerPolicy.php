@@ -6,9 +6,9 @@ namespace App\Policies;
 
 use App\Features\Customer\CustomerBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
-use Illuminate\Foundation\Auth\User;
 use Domain\Customer\Models\Customer;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Foundation\Auth\User;
 
 class CustomerPolicy
 {
@@ -16,7 +16,7 @@ class CustomerPolicy
 
     public function before(): ?Response
     {
-        if ( ! tenancy()->tenant?->features()->active(CustomerBase::class)) {
+        if (! tenancy()->tenant?->features()->active(CustomerBase::class)) {
             return Response::denyAsNotFound();
         }
 

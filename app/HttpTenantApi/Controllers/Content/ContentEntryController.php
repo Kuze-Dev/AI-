@@ -20,7 +20,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('contents.entries', only: ['index', 'show'], parameters: ['entries' => 'contentEntry']),
-    Middleware('feature.tenant:' . CMSBase::class)
+    Middleware('feature.tenant:'.CMSBase::class)
 ]
 class ContentEntryController
 {

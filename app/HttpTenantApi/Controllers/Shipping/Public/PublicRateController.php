@@ -8,9 +8,9 @@ use App\Features\ECommerce\ECommerceBase;
 use App\HttpTenantApi\Requests\Shipping\ShippingRateRequest;
 use Domain\Cart\Actions\PublicCart\GuestCartSummaryAction;
 use Domain\Shipment\Actions\GetBoxAction;
-use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\Actions\GetShippingRateAction;
 use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
+use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\Shipment\Enums\UnitEnum;
 use Domain\ShippingMethod\Models\ShippingMethod;
@@ -18,7 +18,7 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 use Throwable;
 
-#[Middleware(['feature.tenant:' . ECommerceBase::class])]
+#[Middleware(['feature.tenant:'.ECommerceBase::class])]
 class PublicRateController
 {
     /** @throws Throwable */
@@ -30,7 +30,7 @@ class PublicRateController
 
         try {
 
-            if ( ! $shippingMethod->active) {
+            if (! $shippingMethod->active) {
                 abort(404);
             }
 

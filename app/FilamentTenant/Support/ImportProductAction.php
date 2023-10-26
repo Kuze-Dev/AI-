@@ -13,9 +13,9 @@ use Domain\Product\Models\ProductVariant;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Validation\ValidationException;
+use Log;
 use Support\Common\Rules\MinimumValueRule;
 use Support\Excel\Actions\ImportAction;
-use Log;
 
 class ImportProductAction
 {
@@ -87,7 +87,7 @@ class ImportProductAction
             ->first();
 
         // If the product does not exist, create a new one
-        if ( ! $foundProduct instanceof Product) {
+        if (! $foundProduct instanceof Product) {
             return app(CreateProductAction::class)->execute(ProductData::fromCsv([
                 ...$data,
                 'sku' => $data['product_sku'] ?? $data['sku'],
@@ -154,7 +154,7 @@ class ImportProductAction
                 return $option['name'] === $row['product_option_1_name'];
             });
 
-            if ( ! $foundOption) {
+            if (! $foundOption) {
                 throw ValidationException::withMessages([
                     'product_option_1_name' => trans("{$row['name']} must not exceed 2 product options."),
                 ]);
@@ -207,7 +207,7 @@ class ImportProductAction
                 }
             }
 
-            if ( ! $hasFound) {
+            if (! $hasFound) {
                 $existingOptions = array_merge($csvRowOptions, $existingOptions);
             }
         }
@@ -286,7 +286,7 @@ class ImportProductAction
                         'selling_price' => $row['selling_price'],
                         'retail_price' => $row['retail_price'],
                         'stock' => $row['stock'],
-                        'sku' => $row['sku'] . $key1 . $key2,
+                        'sku' => $row['sku'].$key1.$key2,
                         'status' => true,
                     ];
                 });
@@ -307,7 +307,7 @@ class ImportProductAction
                     'selling_price' => $row['selling_price'],
                     'retail_price' => $row['retail_price'],
                     'stock' => $row['stock'],
-                    'sku' => $row['sku'] . $keyOne,
+                    'sku' => $row['sku'].$keyOne,
                     'status' => true,
                 ];
             }
@@ -363,7 +363,7 @@ class ImportProductAction
             if ($taxonomy) {
                 $termModel = TaxonomyTerm::whereName($taxonomyTerm)->first();
 
-                if ( ! $termModel) {
+                if (! $termModel) {
                     $termModel = TaxonomyTerm::create([
                         'name' => $taxonomyTerm,
                         'taxonomy_id' => $taxonomy->id,

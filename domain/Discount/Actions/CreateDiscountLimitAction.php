@@ -15,7 +15,7 @@ final class CreateDiscountLimitAction
     public function execute(Discount $discount, Order $order, ?Customer $customer): void
     {
 
-        if ( ! is_null($discount->max_uses)) {
+        if (! is_null($discount->max_uses)) {
             $discount->update([
                 'max_uses' => $discount->max_uses - 1,
             ]);

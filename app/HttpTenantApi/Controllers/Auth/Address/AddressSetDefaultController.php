@@ -18,7 +18,7 @@ use Throwable;
 
 #[
     Prefix('addresses'),
-    Middleware(['auth:sanctum', 'feature.tenant:' . AddressBase::class])
+    Middleware(['auth:sanctum', 'feature.tenant:'.AddressBase::class])
 ]
 class AddressSetDefaultController extends Controller
 {

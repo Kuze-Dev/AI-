@@ -18,7 +18,7 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 
 #[
-    Middleware(['feature.tenant:' . AddressBase::class])
+    Middleware(['feature.tenant:'.AddressBase::class])
 ]
 class ValidateGuestAddressController extends Controller
 {

@@ -13,7 +13,7 @@ class AddressClient extends BaseClient
 {
     public static function uri(): string
     {
-        return'ShippingAPI.dll';
+        return 'ShippingAPI.dll';
     }
 
     public function verify(AddressValidateRequestData $addressData): AddressValidateResponseData

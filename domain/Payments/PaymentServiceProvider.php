@@ -22,7 +22,7 @@ class PaymentServiceProvider extends ServiceProvider implements DeferrableProvid
             fn ($app) => $app->make(PaymentManager::class)
         );
 
-        $this->mergeConfigFrom(__DIR__ . '/config/payment.php', 'payment-gateway');
+        $this->mergeConfigFrom(__DIR__.'/config/payment.php', 'payment-gateway');
     }
 
     public function boot(): void

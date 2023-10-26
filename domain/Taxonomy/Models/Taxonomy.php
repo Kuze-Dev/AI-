@@ -6,18 +6,18 @@ namespace Domain\Taxonomy\Models;
 
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Content\Models\Content;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\Models\Activity;
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
 
 /**
  * Domain\Taxonomy\Models\Taxonomy
@@ -37,6 +37,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property-read int|null $parent_terms_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Taxonomy\Models\TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy query()
@@ -46,6 +47,7 @@ use Spatie\Sluggable\SlugOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 #[
@@ -54,9 +56,9 @@ use Spatie\Sluggable\SlugOptions;
 ]
 class Taxonomy extends Model
 {
+    use ConstraintsRelationships;
     use HasSlug;
     use LogsActivity;
-    use ConstraintsRelationships;
 
     protected $fillable = [
         'name',

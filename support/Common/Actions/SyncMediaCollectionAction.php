@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Support\Common\Actions;
 
-use Support\Common\DataTransferObjects\MediaCollectionData;
-use Support\Common\DataTransferObjects\MediaData;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
@@ -14,6 +12,8 @@ use InvalidArgumentException;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Support\Common\DataTransferObjects\MediaCollectionData;
+use Support\Common\DataTransferObjects\MediaData;
 
 class SyncMediaCollectionAction
 {
@@ -30,7 +30,7 @@ class SyncMediaCollectionAction
                     return $this->addMediaFromUrl($model, $mediaCollectionData->collection, $mediaData->media);
                 }
 
-                if ( ! Str::isUuid($mediaData->media)) {
+                if (! Str::isUuid($mediaData->media)) {
                     throw new InvalidArgumentException();
                 }
 
@@ -49,11 +49,11 @@ class SyncMediaCollectionAction
 
     protected function addMedia(Model&HasMedia $model, string $collection, UploadedFile $media, array $customProperties = []): Media
     {
-        if ( ! $imageString = $media->get()) {
+        if (! $imageString = $media->get()) {
             throw new InvalidArgumentException();
         }
 
-        if ( ! method_exists($model, 'addMediaFromString')) {
+        if (! method_exists($model, 'addMediaFromString')) {
             throw new InvalidArgumentException();
         }
 
@@ -66,7 +66,7 @@ class SyncMediaCollectionAction
 
     protected function addMediaFromUrl(Model&HasMedia $model, string $collection, string $media): Media
     {
-        if ( ! method_exists($model, 'addMediaFromUrl')) {
+        if (! method_exists($model, 'addMediaFromUrl')) {
             throw new InvalidArgumentException();
         }
 

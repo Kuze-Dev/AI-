@@ -22,6 +22,8 @@ class ServiceSettings extends Settings
     public ?array $email_reply_to = [];
     public ?string $email_footer = null;
 
+    public ?int $days_before_due_date_notification = 1;
+
     public static function group(): string
     {
         return 'service';

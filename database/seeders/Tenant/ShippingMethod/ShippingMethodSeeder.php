@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Tenant\ShippingMethod;
 
-use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
-use Domain\ShippingMethod\Enums\Driver;
-use Illuminate\Database\Seeder;
 use Domain\Address\Database\Factories\AddressFactory;
 use Domain\Address\Database\Factories\StateFactory;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Customer\Database\Factories\CustomerFactory;
+use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
+use Domain\ShippingMethod\Enums\Driver;
 use Domain\Tier\Models\Tier;
+use Illuminate\Database\Seeder;
 
 class ShippingMethodSeeder extends Seeder
 {

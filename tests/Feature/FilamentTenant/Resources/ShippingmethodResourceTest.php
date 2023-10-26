@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\FilamentTenant\Resources\ShippingmethodResource;
-use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use App\Features\ECommerce\ECommerceBase;
 use App\Features\ECommerce\ShippingStorePickup;
+use App\FilamentTenant\Resources\ShippingmethodResource;
+use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use Filament\Facades\Filament;
 
 beforeEach(function () {

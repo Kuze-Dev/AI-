@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Pages\Settings;
 
+use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
 use App\Settings\OrderSettings as SettingsOrderSettings;
+use Closure;
 use Filament\Forms;
 use Illuminate\Support\Str;
-use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
-use Closure;
 
 class OrderSettings extends TenantBaseSettings
 {
@@ -36,7 +36,7 @@ class OrderSettings extends TenantBaseSettings
                             ->required(function (Closure $get) {
                                 return $get('admin_should_receive');
                             })
-                            ->dehydrateStateUsing(fn (string|null $state) => is_null($state) ? '' : $state),
+                            ->dehydrateStateUsing(fn (?string $state) => is_null($state) ? '' : $state),
                         Forms\Components\TextInput::make('admin_cc')
                             ->label(trans('CC'))
                             ->nullable()

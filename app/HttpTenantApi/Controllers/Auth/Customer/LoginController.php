@@ -16,7 +16,7 @@ use Illuminate\Validation\Rule;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 
-#[Middleware('feature.tenant:' . CustomerBase::class)]
+#[Middleware('feature.tenant:'.CustomerBase::class)]
 class LoginController extends Controller
 {
     /** @throws \Illuminate\Auth\AuthenticationException */
@@ -28,7 +28,7 @@ class LoginController extends Controller
             'password' => 'required|string',
         ]);
 
-        if ( ! Auth::guard('api')->attempt($validated)) {
+        if (! Auth::guard('api')->attempt($validated)) {
             throw new AuthenticationException(trans('These credentials do not match our records.'));
         }
 

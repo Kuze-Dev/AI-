@@ -6,11 +6,11 @@ namespace Domain\Product\Actions;
 
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
-use Support\MetaData\Actions\CreateMetaDataAction;
-use Support\MetaData\Actions\UpdateMetaDataAction;
 use Support\Common\Actions\SyncMediaCollectionAction;
 use Support\Common\DataTransferObjects\MediaCollectionData;
 use Support\Common\DataTransferObjects\MediaData;
+use Support\MetaData\Actions\CreateMetaDataAction;
+use Support\MetaData\Actions\UpdateMetaDataAction;
 
 class UpdateProductAction
 {
@@ -23,7 +23,6 @@ class UpdateProductAction
     ) {
     }
 
-    /** @param \Domain\Product\Models\Product $product */
     public function execute(Product $product, ProductData $productData): Product
     {
         $product->update($this->getProductAttributes($productData));

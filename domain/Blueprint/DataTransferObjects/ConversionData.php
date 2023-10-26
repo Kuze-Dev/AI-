@@ -13,7 +13,7 @@ use Illuminate\Support\Arr;
  */
 class ConversionData implements Arrayable
 {
-    /** @param array<string, ManipulationData> $manipulations */
+    /** @param  array<string, ManipulationData>  $manipulations */
     private function __construct(
         public readonly string $name,
         public readonly array $manipulations = [],
@@ -22,7 +22,7 @@ class ConversionData implements Arrayable
 
     public static function fromArray(array $data): self
     {
-        if ( ! empty($data['manipulations'] ?? [])) {
+        if (! empty($data['manipulations'] ?? [])) {
 
             $manipulations = [];
             foreach ($data['manipulations'] as $type => $params) {

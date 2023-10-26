@@ -11,8 +11,8 @@ use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentRefund;
 use Domain\Payments\Enums\PaymentStatus;
 use Domain\Payments\Events\PaymentProcessEvent;
 use Domain\Payments\Models\Payment;
-use Stripe\StripeClient;
 use InvalidArgumentException;
+use Stripe\StripeClient;
 use Throwable;
 
 class StripeProvider extends Provider
@@ -98,7 +98,7 @@ class StripeProvider extends Provider
                 'amount' => $amount * 100,
             ]);
 
-            if($refund->status == 'succeeded') {
+            if ($refund->status == 'succeeded') {
 
                 $paymentModel->refunds()->create([
 

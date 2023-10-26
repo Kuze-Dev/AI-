@@ -20,6 +20,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \Domain\Form\Models\Form $form
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|FormSubmission newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FormSubmission newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FormSubmission query()
@@ -28,6 +29,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|FormSubmission whereFormId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FormSubmission whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FormSubmission whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class FormSubmission extends Model

@@ -14,9 +14,6 @@ class GuestOrderPlacedListener
 {
     /**
      * Handle the event.
-     *
-     * @param  \Domain\Order\Events\PublicOrder\GuestOrderPlacedEvent $event
-     * @return void
      */
     public function handle(GuestOrderPlacedEvent $event): void
     {
@@ -26,7 +23,7 @@ class GuestOrderPlacedListener
         $discount = $event->guestPreparedOrderData->discount;
 
         // minus the discount
-        if ( ! is_null($discount)) {
+        if (! is_null($discount)) {
             app(CreateDiscountLimitAction::class)->execute($discount, $order, null);
         }
 

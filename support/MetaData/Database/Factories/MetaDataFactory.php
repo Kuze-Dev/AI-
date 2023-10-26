@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Support\MetaData\Database\Factories;
 
-use Support\MetaData\Contracts\HasMetaData;
-use Support\MetaData\Models\MetaData;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Support\MetaData\Contracts\HasMetaData;
+use Support\MetaData\Models\MetaData;
 
 /**
  * @extends Factory<MetaData>

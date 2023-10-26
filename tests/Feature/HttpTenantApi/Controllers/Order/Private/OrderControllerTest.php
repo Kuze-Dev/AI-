@@ -130,7 +130,7 @@ it('can list orders with include', function (string $include) {
     $order = OrderFactory::new()
         ->createOne();
 
-    getJson('api/orders?' . http_build_query(['include' => $include]))
+    getJson('api/orders?'.http_build_query(['include' => $include]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($order) {
             $json
@@ -177,7 +177,7 @@ it('can show order', function () {
     $order = OrderFactory::new()
         ->createOne();
 
-    getJson('api/orders/' . $order->getRouteKey())
+    getJson('api/orders/'.$order->getRouteKey())
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($order) {
             $json
@@ -213,7 +213,7 @@ it('can update order', function () {
 
     assertInstanceOf(Order::class, $order);
 
-    patchJson('api/orders/' . $order->getRouteKey(), [
+    patchJson('api/orders/'.$order->getRouteKey(), [
         'type' => 'status',
         'status' => 'cancelled',
         'notes' => 'test cancellation notes',
@@ -232,7 +232,7 @@ it('can show order with includes', function (string $include) {
     $order = OrderFactory::new()
         ->createOne();
 
-    getJson("api/orders/{$order->getRouteKey()}?" . http_build_query(['include' => $include]))
+    getJson("api/orders/{$order->getRouteKey()}?".http_build_query(['include' => $include]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($order) {
             $json

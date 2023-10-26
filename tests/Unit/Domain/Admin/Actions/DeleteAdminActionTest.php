@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Actions\DeleteAdminAction;
+use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Exceptions\CantDeleteZeroDayAdminException;
 
 use function Pest\Laravel\assertModelMissing;

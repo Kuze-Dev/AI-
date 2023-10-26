@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Discount\Models;
 
-use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Enums\DiscountConditionType;
+use Domain\Discount\Enums\DiscountStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -33,6 +33,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Discount\Models\DiscountLimit> $discountLimits
  * @property-read int|null $discount_limits_count
  * @property-read \Domain\Discount\Models\DiscountRequirement|null $discountRequirement
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Discount newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Discount newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Discount onlyTrashed()
@@ -51,12 +52,13 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|Discount whereValidStartAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Discount withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Discount withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Discount extends Model
 {
-    use SoftDeletes;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $fillable = [
         'name',

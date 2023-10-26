@@ -15,17 +15,17 @@ use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
+use Exception;
+use Filament\Notifications\Notification;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Livewire\Redirector;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Throwable;
-use Exception;
-use Filament\Notifications\Notification;
-use Illuminate\Http\RedirectResponse;
-use Livewire\Redirector;
 
 class EditCustomer extends EditRecord
 {
@@ -39,7 +39,7 @@ class EditCustomer extends EditRecord
         return [
 
             Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->requiresConfirmation(
                     fn ($livewire) => $livewire
                         ->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value
@@ -91,13 +91,14 @@ class EditCustomer extends EditRecord
     }
 
     /**
-     * @param \Domain\Customer\Models\Customer $record
+     * @param  \Domain\Customer\Models\Customer  $record
+     *
      * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         $customerTier = null;
-        if(isset($data['tier_id'])) {
+        if (isset($data['tier_id'])) {
             $customerTier = Tier::whereId($data['tier_id'])->first();
         }
 
@@ -114,7 +115,7 @@ class EditCustomer extends EditRecord
         /** @var \Domain\Customer\Models\Customer $record */
         $record = $this->record;
 
-        if($data['tier_approval_status'] === TierApprovalStatus::REJECTED->value) {
+        if ($data['tier_approval_status'] === TierApprovalStatus::REJECTED->value) {
 
             app(ForceDeleteCustomerAction::class)->execute($record);
 

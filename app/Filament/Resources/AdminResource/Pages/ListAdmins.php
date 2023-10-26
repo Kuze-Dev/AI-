@@ -61,7 +61,7 @@ class ListAdmins extends ListRecords
                         'email' => [
                             'required',
                             Rule::email(),
-                            'prohibited_if:email,' . Admin::whereKey(1)->value('email'),
+                            'prohibited_if:email,'.Admin::whereKey(1)->value('email'),
                         ],
                         'first_name' => 'required|string|min:3|max:100',
                         'last_name' => 'required|string|min:3|max:100',

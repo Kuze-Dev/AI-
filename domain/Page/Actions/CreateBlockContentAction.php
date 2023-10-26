@@ -6,8 +6,8 @@ namespace Domain\Page\Actions;
 
 use Domain\Blueprint\Actions\CreateBlueprintDataAction;
 use Domain\Page\DataTransferObjects\BlockContentData;
-use Domain\Page\Models\Page;
 use Domain\Page\Models\BlockContent;
+use Domain\Page\Models\Page;
 
 class CreateBlockContentAction
 {

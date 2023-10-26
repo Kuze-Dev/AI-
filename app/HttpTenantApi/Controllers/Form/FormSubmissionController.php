@@ -16,7 +16,7 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 use Throwable;
 
-#[Middleware('feature.tenant:'. CMSBase::class)]
+#[Middleware('feature.tenant:'.CMSBase::class)]
 class FormSubmissionController extends Controller
 {
     /** @throws Throwable */

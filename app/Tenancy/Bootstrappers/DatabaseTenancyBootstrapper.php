@@ -28,7 +28,7 @@ class DatabaseTenancyBootstrapper implements TenancyBootstrapper
             $manager = $tenant->database()->manager();
             $manager->setConnection('tenant');
 
-            if ( ! $manager->databaseExists($database = $tenant->database()->getName() ?? '')) {
+            if (! $manager->databaseExists($database = $tenant->database()->getName() ?? '')) {
                 throw new TenantDatabaseDoesNotExistException($database);
             }
         }

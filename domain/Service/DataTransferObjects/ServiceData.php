@@ -46,7 +46,7 @@ class ServiceData
             is_subscription: $data['is_subscription'],
             status: $data['status'],
             needs_approval: $data['needs_approval'],
-            is_auto_generated_bill:  $data['is_auto_generated_bill'] ?? false,
+            is_auto_generated_bill: $data['is_auto_generated_bill'] ?? false,
             meta_data: $data['meta_data'],
             media_collection: ['collection' => 'media', 'media' => $data['media']],
         );

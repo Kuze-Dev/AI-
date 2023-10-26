@@ -10,9 +10,9 @@ use Illuminate\Support\Str;
 class MediaFieldData extends FieldData
 {
     /**
-     * @param array<string> $rules
-     * @param array<string> $accept
-     * @param array<ConversionData> $conversions
+     * @param  array<string>  $rules
+     * @param  array<string>  $accept
+     * @param  array<ConversionData>  $conversions
      */
     private function __construct(
         public readonly string $title,
@@ -49,7 +49,7 @@ class MediaFieldData extends FieldData
             min_files: $data['min_files'] ?? null,
             max_files: $data['max_files'] ?? null,
             helper_text: $data['helper_text'] ?? null,
-            conversions:array_map(
+            conversions: array_map(
                 fn (array $conversion) => ConversionData::fromArray($conversion),
                 $data['conversions'] ?? []
             ),

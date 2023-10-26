@@ -5,15 +5,14 @@ declare(strict_types=1);
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
-use Domain\Page\Models\Page;
-use Domain\Page\Models\BlockContent;
-use Support\MetaData\Models\MetaData;
 use Domain\Page\Actions\UpdatePageAction;
-use Domain\Page\DataTransferObjects\PageData;
-use Domain\Page\Database\Factories\PageFactory;
-
-use Domain\Site\Database\Factories\SiteFactory;
 use Domain\Page\Database\Factories\BlockFactory;
+use Domain\Page\Database\Factories\PageFactory;
+use Domain\Page\DataTransferObjects\PageData;
+use Domain\Page\Models\BlockContent;
+use Domain\Page\Models\Page;
+use Domain\Site\Database\Factories\SiteFactory;
+use Support\MetaData\Models\MetaData;
 
 use function Pest\Laravel\assertDatabaseHas;
 

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\ECommerce\AllowGuestOrder;
 use App\Settings\OrderSettings;
 use Domain\Address\Database\Factories\CountryFactory;
 use Domain\Cart\Actions\CheckoutAction;
@@ -24,7 +25,6 @@ use Domain\Shipment\Drivers\StorePickupDriver;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Testing\Fluent\AssertableJson;
-use App\Features\ECommerce\AllowGuestOrder;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\getJson;
@@ -81,7 +81,7 @@ beforeEach(function () {
 
     $uuid = uuid_create(UUID_TYPE_RANDOM);
 
-    $sessionId = time() . $uuid;
+    $sessionId = time().$uuid;
 
     CartFactory::new()->setGuestId($sessionId)->createOne();
 
@@ -91,7 +91,7 @@ beforeEach(function () {
             $cartLine->save();
         })->create();
 
-    withHeader('Authorization', 'Bearer ' . $sessionId);
+    withHeader('Authorization', 'Bearer '.$sessionId);
 
     $this->country = $country;
     $this->state = $state;
@@ -144,7 +144,7 @@ it('can show order', function () {
     $order = OrderFactory::new()
         ->createOne();
 
-    getJson('api/guest/orders/' . $order->getRouteKey())
+    getJson('api/guest/orders/'.$order->getRouteKey())
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($order) {
             $json
@@ -181,7 +181,7 @@ it('can update order', function () {
 
     assertInstanceOf(Order::class, $order);
 
-    patchJson('api/guest/orders/' . $order->getRouteKey(), [
+    patchJson('api/guest/orders/'.$order->getRouteKey(), [
         'type' => 'status',
         'status' => 'cancelled',
         'notes' => 'test cancellation notes',
@@ -200,7 +200,7 @@ it('can show order with includes', function (string $include) {
     $order = OrderFactory::new()
         ->createOne();
 
-    getJson("api/guest/orders/{$order->getRouteKey()}?" . http_build_query(['include' => $include]))
+    getJson("api/guest/orders/{$order->getRouteKey()}?".http_build_query(['include' => $include]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($order) {
             $json

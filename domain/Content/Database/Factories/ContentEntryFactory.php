@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Domain\Content\Database\Factories;
 
 use Domain\Content\Models\ContentEntry;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Support\MetaData\Database\Factories\MetaDataFactory;
 use Support\RouteUrl\Database\Factories\RouteUrlFactory;
-use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Content\Models\ContentEntry>

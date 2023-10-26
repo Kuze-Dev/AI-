@@ -20,7 +20,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('pages', only: ['index', 'show']),
-    Middleware('feature.tenant:'. CMSBase::class)
+    Middleware('feature.tenant:'.CMSBase::class)
 ]
 class PageController
 {

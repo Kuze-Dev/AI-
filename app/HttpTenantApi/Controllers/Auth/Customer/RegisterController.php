@@ -18,7 +18,7 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 use Throwable;
 
-#[Middleware('feature.tenant:' . CustomerBase::class)]
+#[Middleware('feature.tenant:'.CustomerBase::class)]
 class RegisterController
 {
     /** @throws Throwable */
@@ -38,7 +38,7 @@ class RegisterController
 
         Notification::send($customer, new NewRegisterNotification($customer));
 
-        if($customerTier?->has_approval) {
+        if ($customerTier?->has_approval) {
             app(SendForApprovalRegistrationAction::class)->execute($customer);
         }
 

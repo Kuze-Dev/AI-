@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Requests\FormSubmission;
 
 use App\Settings\FormSettings;
-use Support\Captcha\CaptchaRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Support\Captcha\CaptchaRule;
 
 class FormSubmissionRequest extends FormRequest
 {

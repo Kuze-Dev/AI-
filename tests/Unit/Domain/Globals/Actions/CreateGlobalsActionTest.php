@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-use Domain\Globals\Models\Globals;
+use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Globals\Actions\CreateGlobalsAction;
-use Domain\Site\Database\Factories\SiteFactory;
 use Domain\Globals\DataTransferObjects\GlobalsData;
-
-use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Globals\Models\Globals;
+use Domain\Site\Database\Factories\SiteFactory;
 
 use function Pest\Laravel\assertDatabaseHas;
 

@@ -13,7 +13,7 @@ class MarkAsUnreadNotificationAction
 {
     public function execute(User $user, DatabaseNotification $databaseNotification): void
     {
-        if ( ! $databaseNotification->notifiable()->is($user)) {
+        if (! $databaseNotification->notifiable()->is($user)) {
             throw new CantUnReadNotificationException();
         }
 

@@ -19,7 +19,7 @@ beforeEach(function () {
 
     $cartLine = CartLineFactory::new()->createOne();
 
-    withHeader('Authorization', 'Bearer ' . $customer
+    withHeader('Authorization', 'Bearer '.$customer
         ->createToken('testing-auth')
         ->plainTextToken);
 

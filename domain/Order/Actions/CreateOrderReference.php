@@ -16,7 +16,7 @@ class CreateOrderReference
         do {
             $existingReference = Order::where('reference', $uniqueReference)->first();
 
-            if ( ! $existingReference) {
+            if (! $existingReference) {
                 $uniqueReference = $uniqueReference;
 
                 break;
