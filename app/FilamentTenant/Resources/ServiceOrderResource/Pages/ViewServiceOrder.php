@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\ServiceOrderResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
-use App\FilamentTenant\Pages\Settings\ServiceSettings;
 use App\FilamentTenant\Resources\ServiceOrderResource;
 use App\FilamentTenant\Support\BadgeLabel;
 use App\FilamentTenant\Support\Divider;
@@ -17,6 +16,7 @@ use Filament\Forms\Components\Section;
 use App\FilamentTenant\Support;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
+use App\Settings\ServiceSettings;
 use Carbon\Carbon;
 use DateTimeZone;
 use Domain\Admin\Models\Admin;
@@ -28,6 +28,7 @@ use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Models\ServiceOrderAddress;
+use Domain\ServiceOrder\Notifications\ChangeByAdminNotification;
 use Domain\Taxation\Enums\PriceDisplay;
 use Filament\Pages\Actions\Action;
 use Filament\Forms\Components\Group;
@@ -39,6 +40,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification as FacadesNotification;
 
 class ViewServiceOrder extends EditRecord
 {
@@ -394,6 +396,14 @@ class ViewServiceOrder extends EditRecord
 
                             if ($shouldSendEmail) {
                                 app(ChangeServiceOrderStatusAction::class)->execute($record);
+                            }
+
+                            $sendEmailToAdmins = app(ServiceSettings::class)->admin_should_receive;
+
+                            if ($sendEmailToAdmins) {
+                                $mainReceiver = app(ServiceSettings::class)->admin_main_receiver;
+                                FacadesNotification::route('mail', $mainReceiver)
+                                    ->notify(new ChangeByAdminNotification($record, $status));
                             }
                         }
                     );
