@@ -9,6 +9,7 @@ use Spatie\LaravelSettings\Settings;
 class ServiceSettings extends Settings
 {
     public ?int $service_category;
+    public ?string $domain_path_segment;
 
     // admin email notif
     public bool $admin_should_receive = false;

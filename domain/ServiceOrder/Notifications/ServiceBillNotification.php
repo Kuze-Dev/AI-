@@ -6,8 +6,6 @@ namespace Domain\ServiceOrder\Notifications;
 
 use App\Settings\ServiceSettings;
 use App\Settings\SiteSettings;
-use Domain\Admin\Models\Admin;
-use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -40,7 +38,7 @@ class ServiceBillNotification extends Notification implements ShouldQueue
 
         $this->from = app(ServiceSettings::class)->email_sender_name;
 
-        $this->url = app(SiteSettings::class)->front_end_domain;
+        $this->url = 'http://' . app(SiteSettings::class)->front_end_domain . '/' . app(ServiceSettings::class)->domain_path_segment .'/'. $serviceBill->reference;
 
         $this->replyTo = app(ServiceSettings::class)->email_reply_to ?? [];
 

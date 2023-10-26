@@ -328,7 +328,14 @@ class ServiceOrderResource extends Resource
                                     ->readOnly(),
                             ])->visible(
                                 function (array $state) {
-                                    return (isset($state['service_address_id']) && $state['is_same_as_billing']) || isset($state['billing_address_id']);
+                                    return (isset(self::getTax(
+                                        Service::whereId($state['service_id'])->first()?->selling_price ?? 0,
+                                        $state['additional_charges'],
+                                        $state['is_same_as_billing'] ? $state['service_address_id'] :
+                                            $state['billing_address_id']
+                                    )->tax_display) ?? isset($state['service_address_id'])
+                                    && $state['is_same_as_billing'])
+                                    || isset($state['billing_address_id']);
                                 }
                             ),
                             TextLabel::make('')
