@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\CreateServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ViewServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ListServiceOrder;
@@ -42,12 +43,15 @@ use Str;
 class ServiceOrderResource extends Resource
 {
     use ContextualResource;
+    use LogsFormActivity;
 
     protected static ?string $model = ServiceOrder::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-ticket';
 
     protected static ?string $navigationGroup = 'Service Management';
+
+    protected static ?string $recordTitleAttribute = 'reference';
 
     public static function form(Form $form): Form
     {

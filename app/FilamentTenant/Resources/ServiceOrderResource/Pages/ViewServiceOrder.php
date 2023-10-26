@@ -44,6 +44,7 @@ class ViewServiceOrder extends EditRecord
 {
     use LogsFormActivity;
     protected static string $resource = ServiceOrderResource::class;
+    protected static ?string $recordTitleAttribute = 'reference';
 
     protected function getHeading(): string|Htmlable
     {
