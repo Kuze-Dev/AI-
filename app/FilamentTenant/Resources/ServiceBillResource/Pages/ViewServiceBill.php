@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\ServiceBillResource\Pages;
 
 use App\FilamentTenant\Resources\ServiceBillResource;
-use Carbon\Carbon;
-use DateTimeZone;
 use Domain\Admin\Models\Admin;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Tables\Columns\TextColumn;
 use Illuminate\Contracts\Support\Htmlable;
 use App\FilamentTenant\Support;
 use App\FilamentTenant\Support\BadgeLabel;
@@ -22,9 +19,7 @@ use App\FilamentTenant\Support\TextLabel;
 use Closure;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
-use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\Taxation\Enums\PriceDisplay;
-use Illuminate\Support\Facades\Auth;
 
 class ViewServiceBill extends ViewRecord
 {
@@ -38,6 +33,7 @@ class ViewServiceBill extends ViewRecord
     protected function getFormSchema(): array
     {
         $admin = Admin::first();
+
         return [
             Forms\Components\Group::make()
                 ->schema([
@@ -47,13 +43,13 @@ class ViewServiceBill extends ViewRecord
                                 Placeholder::make('service')
                                     ->content(fn ($record) => $record->serviceOrder->service_name),
                                 Placeholder::make('service Price')
-                                    ->content(fn ($record) => $record->serviceOrder->service_price),
+                                    ->content(fn ($record) => $record->serviceOrder->currency_symbol . ' ' . number_format($record->serviceOrder->service_price, 2, '.', ',')),
                             ]),
                         ]),
                         Section::make(trans('Additional Charges'))
                             ->schema([
                                 Forms\Components\Group::make()->schema($this->getAdditionalCharges()),
-                            ])->visible(fn ($record) => !empty($record->additional_charges)),
+                            ])->visible(fn ($record) => ! empty($record->additional_charges)),
 
                     ]),
 
@@ -61,11 +57,11 @@ class ViewServiceBill extends ViewRecord
                         Forms\Components\Group::make()->columns(2)
                             ->schema([
                                 TextLabel::make('')
-                                ->label(trans('Status'))
-                                ->alignLeft()
-                                ->size('md')
-                                ->inline()
-                                ->readOnly(),
+                                    ->label(trans('Status'))
+                                    ->alignLeft()
+                                    ->size('md')
+                                    ->inline()
+                                    ->readOnly(),
                                 BadgeLabel::make(trans('status'))->formatStateUsing(function (string $state): string {
                                     if ($state == ServiceOrderStatus::FORPAYMENT->value) {
                                         return trans('For Payment');

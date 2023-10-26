@@ -26,16 +26,28 @@ class ServiceOrderController
 {
     public function index(): JsonApiResourceCollection
     {
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = auth()->user();
+
         return ServiceOrderResource::collection(
-            QueryBuilder::for(ServiceOrder::query()->latest())
+            QueryBuilder::for(ServiceOrder::query()->whereBelongsTo($customer))
+                ->defaultSort('-created_at')
+                ->allowedFilters(['status', 'reference'])
+                ->allowedIncludes(['serviceBills'])
+                ->allowedSorts(['reference', 'total_price', 'status', 'created_at'])
                 ->jsonPaginate()
         );
     }
 
     public function show(string $serviceOrder): ServiceOrderResource
     {
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = auth()->user();
+
         return ServiceOrderResource::make(
-            QueryBuilder::for(ServiceOrder::whereReference($serviceOrder))->firstOrFail()
+            QueryBuilder::for(ServiceOrder::whereReference($serviceOrder)->whereBelongsTo($customer))
+                ->allowedIncludes(['serviceBills'])
+                ->firstOrFail()
         );
     }
 
