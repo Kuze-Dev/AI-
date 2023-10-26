@@ -11,8 +11,8 @@ use Domain\Content\Models\ContentEntry;
 use Domain\Page\Models\Page;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Spatie\RouteAttributes\Attributes\Get;
 use Illuminate\Support\Str;
+use Spatie\RouteAttributes\Attributes\Get;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 class SearchController
@@ -27,7 +27,7 @@ class SearchController
                 ? explode(',', $request->filter['models'])
                 : self::SEARCHABLE_MODELS,
             function (array $results, string $model) use ($request) {
-                if ( ! method_exists($this, $method = 'get' . Str::of($model)->studly() . 'Results')) {
+                if (! method_exists($this, $method = 'get'.Str::of($model)->studly().'Results')) {
                     throw new BadMethodCallException("Searching for `{$model}` may be invalid or not yet implemented.");
                 }
 
@@ -43,7 +43,7 @@ class SearchController
     }
 
     /** @return JsonApiResourceCollection <int, Page> */
-    protected function getPageResults(string $searchQuery, ?array $filter = null): JsonApiResourceCollection
+    protected function getPageResults(string $searchQuery, array $filter = null): JsonApiResourceCollection
     {
         return PageResource::collection(
             Page::query()
@@ -53,8 +53,7 @@ class SearchController
         );
     }
 
-    /** @return JsonApiResourceCollection */
-    protected function getContentEntryResults(string $searchQuery, ?array $filter = null): JsonApiResourceCollection
+    protected function getContentEntryResults(string $searchQuery, array $filter = null): JsonApiResourceCollection
     {
         return ContentEntryResource::collection(
             ContentEntry::query()

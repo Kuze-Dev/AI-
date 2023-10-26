@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace  Domain\Blueprint\Enums;
+namespace Domain\Blueprint\Enums;
 
 enum BlueprintDataType: string
 {

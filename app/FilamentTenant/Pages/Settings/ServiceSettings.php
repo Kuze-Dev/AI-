@@ -10,8 +10,10 @@ use Closure;
 use Domain\Taxonomy\Models\Taxonomy;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Str;
+use Filament\Forms\Components\TextInput;
 
 class ServiceSettings extends TenantBaseSettings
 {
@@ -109,6 +111,14 @@ class ServiceSettings extends TenantBaseSettings
                             ->helperText('This will be automatically centered in the email layout.')
                             ->columnSpanFull(),
                     ]),
+            ]),
+            Section::make('Service Order Section')
+            ->schema([
+                TextInput::make('days_before_due_date_notification')
+                    ->placeholder(trans('Days Before Due Date Notification'))
+                    ->numeric()
+                    ->minValue(1)
+                    ->columnSpan('full'),
             ]),
         ];
     }

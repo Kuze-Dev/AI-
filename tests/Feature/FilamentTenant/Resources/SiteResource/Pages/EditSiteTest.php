@@ -18,7 +18,7 @@ beforeEach(function () {
 it('can render site', function () {
     $record = SiteFactory::new()->createOne();
 
-    livewire(EditSite::class,  ['record' => $record->getRouteKey()])
+    livewire(EditSite::class, ['record' => $record->getRouteKey()])
         ->assertFormExists()
         ->assertSuccessful();
 });

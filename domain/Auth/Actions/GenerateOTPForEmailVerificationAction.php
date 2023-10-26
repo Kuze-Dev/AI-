@@ -6,6 +6,7 @@ namespace Domain\Auth\Actions;
 
 use Domain\Auth\Contracts\HasEmailVerificationOTP;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Support\Str;
 
 class GenerateOTPForEmailVerificationAction
 {
@@ -13,7 +14,7 @@ class GenerateOTPForEmailVerificationAction
     {
         $model->emailVerificationOneTimePassword?->delete();
 
-        $password = (string) str()->uuid();
+        $password = (string) Str::uuid();
 
         $model
             ->emailVerificationOneTimePassword()

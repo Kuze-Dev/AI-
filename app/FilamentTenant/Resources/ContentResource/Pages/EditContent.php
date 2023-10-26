@@ -10,12 +10,12 @@ use App\FilamentTenant\Resources\ContentResource;
 use Domain\Content\Actions\UpdateContentAction;
 use Domain\Content\DataTransferObjects\ContentData;
 use Domain\Content\Enums\PublishBehavior;
-use Filament\Resources\Pages\EditRecord;
+use Domain\Content\Models\Content;
 use Filament\Pages\Actions;
+use Filament\Pages\Actions\Action;
+use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Domain\Content\Models\Content;
-use Filament\Pages\Actions\Action;
 
 class EditContent extends EditRecord
 {
@@ -31,7 +31,7 @@ class EditContent extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
@@ -51,7 +51,8 @@ class EditContent extends EditRecord
     /**
      * Execute database transaction
      * for updating contents.
-     * @param Content $record
+     *
+     * @param  Content  $record
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {

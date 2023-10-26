@@ -21,6 +21,7 @@ use Domain\Customer\Models\Customer;
 use Domain\RewardPoint\Models\PointEarning;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
+use ErrorException;
 use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms;
@@ -28,19 +29,18 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Support\Excel\Actions\ExportBulkAction;
-use ErrorException;
-use Filament\Tables\Actions\BulkAction;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\HtmlString;
 
 class CustomerResource extends Resource
 {
@@ -132,7 +132,7 @@ class CustomerResource extends Resource
                         ->hidden(function ($record, $context) {
 
                             $tier = Tier::whereId($record?->tier_id)->first();
-                            if ( ! $tier?->has_approval) {
+                            if (! $tier?->has_approval) {
                                 return true;
                             }
 
@@ -189,7 +189,7 @@ class CustomerResource extends Resource
                     Forms\Components\Placeholder::make('is_verified')
                         ->label(trans('Is Verified: '))
                         ->content(function ($record) {
-                            if($record?->hasVerifiedEmail()) {
+                            if ($record?->hasVerifiedEmail()) {
                                 return new HtmlString('<span class="px-2 py-1 rounded-full bg-green-500 text-white">Verified</span>');
                             } else {
                                 return new HtmlString('<span class="px-2 py-1 rounded-full bg-red-500 text-white">Unverified</span>');
@@ -307,7 +307,7 @@ class CustomerResource extends Resource
                         ->icon('heroicon-o-speakerphone')
                         ->action(function (Customer $record, Tables\Actions\Action $action): void {
 
-                            if($record->register_status == RegisterStatus::UNREGISTERED) {
+                            if ($record->register_status == RegisterStatus::UNREGISTERED) {
                                 $success = app(SendRegisterInvitationAction::class)
                                     ->execute($record);
 
@@ -326,7 +326,7 @@ class CustomerResource extends Resource
                         ->authorize('sendRegisterInvitation')
                         ->withActivityLog(
                             event: 'register-invitation-link-sent',
-                            description: fn (Customer $record) => $record->full_name . ' register invitation link sent'
+                            description: fn (Customer $record) => $record->full_name.' register invitation link sent'
                         )
                         ->visible(fn (Customer $record) => $record->register_status !== RegisterStatus::REGISTERED),
                     Tables\Actions\DeleteAction::make()
@@ -384,8 +384,8 @@ class CustomerResource extends Resource
                     ->action(function (Collection $records, Tables\Actions\BulkAction $action) {
 
                         /** @var \Domain\Customer\Models\Customer $customer */
-                        foreach($records as $customer) {
-                            if($customer->status === Status::INACTIVE && $customer->register_status === RegisterStatus::UNREGISTERED) {
+                        foreach ($records as $customer) {
+                            if ($customer->status === Status::INACTIVE && $customer->register_status === RegisterStatus::UNREGISTERED) {
                                 $success = app(SendRegisterInvitationAction::class)->execute($customer);
                                 if ($success) {
                                     $action

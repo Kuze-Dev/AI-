@@ -8,8 +8,8 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ShippingmethodResource;
 use Domain\ShippingMethod\Actions\CreateShippingMethodAction;
 use Domain\ShippingMethod\DataTransferObjects\ShippingMethodData;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Pages\Actions\Action;
+use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -23,7 +23,7 @@ class CreateShippingmethod extends CreateRecord
     {
         return [
             Action::make('create')
-                ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];

@@ -30,7 +30,7 @@ class ShippingMethodData
             title: $data['title'],
             subtitle: $data['subtitle'],
             driver: $data['driver'],
-            shipper_country_id :(int) $data['shipper_country_id'],
+            shipper_country_id : (int) $data['shipper_country_id'],
             shipper_state_id : (int) $data['shipper_state_id'],
             shipper_address : $data['shipper_address'],
             shipper_city : $data['shipper_city'],

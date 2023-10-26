@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\BlockResource\Blocks;
 
 use App\FilamentTenant\Resources\BlockResource;
+use Exception;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Exception;
 
 class ListBlocks extends ListRecords
 {

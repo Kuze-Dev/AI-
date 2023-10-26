@@ -27,7 +27,7 @@ class LocaleFactory extends Factory
     {
         $locale = Locale::whereCode('en')->first();
 
-        if ( ! $locale) {
+        if (! $locale) {
             return self::new([
                 'name' => 'English (en)',
                 'code' => 'en',

@@ -20,7 +20,7 @@ class DelimitedCast implements CastsAttributes
         return explode(',', $value);
     }
 
-    /** @param string|array $value */
+    /** @param  string|array  $value */
     public function set($model, string $key, $value, array $attributes): ?string
     {
         if (is_array($value)) {

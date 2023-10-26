@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Domain\Product\Rules;
 
 use App\FilamentTenant\Resources\ProductResource\Pages\EditProduct;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 class UniqueProductSkuRule implements ValidationRule
 {

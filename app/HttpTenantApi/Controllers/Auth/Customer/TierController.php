@@ -14,7 +14,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('tiers', only: ['index']),
-    Middleware('feature.tenant:' . CustomerBase::class)
+    Middleware('feature.tenant:'.CustomerBase::class)
 ]
 class TierController
 {

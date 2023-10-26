@@ -80,7 +80,7 @@ it('can access private route with valid token', function () {
         ]);
 
     getJson('api/test-private-route', [
-        'Authorization' => 'Bearer ' . $token,
+        'Authorization' => 'Bearer '.$token,
     ])
         ->assertOk()
         ->assertSee('access granted!');

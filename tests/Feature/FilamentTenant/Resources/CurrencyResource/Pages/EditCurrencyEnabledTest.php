@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Domain\Currency\Database\Factories\CurrencyFactory;
 use Domain\Currency\Actions\UpdateCurrencyEnabledAction;
+use Domain\Currency\Database\Factories\CurrencyFactory;
 use Domain\Currency\Models\Currency;
 use Filament\Facades\Filament;
 

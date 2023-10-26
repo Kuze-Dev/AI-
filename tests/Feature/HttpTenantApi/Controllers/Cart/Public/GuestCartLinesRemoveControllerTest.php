@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Features\ECommerce\AllowGuestOrder;
 use Domain\Cart\Database\Factories\CartFactory;
 use Domain\Cart\Database\Factories\CartLineFactory;
-use App\Features\ECommerce\AllowGuestOrder;
 use Domain\Cart\Models\CartLine;
 
 use function Pest\Laravel\postJson;
@@ -17,13 +17,13 @@ beforeEach(function () {
 
     $uuid = uuid_create(UUID_TYPE_RANDOM);
 
-    $sessionId = time() . $uuid;
+    $sessionId = time().$uuid;
 
     $cart = CartFactory::new()->setGuestId($sessionId)->createOne();
 
     CartLineFactory::new()->createOne();
 
-    withHeader('Authorization', 'Bearer ' . $sessionId);
+    withHeader('Authorization', 'Bearer '.$sessionId);
 
     $this->cart = $cart;
 });

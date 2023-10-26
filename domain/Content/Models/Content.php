@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace Domain\Content\Models;
 
-use Domain\Site\Traits\Sites;
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
-use Spatie\Activitylog\LogOptions;
-use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Blueprint\Models\Blueprint;
-use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Models\Activity;
 use Domain\Content\Enums\PublishBehavior;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Domain\Site\Traits\Sites;
+use Domain\Taxonomy\Models\Taxonomy;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Content\Models\Content
@@ -41,6 +41,7 @@ use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
  * @property-read int|null $content_entries_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Taxonomy> $taxonomies
  * @property-read int|null $taxonomies_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Content newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Content newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Content query()
@@ -54,6 +55,7 @@ use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
  * @method static \Illuminate\Database\Eloquent\Builder|Content wherePrefix($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Content whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Content whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 #[
@@ -62,9 +64,9 @@ use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 ]
 class Content extends Model
 {
-    use LogsActivity;
-    use HasSlug;
     use ConstraintsRelationships;
+    use HasSlug;
+    use LogsActivity;
     use Sites;
 
     /**
@@ -91,7 +93,6 @@ class Content extends Model
         'is_sortable' => 'boolean',
     ];
 
-    /** @return LogOptions */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -142,7 +143,6 @@ class Content extends Model
         return 'slug';
     }
 
-    /** @return SlugOptions */
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()

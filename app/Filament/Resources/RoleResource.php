@@ -11,7 +11,6 @@ use App\Filament\Resources\RoleResource\Support\PermissionGroupCollection;
 use Closure;
 use Domain\Role\Actions\DeleteRoleAction;
 use Domain\Role\Models\Role;
-use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -21,6 +20,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class RoleResource extends Resource
 {
@@ -191,7 +191,7 @@ class RoleResource extends Resource
                                             ->columns(2)
                                             ->reactive()
                                             ->formatStateUsing(function (Forms\Components\CheckboxList $component, ?Role $record) use ($permissionGroup): array {
-                                                if ( ! $record) {
+                                                if (! $record) {
                                                     return [];
                                                 }
 

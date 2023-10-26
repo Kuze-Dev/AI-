@@ -14,7 +14,6 @@ class CountryFactory extends Factory
 {
     protected $model = Country::class;
 
-    /** @return array */
     public function definition(): array
     {
         return [

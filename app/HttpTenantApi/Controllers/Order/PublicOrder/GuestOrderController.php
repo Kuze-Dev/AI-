@@ -23,17 +23,17 @@ use Domain\Shipment\API\AusPost\Exceptions\AusPostServiceNotFoundException;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\RouteAttributes\Attributes\Resource;
-use Symfony\Component\Mailer\Exception\TransportException;
-use Illuminate\Support\Facades\DB;
 use Spatie\RouteAttributes\Attributes\Middleware;
+use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Mailer\Exception\TransportException;
 
 #[
     Resource('guest/orders', apiResource: true, except: 'destroy', names: 'guest.orders'),
-    Middleware(['feature.tenant:' . AllowGuestOrder::class])
+    Middleware(['feature.tenant:'.AllowGuestOrder::class])
 ]
 class GuestOrderController extends Controller
 {

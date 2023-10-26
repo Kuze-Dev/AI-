@@ -12,14 +12,14 @@ use Tests\Fixtures\TestNotification;
 
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\patchJson;
-use function Pest\Laravel\withoutExceptionHandling;
 use function Pest\Laravel\withHeader;
+use function Pest\Laravel\withoutExceptionHandling;
 
 beforeEach(function () {
     testInTenantContext();
     $customer = CustomerFactory::new()->createOne();
 
-    withHeader('Authorization', 'Bearer ' . $customer
+    withHeader('Authorization', 'Bearer '.$customer
         ->createToken('testing-auth')
     ->plainTextToken);
 
@@ -40,7 +40,7 @@ it('return list', function () {
 
     getJson('api/notifications')
         ->assertOk()
-        ->assertJson(function (Illuminate\Testing\Fluent\AssertableJson $json) use ($notification, $message) {
+        ->assertJson(function (AssertableJson $json) use ($notification, $message) {
             $json
                 ->count('data', 1)
                 ->where('data.0.attributes.data.message', $message)
@@ -57,7 +57,7 @@ it('cant update in not associated', function (string $url, string $exception) {
 
     withoutExceptionHandling();
 
-    expect(fn () => patchJson('api/notifications/' . $notification->getRouteKey() . $url))
+    expect(fn () => patchJson('api/notifications/'.$notification->getRouteKey().$url))
         ->toThrow($exception);
 })
     ->with([

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\Payments\Actions;
 
+use DB;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\DataTransferObjects\CreatepaymentData;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
+use Domain\Payments\Enums\PaymentStatus;
 use Domain\Payments\Interfaces\PayableInterface;
 use Throwable;
-use DB;
-use Domain\Payments\Enums\PaymentStatus;
 
 class CreatePaymentAction
 {

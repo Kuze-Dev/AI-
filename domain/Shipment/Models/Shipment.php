@@ -28,6 +28,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read ShippingMethod|null $shippingMethod
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Shipment newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Shipment newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Shipment query()
@@ -42,12 +43,13 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @method static \Illuminate\Database\Eloquent\Builder|Shipment whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shipment whereTrackingId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shipment whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Shipment extends Model
 {
-    use LogsActivity;
     use ConstraintsRelationships;
+    use LogsActivity;
 
     protected $fillable = [
         'model_type',

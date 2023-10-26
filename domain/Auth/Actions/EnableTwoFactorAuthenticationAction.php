@@ -22,7 +22,7 @@ class EnableTwoFactorAuthenticationAction
             return null;
         }
 
-        if ( ! $this->validator->execute($authenticatable, $code)) {
+        if (! $this->validator->execute($authenticatable, $code)) {
             return false;
         }
 

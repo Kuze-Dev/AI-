@@ -6,9 +6,8 @@ use Domain\Form\Actions\CreateFormSubmissionAction;
 use Domain\Form\Database\Factories\FormEmailNotificationFactory;
 use Domain\Form\Database\Factories\FormFactory;
 use Domain\Form\Mail\FormEmailNotificationMail;
-use Illuminate\Support\Facades\Mail;
-
 use Domain\Form\Models\FormSubmission;
+use Illuminate\Support\Facades\Mail;
 
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseHas;

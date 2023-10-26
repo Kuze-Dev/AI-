@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Review;
 
 use Domain\Review\Actions\EditLikeAction;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Spatie\RouteAttributes\Attributes\Middleware;
-use Spatie\RouteAttributes\Attributes\Prefix;
 use Spatie\RouteAttributes\Attributes\Patch;
+use Spatie\RouteAttributes\Attributes\Prefix;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[
     Prefix('reviews'),

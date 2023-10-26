@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon $expired_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|EmailVerificationOneTimePassword newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|EmailVerificationOneTimePassword newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|EmailVerificationOneTimePassword query()
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|EmailVerificationOneTimePassword whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|EmailVerificationOneTimePassword wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder|EmailVerificationOneTimePassword whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class EmailVerificationOneTimePassword extends Model

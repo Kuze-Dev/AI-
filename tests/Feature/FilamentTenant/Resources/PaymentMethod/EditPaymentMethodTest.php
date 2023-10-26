@@ -21,7 +21,7 @@ it('can render globals', function () {
 
     $record = PaymentMethodFactory::new()->createOne();
 
-    livewire(EditPaymentMethod::class,  ['record' => $record->getRouteKey()])
+    livewire(EditPaymentMethod::class, ['record' => $record->getRouteKey()])
         ->assertFormExists()
         ->assertSuccessful();
 });

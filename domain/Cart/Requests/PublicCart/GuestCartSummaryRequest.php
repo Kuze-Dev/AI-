@@ -12,8 +12,8 @@ use Domain\Discount\Models\Discount;
 use Domain\Shipment\DataTransferObjects\ReceiverData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
-use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Validation\Rule;
 
 class GuestCartSummaryRequest extends AddressRequest
 {
@@ -65,7 +65,7 @@ class GuestCartSummaryRequest extends AddressRequest
                     if (is_int($value) || is_string($value)) {
                         return true;
                     } else {
-                        $fail($attribute . ' is invalid.');
+                        $fail($attribute.' is invalid.');
                     }
                 },
             ],
@@ -90,7 +90,6 @@ class GuestCartSummaryRequest extends AddressRequest
         return $this->cartLinesCache;
     }
 
-    /** @return \Domain\Address\Models\Country|null */
     public function getCountry(): ?Country
     {
         if (

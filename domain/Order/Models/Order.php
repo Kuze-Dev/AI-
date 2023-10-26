@@ -67,6 +67,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read int|null $payments_count
  * @property-read \Domain\Order\Models\OrderAddress $shippingAddress
  * @property-read ShippingMethod|null $shippingMethod
+ *
  * @method static Builder|Order newModelQuery()
  * @method static Builder|Order newQuery()
  * @method static Builder|Order query()
@@ -97,13 +98,14 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static Builder|Order whereTaxTotal($value)
  * @method static Builder|Order whereTotal($value)
  * @method static Builder|Order whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Order extends Model implements HasMedia, PayableInterface
 {
-    use LogsActivity;
-    use InteractsWithMedia;
     use HasPayments;
+    use InteractsWithMedia;
+    use LogsActivity;
     use Notifiable;
 
     protected $fillable = [

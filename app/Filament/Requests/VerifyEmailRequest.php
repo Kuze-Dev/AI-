@@ -14,7 +14,7 @@ class VerifyEmailRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        if ( ! hash_equals($this->id ?? '', (string) $this->user()?->getKey())) {
+        if (! hash_equals($this->id ?? '', (string) $this->user()?->getKey())) {
             return false;
         }
 

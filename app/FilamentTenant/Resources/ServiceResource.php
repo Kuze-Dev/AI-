@@ -20,6 +20,7 @@ use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Service\Enums\Status;
 use Domain\Service\Models\Service;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Exception;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -27,8 +28,8 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
-use Exception;
 
 class ServiceResource extends Resource
 {
@@ -167,7 +168,7 @@ class ServiceResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->translateLabel()
-                    ->options(['1' => Status::ACTIVE->value, '0' => Status::INACTIVE->value])
+                    ->options(['1' => ucfirst(Status::ACTIVE->value), '0' => ucfirst(Status::INACTIVE->value)])
                     ->query(function (Builder $query, array $data) {
                         $query->when(filled($data['value']), function (Builder $query) use ($data) {
                             $query->when(filled($data['value']), function (Builder $query) use ($data) {
@@ -224,6 +225,15 @@ class ServiceResource extends Resource
             'create' => CreateService::route('/create'),
             'edit' => EditService::route('/{record}/edit'),
         ];
+    }
+
+    /** @return Builder<\Domain\Service\Models\Service> */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 
     public static function servicePriceSection(): Forms\Components\Section
@@ -314,19 +324,11 @@ class ServiceResource extends Resource
                 Forms\Components\Select::make('due_date_every')
                     ->reactive()
                     ->options(function (Closure $get) {
-                        $options = [];
-                        switch ($get('billing_cycle')) {
-                            case BillingCycleEnum::MONTHLY->value:
-                                $options = range(1, now()->daysInMonth);
-
-                                break;
-                            case BillingCycleEnum::YEARLY->value:
-                                $options = range(1, 12);
-
-                                break;
+                        if ($get('billing_cycle') !== BillingCycleEnum::DAILY->value) {
+                            return range(1, 31);
                         }
 
-                        return $options;
+                        return null;
                     })
                     ->formatStateUsing(
                         fn ($record, Closure $get, Closure $set) => $get('is_auto_generated_bill') === true
@@ -347,7 +349,7 @@ class ServiceResource extends Resource
                 'status::update' => [
                     function (Forms\Components\Section $component): void {
                         $component->evaluate(function (Closure $get, Closure $set) {
-                            if($get('status')) {
+                            if ($get('status')) {
                                 $set('status')
                                     ->label(fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value)));
                             }

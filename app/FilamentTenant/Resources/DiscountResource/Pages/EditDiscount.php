@@ -27,7 +27,7 @@ class EditDiscount extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
@@ -49,7 +49,7 @@ class EditDiscount extends EditRecord
         return $this->getCachedActions();
     }
 
-    /** @param \Domain\Discount\Models\Discount $record */
+    /** @param  \Domain\Discount\Models\Discount  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(

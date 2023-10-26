@@ -5,31 +5,31 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Cart\PublicCart;
 
 use App\Features\ECommerce\AllowGuestOrder;
-use Domain\Cart\Actions\UpdateCartLineAction;
-use Domain\Cart\DataTransferObjects\UpdateCartLineData;
-use Domain\Cart\DataTransferObjects\CreateCartData;
-use Domain\Cart\Models\CartLine;
-use Domain\Cart\Requests\UpdateCartLineRequest;
-use Domain\Cart\Requests\CreateCartLineRequest;
-use Spatie\RouteAttributes\Attributes\Resource;
 use App\Http\Controllers\Controller;
 use Domain\Cart\Actions\CreateCartLineAction;
 use Domain\Cart\Actions\DestroyCartLineAction;
 use Domain\Cart\Actions\PublicCart\GuestCreateCartAction;
+use Domain\Cart\Actions\UpdateCartLineAction;
+use Domain\Cart\DataTransferObjects\CreateCartData;
+use Domain\Cart\DataTransferObjects\UpdateCartLineData;
 use Domain\Cart\Helpers\PublicCart\AuthorizeGuestCart;
 use Domain\Cart\Models\Cart;
+use Domain\Cart\Models\CartLine;
+use Domain\Cart\Requests\CreateCartLineRequest;
+use Domain\Cart\Requests\UpdateCartLineRequest;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Exception;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Spatie\MediaLibrary\Support\File;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
+use Spatie\MediaLibrary\Support\File;
 use Spatie\RouteAttributes\Attributes\Middleware;
+use Spatie\RouteAttributes\Attributes\Resource;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 #[
     Resource('guest/carts/cartlines', apiResource: true, except: ['show', 'index'], names: 'guest.carts.cartlines'),
-    Middleware(['feature.tenant:' . AllowGuestOrder::class])
+    Middleware(['feature.tenant:'.AllowGuestOrder::class])
 ]
 class GuestCartLinesController extends Controller
 {
@@ -42,7 +42,7 @@ class GuestCartLinesController extends Controller
             $dbResult = DB::transaction(function () use ($validatedData, $sessionId) {
                 $cart = app(GuestCreateCartAction::class)->execute($sessionId);
 
-                if ( ! $cart instanceof Cart) {
+                if (! $cart instanceof Cart) {
                     return response()->json([
                         'message' => 'Invalid action',
                     ], 400);
@@ -82,7 +82,7 @@ class GuestCartLinesController extends Controller
 
         $allowed = app(AuthorizeGuestCart::class)->execute($cartline, $sessionId);
 
-        if ( ! $allowed) {
+        if (! $allowed) {
             abort(403);
         }
 
@@ -127,13 +127,13 @@ class GuestCartLinesController extends Controller
 
         $allowed = app(AuthorizeGuestCart::class)->execute($cartline, $sessionId);
 
-        if ( ! $allowed) {
+        if (! $allowed) {
             abort(403);
         }
 
         $result = app(DestroyCartLineAction::class)->execute($cartline);
 
-        if ( ! $result) {
+        if (! $result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

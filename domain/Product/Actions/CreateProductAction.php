@@ -6,10 +6,10 @@ namespace Domain\Product\Actions;
 
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
-use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\Common\Actions\SyncMediaCollectionAction;
 use Support\Common\DataTransferObjects\MediaCollectionData;
 use Support\Common\DataTransferObjects\MediaData;
+use Support\MetaData\Actions\CreateMetaDataAction;
 
 class CreateProductAction
 {

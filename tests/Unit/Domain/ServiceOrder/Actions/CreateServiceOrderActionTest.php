@@ -27,6 +27,7 @@ beforeEach(function () {
 
 it('can create service order', function () {
     $service = ServiceFactory::new()
+        ->isActive()
         ->withDummyBlueprint()
         ->createOne();
 

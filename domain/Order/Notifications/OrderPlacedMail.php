@@ -25,13 +25,21 @@ class OrderPlacedMail extends Notification implements ShouldQueue
     use Queueable;
 
     private Order $order;
+
     private OrderAddress $shippingAddress;
+
     private ShippingMethod $shippingMethod;
+
     private string $logo;
+
     private string $title;
+
     private string $description;
+
     private string $from;
+
     private array $replyTo;
+
     private ?string $footer = null;
 
     /** Create a new notification instance. */
@@ -140,7 +148,7 @@ class OrderPlacedMail extends Notification implements ShouldQueue
         foreach ($emailArray as $email) {
             $email = trim($email);
 
-            if ( ! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            if (! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $sanitizedEmails[] = $email;
             }
         }

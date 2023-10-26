@@ -10,11 +10,11 @@ use Domain\Auth\Contracts\HasEmailVerificationOTP;
 use Domain\Auth\EmailVerificationOTP;
 use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
-use Domain\Customer\Notifications\ResetPassword;
 use Domain\Customer\Enums\RegisterStatus;
-use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Queries\CustomerQueryBuilder;
+use Domain\Customer\Notifications\ResetPassword;
+use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Discount\Models\DiscountLimit;
 use Domain\Favorite\Models\Favorite;
 use Domain\ServiceOrder\Models\ServiceOrder;
@@ -76,6 +76,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
  * @property-read VerifiedAddress|null $verifiedAddress
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer onlyTrashed()
@@ -100,18 +101,19 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['addresses'])]
-class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, HasEmailVerificationOTP
+class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMedia, MustVerifyEmail
 {
-    use SoftDeletes;
-    use LogsActivity;
-    use InteractsWithMedia;
-    use Notifiable;
-    use HasApiTokens;
     use ConstraintsRelationships;
     use EmailVerificationOTP;
+    use HasApiTokens;
+    use InteractsWithMedia;
+    use LogsActivity;
+    use Notifiable;
+    use SoftDeletes;
 
     protected $fillable = [
         'tier_id',

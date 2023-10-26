@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\PageResource\Pages;
 
 use App\FilamentTenant\Resources\PageResource;
+use Exception;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Exception;
 
 class ListPages extends ListRecords
 {

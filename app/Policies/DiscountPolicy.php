@@ -7,8 +7,8 @@ namespace App\Policies;
 use App\Features\ECommerce\ECommerceBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Discount\Models\Discount;
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Foundation\Auth\User;
 
 class DiscountPolicy
 {
@@ -16,7 +16,7 @@ class DiscountPolicy
 
     public function before(): ?Response
     {
-        if ( ! tenancy()->tenant?->features()->active(ECommerceBase::class)) {
+        if (! tenancy()->tenant?->features()->active(ECommerceBase::class)) {
             return Response::denyAsNotFound();
         }
 

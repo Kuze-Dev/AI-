@@ -17,14 +17,14 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('services', only: ['index', 'show']),
-    Middleware('feature.tenant:' . ServiceBase::class)
+    Middleware('feature.tenant:'.ServiceBase::class)
 ]
 class ServiceController
 {
     public function index(): JsonApiResourceCollection
     {
         return ServiceResource::collection(
-            QueryBuilder::for(Service::query()->whereStatus(true))
+            QueryBuilder::for(Service::whereStatus(true))
                 ->allowedFilters([
                     'name',
                     'selling_price',

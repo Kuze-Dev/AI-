@@ -5,13 +5,13 @@ declare(strict_types=1);
 use Domain\Content\Database\Factories\ContentEntryFactory;
 use Domain\Content\Database\Factories\ContentFactory;
 use Domain\Page\Database\Factories\PageFactory;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 use Support\RouteUrl\Contracts\HasRouteUrl;
 use Support\RouteUrl\Database\Factories\RouteUrlFactory;
 use Support\RouteUrl\DataTransferObjects\RouteUrlData;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\Fixtures\TestModelForRouteUrl;
 
 use function Pest\Laravel\getJson;
@@ -24,7 +24,7 @@ beforeEach(function () {
 });
 
 it('can retrieve model at requested route url', function (HasRouteUrl $model, string $route) {
-    getJson('api/route' . $route)
+    getJson('api/route'.$route)
         ->assertOk()
         ->assertJson(
             fn (AssertableJson $json) => $json
@@ -76,7 +76,7 @@ it('can retrieve model using inactive route url', function () {
 });
 
 it('responds 404 when route url doesn\'t exist', function () {
-    getJson('api/route/' . fake()->word())
+    getJson('api/route/'.fake()->word())
         ->assertNotFound();
 });
 
@@ -98,7 +98,7 @@ it('can get route url but return InvalidArgumentException with error message', f
         ->execute($model, new RouteUrlData('url/path/one', true));
 
     withoutExceptionHandling();
-    getJson('api/route/' . $model->refresh()->activeRouteUrl->url)
+    getJson('api/route/'.$model->refresh()->activeRouteUrl->url)
         ->assertOk();
 })
-    ->throws(InvalidArgumentException::class, 'No resource found for model ' . TestModelForRouteUrl::class);
+    ->throws(InvalidArgumentException::class, 'No resource found for model '.TestModelForRouteUrl::class);

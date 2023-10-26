@@ -22,7 +22,7 @@ class NotificationCountController
     public function __invoke(): JsonResponse
     {
 
-        if ( ! $user = Auth::user()) {
+        if (! $user = Auth::user()) {
             throw new AuthenticationException();
         }
 

@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Actions;
 
+use App\Settings\ServiceSettings;
 use Domain\Customer\Models\Customer;
+use Domain\ServiceOrder\Exceptions\MissingServiceSettingsConfigurationException;
 use Domain\ServiceOrder\Models\ServiceOrder;
 
 class NotifyCustomerServiceBillDueDateAction
 {
     public function __construct(
         private SendToCustomerServiceBillDueDateEmailAction $sendToCustomerServiceBillDueDateAction,
-        private ExpiredServiceOrderAction $expiredServiceOrderAction
+        private ServiceSettings $serviceSettings
     ) {
     }
 
@@ -30,28 +32,56 @@ class NotifyCustomerServiceBillDueDateAction
                 ->whereNotifiable())
             ->get();
 
-        $customers
-            ->each(function (Customer $customer) {
-                $customer
-                    ->serviceOrders
-                    ->each(function (ServiceOrder $serviceOrder) use ($customer) {
-                        /** @var \Domain\ServiceOrder\Models\ServiceBill $latestForPaymentServiceBill */
-                        $latestForPaymentServiceBill = $serviceOrder->serviceBills->first();
+        /** @var int|null $daysBeforeDueDateNotification */
+        $daysBeforeDueDateNotification = $this->serviceSettings
+            ->days_before_due_date_notification;
 
-                        /** TODO: add config in service settings, notify customer before x day/s. */
-                        if (
-                            $latestForPaymentServiceBill->bill_date &&
-                            now()->parse($latestForPaymentServiceBill->bill_date)
-                                ->toDateString() === now()->toDateString()
-                        ) {
-                            $this->sendToCustomerServiceBillDueDateAction
-                                ->onQueue()
-                                ->execute(
-                                    $customer,
-                                    $latestForPaymentServiceBill
-                                );
-                        }
-                    });
-            });
+        if (is_null($daysBeforeDueDateNotification)) {
+            throw new MissingServiceSettingsConfigurationException();
+        }
+
+        $customers
+            ->each(
+                function (Customer $customer) use ($daysBeforeDueDateNotification) {
+                    $customer
+                        ->serviceOrders
+                        ->each(
+                            function (ServiceOrder $serviceOrder) use (
+                                $customer,
+                                $daysBeforeDueDateNotification,
+                            ) {
+
+                                /** @var \Domain\ServiceOrder\Models\ServiceBill $latestForPaymentServiceBill */
+                                $latestForPaymentServiceBill = $serviceOrder->latestForPaymentServiceBill();
+
+                                /** @var \Carbon\Carbon $dateOfNotification */
+                                $dateOfNotification = now()->parse($latestForPaymentServiceBill->due_date)
+                                    ->subDays($daysBeforeDueDateNotification)
+                                    ->toDateString();
+
+                                /** @var \Carbon\Carbon $dateToday */
+                                $dateToday = now()->toDateString();
+
+                                /** @var \Carbon\Carbon $billDate */
+                                $billDate = now()->parse($latestForPaymentServiceBill->bill_date)
+                                    ->toDateString();
+
+                                if (
+                                    ($dateOfNotification < $billDate &&
+                                        $billDate === $dateToday) ||
+                                    ($dateOfNotification === $dateToday)
+                                ) {
+                                    $this->sendToCustomerServiceBillDueDateAction
+                                        ->onQueue()
+                                        ->execute(
+                                            $customer,
+                                            $latestForPaymentServiceBill
+                                        );
+                                }
+
+                            }
+                        );
+                }
+            );
     }
 }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Settings;
 
-use Support\Captcha\CaptchaProvider;
 use Spatie\LaravelSettings\Settings;
+use Support\Captcha\CaptchaProvider;
 
 class FormSettings extends Settings
 {

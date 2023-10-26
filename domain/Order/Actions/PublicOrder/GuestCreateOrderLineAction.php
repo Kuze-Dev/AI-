@@ -23,7 +23,7 @@ class GuestCreateOrderLineAction
     ) {
     }
 
-    public function execute(Order $order,  GuestPlaceOrderData $placeOrderData, GuestPreparedOrderData $guestPreparedOrderData): void
+    public function execute(Order $order, GuestPlaceOrderData $placeOrderData, GuestPreparedOrderData $guestPreparedOrderData): void
     {
         foreach ($guestPreparedOrderData->cartLine as $cartLine) {
 
@@ -93,10 +93,7 @@ class GuestCreateOrderLineAction
     }
 
     /**
-     * @param \Domain\Order\Models\OrderLine $orderLine
-     * @param \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $medias
-     * @param string $collection
-     * @return void
+     * @param  \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media>  $medias
      */
     private function copyMediaToOrderLine(OrderLine $orderLine, MediaCollection $medias, string $collection): void
     {

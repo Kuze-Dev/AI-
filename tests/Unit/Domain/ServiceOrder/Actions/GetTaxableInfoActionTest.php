@@ -48,7 +48,7 @@ it('can get info', function () {
             $address
         );
 
-    expect($taxTotal)->toBe($data['taxTotal']);
+    expect($taxTotal)->toBe($data->tax_total);
 
-    expect($totalPrice)->toBe($data['totalPrice']);
+    expect($totalPrice)->toBe($data->total_price);
 });

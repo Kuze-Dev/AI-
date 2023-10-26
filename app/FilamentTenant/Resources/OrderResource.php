@@ -8,14 +8,6 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Support;
 use App\Settings\OrderSettings;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Domain\Order\Models\Order;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
-use Filament\Resources\Form;
-use Filament\Forms;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use Closure;
 use Domain\Customer\Models\Customer;
@@ -23,12 +15,20 @@ use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Enums\OrderUserType;
 use Domain\Order\Events\AdminOrderBankPaymentEvent;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
+use Domain\Order\Models\Order;
 use Domain\Taxation\Enums\PriceDisplay;
+use Filament\Forms;
 use Filament\Notifications\Notification;
+use Filament\Resources\Form;
+use Filament\Resources\Resource;
+use Filament\Resources\Table;
+use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 
 class OrderResource extends Resource
 {
@@ -232,7 +232,7 @@ class OrderResource extends Resource
                     })
                     ->alignLeft()
                     ->label(trans('Customer Type'))
-                    ->formatStateUsing(function (string|null $state) {
+                    ->formatStateUsing(function (?string $state) {
                         return $state ? 'Registered'
                             : 'Guest';
                     }),
@@ -243,7 +243,7 @@ class OrderResource extends Resource
                             ->orderBy('customer_first_name', $direction);
                     })
                     ->formatStateUsing(function ($record) {
-                        return Str::limit($record->customer_first_name . ' ' . $record->customer_last_name, 30);
+                        return Str::limit($record->customer_first_name.' '.$record->customer_last_name, 30);
                     })
                     ->searchable(query: function (Builder $query, string $search) {
                         $query->where('customer_first_name', 'like', "%{$search}%")
@@ -254,11 +254,11 @@ class OrderResource extends Resource
                     ->label(trans('Tax Total'))
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->formatStateUsing(function (Order $record) {
-                        return $record->currency_symbol . ' ' . number_format((float) $record->tax_total, 2, '.', ',');
+                        return $record->currency_symbol.' '.number_format((float) $record->tax_total, 2, '.', ',');
                     }),
                 Tables\Columns\TextColumn::make('total')
                     ->formatStateUsing(function (Order $record) {
-                        return $record->currency_symbol . ' ' . number_format((float) $record->total, 2, '.', ',');
+                        return $record->currency_symbol.' '.number_format((float) $record->total, 2, '.', ',');
                     })
                     ->alignRight()
                     ->label(trans('Total'))
@@ -342,11 +342,11 @@ class OrderResource extends Resource
                         $indicators = [];
 
                         if ($data['created_from'] ?? null) {
-                            $indicators['created_from'] = 'Created from ' . Carbon::parse($data['created_from'])->toFormattedDateString();
+                            $indicators['created_from'] = 'Created from '.Carbon::parse($data['created_from'])->toFormattedDateString();
                         }
 
                         if ($data['created_until'] ?? null) {
-                            $indicators['created_until'] = 'Created until ' . Carbon::parse($data['created_until'])->toFormattedDateString();
+                            $indicators['created_until'] = 'Created until '.Carbon::parse($data['created_until'])->toFormattedDateString();
                         }
 
                         return $indicators;
@@ -489,7 +489,7 @@ class OrderResource extends Resource
                             ->readOnly(),
                         Support\TextLabel::make('sub_total')
                             ->formatStateUsing(function (Order $record) {
-                                return $record->currency_symbol . ' ' . number_format($record->sub_total, 2, '.', ',');
+                                return $record->currency_symbol.' '.number_format($record->sub_total, 2, '.', ',');
                             })
                             ->alignRight()
                             ->size('md')
@@ -508,7 +508,7 @@ class OrderResource extends Resource
                             ->size('md')
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
-                                return $record->currency_symbol . ' ' . number_format($record->shipping_total, 2, '.', ',');
+                                return $record->currency_symbol.' '.number_format($record->shipping_total, 2, '.', ',');
                             }),
                     ]),
                 Forms\Components\Grid::make(2)
@@ -527,10 +527,10 @@ class OrderResource extends Resource
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
                                 if ($record->tax_total) {
-                                    return $record->currency_symbol . ' ' . number_format($record->tax_total, 2, '.', ',');
+                                    return $record->currency_symbol.' '.number_format($record->tax_total, 2, '.', ',');
                                 }
 
-                                return  $record->currency_symbol . ' ' . '0.00';
+                                return $record->currency_symbol.' '.'0.00';
                             }),
                     ])->hidden(function (Order $record) {
                         return $record->tax_display == PriceDisplay::INCLUSIVE;
@@ -549,10 +549,10 @@ class OrderResource extends Resource
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
                                 if ($record->discount_total) {
-                                    return $record->currency_symbol . ' ' . number_format($record->discount_total, 2, '.', ',');
+                                    return $record->currency_symbol.' '.number_format($record->discount_total, 2, '.', ',');
                                 }
 
-                                return  $record->currency_symbol . ' ' . '0.00';
+                                return $record->currency_symbol.' '.'0.00';
                             }),
                     ])->hidden(function (Order $record) {
                         return (bool) ($record->discount_total == 0);
@@ -588,7 +588,7 @@ class OrderResource extends Resource
                             ->color('primary')
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
-                                return $record->currency_symbol . ' ' . number_format($record->total, 2, '.', ',');
+                                return $record->currency_symbol.' '.number_format($record->total, 2, '.', ',');
                             }),
                     ]),
             ])->columnSpan(1);
@@ -638,7 +638,7 @@ class OrderResource extends Resource
                             ->maxLength(255)
                             ->label(trans('Remarks'))
                             ->visible(fn (Closure $get) => $get('send_email') == true)
-                            ->dehydrateStateUsing(function (string|null $state) use ($get) {
+                            ->dehydrateStateUsing(function (?string $state) use ($get) {
                                 if (filled($state) && $get('send_email') == true) {
                                     return $state;
                                 }
@@ -670,7 +670,7 @@ class OrderResource extends Resource
                                 $updateData = ['status' => $status];
 
                                 if ($status == OrderStatuses::CANCELLED->value) {
-                                    if ( ! in_array($record->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])) {
+                                    if (! in_array($record->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])) {
                                         Notification::make()
                                             ->title(trans("You can't cancel this order."))
                                             ->warning()
@@ -811,7 +811,7 @@ class OrderResource extends Resource
                 /** @var \Domain\Payments\Models\Payment $payment */
                 $payment = $order->payments->first();
 
-                if ( ! is_null($payment->remarks)) {
+                if (! is_null($payment->remarks)) {
                     return $footerActions->modalActions([])->disableForm();
                 }
 
@@ -850,7 +850,7 @@ class OrderResource extends Resource
                     /** @var \Domain\Payments\Models\Payment $payment */
                     $payment = $order->payments->first();
 
-                    if ( ! is_null($payment->remarks)) {
+                    if (! is_null($payment->remarks)) {
                         Notification::make()
                             ->title(trans('Invalid action.'))
                             ->warning()
