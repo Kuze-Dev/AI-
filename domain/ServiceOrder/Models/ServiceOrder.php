@@ -37,6 +37,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property float $service_price
  * @property BillingCycleEnum $billing_cycle
  * @property int|null $due_date_every
+ * @property bool $pay_upfront
+ * @property bool $is_subscription
+ * @property bool $needs_approval
+ * @property bool $is_auto_generated_bill
  * @property \Illuminate\Support\Carbon $schedule
  * @property ServiceOrderStatus $status
  * @property string|null $cancelled_reason
@@ -93,10 +97,14 @@ class ServiceOrder extends Model
         'currency_code',
         'currency_name',
         'currency_symbol',
-        'billing_cycle',
-        'due_date_every',
         'service_name',
         'service_price',
+        'billing_cycle',
+        'due_date_every',
+        'pay_upfront',
+        'is_subscription',
+        'needs_approval',
+        'is_auto_generated_bill',
         'schedule',
         'status',
         'cancelled_reason',
@@ -112,6 +120,10 @@ class ServiceOrder extends Model
         'service_price' => 'float',
         'additional_charges' => 'json',
         'billing_cycle' => BillingCycleEnum::class,
+        'pay_upfront' => 'boolean',
+        'is_subscription' => 'boolean',
+        'needs_approval' => 'boolean',
+        'is_auto_generated_bill' => 'boolean',
         'schedule' => 'datetime',
         'sub_total' => 'float',
         'tax_percentage' => 'float',

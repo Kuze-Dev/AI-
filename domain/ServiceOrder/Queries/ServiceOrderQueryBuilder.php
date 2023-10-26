@@ -17,16 +17,12 @@ class ServiceOrderQueryBuilder extends Builder
 
     public function whereSubscriptionBased(): self
     {
-        return $this->whereHas('service', function ($nestedQuery) {
-            $nestedQuery->where('is_subscription', true);
-        });
+        return $this->where('is_subscription', true);
     }
 
     public function whereAutoGenerateBills(): self
     {
-        return $this->whereHas('service', function ($nestedQuery) {
-            $nestedQuery->where('is_auto_generated_bill', true);
-        });
+        return $this->where('is_auto_generated_bill', true);
     }
 
     public function whereShouldAutoGenerateBill(): self

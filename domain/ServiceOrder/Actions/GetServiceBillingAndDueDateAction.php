@@ -18,16 +18,12 @@ class GetServiceBillingAndDueDateAction
     /** @throws Throwable */
     public function execute(ServiceBill $serviceBill): mixed
     {
-        /** @var \Domain\Service\Models\Service $service */
-        $service = $serviceBill->serviceOrder
-            ->service;
-
-        if ((bool) $service->is_subscription === false) {
-            throw new NonSubscriptionNotAllowedException();
-        }
-
         /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
         $serviceOrder = $serviceBill->serviceOrder;
+
+        if ( ! $serviceOrder->is_subscription) {
+            throw new NonSubscriptionNotAllowedException();
+        }
 
         /** @var \Domain\Service\Enums\BillingCycleEnum $billingCycle */
         $billingCycle = $serviceOrder->billing_cycle;
