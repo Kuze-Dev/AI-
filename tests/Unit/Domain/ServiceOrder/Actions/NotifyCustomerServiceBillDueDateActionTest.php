@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Settings\ServiceSettings;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Service\Databases\Factories\ServiceFactory;
 use Domain\ServiceOrder\Actions\NotifyCustomerServiceBillDueDateAction;
@@ -15,6 +16,10 @@ beforeEach(function () {
     testInTenantContext();
 
     Queue::fake();
+
+    ServiceSettings::fake([
+        'days_before_due_date_notification' => 3,
+    ]);
 });
 
 it('can dispatch to customer with payable bills only (subscription based)', function () {
