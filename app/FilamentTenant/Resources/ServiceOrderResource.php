@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Resources;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\CreateServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ViewServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ListServiceOrder;
+use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceBillRelationManager;
 use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceTransactionRelationManager;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
@@ -204,7 +205,7 @@ class ServiceOrderResource extends Resource
                                                 : ''),
                                         Placeholder::make('Service Price')
                                             ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
-                                                ? Service::whereId($serviceId)->first()?->selling_price
+                                                ? $Currency . ' ' . number_format(Service::whereId($serviceId)->first()?->selling_price, 2, '.', ',')
                                                 : ''),
                                         Forms\Components\Group::make()->columnSpan(2)->columns(2)->visible(
                                             fn (Closure $get) => Service::whereId($get('service_id'))->first()?->is_subscription
@@ -241,9 +242,9 @@ class ServiceOrderResource extends Resource
                                     ->columnSpan(2)
                                     ->defaultItems(0)
                                     ->schema([
-                                        TextInput::make('name')->required(),
-                                        TextInput::make('quantity')->required()->numeric()->reactive()->default(1),
-                                        TextInput::make('price')->required()->numeric()->reactive(),
+                                        TextInput::make('name')->required()->translateLabel(),
+                                        TextInput::make('quantity')->required()->numeric()->reactive()->default(1)->translateLabel(),
+                                        TextInput::make('price')->required()->reactive()->translateLabel(),
                                     ])
                                     ->maxItems(3)
                                     ->columns(3),
@@ -271,7 +272,8 @@ class ServiceOrderResource extends Resource
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(fn (Closure $get) => $Currency . ' ' . (Service::whereId($get('service_id'))->first()?->selling_price ?? 0))
+
+                                ->label(fn (Closure $get) => $Currency . ' ' . number_format((Service::whereId($get('service_id'))->first()?->selling_price ?? 0), 2, '.', ','))
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()
@@ -283,13 +285,13 @@ class ServiceOrderResource extends Resource
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(fn (Closure $get) => $Currency . ' ' . array_reduce($get('additional_charges'), function ($carry, $data) {
+                                ->label(fn (Closure $get) => $Currency . ' ' . number_format(array_reduce($get('additional_charges'), function ($carry, $data) {
                                     if (isset($data['price']) && is_numeric($data['price']) && isset($data['quantity']) && is_numeric($data['quantity'])) {
                                         return $carry + ($data['price'] * $data['quantity']);
                                     }
 
                                     return $carry;
-                                }, 0))
+                                }, 0), 2, '.', ','))
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()
@@ -314,7 +316,7 @@ class ServiceOrderResource extends Resource
                                         $get('additional_charges'),
                                         $get('is_same_as_billing') ? $get('service_address_id') :
                                             $get('billing_address_id')
-                                    )->tax_display) == PriceDisplay::INCLUSIVE->value ? 'Inclusive' : $Currency . ' ' . (self::getTax(
+                                    )->tax_display) == PriceDisplay::INCLUSIVE ? 'Inclusive' : $Currency . ' ' . (self::getTax(
                                         Service::whereId($get('service_id'))->first()?->selling_price ?? 0,
                                         $get('additional_charges'),
                                         $get('is_same_as_billing') ? $get('service_address_id') :
@@ -337,12 +339,12 @@ class ServiceOrderResource extends Resource
                                 ->readOnly()
                                 ->color('primary'),
                             TextLabel::make('')
-                                ->label(fn (Closure $get) => $Currency . ' ' . (self::getTax(
+                                ->label(fn (Closure $get) => $Currency . ' ' .  number_format((self::getTax(
                                     Service::whereId($get('service_id'))->first()?->selling_price ?? 0,
                                     $get('additional_charges'),
                                     $get('is_same_as_billing') ? $get('service_address_id') :
                                         $get('billing_address_id')
-                                )->total_price))
+                                )->total_price), 2, '.', ','))
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()
@@ -415,8 +417,7 @@ class ServiceOrderResource extends Resource
             ])
             ->filters([])
             ->actions([])
-            ->bulkActions([
-            ])
+            ->bulkActions([])
             ->defaultSort('updated_at', 'desc');
     }
 
@@ -424,6 +425,7 @@ class ServiceOrderResource extends Resource
     {
         return [
             ServiceTransactionRelationManager::class,
+            ServiceBillRelationManager::class,
         ];
     }
 
@@ -436,7 +438,7 @@ class ServiceOrderResource extends Resource
         ];
     }
 
-    private static function getSubtotal($selling_price, $additional_charges): float
+    public static function getSubtotal($selling_price, $additional_charges): float
     {
         $subTotal = app(CalculateServiceOrderTotalPriceAction::class)
             ->execute(
@@ -469,7 +471,7 @@ class ServiceOrderResource extends Resource
     {
         $subTotal = self::getSubtotal($selling_price, $additional_charges);
 
-        if( ! isset($billing_address_id)) {
+        if ( ! isset($billing_address_id)) {
             return new ServiceOrderTaxData(
                 sub_total: $subTotal,
                 tax_display: null,

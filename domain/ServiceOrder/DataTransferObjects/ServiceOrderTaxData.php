@@ -10,7 +10,7 @@ class ServiceOrderTaxData
 {
     public function __construct(
         public readonly int|float $sub_total,
-        public readonly PriceDisplay|null $tax_display,
+        public readonly PriceDisplay|null|string $tax_display,
         public readonly int|float $tax_percentage,
         public readonly int|float $tax_total,
         public readonly int|float $total_price
