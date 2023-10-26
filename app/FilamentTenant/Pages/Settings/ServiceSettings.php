@@ -35,13 +35,14 @@ class ServiceSettings extends TenantBaseSettings
                     ->columnSpan('full'),
             ]),
             Section::make('Service Order Section')
-            ->schema([
-                TextInput::make('days_before_due_date_notification')
-                    ->placeholder(trans('Days Before Due Date Notification'))
-                    ->numeric()
-                    ->minValue(1)
-                    ->columnSpan('full'),
-            ]),
+                ->schema([
+                    TextInput::make('days_before_due_date_notification')
+                        ->placeholder(trans('Days Before Due Date Notification'))
+                        ->numeric()
+                        ->minValue(1)
+                        ->maxValue(31)
+                        ->columnSpan('full'),
+                ]),
         ];
     }
 }
