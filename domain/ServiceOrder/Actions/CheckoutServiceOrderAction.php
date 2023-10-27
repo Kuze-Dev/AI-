@@ -63,7 +63,13 @@ class CheckoutServiceOrderAction
                         'currency' => $serviceBill->serviceOrder->currency_code,
                         'total' => (int) $serviceBill->total_amount,
                         'details' => PaymentDetailsData::fromArray(
-                            []
+                            [
+                                'service_price' => $serviceBill->service_price,
+                                'additional_charges' => $serviceBill->additional_charges,
+                                'subtotal' => $serviceBill->sub_total,
+                                'tax_percentage' => $serviceBill->tax_percentage,
+                                'tax' => $serviceBill->tax_total,
+                            ]
                         ),
                     ]),
                 ]
