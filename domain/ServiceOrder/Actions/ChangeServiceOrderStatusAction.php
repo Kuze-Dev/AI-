@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Actions;
 
+use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
@@ -14,43 +15,75 @@ use Domain\ServiceOrder\Notifications\ForPaymentNotification;
 
 class ChangeServiceOrderStatusAction
 {
-    private ServiceBill $serviceBill;
+    public function __construct(
+        private CreateServiceBillAction $createServiceBillAction,
+    ) {
+    }
 
-    public function execute(ServiceOrder $serviceOrder): void
+    private ?ServiceBill $serviceBill;
+
+    public function execute(ServiceOrder $serviceOrder, bool $shouldSendEmail): void
     {
         $this->serviceBill = $serviceOrder->latestServiceBill();
 
         match ($serviceOrder->status) {
-            ServiceOrderStatus::ACTIVE => $this->onActive($serviceOrder),
-            ServiceOrderStatus::INACTIVE => $this->onInactive($serviceOrder),
-            ServiceOrderStatus::CLOSED => $this->onClosed($serviceOrder),
-            ServiceOrderStatus::FORPAYMENT => $this->onPayment($serviceOrder),
-            ServiceOrderStatus::INPROGRESS => $this->onProgress(),
+            ServiceOrderStatus::ACTIVE => $this->onActive($serviceOrder, $shouldSendEmail),
+            ServiceOrderStatus::INACTIVE => $this->onInactive($serviceOrder, $shouldSendEmail),
+            ServiceOrderStatus::CLOSED => $this->onClosed($serviceOrder, $shouldSendEmail),
+            ServiceOrderStatus::FORPAYMENT => $this->onPayment($serviceOrder, $shouldSendEmail),
+            ServiceOrderStatus::INPROGRESS => $this->onProgress($serviceOrder, $shouldSendEmail),
             default => null
         };
     }
 
-    private function onActive($serviceOrder)
+    private function onActive($serviceOrder, $shouldSendEmail)
     {
-        $serviceOrder?->customer->notify(new ActivatedServiceOrderNotification($this->serviceBill));
+        if ($shouldSendEmail) {
+            $serviceOrder?->customer->notify(new ActivatedServiceOrderNotification($this->serviceBill));
+        }
     }
 
-    private function onInactive($serviceOrder)
+    private function onInactive($serviceOrder, $shouldSendEmail)
     {
-        $serviceOrder?->customer->notify(new ExpiredServiceOrderNotification($this->serviceBill));
+        if ($shouldSendEmail) {
+            $serviceOrder?->customer->notify(new ExpiredServiceOrderNotification($this->serviceBill));
+        }
     }
 
-    private function onClosed($serviceOrder)
+    private function onClosed($serviceOrder, $shouldSendEmail)
     {
-        $serviceOrder?->customer->notify(new ClosedServiceOrderNotification($this->serviceBill));
+        if ($shouldSendEmail) {
+            $serviceOrder?->customer->notify(new ClosedServiceOrderNotification($this->serviceBill));
+        }
     }
 
-    private function onPayment($serviceOrder)
+    private function onPayment($serviceOrder, $shouldSendEmail)
     {
-        $serviceOrder?->customer->notify(new ForPaymentNotification($this->serviceBill));
+        $serviceBill = $this->serviceBill;
+
+        if (is_null($serviceBill)) {
+            $serviceBill = $this->createServiceBillAction->execute(
+                ServiceBillData::fromCreatedServiceOrder($serviceOrder->toArray())
+            );
+        }
+
+        if ($shouldSendEmail) {
+            $serviceOrder?->customer->notify(new ForPaymentNotification($serviceBill));
+        }
     }
 
-    private function onProgress()
+    private function onProgress($serviceOrder, $shouldSendEmail)
     {
+        $serviceBill = $this->serviceBill;
+
+        if (is_null($serviceBill)) {
+            $serviceBill = $this->createServiceBillAction->execute(
+                ServiceBillData::fromCreatedServiceOrder($serviceOrder->toArray())
+            );
+        }
+
+        if ($shouldSendEmail) {
+            $serviceOrder?->customer->notify(new ForPaymentNotification($serviceBill));
+        }
     }
 }

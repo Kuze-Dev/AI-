@@ -26,7 +26,7 @@ it('can notify for active status', function () {
                 ->active()
                 ->for(CustomerFactory::new())
                 ->has(ServiceBillFactory::new())
-                ->createOne()
+                ->createOne(), true
         );
 
     Notification::assertSentTo(
@@ -43,7 +43,8 @@ it('can notify for inactive status', function () {
                 ->inactive()
                 ->for(CustomerFactory::new())
                 ->has(ServiceBillFactory::new())
-                ->createOne()
+                ->createOne(),
+            true
         );
 
     Notification::assertSentTo(
@@ -60,7 +61,8 @@ it('can notify for closed status', function () {
                 ->closed()
                 ->for(CustomerFactory::new())
                 ->has(ServiceBillFactory::new())
-                ->createOne()
+                ->createOne(),
+            true
         );
 
     Notification::assertSentTo(
@@ -77,7 +79,8 @@ it('can notify for payment status', function () {
                 ->forPayment()
                 ->for(CustomerFactory::new())
                 ->has(ServiceBillFactory::new())
-                ->createOne()
+                ->createOne(),
+            true
         );
 
     Notification::assertSentTo(

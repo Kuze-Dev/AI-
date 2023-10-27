@@ -19,9 +19,6 @@ class ServiceOrderPaymentUpdatedListener
 {
     /**
      * Handle the event.
-     *
-     * @param  \Domain\Payments\Events\PaymentProcessEvent  $event
-     * @return void
      */
     public function handle(PaymentProcessEvent $event): void
     {
@@ -74,6 +71,6 @@ class ServiceOrderPaymentUpdatedListener
                 : ServiceOrderStatus::PENDING,
         ]);
 
-        app(ChangeServiceOrderStatusAction::class)->execute($serviceOrder);
+        app(ChangeServiceOrderStatusAction::class)->execute($serviceOrder, true);
     }
 }
