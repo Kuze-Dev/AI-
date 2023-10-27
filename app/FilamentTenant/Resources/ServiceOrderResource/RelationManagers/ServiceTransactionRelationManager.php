@@ -27,24 +27,20 @@ class ServiceTransactionRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('serviceBill.reference')
                     ->exists('serviceBill')
-                    ->label('reference')
-                    ->translateLabel()
+                    ->label(trans('Reference'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_amount')
                     ->exists('serviceBill')
                     ->formatStateUsing(
                         fn (ServiceTransaction $record): string => $record->getTotalAmountWithCurrency()
                     )
-                    ->label('Amount')
-                    ->translateLabel()
+                    ->label(trans('Amount'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('payment_method.title')
                     ->exists('payment_method')
-                    ->label('Payment Method')
-                    ->translateLabel()
+                    ->label(trans('Payment Method'))
                     ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')
-                    ->label('Status')
                     ->translateLabel()
                     ->formatStateUsing(
                         fn (string $state): string => ucfirst($state)
@@ -54,7 +50,6 @@ class ServiceTransactionRelationManager extends RelationManager
                     )
                     ->inline(),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Updated at')
                     ->translateLabel()
                     ->sortable(),
             ])

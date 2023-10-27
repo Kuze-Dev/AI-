@@ -21,8 +21,7 @@ class ServiceBillRelationManager extends RelationManager
         return ServiceBillResource::table($table)
             ->actions([
                 Tables\Actions\Action::make('view')
-                    ->label('View Details')
-                    ->translateLabel()
+                    ->label(trans('View Details'))
                     ->color('secondary')
                     ->url(
                         fn (ServiceBill $record) => ServiceBillResource::getUrl(
