@@ -29,6 +29,8 @@ class ServiceOrderPaymentUpdatedListener
 
             match ($status) {
                 'paid' => $this->onServiceBillPaid($serviceBill),
+                'refunded', => $this->onServiceBillRefunded($serviceBill),
+                'cancelled', => $this->onServiceBillCancelled($serviceBill),
                 default => null
             };
         }
@@ -72,5 +74,33 @@ class ServiceOrderPaymentUpdatedListener
         ]);
 
         app(ChangeServiceOrderStatusAction::class)->execute($serviceOrder, true);
+    }
+
+    private function onServiceBillRefunded(ServiceBill $serviceBill): void
+    {
+        $serviceTransaction = ServiceTransaction::whereServiceBillId($serviceBill->id)->firstOrFail();
+
+        $serviceTransaction->update([
+            'status' => ServiceTransactionStatus::REFUNDED,
+        ]);
+
+        $serviceBill->update([
+            'status' => ServiceBillStatus::PENDING,
+        ]);
+
+    }
+
+    private function onServiceBillCancelled(ServiceBill $serviceBill): void
+    {
+        $serviceTransaction = ServiceTransaction::whereServiceBillId($serviceBill->id)->firstOrFail();
+
+        $serviceTransaction->update([
+            'status' => ServiceTransactionStatus::CANCELLED,
+        ]);
+
+        $serviceBill->update([
+            'status' => ServiceBillStatus::PENDING,
+        ]);
+
     }
 }

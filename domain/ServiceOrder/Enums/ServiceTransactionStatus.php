@@ -10,4 +10,5 @@ enum ServiceTransactionStatus: string
     case PAID = 'paid';
     case UNPAID = 'un_paid';
     case REFUNDED = 'refunded';
+    case CANCELLED = 'cancelled';
 }
