@@ -6,8 +6,7 @@ namespace Domain\Menu\Models;
 
 use Domain\Menu\Enums\NodeType;
 use Domain\Menu\Enums\Target;
-use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,7 +14,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
-use Eloquent;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Menu\Models\Node
@@ -36,6 +36,7 @@ use Eloquent;
  * @property-read int|null $children_count
  * @property-read \Domain\Menu\Models\Menu|null $menu
  * @property-read Model|Eloquent|null $model
+ *
  * @method static Builder|Node newModelQuery()
  * @method static Builder|Node newQuery()
  * @method static Builder|Node ordered(string $direction = 'asc')
@@ -52,13 +53,14 @@ use Eloquent;
  * @method static Builder|Node whereType($value)
  * @method static Builder|Node whereUpdatedAt($value)
  * @method static Builder|Node whereUrl($value)
+ *
  * @mixin Eloquent
  */
 #[OnDeleteCascade(['children'])]
 class Node extends Model implements Sortable
 {
-    use SortableTrait;
     use ConstraintsRelationships;
+    use SortableTrait;
 
     protected $fillable = [
         'menu_id',

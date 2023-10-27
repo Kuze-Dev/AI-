@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
  */
 class SectionData implements Arrayable
 {
-    /** @param array<FieldData> $fields */
+    /** @param  array<FieldData>  $fields */
     private function __construct(
         public readonly string $title,
         public readonly string $state_name,

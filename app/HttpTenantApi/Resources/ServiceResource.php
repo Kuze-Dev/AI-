@@ -17,6 +17,7 @@ class ServiceResource extends JsonApiResource
     {
         return [
             'id' => $this->id,
+            'uuid' => $this->uuid,
             'name' => $this->name,
             'description' => $this->description,
             'retail_price' => $this->retail_price,
@@ -28,11 +29,12 @@ class ServiceResource extends JsonApiResource
             'is_subscription' => $this->is_subscription,
             'pay_upfront' => $this->pay_upfront,
             'status' => $this->status,
+            'needs_approval' => $this->needs_approval,
+            'is_auto_generated_bill' => $this->is_auto_generated_bill,
         ];
     }
 
     /**
-     * @param Request $request
      * @return array<string, callable>
      */
     public function toRelationships(Request $request): array

@@ -24,7 +24,7 @@ use Throwable;
 
 #[
     Prefix('account/verification'),
-    Middleware(['feature.tenant:' . CustomerBase::class])
+    Middleware(['feature.tenant:'.CustomerBase::class])
 ]
 class VerifyEmailController extends Controller
 {
@@ -33,7 +33,7 @@ class VerifyEmailController extends Controller
     {
         /** @var string $hash */
         $hash = $request->route('hash') ?? '';
-        if ( ! hash_equals($hash, sha1($customer->getEmailForVerification()))) {
+        if (! hash_equals($hash, sha1($customer->getEmailForVerification()))) {
             throw new AuthorizationException();
         }
 
@@ -73,7 +73,7 @@ class VerifyEmailController extends Controller
         /** @var Customer $customer */
         $customer = Auth::user();
 
-        if ( ! DB::transaction(
+        if (! DB::transaction(
             fn () => app(CustomerResendEmailVerificationAction::class)->execute($customer)
         )) {
             return response()->noContent();

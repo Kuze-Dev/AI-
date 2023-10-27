@@ -17,7 +17,7 @@ it('can get settings', function ($settingsClass) {
     /** @var \Spatie\LaravelSettings\Settings $settings */
     $settings = app($settingsClass);
 
-    getJson('api/settings/' . $settings::group())
+    getJson('api/settings/'.$settings::group())
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($settings) {
             $json

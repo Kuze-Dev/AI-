@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Domain\Page\Actions;
 
 use Domain\Blueprint\Actions\CreateBlueprintDataAction;
+use Domain\Internationalization\Models\Locale;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
-use Domain\Internationalization\Models\Locale;
 
 class CreatePageAction
 {

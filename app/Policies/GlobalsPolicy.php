@@ -16,7 +16,7 @@ class GlobalsPolicy
 
     public function before(): ?Response
     {
-        if ( ! tenancy()->tenant?->features()->active(CMSBase::class)) {
+        if (! tenancy()->tenant?->features()->active(CMSBase::class)) {
             return Response::denyAsNotFound();
         }
 

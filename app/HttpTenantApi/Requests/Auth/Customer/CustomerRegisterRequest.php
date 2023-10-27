@@ -16,6 +16,7 @@ use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
@@ -23,7 +24,7 @@ class CustomerRegisterRequest extends FormRequest
 {
     protected function prepareForValidation(): void
     {
-        logger('register', $this->all());
+        Log::debug('register', $this->all());
     }
 
     public function rules(): array

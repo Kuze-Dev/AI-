@@ -42,7 +42,7 @@ class RouteUrlFieldset extends Group
                             $inputUrl = $get('route_url.url');
                             $inputUrl = Str::startsWith($inputUrl, '/') ?
                                 Str::contains($inputUrl, "/$locale") ? Str::replace("/$locale", '', $inputUrl) : $inputUrl
-                                : '/' . $inputUrl;
+                                : '/'.$inputUrl;
 
                             $newUrl = $locale !== $defaultLocale && tenancy()->tenant?->features()->active(Internationalization::class) ?
                                 "/$locale$inputUrl" : $inputUrl;

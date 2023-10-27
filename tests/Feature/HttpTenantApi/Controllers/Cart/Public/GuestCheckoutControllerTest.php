@@ -30,7 +30,7 @@ beforeEach(function () {
 
     $uuid = uuid_create(UUID_TYPE_RANDOM);
 
-    $sessionId = time() . $uuid;
+    $sessionId = time().$uuid;
 
     $cart = CartFactory::new()->setGuestId($sessionId)->createOne();
 
@@ -40,7 +40,7 @@ beforeEach(function () {
             $cartLine->save();
         })->create();
 
-    withHeader('Authorization', 'Bearer ' . $sessionId);
+    withHeader('Authorization', 'Bearer '.$sessionId);
 
     $this->cart = $cart;
     $this->cartLines = $cartLines;
@@ -114,7 +114,7 @@ it('can show checkout items', function () {
     $result = app(CheckoutAction::class)
         ->execute(CheckoutData::fromArray(['cart_line_ids' => $cartLineIds]));
 
-    getJson('api/guest/carts/checkouts?' . http_build_query(['reference' => $result]))
+    getJson('api/guest/carts/checkouts?'.http_build_query(['reference' => $result]))
         ->assertValid()
         ->assertJsonCount(3, 'data')
         ->assertJson(function (AssertableJson $json) use ($cartLineIds) {

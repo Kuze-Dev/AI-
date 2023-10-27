@@ -31,7 +31,7 @@ class AuthenticateTwoFactorAction
     {
         $user = $this->getChallengedUser($twoFactorData);
 
-        if ( ! $twoFactorData->recovery_code && ! $twoFactorData->code) {
+        if (! $twoFactorData->recovery_code && ! $twoFactorData->code) {
             throw new LogicException('`$twoFactorData` must provide either `$recovery_code` or `$code`.');
         }
 
@@ -66,17 +66,17 @@ class AuthenticateTwoFactorAction
         $guard = $twoFactorData->guard ?? config('auth.defaults.guard');
         $userProvider = Auth::createUserProvider(config("auth.guards.{$guard}.provider"));
 
-        if ( ! $userProvider instanceof EloquentUserProvider) {
+        if (! $userProvider instanceof EloquentUserProvider) {
             throw new UserProviderNotSupportedException($guard);
         }
 
         $user = $userProvider->retrieveById(Session::get('login.id'));
 
-        if ( ! $user) {
+        if (! $user) {
             throw new AuthenticationException();
         }
 
-        if ( ! $user instanceof TwoFactorAuthenticatable || ! $user->hasEnabledTwoFactorAuthentication()) {
+        if (! $user instanceof TwoFactorAuthenticatable || ! $user->hasEnabledTwoFactorAuthentication()) {
             throw new UnauthorizedException();
         }
 

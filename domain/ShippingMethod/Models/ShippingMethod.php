@@ -10,14 +10,14 @@ use Domain\Shipment\Models\Shipment;
 use Domain\ShippingMethod\Enums\Driver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
  * Domain\ShippingMethod\Models\ShippingMethod
@@ -45,6 +45,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Shipment> $shipments
  * @property-read int|null $shipments_count
  * @property-read State $state
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod query()
@@ -63,14 +64,15 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereSubtitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShippingMethod whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ShippingMethod extends Model implements HasMedia
 {
-    use LogsActivity;
-    use HasSlug;
     use ConstraintsRelationships;
+    use HasSlug;
     use InteractsWithMedia;
+    use LogsActivity;
 
     protected $fillable = [
         'title',

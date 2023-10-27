@@ -11,7 +11,7 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 
 #[
-    Middleware(['feature.tenant:' . AllowGuestOrder::class])
+    Middleware(['feature.tenant:'.AllowGuestOrder::class])
 ]
 class GuestCartLinesRemoveController
 {
@@ -31,7 +31,7 @@ class GuestCartLinesRemoveController
         $result = app(BulkDestroyCartLineAction::class)
             ->execute($cartLineIds);
 
-        if ( ! $result) {
+        if (! $result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

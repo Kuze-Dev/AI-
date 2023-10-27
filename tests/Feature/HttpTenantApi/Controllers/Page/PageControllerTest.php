@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Testing\Fluent\AssertableJson;
+use Domain\Page\Database\Factories\BlockFactory;
 use Domain\Page\Database\Factories\PageFactory;
 use Domain\Site\Database\Factories\SiteFactory;
-use Domain\Page\Database\Factories\BlockFactory;
-
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Support\RouteUrl\Database\Factories\RouteUrlFactory;
 
 use function Pest\Laravel\getJson;
@@ -48,7 +47,7 @@ it('can filter pages', function ($attribute) {
         ->create();
 
     foreach ($pages as $page) {
-        getJson('api/pages?' . http_build_query(['filter' => [$attribute => $page->$attribute]]))
+        getJson('api/pages?'.http_build_query(['filter' => [$attribute => $page->$attribute]]))
             ->assertOk()
             ->assertJson(function (AssertableJson $json) use ($page) {
                 $json
@@ -75,7 +74,7 @@ it('can show a page with includes', function (string $include) {
         'keywords' => 'Foo keywords',
     ]);
 
-    getJson("api/pages/{$page->getRouteKey()}?" . http_build_query(['include' => $include]))
+    getJson("api/pages/{$page->getRouteKey()}?".http_build_query(['include' => $include]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($page, $include) {
             $json

@@ -32,7 +32,7 @@ use Throwable;
 
 #[
     Resource('addresses', apiResource: true),
-    Middleware(['auth:sanctum', 'feature.tenant:' . AddressBase::class])
+    Middleware(['auth:sanctum', 'feature.tenant:'.AddressBase::class])
 ]
 class AddressController extends Controller
 {
@@ -167,9 +167,9 @@ class AddressController extends Controller
                     ->execute($address)
             );
         } catch (CantDeleteDefaultAddressException) {
-            abort(400,  trans('Deleting default address not allowed.'));
+            abort(400, trans('Deleting default address not allowed.'));
         } catch (DeleteRestrictedException) {
-            abort(400,  trans('Failed to delete.'));
+            abort(400, trans('Failed to delete.'));
         }
 
         return response()->noContent();

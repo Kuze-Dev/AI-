@@ -11,8 +11,8 @@ use Domain\Cart\Exceptions\InvalidPurchasableException;
 use Domain\Cart\Models\CartLine;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\ShippingMethod\Models\ShippingMethod;
-use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Throwable;
 
 class PlaceOrderRequest extends FormRequest
@@ -49,7 +49,7 @@ class PlaceOrderRequest extends FormRequest
                         ->whereNull('checked_out_at')
                         ->count();
 
-                    if ( ! $cartLines) {
+                    if (! $cartLines) {
                         $fail('No cart lines for checkout');
 
                         return;
@@ -76,7 +76,7 @@ class PlaceOrderRequest extends FormRequest
                     try {
                         //stock check
                         $checkStocks = app(CartPurchasableValidatorAction::class)->validateCheckout($cartLineIds, $userId, $type);
-                        if ($checkStocks !== count($value)) {
+                        if ($checkStocks !== count($cartLineIds)) {
                             $fail('Invalid stocks');
                         }
                     } catch (Throwable $th) {
@@ -112,7 +112,7 @@ class PlaceOrderRequest extends FormRequest
                     if (is_int($value) || is_string($value)) {
                         return true;
                     } else {
-                        $fail($attribute . ' is invalid.');
+                        $fail($attribute.' is invalid.');
                     }
                 },
             ],

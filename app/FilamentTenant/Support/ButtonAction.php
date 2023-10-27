@@ -17,7 +17,9 @@ class ButtonAction extends Field
 
     /** @var array<Action|Closure> */
     protected array $actions = [];
-    private array   $evaluatedActions = [];
+
+    private array $evaluatedActions = [];
+
     protected string|Closure|null $width = null;
 
     protected string $view = 'filament.forms.components.button-action';
@@ -39,7 +41,7 @@ class ButtonAction extends Field
     /** @return array<Action|Closure> */
     public function getExecutableActions(bool $reevaluate = false): array
     {
-        if (( ! $reevaluate) && $this->evaluatedActions) {
+        if ((! $reevaluate) && $this->evaluatedActions) {
             return $this->evaluatedActions;
         }
 

@@ -23,7 +23,7 @@ class CreateOrderLineAction
     ) {
     }
 
-    public function execute(Order $order,  PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData): void
+    public function execute(Order $order, PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData): void
     {
         foreach ($preparedOrderData->cartLine as $cartLine) {
 
@@ -103,10 +103,7 @@ class CreateOrderLineAction
     }
 
     /**
-     * @param \Domain\Order\Models\OrderLine $orderLine
-     * @param \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $medias
-     * @param string $collection
-     * @return void
+     * @param  \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media>  $medias
      */
     private function copyMediaToOrderLine(OrderLine $orderLine, MediaCollection $medias, string $collection): void
     {

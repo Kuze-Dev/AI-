@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Domain\Blueprint\Models;
 
 use Domain\Blueprint\Models\Casts\SchemaDataCast;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Blueprint\Models\Blueprint
@@ -22,6 +22,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Blueprint newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Blueprint newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Blueprint query()
@@ -30,13 +31,14 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|Blueprint whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Blueprint whereSchema($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Blueprint whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Blueprint extends Model
 {
+    use ConstraintsRelationships;
     use HasUuids;
     use LogsActivity;
-    use ConstraintsRelationships;
 
     protected $fillable = [
         'name',

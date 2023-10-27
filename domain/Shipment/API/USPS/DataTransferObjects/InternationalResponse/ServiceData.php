@@ -6,7 +6,7 @@ namespace Domain\Shipment\API\USPS\DataTransferObjects\InternationalResponse;
 
 class ServiceData
 {
-    /** @param array<\Domain\Shipment\API\USPS\DataTransferObjects\InternationalResponse\ExtraServiceData> $extra_services */
+    /** @param  array<\Domain\Shipment\API\USPS\DataTransferObjects\InternationalResponse\ExtraServiceData>  $extra_services */
     public function __construct(
         public readonly int $id,
         public readonly float $pound,

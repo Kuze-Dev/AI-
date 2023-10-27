@@ -6,9 +6,9 @@ namespace Domain\RewardPoint\Models;
 
 use Domain\Customer\Models\Customer;
 use Domain\Order\Models\Order;
+use Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Eloquent;
 
 /**
  * Domain\RewardPoint\Models\PointEarning
@@ -24,6 +24,7 @@ use Eloquent;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Model|Eloquent $customer
  * @property-read Model|Eloquent $order
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|PointEarning newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PointEarning newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PointEarning query()
@@ -36,6 +37,7 @@ use Eloquent;
  * @method static \Illuminate\Database\Eloquent\Builder|PointEarning whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PointEarning whereOrderType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PointEarning whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class PointEarning extends Model

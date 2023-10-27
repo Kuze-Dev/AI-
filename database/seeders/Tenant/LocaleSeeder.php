@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Tenant;
 
-use Illuminate\Database\Seeder;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
+use Illuminate\Database\Seeder;
 
 class LocaleSeeder extends Seeder
 {

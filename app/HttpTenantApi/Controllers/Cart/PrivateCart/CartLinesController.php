@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
+use App\Http\Controllers\Controller;
+use Domain\Cart\Actions\CreateCartAction;
+use Domain\Cart\Actions\CreateCartLineAction;
 use Domain\Cart\Actions\DestroyCartLineAction;
 use Domain\Cart\Actions\UpdateCartLineAction;
-use Domain\Cart\Actions\CreateCartAction;
-use Domain\Cart\DataTransferObjects\UpdateCartLineData;
 use Domain\Cart\DataTransferObjects\CreateCartData;
-use Domain\Cart\Models\CartLine;
-use Domain\Cart\Requests\UpdateCartLineRequest;
-use Domain\Cart\Requests\CreateCartLineRequest;
-use Spatie\RouteAttributes\Attributes\Middleware;
-use Spatie\RouteAttributes\Attributes\Resource;
-use App\Http\Controllers\Controller;
-use Domain\Cart\Actions\CreateCartLineAction;
+use Domain\Cart\DataTransferObjects\UpdateCartLineData;
 use Domain\Cart\Models\Cart;
+use Domain\Cart\Models\CartLine;
+use Domain\Cart\Requests\CreateCartLineRequest;
+use Domain\Cart\Requests\UpdateCartLineRequest;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Spatie\MediaLibrary\Support\File;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
+use Spatie\MediaLibrary\Support\File;
+use Spatie\RouteAttributes\Attributes\Middleware;
+use Spatie\RouteAttributes\Attributes\Resource;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 #[
     Resource('carts/cartlines', apiResource: true, except: ['show', 'index'], names: 'carts.cartlines'),
@@ -41,7 +41,7 @@ class CartLinesController extends Controller
             $dbResult = DB::transaction(function () use ($validatedData, $customer) {
                 $cart = app(CreateCartAction::class)->execute($customer);
 
-                if ( ! $cart instanceof Cart) {
+                if (! $cart instanceof Cart) {
                     return response()->json([
                         'message' => 'Invalid action',
                     ], 400);
@@ -118,7 +118,7 @@ class CartLinesController extends Controller
         $result = app(DestroyCartLineAction::class)
             ->execute($cartline);
 
-        if ( ! $result) {
+        if (! $result) {
             return response()->json([
                 'message' => 'Invalid action',
             ], 400);

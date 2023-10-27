@@ -89,7 +89,7 @@ class ImportAction extends Action
             ])
             ->withActivityLog(
                 event: 'imported',
-                description: fn (self $action) => 'Imported ' . $action->getModelLabel()
+                description: fn (self $action) => 'Imported '.$action->getModelLabel()
             );
     }
 
@@ -109,7 +109,7 @@ class ImportAction extends Action
         return $this;
     }
 
-    /** @param class-string|Closure $importClass */
+    /** @param  class-string|Closure  $importClass */
     public function importClass(string|Closure $importClass): self
     {
         $this->importClass = $importClass;

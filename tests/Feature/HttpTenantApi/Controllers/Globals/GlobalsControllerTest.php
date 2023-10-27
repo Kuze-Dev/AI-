@@ -40,7 +40,7 @@ it('can filter globals', function ($attribute) {
         ->create();
 
     foreach ($records as $record) {
-        getJson('api/globals?' . http_build_query(['filter' => [$attribute => $record->$attribute]]))
+        getJson('api/globals?'.http_build_query(['filter' => [$attribute => $record->$attribute]]))
             ->assertOk()
             ->assertJson(function (AssertableJson $json) use ($record) {
                 $json

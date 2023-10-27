@@ -13,7 +13,9 @@ use Filament\Widgets\PieChartWidget;
 class MostFavoriteProduct extends PieChartWidget
 {
     protected static ?string $heading = 'Most Favorite Product';
+
     protected static ?string $pollingInterval = null;
+
     public ?string $filter = 'allTime';
 
     protected function getFilters(): ?array

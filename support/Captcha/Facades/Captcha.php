@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Support\Captcha\Facades;
 
-use Support\Captcha\CaptchaManager;
 use Illuminate\Support\Facades\Facade;
+use Support\Captcha\CaptchaManager;
 
 /**
  * @method static bool verify(string $token, ?string $ip = null)

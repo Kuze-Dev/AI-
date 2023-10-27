@@ -101,7 +101,7 @@ it('can show taxonomy with includes', function (string $include) {
         ->has(TaxonomyTermFactory::new())
         ->create();
 
-    getJson("api/taxonomies/{$taxonomy->getRouteKey()}?" . http_build_query(['include' => $include]))
+    getJson("api/taxonomies/{$taxonomy->getRouteKey()}?".http_build_query(['include' => $include]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($taxonomy, $include) {
             $json

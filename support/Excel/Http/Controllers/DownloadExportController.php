@@ -12,9 +12,9 @@ class DownloadExportController
 {
     public function __invoke(string $path): StreamedResponse
     {
-        $path = Str::finish(config('support.excel.temporary_files.base_directory'), '/exports/') . $path;
+        $path = Str::finish(config('support.excel.temporary_files.base_directory'), '/exports/').$path;
 
-        if ( ! Storage::disk(config('support.excel.temporary_files.disk'))->exists($path)) {
+        if (! Storage::disk(config('support.excel.temporary_files.disk'))->exists($path)) {
             abort(404);
         }
 

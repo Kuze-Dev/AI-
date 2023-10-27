@@ -8,11 +8,9 @@ use Domain\Service\Databases\Factories\ServiceFactory;
 use Filament\Facades\Filament;
 
 beforeEach(function () {
-    testInTenantContext();
+    testInTenantContext()->features()->activate(ServiceBase::class);
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
-
-    tenancy()->tenant->features()->activate(ServiceBase::class);
 });
 
 it('can globally search', function () {
@@ -24,6 +22,6 @@ it('can globally search', function () {
     $results = Filament::getGlobalSearchProvider()
         ->getResults($service->name);
 
-    expect($results->getCategories()['services']->first()->url)
+    expect($results?->getCategories()['services']->first()->url)
         ->toEqual(ServiceResource::getUrl('edit', [$service]));
 });

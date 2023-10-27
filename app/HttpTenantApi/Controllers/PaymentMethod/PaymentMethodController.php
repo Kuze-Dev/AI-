@@ -14,7 +14,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('paymentmethod', only: ['index']),
-    Middleware('feature.tenant:' . CMSBase::class)
+    Middleware('feature.tenant:'.CMSBase::class)
 ]
 class PaymentMethodController
 {

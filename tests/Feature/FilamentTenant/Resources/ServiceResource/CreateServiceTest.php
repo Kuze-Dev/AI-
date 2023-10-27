@@ -28,6 +28,7 @@ beforeEach(function () {
     CurrencyFactory::new()->createOne([
         'enabled' => true,
     ]);
+
 });
 
 it('can render page', function () {
@@ -61,10 +62,10 @@ it('can create service', function () {
             'blueprint_id' => $blueprint->getKey(),
             'retail_price' => 99.99,
             'selling_price' => 99.69,
-            'billing_cycle' => 'daily',
+            'billing_cycle' => 'monthly',
             'due_date_every' => 20,
             'taxonomy_term_id' => $taxonomyTerm->id,
-            'images.0' => $image,
+            'media.0' => $image,
             'meta_data' => $metaData,
             'meta_data.image.0' => $image,
         ])
@@ -113,6 +114,8 @@ it('cannot create service with same name', function () {
         ->isActive()
         ->createOne();
 
+    $image = UploadedFile::fake()->image('preview.jpeg');
+
     livewire(CreateService::class)
         ->fillForm([
             'name' => 'Test',
@@ -120,7 +123,7 @@ it('cannot create service with same name', function () {
             'retail_price' => 99.99,
             'selling_price' => 99.69,
             'billing_cycle' => 'daily',
-            'due_date_every' => 20,
+            'media.0' => $image,
         ])
         ->call('create')
         ->assertHasFormErrors(['name' => 'unique'])
@@ -143,16 +146,19 @@ it('can create service with metadata', function () {
         'description' => 'Test Description',
     ];
 
+    $image = UploadedFile::fake()->image('preview.jpeg');
+
     $service = livewire(CreateService::class)
         ->fillForm([
             'name' => 'Test',
             'blueprint_id' => $blueprint->getKey(),
             'retail_price' => 99.99,
             'selling_price' => 99.69,
-            'billing_cycle' => 'daily',
+            'billing_cycle' => 'monthly',
             'due_date_every' => 20,
             'meta_data' => $metaData,
             'taxonomy_term_id' => $taxonomyTerm->id,
+            'media.0' => $image,
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -181,6 +187,8 @@ it('can create different types of service', function ($attribute) {
         ->for(TaxonomyFactory::new()->withDummyBlueprint())
         ->createOne();
 
+    $image = UploadedFile::fake()->image('preview.jpeg');
+
     livewire(CreateService::class)
         ->fillForm([
             'name' => 'Test',
@@ -189,8 +197,9 @@ it('can create different types of service', function ($attribute) {
             'selling_price' => 99.69,
             'is_subscription' => $attribute !== 'once',
             'billing_cycle' => $attribute !== 'once' ? $attribute : null,
-            'due_date_every' => $attribute !== 'once' ? 20 : null,
+            'due_date_every' => $attribute !== ('once' || 'daily') ? 20 : null,
             'taxonomy_term_id' => $taxonomyTerm->id,
+            'media.0' => $image,
         ])
         ->call('create')
         ->assertHasNoFormErrors()

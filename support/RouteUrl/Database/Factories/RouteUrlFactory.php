@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Support\RouteUrl\Database\Factories;
 
-use Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Support\RouteUrl\Models\RouteUrl;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Support\RouteUrl\Models\RouteUrl>

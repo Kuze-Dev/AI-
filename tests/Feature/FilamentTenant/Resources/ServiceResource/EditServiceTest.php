@@ -37,6 +37,7 @@ it('can render service', function () {
         ->withDummyBlueprint()
         ->has(MetaDataFactory::new())
         ->isActive()
+        ->withBillingCycle()
         ->createOne();
 
     livewire(EditService::class, ['record' => $service->getRouteKey()])
@@ -56,6 +57,7 @@ it('can render service', function () {
             'is_subscription' => $service->is_subscription,
             'status' => $service->status,
             'needs_approval' => $service->needs_approval,
+            'is_auto_generated_bill' => $service->is_auto_generated_bill,
         ])
         ->assertOk();
 });
@@ -66,6 +68,7 @@ it('can edit service', function () {
         ->has(TaxonomyTermFactory::new()->for(TaxonomyFactory::new()->withDummyBlueprint()))
         ->has(MetaDataFactory::new())
         ->isActive()
+        ->withBillingCycle()
         ->createOne();
 
     $taxonomyTerm = TaxonomyTermFactory::new(['name' => 'category'])
@@ -94,8 +97,9 @@ it('can edit service', function () {
             'is_subscription' => ! $service->is_subscription,
             'status' => ! $service->status,
             'needs_approval' => ! $service->needs_approval,
+            'is_auto_generated_bill' => ! $service->is_auto_generated_bill,
             'taxonomy_term_id' => $taxonomyTerm->id,
-            'images.0' => $image,
+            'media.0' => $image,
             'meta_data' => $metaData,
             'meta_data.image.0' => $image,
         ])

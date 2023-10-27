@@ -10,13 +10,13 @@ use Domain\Blueprint\DataTransferObjects\RepeaterFieldData;
 use Domain\Blueprint\Enums\BlueprintDataType;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\ManipulationType;
+use Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Eloquent;
 
 /**
  * Domain\Blueprint\Models\BlueprintData
@@ -34,6 +34,7 @@ use Eloquent;
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @property-read Model|Eloquent $model
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BlueprintData newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|BlueprintData newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|BlueprintData query()
@@ -46,6 +47,7 @@ use Eloquent;
  * @method static \Illuminate\Database\Eloquent\Builder|BlueprintData whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|BlueprintData whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|BlueprintData whereValue($value)
+ *
  * @mixin \Eloquent
  */
 class BlueprintData extends Model implements HasMedia
@@ -84,7 +86,7 @@ class BlueprintData extends Model implements HasMedia
     public function registerMediaConversions(Media $media = null): void
     {
         $blueprint = $this->blueprint;
-        if( ! $blueprint) {
+        if (! $blueprint) {
             return;
         }
         $schema = $blueprint->schema;
@@ -98,10 +100,10 @@ class BlueprintData extends Model implements HasMedia
 
     protected function processRepeaterField(RepeaterFieldData|FieldData|MediaFieldData $field, string $currentpath): void
     {
-        $statePath = $currentpath . '.' . $field->state_name;
-        if($field->type === FieldType::REPEATER) {
+        $statePath = $currentpath.'.'.$field->state_name;
+        if ($field->type === FieldType::REPEATER) {
             if (property_exists($field, 'fields') && is_array($field->fields)) {
-                foreach($field->fields as $repeaterFields) {
+                foreach ($field->fields as $repeaterFields) {
                     $this->processRepeaterField($repeaterFields, $statePath);
                 }
             }
@@ -109,8 +111,8 @@ class BlueprintData extends Model implements HasMedia
         }
         if ($field->type === FieldType::MEDIA) {
             $arrayStatepath = explode('.', $this->state_path);
-            foreach($arrayStatepath as $newStatepath) {
-                if(is_numeric($newStatepath)) {
+            foreach ($arrayStatepath as $newStatepath) {
+                if (is_numeric($newStatepath)) {
                     $arrayStatepath = array_diff($arrayStatepath, [$newStatepath]);
                 }
             }
@@ -123,24 +125,24 @@ class BlueprintData extends Model implements HasMedia
                     $type = null;
                     $fit = 'contain';
                     if (isset($conversion->manipulations)) {
-                        foreach($conversion->manipulations as $manipulation) {
-                            if($manipulation->type == ManipulationType::WIDTH) {
+                        foreach ($conversion->manipulations as $manipulation) {
+                            if ($manipulation->type == ManipulationType::WIDTH) {
                                 $width = $manipulation->params[0];
                             }
-                            if($manipulation->type == ManipulationType::HEIGHT) {
+                            if ($manipulation->type == ManipulationType::HEIGHT) {
                                 $height = $manipulation->params[0];
                             }
-                            if($manipulation->type == ManipulationType::TYPE) {
-                                if( ! empty($manipulation->params[0])) {
+                            if ($manipulation->type == ManipulationType::TYPE) {
+                                if (! empty($manipulation->params[0])) {
                                     $type = $manipulation->params[0];
                                 }
                             }
-                            if($manipulation->type == ManipulationType::FIT) {
+                            if ($manipulation->type == ManipulationType::FIT) {
                                 $fit = $manipulation->params[0];
                             }
                         }
 
-                        if($type) {
+                        if ($type) {
                             $this->addMediaConversion($title)
                                 ->width($width)
                                 ->height($height)

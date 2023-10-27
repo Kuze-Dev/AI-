@@ -15,7 +15,7 @@ class ReportPolicy
 
     public function before(): ?Response
     {
-        if ( ! tenancy()->tenant?->features()->active(ECommerceBase::class)) {
+        if (! tenancy()->tenant?->features()->active(ECommerceBase::class)) {
             return Response::denyAsNotFound();
         }
 

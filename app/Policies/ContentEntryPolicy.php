@@ -16,7 +16,7 @@ class ContentEntryPolicy
 
     public function before(): ?Response
     {
-        if ( ! tenancy()->tenant?->features()->active(CMSBase::class)) {
+        if (! tenancy()->tenant?->features()->active(CMSBase::class)) {
             return Response::denyAsNotFound();
         }
 
@@ -56,7 +56,7 @@ class ContentEntryPolicy
 
             $intersection = array_intersect($contentEntrySites, $userSites);
 
-            return ((count($intersection) === count($contentEntrySites)) && $this->checkWildcardPermissions($user));
+            return (count($intersection) === count($contentEntrySites)) && $this->checkWildcardPermissions($user);
         }
 
         return $this->checkWildcardPermissions($user);

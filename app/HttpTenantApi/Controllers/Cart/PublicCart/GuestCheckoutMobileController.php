@@ -18,7 +18,7 @@ use Spatie\RouteAttributes\Attributes\Post;
 use Throwable;
 
 #[
-    Middleware(['feature.tenant:' . AllowGuestOrder::class])
+    Middleware(['feature.tenant:'.AllowGuestOrder::class])
 ]
 class GuestCheckoutMobileController extends Controller
 {
@@ -96,7 +96,7 @@ class GuestCheckoutMobileController extends Controller
                 'reference' => $reference,
             ];
 
-            if ( ! $discountCode) {
+            if (! $discountCode) {
                 unset($responseArray['summary']['discount']);
             }
 

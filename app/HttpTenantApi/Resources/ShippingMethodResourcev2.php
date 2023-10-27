@@ -17,8 +17,8 @@ use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\Shipment\Enums\UnitEnum;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
-use TiMacDonald\JsonApi\JsonApiResource;
 use Throwable;
+use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
  * @mixin \Domain\ShippingMethod\Models\ShippingMethod
@@ -29,7 +29,7 @@ class ShippingMethodResourcev2 extends JsonApiResource
     {
         $rateData = $this->getRateData($request);
 
-        return  [
+        return [
             'name' => $this->title,
             'slug' => $this->slug,
             'subtitle' => $this->subtitle,
@@ -60,7 +60,7 @@ class ShippingMethodResourcev2 extends JsonApiResource
             /** @var \Domain\Customer\Models\Customer|null */
             $user = auth()->user();
 
-            if($user) {
+            if ($user) {
                 /** @var \Domain\Address\Models\Address */
                 $addressModel = Address::findOrfail($request->address_id);
 

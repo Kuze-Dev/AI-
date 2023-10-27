@@ -11,10 +11,10 @@ use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
-use Support\MetaData\Database\Factories\MetaDataFactory;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Support\MetaData\Database\Factories\MetaDataFactory;
 use Support\MetaData\Models\MetaData;
 
 use function Pest\Laravel\assertDatabaseHas;

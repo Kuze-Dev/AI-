@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Customer|null $customer
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|VerifiedAddress newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|VerifiedAddress newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|VerifiedAddress query()
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|VerifiedAddress whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|VerifiedAddress whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|VerifiedAddress whereVerifiedAddress($value)
+ *
  * @mixin \Eloquent
  */
 class VerifiedAddress extends Model

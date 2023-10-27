@@ -77,7 +77,7 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
             }
         );
 
-        $this->mergeConfigFrom(__DIR__ . '/config/shipment.php', 'domain.shipment');
+        $this->mergeConfigFrom(__DIR__.'/config/shipment.php', 'domain.shipment');
     }
 
     public function boot(): void

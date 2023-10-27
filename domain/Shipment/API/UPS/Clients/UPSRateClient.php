@@ -50,7 +50,7 @@ class UPSRateClient extends BaseClient
                         ],
                     ],
                     'ShipTo' => [
-                        'Name' => $customer->first_name. ' '. $customer->last_name,
+                        'Name' => $customer->first_name.' '.$customer->last_name,
                         'Address' => [
                             'AddressLine' => $address->address,
                             'City' => $address->city,
@@ -100,7 +100,7 @@ class UPSRateClient extends BaseClient
 
         $arrayResponse = json_decode($response, true);
 
-        if ( ! isset($arrayResponse['RateResponse'])) {
+        if (! isset($arrayResponse['RateResponse'])) {
             self::throwError($arrayResponse['response'], __METHOD__.':'.__LINE__);
         }
 
@@ -142,7 +142,7 @@ class UPSRateClient extends BaseClient
                         ],
                     ],
                     'ShipTo' => [
-                        'Name' => $customer->first_name. ' '. $customer->last_name,
+                        'Name' => $customer->first_name.' '.$customer->last_name,
                         'Address' => [
                             'AddressLine' => $address->address,
                             'City' => $address->city,
@@ -187,7 +187,7 @@ class UPSRateClient extends BaseClient
 
         $arrayResponse = json_decode($response, true);
 
-        if ( ! isset($arrayResponse['RateResponse'])) {
+        if (! isset($arrayResponse['RateResponse'])) {
             self::throwError($arrayResponse['response'], __METHOD__.':'.__LINE__);
         }
 
