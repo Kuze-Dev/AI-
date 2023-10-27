@@ -37,12 +37,15 @@ class CreateServiceTransactionAction
     {
         $serviceBill = ServiceBill::whereReference($data['reference_id'])->firstOrFail();
 
+        /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
+        $serviceOrder = $serviceBill->serviceOrder;
+
         $newData = [
             'service_order_id' => $serviceBill->service_order_id,
             'service_bill_id' => $serviceBill->id,
             'payment_method_id' => $paymentMethod->id,
             'total_amount' => $serviceBill->total_amount,
-            'currency' => $serviceBill->serviceOrder->currency_symbol,
+            'currency' => $serviceOrder->currency_symbol,
             'status' => ServiceTransactionStatus::PENDING,
         ];
 

@@ -118,7 +118,7 @@ class ViewServiceBill extends ViewRecord
                                 TextLabel::make('')
                                     ->label(fn (ServiceBill $record, Closure $get) => $record->tax_display == PriceDisplay::INCLUSIVE->value ? 'Inclusive'
                                         :
-                                        $record->serviceOrder->currency_symbol.' '.number_format($record->tax_total, 2, '.', '.'))
+                                        $record->serviceOrder?->currency_symbol.' '.number_format($record->tax_total, 2, '.', '.'))
                                     ->alignRight()
                                     ->size('md')
                                     ->inline()
@@ -136,7 +136,7 @@ class ViewServiceBill extends ViewRecord
                                 ->readOnly()
                                 ->color('primary'),
                             TextLabel::make('')
-                                ->label(fn (ServiceBill $record, Closure $get) => $record->serviceOrder->currency_symbol.' '.number_format($record->total_amount, 2, '.', '.'))
+                                ->label(fn (ServiceBill $record, Closure $get) => $record->serviceOrder?->currency_symbol.' '.number_format($record->total_amount, 2, '.', '.'))
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()

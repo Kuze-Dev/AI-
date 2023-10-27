@@ -65,7 +65,11 @@ class ServiceOrderController
                 throw new InvalidServiceBillException();
             }
 
-            app(ChangeServiceOrderStatusAction::class)->execute($serviceBill->serviceOrder, true);
+            /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
+            $serviceOrder = $serviceBill->serviceOrder;
+
+            app(ChangeServiceOrderStatusAction::class)
+                ->execute($serviceOrder, true);
 
             return response()->json([
                 'message' => 'Service order placed successfully',

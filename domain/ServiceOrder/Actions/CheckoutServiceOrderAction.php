@@ -55,12 +55,16 @@ class CheckoutServiceOrderAction
         ServiceBill $serviceBill,
         PaymentMethod $paymentMethod
     ): PaymentAuthorize {
+
+        /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
+        $serviceOrder = $serviceBill->serviceOrder;
+
         $providerData = new CreatepaymentData(
             transactionData: TransactionData::fromArray(
                 [
                     'reference_id' => $serviceBill->reference,
                     'amount' => AmountData::fromArray([
-                        'currency' => $serviceBill->serviceOrder->currency_code,
+                        'currency' => $serviceOrder->currency_code,
                         'total' => (int) $serviceBill->total_amount,
                         'details' => PaymentDetailsData::fromArray(
                             [
@@ -82,5 +86,6 @@ class CheckoutServiceOrderAction
         }
 
         throw new PaymentException();
+
     }
 }
