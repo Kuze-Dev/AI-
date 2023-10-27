@@ -47,7 +47,7 @@ class ServiceSettings extends TenantBaseSettings
                         Forms\Components\Toggle::make('admin_should_receive')
                             ->inline(false)
                             ->label('')
-                            ->helperText('Enable this if you want to receive emails whenever an order is placed.')
+                            ->helperText('Enable this if you want to receive emails whenever a service order status changes.')
                             ->reactive(),
                         Forms\Components\TextInput::make('admin_main_receiver')
                             ->label(trans('Main Receiver'))
