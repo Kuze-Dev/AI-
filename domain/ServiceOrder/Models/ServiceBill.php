@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Payments\Models\Payment> $payments
  * @property-read int|null $payments_count
  * @property-read \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill query()
@@ -49,6 +50,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereTotalAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ServiceBill extends Model implements PayableInterface
@@ -115,6 +117,21 @@ class ServiceBill extends Model implements PayableInterface
                 return $total;
             }
         );
+    }
+
+    public function getStatusColor(): string
+    {
+        return match (
+            str_replace(
+                ' ',
+                '_',
+                strtolower($this->status->value)
+            )
+        ) {
+            ServiceBillStatus::PAID->value => 'success',
+            ServiceBillStatus::PENDING->value => 'warning',
+            default => 'secondary',
+        };
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ServiceOrder\Models\ServiceOrder, \Domain\ServiceOrder\Models\ServiceBill> */

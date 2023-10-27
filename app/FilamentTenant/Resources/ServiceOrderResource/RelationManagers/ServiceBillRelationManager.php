@@ -13,15 +13,23 @@ use Filament\Tables;
 class ServiceBillRelationManager extends RelationManager
 {
     protected static string $relationship = 'serviceBills';
+
     protected static ?string $title = 'Service Bills';
 
     public static function table(Table $table): Table
     {
-        return ServiceBillResource::table($table)->actions([
-            Tables\Actions\Action::make('view')
-                ->label(trans('View Details'))
-                ->color('secondary')
-                ->url(fn (ServiceBill $record) => ServiceBillResource::getUrl('view', [$record])),
-        ]);
+        return ServiceBillResource::table($table)
+            ->actions([
+                Tables\Actions\Action::make('view')
+                    ->label('View Details')
+                    ->translateLabel()
+                    ->color('secondary')
+                    ->url(
+                        fn (ServiceBill $record) => ServiceBillResource::getUrl(
+                            'view',
+                            [$record]
+                        )
+                    ),
+            ]);
     }
 }

@@ -10,10 +10,10 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
 use Domain\ServiceOrder\Actions\ComputeServiceBillingCycleAction;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
-use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Filament\Resources\Form;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
@@ -40,63 +40,61 @@ class ServiceBillResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('reference')
                     ->label('reference')
+                    ->translateLabel()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_amount')
-                    ->formatStateUsing(function (ServiceBill $record) {
-                        return $record->serviceOrder->currency_symbol.' '.number_format((float) $record->total_amount, 2, '.', ',');
-                    })
+                    ->formatStateUsing(
+                        fn (ServiceBill $record): string => $record->serviceOrder->currency_symbol.' '.
+                            number_format((float) $record->total_amount, 2, '.', ',')
+                    )
                     ->label('Amount')
+                    ->translateLabel()
                     ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')
-                    ->label(trans('Status'))
-                    ->alignRight()
-                    ->formatStateUsing(function (string $state): string {
-                        return ucfirst($state);
-                    })
-                    ->color(function ($state) {
-                        $newState = str_replace(' ', '_', strtolower($state));
-
-                        return match ($newState) {
-                            ServiceTransactionStatus::PAID->value => 'success',
-                            ServiceTransactionStatus::PENDING->value => 'warning',
-                            ServiceTransactionStatus::REFUNDED->value => 'danger',
-                            default => 'secondary',
-                        };
-                    })->inline()
-                    ->alignLeft(),
-                Tables\Columns\TextColumn::make('due_date')
-                    ->formatStateUsing(function (ServiceBill $record) {
-                        if (! isset($record->due_date)) {
-                            return 'N/A';
-                        }
-
-                        return $record->due_date;
-                    })
-                    ->label('Due at')
-                    ->sortable(),
+                    ->label('Status')
+                    ->translateLabel()
+                    ->formatStateUsing(
+                        fn (string $state): string => ucfirst($state)
+                    )
+                    ->color(
+                        fn (ServiceBill $record): string => $record->getStatusColor()
+                    )
+                    ->inline(),
                 Tables\Columns\TextColumn::make('bill_date')
-                    ->formatStateUsing(function (ServiceBill $record) {
-                        if (! isset($record->due_date)) {
-                            return 'N/A';
-                        }
-
-                        return $record->due_date;
-                    })
+                    ->formatStateUsing(
+                        fn (ServiceBill $record) => ! isset($record->bill_date)
+                            ? 'N/A'
+                            : $record->bill_date
+                    )
                     ->label('Bill Date')
+                    ->translateLabel()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('due_date')
+                    ->formatStateUsing(
+                        fn (ServiceBill $record) => ! isset($record->due_date)
+                            ? 'N/A'
+                            : $record->due_date
+                    )
+                    ->label('Due at')
+                    ->translateLabel()
                     ->sortable(),
             ])
             ->headerActions([
                 Tables\Actions\Action::make('view')
-                    ->label(function ($livewire) {
-                        $serviceOrder = $livewire->ownerRecord;
+                    ->label(
+                        function (RelationManager $livewire) {
+                            /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
+                            $serviceOrder = $livewire->ownerRecord;
 
-                        return self::upCommingBill($serviceOrder);
-                    })
+                            return self::upcomingBill($serviceOrder);
+                        }
+                    )
                     ->translateLabel()
                     ->color('secondary')
                     ->disabled()
                     ->visible(
-                        function ($livewire) {
+                        function (RelationManager $livewire) {
+                            /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
                             $serviceOrder = $livewire->ownerRecord;
 
                             return self::shouldDisplayUpcomingBill($serviceOrder);
@@ -118,6 +116,7 @@ class ServiceBillResource extends Resource
     private static function shouldDisplayUpcomingBill(ServiceOrder $serviceOrder): bool
     {
         $isAutoBilling = $serviceOrder->is_auto_generated_bill;
+
         $latestServiceBill = $serviceOrder->latestServiceBill();
 
         if ($isAutoBilling && isset($latestServiceBill) && $serviceOrder->status == ServiceOrderStatus::ACTIVE) {
@@ -127,9 +126,9 @@ class ServiceBillResource extends Resource
         return false;
     }
 
-    private static function upCommingBill(ServiceOrder $serviceOrder): string
+    private static function upcomingBill(ServiceOrder $serviceOrder): string
     {
-        /** @var \Domain\ServiceOrder\Models\ServiceBill $latestServiceBill */
+        /** @var \Domain\ServiceOrder\Models\ServiceBill|null $latestServiceBill */
         $latestServiceBill = $serviceOrder->latestServiceBill();
 
         /** @var \Carbon\Carbon|null $referenceDate */

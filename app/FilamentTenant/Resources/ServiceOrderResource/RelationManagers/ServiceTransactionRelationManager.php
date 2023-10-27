@@ -36,6 +36,7 @@ class ServiceTransactionRelationManager extends RelationManager
                         fn (ServiceTransaction $record): string => $record->getTotalAmountWithCurrency()
                     )
                     ->label('Amount')
+                    ->translateLabel()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('payment_method.title')
                     ->exists('payment_method')
@@ -54,6 +55,7 @@ class ServiceTransactionRelationManager extends RelationManager
                     ->inline(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Updated at')
+                    ->translateLabel()
                     ->sortable(),
             ])
             ->actions([
