@@ -7,7 +7,9 @@ namespace App\HttpTenantApi\Controllers\Service;
 use App\Features\Service\ServiceBase;
 use App\HttpTenantApi\Resources\ServiceResource;
 use Domain\Service\Models\Service;
-use Spatie\QueryBuilder\AllowedInclude;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Arr;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -22,7 +24,7 @@ class ServiceController
     public function index(): JsonApiResourceCollection
     {
         return ServiceResource::collection(
-            QueryBuilder::for(Service::query()->whereStatus(true))
+            QueryBuilder::for(Service::whereStatus(true))
                 ->allowedFilters([
                     'name',
                     'selling_price',
@@ -33,7 +35,26 @@ class ServiceController
                     'pay_upfront',
                     'status',
                     'needs_approval',
-                    AllowedInclude::relationship('taxonomyTerms'),
+                    'is_auto_generated_bill',
+                    AllowedFilter::callback(
+                        'taxonomies',
+                        function (Builder $query, array $value) {
+                            foreach ($value as $taxonomySlug => $taxonomyTermSlugs) {
+                                if (filled($taxonomyTermSlugs)) {
+                                    $query->whereHas(
+                                        'taxonomyTerms',
+                                        function (Builder $query) use ($taxonomySlug, $taxonomyTermSlugs) {
+                                            $query->whereIn('slug', Arr::wrap($taxonomyTermSlugs))
+                                                ->whereHas(
+                                                    'taxonomy',
+                                                    fn ($query) => $query->where('slug', $taxonomySlug)
+                                                );
+                                        }
+                                    );
+                                }
+                            }
+                        }
+                    ),
                 ])
                 ->allowedIncludes([
                     'taxonomyTerms',
@@ -47,7 +68,7 @@ class ServiceController
     public function show(string $service): ServiceResource
     {
         return ServiceResource::make(
-            QueryBuilder::for(Service::whereId($service)->whereStatus(true))
+            QueryBuilder::for(Service::whereUuid($service)->whereStatus(true))
                 ->allowedIncludes([
                     'taxonomyTerms',
                     'media',

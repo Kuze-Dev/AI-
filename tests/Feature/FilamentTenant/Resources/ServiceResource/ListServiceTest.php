@@ -15,11 +15,10 @@ use Support\MetaData\Database\Factories\MetaDataFactory;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    testInTenantContext();
+    testInTenantContext()->features()->activate(ServiceBase::class);
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 
-    tenancy()->tenant->features()->activate(ServiceBase::class);
     CurrencyFactory::new()->createOne([
         'enabled' => true,
     ]);

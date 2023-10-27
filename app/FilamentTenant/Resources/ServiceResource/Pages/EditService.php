@@ -43,6 +43,7 @@ class EditService extends EditRecord
                 ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
+            Actions\RestoreAction::make(),
             Actions\DeleteAction::make()
                 ->using(fn (Service $record) => DB::transaction(
                     fn () => app(DeleteServiceAction::class)
