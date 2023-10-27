@@ -277,7 +277,8 @@
                     {{
                         money(
                             $total_amount,
-                            $transaction->currency
+                            $transaction->serviceOrder
+                                ->currency_code
                         )
                             ->format()
                     }}
