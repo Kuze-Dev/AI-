@@ -19,13 +19,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $payment_method_id
  * @property string $currency
  * @property float $total_amount
- * @property \Domain\ServiceOrder\Enums\ServiceTransactionStatus $status
+ * @property ServiceTransactionStatus $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Payment|null $payment
  * @property-read PaymentMethod|null $payment_method
- * @property-read \Domain\ServiceOrder\Models\ServiceBill $serviceBill
- * @property-read \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder
+ * @property-read \Domain\ServiceOrder\Models\ServiceBill|null $serviceBill
+ * @property-read \Domain\ServiceOrder\Models\ServiceOrder|null $serviceOrder
  *
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction newQuery()

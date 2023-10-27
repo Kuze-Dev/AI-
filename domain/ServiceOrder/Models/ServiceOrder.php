@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Models;
 
-use Barryvdh\Reflection\DocBlock\Type\Collection;
 use Domain\Admin\Models\Admin;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Enums\BillingCycleEnum;
@@ -16,7 +15,6 @@ use Domain\ServiceOrder\Queries\ServiceOrderQueryBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Spatie\Activitylog\Contracts\Activity;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -39,7 +37,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string $currency_symbol
  * @property string $service_name
  * @property float $service_price
- * @property BillingCycleEnum $billing_cycle
+ * @property BillingCycleEnum|null $billing_cycle
  * @property int|null $due_date_every
  * @property bool $pay_upfront
  * @property bool $is_subscription
@@ -48,43 +46,64 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property \Illuminate\Support\Carbon $schedule
  * @property ServiceOrderStatus $status
  * @property string|null $cancelled_reason
+ * @property float $sub_total
+ * @property string|null $tax_display
+ * @property float $tax_percentage
+ * @property float $tax_total
  * @property float $total_price
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read Collection<int, Activity> $activities
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read Admin|null $admin
  * @property-read Customer|null $customer
  * @property-read Service|null $service
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\ServiceOrder\Models\ServiceBill> $serviceBills
+ * @property-read int|null $service_bills_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\ServiceOrder\Models\ServiceOrderAddress> $serviceOrderAddress
  * @property-read int|null $service_order_address_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\ServiceOrder\Models\ServiceTransaction> $serviceTransactions
+ * @property-read int|null $service_transactions_count
  *
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder query()
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereAdditionalCharges($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereAdminId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereBillingCycle($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCancelledReason($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCurrencyCode($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCurrencyName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCurrencySymbol($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCustomerEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCustomerFirstName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCustomerForm($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCustomerId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCustomerLastName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereCustomerMobile($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereDueDateEvery($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereReference($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereSchedule($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereServiceId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereServiceName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereServicePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereTotalPrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereUpdatedAt($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder newModelQuery()
+ * @method static ServiceOrderQueryBuilder|ServiceOrder newQuery()
+ * @method static ServiceOrderQueryBuilder|ServiceOrder query()
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereActive()
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereAdditionalCharges($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereAdminId($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereAutoGenerateBills()
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereBillingCycle($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereCancelledReason($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereCreatedAt($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereCurrencyCode($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereCurrencyName($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereCurrencySymbol($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereCustomerEmail($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereCustomerFirstName($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereCustomerForm($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereCustomerId($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereCustomerLastName($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereCustomerMobile($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereDueDateEvery($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereId($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereIsAutoGeneratedBill($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereIsSubscription($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereNeedsApproval($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder wherePayUpfront($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereReference($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereSchedule($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereServiceId($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereServiceName($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereServicePrice($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereShouldAutoGenerateBill()
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereStatus($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereSubTotal($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereSubscriptionBased()
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereTaxDisplay($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereTaxPercentage($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereTaxTotal($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereTotalPrice($value)
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */

@@ -22,11 +22,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string $reference
  * @property \Illuminate\Support\Carbon|null $bill_date
  * @property \Illuminate\Support\Carbon|null $due_date
- * @property string $tax_display
  * @property float $service_price
  * @property array $additional_charges
- * @property float $tax_percentage
  * @property float $sub_total
+ * @property string|null $tax_display
+ * @property float $tax_percentage
  * @property float $tax_total
  * @property float $total_amount
  * @property ServiceBillStatus $status
@@ -34,22 +34,31 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Payments\Models\Payment> $payments
  * @property-read int|null $payments_count
- * @property-read \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder
+ * @property-read \Domain\ServiceOrder\Models\ServiceOrder|null $serviceOrder
+ * @property-read \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction
  *
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill query()
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereAdditionalCharges($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereBillDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereDueDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereReference($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereServiceOrderId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereServicePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereTotalAmount($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ServiceBill whereUpdatedAt($value)
+ * @method static ServiceBillQueryBuilder|ServiceBill newModelQuery()
+ * @method static ServiceBillQueryBuilder|ServiceBill newQuery()
+ * @method static ServiceBillQueryBuilder|ServiceBill query()
+ * @method static ServiceBillQueryBuilder|ServiceBill whereAdditionalCharges($value)
+ * @method static ServiceBillQueryBuilder|ServiceBill whereBillDate($value)
+ * @method static ServiceBillQueryBuilder|ServiceBill whereCreatedAt($value)
+ * @method static ServiceBillQueryBuilder|ServiceBill whereDueDate($value)
+ * @method static ServiceBillQueryBuilder|ServiceBill whereHasBillingDate()
+ * @method static ServiceBillQueryBuilder|ServiceBill whereHasDueDate()
+ * @method static ServiceBillQueryBuilder|ServiceBill whereId($value)
+ * @method static ServiceBillQueryBuilder|ServiceBill whereNotifiable()
+ * @method static ServiceBillQueryBuilder|ServiceBill wherePendingStatus()
+ * @method static ServiceBillQueryBuilder|ServiceBill whereReference($value)
+ * @method static ServiceBillQueryBuilder|ServiceBill whereServiceOrderId($value)
+ * @method static ServiceBillQueryBuilder|ServiceBill whereServicePrice($value)
+ * @method static ServiceBillQueryBuilder|ServiceBill whereStatus($value)
+ * @method static ServiceBillQueryBuilder|ServiceBill whereSubTotal($value)
+ * @method static ServiceBillQueryBuilder|ServiceBill whereTaxDisplay($value)
+ * @method static ServiceBillQueryBuilder|ServiceBill whereTaxPercentage($value)
+ * @method static ServiceBillQueryBuilder|ServiceBill whereTaxTotal($value)
+ * @method static ServiceBillQueryBuilder|ServiceBill whereTotalAmount($value)
+ * @method static ServiceBillQueryBuilder|ServiceBill whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */

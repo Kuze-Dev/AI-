@@ -410,6 +410,13 @@ class ViewServiceOrder extends EditRecord
 
                             if ($result) {
                                 app(ChangeServiceOrderStatusAction::class)->execute($record, $shouldSendEmail);
+                                $sendEmailToAdmins = app(ServiceSettings::class)->admin_should_receive;
+
+                                if ($sendEmailToAdmins) {
+                                    $mainReceiver = app(ServiceSettings::class)->admin_main_receiver;
+                                    FacadesNotification::route('mail', $mainReceiver)
+                                        ->notify(new ChangeByAdminNotification($record, $status));
+                                }
                                 $set('status', ucfirst($data['status_options']));
                                 Notification::make()
                                     ->title(trans('Service Order updated successfully'))
@@ -417,13 +424,6 @@ class ViewServiceOrder extends EditRecord
                                     ->send();
                             }
 
-                            $sendEmailToAdmins = app(ServiceSettings::class)->admin_should_receive;
-
-                            if ($sendEmailToAdmins) {
-                                $mainReceiver = app(ServiceSettings::class)->admin_main_receiver;
-                                FacadesNotification::route('mail', $mainReceiver)
-                                    ->notify(new ChangeByAdminNotification($record, $status));
-                            }
                         }
                     );
             })

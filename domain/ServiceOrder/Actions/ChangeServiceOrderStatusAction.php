@@ -66,7 +66,7 @@ class ChangeServiceOrderStatusAction
     private function onPayment(ServiceOrder $serviceOrder, bool $shouldSendEmail): void
     {
         $serviceBill = $this->serviceBill;
-
+        dd($serviceOrder);
         if (is_null($serviceBill)) {
             $serviceBill = $this->createServiceBillAction->execute(
                 ServiceBillData::fromCreatedServiceOrder($serviceOrder->toArray())

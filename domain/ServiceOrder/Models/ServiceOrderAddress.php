@@ -25,7 +25,8 @@ use Spatie\Activitylog\LogOptions;
  * @property string $city
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder
+ * @property-read \Domain\ServiceOrder\Models\ServiceOrder|null $serviceOrder
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrderAddress newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrderAddress newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrderAddress query()
@@ -40,6 +41,7 @@ use Spatie\Activitylog\LogOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrderAddress whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrderAddress whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrderAddress whereZipCode($value)
+ *
  * @mixin \Eloquent
  */
 class ServiceOrderAddress extends Model

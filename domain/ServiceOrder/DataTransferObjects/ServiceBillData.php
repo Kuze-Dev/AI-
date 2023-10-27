@@ -20,7 +20,7 @@ class ServiceBillData
         public readonly float $sub_total,
         public readonly float $tax_percentage,
         public readonly float $tax_total,
-        public readonly ?PriceDisplay $tax_display,
+        public readonly PriceDisplay|string|null $tax_display,
         public readonly float $total_amount,
         public readonly ServiceBillStatus $status,
     ) {
