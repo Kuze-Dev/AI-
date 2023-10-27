@@ -18,12 +18,19 @@ class ForPaymentNotification extends Notification implements ShouldQueue
     use Queueable;
 
     private ServiceBill $serviceBill;
+
     private string $logo;
+
     private string $title;
+
     private string $description;
+
     private string $from;
+
     private string $url;
+
     private array $replyTo;
+
     private ?string $footer = null;
 
     /** Create a new notification instance. */
@@ -34,7 +41,7 @@ class ForPaymentNotification extends Notification implements ShouldQueue
         $this->logo = app(SiteSettings::class)->getLogoUrl();
         $this->title = app(SiteSettings::class)->name;
         $this->description = app(SiteSettings::class)->description;
-        $this->url = 'http://' . app(SiteSettings::class)->front_end_domain . '/' . app(ServiceSettings::class)->domain_path_segment .'/'. $serviceBill->reference;
+        $this->url = 'http://'.app(SiteSettings::class)->front_end_domain.'/'.app(ServiceSettings::class)->domain_path_segment.'/'.$serviceBill->reference;
 
         $this->from = app(ServiceSettings::class)->email_sender_name;
 
@@ -92,7 +99,7 @@ class ForPaymentNotification extends Notification implements ShouldQueue
         foreach ($emailArray as $email) {
             $email = trim($email);
 
-            if ( ! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            if (! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $sanitizedEmails[] = $email;
             }
         }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class ServiceOrderStoreRequest extends FormRequest
@@ -56,7 +56,6 @@ class ServiceOrderStoreRequest extends FormRequest
     /**
      * Handle a failed validation attempt.
      *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @return void
      *
      * @throws \Illuminate\Http\Exceptions\HttpResponseException

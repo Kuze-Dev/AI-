@@ -12,8 +12,8 @@ use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Str;
 use Filament\Forms\Components\TextInput;
+use Str;
 
 class ServiceSettings extends TenantBaseSettings
 {
@@ -39,7 +39,7 @@ class ServiceSettings extends TenantBaseSettings
                 Forms\Components\TextInput::make('domain_path_segment')
                     ->label(trans('Domain Path Segment'))
                     ->required()
-                    ->dehydrateStateUsing(fn (string|null $state) => is_null($state) ? '' : $state),
+                    ->dehydrateStateUsing(fn (?string $state) => is_null($state) ? '' : $state),
             ]),
             Forms\Components\Card::make([
                 Forms\Components\Section::make('Admin Email Notification')
@@ -54,7 +54,7 @@ class ServiceSettings extends TenantBaseSettings
                             ->required(function (Closure $get) {
                                 return $get('admin_should_receive');
                             })
-                            ->dehydrateStateUsing(fn (string|null $state) => is_null($state) ? '' : $state),
+                            ->dehydrateStateUsing(fn (?string $state) => is_null($state) ? '' : $state),
                         Forms\Components\TextInput::make('admin_cc')
                             ->label(trans('CC'))
                             ->nullable()
@@ -113,13 +113,13 @@ class ServiceSettings extends TenantBaseSettings
                     ]),
             ]),
             Section::make('Service Order Section')
-            ->schema([
-                TextInput::make('days_before_due_date_notification')
-                    ->placeholder(trans('Days Before Due Date Notification'))
-                    ->numeric()
-                    ->minValue(1)
-                    ->columnSpan('full'),
-            ]),
+                ->schema([
+                    TextInput::make('days_before_due_date_notification')
+                        ->placeholder(trans('Days Before Due Date Notification'))
+                        ->numeric()
+                        ->minValue(1)
+                        ->columnSpan('full'),
+                ]),
         ];
     }
 }

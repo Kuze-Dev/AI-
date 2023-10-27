@@ -18,12 +18,19 @@ class ServiceBillNotification extends Notification implements ShouldQueue
     use Queueable;
 
     private ServiceBill $serviceBill;
+
     private string $logo;
+
     private string $title;
+
     private string $description;
+
     private string $from;
+
     private string $url;
+
     private array $replyTo;
+
     private ?string $footer = null;
 
     public function __construct(ServiceBill $serviceBill)
@@ -38,7 +45,7 @@ class ServiceBillNotification extends Notification implements ShouldQueue
 
         $this->from = app(ServiceSettings::class)->email_sender_name;
 
-        $this->url = 'http://' . app(SiteSettings::class)->front_end_domain . '/' . app(ServiceSettings::class)->domain_path_segment .'/'. $serviceBill->reference;
+        $this->url = 'http://'.app(SiteSettings::class)->front_end_domain.'/'.app(ServiceSettings::class)->domain_path_segment.'/'.$serviceBill->reference;
 
         $this->replyTo = app(ServiceSettings::class)->email_reply_to ?? [];
 

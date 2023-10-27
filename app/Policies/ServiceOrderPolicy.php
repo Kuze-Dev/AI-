@@ -7,8 +7,8 @@ namespace App\Policies;
 use App\Features\Service\ServiceBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\ServiceOrder\Models\ServiceOrder;
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Foundation\Auth\User;
 
 class ServiceOrderPolicy
 {
@@ -16,7 +16,7 @@ class ServiceOrderPolicy
 
     public function before(): ?Response
     {
-        if ( ! tenancy()->tenant?->features()->active(ServiceBase::class)) {
+        if (! tenancy()->tenant?->features()->active(ServiceBase::class)) {
             return Response::denyAsNotFound();
         }
 

@@ -26,7 +26,7 @@ class CreateServiceOrderAction
 
     public function execute(
         ServiceOrderData $serviceOrderData,
-        int|null $adminId
+        ?int $adminId
     ): ServiceOrder {
 
         $uniqueReference = null;
@@ -37,7 +37,7 @@ class CreateServiceOrderAction
             $existingReference = ServiceOrder::where('reference', $referenceNumber)
                 ->first();
 
-            if ( ! $existingReference) {
+            if (! $existingReference) {
                 $uniqueReference = $referenceNumber;
 
                 break;
@@ -52,15 +52,15 @@ class CreateServiceOrderAction
 
         $currency = Currency::whereEnabled(true)->first();
 
-        if ( ! ($customer instanceof Customer)) {
+        if (! ($customer instanceof Customer)) {
             throw new BadRequestHttpException('Customer not found');
-        } elseif ( ! ($service instanceof Service)) {
+        } elseif (! ($service instanceof Service)) {
             throw new BadRequestHttpException('Service not found');
-        } elseif ( ! ($currency instanceof Currency)) {
+        } elseif (! ($currency instanceof Currency)) {
             throw new BadRequestHttpException('Currency not found');
         }
 
-        if( ! $service->status) {
+        if (! $service->status) {
             throw new BadRequestHttpException('inactive service found');
         }
 

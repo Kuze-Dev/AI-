@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Customer\Queries;
 
-use Domain\Customer\Enums\Status;
 use Domain\Customer\Enums\RegisterStatus;
+use Domain\Customer\Enums\Status;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Illuminate\Database\Eloquent\Builder;
 

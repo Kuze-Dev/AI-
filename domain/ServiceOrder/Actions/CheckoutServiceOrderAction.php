@@ -86,6 +86,5 @@ class CheckoutServiceOrderAction
         }
 
         throw new PaymentException();
-
     }
 }

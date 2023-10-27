@@ -13,7 +13,7 @@ class CreateServiceBillAction
 {
     public function execute(
         ServiceBillData $serviceBillData,
-        ?ServiceOrderBillingAndDueDateData $serviceOrderBillingAndDueDateData = null
+        ServiceOrderBillingAndDueDateData $serviceOrderBillingAndDueDateData = null
     ): ServiceBill {
         $uniqueReference = null;
 
@@ -22,7 +22,7 @@ class CreateServiceBillAction
 
             $existingReference = ServiceBill::where('reference', $referenceNumber)->first();
 
-            if ( ! $existingReference) {
+            if (! $existingReference) {
                 $uniqueReference = $referenceNumber;
 
                 break;

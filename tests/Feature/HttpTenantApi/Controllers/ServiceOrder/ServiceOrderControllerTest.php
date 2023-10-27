@@ -44,7 +44,7 @@ it('can list', function () {
 it('can show', function () {
     $serviceOrder = ServiceOrderFactory::new()->createOne();
 
-    getJson('api/service-order/' . $serviceOrder->getRouteKey())
+    getJson('api/service-order/'.$serviceOrder->getRouteKey())
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($serviceOrder) {
             $json

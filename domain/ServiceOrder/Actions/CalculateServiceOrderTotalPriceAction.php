@@ -9,7 +9,7 @@ use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData;
 
 class CalculateServiceOrderTotalPriceAction
 {
-    /** @param \Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData[] $additionalCharges*/
+    /** @param  \Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData[]  $additionalCharges*/
     public function execute(float $servicePrice, array $additionalCharges = []): Money
     {
         /** @var \Akaunting\Money\Money $result */

@@ -35,7 +35,7 @@ class MediaPathGenerator extends DefaultPathGenerator
         );
 
         if ($prefix !== '') {
-            return $prefix . '/' . $md5;
+            return $prefix.'/'.$md5;
         }
 
         return $md5;

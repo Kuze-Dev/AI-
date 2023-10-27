@@ -20,7 +20,7 @@ class ServiceOrderData
     ) {
     }
 
-    public static function fromArray(array $data, int|null $customer_id): self
+    public static function fromArray(array $data, ?int $customer_id): self
     {
         return new self(
             customer_id: isset($data['customer_id']) ? (int) $data['customer_id'] : $customer_id,

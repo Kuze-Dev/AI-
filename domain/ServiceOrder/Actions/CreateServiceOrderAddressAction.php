@@ -17,7 +17,7 @@ class CreateServiceOrderAddressAction
 
         $serviceAddressModel = Address::whereId($serviceOrderData->service_address_id)->first();
         $addressesToInsert = [];
-        if($serviceAddressModel) {
+        if ($serviceAddressModel) {
             $commonAddressData = [
                 'service_order_id' => $serviceOrder->id,
                 'country' => $serviceAddressModel->state->country->name,
@@ -39,9 +39,9 @@ class CreateServiceOrderAddressAction
             ];
         }
 
-        if( ! $serviceOrderData->is_same_as_billing) {
+        if (! $serviceOrderData->is_same_as_billing) {
             $billingAddressModel = Address::whereId($serviceOrderData->billing_address_id)->first();
-            if($billingAddressModel) {
+            if ($billingAddressModel) {
                 $addressesToInsert[1] =
                 [
                     'service_order_id' => $serviceOrder->id,

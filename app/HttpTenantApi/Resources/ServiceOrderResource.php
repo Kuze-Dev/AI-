@@ -30,7 +30,6 @@ class ServiceOrderResource extends JsonApiResource
     }
 
     /**
-     * @param Request $request
      * @return array<string, callable>
      */
     public function toRelationships(Request $request): array
