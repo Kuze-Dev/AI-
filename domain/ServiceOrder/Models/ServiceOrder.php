@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Models;
 
 use Barryvdh\Reflection\DocBlock\Type\Collection;
-use Domain\ServiceOrder\Enums\ServiceOrderStatus;
-use Illuminate\Database\Eloquent\Model;
 use Domain\Admin\Models\Admin;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Service\Models\Service;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
+use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Queries\ServiceOrderQueryBuilder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\Contracts\Activity;
@@ -57,6 +57,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property-read Service|null $service
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\ServiceOrder\Models\ServiceOrderAddress> $serviceOrderAddress
  * @property-read int|null $service_order_address_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder query()
@@ -84,11 +85,13 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereTotalPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceOrder whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ServiceOrder extends Model
 {
     use LogsActivity;
+
     protected $fillable = [
         'service_id',
         'customer_id',
@@ -201,12 +204,12 @@ class ServiceOrder extends Model
             : null;
     }
 
-    public function latestForPaymentServiceBill(): ?ServiceBill
+    public function latestPendingServiceBill(): ?ServiceBill
     {
         /** @var \Domain\ServiceOrder\Models\ServiceBill $serviceBill */
         $serviceBill = $this->latestServiceBill();
 
-        return filled($serviceBill) && $serviceBill->status === ServiceBillStatus::FORPAYMENT
+        return filled($serviceBill) && $serviceBill->status === ServiceBillStatus::PENDING
             ? $serviceBill
             : null;
     }
@@ -217,7 +220,6 @@ class ServiceOrder extends Model
             ->where('type', ServiceOrderAddressType::BILLING_ADDRESS)
             ->first();
     }
-
 
     public function getActivitylogOptions(): LogOptions
     {

@@ -10,9 +10,9 @@ use Illuminate\Database\Eloquent\Builder;
 /** @extends \Illuminate\Database\Eloquent\Builder<\Domain\ServiceOrder\Models\ServiceBill> */
 class ServiceBillQueryBuilder extends Builder
 {
-    public function whereForPaymentStatus(): self
+    public function wherePendingStatus(): self
     {
-        return $this->where('status', ServiceBillStatus::FORPAYMENT);
+        return $this->where('status', ServiceBillStatus::PENDING);
     }
 
     public function whereHasBillingDate(): self
@@ -27,7 +27,8 @@ class ServiceBillQueryBuilder extends Builder
 
     public function whereNotifiable(): self
     {
-        return $this->whereHasBillingDate()
+        return $this->wherePendingStatus()
+            ->whereHasBillingDate()
             ->whereHasDueDate();
     }
 }

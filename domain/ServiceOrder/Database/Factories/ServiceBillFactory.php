@@ -41,12 +41,14 @@ class ServiceBillFactory extends Factory
     /** TODO: to be removed */
     public function unpaid(): self
     {
+        /** @phpstan-ignore-next-line */
         return $this->state(['status' => ServiceBillStatus::FORPAYMENT]);
     }
 
     /** TODO: to be removed */
     public function forPayment(): self
     {
+        /** @phpstan-ignore-next-line */
         return $this->state(['status' => ServiceBillStatus::FORPAYMENT]);
     }
 

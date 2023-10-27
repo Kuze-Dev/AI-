@@ -23,13 +23,11 @@ class NotifyCustomerServiceBillDueDateAction
             ->with([
                 'serviceOrders' => fn ($query) => $query->whereActive()
                     ->whereSubscriptionBased(),
-                'serviceOrders.serviceBills' => fn ($query) => $query->whereForPaymentStatus()
-                    ->whereNotifiable(),
+                'serviceOrders.serviceBills' => fn ($query) => $query->whereNotifiable(),
             ])
             ->whereActive()
             ->whereRegistered()
-            ->whereHas('serviceOrders.serviceBills', fn ($query) => $query->whereForPaymentStatus()
-                ->whereNotifiable())
+            ->whereHas('serviceOrders.serviceBills', fn ($query) => $query->whereNotifiable())
             ->get();
 
         /** @var int|null $daysBeforeDueDateNotification */
@@ -51,11 +49,11 @@ class NotifyCustomerServiceBillDueDateAction
                                 $daysBeforeDueDateNotification,
                             ) {
 
-                                /** @var \Domain\ServiceOrder\Models\ServiceBill $latestForPaymentServiceBill */
-                                $latestForPaymentServiceBill = $serviceOrder->latestForPaymentServiceBill();
+                                /** @var \Domain\ServiceOrder\Models\ServiceBill $latestPendingServiceBill */
+                                $latestPendingServiceBill = $serviceOrder->latestPendingServiceBill();
 
                                 /** @var \Carbon\Carbon $dateOfNotification */
-                                $dateOfNotification = now()->parse($latestForPaymentServiceBill->due_date)
+                                $dateOfNotification = now()->parse($latestPendingServiceBill->due_date)
                                     ->subDays($daysBeforeDueDateNotification)
                                     ->toDateString();
 
@@ -63,7 +61,7 @@ class NotifyCustomerServiceBillDueDateAction
                                 $dateToday = now()->toDateString();
 
                                 /** @var \Carbon\Carbon $billDate */
-                                $billDate = now()->parse($latestForPaymentServiceBill->bill_date)
+                                $billDate = now()->parse($latestPendingServiceBill->bill_date)
                                     ->toDateString();
 
                                 if (
@@ -75,7 +73,7 @@ class NotifyCustomerServiceBillDueDateAction
                                         ->onQueue()
                                         ->execute(
                                             $customer,
-                                            $latestForPaymentServiceBill
+                                            $latestPendingServiceBill
                                         );
                                 }
 
