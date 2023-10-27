@@ -104,6 +104,7 @@
         }
 
         .button-link {
+            display: inline-block;
             padding: 10px 20px;
             background-color: #40414b;
             color: #fff;
@@ -114,11 +115,12 @@
             text-align: center;
             font-weight: bold;
             transition: background-color 0.3s;
+
             :hover {
                 background-color: #258cd1;
             }
         }
- 
+
         .footer p {
             margin: 0;
             padding: 0;

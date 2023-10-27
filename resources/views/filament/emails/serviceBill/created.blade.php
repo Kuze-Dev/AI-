@@ -80,8 +80,8 @@
                     </div>
                 </div>
             </div>
-            <div style="">
-                <a href="{{$url}}" class="button-link">Proceed to payment</button>
+            <div style="width: 100%; display: flex; align-items: center; justify-content: center; margin-top: 3em">
+                <a href={{$url}} class="button-link">Proceed to payment</button>
             </div>
         </div>
 

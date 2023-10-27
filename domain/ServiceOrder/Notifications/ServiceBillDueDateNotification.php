@@ -6,7 +6,6 @@ namespace Domain\ServiceOrder\Notifications;
 
 use App\Settings\ServiceSettings;
 use App\Settings\SiteSettings;
-use Domain\Admin\Models\Admin;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -18,12 +17,19 @@ class ServiceBillDueDateNotification extends Notification implements ShouldQueue
     use Queueable;
 
     private ServiceBill $serviceBill;
+
     private string $logo;
+
     private string $title;
+
     private string $description;
+
     private string $from;
+
     private string $url;
+
     private array $replyTo;
+
     private ?string $footer = null;
 
     public function __construct(ServiceBill $serviceBill)
@@ -31,15 +37,16 @@ class ServiceBillDueDateNotification extends Notification implements ShouldQueue
         $this->serviceBill = $serviceBill;
 
         $this->logo = app(SiteSettings::class)->getLogoUrl();
+
         $this->title = app(SiteSettings::class)->name;
+
         $this->description = app(SiteSettings::class)->description;
 
-        $this->url = 'http://' . app(SiteSettings::class)->front_end_domain . '/' . app(ServiceSettings::class)->domain_path_segment .'/'. $serviceBill->reference;
+        $this->url = 'http://'.app(SiteSettings::class)->front_end_domain.'/'.app(ServiceSettings::class)->domain_path_segment.'/'.$serviceBill->reference;
 
         $this->from = app(ServiceSettings::class)->email_sender_name;
 
-        $sanitizedReplyToEmails = $this->sanitizeEmailArray(app(ServiceSettings::class)->email_reply_to ?? []);
-        $this->replyTo = $sanitizedReplyToEmails;
+        $this->replyTo = app(ServiceSettings::class)->email_reply_to ?? [];
 
         $this->footer = app(ServiceSettings::class)->email_footer;
     }
@@ -52,42 +59,21 @@ class ServiceBillDueDateNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $admin = Admin::first();
+        $subject = trans('Payment Reminder');
 
         return (new MailMessage())
-            ->subject('Service Bill Due Date')
+            ->subject($subject)
             ->replyTo($this->replyTo)
             ->from($this->from)
-            ->view('filament.emails.serviceOrder.created', [
+            ->view('filament.emails.serviceBill.due', [
+                'subject' => $subject,
                 'logo' => $this->logo,
                 'title' => $this->title,
                 'description' => $this->description,
-                'timezone' => $admin?->timezone,
                 'serviceBill' => $this->serviceBill,
                 'customer' => $notifiable,
-                'footer' => $this->footer,
                 'url' => $this->url,
+                'footer' => $this->footer,
             ]);
-    }
-
-    /** @return array<string, mixed> */
-    public function toArray(object $notifiable): array
-    {
-        return [];
-    }
-
-    private function sanitizeEmailArray(array $emailArray): array
-    {
-        $sanitizedEmails = [];
-
-        foreach ($emailArray as $email) {
-            $email = trim($email);
-
-            if ( ! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $sanitizedEmails[] = $email;
-            }
-        }
-
-        return $sanitizedEmails;
     }
 }
