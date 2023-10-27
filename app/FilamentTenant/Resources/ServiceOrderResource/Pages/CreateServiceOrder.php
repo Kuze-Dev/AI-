@@ -30,7 +30,7 @@ class CreateServiceOrder extends CreateRecord
     {
         return [
             Action::make('create')
-                ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
