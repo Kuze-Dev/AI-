@@ -6,7 +6,6 @@ namespace App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers;
 
 use App\Settings\SiteSettings;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Models\ServiceTransaction;
 use Exception;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -26,35 +25,33 @@ class ServiceTransactionRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('serviceBill.reference')->exists('serviceBill')
+                Tables\Columns\TextColumn::make('serviceBill.reference')
+                    ->exists('serviceBill')
                     ->label('reference')
+                    ->translateLabel()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('total_amount')->exists('serviceBill')
-                    ->formatStateUsing(function (ServiceTransaction $record) {
-                        return $record->currency.' '.number_format((float) $record->total_amount, 2, '.', ',');
-                    })
+                Tables\Columns\TextColumn::make('total_amount')
+                    ->exists('serviceBill')
+                    ->formatStateUsing(
+                        fn (ServiceTransaction $record): string => $record->getTotalAmountWithCurrency()
+                    )
                     ->label('Amount')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('payment_method.title')->exists('payment_method')
+                Tables\Columns\TextColumn::make('payment_method.title')
+                    ->exists('payment_method')
                     ->label('Payment Method')
+                    ->translateLabel()
                     ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')
-                    ->label(trans('Status'))
-                    ->alignRight()
-                    ->formatStateUsing(function (string $state): string {
-                        return ucfirst($state);
-                    })
-                    ->color(function ($state) {
-                        $newState = str_replace(' ', '_', strtolower($state));
-
-                        return match ($newState) {
-                            ServiceTransactionStatus::PAID->value => 'success',
-                            ServiceTransactionStatus::PENDING->value => 'warning',
-                            ServiceTransactionStatus::REFUNDED->value => 'danger',
-                            default => 'secondary',
-                        };
-                    })->inline()
-                    ->alignLeft(),
+                    ->label('Status')
+                    ->translateLabel()
+                    ->formatStateUsing(
+                        fn (string $state): string => ucfirst($state)
+                    )
+                    ->color(
+                        fn (ServiceTransaction $record): string => $record->getStatusColor()
+                    )
+                    ->inline(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Updated at')
                     ->sortable(),
@@ -65,58 +62,55 @@ class ServiceTransactionRelationManager extends RelationManager
                     ->requiresConfirmation()
                     ->button()
                     ->icon('heroicon-o-download')
-                    ->action(function (ServiceTransaction $record, Tables\Actions\Action $action) {
-                        try {
-                            /** @var \Illuminate\Support\Carbon $createdAt */
-                            $createdAt = $record->created_at;
+                    ->action(
+                        function (ServiceTransaction $record, Tables\Actions\Action $action) {
+                            try {
+                                /** @var \Illuminate\Support\Carbon $createdAt */
+                                $createdAt = $record->created_at;
 
-                            /** @var \Domain\Customer\Models\Customer $customer */
-                            $customer = $record->serviceOrder->customer;
+                                /** @var \Domain\Customer\Models\Customer $customer */
+                                $customer = $record->serviceOrder->customer;
 
-                            /** @var string $filename */
-                            $filename =
-                                $record->getKey().'-'.
-                                $record->serviceOrder
-                                    ->getKey().
-                                $customer
-                                    ->getKey().DIRECTORY_SEPARATOR.
-                                Str::snake(app(SiteSettings::class)->name).
-                                '_'.
-                                $createdAt->format('m_Y').
-                                '.pdf';
+                                /** @var string $filename */
+                                $filename = $record->getKey().'-'.
+                                    $record->serviceOrder
+                                        ->getKey().
+                                    $customer->getKey().DIRECTORY_SEPARATOR.
+                                    Str::snake(app(SiteSettings::class)->name).'_'.
+                                    $createdAt->format('m_Y').
+                                    '.pdf';
 
-                            Pdf::loadView(
-                                'web.layouts.service-order.receipts.default',
-                                ['transaction' => $record]
-                            )
-                                ->save($filename, 'receipt-files');
+                                Pdf::loadView(
+                                    'web.layouts.service-order.receipts.default',
+                                    ['transaction' => $record]
+                                )
+                                    ->save($filename, 'receipt-files');
 
-                            $customer
-                                ->addMedia(
+                                $customer->addMedia(
                                     Storage::disk('receipt-files')
                                         ->path($filename)
                                 )
-                                ->toMediaCollection('receipts');
+                                    ->toMediaCollection('receipts');
 
-                            $action
-                                ->successNotificationTitle(trans('Success'))
-                                ->success();
+                                $action->successNotificationTitle(trans('Success'))
+                                    ->success();
 
-                            /** @var \Spatie\MediaLibrary\MediaCollections\Models\Media $pdf */
-                            $pdf = $customer->getMedia('receipts')
-                                ->sortByDesc('id')
-                                ->first();
+                                /** @var \Spatie\MediaLibrary\MediaCollections\Models\Media $pdf */
+                                $pdf = $customer->getMedia('receipts')
+                                    ->sortByDesc('id')
+                                    ->first();
 
-                            Redirect::away($pdf->original_url);
+                                Redirect::away($pdf->original_url);
 
-                        } catch (Exception $e) {
-                            $action
-                                ->failureNotificationTitle(trans('Something went wrong!'))
-                                ->failure();
+                            } catch (Exception $e) {
+                                $action
+                                    ->failureNotificationTitle(trans('Something went wrong!'))
+                                    ->failure();
 
-                            report($e);
+                                report($e);
+                            }
                         }
-                    })
+                    )
                     ->withActivityLog()
                     ->authorize('customerPrintReceipt'),
             ])

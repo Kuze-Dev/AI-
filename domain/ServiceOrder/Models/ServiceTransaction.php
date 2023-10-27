@@ -19,13 +19,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $payment_method_id
  * @property string $currency
  * @property float $total_amount
- * @property string $status
+ * @property \Domain\ServiceOrder\Enums\ServiceTransactionStatus $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Payment|null $payment
  * @property-read PaymentMethod|null $payment_method
  * @property-read \Domain\ServiceOrder\Models\ServiceBill $serviceBill
  * @property-read \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction query()
@@ -38,6 +39,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction whereTotalAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ServiceTransaction extends Model
@@ -57,6 +59,29 @@ class ServiceTransaction extends Model
         'total_amount' => 'float',
         'status' => ServiceTransactionStatus::class,
     ];
+
+    public function getTotalAmountWithCurrency(): string
+    {
+        return $this->currency.
+            ''.
+            number_format((float) $this->total_amount, 2, '.', ',');
+    }
+
+    public function getStatusColor(): string
+    {
+        return match (
+            str_replace(
+                ' ',
+                '_',
+                strtolower($this->status->value)
+            )
+        ) {
+            ServiceTransactionStatus::PAID->value => 'success',
+            ServiceTransactionStatus::PENDING->value => 'warning',
+            ServiceTransactionStatus::REFUNDED->value => 'danger',
+            default => 'secondary',
+        };
+    }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ServiceOrder\Models\ServiceOrder, \Domain\ServiceOrder\Models\ServiceTransaction> */
     public function serviceOrder(): BelongsTo
