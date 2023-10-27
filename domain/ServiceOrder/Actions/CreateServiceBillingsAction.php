@@ -39,7 +39,7 @@ class CreateServiceBillingsAction
                                 $latestServiceBill = $serviceOrder->latestServiceBill();
 
                                 /** @var \Carbon\Carbon|null $referenceDate */
-                                $referenceDate = $latestServiceBill?->bill_date;
+                                $referenceDate = $latestServiceBill->bill_date;
 
                                 /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
                                 $serviceTransaction = $latestServiceBill->serviceTransaction;
