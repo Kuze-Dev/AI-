@@ -314,13 +314,6 @@ class ServiceResource extends Resource
                     ->reactive()
                     ->hidden(fn (Closure $get) => $get('is_subscription') === false)
                     ->required(fn (Closure $get) => $get('is_subscription') === true),
-                Forms\Components\Toggle::make('is_auto_generated_bill')
-                    ->label(trans('Auto Generate Bill'))
-                    ->reactive()
-                    ->hidden(fn (Closure $get, $state) => $get('is_subscription') === false)
-                    ->afterStateUpdated(
-                        fn (Forms\Components\Toggle $component, Closure $get, Closure $set) => $set('due_date_every', $component->getState() === false ? null : $get('due_date_every'))
-                    ),
                 Forms\Components\Select::make('due_date_every')
                     ->reactive()
                     ->options(function (Closure $get) {
@@ -330,18 +323,14 @@ class ServiceResource extends Resource
 
                         return null;
                     })
-                    ->formatStateUsing(
-                        fn ($record, Closure $get, Closure $set) => $get('is_auto_generated_bill') === true
-                            ? $record->due_date_every : null
-                    )
                     ->hidden(
                         fn (Closure $get) => ($get('is_subscription') === false
                         || $get('billing_cycle') === BillingCycleEnum::DAILY->value)
                     )
-                    ->disabled(
-                        fn (Closure $get) => $get('is_auto_generated_bill') === false
-                    )
-                    ->required(fn (Closure $get) => $get('is_auto_generated_bill') === true),
+                    ->required(),
+                Forms\Components\Toggle::make('is_auto_generated_bill')
+                    ->label(trans('Auto Generate Bill'))
+                    ->reactive(),
                 Forms\Components\Toggle::make('needs_approval')
                     ->label(trans('Needs Approval')),
             ])
