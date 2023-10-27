@@ -118,6 +118,7 @@ class ServiceSettings extends TenantBaseSettings
                         ->placeholder(trans('Days Before Due Date Notification'))
                         ->numeric()
                         ->minValue(1)
+                        ->maxValue(31)
                         ->columnSpan('full'),
                 ]),
         ];
