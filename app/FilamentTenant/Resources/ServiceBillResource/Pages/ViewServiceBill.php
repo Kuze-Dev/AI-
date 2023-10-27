@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\ServiceBillResource\Pages;
 
 use App\FilamentTenant\Resources\ServiceBillResource;
+use App\FilamentTenant\Support;
+use App\FilamentTenant\Support\BadgeLabel;
+use App\FilamentTenant\Support\Divider;
+use App\FilamentTenant\Support\TextLabel;
+use Closure;
 use Domain\Admin\Models\Admin;
+use Domain\ServiceOrder\Enums\ServiceBillStatus;
+use Domain\ServiceOrder\Models\ServiceBill;
+use Domain\Taxation\Enums\PriceDisplay;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
-use App\FilamentTenant\Support;
-use App\FilamentTenant\Support\BadgeLabel;
-use App\FilamentTenant\Support\Divider;
-use App\FilamentTenant\Support\TextLabel;
-use Closure;
-use Domain\ServiceOrder\Enums\ServiceOrderStatus;
-use Domain\ServiceOrder\Models\ServiceBill;
-use Domain\Taxation\Enums\PriceDisplay;
 
 class ViewServiceBill extends ViewRecord
 {
@@ -27,7 +27,7 @@ class ViewServiceBill extends ViewRecord
 
     protected function getHeading(): string|Htmlable
     {
-        return trans('Service Bill Details #') . $this->record->reference;
+        return trans('Service Bill Details #').$this->record->reference;
     }
 
     protected function getFormSchema(): array
@@ -43,7 +43,7 @@ class ViewServiceBill extends ViewRecord
                                 Placeholder::make('service')
                                     ->content(fn ($record) => $record->serviceOrder->service_name),
                                 Placeholder::make('service Price')
-                                    ->content(fn ($record) => $record->serviceOrder->currency_symbol . ' ' . number_format($record->serviceOrder->service_price, 2, '.', ',')),
+                                    ->content(fn ($record) => $record->serviceOrder->currency_symbol.' '.number_format($record->serviceOrder->service_price, 2, '.', ',')),
                             ]),
                         ]),
                         Section::make(trans('Additional Charges'))
@@ -63,22 +63,14 @@ class ViewServiceBill extends ViewRecord
                                     ->inline()
                                     ->readOnly(),
                                 BadgeLabel::make(trans('status'))->formatStateUsing(function (string $state): string {
-                                    if ($state == ServiceOrderStatus::FORPAYMENT->value) {
-                                        return trans('For Payment');
-                                    }
-                                    if ($state == ServiceOrderStatus::INPROGRESS->value) {
-                                        return trans('In Progress');
-                                    }
-
                                     return ucfirst($state);
                                 })
                                     ->color(function ($state) {
                                         $newState = str_replace(' ', '_', strtolower($state));
 
                                         return match ($newState) {
-                                            ServiceOrderStatus::PENDING->value, ServiceOrderStatus::INPROGRESS->value => 'warning',
-                                            ServiceOrderStatus::CLOSED->value, ServiceOrderStatus::INACTIVE->value, ServiceOrderStatus::CLOSED->value => 'danger',
-                                            ServiceOrderStatus::COMPLETED->value, ServiceOrderStatus::ACTIVE->value => 'success',
+                                            ServiceBillStatus::PENDING->value => 'warning',
+                                            ServiceBillStatus::PAID->value => 'success',
                                             default => 'secondary',
                                         };
                                     })->inline()
@@ -93,7 +85,7 @@ class ViewServiceBill extends ViewRecord
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(fn ($record) => $record->serviceOrder->currency_symbol . ' ' . number_format($record->service_price, 2, '.', ','))
+                                ->label(fn ($record) => $record->serviceOrder->currency_symbol.' '.number_format($record->service_price, 2, '.', ','))
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()
@@ -105,7 +97,7 @@ class ViewServiceBill extends ViewRecord
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(fn ($record, Closure $get) => $record->serviceOrder->currency_symbol . ' ' . number_format(array_reduce($get('additional_charges'), function ($carry, $data) {
+                                ->label(fn ($record, Closure $get) => $record->serviceOrder->currency_symbol.' '.number_format(array_reduce($get('additional_charges'), function ($carry, $data) {
                                     if (isset($data['price']) && is_numeric($data['price']) && isset($data['quantity']) && is_numeric($data['quantity'])) {
                                         return $carry + ($data['price'] * $data['quantity']);
                                     }
@@ -118,7 +110,7 @@ class ViewServiceBill extends ViewRecord
                                 ->readOnly(),
                             Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
                                 TextLabel::make('')
-                                    ->label(fn ($record) => trans('Tax (') . $record->tax_percentage . '%)')
+                                    ->label(fn ($record) => trans('Tax (').$record->tax_percentage.'%)')
                                     ->alignLeft()
                                     ->size('md')
                                     ->inline()
@@ -126,7 +118,7 @@ class ViewServiceBill extends ViewRecord
                                 TextLabel::make('')
                                     ->label(fn (ServiceBill $record, Closure $get) => $record->tax_display == PriceDisplay::INCLUSIVE->value ? 'Inclusive'
                                         :
-                                        $record->serviceOrder->currency_symbol . ' ' .  number_format($record->tax_total, 2, '.', '.'))
+                                        $record->serviceOrder->currency_symbol.' '.number_format($record->tax_total, 2, '.', '.'))
                                     ->alignRight()
                                     ->size('md')
                                     ->inline()
@@ -144,7 +136,7 @@ class ViewServiceBill extends ViewRecord
                                 ->readOnly()
                                 ->color('primary'),
                             TextLabel::make('')
-                                ->label(fn (ServiceBill $record, Closure $get) => $record->serviceOrder->currency_symbol . ' ' . number_format($record->total_amount, 2, '.', '.'))
+                                ->label(fn (ServiceBill $record, Closure $get) => $record->serviceOrder->currency_symbol.' '.number_format($record->total_amount, 2, '.', '.'))
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()
@@ -191,13 +183,13 @@ class ViewServiceBill extends ViewRecord
                     ->inline()
                     ->readOnly(),
                 Support\TextLabel::make('')
-                    ->label('' . $additionalcharge['quantity'])
+                    ->label(''.$additionalcharge['quantity'])
                     ->alignLeft()
                     ->size('md')
                     ->inline()
                     ->readOnly(),
                 Support\TextLabel::make('')
-                    ->label($this->record->serviceOrder->currency_symbol . $additionalcharge['price'])
+                    ->label($this->record->serviceOrder->currency_symbol.$additionalcharge['price'])
                     ->alignLeft()
                     ->size('md')
                     ->inline()
