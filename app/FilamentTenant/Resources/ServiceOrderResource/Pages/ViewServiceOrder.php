@@ -6,18 +6,14 @@ namespace App\FilamentTenant\Resources\ServiceOrderResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ServiceOrderResource;
+use App\FilamentTenant\Support;
 use App\FilamentTenant\Support\BadgeLabel;
 use App\FilamentTenant\Support\Divider;
-use Closure;
-use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
-use App\FilamentTenant\Support;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
 use App\Settings\ServiceSettings;
 use Carbon\Carbon;
+use Closure;
 use DateTimeZone;
 use Domain\Admin\Models\Admin;
 use Domain\ServiceOrder\Actions\ChangeServiceOrderStatusAction;
@@ -30,11 +26,15 @@ use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Models\ServiceOrderAddress;
 use Domain\ServiceOrder\Notifications\ChangeByAdminNotification;
 use Domain\Taxation\Enums\PriceDisplay;
-use Filament\Pages\Actions\Action;
+use Filament\Forms;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
@@ -45,12 +45,14 @@ use Illuminate\Support\Facades\Notification as FacadesNotification;
 class ViewServiceOrder extends EditRecord
 {
     use LogsFormActivity;
+
     protected static string $resource = ServiceOrderResource::class;
+
     protected static ?string $recordTitleAttribute = 'reference';
 
     protected function getHeading(): string|Htmlable
     {
-        return trans('Service Order Details #') . $this->record->reference;
+        return trans('Service Order Details #').$this->record->reference;
     }
 
     protected function handleRecordUpdate(Model $record, array $data): Model
@@ -121,7 +123,7 @@ class ViewServiceOrder extends EditRecord
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(fn ($record) => $record->admin->first_name . ' ' . $record->admin->last_name)
+                                ->label(fn ($record) => $record->admin->first_name.' '.$record->admin->last_name)
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()
@@ -159,7 +161,7 @@ class ViewServiceOrder extends EditRecord
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(fn ($record) => $record->currency_symbol . ' ' . number_format($record->service_price, 2, '.', ','))
+                                ->label(fn ($record) => $record->currency_symbol.' '.number_format($record->service_price, 2, '.', ','))
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()
@@ -171,7 +173,7 @@ class ViewServiceOrder extends EditRecord
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(fn ($record, Closure $get) => $record->currency_symbol . ' ' . number_format(array_reduce($get('additional_charges'), function ($carry, $data) {
+                                ->label(fn ($record, Closure $get) => $record->currency_symbol.' '.number_format(array_reduce($get('additional_charges'), function ($carry, $data) {
                                     if (isset($data['price']) && is_numeric($data['price']) && isset($data['quantity']) && is_numeric($data['quantity'])) {
                                         return $carry + ($data['price'] * $data['quantity']);
                                     }
@@ -184,7 +186,7 @@ class ViewServiceOrder extends EditRecord
                                 ->readOnly(),
                             Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
                                 TextLabel::make('')
-                                    ->label(fn ($record) => trans('Tax (') . $record->tax_percentage . '%)')
+                                    ->label(fn ($record) => trans('Tax (').$record->tax_percentage.'%)')
                                     ->alignLeft()
                                     ->size('md')
                                     ->inline()
@@ -192,7 +194,7 @@ class ViewServiceOrder extends EditRecord
                                 TextLabel::make('')
                                     ->label(fn (ServiceOrder $record, Closure $get) => $record->tax_display == PriceDisplay::INCLUSIVE->value ? 'Inclusive'
                                         :
-                                        $record->currency_symbol . ' ' .  number_format(self::calculateTaxInfo($record, $get('additional_charges'))->total_price, 2, '.', '.'))
+                                        $record->currency_symbol.' '.number_format(self::calculateTaxInfo($record, $get('additional_charges'))->total_price, 2, '.', '.'))
                                     ->alignRight()
                                     ->size('md')
                                     ->inline()
@@ -210,7 +212,8 @@ class ViewServiceOrder extends EditRecord
                                 ->readOnly()
                                 ->color('primary'),
                             TextLabel::make('')
-                                ->label(fn (ServiceOrder $record, Closure $get) => $record->currency_symbol . ' ' . number_format(self::calculateTaxInfo($record, $get('additional_charges'))->total_price, 2, '.', '.'))
+                                ->label(fn (ServiceOrder $record, Closure $get) => $record->currency_symbol.' '.
+                                number_format(self::calculateTaxInfo($record, $get('additional_charges'))->total_price, 2, '.', '.'))
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()
@@ -233,7 +236,7 @@ class ViewServiceOrder extends EditRecord
                     Placeholder::make('service')
                         ->content(fn ($record) => $record->service_name),
                     Placeholder::make('service Price')
-                        ->content(fn ($record) => $record->currency_symbol . ' ' . number_format($record->service_price, 2, '.', ',')),
+                        ->content(fn ($record) => $record->currency_symbol.' '.number_format($record->service_price, 2, '.', ',')),
                     Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
                         Placeholder::make('BillingCycle')
                             ->content(fn ($record) => $record->billing_cycle),
@@ -387,15 +390,12 @@ class ViewServiceOrder extends EditRecord
                             $result = $record->update($updateData);
 
                             if ($result) {
+                                app(ChangeServiceOrderStatusAction::class)->execute($record, $shouldSendEmail);
                                 $set('status', ucfirst($data['status_options']));
                                 Notification::make()
                                     ->title(trans('Service Order updated successfully'))
                                     ->success()
                                     ->send();
-                            }
-
-                            if ($shouldSendEmail) {
-                                app(ChangeServiceOrderStatusAction::class)->execute($record);
                             }
 
                             $sendEmailToAdmins = app(ServiceSettings::class)->admin_should_receive;

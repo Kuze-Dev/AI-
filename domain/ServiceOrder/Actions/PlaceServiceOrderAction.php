@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Actions;
 
-use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
@@ -19,7 +18,7 @@ class PlaceServiceOrderAction
     ) {
     }
 
-    public function execute(array $data, int|null $customer_id, int|null $adminId): ServiceOrder|ServiceBill
+    public function execute(array $data, ?int $customer_id, ?int $adminId): ServiceOrder|ServiceBill
     {
         $serviceOrderData = ServiceOrderData::fromArray($data, $customer_id);
 
@@ -27,16 +26,8 @@ class PlaceServiceOrderAction
 
         $this->createServiceOrderAddressAction->execute($serviceOrder, $serviceOrderData);
 
-        $serviceBill = $this->createServiceBillAction->execute(
-            ServiceBillData::fromCreatedServiceOrder($serviceOrder->toArray())
-        );
+        $this->changeServiceOrderStatusAction->execute($serviceOrder, true);
 
-        $this->changeServiceOrderStatusAction->execute($serviceBill->serviceOrder);
-
-        if( ! $adminId) {
-            return $serviceBill;
-        } else {
-            return $serviceOrder;
-        }
+        return $serviceOrder;
     }
 }

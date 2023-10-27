@@ -11,12 +11,12 @@ use Domain\ServiceOrder\Exceptions\InvalidServiceBillException;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Requests\ServiceOrderStoreRequest;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
-use Exception;
 
 #[
     ApiResource('service-order', except: ['destroy']),
@@ -61,11 +61,11 @@ class ServiceOrderController
 
             $serviceBill = $placeServiceOrderAction->execute($validatedData, $customer->id, null);
 
-            if ( ! $serviceBill instanceof ServiceBill) {
+            if (! $serviceBill instanceof ServiceBill) {
                 throw new InvalidServiceBillException();
             }
 
-            app(ChangeServiceOrderStatusAction::class)->execute($serviceBill->serviceOrder);
+            app(ChangeServiceOrderStatusAction::class)->execute($serviceBill->serviceOrder, true);
 
             return response()->json([
                 'message' => 'Service order placed successfully',
