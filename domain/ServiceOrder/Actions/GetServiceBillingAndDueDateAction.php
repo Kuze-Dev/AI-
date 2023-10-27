@@ -4,32 +4,28 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Actions;
 
-use Carbon\Carbon;
-use Domain\Service\Enums\BillingCycleEnum;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData;
 use Domain\ServiceOrder\Exceptions\InvalidServiceBillException;
-use Domain\ServiceOrder\Exceptions\InvalidServiceBillingCycleException;
 use Domain\ServiceOrder\Exceptions\NonSubscriptionNotAllowedException;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Throwable;
 
 class GetServiceBillingAndDueDateAction
 {
+    public function __construct(
+        private ComputeServiceBillingCycle $computeServiceBillingCycle
+    ) {
+    }
+
     /** @throws Throwable */
-    public function execute(ServiceBill $serviceBill): mixed
+    public function execute(ServiceBill $serviceBill): ServiceOrderBillingAndDueDateData
     {
         /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
         $serviceOrder = $serviceBill->serviceOrder;
 
-        if ( ! $serviceOrder->is_subscription) {
+        if (! $serviceOrder->is_subscription) {
             throw new NonSubscriptionNotAllowedException();
         }
-
-        /** @var \Domain\Service\Enums\BillingCycleEnum $billingCycle */
-        $billingCycle = $serviceOrder->billing_cycle;
-
-        /** @var int $dueDateEvery */
-        $dueDateEvery = $serviceOrder->due_date_every ?? 0;
 
         /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
         $serviceTransaction = $serviceBill->serviceTransaction;
@@ -38,17 +34,20 @@ class GetServiceBillingAndDueDateAction
         $referenceDate = $serviceBill->bill_date;
 
         if ($serviceTransaction) {
-            /** @var \Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData $serviceTransactionComputedBillingCycle */
-            $serviceTransactionComputedBillingCycle = $this->computeBillingCycle(
-                $billingCycle,
-                $dueDateEvery,
-                /** @phpstan-ignore-next-line */
-                $serviceTransaction->created_at,
-            );
+            /** @var \Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData
+             *  $serviceTransactionComputedBillingCycle
+             */
+            $serviceTransactionComputedBillingCycle = $this->computeServiceBillingCycle
+                ->execute(
+                    $serviceOrder,
+                    /** @phpstan-ignore-next-line */
+                    $serviceTransaction->created_at,
+                );
 
             if (
                 is_null($serviceBill->due_date) ||
-                $serviceBill->due_date < now()
+                now()->parse($serviceBill->due_date)
+                    ->toDateString() < now()->toDateString()
             ) {
                 $referenceDate = $serviceTransactionComputedBillingCycle
                     ->bill_date;
@@ -59,32 +58,10 @@ class GetServiceBillingAndDueDateAction
             throw new InvalidServiceBillException();
         }
 
-        return $this->computeBillingCycle(
-            $billingCycle,
-            $dueDateEvery,
-            now()->parse($referenceDate)
-        );
-    }
-
-    private function computeBillingCycle(
-        BillingCycleEnum $billingCycleEnum,
-        int $dueDateEvery,
-        Carbon $startDate
-    ): ServiceOrderBillingAndDueDateData {
-        /** @var \Illuminate\Support\Carbon $billDate */
-        $billDate = match ($billingCycleEnum) {
-            BillingCycleEnum::DAILY => $startDate->addDay(),
-            BillingCycleEnum::MONTHLY => $startDate->addMonthNoOverflow(),
-            BillingCycleEnum::YEARLY => $startDate->addYearNoOverflow(),
-            /** @phpstan-ignore-next-line  */
-            default => throw new InvalidServiceBillingCycleException()
-        };
-
-        return new ServiceOrderBillingAndDueDateData(
-            bill_date: $billDate,
-            due_date: now()
-                ->parse($billDate)
-                ->addDays($dueDateEvery)
-        );
+        return $this->computeServiceBillingCycle
+            ->execute(
+                $serviceOrder,
+                now()->parse($referenceDate)
+            );
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Jobs;
 
-use Domain\Customer\Models\Customer;
 use Domain\ServiceOrder\Actions\CreateServiceBillAction;
 use Domain\ServiceOrder\Actions\GetServiceBillingAndDueDateAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
@@ -17,7 +16,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class CreateServiceBillJob implements ShouldQueue, ShouldBeUnique
+class CreateServiceBillJob implements ShouldBeUnique, ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
@@ -25,11 +24,6 @@ class CreateServiceBillJob implements ShouldQueue, ShouldBeUnique
     use SerializesModels;
 
     public function __construct(
-        /**
-         * TODO: to be removed.
-         * @phpstan-ignore-next-line
-         */
-        private Customer $customer,
         private ServiceOrder $serviceOrder,
         private ServiceBill $serviceBill
     ) {
@@ -37,23 +31,22 @@ class CreateServiceBillJob implements ShouldQueue, ShouldBeUnique
 
     public function uniqueId(): string
     {
-        return $this->serviceOrder->reference;
+        return $this->serviceOrder->getRouteKeyName();
     }
 
     public function handle(
         CreateServiceBillAction $createServiceBillAction,
         GetServiceBillingAndDueDateAction $getServiceBillingAndDueDateAction
     ): void {
-        $serviceBillData = ServiceBillData::fromArray(
-            $this->serviceBill->toArray()
-        );
-
-        $serviceOrderBillingAndDueDateData = $getServiceBillingAndDueDateAction
-            ->execute($this->serviceBill);
 
         $createServiceBillAction->execute(
-            $serviceBillData,
-            $serviceOrderBillingAndDueDateData
+            ServiceBillData::fromCreatedServiceOrder(
+                $this->serviceOrder->toArray()
+            ),
+            $getServiceBillingAndDueDateAction->execute(
+                $this->serviceBill
+            )
         );
+
     }
 }

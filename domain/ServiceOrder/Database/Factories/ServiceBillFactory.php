@@ -44,9 +44,15 @@ class ServiceBillFactory extends Factory
         return $this->state(['status' => ServiceBillStatus::FORPAYMENT]);
     }
 
+    /** TODO: to be removed */
     public function forPayment(): self
     {
         return $this->state(['status' => ServiceBillStatus::FORPAYMENT]);
+    }
+
+    public function pending(): self
+    {
+        return $this->state(['status' => ServiceBillStatus::PENDING]);
     }
 
     public function billingDate(?Carbon $bill_date): self

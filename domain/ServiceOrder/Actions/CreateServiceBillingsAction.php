@@ -11,6 +11,11 @@ use Domain\ServiceOrder\Models\ServiceOrder;
 
 class CreateServiceBillingsAction
 {
+    public function __construct(
+        private ComputeServiceBillingCycle $computeServiceBillingCycle
+    ) {
+    }
+
     public function execute(): void
     {
         $customers = Customer::query()
@@ -24,29 +29,54 @@ class CreateServiceBillingsAction
             ->get();
 
         $customers
-            ->each(function (Customer $customer) {
-                $customer
-                    ->serviceOrders
-                    ->each(function (ServiceOrder $serviceOrder) use ($customer) {
-                        /** @var \Domain\ServiceOrder\Models\ServiceBill $latestServiceBill */
-                        $latestServiceBill = $serviceOrder->latestServiceBill();
+            ->each(
+                function (Customer $customer) {
+                    $customer
+                        ->serviceOrders
+                        ->each(
+                            function (ServiceOrder $serviceOrder) use ($customer) {
+                                /** @var \Domain\ServiceOrder\Models\ServiceBill $latestServiceBill */
+                                $latestServiceBill = $serviceOrder->latestServiceBill();
 
-                        if (
-                            now()->parse($latestServiceBill->bill_date)
-                                ->toDateString() === now()->toDateString()
-                        ) {
-                            CreateServiceBillJob::dispatch(
-                                $customer,
-                                $serviceOrder,
-                                $latestServiceBill
-                            )->chain([
-                                new NotifyCustomerLatestServiceBillJob(
-                                    $customer,
-                                    $serviceOrder
-                                ),
-                            ]);
-                        }
-                    });
-            });
+                                /** @var \Carbon\Carbon|null $referenceDate */
+                                $referenceDate = $latestServiceBill->bill_date;
+
+                                /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
+                                $serviceTransaction = $latestServiceBill->serviceTransaction;
+
+                                if (is_null($referenceDate) && $serviceTransaction) {
+                                    /** @var \Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData
+                                     *  $serviceOrderBillingAndDueDateData
+                                     */
+                                    $serviceOrderBillingAndDueDateData = $this->computeServiceBillingCycle
+                                        ->execute(
+                                            $serviceOrder,
+                                            /** @phpstan-ignore-next-line */
+                                            $serviceTransaction->created_at
+                                        );
+
+                                    $referenceDate = $serviceOrderBillingAndDueDateData->bill_date;
+                                }
+
+                                if (
+                                    $referenceDate && (
+                                        now()->parse($referenceDate)
+                                            ->toDateString() === now()->toDateString()
+                                    )
+                                ) {
+                                    CreateServiceBillJob::dispatch(
+                                        $serviceOrder,
+                                        $latestServiceBill
+                                    )->chain([
+                                        new NotifyCustomerLatestServiceBillJob(
+                                            $customer,
+                                            $serviceOrder
+                                        ),
+                                    ]);
+                                }
+                            }
+                        );
+                }
+            );
     }
 }
