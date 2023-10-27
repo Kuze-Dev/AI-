@@ -73,6 +73,7 @@ class ServiceTransactionRelationManager extends RelationManager
                             /** @var \Domain\Customer\Models\Customer $customer */
                             $customer = $record->serviceOrder->customer;
 
+                            /** @var string $filename */
                             $filename =
                                 $record->getKey().'-'.
                                 $record->serviceOrder
@@ -91,19 +92,22 @@ class ServiceTransactionRelationManager extends RelationManager
                                 ->save($filename, 'receipt-files');
 
                             $customer
-                                ->addMedia(Storage::disk('receipt-files')->path($filename))
+                                ->addMedia(
+                                    Storage::disk('receipt-files')
+                                        ->path($filename)
+                                )
                                 ->toMediaCollection('receipts');
 
                             $action
                                 ->successNotificationTitle(trans('Success'))
                                 ->success();
 
-                            Redirect::away(
-                                $customer->getMedia('receipts')
-                                    ->sortByDesc('id')
-                                    ->first()
-                                    ->original_url
-                            );
+                            /** @var \Spatie\MediaLibrary\MediaCollections\Models\Media $pdf */
+                            $pdf = $customer->getMedia('receipts')
+                                ->sortByDesc('id')
+                                ->first();
+
+                            Redirect::away($pdf->original_url);
 
                         } catch (Exception $e) {
                             $action
