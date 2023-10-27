@@ -24,7 +24,6 @@ class ComputeServiceBillingCycleAction
             BillingCycleEnum::DAILY => $startDate->addDay(),
             BillingCycleEnum::MONTHLY => $startDate->addMonthNoOverflow(),
             BillingCycleEnum::YEARLY => $startDate->addYearNoOverflow(),
-            /** @phpstan-ignore-next-line  */
             default => throw new InvalidServiceBillingCycleException()
         };
 

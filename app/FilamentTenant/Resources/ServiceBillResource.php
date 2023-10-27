@@ -44,8 +44,13 @@ class ServiceBillResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_amount')
                     ->formatStateUsing(
-                        fn (ServiceBill $record): string => $record->serviceOrder->currency_symbol.' '.
-                            number_format((float) $record->total_amount, 2, '.', ',')
+                        function (ServiceBill $record): string {
+                            /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
+                            $serviceOrder = $record->serviceOrder;
+
+                            return $serviceOrder->currency_symbol.' '.
+                                number_format((float) $record->total_amount, 2, '.', ',');
+                        }
                     )
                     ->label('Amount')
                     ->translateLabel()

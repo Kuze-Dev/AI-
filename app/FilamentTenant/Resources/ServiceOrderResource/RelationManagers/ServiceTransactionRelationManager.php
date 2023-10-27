@@ -65,13 +65,15 @@ class ServiceTransactionRelationManager extends RelationManager
                                 /** @var \Illuminate\Support\Carbon $createdAt */
                                 $createdAt = $record->created_at;
 
+                                /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
+                                $serviceOrder = $record->serviceOrder;
+
                                 /** @var \Domain\Customer\Models\Customer $customer */
-                                $customer = $record->serviceOrder->customer;
+                                $customer = $serviceOrder->customer;
 
                                 /** @var string $filename */
                                 $filename = $record->getKey().'-'.
-                                    $record->serviceOrder
-                                        ->getKey().
+                                    $serviceOrder->getKey().
                                     $customer->getKey().DIRECTORY_SEPARATOR.
                                     Str::snake(app(SiteSettings::class)->name).'_'.
                                     $createdAt->format('m_Y').
