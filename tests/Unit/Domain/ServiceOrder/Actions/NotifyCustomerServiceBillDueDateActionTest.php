@@ -29,12 +29,11 @@ it('can dispatch to customer with payable bills only (subscription based)', func
         ->has(
             ServiceOrderFactory::new()
                 ->active()
-                ->for(
-                    ServiceFactory::new()
-                        ->isSubscription()
-                        ->withDummyBlueprint()
+                ->subscriptionBased()
+                ->has(
+                    ServiceBillFactory::new()
+                        ->pending()
                 )
-                ->has(ServiceBillFactory::new()->forPayment())
         )
         ->createOne();
 
@@ -51,12 +50,10 @@ it('cannot dispatch to non-subscription based', function () {
             ServiceOrderFactory::new()
                 ->active()
                 ->nonSubscriptionBased()
-                ->for(
-                    ServiceFactory::new()
-                        ->isSubscription(false)
-                        ->withDummyBlueprint()
+                ->has(
+                    ServiceBillFactory::new()
+                        ->pending()
                 )
-                ->has(ServiceBillFactory::new()->forPayment())
         )
         ->createOne();
 
@@ -72,12 +69,12 @@ it('cannot dispatch non notifiable bill', function () {
         ->has(
             ServiceOrderFactory::new()
                 ->active()
-                ->for(
-                    ServiceFactory::new()
-                        ->isSubscription(false)
-                        ->withDummyBlueprint()
+                ->subscriptionBased()
+                ->has(
+                    ServiceBillFactory::new()
+                        ->billingDate(null)
+                        ->pending()
                 )
-                ->has(ServiceBillFactory::new()->forPayment()->billingDate(null))
         )
         ->createOne();
 
@@ -115,12 +112,11 @@ it('cannot dispatch inactive service order', function () {
         ->has(
             ServiceOrderFactory::new()
                 ->inactive()
-                ->for(
-                    ServiceFactory::new()
-                        ->isSubscription()
-                        ->withDummyBlueprint()
+                ->subscriptionBased()
+                ->has(
+                    ServiceBillFactory::new()
+                        ->pending()
                 )
-                ->has(ServiceBillFactory::new()->forPayment())
         )
         ->createOne();
 
@@ -136,12 +132,11 @@ it('cannot dispatch closed service order', function () {
         ->has(
             ServiceOrderFactory::new()
                 ->closed()
-                ->for(
-                    ServiceFactory::new()
-                        ->isSubscription()
-                        ->withDummyBlueprint()
+                ->subscriptionBased()
+                ->has(
+                    ServiceBillFactory::new()
+                        ->pending()
                 )
-                ->has(ServiceBillFactory::new()->forPayment())
         )
         ->createOne();
 
@@ -157,7 +152,7 @@ it('cannot dispatch active service order without a bill', function () {
         ->has(
             ServiceOrderFactory::new()
                 ->active()
-                ->for(ServiceFactory::new()->isSubscription()->withDummyBlueprint())
+                ->subscriptionBased()
         )
         ->createOne();
 

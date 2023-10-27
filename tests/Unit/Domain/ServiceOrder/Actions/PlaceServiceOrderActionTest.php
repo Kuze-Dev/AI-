@@ -7,7 +7,6 @@ use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Service\Databases\Factories\ServiceFactory;
 use Domain\ServiceOrder\Actions\PlaceServiceOrderAction;
 use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
-use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 
 use function PHPUnit\Framework\assertInstanceOf;
@@ -53,7 +52,7 @@ beforeEach(function () {
     ];
 });
 
-it('can create service bill based on service order using admin', function () {
+it('can create using admin', function () {
     $record = app(PlaceServiceOrderAction::class)
         ->execute(
             $this->data,
@@ -64,7 +63,7 @@ it('can create service bill based on service order using admin', function () {
     assertInstanceOf(ServiceOrder::class, $record);
 });
 
-it('can create service bill based on service order', function () {
+it('can create', function () {
     $record = app(PlaceServiceOrderAction::class)
         ->execute(
             $this->data,
@@ -72,5 +71,5 @@ it('can create service bill based on service order', function () {
             null
         );
 
-    assertInstanceOf(ServiceBill::class, $record);
+    assertInstanceOf(ServiceOrder::class, $record);
 });

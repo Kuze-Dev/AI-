@@ -38,20 +38,6 @@ class ServiceBillFactory extends Factory
         return $this->state(['status' => ServiceBillStatus::PAID]);
     }
 
-    /** TODO: to be removed */
-    public function unpaid(): self
-    {
-        /** @phpstan-ignore-next-line */
-        return $this->state(['status' => ServiceBillStatus::FORPAYMENT]);
-    }
-
-    /** TODO: to be removed */
-    public function forPayment(): self
-    {
-        /** @phpstan-ignore-next-line */
-        return $this->state(['status' => ServiceBillStatus::FORPAYMENT]);
-    }
-
     public function pending(): self
     {
         return $this->state(['status' => ServiceBillStatus::PENDING]);
