@@ -11,7 +11,7 @@ use Domain\ServiceOrder\Exceptions\InvalidServiceBillingCycleException;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Throwable;
 
-class ComputeServiceBillingCycle
+class ComputeServiceBillingCycleAction
 {
     /** @throws Throwable */
     public function execute(

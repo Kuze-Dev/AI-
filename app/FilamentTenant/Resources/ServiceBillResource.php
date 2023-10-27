@@ -8,7 +8,7 @@ use App\FilamentTenant\Resources\ServiceBillResource\Pages\ListServiceBill;
 use App\FilamentTenant\Resources\ServiceBillResource\Pages\ViewServiceBill;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
-use Domain\ServiceOrder\Actions\ComputeServiceBillingCycle;
+use Domain\ServiceOrder\Actions\ComputeServiceBillingCycleAction;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Filament\Resources\Form;
@@ -101,7 +101,7 @@ class ServiceBillResource extends Resource
                             /** @var \Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData
                              *  $serviceOrderBillingAndDueDateData
                              */
-                            $serviceOrderBillingAndDueDateData = app(ComputeServiceBillingCycle::class)
+                            $serviceOrderBillingAndDueDateData = app(ComputeServiceBillingCycleAction::class)
                                 ->execute(
                                     $serviceOrder,
                                     /** @phpstan-ignore-next-line */

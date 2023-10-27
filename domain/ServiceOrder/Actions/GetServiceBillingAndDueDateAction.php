@@ -13,7 +13,7 @@ use Throwable;
 class GetServiceBillingAndDueDateAction
 {
     public function __construct(
-        private ComputeServiceBillingCycle $computeServiceBillingCycle
+        private ComputeServiceBillingCycleAction $computeServiceBillingCycleAction
     ) {
     }
 
@@ -37,7 +37,7 @@ class GetServiceBillingAndDueDateAction
             /** @var \Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData
              *  $serviceTransactionComputedBillingCycle
              */
-            $serviceTransactionComputedBillingCycle = $this->computeServiceBillingCycle
+            $serviceTransactionComputedBillingCycle = $this->computeServiceBillingCycleAction
                 ->execute(
                     $serviceOrder,
                     /** @phpstan-ignore-next-line */
@@ -58,7 +58,7 @@ class GetServiceBillingAndDueDateAction
             throw new InvalidServiceBillException();
         }
 
-        return $this->computeServiceBillingCycle
+        return $this->computeServiceBillingCycleAction
             ->execute(
                 $serviceOrder,
                 now()->parse($referenceDate)

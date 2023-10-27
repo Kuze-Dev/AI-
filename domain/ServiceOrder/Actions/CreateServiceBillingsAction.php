@@ -12,7 +12,7 @@ use Domain\ServiceOrder\Models\ServiceOrder;
 class CreateServiceBillingsAction
 {
     public function __construct(
-        private ComputeServiceBillingCycle $computeServiceBillingCycle
+        private ComputeServiceBillingCycleAction $computeServiceBillingCycleAction
     ) {
     }
 
@@ -48,7 +48,7 @@ class CreateServiceBillingsAction
                                     /** @var \Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData
                                      *  $serviceOrderBillingAndDueDateData
                                      */
-                                    $serviceOrderBillingAndDueDateData = $this->computeServiceBillingCycle
+                                    $serviceOrderBillingAndDueDateData = $this->computeServiceBillingCycleAction
                                         ->execute(
                                             $serviceOrder,
                                             /** @phpstan-ignore-next-line */
