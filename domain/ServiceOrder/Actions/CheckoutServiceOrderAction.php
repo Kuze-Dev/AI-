@@ -44,7 +44,7 @@ class CheckoutServiceOrderAction
     {
         $paymentMethod = PaymentMethod::whereSlug($payment_method)->first();
 
-        if ( ! $paymentMethod instanceof PaymentMethod) {
+        if (! $paymentMethod instanceof PaymentMethod) {
             throw new BadRequestHttpException('No paymentMethod found');
         }
 
