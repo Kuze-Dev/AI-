@@ -36,28 +36,34 @@ class ChangeServiceOrderStatusAction
         };
     }
 
-    private function onActive($serviceOrder, $shouldSendEmail)
+    private function onActive(ServiceOrder $serviceOrder, bool $shouldSendEmail): void
     {
         if ($shouldSendEmail) {
-            $serviceOrder?->customer->notify(new ActivatedServiceOrderNotification($this->serviceBill));
+            if ($serviceOrder->customer && $this->serviceBill) {
+                $serviceOrder->customer->notify(new ActivatedServiceOrderNotification($this->serviceBill));
+            }
         }
     }
 
-    private function onInactive($serviceOrder, $shouldSendEmail)
+    private function onInactive(ServiceOrder $serviceOrder, bool $shouldSendEmail): void
     {
         if ($shouldSendEmail) {
-            $serviceOrder?->customer->notify(new ExpiredServiceOrderNotification($this->serviceBill));
+            if ($serviceOrder->customer && $this->serviceBill) {
+                $serviceOrder->customer->notify(new ExpiredServiceOrderNotification($this->serviceBill));
+            }
         }
     }
 
-    private function onClosed($serviceOrder, $shouldSendEmail)
+    private function onClosed(ServiceOrder $serviceOrder, bool $shouldSendEmail): void
     {
         if ($shouldSendEmail) {
-            $serviceOrder?->customer->notify(new ClosedServiceOrderNotification($this->serviceBill));
+            if ($serviceOrder->customer && $this->serviceBill) {
+                $serviceOrder->customer->notify(new ClosedServiceOrderNotification($this->serviceBill));
+            }
         }
     }
 
-    private function onPayment($serviceOrder, $shouldSendEmail)
+    private function onPayment(ServiceOrder $serviceOrder, bool $shouldSendEmail): void
     {
         $serviceBill = $this->serviceBill;
 
@@ -68,11 +74,13 @@ class ChangeServiceOrderStatusAction
         }
 
         if ($shouldSendEmail) {
-            $serviceOrder?->customer->notify(new ForPaymentNotification($serviceBill));
+            if ($serviceOrder->customer) {
+                $serviceOrder->customer->notify(new ForPaymentNotification($serviceBill));
+            }
         }
     }
 
-    private function onProgress($serviceOrder, $shouldSendEmail)
+    private function onProgress(ServiceOrder $serviceOrder, bool $shouldSendEmail): void
     {
         $serviceBill = $this->serviceBill;
 
@@ -83,7 +91,9 @@ class ChangeServiceOrderStatusAction
         }
 
         if ($shouldSendEmail) {
-            $serviceOrder?->customer->notify(new ForPaymentNotification($serviceBill));
+            if ($serviceOrder->customer) {
+                $serviceOrder->customer->notify(new ForPaymentNotification($serviceBill));
+            }
         }
     }
 }

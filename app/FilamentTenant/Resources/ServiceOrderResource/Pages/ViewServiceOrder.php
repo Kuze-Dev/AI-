@@ -41,6 +41,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification as FacadesNotification;
+use Throwable;
 
 class ViewServiceOrder extends EditRecord
 {
@@ -52,9 +53,19 @@ class ViewServiceOrder extends EditRecord
 
     protected function getHeading(): string|Htmlable
     {
-        return trans('Service Order Details #').$this->record->reference;
+        $reference = '';
+        if ($this->record instanceof ServiceOrder) {
+            $reference = $this->record->reference;
+        }
+
+        return trans('Service Order Details #').$reference;
     }
 
+    /**
+     * @param  \Domain\ServiceOrder\Models\ServiceOrder  $record
+     *
+     * @throws Throwable
+     */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(fn () => app(UpdateServiceOrderAction::class)
@@ -71,7 +82,7 @@ class ViewServiceOrder extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
         ];
@@ -213,7 +224,7 @@ class ViewServiceOrder extends EditRecord
                                 ->color('primary'),
                             TextLabel::make('')
                                 ->label(fn (ServiceOrder $record, Closure $get) => $record->currency_symbol.' '.
-                                number_format(self::calculateTaxInfo($record, $get('additional_charges'))->total_price, 2, '.', '.'))
+                                    number_format(self::calculateTaxInfo($record, $get('additional_charges'))->total_price, 2, '.', '.'))
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()
@@ -245,7 +256,15 @@ class ViewServiceOrder extends EditRecord
                     ])->visible(fn ($record) => $record->service->is_subscription),
                     Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
                         Placeholder::make('schedule')
-                            ->content(fn ($record) => Carbon::parse($record->schedule)->timezone(new DateTimeZone($admin?->timezone))->format('F j Y g:i A')),
+                            ->content(function ($record) use ($admin) {
+                                if ($admin) {
+                                    return Carbon::parse($record->schedule)
+                                        ->timezone(new DateTimeZone($admin->timezone))
+                                        ->format('F j Y g:i A');
+                                } else {
+                                    return 'No admin information available';
+                                }
+                            }),
                     ])->visible(fn ($record) => ! $record->service->is_subscription),
                 ]),
             ]),
@@ -418,7 +437,7 @@ class ViewServiceOrder extends EditRecord
             });
     }
 
-    public static function calculateTaxInfo(ServiceOrder $record, $additionalCharges)
+    public static function calculateTaxInfo(ServiceOrder $record, array $additionalCharges): ServiceOrderTaxData
     {
         $subTotal = ServiceOrderResource::getSubtotal($record->service_price, $additionalCharges);
         $totalPrice = $subTotal;

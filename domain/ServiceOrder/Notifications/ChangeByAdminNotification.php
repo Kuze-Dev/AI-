@@ -17,14 +17,19 @@ class ChangeByAdminNotification extends Notification implements ShouldQueue
     use Queueable;
 
     private ?array $cc = [];
+
     private ?array $bcc = [];
+
     private string $url;
+
     private string $reference;
+
     private string $status;
+
     private string $from;
 
     /** Create a new notification instance. */
-    public function __construct(ServiceOrder $serviceOrder, $status)
+    public function __construct(ServiceOrder $serviceOrder, string $status)
     {
         $this->cc = app(ServiceSettings::class)->admin_cc;
         $this->bcc = app(ServiceSettings::class)->admin_bcc;
@@ -53,10 +58,10 @@ class ChangeByAdminNotification extends Notification implements ShouldQueue
             ->greeting('Hi Admin,')
             ->from($this->from)
             ->subject("Service order #$this->reference")
-            ->line("{$user->first_name} {$user->last_name} has updated the status of this service order to '{$this->status}'")
+            ->line("{$user?->first_name} {$user?->last_name} has updated the status of this service order to '{$this->status}'")
             ->action('View Order', $this->url)
-            ->cc($this->cc)
-            ->bcc($this->bcc);
+            ->cc($this->cc ?? [])
+            ->bcc($this->bcc ?? []);
     }
 
     /**

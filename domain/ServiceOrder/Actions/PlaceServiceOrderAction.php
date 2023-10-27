@@ -13,7 +13,6 @@ class PlaceServiceOrderAction
     public function __construct(
         private CreateServiceOrderAction $createServiceOrderAction,
         private CreateServiceOrderAddressAction $createServiceOrderAddressAction,
-        private CreateServiceBillAction $createServiceBillAction,
         private ChangeServiceOrderStatusAction $changeServiceOrderStatusAction
     ) {
     }

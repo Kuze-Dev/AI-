@@ -25,7 +25,7 @@ class ServiceOrderCheckoutController
 
             $data = $checkoutServiceOrderAction->execute($validatedData);
 
-            if ( ! $data) {
+            if (! $data) {
                 throw new InvalidServiceTransactionException();
             }
 
@@ -41,8 +41,6 @@ class ServiceOrderCheckoutController
                 'message' => 'Invalid Service Transaction',
             ], 404);
         } catch (Exception $e) {
-            info($e->getMessage());
-
             return response()->json([
                 'message' => 'Something went wrong!',
             ], 404);

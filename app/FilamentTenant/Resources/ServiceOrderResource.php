@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\CreateServiceOrder;
-use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ViewServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ListServiceOrder;
+use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ViewServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceBillRelationManager;
 use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceTransactionRelationManager;
 use App\FilamentTenant\Support\SchemaFormBuilder;
@@ -36,14 +35,13 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Str;
 
 class ServiceOrderResource extends Resource
 {
     use ContextualResource;
-    use LogsFormActivity;
 
     protected static ?string $model = ServiceOrder::class;
 
@@ -209,7 +207,7 @@ class ServiceOrderResource extends Resource
                                                 : ''),
                                         Placeholder::make('Service Price')
                                             ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
-                                                ? $Currency . ' ' . number_format(Service::whereId($serviceId)->first()?->selling_price, 2, '.', ',')
+                                                ? $Currency.' '.number_format(Service::whereId($serviceId)->first()?->selling_price ?? 0.0, 2, '.', ',')
                                                 : ''),
                                         Forms\Components\Group::make()->columnSpan(2)->columns(2)->visible(
                                             fn (Closure $get) => Service::whereId($get('service_id'))->first()?->is_subscription
@@ -277,7 +275,7 @@ class ServiceOrderResource extends Resource
                                 ->readOnly(),
                             TextLabel::make('')
 
-                                ->label(fn (Closure $get) => $Currency . ' ' . number_format((Service::whereId($get('service_id'))->first()?->selling_price ?? 0), 2, '.', ','))
+                                ->label(fn (Closure $get) => $Currency.' '.number_format((Service::whereId($get('service_id'))->first()?->selling_price ?? 0), 2, '.', ','))
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()
@@ -289,7 +287,7 @@ class ServiceOrderResource extends Resource
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(fn (Closure $get) => $Currency . ' ' . number_format(array_reduce($get('additional_charges'), function ($carry, $data) {
+                                ->label(fn (Closure $get) => $Currency.' '.number_format(array_reduce($get('additional_charges'), function ($carry, $data) {
                                     if (isset($data['price']) && is_numeric($data['price']) && isset($data['quantity']) && is_numeric($data['quantity'])) {
                                         return $carry + ($data['price'] * $data['quantity']);
                                     }
@@ -303,13 +301,13 @@ class ServiceOrderResource extends Resource
                             Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
 
                                 TextLabel::make('')
-                                    ->label(fn (Closure $get) => trans('Tax (') .
+                                    ->label(fn (Closure $get) => trans('Tax (').
                                         (self::getTax(
                                             Service::whereId($get('service_id'))->first()?->selling_price ?? 0,
                                             $get('additional_charges'),
                                             $get('is_same_as_billing') ? $get('service_address_id') :
                                                 $get('billing_address_id')
-                                        )->tax_percentage)  .  '%)')
+                                        )->tax_percentage).'%)')
                                     ->alignLeft()
                                     ->size('md')
                                     ->inline()
@@ -320,7 +318,7 @@ class ServiceOrderResource extends Resource
                                         $get('additional_charges'),
                                         $get('is_same_as_billing') ? $get('service_address_id') :
                                             $get('billing_address_id')
-                                    )->tax_display) == PriceDisplay::INCLUSIVE ? 'Inclusive' : $Currency . ' ' . (self::getTax(
+                                    )->tax_display) == PriceDisplay::INCLUSIVE ? 'Inclusive' : $Currency.' '.(self::getTax(
                                         Service::whereId($get('service_id'))->first()?->selling_price ?? 0,
                                         $get('additional_charges'),
                                         $get('is_same_as_billing') ? $get('service_address_id') :
@@ -332,14 +330,16 @@ class ServiceOrderResource extends Resource
                                     ->readOnly(),
                             ])->visible(
                                 function (array $state) {
-                                    return (isset(self::getTax(
-                                        Service::whereId($state['service_id'])->first()?->selling_price ?? 0,
+                                    $sellingPrice = Service::whereId($state['service_id'])->first()?->selling_price ?? 0;
+                                    $taxDisplay = self::getTax(
+                                        $sellingPrice,
                                         $state['additional_charges'],
-                                        $state['is_same_as_billing'] ? $state['service_address_id'] :
-                                            $state['billing_address_id']
-                                    )->tax_display) ?? isset($state['service_address_id'])
-                                    && $state['is_same_as_billing'])
-                                    || isset($state['billing_address_id']);
+                                        $state['is_same_as_billing'] ? $state['service_address_id'] : $state['billing_address_id']
+                                    )->tax_display;
+
+                                    return (
+                                        isset($taxDisplay) || (isset($state['service_address_id']) && $state['is_same_as_billing'])
+                                    ) || isset($state['billing_address_id']);
                                 }
                             ),
                             TextLabel::make('')
@@ -350,7 +350,7 @@ class ServiceOrderResource extends Resource
                                 ->readOnly()
                                 ->color('primary'),
                             TextLabel::make('')
-                                ->label(fn (Closure $get) => $Currency . ' ' .  number_format((self::getTax(
+                                ->label(fn (Closure $get) => $Currency.' '.number_format((self::getTax(
                                     Service::whereId($get('service_id'))->first()?->selling_price ?? 0,
                                     $get('additional_charges'),
                                     $get('is_same_as_billing') ? $get('service_address_id') :
@@ -383,7 +383,7 @@ class ServiceOrderResource extends Resource
                             ->orderBy('customer_first_name', $direction);
                     })
                     ->formatStateUsing(function ($record) {
-                        return Str::limit($record->customer_first_name . ' ' . $record->customer_last_name, 30);
+                        return Str::limit($record->customer_first_name.' '.$record->customer_last_name, 30);
                     })
                     ->searchable(query: function (Builder $query, string $search) {
                         $query->where('customer_first_name', 'like', "%{$search}%")
@@ -391,7 +391,7 @@ class ServiceOrderResource extends Resource
                     })->wrap(),
                 Tables\Columns\TextColumn::make('total')
                     ->formatStateUsing(function (ServiceOrder $record) {
-                        return $record->currency_symbol . ' ' . number_format((float) $record->total_price, 2, '.', ',');
+                        return $record->currency_symbol.' '.number_format((float) $record->total_price, 2, '.', ',');
                     })
                     ->alignRight()
                     ->label(trans('Total'))
@@ -449,7 +449,7 @@ class ServiceOrderResource extends Resource
         ];
     }
 
-    public static function getSubtotal($selling_price, $additional_charges): float
+    public static function getSubtotal(float $selling_price, array $additional_charges): float
     {
         $subTotal = app(CalculateServiceOrderTotalPriceAction::class)
             ->execute(
@@ -469,7 +469,7 @@ class ServiceOrderResource extends Resource
                                 );
                             }
                         },
-                        $additional_charges ?? []
+                        $additional_charges
                     )
                 )
             )
@@ -478,11 +478,11 @@ class ServiceOrderResource extends Resource
         return $subTotal;
     }
 
-    public static function getTax($selling_price, $additional_charges, $billing_address_id)
+    public static function getTax(float $selling_price, array $additional_charges, ?int $billing_address_id): ServiceOrderTaxData
     {
         $subTotal = self::getSubtotal($selling_price, $additional_charges);
 
-        if ( ! isset($billing_address_id)) {
+        if (! isset($billing_address_id)) {
             return new ServiceOrderTaxData(
                 sub_total: $subTotal,
                 tax_display: null,
