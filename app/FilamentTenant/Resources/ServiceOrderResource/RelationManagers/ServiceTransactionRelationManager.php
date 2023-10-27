@@ -12,12 +12,14 @@ use Exception;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ServiceTransactionRelationManager extends RelationManager
 {
     protected static string $relationship = 'serviceTransactions';
+
     protected static ?string $title = 'Payment';
 
     public static function table(Table $table): Table
@@ -29,7 +31,7 @@ class ServiceTransactionRelationManager extends RelationManager
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_amount')->exists('serviceBill')
                     ->formatStateUsing(function (ServiceTransaction $record) {
-                        return $record->currency . ' ' . number_format((float) $record->total_amount, 2, '.', ',');
+                        return $record->currency.' '.number_format((float) $record->total_amount, 2, '.', ',');
                     })
                     ->label('Amount')
                     ->sortable(),
@@ -60,7 +62,7 @@ class ServiceTransactionRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\Action::make('print')
                     ->translateLabel()
-                    // ->requiresConfirmation()
+                    ->requiresConfirmation()
                     ->button()
                     ->icon('heroicon-o-download')
                     ->action(function (ServiceTransaction $record, Tables\Actions\Action $action) {
@@ -71,6 +73,7 @@ class ServiceTransactionRelationManager extends RelationManager
                             /** @var \Domain\Customer\Models\Customer $customer */
                             $customer = $record->serviceOrder->customer;
 
+                            /** @var string $filename */
                             $filename =
                                 $record->getKey().'-'.
                                 $record->serviceOrder
@@ -89,17 +92,26 @@ class ServiceTransactionRelationManager extends RelationManager
                                 ->save($filename, 'receipt-files');
 
                             $customer
-                                ->addMedia(Storage::disk('receipt-files')->path($filename))
+                                ->addMedia(
+                                    Storage::disk('receipt-files')
+                                        ->path($filename)
+                                )
                                 ->toMediaCollection('receipts');
 
                             $action
                                 ->successNotificationTitle(trans('Success'))
                                 ->success();
 
+                            /** @var \Spatie\MediaLibrary\MediaCollections\Models\Media $pdf */
+                            $pdf = $customer->getMedia('receipts')
+                                ->sortByDesc('id')
+                                ->first();
+
+                            Redirect::away($pdf->original_url);
+
                         } catch (Exception $e) {
                             $action
-                                ->failureNotificationTitle($e->getMessage())
-                                // ->failureNotificationTitle(trans('Something went wrong.'))
+                                ->failureNotificationTitle(trans('Something went wrong!'))
                                 ->failure();
 
                             report($e);
