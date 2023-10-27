@@ -9,8 +9,10 @@ use App\FilamentTenant\Resources\ServiceBillResource\Pages\ViewServiceBill;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
 use Domain\ServiceOrder\Actions\ComputeServiceBillingCycleAction;
+use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
+use Domain\ServiceOrder\Models\ServiceOrder;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -88,45 +90,16 @@ class ServiceBillResource extends Resource
                     ->label(function ($livewire) {
                         $serviceOrder = $livewire->ownerRecord;
 
-                        /** @var \Domain\ServiceOrder\Models\ServiceBill $latestServiceBill */
-                        $latestServiceBill = $serviceOrder->latestServiceBill();
-
-                        /** @var \Carbon\Carbon|null $referenceDate */
-                        $referenceDate = $latestServiceBill->bill_date;
-
-                        /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
-                        $serviceTransaction = $latestServiceBill->serviceTransaction;
-
-                        if (is_null($referenceDate) && $serviceTransaction) {
-                            /** @var \Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData
-                             *  $serviceOrderBillingAndDueDateData
-                             */
-                            $serviceOrderBillingAndDueDateData = app(ComputeServiceBillingCycleAction::class)
-                                ->execute(
-                                    $serviceOrder,
-                                    /** @phpstan-ignore-next-line */
-                                    $serviceTransaction->created_at
-                                );
-
-                            $referenceDate = $serviceOrderBillingAndDueDateData->bill_date;
-                        }
-
-                        /** @var string */
-                        $timeZone = Auth::user()?->timezone;
-
-                        $formattedState = Carbon::parse($referenceDate)
-                            ->setTimezone($timeZone)
-                            ->translatedFormat('F d, Y g:i A');
-
-                        return 'Upcoming Bill: '.$formattedState;
+                        return self::upCommingBill($serviceOrder);
                     })
                     ->translateLabel()
                     ->color('secondary')
-                    ->disabled()->visible(
+                    ->disabled()
+                    ->visible(
                         function ($livewire) {
-                            $isAutoBilling = $livewire->ownerRecord->is_auto_generated_bill;
+                            $serviceOrder = $livewire->ownerRecord;
 
-                            return $isAutoBilling;
+                            return self::shouldDisplayUpcomingBill($serviceOrder);
                         }
                     ),
             ])
@@ -140,5 +113,52 @@ class ServiceBillResource extends Resource
             'index' => ListServiceBill::route('/'),
             'view' => ViewServiceBill::route('/{record}'),
         ];
+    }
+
+    private static function shouldDisplayUpcomingBill(ServiceOrder $serviceOrder): bool
+    {
+        $isAutoBilling = $serviceOrder->is_auto_generated_bill;
+        $latestServiceBill = $serviceOrder->latestServiceBill();
+
+        if ($isAutoBilling && isset($latestServiceBill) && $serviceOrder->status == ServiceOrderStatus::ACTIVE) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static function upCommingBill(ServiceOrder $serviceOrder): string
+    {
+        /** @var \Domain\ServiceOrder\Models\ServiceBill $latestServiceBill */
+        $latestServiceBill = $serviceOrder->latestServiceBill();
+
+        /** @var \Carbon\Carbon|null $referenceDate */
+        $referenceDate = $latestServiceBill?->bill_date;
+
+        /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
+        $serviceTransaction = $latestServiceBill?->serviceTransaction;
+
+        if (is_null($referenceDate) && $serviceTransaction) {
+            /** @var \Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData
+             *  $serviceOrderBillingAndDueDateData
+             */
+            $serviceOrderBillingAndDueDateData = app(ComputeServiceBillingCycleAction::class)
+                ->execute(
+                    $serviceOrder,
+                    /** @phpstan-ignore-next-line */
+                    $serviceTransaction->created_at
+                );
+
+            $referenceDate = $serviceOrderBillingAndDueDateData->bill_date;
+        }
+
+        /** @var string */
+        $timeZone = Auth::user()?->timezone;
+
+        $formattedState = Carbon::parse($referenceDate)
+            ->setTimezone($timeZone)
+            ->format('F d, Y');
+
+        return 'Upcoming Bill: '.$formattedState;
     }
 }

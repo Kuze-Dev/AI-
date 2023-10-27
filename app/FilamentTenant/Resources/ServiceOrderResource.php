@@ -305,8 +305,8 @@ class ServiceOrderResource extends Resource
                                         (self::getTax(
                                             Service::whereId($get('service_id'))->first()?->selling_price ?? 0,
                                             $get('additional_charges'),
-                                            $get('is_same_as_billing') ? $get('service_address_id') :
-                                                $get('billing_address_id')
+                                            (int) ($get('is_same_as_billing') ? $get('service_address_id') :
+                                                $get('billing_address_id'))
                                         )->tax_percentage).'%)')
                                     ->alignLeft()
                                     ->size('md')
@@ -316,13 +316,13 @@ class ServiceOrderResource extends Resource
                                     ->label(fn ($record, Closure $get) => (self::getTax(
                                         Service::whereId($get('service_id'))->first()?->selling_price ?? 0,
                                         $get('additional_charges'),
-                                        $get('is_same_as_billing') ? $get('service_address_id') :
-                                            $get('billing_address_id')
+                                        (int) ($get('is_same_as_billing') ? $get('service_address_id') :
+                                            $get('billing_address_id'))
                                     )->tax_display) == PriceDisplay::INCLUSIVE ? 'Inclusive' : $Currency.' '.(self::getTax(
                                         Service::whereId($get('service_id'))->first()?->selling_price ?? 0,
                                         $get('additional_charges'),
-                                        $get('is_same_as_billing') ? $get('service_address_id') :
-                                            $get('billing_address_id')
+                                        (int) ($get('is_same_as_billing') ? $get('service_address_id') :
+                                            $get('billing_address_id'))
                                     )->tax_total))
                                     ->alignRight()
                                     ->size('md')
@@ -334,7 +334,7 @@ class ServiceOrderResource extends Resource
                                     $taxDisplay = self::getTax(
                                         $sellingPrice,
                                         $state['additional_charges'],
-                                        $state['is_same_as_billing'] ? $state['service_address_id'] : $state['billing_address_id']
+                                        (int) ($state['is_same_as_billing'] ? $state['service_address_id'] : $state['billing_address_id'])
                                     )->tax_display;
 
                                     return (
@@ -353,8 +353,8 @@ class ServiceOrderResource extends Resource
                                 ->label(fn (Closure $get) => $Currency.' '.number_format((self::getTax(
                                     Service::whereId($get('service_id'))->first()?->selling_price ?? 0,
                                     $get('additional_charges'),
-                                    $get('is_same_as_billing') ? $get('service_address_id') :
-                                        $get('billing_address_id')
+                                    (int) ($get('is_same_as_billing') ? $get('service_address_id') :
+                                    $get('billing_address_id'))
                                 )->total_price), 2, '.', ','))
                                 ->alignRight()
                                 ->size('md')
@@ -482,7 +482,7 @@ class ServiceOrderResource extends Resource
     {
         $subTotal = self::getSubtotal($selling_price, $additional_charges);
 
-        if (! isset($billing_address_id)) {
+        if (is_null($billing_address_id) || $billing_address_id === 0) {
             return new ServiceOrderTaxData(
                 sub_total: $subTotal,
                 tax_display: null,
