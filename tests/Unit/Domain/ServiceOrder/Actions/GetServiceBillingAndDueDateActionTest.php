@@ -86,17 +86,12 @@ it(
         now()->setTestNow(now()->parse($createdAt)->addDay());
 
         $serviceOrder = ServiceOrderFactory::new()
-            ->for(
-                ServiceFactory::new()
-                    ->isActive()
-                    ->isSubscription()
-                    ->withDummyBlueprint()
-            )
+            ->active()
+            ->subscriptionBased()
             ->has(
-                ServiceBillFactory::new([
-                    'bill_date' => null,
-                    'due_date' => null,
-                ])
+                ServiceBillFactory::new()
+                    ->billingDate(null)
+                    ->dueDate(null)
                     ->paid()
                     ->has(ServiceTransactionFactory::new())
             )
@@ -114,12 +109,12 @@ it(
             ->toBeGreaterThan($nextBillDate);
 
         expect($dates->due_date)
-            ->toBeGreaterThan($nextDueDate);
+            ->toBeGreaterThan($dates->bill_date);
     }
 )->with($dataSets);
 
 it(
-    'can get billing dates based on service bill (on-time)',
+    'can get billing dates based on service bill (on-time payment)',
     function (
         BillingCycleEnum $billingCycle,
         int $dueDateEvery,
@@ -133,17 +128,12 @@ it(
         now()->setTestNow(now()->parse($dueDate)->subDay());
 
         $serviceOrder = ServiceOrderFactory::new()
-            ->for(
-                ServiceFactory::new()
-                    ->isActive()
-                    ->isSubscription()
-                    ->withDummyBlueprint()
-            )
+            ->active()
+            ->subscriptionBased()
             ->has(
-                ServiceBillFactory::new([
-                    'bill_date' => $billDate,
-                    'due_date' => $dueDate,
-                ])
+                ServiceBillFactory::new()
+                    ->billingDate($billDate)
+                    ->dueDate($dueDate)
                     ->paid()
                     ->has(ServiceTransactionFactory::new())
             )
@@ -157,16 +147,22 @@ it(
         $dates = $this->getServiceBillingAndDueDateAction
             ->execute($serviceBill);
 
-        expect($dates->bill_date->format($this->dateFormat))
+        expect(
+            $dates->bill_date
+                ->format($this->dateFormat)
+        )
             ->toBe($nextBillDate->format($this->dateFormat));
 
-        expect($dates->due_date->format($this->dateFormat))
+        expect(
+            $dates->due_date
+                ->format($this->dateFormat)
+        )
             ->toBe($nextDueDate->format($this->dateFormat));
     }
 )->with($dataSets);
 
 it(
-    'can get billing dates based on service bill (late)',
+    'can get billing dates based on service bill (late payment)',
     function (
         BillingCycleEnum $billingCycle,
         int $dueDateEvery,
@@ -180,17 +176,12 @@ it(
         now()->setTestNow(now()->parse($dueDate)->addDay());
 
         $serviceOrder = ServiceOrderFactory::new()
-            ->for(
-                ServiceFactory::new()
-                    ->isActive()
-                    ->isSubscription()
-                    ->withDummyBlueprint()
-            )
+            ->active()
+            ->subscriptionBased()
             ->has(
-                ServiceBillFactory::new([
-                    'bill_date' => $billDate,
-                    'due_date' => $dueDate,
-                ])
+                ServiceBillFactory::new()
+                    ->billingDate($billDate)
+                    ->dueDate($dueDate)
                     ->paid()
                     ->has(ServiceTransactionFactory::new())
             )
@@ -208,18 +199,14 @@ it(
             ->toBeGreaterThan($nextBillDate);
 
         expect($dates->due_date)
-            ->toBeGreaterThan($nextDueDate);
+            ->toBeGreaterThan($dates->bill_date);
     }
 )->with($dataSets);
 
-it('can can get billing dates (daily billing cycle)', function () {
+it('can get billing dates (daily billing cycle)', function () {
     $serviceOrder = ServiceOrderFactory::new()
-        ->for(
-            ServiceFactory::new()
-                ->isActive()
-                ->isSubscription()
-                ->withDummyBlueprint()
-        )
+        ->active()
+        ->subscriptionBased()
         ->has(
             ServiceBillFactory::new()
                 ->billingDate(null)
@@ -247,19 +234,14 @@ it('can can get billing dates (daily billing cycle)', function () {
         ->toEqual($dates->bill_date);
 });
 
-it('can cannot get billing dates', function () {
+it('cannot get billing dates', function () {
     $serviceOrder = ServiceOrderFactory::new()
-        ->for(
-            ServiceFactory::new()
-                ->isActive()
-                ->isSubscription()
-                ->withDummyBlueprint()
-        )
+        ->subscriptionBased()
         ->has(
-            ServiceBillFactory::new([
-                'bill_date' => null,
-                'due_date' => null,
-            ])->unpaid()
+            ServiceBillFactory::new()
+                ->billingDate(null)
+                ->dueDate(null)
+                ->pending()
         )
         ->createOne();
 

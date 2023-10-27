@@ -11,6 +11,7 @@ beforeEach(function () {
     testInTenantContext();
 });
 
+/** TODO: to be removed. */
 it('can update', function () {
     $serviceOrder = ServiceOrderFactory::new()
         ->active()
