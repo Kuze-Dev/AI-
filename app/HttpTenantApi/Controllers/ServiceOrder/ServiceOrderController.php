@@ -7,12 +7,14 @@ namespace App\HttpTenantApi\Controllers\ServiceOrder;
 use App\HttpTenantApi\Resources\ServiceOrderResource;
 use Domain\ServiceOrder\Actions\ChangeServiceOrderStatusAction;
 use Domain\ServiceOrder\Actions\PlaceServiceOrderAction;
+use Domain\ServiceOrder\DataTransferObjects\PlaceServiceOrderData;
 use Domain\ServiceOrder\Exceptions\InvalidServiceBillException;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Requests\ServiceOrderStoreRequest;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -51,29 +53,31 @@ class ServiceOrderController
         );
     }
 
-    public function store(ServiceOrderStoreRequest $request, PlaceServiceOrderAction $placeServiceOrderAction): JsonResponse
-    {
+    public function store(
+        ServiceOrderStoreRequest $request,
+        PlaceServiceOrderAction $placeServiceOrderAction
+    ): JsonResponse {
+
         try {
             $validatedData = $request->validated();
 
-            /** @var \Domain\Customer\Models\Customer $customer */
-            $customer = auth()->user();
-
-            $serviceBill = $placeServiceOrderAction->execute($validatedData, $customer->id);
-
-            if (! $serviceBill instanceof ServiceBill) {
-                throw new InvalidServiceBillException();
-            }
-
             /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
-            $serviceOrder = $serviceBill->serviceOrder;
-
-            app(ChangeServiceOrderStatusAction::class)
-                ->execute($serviceOrder, true);
+            $serviceOrder = $placeServiceOrderAction->execute(
+                new PlaceServiceOrderData(
+                    customer_id: (int) Auth::id(),
+                    service_id: (int) $validatedData->service_id,
+                    schedule: $validatedData->schedule,
+                    service_address_id: $validatedData->service_address_id,
+                    billing_address_id: $validatedData->billing_address_id,
+                    is_same_as_billing: $validatedData->is_same_as_billing,
+                    additional_charges: $validatedData->additional_charges,
+                    form: $validatedData->form
+                )
+            );
 
             return response()->json([
                 'message' => 'Service order placed successfully',
-                'data' => $serviceBill,
+                'data' => $serviceOrder->latestServiceBill(),
             ], 201);
         } catch (InvalidServiceBillException) {
             return response()->json([

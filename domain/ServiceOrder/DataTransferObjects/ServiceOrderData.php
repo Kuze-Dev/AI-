@@ -9,7 +9,7 @@ use DateTime;
 class ServiceOrderData
 {
     public function __construct(
-        public readonly ?int $customer_id,
+        public readonly int $customer_id,
         public readonly int $service_id,
         public readonly DateTime $schedule,
         public readonly ?int $service_address_id,
@@ -20,10 +20,10 @@ class ServiceOrderData
     ) {
     }
 
-    public static function fromArray(array $data, ?int $customer_id): self
+    public static function fromArray(array $data): self
     {
         return new self(
-            customer_id: isset($data['customer_id']) ? (int) $data['customer_id'] : $customer_id,
+            customer_id: (int) $data['customer_id'],
             service_id: (int) $data['service_id'],
             schedule: new DateTime($data['schedule']),
             service_address_id: (int) $data['service_address_id'],
