@@ -52,7 +52,7 @@ it('can create service order addresses', function () {
     );
 
     $serviceOrder = app(CreateServiceOrderAction::class)
-        ->execute($serviceOrderData, $this->admin->id);
+        ->execute($serviceOrderData);
 
     app(CreateServiceOrderAddressAction::class)
         ->execute($serviceOrder, $serviceOrderData);

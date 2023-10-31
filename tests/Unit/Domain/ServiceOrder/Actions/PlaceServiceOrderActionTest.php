@@ -56,8 +56,7 @@ it('can create using admin', function () {
     $record = app(PlaceServiceOrderAction::class)
         ->execute(
             $this->data,
-            $this->customer->id,
-            $this->admin->id
+            $this->customer->id
         );
 
     assertInstanceOf(ServiceOrder::class, $record);
@@ -67,8 +66,7 @@ it('can create', function () {
     $record = app(PlaceServiceOrderAction::class)
         ->execute(
             $this->data,
-            $this->customer->id,
-            null
+            $this->customer->id
         );
 
     assertInstanceOf(ServiceOrder::class, $record);

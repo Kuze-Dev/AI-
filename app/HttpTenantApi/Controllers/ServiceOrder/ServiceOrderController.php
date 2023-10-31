@@ -59,7 +59,7 @@ class ServiceOrderController
             /** @var \Domain\Customer\Models\Customer $customer */
             $customer = auth()->user();
 
-            $serviceBill = $placeServiceOrderAction->execute($validatedData, $customer->id, null);
+            $serviceBill = $placeServiceOrderAction->execute($validatedData, $customer->id);
 
             if (! $serviceBill instanceof ServiceBill) {
                 throw new InvalidServiceBillException();

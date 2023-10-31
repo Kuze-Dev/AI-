@@ -17,11 +17,11 @@ class PlaceServiceOrderAction
     ) {
     }
 
-    public function execute(array $data, ?int $customer_id, ?int $adminId): ServiceOrder|ServiceBill
+    public function execute(array $data, ?int $customer_id): ServiceOrder|ServiceBill
     {
         $serviceOrderData = ServiceOrderData::fromArray($data, $customer_id);
 
-        $serviceOrder = $this->createServiceOrderAction->execute($serviceOrderData, $adminId);
+        $serviceOrder = $this->createServiceOrderAction->execute($serviceOrderData);
 
         $this->createServiceOrderAddressAction->execute($serviceOrder, $serviceOrderData);
 

@@ -13,6 +13,7 @@ use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -25,8 +26,7 @@ class CreateServiceOrderAction
     }
 
     public function execute(
-        ServiceOrderData $serviceOrderData,
-        ?int $adminId
+        ServiceOrderData $serviceOrderData
     ): ServiceOrder {
 
         $uniqueReference = null;
@@ -92,7 +92,9 @@ class CreateServiceOrderAction
         $taxableInfo = $this->getTax($serviceOrderData, $subTotal);
 
         $serviceOrder = ServiceOrder::create([
-            'admin_id' => $adminId,
+            'admin_id' => Auth::user()?->hasRole(config('domain.role.super_admin'))
+                ? Auth::id()
+                : null,
             'service_id' => $serviceOrderData->service_id,
             'customer_id' => $serviceOrderData->customer_id,
             'customer_first_name' => $customer->first_name,

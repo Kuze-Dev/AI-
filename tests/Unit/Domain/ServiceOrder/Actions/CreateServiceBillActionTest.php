@@ -58,7 +58,7 @@ it('can create', function () {
     );
 
     $serviceOrder = app(CreateServiceOrderAction::class)
-        ->execute($serviceOrderData, $this->admin->id);
+        ->execute($serviceOrderData);
 
     $serviceBill = app(CreateServiceBillAction::class)->execute(
         ServiceBillData::fromCreatedServiceOrder($serviceOrder->toArray())
@@ -85,7 +85,7 @@ it('can create bill billing and due dates', function () {
         ->createOne();
 
     $serviceOrder = app(CreateServiceOrderAction::class)
-        ->execute($serviceOrderData, $this->admin->id);
+        ->execute($serviceOrderData);
 
     $serviceOrderBillingAndDueDateData = app(GetServiceBillingAndDueDateAction::class)
         ->execute($serviceBill);

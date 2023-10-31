@@ -23,7 +23,7 @@ class CreateServiceOrder extends CreateRecord
     {
         $user = Auth::user();
 
-        return DB::transaction(fn () => app(PlaceServiceOrderAction::class)->execute($data, null, $user?->id));
+        return DB::transaction(fn () => app(PlaceServiceOrderAction::class)->execute($data, null));
     }
 
     protected function getActions(): array
