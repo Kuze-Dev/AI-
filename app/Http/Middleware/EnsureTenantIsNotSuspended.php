@@ -17,7 +17,7 @@ class EnsureTenantIsNotSuspended
 
         if (tenancy()->tenant?->is_suspended) {
 
-            abort(403, 'Your account has been suspended. Please contact the administrator.');
+            abort(403, 'ACCESS TO THIS PAGE IS RESTRICTED. PLEASE CONTACT ADMINISTRATOR.');
         }
 
         return $next($request);
