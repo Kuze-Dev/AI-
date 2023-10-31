@@ -16,7 +16,7 @@ use Carbon\Carbon;
 use Closure;
 use DateTimeZone;
 use Domain\Admin\Models\Admin;
-use Domain\ServiceOrder\Actions\NotifyCustomerServiceOrderStatusAction;
+use Domain\ServiceOrder\Actions\SendToCustomerServiceOrderStatusAction;
 use Domain\ServiceOrder\Actions\UpdateServiceOrderAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
 use Domain\ServiceOrder\DataTransferObjects\UpdateServiceOrderData;
@@ -441,7 +441,7 @@ class ViewServiceOrder extends EditRecord
 
                                         if ($record->update($updateData)) {
                                             if ($shouldSendEmailToCustomer) {
-                                                app(NotifyCustomerServiceOrderStatusAction::class)
+                                                app(SendToCustomerServiceOrderStatusAction::class)
                                                     ->execute($record);
                                             }
 

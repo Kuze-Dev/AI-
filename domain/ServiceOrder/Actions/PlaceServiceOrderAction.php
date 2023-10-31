@@ -15,7 +15,7 @@ class PlaceServiceOrderAction
         private CreateServiceOrderAction $createServiceOrderAction,
         private CreateServiceOrderAddressAction $createServiceOrderAddressAction,
         private CreateServiceBillAction $createServiceBillAction,
-        private NotifyCustomerServiceOrderStatusAction $notifyCustomerServiceOrderStatusAction
+        private SendToCustomerServiceOrderStatusAction $SendToCustomerServiceOrderStatusAction
     ) {
     }
 
@@ -44,7 +44,7 @@ class PlaceServiceOrderAction
                 )
                 ->exists
         ) {
-            $this->notifyCustomerServiceOrderStatusAction
+            $this->SendToCustomerServiceOrderStatusAction
                 ->execute($serviceOrder);
         }
 
