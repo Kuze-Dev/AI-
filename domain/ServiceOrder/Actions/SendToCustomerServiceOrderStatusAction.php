@@ -13,6 +13,7 @@ use Domain\ServiceOrder\Notifications\ExpiredServiceOrderNotification;
 use Domain\ServiceOrder\Notifications\ForPaymentNotification;
 use Throwable;
 
+/** TODO: rename to SendToCustomerServiceOrderStatusEmailAction */
 class SendToCustomerServiceOrderStatusAction
 {
     /** @throws Throwable */

@@ -16,17 +16,16 @@ use Carbon\Carbon;
 use Closure;
 use DateTimeZone;
 use Domain\Admin\Models\Admin;
-use Domain\ServiceOrder\Actions\SendToCustomerServiceOrderStatusAction;
 use Domain\ServiceOrder\Actions\UpdateServiceOrderAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
 use Domain\ServiceOrder\DataTransferObjects\UpdateServiceOrderData;
 use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
+use Domain\ServiceOrder\Events\AdminServiceOrderStatusUpdatedEvent;
 use Domain\ServiceOrder\Exceptions\InvalidServiceBillException;
 use Domain\ServiceOrder\Exceptions\MissingServiceSettingsConfigurationException;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Models\ServiceOrderAddress;
-use Domain\ServiceOrder\Notifications\ChangeByAdminNotification;
 use Domain\Taxation\Enums\PriceDisplay;
 use Exception;
 use Filament\Forms;
@@ -37,14 +36,12 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Notification as FacadesNotification;
 use Throwable;
 
 class ViewServiceOrder extends EditRecord
@@ -401,18 +398,19 @@ class ViewServiceOrder extends EditRecord
                         ) {
                             try {
                                 DB::transaction(
-                                    function () use (
+                                    function (
+                                    ) use (
                                         $data,
                                         $livewire,
                                         $action,
                                         $record,
                                         $set
                                     ) {
-                                        $shouldSendEmailToCustomer = $livewire
+                                        $shouldNotifyCustomer = $livewire
                                             ->mountedFormComponentActionData['send_email'];
 
                                         if (
-                                            $shouldSendEmailToCustomer &&
+                                            $shouldNotifyCustomer &&
                                             empty(app(ServiceSettings::class)->email_sender_name)
                                         ) {
                                             throw new MissingServiceSettingsConfigurationException(
@@ -420,7 +418,7 @@ class ViewServiceOrder extends EditRecord
                                             );
                                         }
 
-                                        $shouldSendEmailToAdmin =  app(ServiceSettings::class)
+                                        $shouldSendEmailToAdmin = app(ServiceSettings::class)
                                             ->admin_should_receive;
 
                                         $adminEmailReceiver = app(ServiceSettings::class)
@@ -440,22 +438,12 @@ class ViewServiceOrder extends EditRecord
                                         $updateData = ['status' => $status];
 
                                         if ($record->update($updateData)) {
-                                            if ($shouldSendEmailToCustomer) {
-                                                app(SendToCustomerServiceOrderStatusAction::class)
-                                                    ->execute($record);
-                                            }
-
-                                            if ($shouldSendEmailToAdmin) {
-                                                FacadesNotification::route(
-                                                    'mail',
-                                                    $adminEmailReceiver
-                                                )->notify(
-                                                    new ChangeByAdminNotification(
-                                                        $record,
-                                                        $status
-                                                    )
-                                                );
-                                            }
+                                            event(new AdminServiceOrderStatusUpdatedEvent(
+                                                /** @phpstan-ignore-next-line */
+                                                customer: $record->customer,
+                                                serviceOrder: $record,
+                                                shouldNotifyCustomer: true
+                                            ));
 
                                             $set('status', ucfirst(str_replace('-', ' ', $status)));
 
@@ -477,7 +465,8 @@ class ViewServiceOrder extends EditRecord
                                 report($i);
                             } catch (Exception $e) {
                                 $action
-                                    ->failureNotificationTitle(trans('Something went wrong!'))
+                                    ->failureNotificationTitle($e->getMessage())
+                                    // ->failureNotificationTitle(trans('Something went wrong!'))
                                     ->failure();
 
                                 report($e);
