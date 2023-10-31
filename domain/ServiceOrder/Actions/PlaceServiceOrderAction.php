@@ -17,7 +17,7 @@ class PlaceServiceOrderAction
     ) {
     }
 
-    public function execute(array $data, ?int $customer_id): ServiceOrder|ServiceBill
+    public function execute(array $data, ?int $customer_id): ServiceOrder
     {
         $serviceOrderData = ServiceOrderData::fromArray($data, $customer_id);
 
