@@ -8,7 +8,6 @@ use App\HttpTenantApi\Resources\ServiceOrderResource;
 use Domain\ServiceOrder\Actions\PlaceServiceOrderAction;
 use Domain\ServiceOrder\DataTransferObjects\PlaceServiceOrderData;
 use Domain\ServiceOrder\Exceptions\InvalidServiceBillException;
-use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Requests\ServiceOrderStoreRequest;
 use Exception;
