@@ -13,7 +13,7 @@ class PlaceServiceOrderAction
     public function __construct(
         private CreateServiceOrderAction $createServiceOrderAction,
         private CreateServiceOrderAddressAction $createServiceOrderAddressAction,
-        private ChangeServiceOrderStatusAction $changeServiceOrderStatusAction
+        private NotifyCustomerServiceOrderStatusAction $notifyCustomerServiceOrderStatusAction
     ) {
     }
 
@@ -34,11 +34,8 @@ class PlaceServiceOrderAction
                 $serviceOrderData
             );
 
-        $this->changeServiceOrderStatusAction
-            ->execute(
-                $serviceOrder,
-                true
-            );
+        $this->notifyCustomerServiceOrderStatusAction
+            ->execute($serviceOrder);
 
         return $serviceOrder;
     }

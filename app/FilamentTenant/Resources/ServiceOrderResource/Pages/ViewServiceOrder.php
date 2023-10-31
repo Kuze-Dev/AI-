@@ -16,17 +16,21 @@ use Carbon\Carbon;
 use Closure;
 use DateTimeZone;
 use Domain\Admin\Models\Admin;
-use Domain\ServiceOrder\Actions\ChangeServiceOrderStatusAction;
+use Domain\ServiceOrder\Actions\NotifyCustomerServiceOrderStatusAction;
 use Domain\ServiceOrder\Actions\UpdateServiceOrderAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
 use Domain\ServiceOrder\DataTransferObjects\UpdateServiceOrderData;
 use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
+use Domain\ServiceOrder\Exceptions\InvalidServiceBillException;
+use Domain\ServiceOrder\Exceptions\MissingServiceSettingsConfigurationException;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Models\ServiceOrderAddress;
 use Domain\ServiceOrder\Notifications\ChangeByAdminNotification;
 use Domain\Taxation\Enums\PriceDisplay;
+use Exception;
 use Filament\Forms;
+use Filament\Forms\Components\Actions\Action as ComponentsAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Placeholder;
@@ -387,45 +391,101 @@ class ViewServiceOrder extends EditRecord
                             ->reactive(),
                     ])
                     ->action(
-                        function (array $data, $livewire) use ($record, $set) {
+                        function (
+                            array $data,
+                            self $livewire,
+                            ComponentsAction $action
+                        ) use (
+                            $record,
+                            $set
+                        ) {
+                            try {
+                                DB::transaction(
+                                    function () use (
+                                        $data,
+                                        $livewire,
+                                        $action,
+                                        $record,
+                                        $set
+                                    ) {
+                                        $shouldSendEmailToCustomer = $livewire
+                                            ->mountedFormComponentActionData['send_email'];
 
-                            $shouldSendEmail = $livewire->mountedFormComponentActionData['send_email'];
+                                        if (
+                                            $shouldSendEmailToCustomer &&
+                                            empty(app(ServiceSettings::class)->email_sender_name)
+                                        ) {
+                                            throw new MissingServiceSettingsConfigurationException(
+                                                'Email sender not found, please update your service settings'
+                                            );
+                                        }
 
-                            if ($shouldSendEmail) {
-                                $fromEmail = app(ServiceSettings::class)->email_sender_name;
-                                if (empty($fromEmail)) {
-                                    Notification::make()
-                                        ->title(trans('Email sender not found, please update your order settings.'))
-                                        ->warning()
-                                        ->send();
+                                        $shouldSendEmailToAdmin =  app(ServiceSettings::class)
+                                            ->admin_should_receive;
 
-                                    return;
-                                }
+                                        $adminEmailReceiver = app(ServiceSettings::class)
+                                            ->admin_main_receiver;
+
+                                        if (
+                                            $shouldSendEmailToAdmin &&
+                                            empty($adminEmailReceiver)
+                                        ) {
+                                            throw new MissingServiceSettingsConfigurationException(
+                                                'Email receiver not found, please update your service settings'
+                                            );
+                                        }
+
+                                        $status = $data['status_options'];
+
+                                        $updateData = ['status' => $status];
+
+                                        if ($record->update($updateData)) {
+                                            if ($shouldSendEmailToCustomer) {
+                                                app(NotifyCustomerServiceOrderStatusAction::class)
+                                                    ->execute($record);
+                                            }
+
+                                            if ($shouldSendEmailToAdmin) {
+                                                FacadesNotification::route(
+                                                    'mail',
+                                                    $adminEmailReceiver
+                                                )->notify(
+                                                    new ChangeByAdminNotification(
+                                                        $record,
+                                                        $status
+                                                    )
+                                                );
+                                            }
+
+                                            $set('status', ucfirst(str_replace('-', ' ', $status)));
+
+                                            $action->successNotificationTitle(
+                                                trans('Service Order updated successfully')
+                                            )->success();
+                                        }
+                                    }
+                                );
+                            } catch (MissingServiceSettingsConfigurationException $m) {
+                                $action->failureNotificationTitle(trans($m->getMessage()))
+                                    ->failure();
+
+                                report($m);
+                            } catch (InvalidServiceBillException $i) {
+                                $action->failureNotificationTitle(trans('No service bill found'))
+                                    ->failure();
+
+                                report($i);
+                            } catch (Exception $e) {
+                                $action
+                                    ->failureNotificationTitle($e->getMessage())
+                                    // ->failureNotificationTitle(trans('Something went wrong!'))
+                                    ->failure();
+
+                                report($e);
                             }
-
-                            $status = $data['status_options'];
-                            $updateData = ['status' => $status];
-
-                            $result = $record->update($updateData);
-
-                            if ($result) {
-                                app(ChangeServiceOrderStatusAction::class)->execute($record, $shouldSendEmail);
-                                $sendEmailToAdmins = app(ServiceSettings::class)->admin_should_receive;
-
-                                if ($sendEmailToAdmins) {
-                                    $mainReceiver = app(ServiceSettings::class)->admin_main_receiver;
-                                    FacadesNotification::route('mail', $mainReceiver)
-                                        ->notify(new ChangeByAdminNotification($record, $status));
-                                }
-                                $set('status', ucfirst($data['status_options']));
-                                Notification::make()
-                                    ->title(trans('Service Order updated successfully'))
-                                    ->success()
-                                    ->send();
-                            }
-
                         }
-                    );
+                    )
+                    ->withActivityLog();
             })
             ->disableLabel()
             ->columnSpan(1)

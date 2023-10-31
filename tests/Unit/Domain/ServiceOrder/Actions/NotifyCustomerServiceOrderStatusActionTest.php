@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Domain\Customer\Database\Factories\CustomerFactory;
-use Domain\ServiceOrder\Actions\ChangeServiceOrderStatusAction;
+use Domain\ServiceOrder\Actions\NotifyCustomerServiceOrderStatusAction;
 use Domain\ServiceOrder\Database\Factories\ServiceBillFactory;
 use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
 use Domain\ServiceOrder\Notifications\ActivatedServiceOrderNotification;
@@ -20,7 +20,7 @@ beforeEach(function () {
 
 it('can notify for active status', function () {
 
-    app(ChangeServiceOrderStatusAction::class)
+    app(NotifyCustomerServiceOrderStatusAction::class)
         ->execute(
             $serviceOrder = ServiceOrderFactory::new()
                 ->active()
@@ -37,7 +37,7 @@ it('can notify for active status', function () {
 
 it('can notify for inactive status', function () {
 
-    app(ChangeServiceOrderStatusAction::class)
+    app(NotifyCustomerServiceOrderStatusAction::class)
         ->execute(
             $serviceOrder = ServiceOrderFactory::new()
                 ->inactive()
@@ -55,7 +55,7 @@ it('can notify for inactive status', function () {
 
 it('can notify for closed status', function () {
 
-    app(ChangeServiceOrderStatusAction::class)
+    app(NotifyCustomerServiceOrderStatusAction::class)
         ->execute(
             $serviceOrder = ServiceOrderFactory::new()
                 ->closed()
@@ -73,7 +73,7 @@ it('can notify for closed status', function () {
 
 it('can notify for payment status', function () {
 
-    app(ChangeServiceOrderStatusAction::class)
+    app(NotifyCustomerServiceOrderStatusAction::class)
         ->execute(
             $serviceOrder = ServiceOrderFactory::new()
                 ->forPayment()

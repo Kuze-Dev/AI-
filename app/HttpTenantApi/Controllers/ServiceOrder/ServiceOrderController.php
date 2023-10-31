@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\ServiceOrder;
 
 use App\HttpTenantApi\Resources\ServiceOrderResource;
-use Domain\ServiceOrder\Actions\ChangeServiceOrderStatusAction;
 use Domain\ServiceOrder\Actions\PlaceServiceOrderAction;
 use Domain\ServiceOrder\DataTransferObjects\PlaceServiceOrderData;
 use Domain\ServiceOrder\Exceptions\InvalidServiceBillException;

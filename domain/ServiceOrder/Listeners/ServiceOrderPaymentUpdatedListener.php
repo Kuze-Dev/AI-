@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Listeners;
 
 use Domain\Payments\Events\PaymentProcessEvent;
-use Domain\ServiceOrder\Actions\ChangeServiceOrderStatusAction;
+use Domain\ServiceOrder\Actions\NotifyCustomerServiceOrderStatusAction;
 use Domain\ServiceOrder\Actions\CreateServiceBillAction;
 use Domain\ServiceOrder\Actions\GetServiceBillingAndDueDateAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
@@ -73,7 +73,7 @@ class ServiceOrderPaymentUpdatedListener
                 : ServiceOrderStatus::PENDING,
         ]);
 
-        app(ChangeServiceOrderStatusAction::class)->execute($serviceOrder, true);
+        app(NotifyCustomerServiceOrderStatusAction::class)->execute($serviceOrder);
     }
 
     private function onServiceBillRefunded(ServiceBill $serviceBill): void
