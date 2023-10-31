@@ -464,8 +464,7 @@ class ViewServiceOrder extends EditRecord
 
                                 report($i);
                             } catch (Exception $e) {
-                                $action
-                                    ->failureNotificationTitle(trans('Something went wrong!'))
+                                $action->failureNotificationTitle(trans('Something went wrong!'))
                                     ->failure();
 
                                 report($e);
