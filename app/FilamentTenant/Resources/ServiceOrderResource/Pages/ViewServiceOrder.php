@@ -442,7 +442,7 @@ class ViewServiceOrder extends EditRecord
                                                 /** @phpstan-ignore-next-line */
                                                 customer: $record->customer,
                                                 serviceOrder: $record,
-                                                shouldNotifyCustomer: true
+                                                shouldNotifyCustomer: $shouldNotifyCustomer
                                             ));
 
                                             $set('status', ucfirst(str_replace('-', ' ', $status)));
