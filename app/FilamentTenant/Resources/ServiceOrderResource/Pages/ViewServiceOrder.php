@@ -439,8 +439,6 @@ class ViewServiceOrder extends EditRecord
 
                                         if ($record->update($updateData)) {
                                             event(new AdminServiceOrderStatusUpdatedEvent(
-                                                /** @phpstan-ignore-next-line */
-                                                customer: $record->customer,
                                                 serviceOrder: $record,
                                                 shouldNotifyCustomer: $shouldNotifyCustomer
                                             ));

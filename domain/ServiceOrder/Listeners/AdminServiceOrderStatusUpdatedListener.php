@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Listeners;
 
 use App\Settings\ServiceSettings;
-use Domain\Customer\Models\Customer;
 use Domain\ServiceOrder\Actions\CreateServiceBillAction;
-use Domain\ServiceOrder\Actions\SendToCustomerServiceOrderStatusAction;
+use Domain\ServiceOrder\Actions\SendToCustomerServiceOrderStatusEmailAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Events\AdminServiceOrderStatusUpdatedEvent;
@@ -18,14 +17,9 @@ use Illuminate\Support\Facades\Notification;
 class AdminServiceOrderStatusUpdatedListener
 {
     public function __construct(
-        /**
-         * TODO: to be used for sendToCustomerServiceOrderStatusAction.
-         *
-         * @phpstan-ignore-next-line */
-        private Customer $customer,
         private ServiceOrder $serviceOrder,
         private CreateServiceBillAction $createServiceBillAction,
-        private SendToCustomerServiceOrderStatusAction $sendToCustomerServiceOrderStatusAction,
+        private SendToCustomerServiceOrderStatusEmailAction $sendToCustomerServiceOrderStatusEmailAction,
         private ServiceSettings $serviceSettings,
         private bool $shouldNotifyCustomer = false,
     ) {
@@ -34,8 +28,6 @@ class AdminServiceOrderStatusUpdatedListener
     public function handle(
         AdminServiceOrderStatusUpdatedEvent $event
     ): void {
-
-        $this->customer = $event->customer;
 
         $this->serviceOrder = $event->serviceOrder;
 
@@ -69,7 +61,7 @@ class AdminServiceOrderStatusUpdatedListener
     private function notifyCustomer(): void
     {
         if ($this->shouldNotifyCustomer) {
-            $this->sendToCustomerServiceOrderStatusAction
+            $this->sendToCustomerServiceOrderStatusEmailAction
                 ->execute($this->serviceOrder);
         }
     }
