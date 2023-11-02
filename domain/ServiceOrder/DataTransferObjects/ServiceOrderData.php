@@ -15,7 +15,7 @@ class ServiceOrderData
         public readonly ?int $service_address_id,
         public readonly ?int $billing_address_id,
         public readonly bool $is_same_as_billing,
-        public readonly ?array $additional_charges,
+        public readonly array $additional_charges,
         public readonly ?array $form,
     ) {
     }
@@ -29,7 +29,7 @@ class ServiceOrderData
             service_address_id: (int) $data['service_address_id'],
             billing_address_id: (int) $data['billing_address_id'],
             is_same_as_billing: $data['is_same_as_billing'],
-            additional_charges: $data['additional_charges'] ?? null,
+            additional_charges: $data['additional_charges'] ?? [],
             form: $data['form'] ?? null,
         );
     }

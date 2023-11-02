@@ -39,32 +39,12 @@ class CreateServiceOrderAction
             throw new ServiceStatusMustBeActive();
         }
 
-        /** @var int|float $subTotal */
-        $subTotal = $this->calculateServiceOrderTotalPriceAction
-            ->execute(
-                $service->selling_price,
-                array_filter(
-                    array_map(
-                        function ($additionalCharge) {
-                            if (
-                                isset($additionalCharge['price']) &&
-                                is_numeric($additionalCharge['price']) &&
-                                isset($additionalCharge['quantity']) &&
-                                is_numeric($additionalCharge['quantity'])
-                            ) {
-                                return new ServiceOrderAdditionalChargeData(
-                                    (float) $additionalCharge['price'],
-                                    (int) $additionalCharge['quantity']
-                                );
-                            }
-                        },
-                        $serviceOrderData->additional_charges ?? []
-                    )
-                )
-            )
-            ->getAmount();
+        $subTotalPrice = $this->getSubTotalPrice(
+            $service->selling_price,
+            $serviceOrderData->additional_charges
+        );
 
-        $taxableInfo = $this->getTax($serviceOrderData, $subTotal);
+        $taxableInfo = $this->getTax($serviceOrderData, $subTotalPrice);
 
         $serviceOrder = ServiceOrder::create([
             'admin_id' => Auth::user()?->hasRole(config('domain.role.super_admin'))
@@ -129,8 +109,9 @@ class CreateServiceOrderAction
 
     public function getTax(
         ServiceOrderData $serviceOrderData,
-        int|float $subTotal
+        int|float $subTotalPrice
     ): ServiceOrderTaxData {
+
         $billingAddressId = $serviceOrderData->is_same_as_billing
             ? $serviceOrderData->service_address_id
             : $serviceOrderData->billing_address_id;
@@ -139,6 +120,39 @@ class CreateServiceOrderAction
             ->firstOrFail();
 
         return $this->getTaxableInfoAction
-            ->execute($subTotal, $billingAddressData);
+            ->execute(
+                $subTotalPrice,
+                $billingAddressData
+            );
+    }
+
+    public function getSubTotalPrice(
+        float $sellingPrice,
+        array $additionalCharges
+    ): int|float {
+
+        return $this->calculateServiceOrderTotalPriceAction
+            ->execute(
+                $sellingPrice,
+                array_filter(
+                    array_map(
+                        function ($additionalCharge) {
+                            if (
+                                isset($additionalCharge['price']) &&
+                                is_numeric($additionalCharge['price']) &&
+                                isset($additionalCharge['quantity']) &&
+                                is_numeric($additionalCharge['quantity'])
+                            ) {
+                                return new ServiceOrderAdditionalChargeData(
+                                    (float) $additionalCharge['price'],
+                                    (int) $additionalCharge['quantity']
+                                );
+                            }
+                        },
+                        $additionalCharges
+                    )
+                )
+            )
+            ->getAmount();
     }
 }
