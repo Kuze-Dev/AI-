@@ -13,6 +13,7 @@ class ServiceBillData
 {
     public function __construct(
         public readonly int $service_order_id,
+        public readonly string $currency,
         public readonly float $service_price,
         public readonly array $additional_charges,
         public readonly float $sub_total,
@@ -26,12 +27,11 @@ class ServiceBillData
     ) {
     }
 
-    public static function initialFromServiceOrder(
-        ServiceOrder $serviceOrder
-    ): self {
-
+    public static function initialFromServiceOrder(ServiceOrder $serviceOrder): self
+    {
         return new self(
             service_order_id: $serviceOrder->id,
+            currency: $serviceOrder->currency_code,
             bill_date: null,
             due_date: null,
             service_price: $serviceOrder->service_price,
@@ -52,6 +52,7 @@ class ServiceBillData
 
         return new self(
             service_order_id: $serviceOrder->id,
+            currency: $serviceOrder->currency_code,
             bill_date: $serviceOrderBillingAndDueDateData->bill_date,
             due_date: $serviceOrderBillingAndDueDateData->due_date,
             service_price: $serviceOrder->service_price,
@@ -69,6 +70,7 @@ class ServiceBillData
     {
         return new self(
             service_order_id: $data['service_order_id'],
+            currency: $data['currency_code'],
             bill_date: $data['bill_date'],
             due_date: $data['due_date'],
             service_price: $data['service_price'],

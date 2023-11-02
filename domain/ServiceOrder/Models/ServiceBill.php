@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Models;
 
 use Akaunting\Money\Money;
+use App\Casts\MoneyCast;
 use Domain\Payments\Interfaces\PayableInterface;
 use Domain\Payments\Models\Traits\HasPayments;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string $reference
  * @property \Illuminate\Support\Carbon|null $bill_date
  * @property \Illuminate\Support\Carbon|null $due_date
+ * @property string $currency
  * @property float $service_price
  * @property array $additional_charges
  * @property float $sub_total
@@ -71,6 +73,7 @@ class ServiceBill extends Model implements PayableInterface
         'reference',
         'bill_date',
         'due_date',
+        'currency',
         'service_price',
         'additional_charges',
         'sub_total',
@@ -85,11 +88,11 @@ class ServiceBill extends Model implements PayableInterface
         'bill_date' => 'datetime',
         'due_date' => 'datetime',
         'additional_charges' => 'array',
-        'service_price' => 'float',
-        'sub_total' => 'float',
+        'service_price' => MoneyCast::class,
+        'sub_total' => MoneyCast::class,
         'tax_percentage' => 'float',
-        'tax_total' => 'float',
-        'total_amount' => 'float',
+        'tax_total' => MoneyCast::class,
+        'total_amount' => MoneyCast::class,
         'status' => ServiceBillStatus::class,
     ];
 

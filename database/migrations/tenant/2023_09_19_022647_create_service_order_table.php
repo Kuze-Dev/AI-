@@ -34,7 +34,7 @@ return new class extends Migration
             $table->string('currency_name')->index();
             $table->string('currency_symbol');
             $table->string('service_name');
-            $table->decimal('service_price', 10, 2);
+            $table->integer('service_price');
             $table->string('billing_cycle')->nullable();
             $table->integer('due_date_every')->nullable();
             $table->boolean('pay_upfront');
@@ -44,11 +44,11 @@ return new class extends Migration
             $table->dateTime('schedule');
             $table->string('status');
             $table->string('cancelled_reason')->nullable()->default(null);
-            $table->decimal('sub_total', 10, 2)->index();
+            $table->integer('sub_total')->index();
             $table->string('tax_display')->nullable();
             $table->decimal('tax_percentage', 7, 2)->index();
-            $table->decimal('tax_total', 10, 2)->index();
-            $table->decimal('total_price', 10, 2)->index();
+            $table->integer('tax_total')->index();
+            $table->integer('total_price')->index();
 
             $table->timestamps();
         });
@@ -75,13 +75,14 @@ return new class extends Migration
             $table->string('reference')->unique();
             $table->dateTime('bill_date')->nullable()->index();
             $table->dateTime('due_date')->nullable()->index();
-            $table->decimal('service_price', 10, 2);
+            $table->string('currency');
+            $table->integer('service_price');
             $table->json('additional_charges');
-            $table->decimal('sub_total', 10, 2)->index();
+            $table->integer('sub_total')->index();
             $table->string('tax_display')->nullable();
             $table->decimal('tax_percentage', 7, 2)->index();
-            $table->decimal('tax_total', 10, 2)->index();
-            $table->decimal('total_amount', 10, 2);
+            $table->integer('tax_total')->index();
+            $table->integer('total_amount');
             $table->string('status')->index();
 
             $table->timestamps();
@@ -95,7 +96,7 @@ return new class extends Migration
             $table->foreignIdFor(PaymentMethod::class)->index();
 
             $table->string('currency');
-            $table->decimal('total_amount', 10, 2)->index();
+            $table->integer('total_amount')->index();
             $table->string('status')->index();
 
             $table->timestamps();

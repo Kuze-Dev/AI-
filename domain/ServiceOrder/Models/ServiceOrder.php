@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Models;
 
+use App\Casts\MoneyCast;
 use Domain\Admin\Models\Admin;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Enums\BillingCycleEnum;
@@ -145,7 +146,7 @@ class ServiceOrder extends Model
 
     protected $casts = [
         'customer_form' => 'json',
-        'service_price' => 'float',
+        'service_price' => MoneyCast::class,
         'additional_charges' => 'json',
         'billing_cycle' => BillingCycleEnum::class,
         'pay_upfront' => 'boolean',
@@ -153,10 +154,10 @@ class ServiceOrder extends Model
         'needs_approval' => 'boolean',
         'is_auto_generated_bill' => 'boolean',
         'schedule' => 'datetime',
-        'sub_total' => 'float',
+        'sub_total' => MoneyCast::class,
         'tax_percentage' => 'float',
-        'tax_total' => 'float',
-        'total_price' => 'float',
+        'tax_total' => MoneyCast::class,
+        'total_price' => MoneyCast::class,
         'status' => ServiceOrderStatus::class,
     ];
 

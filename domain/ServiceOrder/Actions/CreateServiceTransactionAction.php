@@ -12,13 +12,8 @@ use Domain\ServiceOrder\Models\ServiceTransaction;
 
 class CreateServiceTransactionAction
 {
-    public function __construct()
-    {
-    }
-
     public function execute(array $data, PaymentMethod $paymentMethod): ServiceTransaction
     {
-
         $serviceTransactionData = $this->prepareTransactionData($data, $paymentMethod);
 
         $serviceTransaction = ServiceTransaction::create([
@@ -33,8 +28,11 @@ class CreateServiceTransactionAction
         return $serviceTransaction;
     }
 
-    private function prepareTransactionData(array $data, PaymentMethod $paymentMethod): ServiceTransactionData
-    {
+    private function prepareTransactionData(
+        array $data,
+        PaymentMethod $paymentMethod
+    ): ServiceTransactionData {
+
         $serviceBill = ServiceBill::whereReference($data['reference_id'])->firstOrFail();
 
         /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
@@ -45,7 +43,7 @@ class CreateServiceTransactionAction
             'service_bill_id' => $serviceBill->id,
             'payment_method_id' => $paymentMethod->id,
             'total_amount' => $serviceBill->total_amount,
-            'currency' => $serviceOrder->currency_symbol,
+            'currency' => $serviceOrder->currency_code,
             'status' => ServiceTransactionStatus::PENDING,
         ];
 

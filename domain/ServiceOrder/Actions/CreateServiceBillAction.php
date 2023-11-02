@@ -22,6 +22,7 @@ class CreateServiceBillAction
                 ->execute(new ServiceBill()),
             'bill_date' => $serviceBillData->bill_date,
             'due_date' => $serviceBillData->due_date,
+            'currency' => $serviceBillData->currency,
             'service_price' => $serviceBillData->service_price,
             'additional_charges' => $serviceBillData->additional_charges,
             'sub_total' => $serviceBillData->sub_total,

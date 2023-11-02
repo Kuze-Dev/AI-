@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Models;
 
+use App\Casts\MoneyCast;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Models\Payment;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
@@ -47,8 +48,6 @@ class ServiceTransaction extends Model
     protected $fillable = [
         'service_order_id',
         'service_bill_id',
-        'payment_id',
-        'payment_method',
         'payment_method_id',
         'currency',
         'total_amount',
@@ -56,7 +55,7 @@ class ServiceTransaction extends Model
     ];
 
     protected $casts = [
-        'total_amount' => 'float',
+        'total_amount' => MoneyCast::class,
         'status' => ServiceTransactionStatus::class,
     ];
 
