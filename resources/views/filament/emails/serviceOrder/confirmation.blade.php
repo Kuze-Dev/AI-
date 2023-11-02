@@ -43,6 +43,26 @@
         padding-left: 4px;
     }
 
+    .card {
+        border: 1.5px solid #E5E7EB;
+        margin-top: 1.5em;
+        padding-top: 0.5em;
+        padding-bottom: 1.5em;
+        padding-left: 1.3em;
+        padding-right: 1.3em;
+        text-align: left;
+        border-radius: 0.8em;
+    }
+
+    .card-title {
+        border-bottom: 1.3px solid #E5E7EB;
+        margin-bottom: 0.3em;
+    }
+
+    .card-title p {
+        font-weight: bold
+    }
+
     .summary-list {
         display: flex;
         justify-content: space-between
@@ -180,18 +200,16 @@
     <div class="main-container">
         <div style="width: 100%; display: flex; align-items: center; justify-content: center">
             <h3 style="margin-bottom: 3em; font-weight: bold">
-                Service Successfully Closed
+                Service Order Confirmation
             </h3>
         </div>
 
         <p style="line-height: 1.5em">Hi {{ $customer->first_name . ' ' . $customer->last_name }},</p>
 
         <p style="line-height: 1.5em">
-            I trust this message finds you well. We are writing to formally inform you that your recent service, {{ $serviceOrder->service_name }},
-            has been successfully closed.
-        </p>
-        <p style="line-height: 1.5em">
-            We would like to express our appreciation for your business and for entrusting us with your service requirements.
+            We have received your service order, {{ $serviceOrder->service_name }}, and we are dedicated to delivering the best quality service to our valued customers.
+            However, I would like to inform you that your service request is currently pending approval.
+            Our team is in the process of reviewing your requirements to ensure that we can fulfill them to your satisfaction.
         </p>
     </div>
 

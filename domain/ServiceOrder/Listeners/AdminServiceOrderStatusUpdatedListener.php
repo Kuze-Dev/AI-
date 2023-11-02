@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Listeners;
 
 use App\Settings\ServiceSettings;
+use DateTimeZone;
+use Domain\ServiceOrder\Actions\ComputeServiceBillingCycleAction;
 use Domain\ServiceOrder\Actions\CreateServiceBillAction;
 use Domain\ServiceOrder\Actions\SendToCustomerServiceOrderStatusEmailAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
@@ -12,6 +14,7 @@ use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Events\AdminServiceOrderStatusUpdatedEvent;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Notifications\ChangeByAdminNotification;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 
 class AdminServiceOrderStatusUpdatedListener
@@ -19,6 +22,7 @@ class AdminServiceOrderStatusUpdatedListener
     public function __construct(
         private ServiceOrder $serviceOrder,
         private CreateServiceBillAction $createServiceBillAction,
+        private ComputeServiceBillingCycleAction $computeServiceBillingCycleAction,
         private SendToCustomerServiceOrderStatusEmailAction $sendToCustomerServiceOrderStatusEmailAction,
         private ServiceSettings $serviceSettings,
         private bool $shouldNotifyCustomer = false,
@@ -42,15 +46,31 @@ class AdminServiceOrderStatusUpdatedListener
 
     private function prepareServiceBill(): void
     {
-        if (
-            $this->serviceOrder->status === ServiceOrderStatus::FORPAYMENT &&
-            is_null(
-                $this->serviceOrder
-                    ->latestServiceBill()
-            )
-        ) {
-            $this->createServiceBillAction
-                ->execute(ServiceBillData::initialFromServiceOrder($this->serviceOrder));
+        switch ($this->serviceOrder->status) {
+            case ServiceOrderStatus::FORPAYMENT:
+                $this->createServiceBillAction
+                    ->execute(ServiceBillData::initialFromServiceOrder($this->serviceOrder));
+                break;
+
+            case ServiceOrderStatus::ACTIVE:
+                /** @var \Domain\Admin\Models\Admin $admin */
+                $admin = Auth::user();
+
+                $this->createServiceBillAction
+                    ->execute(
+                        ServiceBillData::subsequentFromServiceOrderWithAssignedDates(
+                            $this->serviceOrder,
+                            $this->computeServiceBillingCycleAction
+                                ->execute(
+                                    $this->serviceOrder,
+                                    now()->timezone(new DateTimeZone($admin->timezone))
+                                )
+                        )
+                    );
+                break;
+
+            default:
+                break;
         }
     }
 

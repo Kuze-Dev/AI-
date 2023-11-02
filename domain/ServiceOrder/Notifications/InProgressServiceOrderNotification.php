@@ -12,7 +12,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ClosedServiceOrderNotification extends Notification implements ShouldQueue
+class InProgressServiceOrderNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -56,10 +56,10 @@ class ClosedServiceOrderNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage())
-            ->subject('Service canceled')
+            ->subject('Service In Progress')
             ->replyTo($this->replyTo)
             ->from($this->from)
-            ->view('filament.emails.serviceOrder.closed', [
+            ->view('filament.emails.serviceOrder.in-progress', [
                 'logo' => $this->logo,
                 'title' => $this->title,
                 'description' => $this->description,

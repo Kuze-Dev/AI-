@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Actions;
 
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
-use Domain\ServiceOrder\Exceptions\InvalidServiceBillException;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Notifications\ActivatedServiceOrderNotification;
 use Domain\ServiceOrder\Notifications\ClosedServiceOrderNotification;
+use Domain\ServiceOrder\Notifications\CompletedServiceOrderNotification;
+use Domain\ServiceOrder\Notifications\ConfirmationServiceOrderNotification;
 use Domain\ServiceOrder\Notifications\ExpiredServiceOrderNotification;
 use Domain\ServiceOrder\Notifications\ForPaymentNotification;
+use Domain\ServiceOrder\Notifications\InProgressServiceOrderNotification;
 use Throwable;
 
 class SendToCustomerServiceOrderStatusEmailAction
@@ -18,27 +20,26 @@ class SendToCustomerServiceOrderStatusEmailAction
     /** @throws Throwable */
     public function execute(ServiceOrder $serviceOrder): void
     {
-        /** @var \Domain\ServiceOrder\Models\ServiceBill|null $serviceBill */
-        $serviceBill = $serviceOrder->latestServiceBill();
-
-        /** @var \Domain\Customer\Models\Customer|null $customer */
-        $customer = $serviceOrder->customer;
-
-        if (is_null($serviceBill) || is_null($customer)) {
-            throw new InvalidServiceBillException();
-        }
-
         $notification = match ($serviceOrder->status) {
-            ServiceOrderStatus::ACTIVE => new ActivatedServiceOrderNotification($serviceBill),
-            ServiceOrderStatus::INACTIVE => new ExpiredServiceOrderNotification($serviceBill),
-            ServiceOrderStatus::CLOSED => new ClosedServiceOrderNotification($serviceBill),
-            ServiceOrderStatus::FORPAYMENT => new ForPaymentNotification($serviceBill),
-            ServiceOrderStatus::INPROGRESS => null,
+            ServiceOrderStatus::PENDING => new ConfirmationServiceOrderNotification($serviceOrder),
+            ServiceOrderStatus::INPROGRESS => new InProgressServiceOrderNotification($serviceOrder),
+            ServiceOrderStatus::COMPLETED => new CompletedServiceOrderNotification($serviceOrder),
+            ServiceOrderStatus::CLOSED => new ClosedServiceOrderNotification($serviceOrder),
             default => null
         };
 
-        if ($notification) {
-            $customer->notify($notification);
+        /** @var \Domain\ServiceOrder\Models\ServiceBill|null $serviceBill */
+        $serviceBill = $serviceOrder->latestServiceBill();
+
+        if ($serviceBill && is_null($notification)) {
+            $notification = match ($serviceOrder->status) {
+                ServiceOrderStatus::ACTIVE => new ActivatedServiceOrderNotification($serviceBill),
+                ServiceOrderStatus::INACTIVE => new ExpiredServiceOrderNotification($serviceBill),
+                ServiceOrderStatus::FORPAYMENT => new ForPaymentNotification($serviceBill),
+                default => null
+            };
         }
+
+        $serviceOrder->customer?->notify($notification);
     }
 }
