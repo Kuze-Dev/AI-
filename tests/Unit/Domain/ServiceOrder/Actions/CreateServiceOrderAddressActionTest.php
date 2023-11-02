@@ -9,16 +9,12 @@ use Domain\Service\Databases\Factories\ServiceFactory;
 use Domain\ServiceOrder\Actions\CreateServiceOrderAction;
 use Domain\ServiceOrder\Actions\CreateServiceOrderAddressAction;
 use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
+use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAddressActionData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Models\ServiceOrderAddress;
-use Filament\Facades\Filament;
 
-beforeEach(function () {
+it('can create service order addresses', function () {
     testInTenantContext();
-
-    Filament::setContext('filament-tenant');
-
-    $this->admin = loginAsSuperAdmin();
 
     CurrencyFactory::new()->createOne([
         'code' => 'USD',
@@ -26,9 +22,7 @@ beforeEach(function () {
         'symbol' => '$',
         'enabled' => true,
     ]);
-});
 
-it('can create service order addresses', function () {
     $service = ServiceFactory::new()
         ->isActive()
         ->withDummyBlueprint()
@@ -55,7 +49,12 @@ it('can create service order addresses', function () {
         ->execute($serviceOrderData);
 
     app(CreateServiceOrderAddressAction::class)
-        ->execute($serviceOrder, $serviceOrderData);
+        ->execute(new ServiceOrderAddressActionData(
+            serviceOrder: $serviceOrder,
+            service_address_id: $serviceOrderData->service_address_id,
+            billing_address_id: $serviceOrderData->billing_address_id,
+            is_same_as_billing: $serviceOrderData->is_same_as_billing
+        ));
 
     expect(ServiceOrderAddress::get()->count())
         ->toBeGreaterThan(0);
