@@ -9,7 +9,7 @@ use Domain\Service\Databases\Factories\ServiceFactory;
 use Domain\ServiceOrder\Actions\CreateServiceOrderAction;
 use Domain\ServiceOrder\Actions\CreateServiceOrderAddressAction;
 use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
-use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAddressActionData;
+use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAddressData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Models\ServiceOrderAddress;
 
@@ -49,7 +49,7 @@ it('can create service order addresses', function () {
         ->execute($serviceOrderData);
 
     app(CreateServiceOrderAddressAction::class)
-        ->execute(new ServiceOrderAddressActionData(
+        ->execute(new ServiceOrderAddressData(
             serviceOrder: $serviceOrder,
             service_address_id: $serviceOrderData->service_address_id,
             billing_address_id: $serviceOrderData->billing_address_id,

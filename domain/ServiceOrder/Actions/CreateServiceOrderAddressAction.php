@@ -5,25 +5,25 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Actions;
 
 use Domain\Address\Models\Address;
-use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAddressActionData;
+use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAddressData;
 use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
 use Domain\ServiceOrder\Models\ServiceOrderAddress;
 
 class CreateServiceOrderAddressAction
 {
     public function execute(
-        ServiceOrderAddressActionData $serviceOrderAddressActionData
+        ServiceOrderAddressData $serviceOrderAddressData
     ): void {
 
         $addressesToInsert = [];
 
         if (
             $serviceAddressModel = Address::whereId(
-                $serviceOrderAddressActionData->service_address_id
+                $serviceOrderAddressData->service_address_id
             )->first()
         ) {
             $commonAddressData = [
-                'service_order_id' => $serviceOrderAddressActionData
+                'service_order_id' => $serviceOrderAddressData
                     ->serviceOrder
                     ->id,
                 'country' => $serviceAddressModel->state->country->name,
@@ -47,13 +47,13 @@ class CreateServiceOrderAddressAction
         }
 
         if (
-            ! $serviceOrderAddressActionData->is_same_as_billing &&
+            ! $serviceOrderAddressData->is_same_as_billing &&
             $billingAddressModel = Address::whereId(
-                $serviceOrderAddressActionData->billing_address_id
+                $serviceOrderAddressData->billing_address_id
             )->first()
         ) {
             $addressesToInsert[1] = [
-                'service_order_id' => $serviceOrderAddressActionData
+                'service_order_id' => $serviceOrderAddressData
                     ->serviceOrder
                     ->id,
                 'type' => ServiceOrderAddressType::BILLING_ADDRESS,

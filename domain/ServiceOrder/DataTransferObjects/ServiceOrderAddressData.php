@@ -6,7 +6,7 @@ namespace Domain\ServiceOrder\DataTransferObjects;
 
 use Domain\ServiceOrder\Models\ServiceOrder;
 
-class ServiceOrderAddressActionData
+class ServiceOrderAddressData
 {
     public function __construct(
         public readonly ServiceOrder $serviceOrder,

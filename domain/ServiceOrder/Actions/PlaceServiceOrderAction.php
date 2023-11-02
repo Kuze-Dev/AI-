@@ -6,7 +6,7 @@ namespace Domain\ServiceOrder\Actions;
 
 use Domain\ServiceOrder\DataTransferObjects\PlaceServiceOrderData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
-use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAddressActionData;
+use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAddressData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Models\ServiceOrder;
 
@@ -33,7 +33,7 @@ class PlaceServiceOrderAction
 
         $this->createServiceOrderAddressAction
             ->execute(
-                new ServiceOrderAddressActionData(
+                new ServiceOrderAddressData(
                     serviceOrder: $serviceOrder,
                     service_address_id: $placeServiceOrderData->service_address_id,
                     billing_address_id: $placeServiceOrderData->billing_address_id,
