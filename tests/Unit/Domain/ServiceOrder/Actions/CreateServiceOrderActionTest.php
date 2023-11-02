@@ -12,10 +12,8 @@ use Domain\ServiceOrder\Models\ServiceOrder;
 
 use function PHPUnit\Framework\assertInstanceOf;
 
-beforeEach(function () {
+it('can create service order', function () {
     testInTenantContext();
-
-    $this->admin = loginAsSuperAdmin();
 
     CurrencyFactory::new()->createOne([
         'code' => 'USD',
@@ -23,9 +21,7 @@ beforeEach(function () {
         'symbol' => '$',
         'enabled' => true,
     ]);
-});
 
-it('can create service order', function () {
     $service = ServiceFactory::new()
         ->isActive()
         ->withDummyBlueprint()

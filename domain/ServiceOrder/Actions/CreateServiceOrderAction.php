@@ -9,12 +9,13 @@ use Domain\Currency\Models\Currency;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData;
+use Domain\ServiceOrder\DataTransferObjects\ServiceOrderCreatedPipelineData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
+use Domain\ServiceOrder\Exceptions\ServiceStatusMustBeActive;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class CreateServiceOrderAction
 {
@@ -22,31 +23,20 @@ class CreateServiceOrderAction
         private GenerateReferenceNumberAction $generateReferenceNumberAction,
         private CalculateServiceOrderTotalPriceAction $calculateServiceOrderTotalPriceAction,
         private GetTaxableInfoAction $getTaxableInfoAction,
+        private ServiceOrderCreatedPipelineAction $serviceOrderCreatedPipelineAction
     ) {
     }
 
-    public function execute(
-        ServiceOrderData $serviceOrderData
-    ): ServiceOrder {
+    public function execute(ServiceOrderData $serviceOrderData): ServiceOrder
+    {
+        $customer = Customer::whereId($serviceOrderData->customer_id)->firstOrFail();
 
-        $customer = Customer::whereId($serviceOrderData->customer_id)
-            ->first();
+        $service = Service::whereId($serviceOrderData->service_id)->firstOrFail();
 
-        $service = Service::whereId($serviceOrderData->service_id)
-            ->first();
-
-        $currency = Currency::whereEnabled(true)->first();
-
-        if (! ($customer instanceof Customer)) {
-            throw new BadRequestHttpException('Customer not found');
-        } elseif (! ($service instanceof Service)) {
-            throw new BadRequestHttpException('Service not found');
-        } elseif (! ($currency instanceof Currency)) {
-            throw new BadRequestHttpException('Currency not found');
-        }
+        $currency = Currency::whereEnabled(true)->firstOrFail();
 
         if (! $service->status) {
-            throw new BadRequestHttpException('inactive service found');
+            throw new ServiceStatusMustBeActive();
         }
 
         /** @var int|float $subTotal */
@@ -109,6 +99,15 @@ class CreateServiceOrderAction
             'tax_total' => $taxableInfo->tax_total,
             'total_price' => $taxableInfo->total_price,
         ]);
+
+        $this->serviceOrderCreatedPipelineAction->execute(
+            new ServiceOrderCreatedPipelineData(
+                serviceOrder: $serviceOrder,
+                service_address_id: $serviceOrderData->service_address_id,
+                billing_address_id: $serviceOrderData->billing_address_id,
+                is_same_as_billing: $serviceOrderData->is_same_as_billing
+            )
+        );
 
         return $serviceOrder;
     }

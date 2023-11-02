@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\ServiceOrder;
 
 use App\HttpTenantApi\Resources\ServiceOrderResource;
-use Domain\ServiceOrder\Actions\PlaceServiceOrderAction;
-use Domain\ServiceOrder\DataTransferObjects\PlaceServiceOrderData;
+use Domain\ServiceOrder\Actions\CreateServiceOrderAction;
+use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Exceptions\InvalidServiceBillException;
+use Domain\ServiceOrder\Exceptions\ServiceStatusMustBeActive;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Requests\ServiceOrderStoreRequest;
 use Exception;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;
+use Symfony\Component\HttpFoundation\Response;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
@@ -51,40 +53,44 @@ class ServiceOrderController
         );
     }
 
-    public function store(
-        ServiceOrderStoreRequest $request,
-        PlaceServiceOrderAction $placeServiceOrderAction
-    ): JsonResponse {
-
+    public function store(ServiceOrderStoreRequest $request): mixed
+    {
         try {
+
             $validatedData = $request->validated();
 
-            /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
-            $serviceOrder = $placeServiceOrderAction->execute(
-                new PlaceServiceOrderData(
-                    customer_id: (int) Auth::id(),
-                    service_id: (int) $validatedData->service_id,
-                    schedule: $validatedData->schedule,
-                    service_address_id: $validatedData->service_address_id,
-                    billing_address_id: $validatedData->billing_address_id,
-                    is_same_as_billing: $validatedData->is_same_as_billing,
-                    additional_charges: $validatedData->additional_charges,
-                    form: $validatedData->form
+            return DB::transaction(
+                fn () => ServiceOrderResource::make(
+                    app(CreateServiceOrderAction::class)->execute(
+                        new ServiceOrderData(
+                            customer_id: (int) Auth::id(),
+                            service_id: (int) $validatedData->service_id,
+                            schedule: $validatedData->schedule,
+                            service_address_id: $validatedData->service_address_id,
+                            billing_address_id: $validatedData->billing_address_id,
+                            is_same_as_billing: $validatedData->is_same_as_billing,
+                            additional_charges: $validatedData->additional_charges,
+                            form: $validatedData->form
+                        )
+                    )
                 )
             );
 
-            return response()->json([
-                'message' => 'Service order placed successfully',
-                'data' => $serviceOrder->latestServiceBill(),
-            ], 201);
+        } catch (ServiceStatusMustBeActive $b) {
+            return response(
+                ['message' => trans('Service is currently unavailable')],
+                Response::HTTP_NOT_FOUND
+            );
         } catch (InvalidServiceBillException) {
-            return response()->json([
-                'message' => 'Invalid Service Bill',
-            ], 404);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Something went wrong!',
-            ], 404);
+            return response(
+                ['message' => trans('Service Bill not found')],
+                Response::HTTP_NOT_FOUND
+            );
+        } catch (Exception) {
+            return response(
+                ['message' => trans('Something went wrong!')],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
         }
     }
 }

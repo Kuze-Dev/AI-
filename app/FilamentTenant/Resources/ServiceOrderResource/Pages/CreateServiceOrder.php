@@ -6,8 +6,8 @@ namespace App\FilamentTenant\Resources\ServiceOrderResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ServiceOrderResource;
-use Domain\ServiceOrder\Actions\PlaceServiceOrderAction;
-use Domain\ServiceOrder\DataTransferObjects\PlaceServiceOrderData;
+use Domain\ServiceOrder\Actions\CreateServiceOrderAction;
+use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -22,19 +22,8 @@ class CreateServiceOrder extends CreateRecord
     public function handleRecordCreation(array $data): Model
     {
         return DB::transaction(
-            fn () => app(PlaceServiceOrderAction::class)
-                ->execute(
-                    new PlaceServiceOrderData(
-                        customer_id: $data['customer_id'],
-                        service_id: $data['service_id'],
-                        schedule: $data['schedule'],
-                        service_address_id: $data['service_address_id'],
-                        billing_address_id: $data['billing_address_id'],
-                        is_same_as_billing: $data['is_same_as_billing'],
-                        additional_charges: $data['additional_charges'],
-                        form: $data['form'],
-                    )
-                )
+            fn () => app(CreateServiceOrderAction::class)
+                ->execute(ServiceOrderData::fromArray($data))
         );
     }
 
