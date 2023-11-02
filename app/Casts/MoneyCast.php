@@ -6,9 +6,9 @@ namespace App\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
-/** https://filamentphp.com/docs/3.x/panels/getting-started#casting-the-price-to-an-integer 
+/** https://filamentphp.com/docs/3.x/panels/getting-started#casting-the-price-to-an-integer
  * @implements CastsAttributes<float, float>
-*/
+ */
 class MoneyCast implements CastsAttributes
 {
     public function get($model, string $key, $value, array $attributes): float
