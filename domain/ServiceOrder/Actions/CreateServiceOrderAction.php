@@ -14,12 +14,12 @@ use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class CreateServiceOrderAction
 {
     public function __construct(
+        private GenerateReferenceNumberAction $generateReferenceNumberAction,
         private CalculateServiceOrderTotalPriceAction $calculateServiceOrderTotalPriceAction,
         private GetTaxableInfoAction $getTaxableInfoAction,
     ) {
@@ -28,21 +28,6 @@ class CreateServiceOrderAction
     public function execute(
         ServiceOrderData $serviceOrderData
     ): ServiceOrder {
-
-        $uniqueReference = null;
-
-        do {
-            $referenceNumber = Str::upper(Str::random(12));
-
-            $existingReference = ServiceOrder::where('reference', $referenceNumber)
-                ->first();
-
-            if (! $existingReference) {
-                $uniqueReference = $referenceNumber;
-
-                break;
-            }
-        } while (true);
 
         $customer = Customer::whereId($serviceOrderData->customer_id)
             ->first();
@@ -97,6 +82,8 @@ class CreateServiceOrderAction
                 : null,
             'service_id' => $serviceOrderData->service_id,
             'customer_id' => $serviceOrderData->customer_id,
+            'reference' => $this->generateReferenceNumberAction
+                ->execute(new ServiceOrder()),
             'customer_first_name' => $customer->first_name,
             'customer_last_name' => $customer->last_name,
             'customer_email' => $customer->email,
@@ -114,7 +101,6 @@ class CreateServiceOrderAction
             'needs_approval' => $service->needs_approval,
             'is_auto_generated_bill' => $service->is_auto_generated_bill,
             'schedule' => $serviceOrderData->schedule,
-            'reference' => $uniqueReference,
             'status' => $this->getStatus($service),
             'additional_charges' => $serviceOrderData->additional_charges,
             'sub_total' => $taxableInfo->sub_total,

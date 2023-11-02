@@ -7,31 +7,23 @@ namespace Domain\ServiceOrder\Actions;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData;
 use Domain\ServiceOrder\Models\ServiceBill;
-use Illuminate\Support\Str;
 
 class CreateServiceBillAction
 {
+    public function __construct(
+        private GenerateReferenceNumberAction $generateReferenceNumberAction,
+    ) {
+    }
+
     public function execute(
         ServiceBillData $serviceBillData,
         ServiceOrderBillingAndDueDateData $serviceOrderBillingAndDueDateData = null
     ): ServiceBill {
-        $uniqueReference = null;
-
-        do {
-            $referenceNumber = str::upper(str::random(12));
-
-            $existingReference = ServiceBill::where('reference', $referenceNumber)->first();
-
-            if (! $existingReference) {
-                $uniqueReference = $referenceNumber;
-
-                break;
-            }
-        } while (true);
 
         $serviceBillData = [
             'service_order_id' => $serviceBillData->service_order_id,
-            'reference' => $uniqueReference,
+            'reference' => $this->generateReferenceNumberAction
+                ->execute(new ServiceBill()),
             'service_price' => $serviceBillData->service_price,
             'additional_charges' => $serviceBillData->additional_charges,
             'sub_total' => $serviceBillData->sub_total,
