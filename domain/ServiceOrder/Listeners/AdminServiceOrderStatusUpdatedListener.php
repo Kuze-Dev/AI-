@@ -50,11 +50,7 @@ class AdminServiceOrderStatusUpdatedListener
             )
         ) {
             $this->createServiceBillAction
-                ->execute(
-                    ServiceBillData::fromCreatedServiceOrder(
-                        $this->serviceOrder->toArray()
-                    )
-                );
+                ->execute(ServiceBillData::initialFromServiceOrder($this->serviceOrder));
         }
     }
 

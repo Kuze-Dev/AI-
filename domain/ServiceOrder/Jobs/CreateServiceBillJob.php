@@ -40,11 +40,10 @@ class CreateServiceBillJob implements ShouldBeUnique, ShouldQueue
     ): void {
 
         $createServiceBillAction->execute(
-            ServiceBillData::fromCreatedServiceOrder(
-                $this->serviceOrder->toArray()
-            ),
-            $getServiceBillingAndDueDateAction->execute(
-                $this->serviceBill
+            ServiceBillData::subsequentFromServiceOrderWithAssignedDates(
+                serviceOrder: $this->serviceOrder,
+                serviceOrderBillingAndDueDateData: $getServiceBillingAndDueDateAction
+                    ->execute($this->serviceBill)
             )
         );
 

@@ -17,9 +17,13 @@ use Domain\ServiceOrder\Models\ServiceTransaction;
 
 class ServiceOrderPaymentUpdatedListener
 {
-    /**
-     * Handle the event.
-     */
+    public function __construct(
+        private CreateServiceBillAction $createServiceBillAction,
+        private GetServiceBillingAndDueDateAction $getServiceBillingAndDueDateAction,
+        private SendToCustomerServiceOrderStatusEmailAction $sendToCustomerServiceOrderStatusEmailAction
+    ) {
+    }
+
     public function handle(PaymentProcessEvent $event): void
     {
         if ($event->payment->payable instanceof ServiceBill) {
@@ -55,15 +59,13 @@ class ServiceOrderPaymentUpdatedListener
             $serviceOrder->is_subscription &&
             ! $serviceOrder->is_auto_generated_bill
         ) {
-            $serviceBillingDate = app(GetServiceBillingAndDueDateAction::class)
-                ->execute($serviceBill);
-
-            app(CreateServiceBillAction::class)
+            $this->createServiceBillAction
                 ->execute(
-                    ServiceBillData::fromCreatedServiceOrder(
-                        $serviceOrder->toArray()
-                    ),
-                    $serviceBillingDate
+                    ServiceBillData::subsequentFromServiceOrderWithAssignedDates(
+                        serviceOrder: $serviceOrder,
+                        serviceOrderBillingAndDueDateData: $this->getServiceBillingAndDueDateAction
+                            ->execute($serviceBill)
+                    )
                 );
         }
 
@@ -73,7 +75,8 @@ class ServiceOrderPaymentUpdatedListener
                 : ServiceOrderStatus::PENDING,
         ]);
 
-        app(SendToCustomerServiceOrderStatusEmailAction::class)->execute($serviceOrder);
+        $this->sendToCustomerServiceOrderStatusEmailAction
+            ->execute($serviceOrder);
     }
 
     private function onServiceBillRefunded(ServiceBill $serviceBill): void

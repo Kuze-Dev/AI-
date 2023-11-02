@@ -68,9 +68,9 @@ class ServiceBill extends Model implements PayableInterface
 
     protected $fillable = [
         'service_order_id',
+        'reference',
         'bill_date',
         'due_date',
-        'reference',
         'service_price',
         'additional_charges',
         'sub_total',

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Actions;
 
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
-use Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData;
 use Domain\ServiceOrder\Models\ServiceBill;
 
 class CreateServiceBillAction
@@ -15,15 +14,14 @@ class CreateServiceBillAction
     ) {
     }
 
-    public function execute(
-        ServiceBillData $serviceBillData,
-        ServiceOrderBillingAndDueDateData $serviceOrderBillingAndDueDateData = null
-    ): ServiceBill {
-
-        $serviceBillData = [
+    public function execute(ServiceBillData $serviceBillData): ServiceBill
+    {
+        return ServiceBill::create([
             'service_order_id' => $serviceBillData->service_order_id,
             'reference' => $this->generateReferenceNumberAction
                 ->execute(new ServiceBill()),
+            'bill_date' => $serviceBillData->bill_date,
+            'due_date' => $serviceBillData->due_date,
             'service_price' => $serviceBillData->service_price,
             'additional_charges' => $serviceBillData->additional_charges,
             'sub_total' => $serviceBillData->sub_total,
@@ -32,15 +30,6 @@ class CreateServiceBillAction
             'tax_total' => $serviceBillData->tax_total,
             'total_amount' => $serviceBillData->total_amount,
             'status' => $serviceBillData->status,
-        ];
-
-        if ($serviceOrderBillingAndDueDateData) {
-            $serviceBillData['bill_date'] = $serviceOrderBillingAndDueDateData->bill_date;
-            $serviceBillData['due_date'] = $serviceOrderBillingAndDueDateData->due_date;
-        }
-
-        $serviceBill = ServiceBill::create($serviceBillData);
-
-        return $serviceBill;
+        ]);
     }
 }

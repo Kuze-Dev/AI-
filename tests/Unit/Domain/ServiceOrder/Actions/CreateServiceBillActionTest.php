@@ -61,7 +61,7 @@ it('can create', function () {
         ->execute($serviceOrderData);
 
     $serviceBill = app(CreateServiceBillAction::class)->execute(
-        ServiceBillData::fromCreatedServiceOrder($serviceOrder->toArray())
+        ServiceBillData::initialFromServiceOrder($serviceOrder)
     );
 
     assertInstanceOf(ServiceBill::class, $serviceBill);
@@ -87,12 +87,12 @@ it('can create bill billing and due dates', function () {
     $serviceOrder = app(CreateServiceOrderAction::class)
         ->execute($serviceOrderData);
 
-    $serviceOrderBillingAndDueDateData = app(GetServiceBillingAndDueDateAction::class)
-        ->execute($serviceBill);
-
     $serviceBill = app(CreateServiceBillAction::class)->execute(
-        ServiceBillData::fromCreatedServiceOrder($serviceOrder->toArray()),
-        $serviceOrderBillingAndDueDateData
+        ServiceBillData::subsequentFromServiceOrderWithAssignedDates(
+            serviceOrder: $serviceOrder,
+            serviceOrderBillingAndDueDateData: app(GetServiceBillingAndDueDateAction::class)
+                ->execute($serviceBill)
+        )
     );
 
     assertInstanceOf(ServiceBill::class, $serviceBill);

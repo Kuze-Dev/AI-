@@ -6,15 +6,13 @@ namespace Domain\ServiceOrder\DataTransferObjects;
 
 use Carbon\Carbon;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
+use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\Taxation\Enums\PriceDisplay;
 
 class ServiceBillData
 {
     public function __construct(
         public readonly int $service_order_id,
-        public readonly ?string $reference,
-        public readonly ?Carbon $bill_date,
-        public readonly ?Carbon $due_date,
         public readonly float $service_price,
         public readonly array $additional_charges,
         public readonly float $sub_total,
@@ -23,23 +21,46 @@ class ServiceBillData
         public readonly PriceDisplay|string|null $tax_display,
         public readonly float $total_amount,
         public readonly ServiceBillStatus $status,
+        public readonly ?Carbon $bill_date = null,
+        public readonly ?Carbon $due_date = null,
     ) {
     }
 
-    public static function fromCreatedServiceOrder(array $data): self
-    {
+    public static function initialFromServiceOrder(
+        ServiceOrder $serviceOrder
+    ): self {
+
         return new self(
-            service_order_id: isset($data['service_order_id']) ? (int) $data['service_order_id'] : (int) $data['id'],
-            reference: null,
+            service_order_id: $serviceOrder->id,
             bill_date: null,
             due_date: null,
-            service_price: $data['service_price'],
-            additional_charges: $data['additional_charges'],
-            sub_total: $data['sub_total'],
-            tax_display: $data['tax_display'],
-            tax_percentage: $data['tax_percentage'],
-            tax_total: $data['tax_total'],
-            total_amount: $data['total_price'],
+            service_price: $serviceOrder->service_price,
+            additional_charges: $serviceOrder->additional_charges,
+            sub_total: $serviceOrder->sub_total,
+            tax_display: $serviceOrder->tax_display,
+            tax_percentage: $serviceOrder->tax_percentage,
+            tax_total: $serviceOrder->tax_total,
+            total_amount: $serviceOrder->total_price,
+            status: ServiceBillStatus::PENDING,
+        );
+    }
+
+    public static function subsequentFromServiceOrderWithAssignedDates(
+        ServiceOrder $serviceOrder,
+        ServiceOrderBillingAndDueDateData $serviceOrderBillingAndDueDateData
+    ): self {
+
+        return new self(
+            service_order_id: $serviceOrder->id,
+            bill_date: $serviceOrderBillingAndDueDateData->bill_date,
+            due_date: $serviceOrderBillingAndDueDateData->due_date,
+            service_price: $serviceOrder->service_price,
+            additional_charges: $serviceOrder->additional_charges,
+            sub_total: $serviceOrder->sub_total,
+            tax_display: $serviceOrder->tax_display,
+            tax_percentage: $serviceOrder->tax_percentage,
+            tax_total: $serviceOrder->tax_total,
+            total_amount: $serviceOrder->total_price,
             status: ServiceBillStatus::PENDING,
         );
     }
@@ -48,7 +69,6 @@ class ServiceBillData
     {
         return new self(
             service_order_id: $data['service_order_id'],
-            reference: $data['reference'],
             bill_date: $data['bill_date'],
             due_date: $data['due_date'],
             service_price: $data['service_price'],

@@ -44,9 +44,7 @@ class PlaceServiceOrderAction
         if (
             ! $serviceOrder->needs_approval &&
             $this->createServiceBillAction
-                ->execute(
-                    ServiceBillData::fromCreatedServiceOrder($serviceOrder->toArray())
-                )
+                ->execute(ServiceBillData::initialFromServiceOrder($serviceOrder))
                 ->exists
         ) {
             $this->sendToCustomerServiceOrderStatusEmailAction
