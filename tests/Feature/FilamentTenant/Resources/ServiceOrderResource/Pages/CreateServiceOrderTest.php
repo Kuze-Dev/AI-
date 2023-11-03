@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\Service\ServiceBase;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\CreateServiceOrder;
 use Domain\Currency\Database\Factories\CurrencyFactory;
 use Domain\Customer\Database\Factories\CustomerFactory;
@@ -11,7 +12,7 @@ use Filament\Facades\Filament;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    testInTenantContext();
+    testInTenantContext()->features()->activate(ServiceBase::class);
 
     Filament::setContext('filament-tenant');
 
