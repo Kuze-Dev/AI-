@@ -12,25 +12,25 @@ class MediaPathGenerator extends DefaultPathGenerator
 {
     protected function getBasePath(Media $media): string
     {
-        if ($media->model instanceof Customer) {
-            return self::forCustomerReceipt($media);
+        if ($media->model_type === Customer::class) {
+            return $this->forCustomerReceipt($media);
         }
 
-        return parent::getBasePath($media);
+        return $this->getBasePath($media);
     }
 
-    public static function forCustomerReceipt(Media $media): string
+    private function forCustomerReceipt(Media $media): string
     {
         if ($media->collection_name !== 'receipts') {
-            /** @phpstan-ignore-next-line */
-            return parent::getBasePath($media);
+
+            return $this->getBasePath($media);
         }
 
         $prefix = config('media-library.prefix', '');
 
         $md5 = md5(
             $media->getKey().
-            $media->model->getKey().
+            $media->model_id.
             $media->created_at
         );
 
