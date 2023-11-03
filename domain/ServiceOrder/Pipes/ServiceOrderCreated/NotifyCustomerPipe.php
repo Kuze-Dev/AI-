@@ -26,16 +26,17 @@ class NotifyCustomerPipe
                 ->serviceOrder
                 ->latestServiceBill()
         ) {
+            /** @var \Domain\Customer\Models\Customer $customer */
+            $customer = $serviceOrderCreatedPipelineData
+                ->serviceOrder
+                ->customer;
 
             $this->sendToCustomerServiceOrderStatusEmailAction
                 ->execute($serviceOrderCreatedPipelineData->serviceOrder);
 
             $this->sendToCustomerServiceBillEmailAction
                 ->execute(
-                    /** @phpstan-ignore-next-line */
-                    $serviceOrderCreatedPipelineData
-                        ->serviceOrder
-                        ->customer,
+                    $customer,
                     $latestServiceBill
                 );
         }
