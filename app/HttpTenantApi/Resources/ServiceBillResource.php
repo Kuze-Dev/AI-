@@ -23,14 +23,4 @@ class ServiceBillResource extends JsonApiResource
             'total_amount' => $this->total_amount,
         ];
     }
-
-    /**
-     * @return array<string, callable>
-     */
-    public function toRelationships(Request $request): array
-    {
-        return [
-
-        ];
-    }
 }
