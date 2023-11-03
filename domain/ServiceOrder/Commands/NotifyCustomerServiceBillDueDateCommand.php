@@ -6,9 +6,14 @@ namespace Domain\ServiceOrder\Commands;
 
 use Domain\ServiceOrder\Actions\NotifyCustomerServiceBillDueDateAction;
 use Illuminate\Console\Command;
+use Stancl\Tenancy\Concerns\HasATenantsOption;
+use Stancl\Tenancy\Concerns\TenantAwareCommand;
 
 class NotifyCustomerServiceBillDueDateCommand extends Command
 {
+    use HasATenantsOption;
+    use TenantAwareCommand;
+
     /** @var string */
     protected $signature = 'app:notify-customer-service-bill-due-date-command';
 
