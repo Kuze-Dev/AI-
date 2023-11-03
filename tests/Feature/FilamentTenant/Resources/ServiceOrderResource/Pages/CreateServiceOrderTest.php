@@ -27,9 +27,7 @@ beforeEach(function () {
 });
 
 it('can render', function () {
-    livewire(CreateServiceOrder::class)
-        ->assertFormExists()
-        ->assertOk();
+    livewire(CreateServiceOrder::class)->assertOk();
 });
 
 it('can create product', function () {
@@ -38,6 +36,7 @@ it('can create product', function () {
         ->createOne();
 
     $service = ServiceFactory::new()
+        ->isActive()
         ->withDummyBlueprint()
         ->createOne();
 

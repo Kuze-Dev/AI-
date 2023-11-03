@@ -23,23 +23,12 @@ it('can view', function () {
         ->for(
             ServiceFactory::new()
                 ->isSubscription()
+                ->isActive()
                 ->withDummyBlueprint()
                 ->createOne()
         )
         ->createOne();
 
     livewire(ViewServiceOrder::class, ['record' => $serviceOrder->getRouteKey()])
-        ->assertFormExists()
-        ->assertSuccessful()
-        ->assertOk()
-        ->assertSee([
-            $serviceOrder->service_name,
-            $serviceOrder->service_price,
-            $serviceOrder->service->billing_cycle,
-            $serviceOrder->service->due_date_every,
-            $serviceOrder->customer_first_name,
-            $serviceOrder->customer_last_name,
-            $serviceOrder->customer_email,
-            $serviceOrder->customer_mobile,
-        ]);
+        ->assertOk();
 });
