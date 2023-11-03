@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\Service\ServiceBase;
 use Domain\Currency\Database\Factories\CurrencyFactory;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Service\Databases\Factories\ServiceFactory;
@@ -14,7 +15,7 @@ use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 
 beforeEach(function () {
-    testInTenantContext();
+    testInTenantContext()->features()->activate(ServiceBase::class);
 
     $this->customer = CustomerFactory::new()->createOne();
 
