@@ -30,7 +30,10 @@ beforeEach(function () {
 });
 
 it('can list', function () {
-    $serviceOrder = ServiceOrderFactory::new()->createOne();
+    $serviceOrder = ServiceOrderFactory::new()
+        ->for($this->customer)
+        ->active()
+        ->createOne();
 
     getJson('api/service-order')
         ->assertOk()
@@ -43,7 +46,9 @@ it('can list', function () {
 });
 
 it('can show', function () {
-    $serviceOrder = ServiceOrderFactory::new()->createOne();
+    $serviceOrder = ServiceOrderFactory::new()
+        ->for($this->customer)
+        ->createOne();
 
     getJson('api/service-order/'.$serviceOrder->getRouteKey())
         ->assertOk()

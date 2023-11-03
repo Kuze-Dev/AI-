@@ -64,13 +64,13 @@ class ServiceOrderController
                     app(CreateServiceOrderAction::class)->execute(
                         new ServiceOrderData(
                             customer_id: (int) Auth::id(),
-                            service_id: (int) $validatedData->service_id,
-                            schedule: $validatedData->schedule,
-                            service_address_id: $validatedData->service_address_id,
-                            billing_address_id: $validatedData->billing_address_id,
-                            is_same_as_billing: $validatedData->is_same_as_billing,
-                            additional_charges: $validatedData->additional_charges,
-                            form: $validatedData->form
+                            service_id: (int) $validatedData['service_id'],
+                            schedule: now()->parse($validatedData['schedule']),
+                            service_address_id: $validatedData['service_address_id'],
+                            billing_address_id: $validatedData['billing_address_id'],
+                            is_same_as_billing: $validatedData['is_same_as_billing'],
+                            additional_charges: $validatedData['additional_charges'],
+                            form: $validatedData['form']
                         )
                     )
                 )

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Actions;
 
 use Domain\Address\Models\Address;
+use Domain\Admin\Models\Admin;
 use Domain\Currency\Models\Currency;
 use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
@@ -47,7 +48,7 @@ class CreateServiceOrderAction
         $taxableInfo = $this->getTax($serviceOrderData, $subTotalPrice);
 
         $serviceOrder = ServiceOrder::create([
-            'admin_id' => Auth::user()?->hasRole(config('domain.role.super_admin'))
+            'admin_id' => Auth::user() instanceof Admin && Auth::user()->hasRole(config('domain.role.super_admin'))
                 ? Auth::id()
                 : null,
             'service_id' => $serviceOrderData->service_id,
