@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Console;
 
 use Domain\ServiceOrder\Commands\CreateServiceBillCommand;
+use Domain\ServiceOrder\Commands\InactivateServiceOrderCommand;
 use Domain\ServiceOrder\Commands\NotifyCustomerServiceBillDueDateCommand;
 use Domain\Tenant\Models\Tenant;
 use Illuminate\Auth\Console\ClearResetsCommand;
@@ -31,6 +32,13 @@ class Kernel extends ConsoleKernel
 
         $schedule->command(
             CreateServiceBillCommand::class,
+            ['--tenants' => $tenants]
+        )
+            ->daily()
+            ->sentryMonitor();
+
+        $schedule->command(
+            InactivateServiceOrderCommand::class,
             ['--tenants' => $tenants]
         )
             ->daily()
