@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Actions;
 
-use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\ServiceOrder\DataTransferObjects\CreateServiceTransactionData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceTransactionData;
-use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
-use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceTransaction;
 
 class CreateServiceTransactionAction
 {
-    public function execute(array $data, PaymentMethod $paymentMethod): ServiceTransaction
+    public function execute(CreateServiceTransactionData $createServiceTransactionData): ServiceTransaction
     {
-        $serviceTransactionData = $this->prepareTransactionData($data, $paymentMethod);
+        $serviceTransactionData = $this->prepareTransactionData($createServiceTransactionData);
 
         $serviceTransaction = ServiceTransaction::create([
             'service_order_id' => $serviceTransactionData->service_order_id,
@@ -29,26 +27,21 @@ class CreateServiceTransactionAction
     }
 
     private function prepareTransactionData(
-        array $data,
-        PaymentMethod $paymentMethod
+        CreateServiceTransactionData $createServiceTransactionData
     ): ServiceTransactionData {
 
-        $serviceBill = ServiceBill::whereReference($data['reference_id'])->firstOrFail();
+        $serviceBill = $createServiceTransactionData->service_bill;
 
         /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
         $serviceOrder = $serviceBill->serviceOrder;
 
-        $newData = [
-            'service_order_id' => $serviceBill->service_order_id,
-            'service_bill_id' => $serviceBill->id,
-            'payment_method_id' => $paymentMethod->id,
-            'total_amount' => $serviceBill->total_amount,
-            'currency' => $serviceOrder->currency_code,
-            'status' => ServiceTransactionStatus::PENDING,
-        ];
-
-        $serviceTransactionData = ServiceTransactionData::fromArray($newData);
-
-        return $serviceTransactionData;
+        return new ServiceTransactionData(
+            service_order_id: $serviceBill->service_order_id,
+            service_bill_id: $serviceBill->id,
+            payment_method_id: $createServiceTransactionData->payment_method_id,
+            total_amount: $serviceBill->total_amount,
+            currency: $serviceOrder->currency_code,
+            status: $createServiceTransactionData->service_transaction_status,
+        );
     }
 }

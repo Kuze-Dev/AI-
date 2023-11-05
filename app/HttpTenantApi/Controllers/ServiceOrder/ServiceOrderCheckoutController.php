@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\ServiceOrder;
 
+use Domain\Payments\Exceptions\PaymentException;
 use Domain\ServiceOrder\Actions\CheckoutServiceOrderAction;
-use Domain\ServiceOrder\Exceptions\InvalidServiceTransactionException;
+use Domain\ServiceOrder\DataTransferObjects\CheckoutServiceOrderData;
+use Domain\ServiceOrder\Exceptions\ServiceOrderStatusStillPendingException;
 use Domain\ServiceOrder\Requests\ServiceTransactionStoreRequest;
 use Exception;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;
+use Symfony\Component\HttpFoundation\Response;
 
 #[
     ApiResource('service-transaction', only: ['store']),
@@ -18,32 +21,42 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 ]
 class ServiceOrderCheckoutController
 {
-    public function store(ServiceTransactionStoreRequest $request, CheckoutServiceOrderAction $checkoutServiceOrderAction): JsonResponse
-    {
+    public function store(
+        ServiceTransactionStoreRequest $request,
+        CheckoutServiceOrderAction $checkoutServiceOrderAction
+    ): mixed {
+
         try {
             $validatedData = $request->validated();
 
-            $data = $checkoutServiceOrderAction->execute($validatedData);
-
-            if (! $data) {
-                throw new InvalidServiceTransactionException();
-            }
-
-            return response()->json(
-                [
-                    'message' => 'Proceed to payment',
-                    'data' => $data,
-                ],
-                201
+            $data = $checkoutServiceOrderAction->execute(
+                CheckoutServiceOrderData::fromRequest($validatedData)
             );
-        } catch (InvalidServiceTransactionException) {
-            return response()->json([
-                'message' => 'Invalid Service Transaction',
-            ], 404);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Something went wrong!',
-            ], 404);
+
+            return response([
+                'message' => trans('Proceed to payment'),
+                'data' => $data,
+            ]);
+        } catch (ModelNotFoundException $m) {
+            return response(
+                ['message' => trans($m->getMessage())],
+                Response::HTTP_NOT_FOUND
+            );
+        } catch (ServiceOrderStatusStillPendingException) {
+            return response(
+                ['message' => trans('Unable to proceed, service order\'s status is still on pending')],
+                Response::HTTP_NOT_FOUND
+            );
+        } catch (PaymentException) {
+            return response(
+                ['message' => trans('Payment Unauthorized')],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        } catch (Exception) {
+            return response(
+                ['message' => trans('Something went wrong!')],
+                Response::HTTP_NOT_FOUND
+            );
         }
     }
 }

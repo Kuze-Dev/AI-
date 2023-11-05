@@ -5,105 +5,127 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Listeners;
 
 use Domain\Payments\Events\PaymentProcessEvent;
-use Domain\ServiceOrder\Actions\CreateServiceBillAction;
-use Domain\ServiceOrder\Actions\GetServiceBillingAndDueDateAction;
+use Domain\Payments\Models\Payment;
+use Domain\ServiceOrder\Actions\CreateServiceTransactionAction;
 use Domain\ServiceOrder\Actions\SendToCustomerServiceOrderStatusEmailAction;
-use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
+use Domain\ServiceOrder\DataTransferObjects\CreateServiceTransactionData;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
+use Domain\ServiceOrder\Jobs\CreateServiceBillJob;
+use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
 use Domain\ServiceOrder\Models\ServiceBill;
-use Domain\ServiceOrder\Models\ServiceTransaction;
+use Domain\ServiceOrder\Models\ServiceOrder;
 
 class ServiceOrderPaymentUpdatedListener
 {
     public function __construct(
-        private CreateServiceBillAction $createServiceBillAction,
-        private GetServiceBillingAndDueDateAction $getServiceBillingAndDueDateAction,
-        private SendToCustomerServiceOrderStatusEmailAction $sendToCustomerServiceOrderStatusEmailAction
+        private Payment $payment,
+        private ServiceBill $serviceBill,
+        private CreateServiceTransactionAction $createServiceTransactionAction
     ) {
     }
 
     public function handle(PaymentProcessEvent $event): void
     {
-        if ($event->payment->payable instanceof ServiceBill) {
-            $status = $event->payment->status;
+        $this->payment = $event->payment;
 
-            $serviceBill = $event->payment->payable;
+        $payable = $event->payment->payable;
 
-            match ($status) {
-                'paid' => $this->onServiceBillPaid($serviceBill),
-                'refunded', => $this->onServiceBillRefunded($serviceBill),
-                'cancelled', => $this->onServiceBillCancelled($serviceBill),
+        if ($payable instanceof ServiceBill) {
+            $this->serviceBill = $payable;
+
+            match ($event->payment->status) {
+                'paid' => $this->onServiceBillPaid(),
+                'refunded', => $this->onServiceBillRefunded(),
+                'cancelled', => $this->onServiceBillCancelled(),
                 default => null
             };
         }
     }
 
-    private function onServiceBillPaid(ServiceBill $serviceBill): void
+    private function onServiceBillPaid(): void
     {
-        $serviceTransaction = ServiceTransaction::whereServiceBillId($serviceBill->id)->firstOrFail();
+        $this->createServiceTransactionAction
+            ->execute(
+                new CreateServiceTransactionData(
+                    service_bill: $this->serviceBill,
+                    service_transaction_status: ServiceTransactionStatus::PAID,
+                    payment_method_id: $this->payment->payment_method_id
+                )
+            );
 
-        $serviceTransaction->update([
-            'status' => ServiceTransactionStatus::PAID,
-        ]);
-
-        $serviceBill->update([
-            'status' => ServiceBillStatus::PAID,
-        ]);
+        $this->serviceBill->update(['status' => ServiceBillStatus::PAID]);
 
         /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
-        $serviceOrder = $serviceBill->serviceOrder;
+        $serviceOrder = $this->serviceBill->serviceOrder;
 
+        $this->createServiceBill($serviceOrder);
+
+        $this->updateServiceOrderStatus($serviceOrder);
+    }
+
+    private function onServiceBillRefunded(): void
+    {
+        $this->createServiceTransactionAction
+            ->execute(
+                new CreateServiceTransactionData(
+                    service_bill: $this->serviceBill,
+                    service_transaction_status: ServiceTransactionStatus::REFUNDED,
+                    payment_method_id: $this->payment->payment_method_id
+                )
+            );
+
+        $this->serviceBill->update(['status' => ServiceBillStatus::PENDING]);
+    }
+
+    private function onServiceBillCancelled(): void
+    {
+        $this->createServiceTransactionAction
+            ->execute(
+                new CreateServiceTransactionData(
+                    service_bill: $this->serviceBill,
+                    service_transaction_status: ServiceTransactionStatus::CANCELLED,
+                    payment_method_id: $this->payment->payment_method_id
+                )
+            );
+
+        $this->serviceBill->update(['status' => ServiceBillStatus::PENDING]);
+    }
+
+    private function createServiceBill(ServiceOrder $serviceOrder): void
+    {
         if (
             $serviceOrder->is_subscription &&
             ! $serviceOrder->is_auto_generated_bill
         ) {
-            $this->createServiceBillAction
-                ->execute(
-                    ServiceBillData::subsequentFromServiceOrderWithAssignedDates(
-                        serviceOrder: $serviceOrder,
-                        serviceOrderBillingAndDueDateData: $this->getServiceBillingAndDueDateAction
-                            ->execute($serviceBill)
-                    )
-                );
+            /** @var \Domain\Customer\Models\Customer $customer */
+            $customer = $serviceOrder->customer;
+
+            CreateServiceBillJob::dispatch(
+                $serviceOrder,
+                $this->serviceBill
+            )->chain([
+                new NotifyCustomerLatestServiceBillJob(
+                    $customer,
+                    $serviceOrder
+                ),
+            ]);
         }
-
-        $serviceOrder->update([
-            'status' => $serviceOrder->is_subscription
-                ? ServiceOrderStatus::ACTIVE
-                : ServiceOrderStatus::PENDING,
-        ]);
-
-        $this->sendToCustomerServiceOrderStatusEmailAction
-            ->execute($serviceOrder);
     }
 
-    private function onServiceBillRefunded(ServiceBill $serviceBill): void
+    private function updateServiceOrderStatus(ServiceOrder $serviceOrder): void
     {
-        $serviceTransaction = ServiceTransaction::whereServiceBillId($serviceBill->id)->firstOrFail();
+        if ($serviceOrder->status != ServiceOrderStatus::CLOSED) {
+            $serviceOrder->update([
+                'status' => $serviceOrder->is_subscription
+                    ? ServiceOrderStatus::ACTIVE
+                    : ServiceOrderStatus::PENDING,
+            ]);
 
-        $serviceTransaction->update([
-            'status' => ServiceTransactionStatus::REFUNDED,
-        ]);
-
-        $serviceBill->update([
-            'status' => ServiceBillStatus::PENDING,
-        ]);
-
-    }
-
-    private function onServiceBillCancelled(ServiceBill $serviceBill): void
-    {
-        $serviceTransaction = ServiceTransaction::whereServiceBillId($serviceBill->id)->firstOrFail();
-
-        $serviceTransaction->update([
-            'status' => ServiceTransactionStatus::CANCELLED,
-        ]);
-
-        $serviceBill->update([
-            'status' => ServiceBillStatus::PENDING,
-        ]);
-
+            app(SendToCustomerServiceOrderStatusEmailAction::class)
+                ->onQueue()
+                ->execute($serviceOrder);
+        }
     }
 }

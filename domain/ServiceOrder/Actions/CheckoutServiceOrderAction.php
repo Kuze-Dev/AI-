@@ -12,32 +12,29 @@ use Domain\Payments\DataTransferObjects\PaymentDetailsData;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\TransactionData;
 use Domain\Payments\Exceptions\PaymentException;
+use Domain\ServiceOrder\DataTransferObjects\CheckoutServiceOrderData;
+use Domain\ServiceOrder\Enums\ServiceOrderStatus;
+use Domain\ServiceOrder\Exceptions\ServiceOrderStatusStillPendingException;
 use Domain\ServiceOrder\Models\ServiceBill;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Throwable;
 
 class CheckoutServiceOrderAction
 {
-    public function __construct(
-        private CreateServiceTransactionAction $createServiceTransactionAction,
-        private CreatePaymentAction $createPaymentAction,
-    ) {
+    public function __construct(private CreatePaymentAction $createPaymentAction)
+    {
     }
 
-    public function execute(array $data): array
+    /** @throws Throwable */
+    public function execute(CheckoutServiceOrderData $checkoutServiceOrderData): PaymentAuthorize
     {
-        $paymentMethod = $this->preparePaymentMethod($data['payment_method']);
+        $paymentMethod = $this->preparePaymentMethod($checkoutServiceOrderData->payment_method);
 
-        $serviceBill = ServiceBill::whereReference($data['reference_id'])
-            ->firstOrFail();
+        $serviceBill = $this->prepareServiceBill($checkoutServiceOrderData->reference_id);
 
         $payment = $this->proceedPayment($serviceBill, $paymentMethod);
 
-        $this->createServiceTransactionAction->execute($data, $paymentMethod);
-
-        return [
-            $payment,
-            $serviceBill,
-        ];
+        return $payment;
     }
 
     private function preparePaymentMethod(string $payment_method): PaymentMethod
@@ -45,12 +42,24 @@ class CheckoutServiceOrderAction
         $paymentMethod = PaymentMethod::whereSlug($payment_method)->first();
 
         if (! $paymentMethod instanceof PaymentMethod) {
-            throw new BadRequestHttpException('No paymentMethod found');
+            throw new ModelNotFoundException('No payment method found');
         }
 
         return $paymentMethod;
     }
 
+    private function prepareServiceBill(string $reference_id): ServiceBill
+    {
+        $serviceBill = ServiceBill::whereReference($reference_id)->first();
+
+        if (! $serviceBill instanceof ServiceBill) {
+            throw new ModelNotFoundException('No service bill found');
+        }
+
+        return $serviceBill;
+    }
+
+    /** @throws Throwable */
     private function proceedPayment(
         ServiceBill $serviceBill,
         PaymentMethod $paymentMethod
@@ -59,13 +68,17 @@ class CheckoutServiceOrderAction
         /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
         $serviceOrder = $serviceBill->serviceOrder;
 
+        if ($serviceOrder->status === ServiceOrderStatus::PENDING) {
+            throw new ServiceOrderStatusStillPendingException();
+        }
+
         $providerData = new CreatepaymentData(
             transactionData: TransactionData::fromArray(
                 [
                     'reference_id' => $serviceBill->reference,
                     'amount' => AmountData::fromArray([
                         'currency' => $serviceOrder->currency_code,
-                        'total' => (int) $serviceBill->total_amount,
+                        'total' => $serviceBill->total_amount,
                         'details' => PaymentDetailsData::fromArray(
                             [
                                 'subtotal' => strval($serviceBill->sub_total),
