@@ -99,9 +99,7 @@ class CreateServiceOrderAction
 
         if ($service->needs_approval) {
             $status = ServiceOrderStatus::PENDING;
-        } elseif (
-            ! $service->pay_upfront && ! $service->is_subscription
-        ) {
+        } elseif (! $service->pay_upfront && ! $service->is_subscription) {
             $status = ServiceOrderStatus::INPROGRESS;
         }
 
@@ -117,21 +115,17 @@ class CreateServiceOrderAction
             ? $serviceOrderData->service_address_id
             : $serviceOrderData->billing_address_id;
 
-        $billingAddressData = Address::whereId($billingAddressId)
-            ->firstOrFail();
+        $billingAddress = Address::whereId($billingAddressId)->firstOrFail();
 
         return $this->getTaxableInfoAction
             ->execute(
                 $subTotalPrice,
-                $billingAddressData
+                $billingAddress
             );
     }
 
-    public function getSubTotalPrice(
-        float $sellingPrice,
-        array $additionalCharges
-    ): int|float {
-
+    public function getSubTotalPrice(float $sellingPrice, array $additionalCharges): int|float
+    {
         return $this->calculateServiceOrderTotalPriceAction
             ->execute(
                 $sellingPrice,

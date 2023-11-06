@@ -20,10 +20,7 @@ class CreateServiceBillPipe
         callable $next
     ): ServiceOrderCreatedPipelineData {
 
-        if (
-            ! $serviceOrderCreatedPipelineData->serviceOrder
-                ->needs_approval
-        ) {
+        if (! $serviceOrderCreatedPipelineData->serviceOrder->needs_approval) {
             $this->createServiceBillAction
                 ->execute(
                     ServiceBillData::initialFromServiceOrder(
