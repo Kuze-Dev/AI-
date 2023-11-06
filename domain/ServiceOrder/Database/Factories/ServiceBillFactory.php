@@ -53,4 +53,12 @@ class ServiceBillFactory extends Factory
     {
         return $this->state(['due_date' => $due_date]);
     }
+
+    public function initial(): self
+    {
+        return $this->state([
+            'bill_date' => null,
+            'due_date' => null,
+        ]);
+    }
 }

@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Actions;
 
-use Domain\Customer\Models\Customer;
 use Domain\ServiceOrder\Models\ServiceBill;
+use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Notifications\ServiceBillNotification;
+use Illuminate\Support\Facades\Notification;
 
 class SendToCustomerServiceBillEmailAction
 {
-    public function execute(Customer $customer, ServiceBill $serviceBill): void
+    public function execute(ServiceOrder $serviceOrder, ServiceBill $serviceBill): void
     {
-        $customer->notify(new ServiceBillNotification($serviceBill));
+        Notification::route('mail', [
+            $serviceOrder->customer_email => $serviceOrder->customer_full_name,
+        ])->notify(new ServiceBillNotification($serviceBill));
     }
 }

@@ -23,61 +23,70 @@ class CreateServiceBillingsAction
         $customers = Customer::query()
             ->with([
                 'serviceOrders' => fn ($query) => $query->whereShouldAutoGenerateBill(),
-                'serviceOrders.serviceBills',
+                'serviceOrders.serviceBills.serviceTransactions',
             ])
             ->whereActive()
             ->whereRegistered()
-            ->whereHas('serviceOrders', fn ($query) => $query->has('serviceBills'))
+            ->whereHas('serviceOrders', fn ($query) => $query->whereShouldAutoGenerateBill()
+                ->has('serviceBills'))
             ->get();
 
-        $customers
-            ->each(
-                function (Customer $customer) {
-                    $customer
-                        ->serviceOrders
-                        ->each(
-                            function (ServiceOrder $serviceOrder) use ($customer) {
-                                /** @var \Domain\ServiceOrder\Models\ServiceBill $latestServiceBill */
-                                $latestServiceBill = $serviceOrder->latestServiceBill();
+        $customers->each(
+            function (Customer $customer) {
+                $customer
+                    ->serviceOrders
+                    ->each(
+                        function (ServiceOrder $serviceOrder) {
+                            /** @var \Domain\ServiceOrder\Models\ServiceBill $latestServiceBill */
+                            $latestServiceBill = $serviceOrder->serviceBills
+                                ->sortByDesc('created_at')
+                                ->first();
 
-                                $referenceDate = $latestServiceBill->bill_date;
+                            $referenceDate = $latestServiceBill->bill_date;
 
-                                /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
-                                $serviceTransaction = $latestServiceBill->serviceTransaction;
+                            /** @var \Illuminate\Database\Eloquent\Collection<int, ServiceTransaction> $transactions */
+                            $transactions = $latestServiceBill->serviceTransactions;
 
-                                if (
-                                    is_null($referenceDate) &&
-                                    $serviceTransaction instanceof ServiceTransaction
-                                ) {
-                                    /** @var \Illuminate\Support\Carbon $createdAt */
-                                    $createdAt = $serviceTransaction->created_at;
+                            /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
+                            $serviceTransaction = $transactions->sortByDesc('created_at')->first();
 
-                                    $serviceOrderBillingAndDueDateData = $this->computeServiceBillingCycleAction
-                                        ->execute(
-                                            $serviceOrder,
-                                            $createdAt
-                                        );
+                            $isServiceTransactionStatusPaid = $serviceTransaction instanceof ServiceTransaction &&
+                                $serviceTransaction->is_paid;
 
-                                    $referenceDate = $serviceOrderBillingAndDueDateData->bill_date;
-                                }
+                            $isInitialServiceBillStatusPaid = is_null($referenceDate) &&
+                                $latestServiceBill->is_paid &&
+                                $isServiceTransactionStatusPaid;
 
-                                $isBillingDateToday = now()->parse($referenceDate)
-                                    ->toDateString() === now()->toDateString();
+                            if ($isInitialServiceBillStatusPaid) {
+                                /**
+                                 * @var \Domain\ServiceOrder\Models\ServiceTransaction $serviceTransaction
+                                 * @var \Illuminate\Support\Carbon $createdAt
+                                 */
+                                $createdAt = $serviceTransaction->created_at;
 
-                                if ($referenceDate instanceof Carbon && $isBillingDateToday) {
-                                    CreateServiceBillJob::dispatch(
-                                        $serviceOrder,
-                                        $latestServiceBill
-                                    )->chain([
-                                        new NotifyCustomerLatestServiceBillJob(
-                                            $customer,
-                                            $serviceOrder
-                                        ),
-                                    ]);
-                                }
+                                $serviceOrderBillingAndDueDateData = $this->computeServiceBillingCycleAction
+                                    ->execute($serviceOrder, $createdAt);
+
+                                $referenceDate = $serviceOrderBillingAndDueDateData->bill_date;
                             }
-                        );
-                }
-            );
+
+                            $isBillingDateToday = $referenceDate instanceof Carbon &&
+                                (
+                                    now()->parse($referenceDate)
+                                        ->toDateString() === now()->toDateString()
+                                );
+
+                            /** @var \Illuminate\Foundation\Bus\PendingDispatch $createServiceBillJob */
+                            $createServiceBillJob = CreateServiceBillJob::dispatchIf(
+                                $isBillingDateToday,
+                                $serviceOrder,
+                                $latestServiceBill
+                            );
+
+                            $createServiceBillJob->chain([new NotifyCustomerLatestServiceBillJob($serviceOrder)]);
+                        }
+                    );
+            }
+        );
     }
 }

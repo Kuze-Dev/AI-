@@ -12,7 +12,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-/** TODO: to be removed. */
 class ServiceBillNotification extends Notification implements ShouldQueue
 {
     use Queueable;

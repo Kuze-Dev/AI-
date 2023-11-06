@@ -37,7 +37,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Payments\Models\Payment> $payments
  * @property-read int|null $payments_count
  * @property-read \Domain\ServiceOrder\Models\ServiceOrder|null $serviceOrder
- * @property-read \Illuminate\Database\Eloquent\Relations\HasMany<ServiceTransaction>|null $serviceTransactions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ServiceTransaction>|null $serviceTransactions
  *
  * @method static ServiceBillQueryBuilder|ServiceBill newModelQuery()
  * @method static ServiceBillQueryBuilder|ServiceBill newQuery()
@@ -156,5 +156,13 @@ class ServiceBill extends Model implements PayableInterface
     public function serviceTransactions(): HasMany
     {
         return $this->hasMany(ServiceTransaction::class);
+    }
+
+    /** @return Attribute<bool, never> */
+    protected function isPaid(): Attribute
+    {
+        return Attribute::get(
+            fn (mixed $value) => $this->status === ServiceBillStatus::PAID
+        );
     }
 }

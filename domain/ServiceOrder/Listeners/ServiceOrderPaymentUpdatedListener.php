@@ -108,20 +108,16 @@ class ServiceOrderPaymentUpdatedListener
         $shouldCreateNewServiceBill = $this->serviceOrder->is_subscription &&
         ! $this->serviceOrder->is_auto_generated_bill;
 
-        if ($shouldCreateNewServiceBill) {
-            /** @var \Domain\Customer\Models\Customer $customer */
-            $customer = $this->serviceOrder->customer;
+        /** @var \Illuminate\Foundation\Bus\PendingDispatch $createServiceBillJob */
+        $createServiceBillJob = CreateServiceBillJob::dispatchIf(
+            $shouldCreateNewServiceBill,
+            $this->serviceOrder,
+            $this->serviceBill
+        );
 
-            CreateServiceBillJob::dispatch(
-                $this->serviceOrder,
-                $this->serviceBill
-            )->chain([
-                new NotifyCustomerLatestServiceBillJob(
-                    $customer,
-                    $this->serviceOrder
-                ),
-            ]);
-        }
+        $createServiceBillJob->chain([
+            new NotifyCustomerLatestServiceBillJob($this->serviceOrder),
+        ]);
     }
 
     private function updateServiceOrderStatus(): void
@@ -141,6 +137,7 @@ class ServiceOrderPaymentUpdatedListener
 
     private function handleServiceBillStatusUpdate(): void
     {
+        /** @var \Domain\ServiceOrder\DataTransferObjects\ServiceOrderPaymentData $serviceOrderPaymentData */
         $serviceOrderPaymentData = match ($this->payment->status) {
             'paid' => $this->onServiceBillPaid(),
             'refunded', => $this->onServiceBillRefunded(),

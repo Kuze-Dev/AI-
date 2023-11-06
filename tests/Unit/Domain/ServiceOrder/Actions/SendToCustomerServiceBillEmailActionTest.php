@@ -2,29 +2,22 @@
 
 declare(strict_types=1);
 
-use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\ServiceOrder\Actions\SendToCustomerServiceBillEmailAction;
 use Domain\ServiceOrder\Database\Factories\ServiceBillFactory;
+use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
 use Domain\ServiceOrder\Notifications\ServiceBillNotification;
 use Illuminate\Support\Facades\Notification;
 
-beforeEach(function () {
-    testInTenantContext();
-});
-
 it('can execute', function () {
-    Notification::fake();
+    testInTenantContext();
 
-    $customer = CustomerFactory::new()->make();
+    Notification::fake();
 
     app(SendToCustomerServiceBillEmailAction::class)
         ->execute(
-            $customer,
+            ServiceOrderFactory::new()->make(),
             ServiceBillFactory::new()->make()
         );
 
-    Notification::assertSentTo(
-        [$customer],
-        ServiceBillNotification::class
-    );
+    Notification::assertSentOnDemand(ServiceBillNotification::class);
 });

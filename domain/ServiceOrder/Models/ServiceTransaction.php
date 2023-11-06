@@ -8,6 +8,7 @@ use App\Casts\MoneyCast;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Models\Payment;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
@@ -119,5 +120,13 @@ class ServiceTransaction extends Model
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
+    }
+
+    /** @return Attribute<bool, never> */
+    protected function isPaid(): Attribute
+    {
+        return Attribute::get(
+            fn (mixed $value) => $this->status === ServiceTransactionStatus::PAID
+        );
     }
 }
