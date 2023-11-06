@@ -10,6 +10,8 @@ use Domain\Payments\Models\Payment;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * Domain\ServiceOrder\Models\ServiceTransaction
@@ -27,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read PaymentMethod|null $payment_method
  * @property-read \Domain\ServiceOrder\Models\ServiceBill|null $serviceBill
  * @property-read \Domain\ServiceOrder\Models\ServiceOrder|null $serviceOrder
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  *
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction newQuery()
@@ -45,6 +48,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ServiceTransaction extends Model
 {
+    use LogsActivity;
+
     protected $fillable = [
         'service_order_id',
         'service_bill_id',
@@ -104,5 +109,13 @@ class ServiceTransaction extends Model
     public function payment_method(): BelongsTo
     {
         return $this->belongsTo(PaymentMethod::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }
