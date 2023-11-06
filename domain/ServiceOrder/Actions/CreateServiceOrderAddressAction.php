@@ -11,27 +11,24 @@ use Domain\ServiceOrder\Models\ServiceOrderAddress;
 
 class CreateServiceOrderAddressAction
 {
-    public function execute(
-        ServiceOrderAddressData $serviceOrderAddressData
-    ): void {
-
+    public function execute(ServiceOrderAddressData $serviceOrderAddressData): void
+    {
         $addressesToInsert = [];
 
-        if (
-            $serviceAddressModel = Address::whereId(
-                $serviceOrderAddressData->service_address_id
-            )->first()
-        ) {
+        $serviceAddress = Address::whereId($serviceOrderAddressData->service_address_id)
+            ->first();
+
+        if ($serviceAddress instanceof Address) {
             $commonAddressData = [
                 'service_order_id' => $serviceOrderAddressData
                     ->serviceOrder
                     ->id,
-                'country' => $serviceAddressModel->state->country->name,
-                'state' => $serviceAddressModel->state->name,
-                'label_as' => $serviceAddressModel->label_as,
-                'address_line_1' => $serviceAddressModel->address_line_1,
-                'zip_code' => $serviceAddressModel->zip_code,
-                'city' => $serviceAddressModel->city,
+                'country' => $serviceAddress->state->country->name,
+                'state' => $serviceAddress->state->name,
+                'label_as' => $serviceAddress->label_as,
+                'address_line_1' => $serviceAddress->address_line_1,
+                'zip_code' => $serviceAddress->zip_code,
+                'city' => $serviceAddress->city,
             ];
 
             $addressesToInsert = [
@@ -46,23 +43,24 @@ class CreateServiceOrderAddressAction
             ];
         }
 
+        $billingAddress = Address::whereId($serviceOrderAddressData->billing_address_id)
+            ->first();
+
         if (
             ! $serviceOrderAddressData->is_same_as_billing &&
-            $billingAddressModel = Address::whereId(
-                $serviceOrderAddressData->billing_address_id
-            )->first()
+            $billingAddress instanceof Address
         ) {
             $addressesToInsert[1] = [
                 'service_order_id' => $serviceOrderAddressData
                     ->serviceOrder
                     ->id,
                 'type' => ServiceOrderAddressType::BILLING_ADDRESS,
-                'country' => $billingAddressModel->state->country->name,
-                'state' => $billingAddressModel->state->name,
-                'label_as' => $billingAddressModel->label_as,
-                'address_line_1' => $billingAddressModel->address_line_1,
-                'zip_code' => $billingAddressModel->zip_code,
-                'city' => $billingAddressModel->city,
+                'country' => $billingAddress->state->country->name,
+                'state' => $billingAddress->state->name,
+                'label_as' => $billingAddress->label_as,
+                'address_line_1' => $billingAddress->address_line_1,
+                'zip_code' => $billingAddress->zip_code,
+                'city' => $billingAddress->city,
             ];
         }
 
