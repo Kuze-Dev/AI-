@@ -49,7 +49,7 @@ class SendToCustomerServiceOrderStatusEmailAction
 
         $customer = $serviceOrder->customer;
 
-        if ($customer instanceof Customer && $notification instanceof Notification) {
+        if ($customer instanceof Customer && ! is_null($notification)) {
             $customer->notify($notification);
 
             Log::info('Service Order status email notification sent to '.$customer->email);
