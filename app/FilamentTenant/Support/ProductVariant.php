@@ -30,13 +30,13 @@ class ProductVariant extends Field
         $this->registerListeners([
             'productVariant::editItem' => [
                 function (self $component, string $statePath): void {
-                    if ( ! Str::startsWith($statePath, $component->getStatePath())) {
+                    if (! Str::startsWith($statePath, $component->getStatePath())) {
                         return;
                     }
 
                     $livewire = $component->getLivewire();
 
-                    if ( ! $livewire instanceof HasProductVariants) {
+                    if (! $livewire instanceof HasProductVariants) {
                         throw new InvalidArgumentException();
                     }
 
@@ -45,7 +45,7 @@ class ProductVariant extends Field
             ],
             'productVariant::toggleItem' => [
                 function (self $component, string $statePath): void {
-                    if ( ! Str::startsWith($statePath, $component->getStatePath())) {
+                    if (! Str::startsWith($statePath, $component->getStatePath())) {
                         return;
                     }
 

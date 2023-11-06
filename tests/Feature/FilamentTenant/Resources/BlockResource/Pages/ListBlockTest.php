@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\BlockResource\Blocks\ListBlocks;
-use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
+use Domain\Page\Database\Factories\PageFactory;
 use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 

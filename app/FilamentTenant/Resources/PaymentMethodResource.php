@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use App\FilamentTenant\Resources\PaymentMethodResource\Pages;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Domain\PaymentMethod\Actions\DeletePaymentMethodAction;
 use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\Payments\Actions\GetAvailablePaymentDriverAction;
+use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
-use Domain\PaymentMethod\Actions\DeletePaymentMethodAction;
-use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
-use Domain\Payments\Actions\GetAvailablePaymentDriverAction;
 use Filament\Tables;
-use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Throwable;
 
 class PaymentMethodResource extends Resource
@@ -27,7 +27,6 @@ class PaymentMethodResource extends Resource
 
     protected static ?string $model = PaymentMethod::class;
 
-    /** @var string|null */
     protected static ?string $navigationGroup = 'Shop Configuration';
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
@@ -121,7 +120,8 @@ class PaymentMethodResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->hidden(fn (PaymentMethod $record) => $record->trashed()),
                 Tables\Actions\RestoreAction::make(),
                 // Tables\Actions\ActionGroup::make([
                 //     Tables\Actions\DeleteAction::make()

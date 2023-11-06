@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Settings\ECommerceSettings;
+use App\Settings\FormSettings;
 use App\Settings\SiteSettings;
 use Domain\Admin\Models\Admin;
 use Domain\Auth\Contracts\HasEmailVerificationOTP;
@@ -55,6 +56,7 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Taxation\Models\TaxZone::class => \App\Policies\TaxZonePolicy::class,
         \Domain\Internationalization\Models\Locale::class => \App\Policies\LocalePolicy::class,
         \Domain\Site\Models\Site::class => \App\Policies\SitePolicy::class,
+        \Domain\Service\Models\Service::class => \App\Policies\ServicePolicy::class,
     ];
 
     /** Register any authentication / authorization services. */
@@ -72,15 +74,25 @@ class AuthServiceProvider extends ServiceProvider
 
             if ($notifiable instanceof HasEmailVerificationOTP && $notifiable->isEmailVerificationUseOTP()) {
                 return (new MailMessage())
+                    ->from(
+                        tenancy()->tenant ?
+                        (app(FormSettings::class)->sender_email ? config('mail.from.address') : config('mail.from.address')) :
+                        config('mail.from.address')
+                    )
                     ->subject(trans('Verify Email Address'))
                     ->line(trans('Please copy OTP below to verify your email address.'))
-                    ->line('OTP: ' . $notifiable->generateEmailVerificationOTP())
+                    ->line('OTP: '.$notifiable->generateEmailVerificationOTP())
                     ->line(trans('If you did not create an account, no further action is required.'));
             }
 
             // copied from \Illuminate\Auth\Notifications\VerifyEmail::buildMailMessage($url)
             // https://github.com/laravel/framework/blob/v10.16.1/src/Illuminate/Auth/Notifications/VerifyEmail.php#L62
             return (new MailMessage())
+                ->from(
+                    tenancy()->tenant ?
+                    (app(FormSettings::class)->sender_email ? config('mail.from.address') : config('mail.from.address')) :
+                    config('mail.from.address')
+                )
                 ->subject(trans('Verify Email Address'))
                 ->line(trans('Please click the button below to verify your email address.'))
                 ->action(trans('Verify Email Address'), $url)
@@ -97,9 +109,9 @@ class AuthServiceProvider extends ServiceProvider
                 /** @var Tenant $tenant */
                 $tenant = tenancy()->tenant;
 
-                $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;
+                $hostName = (app()->environment('local') ? 'http://' : 'https://').$tenant->domains->first()?->domain;
 
-                return $hostName . URL::temporarySignedRoute(
+                return $hostName.URL::temporarySignedRoute(
                     'tenant.api.customer.verification.verify',
                     now()->addMinutes(Config::get('auth.verification.expire', 60)),
                     [
@@ -115,14 +127,14 @@ class AuthServiceProvider extends ServiceProvider
                     /** @var Tenant $tenant */
                     $tenant = tenancy()->tenant;
 
-                    $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;
+                    $hostName = (app()->environment('local') ? 'http://' : 'https://').$tenant->domains->first()?->domain;
                     $routeName = 'filament-tenant.auth.verification.verify';
                 } else {
                     $hostName = url('/', secure: app()->environment('local'));
                     $routeName = 'filament.auth.verification.verify';
                 }
 
-                return $hostName . URL::temporarySignedRoute(
+                return $hostName.URL::temporarySignedRoute(
                     $routeName,
                     now()->addMinutes(Config::get('auth.verification.expire', 60)),
                     [
@@ -133,15 +145,15 @@ class AuthServiceProvider extends ServiceProvider
                 );
             }
         });
-
         ResetPasswordNotification::createUrlUsing(function (mixed $notifiable, string $token) {
 
             if ($notifiable instanceof Customer) {
                 $baseUrl = app(ECommerceSettings::class)->domainWithScheme()
                     ?? app(SiteSettings::class)->domainWithScheme();
 
-                return $baseUrl . '/password/reset' . '?' . http_build_query([
+                return $baseUrl.'/password/reset'.'?'.http_build_query([
                     'token' => $token,
+                    'expired_at' => now()->addMinutes(config('auth.passwords.customer.expire'))->timestamp,
                     'email' => $notifiable->getEmailForPasswordReset(),
                 ]);
             }
@@ -151,14 +163,14 @@ class AuthServiceProvider extends ServiceProvider
                     /** @var Tenant $tenant */
                     $tenant = tenancy()->tenant;
 
-                    $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;
+                    $hostName = (app()->environment('local') ? 'http://' : 'https://').$tenant->domains->first()?->domain;
                     $routeName = 'filament-tenant.auth.password.reset';
                 } else {
                     $hostName = url('/', secure: app()->environment('local'));
                     $routeName = 'filament.auth.password.reset';
                 }
 
-                return $hostName . URL::route(
+                return $hostName.URL::route(
                     $routeName,
                     [
                         'token' => $token,

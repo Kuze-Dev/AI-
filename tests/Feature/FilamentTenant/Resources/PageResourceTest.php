@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\PageResource;
-use Filament\Facades\Filament;
 use Domain\Page\Database\Factories\PageFactory;
+use Filament\Facades\Filament;
 
 beforeEach(function () {
     testInTenantContext();

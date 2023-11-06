@@ -34,7 +34,7 @@ class TaxZoneResource extends Resource
 
     protected static function getNavigationLabel(): string
     {
-        return trans('Taxation');
+        return trans('Tax Zone');
     }
 
     public static function form(Form $form): Form
@@ -98,6 +98,7 @@ class TaxZoneResource extends Resource
                             ->afterStateUpdated(fn (Closure $set) => $set('states', []))
                             ->optionsFromModel(Country::class, 'name')
                             ->preload()
+                            ->dehydrateStateUsing(fn ($state) => is_array($state) ? $state : [$state])
                             ->required()
                             ->reactive(),
                         Forms\Components\Fieldset::make(trans('States/Provinces'))
@@ -141,11 +142,8 @@ class TaxZoneResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\IconColumn::make('is_active')
-                    ->boolean()
-                    ->sortable(),
-                Tables\Columns\IconColumn::make('is_default')
-                    ->boolean()
+                Tables\Columns\TextColumn::make('percentage')
+                    ->formatStateUsing(fn (float $state) => $state.'%')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type')
                     ->formatStateUsing(fn (TaxZone $record) => match ($record->type) {
@@ -154,8 +152,11 @@ class TaxZoneResource extends Resource
                     })
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('percentage')
-                    ->formatStateUsing(fn (float $state) => $state . '%')
+                Tables\Columns\IconColumn::make('is_active')
+                    ->boolean()
+                    ->sortable(),
+                Tables\Columns\IconColumn::make('is_default')
+                    ->boolean()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)

@@ -11,7 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
  */
 class SchemaData implements Arrayable
 {
-    /** @param array<SectionData> $sections */
+    /** @param  array<SectionData>  $sections */
     private function __construct(
         public readonly array $sections
     ) {

@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Features\Customer\AddressBase;
+use App\Features\Customer\CustomerBase;
+use App\Features\Customer\TierBase;
 use App\FilamentTenant\Resources\CustomerResource\Pages\CreateCustomer;
 use Domain\Address\Database\Factories\StateFactory;
 use Domain\Address\Models\Address;
@@ -9,7 +12,6 @@ use Domain\Customer\Models\Customer;
 use Domain\Tier\Database\Factories\TierFactory;
 use Domain\Tier\Models\Tier;
 use Filament\Facades\Filament;
-
 use Tests\RequestFactories\CustomerRequestFactory;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -19,9 +21,12 @@ use function Pest\Livewire\livewire;
 uses()->group('customer');
 
 beforeEach(function () {
-    testInTenantContext();
+    $tenant = testInTenantContext();
+    $tenant->features()->activate(CustomerBase::class);
+    $tenant->features()->activate(AddressBase::class);
+    $tenant->features()->activate(TierBase::class);
     Filament::setContext('filament-tenant');
-    if( ! Tier::whereName(config('domain.tier.default'))->first()) {
+    if (! Tier::whereName(config('domain.tier.default'))->first()) {
         TierFactory::createDefault();
     }
     loginAsSuperAdmin();

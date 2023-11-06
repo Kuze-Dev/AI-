@@ -109,6 +109,13 @@ class TenantResource extends Resource
                                         Features\CMS\SitesManagement::class => app(Features\CMS\SitesManagement::class)->label,
                                     ],
                                 ],
+                                Features\Customer\CustomerBase::class => [
+                                    'label' => trans('Customer'),
+                                    'extras' => [
+                                        Features\Customer\TierBase::class => app(Features\Customer\TierBase::class)->label,
+                                        Features\Customer\AddressBase::class => app(Features\Customer\AddressBase::class)->label,
+                                    ],
+                                ],
                                 Features\ECommerce\ECommerceBase::class => [
                                     'label' => trans('eCommerce'),
                                     'extras' => [
@@ -124,18 +131,27 @@ class TenantResource extends Resource
                                             Features\ECommerce\ShippingUps::class => app(Features\ECommerce\ShippingUps::class)->label,
                                             Features\ECommerce\ShippingAusPost::class => app(Features\ECommerce\ShippingAusPost::class)->label,
                                         ],
+                                        Features\ECommerce\AllowGuestOrder::class => 'Allow Guest Orders',
                                         Features\ECommerce\RewardPoints::class => app(Features\ECommerce\RewardPoints::class)->label,
                                     ],
                                 ],
-                                Features\Customer\CustomerBase::class => [
-                                    'label' => trans('Customer'),
-                                    'extras' => [
-                                        Features\Customer\TierBase::class => app(Features\Customer\TierBase::class)->label,
-                                        Features\Customer\AddressBase::class => app(Features\Customer\AddressBase::class)->label,
-                                    ],
+                                Features\Service\ServiceBase::class => [
+                                    'label' => trans('Service'),
+                                    'extras' => [],
                                 ],
                             ]),
-                    ]),
+                    ])->hidden(
+                        fn () => ! auth()->user()?->can('updateFeatures')
+                    ),
+                Forms\Components\Section::make(trans('Suspension Option'))
+                    ->view('filament.forms.components.redbgheading-section')
+                    ->collapsed(fn (string $context) => $context === 'edit')
+                    ->schema([
+                        Forms\Components\Toggle::make('is_suspended')
+                            ->label('Suspend')
+                            ->helpertext('Warning this will suspend the current tenant are you sure with this action?')
+                            ->inline(false),
+                    ])->hidden(fn () => ! auth()->user()?->can('canSuspendTenant')),
             ])->columns(2);
     }
 
@@ -147,6 +163,13 @@ class TenantResource extends Resource
                     ->searchable(),
                 Tables\Columns\TagsColumn::make('domains.domain'),
                 Tables\Columns\TextColumn::make('total_api_request'),
+                Tables\Columns\IconColumn::make('is_suspended')
+                    ->label(trans('Active'))
+                    ->options([
+                        'heroicon-o-check-circle' => fn ($state) => $state == false,
+                        'heroicon-o-x-circle' => fn ($state) => $state === true,
+                    ])
+                    ->color(fn ($state) => $state == false ? 'success' : 'danger'),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),

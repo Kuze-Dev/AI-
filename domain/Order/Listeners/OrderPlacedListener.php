@@ -22,21 +22,16 @@ class OrderPlacedListener
 
     /**
      * Handle the event.
-     *
-     * @param  \Domain\Order\Events\OrderPlacedEvent  $event
-     * @return void
      */
     public function handle(OrderPlacedEvent $event): void
     {
         $customer = $event->preparedOrderData->customer;
         $order = $event->order;
-        $shippingAddress = $event->preparedOrderData->shippingAddress;
-        $shippingMethod = $event->preparedOrderData->shippingMethod;
 
         $discount = $event->preparedOrderData->discount;
 
         // minus the discount
-        if ( ! is_null($discount)) {
+        if (! is_null($discount)) {
             app(CreateDiscountLimitAction::class)->execute($discount, $order, $customer);
         }
 
@@ -46,7 +41,7 @@ class OrderPlacedListener
 
         Notification::send($customer, new OrderPlacedNotification($order));
 
-        $customer->notify(new OrderPlacedMail($order, $shippingAddress, $shippingMethod));
+        $customer->notify(new OrderPlacedMail($order, $event->preparedOrderData));
 
         $sendEmailToAdmins = $this->orderSettings->admin_should_receive;
 

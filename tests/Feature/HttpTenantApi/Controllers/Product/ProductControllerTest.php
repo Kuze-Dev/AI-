@@ -8,8 +8,9 @@ use Domain\Product\Database\Factories\ProductOptionValueFactory;
 use Domain\Product\Database\Factories\ProductVariantFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
-use Illuminate\Testing\Fluent\AssertableJson;
+use Domain\Tier\Database\Factories\TierFactory;
 use Illuminate\Support\Str;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Support\MetaData\Database\Factories\MetaDataFactory;
 
 use function Pest\Laravel\getJson;
@@ -40,7 +41,7 @@ it('can list products', function () {
 it('can show a product', function () {
     $product = ProductFactory::new(['status' => 1])->createOne();
 
-    getJson('api/products/' . $product->getRouteKey())
+    getJson('api/products/'.$product->getRouteKey())
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($product) {
             $json
@@ -62,7 +63,7 @@ it('can filter products', function (string $attribute) {
         ->create();
 
     foreach ($products as $product) {
-        getJson('api/products?' . http_build_query([
+        getJson('api/products?'.http_build_query([
             'filter' => [$attribute => $product->$attribute],
         ]))
             ->assertOk()
@@ -84,11 +85,12 @@ it('can show a product with includes', function (string $include) {
     $product = ProductFactory::new(['name' => 'Foo', 'status' => 1])
         ->has(TaxonomyTermFactory::new()->for(TaxonomyFactory::new()->withDummyBlueprint())->count(2))
         ->has(ProductOptionFactory::new()->has(ProductOptionValueFactory::new()))
+        ->has(TierFactory::new())
         ->has(ProductVariantFactory::new())
         ->has(MetaDataFactory::new())
         ->create();
 
-    getJson("api/products/{$product->getRouteKey()}?" . http_build_query(['include' => $include]))
+    getJson("api/products/{$product->getRouteKey()}?".http_build_query(['include' => $include]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($product, $include) {
             $json
@@ -106,6 +108,8 @@ it('can show a product with includes', function (string $include) {
     'productOptions',
     'productVariants',
     'metaData',
+    'tiers',
+    'productTier',
 ]);
 
 it('cant list inactive products', function () {

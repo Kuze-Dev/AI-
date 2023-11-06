@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Pages\Settings;
 
 use App\Filament\Rules\FullyQualifiedDomainNameRule;
+use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
 use App\Settings\ECommerceSettings as SettingsECommerceSettings;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\TextInput;
-use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
 
 class ECommerceSettings extends TenantBaseSettings
 {

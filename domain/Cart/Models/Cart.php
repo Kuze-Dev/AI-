@@ -26,6 +26,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $cartLines
  * @property-read int|null $cart_lines_count
  * @property-read Customer|null $customer
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Cart newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Cart newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Cart query()
@@ -35,19 +36,20 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereUuid($value)
+ *
  * @mixin \Eloquent
  */
-
 #[OnDeleteCascade(['cartLines'])]
 class Cart extends Model
 {
-    use LogsActivity;
-    use HasFactory;
     use ConstraintsRelationships;
+    use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'uuid',
         'customer_id',
+        'session_id',
         'coupon_code',
     ];
 

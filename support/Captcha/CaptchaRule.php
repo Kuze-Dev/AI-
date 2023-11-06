@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Support\Captcha;
 
 use Closure;
-use Support\Captcha\Facades\Captcha;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Support\Captcha\Facades\Captcha;
 
 class CaptchaRule implements ValidationRule
 {
@@ -22,7 +22,7 @@ class CaptchaRule implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if ( ! Captcha::verify($value, $this->ip)) {
+        if (! Captcha::verify($value, $this->ip)) {
             $fail(trans('Unable to process request'));
         }
     }

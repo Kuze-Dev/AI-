@@ -28,19 +28,10 @@ class EditTaxZone extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
-        ];
-    }
-
-    protected function getBreadcrumbs(): array
-    {
-        return [
-            TaxZoneResource::getUrl('index') => trans('Taxation'),
-            url()->current() => $this->record->name,
-            'Edit',
         ];
     }
 
@@ -49,7 +40,7 @@ class EditTaxZone extends EditRecord
         return $this->getCachedActions();
     }
 
-    /** @param TaxZone $record */
+    /** @param  TaxZone  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(fn () => app(UpdateTaxZoneAction::class)->execute($record, TaxZoneData::formArray($data)));

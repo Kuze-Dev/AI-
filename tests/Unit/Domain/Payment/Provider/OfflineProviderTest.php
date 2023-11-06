@@ -37,7 +37,7 @@ it('can generate payment authorization dto ', function () {
     $payment = PaymentFactory::new()->setPaymentMethod($paymentMethod->id)->createOne();
 
     $providerData = new ProviderData(
-        transactionData:  TransactionData::fromArray([
+        transactionData: TransactionData::fromArray([
             'reference_id' => '123',
             'amount' => AmountData::fromArray([
                 'currency' => $payment->currency,

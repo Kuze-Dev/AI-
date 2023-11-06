@@ -16,7 +16,9 @@ use Flowframe\Trend\TrendValue;
 class ConversionRate extends LineChartWidget
 {
     protected static ?string $heading = 'Conversion Rate';
+
     protected static ?string $pollingInterval = null;
+
     public ?string $filter = 'perMonth';
 
     protected function getFilters(): ?array
@@ -38,7 +40,7 @@ class ConversionRate extends LineChartWidget
 
         $totalUser = Trend::model(Customer::class)
             ->between(
-                start:  $startDate,
+                start: $startDate,
                 end: $endDate,
             )
             ->$activeFilter()
@@ -54,7 +56,7 @@ class ConversionRate extends LineChartWidget
 
         $totalCheckout = Trend::query(CartLine::whereNotNull('checked_out_at'))
             ->between(
-                start:  $startDate,
+                start: $startDate,
                 end: $endDate,
             )
             ->$activeFilter()

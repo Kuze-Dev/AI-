@@ -26,7 +26,19 @@ class EditTenant extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->requiresConfirmation(function ($livewire) {
+                    return $livewire->data['is_suspended'] == true ? true : false;
+                })
+                ->modalCancelAction(function ($livewire) {
+
+                    return Action::makeModalAction('redirect')
+                        ->label(trans('Cancel & Revert Changes'))
+                        ->color('secondary')
+                        ->url(TenantResource::getUrl('edit', [$this->record]));
+                })
+                ->modalHeading(fn ($livewire) => $livewire->data['is_suspended'] ? 'Warning' : null)
+                ->modalSubheading(fn ($livewire) => $livewire->data['is_suspended'] ? 'The suspend option is enabled. Please proceed with caution as this action will suspend the tenant. Would you like to proceed ?' : null)
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
@@ -54,7 +66,8 @@ class EditTenant extends EditRecord
     }
 
     /**
-     * @param Tenant $record
+     * @param  Tenant  $record
+     *
      * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model

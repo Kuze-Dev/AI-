@@ -23,7 +23,7 @@ class CreateOrderLineAction
     ) {
     }
 
-    public function execute(Order $order,  PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData): void
+    public function execute(Order $order, PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData): void
     {
         foreach ($preparedOrderData->cartLine as $cartLine) {
 
@@ -33,7 +33,7 @@ class CreateOrderLineAction
             /** @var \Domain\Address\Models\Country $country */
             $country = $state->country;
 
-            $summary = $this->cartSummaryAction->getSummary(
+            $summary = $this->cartSummaryAction->execute(
                 $cartLine,
                 new CartSummaryTaxData(
                     $country->id,
@@ -47,6 +47,10 @@ class CreateOrderLineAction
                 $preparedOrderData->discount,
                 $placeOrderData->serviceId
             );
+
+            $initialSellingPrice = (float) $cartLine->purchasable->selling_price;
+
+            $sellingPrice = $this->cartSummaryAction->getTierSellingPrice($cartLine->purchasable, $initialSellingPrice);
 
             $name = null;
             if ($cartLine->purchasable instanceof Product) {
@@ -70,7 +74,7 @@ class CreateOrderLineAction
                 'purchasable_type' => $cartLine->purchasable_type,
                 'purchasable_sku' => $cartLine->purchasable->sku,
                 'name' => $name,
-                'unit_price' => $cartLine->purchasable->selling_price,
+                'unit_price' => $sellingPrice,
                 'quantity' => $cartLine->quantity,
                 'tax_total' => $summary->taxTotal,
                 'tax_display' => $summary->taxDisplay,
@@ -99,10 +103,7 @@ class CreateOrderLineAction
     }
 
     /**
-     * @param \Domain\Order\Models\OrderLine $orderLine
-     * @param \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $medias
-     * @param string $collection
-     * @return void
+     * @param  \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media>  $medias
      */
     private function copyMediaToOrderLine(OrderLine $orderLine, MediaCollection $medias, string $collection): void
     {

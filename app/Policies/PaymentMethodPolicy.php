@@ -19,7 +19,7 @@ class PaymentMethodPolicy
 
     public function before(): ?Response
     {
-        if ( ! tenancy()->tenant?->features()->someAreActive([
+        if (! tenancy()->tenant?->features()->someAreActive([
             PaypalGateway::class,
             OfflineGateway::class,
             StripeGateway::class,

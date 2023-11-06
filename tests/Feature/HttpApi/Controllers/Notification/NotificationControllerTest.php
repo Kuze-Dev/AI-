@@ -31,7 +31,7 @@ it('return list', function () {
 
     getJson('api/notifications')
         ->assertOk()
-        ->assertJson(function (Illuminate\Testing\Fluent\AssertableJson $json) use ($notification, $message) {
+        ->assertJson(function (AssertableJson $json) use ($notification, $message) {
             $json
                 ->count('data', 1)
                 ->where('data.0.attributes.data.message', $message)
@@ -49,7 +49,7 @@ it('cant update in not associated', function (string $url, string $exception) {
     withoutExceptionHandling();
 
     loginAsUser();
-    expect(fn () => patchJson('api/notifications/' . $notification->getRouteKey() . $url))
+    expect(fn () => patchJson('api/notifications/'.$notification->getRouteKey().$url))
         ->toThrow($exception);
 })
     ->with([

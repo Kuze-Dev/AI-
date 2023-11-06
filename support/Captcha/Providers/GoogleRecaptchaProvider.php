@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\Http;
 
 class GoogleRecaptchaProvider extends BaseProvider
 {
-    public function verify(string $token, ?string $ip = null): bool
+    public function verify(string $token, string $ip = null): bool
     {
         $response = Http::asJson()
             ->post(
-                'https://www.google.com/recaptcha/api/siteverify?' . http_build_query([
+                'https://www.google.com/recaptcha/api/siteverify?'.http_build_query([
                     'secret' => $this->credentials['secret_key'],
                     'response' => $token,
                     'remoteip' => $ip,

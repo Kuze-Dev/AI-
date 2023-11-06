@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Domain\Taxonomy\Models;
 
 use Domain\Content\Models\ContentEntry;
-use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
-use Illuminate\Database\Eloquent\Model;
 use Domain\Product\Models\Product;
+use Domain\Service\Models\Service;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,7 +16,9 @@ use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
-use Illuminate\Database\Eloquent\Builder;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Taxonomy\Models\TaxonomyTerm
@@ -38,6 +39,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
  * @property-read int|null $products_count
  * @property-read \Domain\Taxonomy\Models\Taxonomy|null $taxonomy
+ *
  * @method static Builder|TaxonomyTerm newModelQuery()
  * @method static Builder|TaxonomyTerm newQuery()
  * @method static Builder|TaxonomyTerm ordered(string $direction = 'asc')
@@ -51,6 +53,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder|TaxonomyTerm whereSlug($value)
  * @method static Builder|TaxonomyTerm whereTaxonomyId($value)
  * @method static Builder|TaxonomyTerm whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 #[
@@ -59,9 +62,9 @@ use Illuminate\Database\Eloquent\Builder;
 ]
 class TaxonomyTerm extends Model implements Sortable
 {
+    use ConstraintsRelationships;
     use HasSlug;
     use SortableTrait;
-    use ConstraintsRelationships;
 
     protected $fillable = [
         'taxonomy_id',
@@ -106,6 +109,12 @@ class TaxonomyTerm extends Model implements Sortable
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class);
+    }
+
+    /** @return BelongsToMany<Service> */
+    public function services(): BelongsToMany
+    {
+        return $this->belongsToMany(Service::class, 'service_taxonomy_terms');
     }
 
     public function getRouteKeyName(): string

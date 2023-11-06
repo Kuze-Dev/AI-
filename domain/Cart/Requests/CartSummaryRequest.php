@@ -7,12 +7,12 @@ namespace Domain\Cart\Requests;
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
-use Domain\Cart\Models\CartLine;
+use Domain\Cart\Helpers\PrivateCart\CartLineQuery;
 use Domain\Discount\Models\Discount;
 use Domain\ShippingMethod\Models\ShippingMethod;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Database\Eloquent\Collection;
 
 class CartSummaryRequest extends FormRequest
 {
@@ -55,7 +55,7 @@ class CartSummaryRequest extends FormRequest
             ],
             'service_id' => [
                 'nullable',
-                'int',
+                'string',
             ],
             'discount_code' => [
                 'nullable',
@@ -71,20 +71,12 @@ class CartSummaryRequest extends FormRequest
         if (empty($this->cartLinesCache)) {
             $cartLineIds = explode(',', $this->validated('cart_line_ids'));
 
-            $this->cartLinesCache = CartLine::query()
-                ->with('purchasable')
-                ->whereHas('cart', function ($query) {
-                    $query->whereBelongsTo(auth()->user());
-                })
-                ->whereNull('checked_out_at')
-                ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
-                ->get();
+            $this->cartLinesCache = app(CartLineQuery::class)->execute($cartLineIds);
         }
 
         return $this->cartLinesCache;
     }
 
-    /** @return \Domain\Address\Models\Country|null */
     public function getCountry(): ?Country
     {
         if ($id = $this->validated('billing_address_id')) {

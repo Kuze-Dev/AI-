@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
+use Domain\Customer\Models\Customer;
+use Domain\Product\Models\Product;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Domain\Product\Models\Product;
-use Domain\Customer\Models\Customer;
 
-return new class () extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('favorites', function (Blueprint $table) {

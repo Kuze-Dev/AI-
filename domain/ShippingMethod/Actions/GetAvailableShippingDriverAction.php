@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\ShippingMethod\Actions;
 
-use Illuminate\Support\Str;
 use Domain\ShippingMethod\Enums\Driver;
+use Illuminate\Support\Str;
 
 class GetAvailableShippingDriverAction
 {

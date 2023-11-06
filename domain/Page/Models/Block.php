@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Domain\Page\Models;
 
 use Domain\Blueprint\Models\Blueprint;
-use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,6 +13,8 @@ use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Page\Models\Block
@@ -34,6 +34,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property-read \Domain\Blueprint\Models\Blueprint $blueprint
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Block newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Block newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Block query()
@@ -45,14 +46,15 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @method static \Illuminate\Database\Eloquent\Builder|Block whereIsFixedContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Block whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Block whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 #[OnDeleteRestrict(['blockContents'])]
 class Block extends Model implements HasMedia
 {
-    use LogsActivity;
     use ConstraintsRelationships;
     use InteractsWithMedia;
+    use LogsActivity;
 
     protected $fillable = [
         'blueprint_id',
@@ -90,6 +92,7 @@ class Block extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')
-            ->singleFile();
+            ->singleFile()
+            ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 }

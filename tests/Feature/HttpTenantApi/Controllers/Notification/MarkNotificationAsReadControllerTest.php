@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Event;
 use Tests\Fixtures\TestNotification;
 
 use function Pest\Laravel\patchJson;
-use function PHPUnit\Framework\assertTrue;
 use function Pest\Laravel\withHeader;
+use function PHPUnit\Framework\assertTrue;
 
 // beforeEach(function () {
 //     testInTenantContext();

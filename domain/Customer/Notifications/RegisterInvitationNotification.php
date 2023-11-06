@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Customer\Notifications;
 
 use App\Settings\ECommerceSettings;
+use App\Settings\FormSettings;
 use App\Settings\SiteSettings;
 use Domain\Customer\Models\Customer;
 use Illuminate\Bus\Queueable;
@@ -24,6 +25,7 @@ class RegisterInvitationNotification extends Notification implements ShouldQueue
     public function toMail(Customer $notifiable): MailMessage
     {
         return (new MailMessage())
+            ->from(app(FormSettings::class)->sender_email ?? config('mail.from.address'))
             ->subject(trans('Register Invitation'))
             ->line(trans('Please click the button below to register your email address.'))
             ->action(trans('Register Email Address'), self::url($notifiable));

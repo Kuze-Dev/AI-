@@ -9,9 +9,11 @@ use Domain\Product\Actions\UpdateProductAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductOption;
+use Domain\Product\Models\ProductVariant;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Validation\ValidationException;
+use Log;
 use Support\Common\Rules\MinimumValueRule;
 use Support\Excel\Actions\ImportAction;
 
@@ -28,7 +30,7 @@ class ImportProductAction
                     'name' => 'required|string|max:100',
                     'category' => 'required|string|max:100',
                     'brand' => 'required|string|max:100',
-                    'sku' => 'required|unique:product_variants|string|max:100',
+                    'sku' => 'required|string|max:100',
                     'stock' => ['required', 'numeric', new MinimumValueRule(0)],
                     'retail_price' => ['required', 'numeric', new MinimumValueRule(0.1)],
                     'selling_price' => ['required', 'numeric', new MinimumValueRule(0.1)],
@@ -85,7 +87,7 @@ class ImportProductAction
             ->first();
 
         // If the product does not exist, create a new one
-        if ( ! $foundProduct instanceof Product) {
+        if (! $foundProduct instanceof Product) {
             return app(CreateProductAction::class)->execute(ProductData::fromCsv([
                 ...$data,
                 'sku' => $data['product_sku'] ?? $data['sku'],
@@ -95,6 +97,38 @@ class ImportProductAction
         // Merge the product options and variants with the existing product
         $data['product_options'] = self::mergingProductOptions($foundProduct, $data['product_options']);
         $data['product_variants'] = self::mergingProductVariants($foundProduct, $data);
+
+        // Check for possible sku duplication
+        $foundProductViaSku = Product::where('sku', $data['product_sku'])->first();
+
+        if ($foundProductViaSku instanceof Product && $foundProductViaSku->id != $foundProduct->id) {
+            throw ValidationException::withMessages([
+                'product_id' => trans("Product ID of {$data['name']} is already exists."),
+            ]);
+        }
+
+        $foundProductVariant = ProductVariant::where('sku', $data['sku'])->first();
+
+        if ($foundProductVariant instanceof ProductVariant) {
+            if ($foundProductVariant->product_id != $foundProduct->id) {
+                throw ValidationException::withMessages([
+                    'sku' => trans("SKU of {$data['name']} is already exists."),
+                ]);
+            }
+
+            if ($foundProductVariant->product_id == $foundProduct->id) {
+                return $foundProduct;
+            }
+        }
+
+        Log::info(
+            'Import row(s) of product ',
+            [
+                'name' => $data['name'],
+                'product_id' => $data['product_sku'] ?? $data['sku'],
+                'sku' => $data['sku'],
+            ]
+        );
 
         // Update the existing product
         return app(UpdateProductAction::class)->execute($foundProduct, ProductData::fromCsv([
@@ -120,7 +154,7 @@ class ImportProductAction
                 return $option['name'] === $row['product_option_1_name'];
             });
 
-            if ( ! $foundOption) {
+            if (! $foundOption) {
                 throw ValidationException::withMessages([
                     'product_option_1_name' => trans("{$row['name']} must not exceed 2 product options."),
                 ]);
@@ -173,7 +207,7 @@ class ImportProductAction
                 }
             }
 
-            if ( ! $hasFound) {
+            if (! $hasFound) {
                 $existingOptions = array_merge($csvRowOptions, $existingOptions);
             }
         }
@@ -252,7 +286,7 @@ class ImportProductAction
                         'selling_price' => $row['selling_price'],
                         'retail_price' => $row['retail_price'],
                         'stock' => $row['stock'],
-                        'sku' => $row['sku'] . $key1 . $key2,
+                        'sku' => $row['sku'].$key1.$key2,
                         'status' => true,
                     ];
                 });
@@ -273,7 +307,7 @@ class ImportProductAction
                     'selling_price' => $row['selling_price'],
                     'retail_price' => $row['retail_price'],
                     'stock' => $row['stock'],
-                    'sku' => $row['sku'] . $keyOne,
+                    'sku' => $row['sku'].$keyOne,
                     'status' => true,
                 ];
             }
@@ -329,7 +363,7 @@ class ImportProductAction
             if ($taxonomy) {
                 $termModel = TaxonomyTerm::whereName($taxonomyTerm)->first();
 
-                if ( ! $termModel) {
+                if (! $termModel) {
                     $termModel = TaxonomyTerm::create([
                         'name' => $taxonomyTerm,
                         'taxonomy_id' => $taxonomy->id,

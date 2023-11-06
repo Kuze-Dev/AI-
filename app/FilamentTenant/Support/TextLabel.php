@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Support;
 
+use Closure;
 use Filament\Forms\Components\Concerns\HasExtraInputAttributes;
 use Filament\Forms\Components\Concerns\HasState;
 use Filament\Forms\Components\Field;
 use Filament\Support\Concerns\HasExtraAttributes;
 use Filament\Tables\Columns\Concerns;
-use Closure;
 
 class TextLabel extends Field
 {
-    use HasState;
-    use HasExtraAttributes;
-    use HasExtraInputAttributes;
+    use Concerns\CanBeInline;
     use Concerns\HasAlignment;
-    use Concerns\HasSize;
-    use Concerns\HasWeight;
     use Concerns\HasColor;
     use Concerns\HasFontFamily;
-    use Concerns\CanBeInline;
+    use Concerns\HasSize;
+    use Concerns\HasWeight;
+    use HasExtraAttributes;
+    use HasExtraInputAttributes;
+    use HasState;
 
     protected string $view = 'filament.forms.components.text-label';
 

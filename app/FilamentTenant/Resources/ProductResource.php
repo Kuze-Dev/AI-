@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Features\ECommerce\AllowGuestOrder;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\ProductResource\Pages\EditProduct;
 use App\FilamentTenant\Resources\ProductResource\RelationManagers\TiersRelationManager;
@@ -12,24 +13,24 @@ use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\ProductOption as ProductOptionSupport;
 use App\FilamentTenant\Support\ProductVariant;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Closure;
+use Domain\Product\Actions\DeleteProductAction;
+use Domain\Product\Enums\Status;
+use Domain\Product\Enums\Taxonomy as EnumsTaxonomy;
 use Domain\Product\Models\Product;
+use Domain\Product\Models\ProductOption;
+use Domain\Product\Rules\UniqueProductSkuRule;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
+use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Support\Facades\Auth;
-use Filament\Forms;
-use Closure;
-use Domain\Product\Models\ProductOption;
-use Domain\Taxonomy\Models\Taxonomy;
-use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Builder;
-use Domain\Product\Actions\DeleteProductAction;
-use Domain\Product\Enums\Status;
-use Domain\Product\Enums\Taxonomy as EnumsTaxonomy;
-use Domain\Product\Rules\UniqueProductSkuRule;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Support\Common\Rules\MinimumValueRule;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
@@ -234,8 +235,8 @@ class ProductResource extends Resource
                             Forms\Components\Toggle::make('allow_guest_purchase')
                                 ->helperText('Item can be purchased by guests.')
                                 ->default(false)
-                                ->hidden()
-                                ->columnSpan(2),
+                                ->columnSpan(2)
+                                ->hidden(fn () => ! tenancy()->tenant?->features()->active(AllowGuestOrder::class) ? true : false),
                         ]),
                     Forms\Components\Section::make('Associations')
                         ->translateLabel()
@@ -388,7 +389,7 @@ class ProductResource extends Resource
                     Forms\Components\Repeater::make('options')
                         ->translateLabel()
                         ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, EditProduct $livewire) {
-                            if ( ! $record) {
+                            if (! $record) {
                                 return $state;
                             }
 
@@ -437,13 +438,13 @@ class ProductResource extends Resource
                 ->itemLabel(fn (array $state) => $state['name'] ?? null)
                 ->formatStateUsing(
                     function (?Product $record) {
-                        if ( ! $record) {
+                        if (! $record) {
                             return [];
                         }
 
                         $newArray = [];
                         foreach ($record->productVariants->toArray() as $key => $value) {
-                            $newKey = 'record-' . $value['id'];
+                            $newKey = 'record-'.$value['id'];
                             $newArray[$newKey] = $value;
                         }
 

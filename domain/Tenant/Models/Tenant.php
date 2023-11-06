@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Domain\Tenant\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Laravel\Pennant\Concerns\HasFeatures;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
@@ -16,6 +14,8 @@ use Stancl\Tenancy\Database\Concerns\HasDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
 use Stancl\Tenancy\Database\Models\Domain;
 use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Tenant\Models\Tenant
@@ -30,6 +30,7 @@ use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Domain> $domains
  * @property-read int|null $domains_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TenantApiCall> $apiCalls
+ *
  * @method static \Stancl\Tenancy\Database\TenantCollection<int, static> all($columns = ['*'])
  * @method static \Stancl\Tenancy\Database\TenantCollection<int, static> get($columns = ['*'])
  * @method static \Illuminate\Database\Eloquent\Builder|Tenant newModelQuery()
@@ -40,16 +41,17 @@ use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
  * @method static \Illuminate\Database\Eloquent\Builder|Tenant whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Tenant whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Tenant whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['domains'])]
 class Tenant extends BaseTenant implements TenantWithDatabase
 {
+    use ConstraintsRelationships;
     use HasDatabase;
     use HasDomains;
-    use LogsActivity;
-    use ConstraintsRelationships;
     use HasFeatures;
+    use LogsActivity;
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -61,6 +63,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
 
     protected $fillable = [
         'name',
+        'is_suspended',
     ];
 
     public static function getCustomColumns(): array

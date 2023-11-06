@@ -43,7 +43,7 @@ class Kernel extends HttpKernel
 
         'api' => [
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
+            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
 
@@ -52,6 +52,7 @@ class Kernel extends HttpKernel
         'tenant' => [
             \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
             \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+            \App\Http\Middleware\EnsureTenantIsNotSuspended::class,
             ApiCallTrackMiddleware::class,
         ],
     ];
@@ -76,5 +77,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'active' => \App\Http\Middleware\EnsureAccountIsActive::class,
         'feature.tenant' => \App\Http\Middleware\EnsureTenantFeaturesAreActive::class,
+        'tenant.suspended' => \App\Http\Middleware\EnsureTenantIsNotSuspended::class,
     ];
 }

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\ShippingMethod\Actions;
 
-use Support\Common\Actions\SyncMediaCollectionAction;
-use Support\Common\DataTransferObjects\MediaCollectionData;
 use Domain\ShippingMethod\DataTransferObjects\ShippingMethodData;
 use Domain\ShippingMethod\Models\ShippingMethod;
+use Support\Common\Actions\SyncMediaCollectionAction;
+use Support\Common\DataTransferObjects\MediaCollectionData;
 
 class UpdateShippingMethodAction
 {

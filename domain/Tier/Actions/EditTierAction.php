@@ -14,6 +14,7 @@ class EditTierAction
         $tier->update([
             'name' => $tierData->name,
             'description' => $tierData->description,
+            'has_approval' => $tierData->has_approval,
         ]);
 
         return $tier;

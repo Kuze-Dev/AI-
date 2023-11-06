@@ -3,9 +3,6 @@
 declare(strict_types=1);
 
 use App\Features\CMS\CMSBase;
-use App\Features\Customer\AddressBase;
-use App\Features\Customer\CustomerBase;
-use App\Features\Customer\TierBase;
 use App\Features\ECommerce\ECommerceBase;
 use Database\Seeders\Tenant\Auth\PermissionSeeder;
 use Database\Seeders\Tenant\Auth\RoleSeeder;
@@ -45,12 +42,12 @@ function loginAsUser(Admin $user = null): Admin
 }
 
 function assertActivityLogged(
-    string|null $logName = null,
-    string|null $event = null,
-    string|null $description = null,
-    array|null $properties = null,
-    Model|null $causedBy = null,
-    Model|null $subject = null,
+    string $logName = null,
+    string $event = null,
+    string $description = null,
+    array $properties = null,
+    Model $causedBy = null,
+    Model $subject = null,
 ): void {
     assertDatabaseHas(
         ActivitylogServiceProvider::determineActivityModel(),
@@ -72,17 +69,14 @@ function testInTenantContext(): Tenant
     /** @var Tenant */
     $tenant = TenantFactory::new()->createOne(['name' => 'testing']);
 
-    $domain = 'test.' . parse_url(config('app.url'), PHP_URL_HOST);
+    $domain = 'test.'.parse_url(config('app.url'), PHP_URL_HOST);
 
     $tenant->createDomain(['domain' => $domain]);
 
     $tenant->features()->activate(CMSBase::class);
     $tenant->features()->activate(ECommerceBase::class);
-    $tenant->features()->activate(CustomerBase::class);
-    $tenant->features()->activate(TierBase::class);
-    $tenant->features()->activate(AddressBase::class);
 
-    URL::forceRootUrl(Request::getScheme() . '://' . $domain);
+    URL::forceRootUrl(Request::getScheme().'://'.$domain);
 
     tenancy()->initialize($tenant);
 

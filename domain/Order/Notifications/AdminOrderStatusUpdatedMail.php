@@ -4,26 +4,36 @@ declare(strict_types=1);
 
 namespace Domain\Order\Notifications;
 
+use App\Settings\OrderSettings;
 use App\Settings\SiteSettings;
+use Domain\Customer\Models\Customer;
+use Domain\Order\DataTransferObjects\GuestCustomerData;
 use Domain\Order\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use App\Settings\OrderSettings;
 
 class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
 {
     use Queueable;
 
     private Order $order;
+
     private string $status;
+
     private ?string $remarks;
+
     private string $logo;
+
     private string $title;
+
     private string $description;
+
     private string $from;
+
     private array $replyTo;
+
     private ?string $footer = null;
 
     /** Create a new notification instance. */
@@ -58,8 +68,10 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
     /** Get the mail representation of the notification. */
     public function toMail(object $notifiable): MailMessage
     {
+        $customer = $this->getCustomer($notifiable);
+
         return (new MailMessage())
-            ->subject('Order ' .  $this->order->reference . ' has been ' . $this->status)
+            ->subject('Order '.$this->order->reference.' has been '.$this->status)
             ->replyTo($this->replyTo)
             ->from($this->from)
             ->view('filament.emails.order.updated', [
@@ -69,7 +81,7 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
                 'status' => $this->status,
                 'remarks' => $this->remarks,
                 'order' => $this->order,
-                'customer' => $notifiable,
+                'customer' => $customer,
                 'footer' => $this->footer,
             ]);
     }
@@ -84,6 +96,20 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
         return [];
     }
 
+    private function getCustomer(object $notifiable): Customer|GuestCustomerData
+    {
+        if ($notifiable instanceof Customer) {
+            return $notifiable;
+        } else {
+            return new GuestCustomerData(
+                first_name: $this->order->customer_first_name,
+                last_name: $this->order->customer_last_name,
+                mobile: $this->order->customer_mobile,
+                email: $this->order->customer_email,
+            );
+        }
+    }
+
     private function sanitizeEmailArray(array $emailArray): array
     {
         $sanitizedEmails = [];
@@ -91,7 +117,7 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
         foreach ($emailArray as $email) {
             $email = trim($email);
 
-            if ( ! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            if (! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $sanitizedEmails[] = $email;
             }
         }

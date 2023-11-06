@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use App\Filament\Rules\FullyQualifiedDomainNameRule;
 use App\FilamentTenant\Resources\SiteResource\Pages;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Site\Models\Site;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\Filament\Rules\FullyQualifiedDomainNameRule;
-use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Http;
@@ -45,7 +45,7 @@ class SiteResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->required()
-                        ->unique(ignoreRecord:true),
+                        ->unique(ignoreRecord: true),
                     Forms\Components\TextInput::make('domain')
                         ->required()
                         ->unique(ignoreRecord: true)
@@ -67,7 +67,7 @@ class SiteResource extends Resource
                                 ->formatStateUsing(fn (?Site $record) => $record ? $record->siteManager->pluck('id')->toArray() : [])
                                 ->columns(2)
                                 ->options(function () {
-                                    return  \Domain\Admin\Models\Admin::permission('site.siteManager')
+                                    return \Domain\Admin\Models\Admin::permission('site.siteManager')
                                         ->get()
                                         ->pluck('site_label', 'id')
                                         ->toArray();
@@ -109,7 +109,7 @@ class SiteResource extends Resource
 
                                 Notification::make()
                                     ->danger()
-                                    ->title(trans('No Deploy Hook Set for '. $record->name))
+                                    ->title(trans('No Deploy Hook Set for '.$record->name))
                                     ->body(trans('Please set a deploy hook first before trying to deploy.'))
                                     ->send();
 
@@ -146,7 +146,7 @@ class SiteResource extends Resource
 
                         } catch (Throwable $th) {
 
-                            if($th instanceof \Illuminate\Http\Client\ConnectionException) {
+                            if ($th instanceof \Illuminate\Http\Client\ConnectionException) {
                                 Notification::make()
                                     ->danger()
                                     ->title('Unable to Deploy Static Site')
@@ -176,7 +176,6 @@ class SiteResource extends Resource
             ]);
     }
 
-    /** @return array */
     public static function getRelations(): array
     {
         return [

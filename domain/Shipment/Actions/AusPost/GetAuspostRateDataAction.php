@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Domain\Shipment\Actions\AusPost;
 
 use Domain\Shipment\API\AusPost\Client\AusPostRateClient;
+use Domain\Shipment\API\AusPost\DataTransferObjects\AusPostResponse;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
-use Domain\Shipment\API\AusPost\DataTransferObjects\AusPostResponse;
 
 class GetAuspostRateDataAction
 {

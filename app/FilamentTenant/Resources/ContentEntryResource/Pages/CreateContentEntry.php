@@ -9,12 +9,12 @@ use App\FilamentTenant\Resources\ContentEntryResource;
 use App\FilamentTenant\Resources\ContentResource;
 use Domain\Content\Actions\CreateContentEntryAction;
 use Domain\Content\DataTransferObjects\ContentEntryData;
+use Domain\Content\Models\Content;
+use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
-use Domain\Content\Models\Content;
-use Filament\Pages\Actions\Action;
 
 class CreateContentEntry extends CreateRecord
 {
@@ -67,7 +67,7 @@ class CreateContentEntry extends CreateRecord
     {
         return [
             Action::make('create')
-                ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];

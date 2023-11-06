@@ -26,7 +26,7 @@ class BucketManager
     {
         $config += ['version' => 'latest'];
 
-        if ( ! empty($config['key']) && ! empty($config['secret'])) {
+        if (! empty($config['key']) && ! empty($config['secret'])) {
             $config['credentials'] = Arr::only($config, ['key', 'secret', 'token']);
         }
 
@@ -98,7 +98,7 @@ class BucketManager
                                 'POST',
                                 'DELETE',
                             ],
-                            'AllowedOrigins' => $this->tenant->domains->pluck('domain')->map(fn (string $domain) => 'https://' . $domain)->toArray(),
+                            'AllowedOrigins' => $this->tenant->domains->pluck('domain')->map(fn (string $domain) => 'https://'.$domain)->toArray(),
                         ],
                         [
                             'AllowedMethods' => [

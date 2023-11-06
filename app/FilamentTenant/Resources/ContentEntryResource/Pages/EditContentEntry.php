@@ -6,31 +6,31 @@ namespace App\FilamentTenant\Resources\ContentEntryResource\Pages;
 
 use App\Filament\Livewire\Actions\CustomPageActionGroup;
 use App\Filament\Pages\Concerns\LogsFormActivity;
-use Domain\Content\DataTransferObjects\ContentEntryData;
-use Filament\Resources\Pages\EditRecord;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\DB;
 use App\FilamentTenant\Resources\ContentEntryResource;
 use App\FilamentTenant\Resources\ContentResource;
+use App\Settings\CMSSettings;
+use App\Settings\SiteSettings;
+use Closure;
 use Domain\Content\Actions\CreateContentEntryDraftAction;
 use Domain\Content\Actions\PublishedContentEntryDraftAction;
 use Domain\Content\Actions\UpdateContentEntryAction;
-use Filament\Notifications\Notification;
+use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
-use App\Settings\CMSSettings;
-use App\Settings\SiteSettings;
-use Filament\Pages\Actions;
-use Domain\Site\Models\Site;
-use Filament\Pages\Actions\Action;
 use Domain\Content\Models\ContentEntry;
+use Domain\Site\Models\Site;
 use Filament\Forms\Components\Radio;
+use Filament\Notifications\Notification;
+use Filament\Pages\Actions;
+use Filament\Pages\Actions\Action;
 use Filament\Pages\Actions\DeleteAction;
+use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Livewire\Redirector;
-use Closure;
 
 /** @method class-string<\Illuminate\Database\Eloquent\Model> getModel()
  *
@@ -48,9 +48,7 @@ class EditContentEntry extends EditRecord
      * Override mount and
      * call parent component mount.
      *
-     * @param mixed $record
-     *
-     * @return void
+     * @param  mixed  $record
      */
     public function mount($record, string $ownerRecord = ''): void
     {
@@ -65,7 +63,7 @@ class EditContentEntry extends EditRecord
         parent::mount($record);
     }
 
-    /** @param string $key */
+    /** @param  string  $key */
     protected function resolveRecord($key): Model
     {
         $record = $this->ownerRecord->resolveChildRouteBinding('contentEntries', $key, null);
@@ -82,31 +80,31 @@ class EditContentEntry extends EditRecord
         return [
             'content_entries_group_actions' => CustomPageActionGroup::make([
                 Action::make('published')
-                    ->label(__('Published Draft'))
+                    ->label(trans('Published Draft'))
                     ->action('published')
                     ->hidden(function () {
                         return $this->record->draftable_id == null ? true : false;
                     }),
                 Action::make('draft')
-                    ->label(__('Save As Draft'))
+                    ->label(trans('Save As Draft'))
                     ->action('draft')
                     ->hidden(function () {
 
-                        if($this->record->draftable_id != null) {
+                        if ($this->record->draftable_id != null) {
                             return true;
                         }
 
                         return ($this->record->draftable_id == null && $this->record->pageDraft) ? true : false;
                     }),
                 Action::make('overwriteDraft')
-                    ->label(__('Save As Draft'))
+                    ->label(trans('Save As Draft'))
                     ->action('overwriteDraft')
                     ->requiresConfirmation()
                     ->modalHeading('Draft for this content already exists')
                     ->modalSubheading('You have an existing draft for this content. Do you want to overwrite the existing draft?')
                     ->modalCancelAction(function () {
                         return Action::makeModalAction('redirect')
-                            ->label(__('Edit Existing Draft'))
+                            ->label(trans('Edit Existing Draft'))
                             ->color('secondary')
                             ->url(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $this->record->pageDraft]));
                     })
@@ -115,15 +113,15 @@ class EditContentEntry extends EditRecord
                         return ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true;
                     }),
                 Action::make('save')
-                    ->label(__('Save and Continue Editing'))
+                    ->label(trans('Save and Continue Editing'))
                     ->action('save')
                     ->keyBindings(['mod+s']),
             ])
                 ->view('filament.pages.actions.custom-action-group.index')
                 ->setName('page_draft_actions')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label')),
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label')),
             // Action::make('save')
-            //     ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+            //     ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
             //     ->action('save')
             //     ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
@@ -131,11 +129,11 @@ class EditContentEntry extends EditRecord
                 Action::make('preview')
                     ->color('secondary')
                     ->hidden((bool) tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
-                    ->label(__('Preview Page'))
+                    ->label(trans('Preview Page'))
                     ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
                         $domain = $siteSettings->front_end_domain ?? $cmsSettings->front_end_domain;
 
-                        if ( ! $domain) {
+                        if (! $domain) {
                             return null;
                         }
 
@@ -226,9 +224,9 @@ class EditContentEntry extends EditRecord
 
         $pageData = ContentEntryData::fromArray($data);
 
-        #check if page has existing draft
+        //check if page has existing draft
 
-        if( ! is_null($record->pageDraft)) {
+        if (! is_null($record->pageDraft)) {
 
             Notification::make()
                 ->danger()
@@ -317,7 +315,7 @@ class EditContentEntry extends EditRecord
         );
     }
 
-    /** @param \Domain\Content\Models\ContentEntry $record */
+    /** @param  \Domain\Content\Models\ContentEntry  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(

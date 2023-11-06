@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Domain\Cart\Requests;
 
 use Domain\Cart\Actions\CartPurchasableValidatorAction;
+use Domain\Cart\Enums\CartUserType;
 use Domain\Cart\Exceptions\InvalidPurchasableException;
+use Domain\Cart\Helpers\ValidateRemarksMedia;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Foundation\Http\FormRequest;
@@ -47,13 +49,17 @@ class CreateCartLineRequest extends FormRequest
                     $purchasableId = $this->input('purchasable_id');
                     $variantId = $this->input('variant_id') ?? null;
 
-                    if ( ! $purchasableId) {
+                    if (! $purchasableId) {
                         $fail('Invalid product.');
                     }
 
+                    $type = auth()->user() ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
+                    /** @var int|string $userId */
+                    $userId = auth()->user() ? auth()->user()->id : $this->bearerToken();
+
                     if (is_null($variantId)) {
                         try {
-                            app(CartPurchasableValidatorAction::class)->validateProduct($purchasableId, $value);
+                            app(CartPurchasableValidatorAction::class)->validateProduct($purchasableId, $value, $userId, $type);
                         } catch (Throwable $th) {
                             if ($th instanceof InvalidPurchasableException) {
                                 $fail($th->getMessage());
@@ -64,7 +70,9 @@ class CreateCartLineRequest extends FormRequest
                             app(CartPurchasableValidatorAction::class)->validateProductVariant(
                                 $purchasableId,
                                 $variantId,
-                                $value
+                                $value,
+                                $userId,
+                                $type
                             );
                         } catch (Throwable $th) {
                             if ($th instanceof InvalidPurchasableException) {
@@ -82,7 +90,7 @@ class CreateCartLineRequest extends FormRequest
 
                     $product = Product::where((new Product())->getRouteKeyName(), $purchasableId)->first();
 
-                    if ( ! $product) {
+                    if (! $product) {
                         $fail('Invalid product.');
 
                         return;
@@ -102,11 +110,13 @@ class CreateCartLineRequest extends FormRequest
                 'nullable',
                 'array',
                 function ($attribute, $value, $fail) {
+                    app(ValidateRemarksMedia::class)->execute($value, $fail);
+
                     $purchasableId = $this->input('purchasable_id');
 
                     $product = Product::where((new Product())->getRouteKeyName(), $purchasableId)->first();
 
-                    if ( ! $product) {
+                    if (! $product) {
                         $fail('Invalid product.');
 
                         return;

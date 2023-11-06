@@ -6,8 +6,8 @@ namespace Domain\Media\Actions;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Support\Str;
+use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class CreateMediaFromS3UrlAction
@@ -62,7 +62,7 @@ class CreateMediaFromS3UrlAction
         $segments = explode('/', $dirname);
         array_splice($segments, 1, 1);
         $outputString = implode('/', $segments);
-        $objectPath = $outputString . '/' . $pathInfo['basename'];
+        $objectPath = $outputString.'/'.$pathInfo['basename'];
 
         return $objectPath;
     }

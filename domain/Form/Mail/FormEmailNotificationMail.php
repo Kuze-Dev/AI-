@@ -112,17 +112,17 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
             return $this->theme;
         }
 
-        return 'mail::themes.' . $this->theme;
+        return 'mail::themes.'.$this->theme;
     }
 
     protected function htmlComponentPaths(): array
     {
-        return array_map(fn ($path) => $path . '/html', $this->componentPaths());
+        return array_map(fn ($path) => $path.'/html', $this->componentPaths());
     }
 
     protected function textComponentPaths(): array
     {
-        return array_map(fn ($path) => $path . '/text', $this->componentPaths());
+        return array_map(fn ($path) => $path.'/text', $this->componentPaths());
     }
 
     protected function componentPaths(): array

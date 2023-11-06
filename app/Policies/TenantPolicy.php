@@ -11,8 +11,8 @@ use Illuminate\Foundation\Auth\User;
 
 class TenantPolicy
 {
-    use HandlesAuthorization;
     use ChecksWildcardPermissions;
+    use HandlesAuthorization;
 
     public function viewAny(User $user): bool
     {
@@ -40,6 +40,16 @@ class TenantPolicy
     }
 
     public function deleteAny(User $user): bool
+    {
+        return $this->checkWildcardPermissions($user);
+    }
+
+    public function updateFeatures(User $user): bool
+    {
+        return $this->checkWildcardPermissions($user);
+    }
+
+    public function canSuspendTenant(User $user): bool
     {
         return $this->checkWildcardPermissions($user);
     }

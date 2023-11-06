@@ -20,6 +20,7 @@ use Domain\Blueprint\DataTransferObjects\SectionData;
 use Domain\Blueprint\DataTransferObjects\SelectFieldData;
 use Domain\Blueprint\DataTransferObjects\TextareaFieldData;
 use Domain\Blueprint\DataTransferObjects\TextFieldData;
+use Domain\Blueprint\DataTransferObjects\TinyEditorData;
 use Domain\Blueprint\DataTransferObjects\ToggleFieldData;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\MarkdownButton;
@@ -40,6 +41,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
+use Mohamedsabil83\FilamentFormsTinyeditor\Components\TinyEditor;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class SchemaFormBuilder extends Component
@@ -124,8 +126,16 @@ class SchemaFormBuilder extends Component
             RepeaterFieldData::class => $this->makeRepeaterComponent($field),
             RelatedResourceFieldData::class => $this->makeRelatedResourceComponent($field),
             MediaFieldData::class => $this->makeMediaComponent($field),
-            default => throw new InvalidArgumentException('Cannot generate field component for `' . $field::class . '` as its not supported.'),
+            TinyEditorData::class => $this->makeTinyEditorComponent($field),
+
+            default => throw new InvalidArgumentException('Cannot generate field component for `'.$field::class.'` as its not supported.'),
         };
+
+        if (! $this->isDehydrated()) {
+            return $fieldComponent
+                ->label($field->title)
+                ->helperText($field->helper_text);
+        }
 
         return $fieldComponent
             ->label($field->title)
@@ -171,7 +181,7 @@ class SchemaFormBuilder extends Component
             $fileUpload->enableReordering($fileFieldData->reorder);
         }
 
-        if ( ! empty($fileFieldData->accept)) {
+        if (! empty($fileFieldData->accept)) {
             $fileUpload->acceptedFileTypes($fileFieldData->accept);
         }
 
@@ -224,7 +234,7 @@ class SchemaFormBuilder extends Component
 
         $media->getUploadedFileUrlUsing(function ($file) {
 
-            if ( ! is_null($file)) {
+            if (! is_null($file)) {
                 $media = Media::where('uuid', $file)->first();
                 if ($media) {
                     return $media->getUrl();
@@ -235,7 +245,7 @@ class SchemaFormBuilder extends Component
 
         });
 
-        if ( ! empty($mediaFieldData->accept)) {
+        if (! empty($mediaFieldData->accept)) {
             $media->acceptedFileTypes($mediaFieldData->accept);
         }
 
@@ -330,5 +340,25 @@ class SchemaFormBuilder extends Component
         }
 
         return $component;
+    }
+
+    private function makeTinyEditorComponent(TinyEditorData $tinyEditorData): TinyEditor
+    {
+
+        $tinyEditor = TinyEditor::make($tinyEditorData->state_name)
+            ->fileAttachmentsDisk('s3')
+            ->fileAttachmentsVisibility('public')
+            ->showMenuBar()
+            ->fileAttachmentsDirectory('tinyeditor_uploads');
+
+        if ($tinyEditorData->min_length) {
+            $tinyEditor->minLength(fn () => $tinyEditorData->min_length);
+        }
+
+        if ($tinyEditorData->max_length) {
+            $tinyEditor->maxLength(fn () => $tinyEditorData->max_length);
+        }
+
+        return $tinyEditor;
     }
 }

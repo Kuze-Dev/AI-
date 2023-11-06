@@ -14,7 +14,7 @@ use Spatie\RouteAttributes\Attributes\Prefix;
 
 #[
     Prefix('account/profile-image'),
-    Middleware(['auth:sanctum', 'feature.tenant:' . CustomerBase::class])
+    Middleware(['auth:sanctum', 'feature.tenant:'.CustomerBase::class])
 ]
 class ProfileImageUpdateController extends Controller
 {

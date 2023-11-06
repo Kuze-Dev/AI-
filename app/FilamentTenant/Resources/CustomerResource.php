@@ -19,7 +19,9 @@ use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\RewardPoint\Models\PointEarning;
+use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
+use ErrorException;
 use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms;
@@ -27,18 +29,18 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Support\Excel\Actions\ExportBulkAction;
-use ErrorException;
-use Filament\Tables\Actions\BulkAction;
-use Illuminate\Database\Eloquent\Collection;
 
 class CustomerResource extends Resource
 {
@@ -121,6 +123,30 @@ class CustomerResource extends Resource
                         ->preload()
                         ->hidden(fn () => ! tenancy()->tenant?->features()->active(TierBase::class) ? true : false)
                         ->optionsFromModel(Tier::class, 'name'),
+
+                    Forms\Components\Select::make('tier_approval_status')
+                        ->options([
+                            TierApprovalStatus::APPROVED->value => 'Approved',
+                            TierApprovalStatus::REJECTED->value => 'Rejected',
+                        ])
+                        ->hidden(function ($record, $context) {
+
+                            $tier = Tier::whereId($record?->tier_id)->first();
+                            if (! $tier?->has_approval) {
+                                return true;
+                            }
+
+                            if ($context === 'create') {
+                                return true;
+                            }
+
+                            if ($record !== null && ($record->tier_approval_status === TierApprovalStatus::APPROVED)) {
+                                return true;
+                            }
+
+                            return (bool) ($record !== null && $tier->isDefault());
+                        }),
+
                     Forms\Components\TextInput::make('password')
                         ->translateLabel()
                         ->password()
@@ -160,121 +186,17 @@ class CustomerResource extends Resource
                         ->label(trans('Earned points from orders: '))
                         ->content(fn ($record) => PointEarning::whereCustomerId($record?->getKey())->sum('earned_points') ?? 0)
                         ->hidden(fn () => ! tenancy()->tenant?->features()->active(RewardPoints::class) ? true : false),
+                    Forms\Components\Placeholder::make('is_verified')
+                        ->label(trans('Is Verified: '))
+                        ->content(function ($record) {
+                            if ($record?->hasVerifiedEmail()) {
+                                return new HtmlString('<span class="px-2 py-1 rounded-full bg-green-500 text-white">Verified</span>');
+                            } else {
+                                return new HtmlString('<span class="px-2 py-1 rounded-full bg-red-500 text-white">Unverified</span>');
+                            }
+                        }),
                 ])
                     ->columns(2),
-                //                Forms\Components\Fieldset::make(trans('Address'))
-                //                    ->schema([
-                //                        Forms\Components\Card::make([
-                //                            Forms\Components\TextInput::make('shipping_address_line_1')
-                //                                ->translateLabel()
-                //                                ->required()
-                //                                ->string()
-                //                                ->maxLength(255)
-                //                                ->columnSpanFull(),
-                //                            Forms\Components\Select::make('shipping_country_id')
-                //                                ->label(trans('Shipping country'))
-                //                                ->required()
-                //                                ->preload()
-                //                                ->optionsFromModel(Country::class, 'name')
-                //                                ->reactive()
-                //                                ->afterStateUpdated(function (callable $set) {
-                //                                    $set('shipping_state_id', null);
-                //                                })
-                //                                ->dehydrated(false),
-                //                            Forms\Components\Select::make('shipping_state_id')
-                //                                ->label(trans('Shipping state'))
-                //                                ->required()
-                //                                ->preload()
-                //                                ->optionsFromModel(
-                //                                    State::class,
-                //                                    'name',
-                //                                    fn (Builder $query, callable $get) => $query->where('country_id', $get('shipping_country_id'))
-                //                                )
-                //                                ->reactive(),
-                //                            Forms\Components\TextInput::make('shipping_zip_code')
-                //                                ->translateLabel()
-                //                                ->required()
-                //                                ->string()
-                //                                ->maxLength(255)
-                //                                ->reactive(),
-                //                            Forms\Components\TextInput::make('shipping_city')
-                //                                ->translateLabel()
-                //                                ->required()
-                //                                ->string()
-                //                                ->maxLength(255),
-                //                            Forms\Components\Select::make('shipping_label_as')
-                //                                ->translateLabel()
-                //                                ->required()
-                //                                ->options(
-                //                                    collect(AddressLabelAs::cases())
-                //                                        ->mapWithKeys(fn (AddressLabelAs $target) => [
-                //                                            $target->value => Str::headline($target->value),
-                //                                        ])
-                //                                        ->toArray()
-                //                                )
-                //                                ->enum(AddressLabelAs::class)
-                //                                ->columnSpanFull(),
-                //                            Forms\Components\Toggle::make('same_as_shipping')
-                //                                ->label(trans('set this as billing address as well'))
-                //                                ->translateLabel()
-                //                                ->reactive(),
-                //                        ])
-                //                            ->columns(2),
-                //                        Forms\Components\Card::make([
-                //                            Forms\Components\TextInput::make('billing_address_line_1')
-                //                                ->translateLabel()
-                //                                ->required()
-                //                                ->string()
-                //                                ->maxLength(255)
-                //                                ->columnSpanFull(),
-                //                            Forms\Components\Select::make('billing_country_id')
-                //                                ->label(trans('Billing country'))
-                //                                ->required()
-                //                                ->preload()
-                //                                ->optionsFromModel(Country::class, 'name')
-                //                                ->reactive()
-                //                                ->afterStateUpdated(function (callable $set) {
-                //                                    $set('billing_state_id', null);
-                //                                })
-                //                                ->dehydrated(false),
-                //                            Forms\Components\Select::make('billing_state_id')
-                //                                ->label(trans('Billing state'))
-                //                                ->required()
-                //                                ->preload()
-                //                                ->optionsFromModel(
-                //                                    State::class,
-                //                                    'name',
-                //                                    fn (Builder $query, callable $get) => $query->where('country_id', $get('billing_country_id'))
-                //                                )
-                //                                ->reactive(),
-                //                            Forms\Components\TextInput::make('billing_zip_code')
-                //                                ->translateLabel()
-                //                                ->required()
-                //                                ->string()
-                //                                ->maxLength(255)
-                //                                ->reactive(),
-                //                            Forms\Components\TextInput::make('billing_city')
-                //                                ->translateLabel()
-                //                                ->required()
-                //                                ->string()
-                //                                ->maxLength(255),
-                //                            Forms\Components\Select::make('billing_label_as')
-                //                                ->translateLabel()
-                //                                ->required()
-                //                                ->options(
-                //                                    collect(AddressLabelAs::cases())
-                //                                        ->mapWithKeys(fn (AddressLabelAs $target) => [
-                //                                            $target->value => Str::headline($target->value),
-                //                                        ])
-                //                                        ->toArray()
-                //                                )
-                //                                ->enum(AddressLabelAs::class)
-                //                                ->columnSpanFull(),
-                //                        ])
-                //                            ->columns(2)
-                //                            ->hidden(fn (callable $get) => $get('same_as_shipping')),
-                //                    ])
-                //                    ->visibleOn('create'),
             ]);
     }
 
@@ -288,8 +210,10 @@ class CustomerResource extends Resource
                     ->conversion('original')
                     ->circular()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('full_name')
                     ->translateLabel()
+                    ->searchable(['first_name', 'last_name'])
                     ->sortable(['first_name', 'last_name'])
                     ->wrap(),
                 Tables\Columns\TextColumn::make('email')
@@ -368,36 +292,41 @@ class CustomerResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->translateLabel(),
+                    ->translateLabel()
+                    ->hidden(fn (?Customer $record) => $record?->tier_approval_status == TierApprovalStatus::REJECTED ? true : false),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('send-register-invitation')
                         ->label(fn (Customer $record) => match ($record->register_status) {
                             RegisterStatus::UNREGISTERED => 'Send register invitation',
                             RegisterStatus::INVITED => 'Resend register invitation',
+                            RegisterStatus::REJECTED => 'Send rejected email notification',
                             default => throw new ErrorException('Invalid register status.'),
                         })
                         ->translateLabel()
                         ->requiresConfirmation()
                         ->icon('heroicon-o-speakerphone')
                         ->action(function (Customer $record, Tables\Actions\Action $action): void {
-                            $success = app(SendRegisterInvitationAction::class)
-                                ->execute($record);
 
-                            if ($success) {
-                                $action
-                                    ->successNotificationTitle(trans('A registration link has been sent to your email address.'))
-                                    ->success();
+                            if ($record->register_status == RegisterStatus::UNREGISTERED) {
+                                $success = app(SendRegisterInvitationAction::class)
+                                    ->execute($record);
 
-                                return;
+                                if ($success) {
+                                    $action
+                                        ->successNotificationTitle(trans('A registration link has been sent to your email address.'))
+                                        ->success();
+
+                                    return;
+                                }
+
+                                $action->failureNotificationTitle(trans('Failed to send register invitation.'))
+                                    ->failure();
                             }
-
-                            $action->failureNotificationTitle(trans('Failed to send register invitation.'))
-                                ->failure();
                         })
                         ->authorize('sendRegisterInvitation')
                         ->withActivityLog(
                             event: 'register-invitation-link-sent',
-                            description: fn (Customer $record) => $record->full_name . ' register invitation link sent'
+                            description: fn (Customer $record) => $record->full_name.' register invitation link sent'
                         )
                         ->visible(fn (Customer $record) => $record->register_status !== RegisterStatus::REGISTERED),
                     Tables\Actions\DeleteAction::make()
@@ -455,8 +384,8 @@ class CustomerResource extends Resource
                     ->action(function (Collection $records, Tables\Actions\BulkAction $action) {
 
                         /** @var \Domain\Customer\Models\Customer $customer */
-                        foreach($records as $customer) {
-                            if($customer->status === Status::INACTIVE && $customer->register_status === RegisterStatus::UNREGISTERED) {
+                        foreach ($records as $customer) {
+                            if ($customer->status === Status::INACTIVE && $customer->register_status === RegisterStatus::UNREGISTERED) {
                                 $success = app(SendRegisterInvitationAction::class)->execute($customer);
                                 if ($success) {
                                     $action

@@ -7,22 +7,22 @@ namespace Domain\Product\Models;
 use Domain\Favorite\Models\Favorite;
 use Domain\Product\Models\Builders\ProductBuilder;
 use Domain\Review\Models\Review;
-use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Support\MetaData\HasMetaData;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Domain\Taxonomy\Models\TaxonomyTerm;
+use Domain\Tier\Models\Tier;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
-use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
-use Domain\Taxonomy\Models\TaxonomyTerm;
-use Domain\Tier\Models\Tier;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
+use Support\MetaData\HasMetaData;
 
 /**
  * Domain\Product\Models\Product
@@ -61,6 +61,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property-read int|null $reviews_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
+ *
  * @method static ProductBuilder|Product newModelQuery()
  * @method static ProductBuilder|Product newQuery()
  * @method static ProductBuilder|Product query()
@@ -84,16 +85,17 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @method static ProductBuilder|Product whereTaxonomyTerms(string $taxonomy, array $terms)
  * @method static ProductBuilder|Product whereUpdatedAt($value)
  * @method static ProductBuilder|Product whereWeight($value)
+ *
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['metaData', 'productOptions', 'productVariants'])]
-class Product extends Model implements HasMetaDataContract, HasMedia
+class Product extends Model implements HasMedia, HasMetaDataContract
 {
-    use LogsActivity;
-    use HasSlug;
-    use HasMetaData;
     use ConstraintsRelationships;
+    use HasMetaData;
+    use HasSlug;
     use InteractsWithMedia;
+    use LogsActivity;
 
     protected $fillable = [
         'name',
@@ -132,8 +134,6 @@ class Product extends Model implements HasMetaDataContract, HasMedia
     /**
      * Define default reference
      * for meta data properties.
-     *
-     * @return array
      */
     public function defaultMetaData(): array
     {
@@ -183,6 +183,17 @@ class Product extends Model implements HasMetaDataContract, HasMedia
         return $this->belongsToMany(Tier::class);
     }
 
+    /**
+     * Get the product tier relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Tier\Models\Tier>
+     */
+    public function productTier(): BelongsToMany
+    {
+        return $this->belongsToMany(Tier::class, 'product_tier', 'product_id', 'tier_id')
+            ->withPivot(['id', 'tier_id', 'discount', 'discount_amount_type']);
+    }
+
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Product\Models\ProductVariant> */
     public function productVariants(): HasMany
     {
@@ -209,7 +220,7 @@ class Product extends Model implements HasMetaDataContract, HasMedia
 
     public function isFavorite(): bool
     {
-        if ( ! auth()->check()) {
+        if (! auth()->check()) {
             return false;
         }
 

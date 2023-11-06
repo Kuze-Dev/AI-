@@ -8,24 +8,27 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Support;
 use App\Settings\OrderSettings;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Domain\Order\Models\Order;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
-use Filament\Resources\Form;
-use Filament\Forms;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use Closure;
 use Domain\Customer\Models\Customer;
 use Domain\Order\Enums\OrderStatuses;
+use Domain\Order\Enums\OrderUserType;
 use Domain\Order\Events\AdminOrderBankPaymentEvent;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
+use Domain\Order\Models\Order;
+use Domain\Taxation\Enums\PriceDisplay;
+use Filament\Forms;
 use Filament\Notifications\Notification;
+use Filament\Resources\Form;
+use Filament\Resources\Resource;
+use Filament\Resources\Table;
+use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
-use Illuminate\Support\Str;
 
 class OrderResource extends Resource
 {
@@ -58,7 +61,13 @@ class OrderResource extends Resource
             ->schema([
                 Forms\Components\Group::make()
                     ->schema([
-                        Forms\Components\Section::make(trans('Customer'))
+                        Forms\Components\Section::make(function (Order $record) {
+                            if (tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\AllowGuestOrder::class)) {
+                                return 'Customer';
+                            }
+
+                            return $record->customer_id ? 'Customer (Registered)' : 'Customer (Guest)';
+                        })
                             ->schema([
                                 Forms\Components\Grid::make(2)
                                     ->schema([
@@ -217,6 +226,16 @@ class OrderResource extends Resource
                     ->label(trans('Order ID'))
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('customer_id')
+                    ->hidden(function () {
+                        return ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\AllowGuestOrder::class);
+                    })
+                    ->alignLeft()
+                    ->label(trans('Customer Type'))
+                    ->formatStateUsing(function (?string $state) {
+                        return $state ? 'Registered'
+                            : 'Guest';
+                    }),
                 Tables\Columns\TextColumn::make('customer_name')
                     ->label(trans('Customer'))
                     ->sortable(query: function (Builder $query, string $direction): Builder {
@@ -224,7 +243,7 @@ class OrderResource extends Resource
                             ->orderBy('customer_first_name', $direction);
                     })
                     ->formatStateUsing(function ($record) {
-                        return Str::limit($record->customer_first_name . ' ' . $record->customer_last_name, 30);
+                        return Str::limit($record->customer_first_name.' '.$record->customer_last_name, 30);
                     })
                     ->searchable(query: function (Builder $query, string $search) {
                         $query->where('customer_first_name', 'like', "%{$search}%")
@@ -235,11 +254,11 @@ class OrderResource extends Resource
                     ->label(trans('Tax Total'))
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->formatStateUsing(function (Order $record) {
-                        return $record->currency_symbol . ' ' . number_format((float) $record->tax_total, 2, '.', ',');
+                        return $record->currency_symbol.' '.number_format((float) $record->tax_total, 2, '.', ',');
                     }),
                 Tables\Columns\TextColumn::make('total')
                     ->formatStateUsing(function (Order $record) {
-                        return $record->currency_symbol . ' ' . number_format((float) $record->total, 2, '.', ',');
+                        return $record->currency_symbol.' '.number_format((float) $record->total, 2, '.', ',');
                     })
                     ->alignRight()
                     ->label(trans('Total'))
@@ -323,11 +342,11 @@ class OrderResource extends Resource
                         $indicators = [];
 
                         if ($data['created_from'] ?? null) {
-                            $indicators['created_from'] = 'Created from ' . Carbon::parse($data['created_from'])->toFormattedDateString();
+                            $indicators['created_from'] = 'Created from '.Carbon::parse($data['created_from'])->toFormattedDateString();
                         }
 
                         if ($data['created_until'] ?? null) {
-                            $indicators['created_until'] = 'Created until ' . Carbon::parse($data['created_until'])->toFormattedDateString();
+                            $indicators['created_until'] = 'Created until '.Carbon::parse($data['created_until'])->toFormattedDateString();
                         }
 
                         return $indicators;
@@ -346,6 +365,24 @@ class OrderResource extends Resource
                         OrderStatuses::FULFILLED->value => trans('Fulfilled'),
                     ])
                     ->attribute('status'),
+                Tables\Filters\SelectFilter::make('customer_id')->label(trans('Customer Type'))
+                    ->hidden(function () {
+                        return ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\AllowGuestOrder::class);
+                    })
+                    ->options([
+                        OrderUserType::REGISTERED->value => trans('Registered'),
+                        OrderUserType::GUEST->value => trans('Guest'),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        $query->when(filled($data['value']), function (Builder $query) use ($data) {
+                            if ($data['value'] === OrderUserType::REGISTERED->value) {
+                                $query->whereNotNull('customer_id');
+
+                                return;
+                            }
+                            $query->whereNull('customer_id');
+                        });
+                    }),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkAction::make('export')
@@ -452,7 +489,7 @@ class OrderResource extends Resource
                             ->readOnly(),
                         Support\TextLabel::make('sub_total')
                             ->formatStateUsing(function (Order $record) {
-                                return $record->currency_symbol . ' ' . number_format($record->sub_total, 2, '.', ',');
+                                return $record->currency_symbol.' '.number_format($record->sub_total, 2, '.', ',');
                             })
                             ->alignRight()
                             ->size('md')
@@ -471,7 +508,7 @@ class OrderResource extends Resource
                             ->size('md')
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
-                                return $record->currency_symbol . ' ' . number_format($record->shipping_total, 2, '.', ',');
+                                return $record->currency_symbol.' '.number_format($record->shipping_total, 2, '.', ',');
                             }),
                     ]),
                 Forms\Components\Grid::make(2)
@@ -490,12 +527,14 @@ class OrderResource extends Resource
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
                                 if ($record->tax_total) {
-                                    return $record->currency_symbol . ' ' . number_format($record->tax_total, 2, '.', ',');
+                                    return $record->currency_symbol.' '.number_format($record->tax_total, 2, '.', ',');
                                 }
 
-                                return  $record->currency_symbol . ' ' . '0.00';
+                                return $record->currency_symbol.' '.'0.00';
                             }),
-                    ]),
+                    ])->hidden(function (Order $record) {
+                        return $record->tax_display == PriceDisplay::INCLUSIVE;
+                    }),
                 Forms\Components\Grid::make(2)
                     ->schema([
                         Support\TextLabel::make('')
@@ -510,10 +549,10 @@ class OrderResource extends Resource
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
                                 if ($record->discount_total) {
-                                    return $record->currency_symbol . ' ' . number_format($record->discount_total, 2, '.', ',');
+                                    return $record->currency_symbol.' '.number_format($record->discount_total, 2, '.', ',');
                                 }
 
-                                return  $record->currency_symbol . ' ' . '0.00';
+                                return $record->currency_symbol.' '.'0.00';
                             }),
                     ])->hidden(function (Order $record) {
                         return (bool) ($record->discount_total == 0);
@@ -549,7 +588,7 @@ class OrderResource extends Resource
                             ->color('primary')
                             ->inline()
                             ->formatStateUsing(function (Order $record) {
-                                return $record->currency_symbol . ' ' . number_format($record->total, 2, '.', ',');
+                                return $record->currency_symbol.' '.number_format($record->total, 2, '.', ',');
                             }),
                     ]),
             ])->columnSpan(1);
@@ -599,7 +638,7 @@ class OrderResource extends Resource
                             ->maxLength(255)
                             ->label(trans('Remarks'))
                             ->visible(fn (Closure $get) => $get('send_email') == true)
-                            ->dehydrateStateUsing(function (string|null $state) use ($get) {
+                            ->dehydrateStateUsing(function (?string $state) use ($get) {
                                 if (filled($state) && $get('send_email') == true) {
                                     return $state;
                                 }
@@ -610,68 +649,80 @@ class OrderResource extends Resource
                     ->action(
                         function (array $data, $livewire) use ($record, $set) {
 
-                            $shouldSendEmail = $livewire->mountedFormComponentActionData['send_email'];
-                            $emailRemarks = $livewire->mountedFormComponentActionData['email_remarks'];
+                            DB::transaction(function () use ($data, $livewire, $record, $set) {
+                                $shouldSendEmail = $livewire->mountedFormComponentActionData['send_email'];
+                                $emailRemarks = $livewire->mountedFormComponentActionData['email_remarks'];
 
-                            if ($shouldSendEmail) {
-                                $fromEmail = app(OrderSettings::class)->email_sender_name;
+                                if ($shouldSendEmail) {
+                                    $fromEmail = app(OrderSettings::class)->email_sender_name;
 
-                                if (empty($fromEmail)) {
-                                    Notification::make()
-                                        ->title(trans('Email sender not found, please update your order settings.'))
-                                        ->warning()
-                                        ->send();
+                                    if (empty($fromEmail)) {
+                                        Notification::make()
+                                            ->title(trans('Email sender not found, please update your order settings.'))
+                                            ->warning()
+                                            ->send();
 
-                                    return;
-                                }
-                            }
-
-                            $status = $data['status_options'];
-                            $updateData = ['status' => $status];
-
-                            if ($status == OrderStatuses::CANCELLED->value) {
-                                if ( ! in_array($record->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])) {
-                                    Notification::make()
-                                        ->title(trans("You can't cancel this order."))
-                                        ->warning()
-                                        ->send();
-
-                                    return;
+                                        return;
+                                    }
                                 }
 
-                                $updateData['cancelled_at'] = now();
+                                $status = $data['status_options'];
+                                $updateData = ['status' => $status];
 
-                                $order = $record;
+                                if ($status == OrderStatuses::CANCELLED->value) {
+                                    if (! in_array($record->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])) {
+                                        Notification::make()
+                                            ->title(trans("You can't cancel this order."))
+                                            ->warning()
+                                            ->send();
 
-                                /** @var \Domain\Payments\Models\Payment $payment */
-                                $payment = $order->payments->first();
+                                        return;
+                                    }
 
-                                $payment->update([
-                                    'status' => 'cancelled',
-                                ]);
-                            }
+                                    $updateData['cancelled_at'] = now();
 
-                            $result = $record->update($updateData);
+                                    $order = $record;
 
-                            if ($result) {
-                                $set('status', ucfirst($data['status_options']));
-                                Notification::make()
-                                    ->title(trans('Order updated successfully'))
-                                    ->success()
-                                    ->send();
-                            }
+                                    /** @var \Domain\Payments\Models\Payment $payment */
+                                    $payment = $order->payments->first();
 
-                            $customer = Customer::where('id', $record->customer_id)->first();
+                                    $payment->update([
+                                        'status' => 'cancelled',
+                                    ]);
+                                }
 
-                            if ($customer) {
-                                event(new AdminOrderStatusUpdatedEvent(
-                                    $customer,
-                                    $record,
-                                    $shouldSendEmail,
-                                    $data['status_options'],
-                                    $emailRemarks
-                                ));
-                            }
+                                $result = $record->update($updateData);
+
+                                if ($result) {
+                                    $set('status', ucfirst($data['status_options']));
+                                    Notification::make()
+                                        ->title(trans('Order updated successfully'))
+                                        ->success()
+                                        ->send();
+                                }
+
+                                if ($record->customer_id) {
+                                    //registered
+                                    $customer = Customer::where('id', $record->customer_id)->first();
+                                    if ($customer) {
+                                        event(new AdminOrderStatusUpdatedEvent(
+                                            $record,
+                                            $shouldSendEmail,
+                                            $data['status_options'],
+                                            $emailRemarks,
+                                            $customer,
+                                        ));
+                                    }
+                                } else {
+                                    //guest
+                                    event(new AdminOrderStatusUpdatedEvent(
+                                        $record,
+                                        $shouldSendEmail,
+                                        $data['status_options'],
+                                        $emailRemarks
+                                    ));
+                                }
+                            });
                         }
                     );
             })
@@ -709,33 +760,34 @@ class OrderResource extends Resource
                     })
                     ->size('sm')
                     ->action(function () use ($order, $set) {
+                        DB::transaction(function () use ($order, $set) {
+                            $isPaid = ! $order->is_paid;
 
-                        $isPaid = ! $order->is_paid;
+                            $result = $order->update([
+                                'is_paid' => $isPaid,
+                            ]);
 
-                        $result = $order->update([
-                            'is_paid' => $isPaid,
-                        ]);
+                            if ($result) {
+                                /** @var \Domain\Payments\Models\Payment $payment */
+                                $payment = $order->payments->first();
 
-                        if ($result) {
-                            /** @var \Domain\Payments\Models\Payment $payment */
-                            $payment = $order->payments->first();
+                                if ($order->is_paid) {
+                                    $payment->update([
+                                        'status' => 'paid',
+                                    ]);
+                                } else {
+                                    $payment->update([
+                                        'status' => 'pending',
+                                    ]);
+                                }
 
-                            if ($order->is_paid) {
-                                $payment->update([
-                                    'status' => 'paid',
-                                ]);
-                            } else {
-                                $payment->update([
-                                    'status' => 'pending',
-                                ]);
+                                $set('is_paid', $isPaid);
+                                Notification::make()
+                                    ->title(trans('Order marked successfully'))
+                                    ->success()
+                                    ->send();
                             }
-
-                            $set('is_paid', $isPaid);
-                            Notification::make()
-                                ->title(trans('Order marked successfully'))
-                                ->success()
-                                ->send();
-                        }
+                        });
                     })
                     ->requiresConfirmation();
             })
@@ -759,7 +811,7 @@ class OrderResource extends Resource
                 /** @var \Domain\Payments\Models\Payment $payment */
                 $payment = $order->payments->first();
 
-                if ( ! is_null($payment->remarks)) {
+                if (! is_null($payment->remarks)) {
                     return $footerActions->modalActions([])->disableForm();
                 }
 
@@ -790,70 +842,73 @@ class OrderResource extends Resource
             ->label(trans('View Proof of payment'))
             ->size('sm')
             ->action(function (array $data) use ($order, $set) {
-                $paymentRemarks = $data['payment_remarks'];
-                $message = $data['message'];
+                DB::transaction(function () use ($data, $order, $set) {
 
-                /** @var \Domain\Payments\Models\Payment $payment */
-                $payment = $order->payments->first();
+                    $paymentRemarks = $data['payment_remarks'];
+                    $message = $data['message'];
 
-                if ( ! is_null($payment->remarks)) {
-                    Notification::make()
-                        ->title(trans('Invalid action.'))
-                        ->warning()
-                        ->send();
+                    /** @var \Domain\Payments\Models\Payment $payment */
+                    $payment = $order->payments->first();
 
-                    return;
-                }
+                    if (! is_null($payment->remarks)) {
+                        Notification::make()
+                            ->title(trans('Invalid action.'))
+                            ->warning()
+                            ->send();
 
-                $result = $payment->update([
-                    'remarks' => $paymentRemarks,
-                    'admin_message' => $message,
-                ]);
+                        return;
+                    }
 
-                if ($result) {
-                    $isPaid = $paymentRemarks == 'approved' ? true : false;
-
-                    $order->update([
-                        'is_paid' => $isPaid,
+                    $result = $payment->update([
+                        'remarks' => $paymentRemarks,
+                        'admin_message' => $message,
                     ]);
 
-                    if ($isPaid) {
-                        $payment->update([
-                            'status' => 'paid',
-                        ]);
+                    if ($result) {
+                        $isPaid = $paymentRemarks == 'approved' ? true : false;
 
                         $order->update([
-                            'status' => OrderStatuses::PROCESSING,
+                            'is_paid' => $isPaid,
                         ]);
 
-                        $set('status', ucfirst(OrderStatuses::PROCESSING->value));
-                    } else {
-                        $payment->update([
-                            'status' => 'cancelled',
-                        ]);
+                        if ($isPaid) {
+                            $payment->update([
+                                'status' => 'paid',
+                            ]);
 
-                        $order->update([
-                            'status' => OrderStatuses::CANCELLED,
-                        ]);
+                            $order->update([
+                                'status' => OrderStatuses::PROCESSING,
+                            ]);
 
-                        $set('status', ucfirst(OrderStatuses::CANCELLED->value));
+                            $set('status', ucfirst(OrderStatuses::PROCESSING->value));
+                        } else {
+                            $payment->update([
+                                'status' => 'cancelled',
+                            ]);
+
+                            $order->update([
+                                'status' => OrderStatuses::CANCELLED,
+                            ]);
+
+                            $set('status', ucfirst(OrderStatuses::CANCELLED->value));
+                        }
+
+                        Notification::make()
+                            ->title(trans('Proof of payment updated successfully'))
+                            ->success()
+                            ->send();
+
+                        $customer = Customer::where('id', $order->customer_id)->first();
+
+                        if ($customer) {
+                            event(new AdminOrderBankPaymentEvent(
+                                $customer,
+                                $order,
+                                $paymentRemarks,
+                            ));
+                        }
                     }
-
-                    Notification::make()
-                        ->title(trans('Proof of payment updated successfully'))
-                        ->success()
-                        ->send();
-
-                    $customer = Customer::where('id', $order->customer_id)->first();
-
-                    if ($customer) {
-                        event(new AdminOrderBankPaymentEvent(
-                            $customer,
-                            $order,
-                            $paymentRemarks,
-                        ));
-                    }
-                }
+                });
             })
             ->modalHeading(trans('Proof of Payment'))
             ->modalWidth('lg')

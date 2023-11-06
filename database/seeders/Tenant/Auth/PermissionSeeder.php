@@ -47,7 +47,7 @@ class PermissionSeeder extends BasePermissionSeeder
                 ...$this->generateFilamentResourcePermissions('discount', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('paymentMethod', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions(
-                    'customers',
+                    'customer',
                     except: [
                         'deleteAny',
                         'restoreAny',
@@ -57,7 +57,7 @@ class PermissionSeeder extends BasePermissionSeeder
                     customPermissions: ['sendRegisterInvitation']
                 ),
                 ...$this->generateFilamentResourcePermissions(
-                    'tiers',
+                    'tier',
                     except: [
                         'deleteAny',
                         'restoreAny',
@@ -65,7 +65,7 @@ class PermissionSeeder extends BasePermissionSeeder
                     ],
                     hasSoftDeletes: true
                 ),
-                ...$this->generateFilamentResourcePermissions('addresses', ),
+                ...$this->generateFilamentResourcePermissions('addresses'),
                 ...$this->generateFilamentResourcePermissions('paymentMethod', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('shippingMethod', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions(
@@ -82,6 +82,10 @@ class PermissionSeeder extends BasePermissionSeeder
                     'order',
                     only: ['view', 'viewAny', 'update'],
                     customPermissions: ['reports']
+                ),
+                ...$this->generateFilamentResourcePermissions(
+                    'service',
+                    except: ['deleteAny']
                 ),
             ],
         ];

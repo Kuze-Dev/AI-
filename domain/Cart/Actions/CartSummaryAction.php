@@ -7,40 +7,46 @@ namespace Domain\Cart\Actions;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\DataTransferObjects\SummaryData;
+use Domain\Cart\Helpers\PrivateCart\ComputedTierSellingPrice;
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
 use Domain\Discount\Actions\DiscountHelperFunctions;
 use Domain\Discount\Enums\DiscountConditionType;
 use Domain\Discount\Models\Discount;
+use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\Actions\GetShippingfeeAction;
+use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 use Domain\Shipment\DataTransferObjects\ParcelData;
+use Domain\Shipment\DataTransferObjects\ReceiverData;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
+use Domain\Shipment\Enums\UnitEnum;
 use Domain\ShippingMethod\Models\ShippingMethod;
+use Domain\Taxation\Enums\PriceDisplay;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
 use Illuminate\Database\Eloquent\Collection;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
-use Domain\Shipment\DataTransferObjects\ReceiverData;
-use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 
 class CartSummaryAction
 {
-    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
-    public function getSummary(
+    /** @param  \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine>  $collections */
+    public function execute(
         CartLine|Collection $collections,
         CartSummaryTaxData $cartSummaryTaxData,
         CartSummaryShippingData $cartSummaryShippingData,
         ?Discount $discount,
-        ?int $serviceId
+        int|string|null $serviceId
     ): SummaryData {
-
         $initialSubTotal = $this->getSubTotal($collections);
 
         $tax = $this->getTax($cartSummaryTaxData->countryId, $cartSummaryTaxData->stateId);
 
         $taxTotal = $tax['taxPercentage'] ? round($initialSubTotal * $tax['taxPercentage'] / 100, 2) : 0;
+
+        if ($tax['taxDisplay'] == PriceDisplay::INCLUSIVE) {
+            $taxTotal = 0;
+        }
 
         $initialShippingTotal = 0;
 
@@ -100,7 +106,7 @@ class CartSummaryAction
         return SummaryData::fromArray($summaryData);
     }
 
-    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
+    /** @param  \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine>  $collections */
     public function getSubTotal(CartLine|Collection $collections): float
     {
         $subTotal = 0;
@@ -109,14 +115,20 @@ class CartSummaryAction
             $subTotal = $collections->reduce(function ($carry, $collection) {
                 /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
                 $purchasable = $collection->purchasable;
-                $sellingPrice = (float) $purchasable->selling_price;
+
+                $initialSellingPrice = (float) $purchasable->selling_price;
+
+                $sellingPrice = $this->getTierSellingPrice($purchasable, $initialSellingPrice);
 
                 return $carry + ($sellingPrice * $collection->quantity);
             }, 0);
         } elseif ($collections instanceof CartLine) {
             /** @var \Domain\Product\Models\Product|\Domain\Product\Models\ProductVariant $purchasable */
             $purchasable = $collections->purchasable;
-            $sellingPrice = (float) $purchasable->selling_price;
+
+            $initialSellingPrice = (float) $purchasable->selling_price;
+
+            $sellingPrice = $this->getTierSellingPrice($purchasable, $initialSellingPrice);
 
             $subTotal = $sellingPrice * $collections->quantity;
         }
@@ -124,18 +136,37 @@ class CartSummaryAction
         return $subTotal;
     }
 
-    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
+    public function getTierSellingPrice(Product|ProductVariant $purchasable, float $sellingPrice): int|float
+    {
+        if ($purchasable instanceof Product) {
+            if ($purchasable->relationLoaded('productTier') && $purchasable->productTier->isNotEmpty()) {
+                $sellingPrice = app(ComputedTierSellingPrice::class)->execute($purchasable, $sellingPrice);
+            }
+        } elseif ($purchasable instanceof ProductVariant) {
+            /** @var \Domain\Product\Models\Product $product */
+            $product = $purchasable->product;
+
+            if ($product->relationLoaded('productTier') && $product->productTier->isNotEmpty()) {
+                $sellingPrice = app(ComputedTierSellingPrice::class)->execute($product, $sellingPrice);
+            }
+        }
+
+        return $sellingPrice;
+    }
+
+    /** @param  \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine>  $collections */
     public function getShippingFee(
         CartLine|Collection $collections,
         Customer $customer,
         ?ShippingAddressData $shippingAddress,
         ?ShippingMethod $shippingMethod,
-        ?int $serviceId
+        int|string|null $serviceId
     ): float {
+
         $shippingFeeTotal = 0;
 
         if ($shippingAddress && $shippingMethod) {
-            $productlist = $this->getProducts($collections);
+            $productlist = $this->getProducts($collections, UnitEnum::INCH);
 
             $subTotal = $this->getSubTotal($collections);
 
@@ -178,14 +209,17 @@ class CartSummaryAction
         return $shippingFeeTotal;
     }
 
-    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
-    public function getProducts(CartLine|Collection $collections): array
+    /** @param  \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine>  $collections */
+    public function getProducts(CartLine|Collection $collections, ?UnitEnum $unit = UnitEnum::CM): array
     {
         $productlist = [];
 
-        $cm_to_inches = 1 / 2.54;
+        $measurement = match ($unit) {
+            UnitEnum::INCH => 1 / 2.54,
+            default => 1,
+        };
 
-        if ( ! is_iterable($collections)) {
+        if (! is_iterable($collections)) {
             /** @var \Domain\Product\Models\Product $product */
             $product = $collections->purchasable;
 
@@ -194,7 +228,7 @@ class CartSummaryAction
                 $product = $collections->purchasable->product;
             }
 
-            if ( ! is_null($product->dimension)) {
+            if (! is_null($product->dimension)) {
                 $purchasableId = $product->id;
 
                 $length = $product->dimension['length'];
@@ -202,13 +236,15 @@ class CartSummaryAction
                 $height = $product->dimension['height'];
                 $weight = $product->weight;
 
-                $productlist[] = [
-                    'product_id' => (string) $purchasableId,
-                    'length' => ceil($length * $cm_to_inches * $collections->quantity),
-                    'width' => ceil($width * $cm_to_inches * $collections->quantity),
-                    'height' => ceil($height * $cm_to_inches * $collections->quantity),
-                    'weight' => (float) $weight * $collections->quantity,
-                ];
+                for ($i = 0; $i < $collections->quantity; $i++) {
+                    $productlist[] = [
+                        'product_id' => (string) $purchasableId,
+                        'length' => ceil($length * $measurement),
+                        'width' => ceil($width * $measurement),
+                        'height' => ceil($height * $measurement),
+                        'weight' => (float) $weight,
+                    ];
+                }
             }
         } else {
             foreach ($collections as $collection) {
@@ -221,7 +257,7 @@ class CartSummaryAction
                     /** @var \Domain\Product\Models\Product $product */
                     $product = $collection->purchasable->product;
                 }
-                if ( ! is_null($product->dimension)) {
+                if (! is_null($product->dimension)) {
                     $purchasableId = $product->id;
 
                     $length = $product->dimension['length'];
@@ -229,13 +265,15 @@ class CartSummaryAction
                     $height = $product->dimension['height'];
                     $weight = $product->weight;
 
-                    $productlist[] = [
-                        'product_id' => (string) $purchasableId,
-                        'length' => ceil($length * $cm_to_inches * $collection->quantity),
-                        'width' => ceil($width * $cm_to_inches * $collection->quantity),
-                        'height' => ceil($height * $cm_to_inches * $collection->quantity),
-                        'weight' => (float) $weight * $collection->quantity,
-                    ];
+                    for ($i = 0; $i < $collection->quantity; $i++) {
+                        $productlist[] = [
+                            'product_id' => (string) $purchasableId,
+                            'length' => ceil($length * $measurement),
+                            'width' => ceil($width * $measurement),
+                            'height' => ceil($height * $measurement),
+                            'weight' => (float) $weight,
+                        ];
+                    }
                 }
             }
         }
@@ -245,7 +283,7 @@ class CartSummaryAction
 
     public function getTax(
         ?int $countryId,
-        ?int $stateId = null
+        int $stateId = null
     ): array {
         if (is_null($countryId)) {
             return [
@@ -257,13 +295,12 @@ class CartSummaryAction
 
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
 
-        if ( ! $taxZone instanceof TaxZone) {
+        if (! $taxZone instanceof TaxZone) {
             return [
                 'taxZone' => null,
                 'taxDisplay' => null,
                 'taxPercentage' => null,
             ];
-            // throw new BadRequestHttpException('No tax zone found');
         }
 
         $taxPercentage = (float) $taxZone->percentage;
@@ -280,7 +317,7 @@ class CartSummaryAction
     {
         $discountTotal = 0;
 
-        if ( ! is_null($discount)) {
+        if (! is_null($discount)) {
             $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal) ?? 0;
         }
 

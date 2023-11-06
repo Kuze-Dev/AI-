@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
+use Domain\Blueprint\Models\Blueprint as BlueprintModel;
+use Domain\Page\Models\Block;
+use Domain\Page\Models\Page;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Domain\Blueprint\Models\Blueprint as BlueprintModel;
-use Domain\Page\Models\Page;
-use Domain\Page\Models\Block;
 
-return new class () extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('pages', function (Blueprint $table) {

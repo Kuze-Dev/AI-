@@ -29,7 +29,7 @@ class ImageProductUploaderSeeder extends Seeder
                     $product = Product::whereName($data['name'])->first();
 
                     if ($product === null) {
-                        $output->error('product not found: ' . $data['name']);
+                        $output->error('product not found: '.$data['name']);
 
                         return;
                     }
@@ -41,13 +41,13 @@ class ImageProductUploaderSeeder extends Seeder
                             ->addMediaFromUrl($data['image_url'])
                             ->toMediaCollection('image');
                     } catch (FileDoesNotExist $e) {
-                        $output->error('FileDoesNotExist: ' . $e->getMessage());
+                        $output->error('FileDoesNotExist: '.$e->getMessage());
                     } catch (FileIsTooBig $e) {
-                        $output->error('FileIsTooBig: ' . $e->getMessage());
+                        $output->error('FileIsTooBig: '.$e->getMessage());
                     } catch (FileCannotBeAdded $e) {
-                        $output->error('FileCannotBeAdded: ' . $e->getMessage());
+                        $output->error('FileCannotBeAdded: '.$e->getMessage());
                     }
-                    $output->success('Done for product: ' . $data['name']);
+                    $output->success('Done for product: '.$data['name']);
                 }
             );
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Customer\DataTransferObjects;
 
+use App\Features\Customer\TierBase;
 use App\HttpTenantApi\Requests\Auth\Customer\CustomerRegisterRequest;
 use Carbon\Carbon;
 use Domain\Address\DataTransferObjects\AddressData;
@@ -11,6 +12,9 @@ use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
+use Domain\Customer\Models\Customer;
+use Domain\Tier\Enums\TierApprovalStatus;
+use Domain\Tier\Models\Tier;
 use Illuminate\Http\UploadedFile;
 
 final class CustomerData
@@ -29,16 +33,33 @@ final class CustomerData
         public readonly ?AddressData $shipping_address_data = null,
         public readonly ?AddressData $billing_address_data = null,
         public readonly EmailVerificationType $email_verification_type = EmailVerificationType::LINK,
-        public readonly ?RegisterStatus $register_status = RegisterStatus::REGISTERED,
+        public readonly RegisterStatus $register_status = RegisterStatus::REGISTERED,
+        public readonly ?TierApprovalStatus $tier_approval_status = null,
         public readonly bool $through_api_registration = false,
     ) {
     }
 
     public static function fromRegistrationRequest(
-        CustomerRegisterRequest $request
+        CustomerRegisterRequest $request,
+        Tier $customerTier = null,
+        Tier $defaultTier
     ): self {
+        $registerStatus = RegisterStatus::REGISTERED;
+        $tierId = null;
         $validated = $request->validated();
         $sameAsShipping = $request->boolean('billing.same_as_shipping');
+        if ($customerTier?->isDefault() || ! tenancy()->tenant?->features()->active(TierBase::class)) {
+
+            $registerStatus = self::getStatus($defaultTier, null, null);
+            /** @var \Domain\Tier\Models\Tier $defaultTier */
+            $tierId = $defaultTier->getKey();
+        }
+        /** @var \Domain\Tier\Models\Tier $customerTier */
+        if ($customerTier->has_approval && ! $customerTier->isDefault()) {
+
+            $registerStatus = self::getStatus($customerTier, null, null);
+            $tierId = $customerTier->getKey();
+        }
         unset($request);
 
         return new self(
@@ -48,7 +69,7 @@ final class CustomerData
             gender: Gender::from($validated['gender']),
             birth_date: now()->parse($validated['birth_date']),
             status: Status::ACTIVE,
-            tier_id: (int) (isset($validated['tier_id']) ? $validated['tier_id'] : null),
+            tier_id: $tierId,
             email: $validated['email'],
             password: $validated['password'],
             image: $validated['profile_image'] ?? null,
@@ -75,6 +96,8 @@ final class CustomerData
             email_verification_type: isset($validated['email_verification_type'])
                 ? EmailVerificationType::from($validated['email_verification_type'])
                 : EmailVerificationType::LINK,
+            register_status: $registerStatus,
+            tier_approval_status: null,
             through_api_registration: true,
         );
     }
@@ -93,6 +116,7 @@ final class CustomerData
 
     public static function fromArrayCreateByAdmin(array $data): self
     {
+
         return new self(
             first_name: $data['first_name'],
             last_name: $data['last_name'],
@@ -104,32 +128,18 @@ final class CustomerData
             email: $data['email'],
             password: $data['password'] ?? null,
             image: $data['image'] ?? null,
-            //            shipping_address_data: new AddressData(
-            //                state_id: (int) $data['shipping_state_id'],
-            //                label_as: $data['shipping_label_as'],
-            //                address_line_1: $data['shipping_address_line_1'],
-            //                zip_code: $data['shipping_zip_code'],
-            //                city: $data['shipping_city'],
-            //                is_default_shipping: true,
-            //                is_default_billing: $data['same_as_shipping'],
-            //            ),
-            //            billing_address_data: $data['same_as_shipping']
-            //                ? null
-            //                : new AddressData(
-            //                    state_id: (int) $data['billing_state_id'],
-            //                    label_as: $data['billing_label_as'],
-            //                    address_line_1: $data['billing_address_line_1'],
-            //                    zip_code: $data['billing_zip_code'],
-            //                    city: $data['billing_city'],
-            //                    is_default_shipping: false,
-            //                    is_default_billing: true,
-            //                ),
+            tier_approval_status: TierApprovalStatus::APPROVED,
             register_status: RegisterStatus::UNREGISTERED,
         );
     }
 
-    public static function fromArrayEditByAdmin(array $data): self
+    public static function fromArrayEditByAdmin(Customer $customer, array $data, Tier $tier = null): self
     {
+
+        $tierApprovalStatus = ! isset($data['tier_approval_status']) ? null : TierApprovalStatus::from($data['tier_approval_status']);
+
+        $registerStatus = self::getStatus($tier, $tierApprovalStatus, $customer);
+
         return new self(
             first_name: $data['first_name'],
             last_name: $data['last_name'],
@@ -140,6 +150,8 @@ final class CustomerData
             tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
             email: $data['email'],
             image: $data['image'],
+            tier_approval_status: isset($data['tier_approval_status']) ? TierApprovalStatus::from($data['tier_approval_status']) : null,
+            register_status: $registerStatus,
         );
     }
 
@@ -156,5 +168,42 @@ final class CustomerData
             email: $data['email'],
             register_status: RegisterStatus::UNREGISTERED,
         );
+    }
+
+    private static function getStatus(
+        Tier $tier = null,
+        TierApprovalStatus $tierApprovalStatus = null,
+        Customer $customer = null
+    ): RegisterStatus {
+
+        if (! tenancy()->tenant?->features()->active(TierBase::class)) {
+            return RegisterStatus::REGISTERED;
+        }
+
+        if ($tierApprovalStatus !== null) {
+            if (
+                $tier?->has_approval &&
+                $tierApprovalStatus === TierApprovalStatus::APPROVED &&
+                $customer?->register_status == RegisterStatus::UNREGISTERED
+
+            ) {
+                return RegisterStatus::REGISTERED;
+            }
+
+        }
+
+        if ($tier?->isDefault()) {
+            return RegisterStatus::REGISTERED;
+        }
+
+        if (
+            $tier?->has_approval &&
+            $customer?->tier_approval_status == TierApprovalStatus::APPROVED &&
+            $customer?->register_status == RegisterStatus::INVITED
+        ) {
+            return RegisterStatus::REGISTERED;
+        }
+
+        return RegisterStatus::UNREGISTERED;
     }
 }

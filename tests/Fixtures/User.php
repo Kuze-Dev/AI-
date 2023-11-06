@@ -17,13 +17,14 @@ use Illuminate\Notifications\Notifiable;
  * @property string $email
  * @property string|null $email_verified_at
  * @property bool $active
+ *
  * @mixin \Eloquent
  */
-class User extends FoundationUser implements TwoFactorAuthenticatableContract, MustVerifyEmail, HasActiveStateContract
+class User extends FoundationUser implements HasActiveStateContract, MustVerifyEmail, TwoFactorAuthenticatableContract
 {
-    use TwoFactorAuthenticatable;
     use HasActiveState;
     use Notifiable;
+    use TwoFactorAuthenticatable;
 
     protected $table = 'test_users';
 

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use Domain\Tenant\Models\Tenant;
-use Filament\Widgets\LineChartWidget;
+use Filament\Widgets\BarChartWidget;
 
-class TenantApiCallChart extends LineChartWidget
+class TenantApiCallChart extends BarChartWidget
 {
-    protected static ?string $heading = 'Tenant api Calls';
+    protected static ?string $heading = 'Tenant API calls';
 
     protected int|string|array $columnSpan = 'full';
 
@@ -51,8 +51,11 @@ class TenantApiCallChart extends LineChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'total api calls',
+                    'label' => 'Total API calls',
                     'data' => array_values($data),
+                    'backgroundColor' => [
+                        'rgb(1 100 141 / 1)',
+                    ],
                 ],
             ],
             'labels' => array_keys($data),

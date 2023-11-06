@@ -21,7 +21,7 @@ class CreateReviewAction
     {
 
         $orderLine = OrderLine::find($createReviewData->order_line_id);
-        if( ! $orderLine) {
+        if (! $orderLine) {
             return new Review();
         }
 
@@ -29,7 +29,7 @@ class CreateReviewAction
         $data = null;
         $product_id = null;
 
-        if( ! $orderLine->purchasable_data) {
+        if (! $orderLine->purchasable_data) {
             return new Review();
         }
 
@@ -45,7 +45,7 @@ class CreateReviewAction
 
         $review = new Review([
             'customer_id' => $customer->id,
-            'customer_name' => $customer->first_name . ' ' . $customer->last_name,
+            'customer_name' => $customer->first_name.' '.$customer->last_name,
             'customer_email' => $customer->email,
             'rating' => $createReviewData->rating,
             'comment' => $createReviewData->comment,

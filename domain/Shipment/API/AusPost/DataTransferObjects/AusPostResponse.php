@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\API\AusPost\DataTransferObjects;
 
+use Domain\Shipment\API\AusPost\Exceptions\AusPostServiceNotFoundException;
 use Domain\Shipment\Contracts\API\RateResponse;
 
 class AusPostResponse implements RateResponse
@@ -15,7 +16,6 @@ class AusPostResponse implements RateResponse
 
     public static function fromArray(array $data): self
     {
-        // $data = $data['RateResponse']['RatedShipment'];
 
         return new self(
             package: $data['services']
@@ -27,8 +27,15 @@ class AusPostResponse implements RateResponse
         return get_object_vars($this);
     }
 
-    public function getRate(int $serviceID = null): float
+    public function getRate(int|string $serviceID = null): float
     {
-        return (float) $this->package['TotalCharges']['MonetaryValue'];
+
+        foreach ($this->package['service'] as $service) {
+            if ($service['code'] == $serviceID) {
+                return (float) $service['price'];
+            }
+        }
+
+        throw new AusPostServiceNotFoundException();
     }
 }

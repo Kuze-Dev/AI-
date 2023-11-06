@@ -7,10 +7,10 @@ namespace Domain\Review\Requests;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\OrderLine;
 use Domain\Review\Models\Review;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class ReviewStoreRequest extends FormRequest
 {
@@ -39,13 +39,13 @@ class ReviewStoreRequest extends FormRequest
                     $orderLineId = $this->input('order_line_id');
                     $review = Review::where('order_line_id', $orderLineId);
                     $orderLine = OrderLine::find($orderLineId);
-                    if($orderLine && isset($orderLine->order)) {
-                        if($orderLine->order->status != OrderStatuses::FULFILLED) {
+                    if ($orderLine && isset($orderLine->order)) {
+                        if ($orderLine->order->status != OrderStatuses::FULFILLED) {
                             $fail('You cannot review this item; the product hasn\'t been fulfilled yet.');
                         }
                     }
 
-                    if($review->exists()) {
+                    if ($review->exists()) {
                         $fail('You already review this product');
                     }
                 },
@@ -62,6 +62,7 @@ class ReviewStoreRequest extends FormRequest
             ],
             'comment' => [
                 'nullable',
+                'max:1000',
             ],
             'media' => [
                 'nullable',
@@ -73,7 +74,6 @@ class ReviewStoreRequest extends FormRequest
     /**
      * Handle a failed validation attempt.
      *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @return void
      *
      * @throws \Illuminate\Http\Exceptions\HttpResponseException

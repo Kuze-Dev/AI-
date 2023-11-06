@@ -12,11 +12,13 @@ use Domain\Blueprint\Actions\DeleteBlueprintAction;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\SectionData;
 use Domain\Blueprint\Enums\FieldType;
+use Domain\Blueprint\Enums\ManipulationFit;
+use Domain\Blueprint\Enums\ManipulationFormat;
 use Domain\Blueprint\Enums\ManipulationType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
 use Domain\Blueprint\Models\Blueprint;
-use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use ErrorException;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
 use Filament\Resources\Form;
@@ -27,9 +29,9 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Illuminate\Support\HtmlString;
-use ErrorException;
+use Illuminate\Support\Str;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class BlueprintResource extends Resource
 {
@@ -147,7 +149,7 @@ class BlueprintResource extends Resource
                         ? $state['type']->value
                         : $state['type'];
 
-                    $label .= ' (' . Str::headline($type) . ')';
+                    $label .= ' ('.Str::headline($type).')';
                 }
 
                 return $label;
@@ -205,7 +207,7 @@ class BlueprintResource extends Resource
                                 ->toArray()
                             : [];
                     })
-                    ->helperText(new HtmlString(<<<HTML
+                    ->helperText(new HtmlString(<<<'HTML'
                             Rules should be separated with "|". Available rules can be found on <a href="https://laravel.com/docs/validation#available-validation-rules" class="text-primary-500" target="_blank" rel="noopener noreferrer">Laravel's Documentation</a>.
                         HTML)),
                 Forms\Components\TextInput::make('helper_text')
@@ -232,7 +234,7 @@ class BlueprintResource extends Resource
                 Forms\Components\DateTimePicker::make('max')
                     ->timezone(Auth::user()?->timezone),
                 Forms\Components\TextInput::make('format')
-                    ->helperText(new HtmlString(<<<HTML
+                    ->helperText(new HtmlString(<<<'HTML'
                             See <a href="https://www.php.net/manual/en/datetime.format.php" class="text-primary-500" target="_blank" rel="noopener noreferrer">PHP's Date/Time Format</a> for available options.
                         HTML)),
             ],
@@ -245,7 +247,7 @@ class BlueprintResource extends Resource
                     ->afterStateHydrated(function (Closure $set, ?array $state): void {
                         $set('accept', implode(',', $state ?? []));
                     })
-                    ->dehydrateStateUsing(function (string|null $state): array {
+                    ->dehydrateStateUsing(function (?string $state): array {
                         if ($state === null) {
                             return [];
                         }
@@ -474,7 +476,7 @@ class BlueprintResource extends Resource
                     ->afterStateHydrated(function (Closure $set, ?array $state): void {
                         $set('accept', implode(',', $state ?? []));
                     })
-                    ->dehydrateStateUsing(function (string|null $state): array {
+                    ->dehydrateStateUsing(function (?string $state): array {
                         if ($state === null) {
                             return [];
                         }
@@ -487,14 +489,14 @@ class BlueprintResource extends Resource
                     })
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('min_size')
-                    ->helperText(new HtmlString(<<<HTML
+                    ->helperText(new HtmlString(<<<'HTML'
                          in kb
                         HTML))
                     ->numeric()
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_size')
-                    ->helperText(new HtmlString(<<<HTML
+                    ->helperText(new HtmlString(<<<'HTML'
                          in kb
                         HTML))
                     ->numeric()
@@ -519,6 +521,15 @@ class BlueprintResource extends Resource
                                 function (?Blueprint $record, $state) {
 
                                     $stateData = fn (ManipulationType $type) => $state[$type->value]['params'][0] ?? null;
+                                    $FormatOptions = [];
+                                    foreach (ManipulationFormat::cases() as $format) {
+                                        $FormatOptions[$format->value] = $format->value;
+                                    }
+
+                                    $Fitoptions = [];
+                                    foreach (ManipulationFit::cases() as $format) {
+                                        $Fitoptions[$format->value] = $format->value;
+                                    }
 
                                     return collect(ManipulationType::cases())
                                         ->map(fn (ManipulationType $manipulationType) => match ($manipulationType) {
@@ -530,9 +541,29 @@ class BlueprintResource extends Resource
                                                 ->minValue(0)
                                                 ->required()
                                                 ->formatStateUsing(fn () => $stateData($manipulationType)),
+                                            ManipulationType::TYPE => Forms\Components\Group::make()->schema([
+                                                Forms\Components\Select::make('type')
+                                                    ->translateLabel()
+                                                    ->options($FormatOptions)
+                                                    ->formatStateUsing(fn () => $stateData($manipulationType)),
+                                            ]),
+
+                                            ManipulationType::FIT => Forms\Components\Group::make()->schema([
+                                                Forms\Components\Select::make('fit')
+                                                    ->translateLabel()
+                                                    ->options($Fitoptions)
+                                                    ->formatStateUsing(fn () => $stateData($manipulationType))
+                                                    ->hint(
+                                                        Str::of('[Documentation](https://spatie.be/docs/image/v1/image-manipulations/resizing-images)')
+                                                            ->inlineMarkdown()
+                                                            ->toHtmlString()
+                                                    )
+                                                    ->hintColor('primary')
+                                                    ->hintIcon('heroicon-s-question-mark-circle'),
+                                            ]),
                                             /** @phpstan-ignore-next-line */
                                             default => throw new ErrorException(
-                                                ManipulationType::class.'::'.Str::upper($manipulationType->value) . ' field not setup for conversion manipulation.'
+                                                ManipulationType::class.'::'.Str::upper($manipulationType->value).' field not setup for conversion manipulation.'
                                             )
                                         })
                                         ->toArray();
@@ -566,6 +597,16 @@ class BlueprintResource extends Resource
                         Forms\Components\TextInput::make('value'),
                         Forms\Components\TextInput::make('description'),
                     ]),
+            ],
+            FieldType::TINYEDITOR => [
+                Forms\Components\TextInput::make('min_length')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('max_length')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
             ],
             default => [],
         };

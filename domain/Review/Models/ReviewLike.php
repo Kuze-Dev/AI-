@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Customer|null $customer
  * @property-read \Domain\Review\Models\Review|null $review
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|ReviewLike newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ReviewLike newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ReviewLike query()
@@ -25,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|ReviewLike whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ReviewLike whereReviewId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ReviewLike whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ReviewLike extends Model

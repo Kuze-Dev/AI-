@@ -20,7 +20,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('contents.entries', only: ['index', 'show'], parameters: ['entries' => 'contentEntry']),
-    Middleware('feature.tenant:' . CMSBase::class)
+    Middleware('feature.tenant:'.CMSBase::class)
 ]
 class ContentEntryController
 {
@@ -75,6 +75,7 @@ class ContentEntryController
                     'taxonomyTerms.taxonomy',
                     'routeUrls',
                     'metaData',
+                    'blueprintData',
                 ])
                 ->jsonPaginate()
         );
@@ -92,6 +93,7 @@ class ContentEntryController
                     'taxonomyTerms.taxonomy',
                     'routeUrls',
                     'metaData',
+                    'blueprintData',
                 ])
                 ->firstOrFail()
         );

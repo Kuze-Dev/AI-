@@ -6,12 +6,13 @@ namespace Domain\Order\Requests;
 
 use Domain\Address\Models\Address;
 use Domain\Cart\Actions\CartPurchasableValidatorAction;
+use Domain\Cart\Enums\CartUserType;
 use Domain\Cart\Exceptions\InvalidPurchasableException;
 use Domain\Cart\Models\CartLine;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\ShippingMethod\Models\ShippingMethod;
-use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Throwable;
 
 class PlaceOrderRequest extends FormRequest
@@ -48,7 +49,7 @@ class PlaceOrderRequest extends FormRequest
                         ->whereNull('checked_out_at')
                         ->count();
 
-                    if ( ! $cartLines) {
+                    if (! $cartLines) {
                         $fail('No cart lines for checkout');
 
                         return;
@@ -58,16 +59,24 @@ class PlaceOrderRequest extends FormRequest
 
                     $cartLineIds = array_values($cartLines->pluck('uuid')->toArray());
 
+                    $type = CartUserType::AUTHENTICATED;
+
+                    /** @var \Domain\Customer\Models\Customer $customer */
+                    $customer = auth()->user();
+
+                    /** @var int|string $userId */
+                    $userId = $customer->id;
+
                     //auth check
-                    $checkAuth = app(CartPurchasableValidatorAction::class)->validateAuth($cartLineIds);
+                    $checkAuth = app(CartPurchasableValidatorAction::class)->validateAuth($cartLineIds, $userId, $type);
                     if ($checkAuth !== count($cartLineIds)) {
                         $fail('Invalid cart line IDs.');
                     }
 
                     try {
                         //stock check
-                        $checkStocks = app(CartPurchasableValidatorAction::class)->validateCheckout($cartLineIds);
-                        if ($checkStocks !== count($value)) {
+                        $checkStocks = app(CartPurchasableValidatorAction::class)->validateCheckout($cartLineIds, $userId, $type);
+                        if ($checkStocks !== count($cartLineIds)) {
                             $fail('Invalid stocks');
                         }
                     } catch (Throwable $th) {
@@ -99,7 +108,13 @@ class PlaceOrderRequest extends FormRequest
             ],
             'service_id' => [
                 'nullable',
-                'int',
+                function ($attribute, $value, $fail) {
+                    if (is_int($value) || is_string($value)) {
+                        return true;
+                    } else {
+                        $fail($attribute.' is invalid.');
+                    }
+                },
             ],
         ];
     }

@@ -14,7 +14,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('taxonomies', only: ['index', 'show']),
-    Middleware('feature.tenant:' . CMSBase::class)
+    Middleware('feature.tenant:'.CMSBase::class)
 ]
 class TaxonomyController
 {

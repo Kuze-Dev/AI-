@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use App\FilamentTenant\Resources\DiscountResource\Pages\CreateDiscount;
 use App\FilamentTenant\Resources\DiscountResource\Pages\EditDiscount;
 use App\FilamentTenant\Resources\DiscountResource\Pages\ListDiscounts;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Currency\Models\Currency;
 use Domain\Discount\Actions\AutoGenerateCode;
@@ -43,11 +43,11 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
-use Illuminate\Database\Eloquent\Builder;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class DiscountResource extends Resource
@@ -102,7 +102,7 @@ class DiscountResource extends Resource
                         ])
 
                         ->label(trans('Maximum Usage'))
-                        ->helperText(new HtmlString(<<<HTML
+                        ->helperText(new HtmlString(<<<'HTML'
                                 Leave this blank if no maximum usage.
                             HTML)),
                     Placeholder::make('times_used')
@@ -130,7 +130,7 @@ class DiscountResource extends Resource
                             DateTimePicker::make('valid_end_at')
                                 ->after('valid_start_at')
                                 ->label(trans('Expiration Date'))
-                                ->helperText(new HtmlString(<<<HTML
+                                ->helperText(new HtmlString(<<<'HTML'
                                         Leave this blank if no expiry.
                                     HTML)),
                         ]),
@@ -145,7 +145,7 @@ class DiscountResource extends Resource
                             ])
                                 ->required()
                                 ->default('order_sub_total')
-                                ->formatStateUsing(fn ($record) => optional($record?->discountCondition()->withTrashed()->first())->discount_type)
+                                ->formatStateUsing(fn ($record) => $record?->discountCondition()->withTrashed()->first()?->discount_type)
                                 ->label(trans('Discount Type')),
 
                             Radio::make('discountCondition.amount_type')->options([
@@ -156,7 +156,7 @@ class DiscountResource extends Resource
                                 ->required()
                                 ->default('fixed_value')
                                 ->filled()
-                                ->formatStateUsing(fn ($record) => optional($record?->discountCondition()->withTrashed()->first())->amount_type)
+                                ->formatStateUsing(fn ($record) => $record?->discountCondition()->withTrashed()->first()?->amount_type)
                                 ->label(trans('Amount Type')),
 
                             TextInput::make('discountCondition.amount')
@@ -169,7 +169,7 @@ class DiscountResource extends Resource
                                 ))
                                 ->minValue(1)
                                 ->rules(['max:100'], fn (Closure $get) => $get('discountCondition.amount_type') === 'percentage')
-                                ->formatStateUsing(fn ($record) => optional($record?->discountCondition()->withTrashed()->first())->amount)
+                                ->formatStateUsing(fn ($record) => $record?->discountCondition()->withTrashed()->first()?->amount)
                                 ->label(trans('Discount Amount')),
                         ]),
 
@@ -193,7 +193,7 @@ class DiscountResource extends Resource
                                     isSigned: false
                                 ))
                                 ->formatStateUsing(fn ($record) => $record?->discountRequirement?->minimum_amount)
-                                ->helperText(new HtmlString(<<<HTML
+                                ->helperText(new HtmlString(<<<'HTML'
                                         Leave this blank if no minimum purchase amount.
                                     HTML))
                                 ->minValue(1),
@@ -215,14 +215,14 @@ class DiscountResource extends Resource
                     ->label(trans('Discount Type'))
                     ->formatStateUsing(function ($record) {
 
-                        $discountType = optional($record?->discountCondition()->withTrashed()->first())->discount_type;
+                        $discountType = $record?->discountCondition()->withTrashed()->first()?->discount_type;
 
                         $label = '';
-                        if($discountType === DiscountConditionType::ORDER_SUB_TOTAL) {
+                        if ($discountType === DiscountConditionType::ORDER_SUB_TOTAL) {
                             $label = trans('Order Sub Total');
                         }
 
-                        if($discountType === DiscountConditionType::DELIVERY_FEE) {
+                        if ($discountType === DiscountConditionType::DELIVERY_FEE) {
                             $label = trans('Shipping Fee');
                         }
 
@@ -230,11 +230,11 @@ class DiscountResource extends Resource
                     }),
                 TextColumn::make('discountCondition.amount')
                     ->formatStateUsing(function ($record) {
-                        $discountCondition = optional($record?->discountCondition()->withTrashed()->first());
+                        $discountCondition = $record?->discountCondition()->withTrashed()->first();
                         if ($discountCondition->amount_type === DiscountAmountType::PERCENTAGE) {
-                            return (string) $discountCondition->amount . '%';
+                            return (string) $discountCondition->amount.'%';
                         } elseif ($discountCondition->amount_type === DiscountAmountType::FIXED_VALUE) {
-                            return Currency::whereEnabled(true)->value('symbol') . ' ' . (string) $discountCondition->amount;
+                            return Currency::whereEnabled(true)->value('symbol').' '.(string) $discountCondition->amount;
                         }
 
                         return null;
@@ -257,7 +257,7 @@ class DiscountResource extends Resource
                         'success' => DiscountStatus::ACTIVE->value,
                         'warning' => DiscountStatus::INACTIVE->value,
 
-                    ])->formatStateUsing(fn (string $state): string => __(ucfirst($state)))->weight('bold'),
+                    ])->formatStateUsing(fn (string $state): string => trans(ucfirst($state)))->weight('bold'),
             ])
             ->filters([
                 TrashedFilter::make()

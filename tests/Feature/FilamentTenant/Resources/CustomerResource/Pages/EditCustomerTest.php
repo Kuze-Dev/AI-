@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
+use App\Features\Customer\AddressBase;
+use App\Features\Customer\CustomerBase;
+use App\Features\Customer\TierBase;
 use App\FilamentTenant\Resources\CustomerResource\Pages\EditCustomer;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
+use Domain\Tier\Database\Factories\TierFactory;
 use Filament\Facades\Filament;
-
 use Illuminate\Http\UploadedFile;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -16,15 +19,21 @@ use function Pest\Livewire\livewire;
 uses()->group('customer');
 
 beforeEach(function () {
-    testInTenantContext();
+    $tenant = testInTenantContext();
+    $tenant->features()->activate(CustomerBase::class);
+    $tenant->features()->activate(AddressBase::class);
+    $tenant->features()->activate(TierBase::class);
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 });
 
 it('can render page', function () {
-    $customer = CustomerFactory::new()
-        ->createOne();
+    $tier = TierFactory::createDefault();
 
+    $customer = CustomerFactory::new()
+        ->createOne([
+            'tier_id' => $tier->getKey(),
+        ]);
     livewire(EditCustomer::class, ['record' => $customer->getRouteKey()])
         ->assertSuccessful()
         ->assertFormExists()
@@ -40,8 +49,12 @@ it('can render page', function () {
 });
 
 it('can edit tier', function () {
+    $tier = TierFactory::createDefault();
+
     $customer = CustomerFactory::new()
-        ->createOne();
+        ->createOne([
+            'tier_id' => $tier->getKey(),
+        ]);
 
     livewire(EditCustomer::class, ['record' => $customer->getRouteKey()])
         ->fillForm([

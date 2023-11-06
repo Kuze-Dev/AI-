@@ -16,15 +16,18 @@ use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Exceptions\OrderEmailSettingsException;
 use Domain\Order\Exceptions\OrderEmailSiteSettingsException;
 use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\ShippingMethod\Models\ShippingMethod;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
+use Domain\Tier\Models\Tier;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Log;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class PrepareOrderAction
 {
@@ -102,7 +105,7 @@ class PrepareOrderAction
     {
         $currency = Currency::where('enabled', true)->first();
 
-        if ( ! $currency instanceof Currency) {
+        if (! $currency instanceof Currency) {
 
             throw new BadRequestHttpException('No currency found');
         }
@@ -111,14 +114,28 @@ class PrepareOrderAction
     }
 
     /**
-     * @param PlaceOrderData $placeOrderData
      * @return Collection<int, CartLine>
      */
     public function prepareCartLines(PlaceOrderData $placeOrderData): Collection
     {
-        return CartLine::with(['purchasable' => function (MorphTo $query) {
+        /** @var \Domain\Customer\Models\Customer $customer */
+        $customer = auth()->user();
+
+        /** @var \Domain\Tier\Models\Tier $tier */
+        $tier = $customer->tier ?? Tier::query()->where('name', config('domain.tier.default'))->first();
+
+        return CartLine::with(['purchasable' => function (MorphTo $query) use ($tier) {
             $query->morphWith([
-                ProductVariant::class => ['product'],
+                Product::class => [
+                    'productTier' => function (BelongsToMany $query) use ($tier) {
+                        $query->where('tier_id', $tier->id);
+                    },
+                ],
+                ProductVariant::class => [
+                    'product.productTier' => function (BelongsToMany $query) use ($tier) {
+                        $query->where('tier_id', $tier->id);
+                    },
+                ],
             ]);
         }, ])
             ->whereCheckoutReference($placeOrderData->cart_reference)
@@ -140,7 +157,7 @@ class PrepareOrderAction
 
         $taxZone = Taxation::getTaxZone($country->id, $state->id);
 
-        if ( ! $taxZone instanceof TaxZone) {
+        if (! $taxZone instanceof TaxZone) {
             // Log::info('No tax zone found');
             return null;
             // throw new BadRequestHttpException('No tax zone found');
@@ -179,7 +196,7 @@ class PrepareOrderAction
     {
         $paymentMethod = PaymentMethod::whereSlug($placeOrderData->payment_method)->first();
 
-        if ( ! $paymentMethod instanceof PaymentMethod) {
+        if (! $paymentMethod instanceof PaymentMethod) {
 
             throw new BadRequestHttpException('No paymentMethod found');
         }

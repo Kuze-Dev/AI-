@@ -7,20 +7,22 @@ namespace Domain\Cart\Requests;
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
+use Domain\Cart\Helpers\PrivateCart\CartLineQuery;
 use Domain\Cart\Models\CartLine;
 use Domain\Discount\Models\Discount;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\ShippingMethod\Models\ShippingMethod;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CartMobileSummaryRequest extends FormRequest
 {
     /** @var \Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> */
     private Collection $cartLinesCache;
+
     private array $cartLineIds;
 
     public function rules(): array
@@ -90,20 +92,13 @@ class CartMobileSummaryRequest extends FormRequest
     public function getCartLines(): Collection
     {
         if (empty($this->cartLinesCache)) {
-            $this->cartLinesCache = CartLine::query()
-                ->with('purchasable')
-                ->whereHas('cart', function ($query) {
-                    $query->whereBelongsTo(auth()->user());
-                })
-                ->whereNull('checked_out_at')
-                ->whereIn((new CartLine())->getRouteKeyName(), $this->cartLineIds)
-                ->get();
+
+            $this->cartLinesCache = app(CartLineQuery::class)->execute($this->cartLineIds);
         }
 
         return $this->cartLinesCache;
     }
 
-    /** @return \Domain\Address\Models\Country|null */
     public function getCountry(): ?Country
     {
         if ($id = $this->validated('billing_address_id')) {
