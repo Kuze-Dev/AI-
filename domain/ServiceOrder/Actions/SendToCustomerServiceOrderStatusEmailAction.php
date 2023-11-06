@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Actions;
 
-use Domain\Customer\Models\Customer;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
@@ -15,15 +14,13 @@ use Domain\ServiceOrder\Notifications\ConfirmationServiceOrderNotification;
 use Domain\ServiceOrder\Notifications\ExpiredServiceOrderNotification;
 use Domain\ServiceOrder\Notifications\ForPaymentNotification;
 use Domain\ServiceOrder\Notifications\InProgressServiceOrderNotification;
-use Filament\Notifications\Notification;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
-use Spatie\QueueableAction\QueueableAction;
+use Illuminate\Support\Facades\Notification as FacadesNotification;
 use Throwable;
 
 class SendToCustomerServiceOrderStatusEmailAction
 {
-    use QueueableAction;
-
     /** @throws Throwable */
     public function execute(ServiceOrder $serviceOrder): void
     {
@@ -47,12 +44,14 @@ class SendToCustomerServiceOrderStatusEmailAction
             };
         }
 
-        $customer = $serviceOrder->customer;
-
-        if ($customer instanceof Customer && ! is_null($notification)) {
-            $customer->notify($notification);
-
-            Log::info('Service Order status email notification sent to '.$customer->email);
+        if (is_null($notification)) {
+            return;
         }
+
+        FacadesNotification::route('mail', [
+            $serviceOrder->customer_email => $serviceOrder->customer_full_name,
+        ])->notify($notification);
+
+        Log::info('Service Order status email notification sent to '.$serviceOrder->customer_full_name);
     }
 }
