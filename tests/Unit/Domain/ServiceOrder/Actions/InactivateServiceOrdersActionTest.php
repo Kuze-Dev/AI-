@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\ServiceOrder\Actions\InactivateServiceOrdersAction;
-use Domain\ServiceOrder\Actions\InactivateServiceOrderStatusAction;
-use Domain\ServiceOrder\Actions\SendToCustomerServiceOrderStatusEmailAction;
 use Domain\ServiceOrder\Database\Factories\ServiceBillFactory;
 use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
+use Domain\ServiceOrder\Jobs\InactivateServiceOrderStatusJob;
+use Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob;
 use Illuminate\Support\Facades\Queue;
-use Spatie\QueueableAction\Testing\QueueableActionFake;
 
 beforeEach(function () {
     testInTenantContext();
 
-    now()->setTestNow('2023-11-05');
+    now()->setTestNow(now()->subDay());
 
     $this->initialServiceBill = ServiceBillFactory::new()
         ->billingDate(null)
@@ -35,18 +34,20 @@ it('can dispatch with an overdue unpaid bill', function () {
                 ->has($this->initialServiceBill)
                 ->has(
                     ServiceBillFactory::new()
-                        ->billingDate(now()->parse('2023-11-01'))
-                        ->dueDate(now()->parse('2023-11-04'))
+                        ->billingDate(now())
+                        ->dueDate(now())
                         ->pending()
                 )
         )
         ->createOne();
 
+    now()->setTestNow(now()->addDay());
+
     app(InactivateServiceOrdersAction::class)->execute();
 
-    QueueableActionFake::assertPushedWithChain(
-        InactivateServiceOrderStatusAction::class,
-        [SendToCustomerServiceOrderStatusEmailAction::class]
+    Queue::assertPushedWithChain(
+        InactivateServiceOrderStatusJob::class,
+        [NotifyCustomerServiceOrderStatusJob::class]
     );
 });
 
@@ -61,8 +62,8 @@ it('cannot dispatch with an inactive customer', function () {
                 ->has($this->initialServiceBill)
                 ->has(
                     ServiceBillFactory::new()
-                        ->billingDate(now()->parse('2023-11-01'))
-                        ->dueDate(now()->parse('2023-11-04'))
+                        ->billingDate(now())
+                        ->dueDate(now()->addDay())
                         ->pending()
                 )
         )
@@ -70,7 +71,7 @@ it('cannot dispatch with an inactive customer', function () {
 
     app(InactivateServiceOrdersAction::class)->execute();
 
-    QueueableActionFake::assertNotPushed(InactivateServiceOrderStatusAction::class);
+    Queue::assertNotPushed(InactivateServiceOrderStatusJob::class);
 });
 
 it('cannot dispatch without service order', function () {
@@ -80,7 +81,7 @@ it('cannot dispatch without service order', function () {
 
     app(InactivateServiceOrdersAction::class)->execute();
 
-    QueueableActionFake::assertNotPushed(InactivateServiceOrderStatusAction::class);
+    Queue::assertNotPushed(InactivateServiceOrderStatusJob::class);
 });
 
 it('cannot dispatch with an inactive service order', function () {
@@ -94,8 +95,8 @@ it('cannot dispatch with an inactive service order', function () {
                 ->has($this->initialServiceBill)
                 ->has(
                     ServiceBillFactory::new()
-                        ->billingDate(now()->parse('2023-11-01'))
-                        ->dueDate(now()->parse('2023-11-04'))
+                        ->billingDate(now())
+                        ->dueDate(now()->addDay())
                         ->pending()
                 )
         )
@@ -103,7 +104,7 @@ it('cannot dispatch with an inactive service order', function () {
 
     app(InactivateServiceOrdersAction::class)->execute();
 
-    QueueableActionFake::assertNotPushed(InactivateServiceOrderStatusAction::class);
+    Queue::assertNotPushed(InactivateServiceOrderStatusJob::class);
 });
 
 it('cannot dispatch with a non-subscription service order', function () {
@@ -117,8 +118,8 @@ it('cannot dispatch with a non-subscription service order', function () {
                 ->has($this->initialServiceBill)
                 ->has(
                     ServiceBillFactory::new()
-                        ->billingDate(now()->parse('2023-11-01'))
-                        ->dueDate(now()->parse('2023-11-04'))
+                        ->billingDate(now())
+                        ->dueDate(now()->addDay())
                         ->pending()
                 )
         )
@@ -126,7 +127,7 @@ it('cannot dispatch with a non-subscription service order', function () {
 
     app(InactivateServiceOrdersAction::class)->execute();
 
-    QueueableActionFake::assertNotPushed(InactivateServiceOrderStatusAction::class);
+    Queue::assertNotPushed(InactivateServiceOrderStatusJob::class);
 });
 
 it('cannot dispatch with an auto generated bill service order', function () {
@@ -140,8 +141,8 @@ it('cannot dispatch with an auto generated bill service order', function () {
                 ->has($this->initialServiceBill)
                 ->has(
                     ServiceBillFactory::new()
-                        ->billingDate(now()->parse('2023-11-01'))
-                        ->dueDate(now()->parse('2023-11-04'))
+                        ->billingDate(now())
+                        ->dueDate(now()->addDay())
                         ->pending()
                 )
         )
@@ -149,7 +150,7 @@ it('cannot dispatch with an auto generated bill service order', function () {
 
     app(InactivateServiceOrdersAction::class)->execute();
 
-    QueueableActionFake::assertNotPushed(InactivateServiceOrderStatusAction::class);
+    Queue::assertNotPushed(InactivateServiceOrderStatusJob::class);
 });
 
 it('cannot dispatch without service bill', function () {
@@ -165,7 +166,7 @@ it('cannot dispatch without service bill', function () {
 
     app(InactivateServiceOrdersAction::class)->execute();
 
-    QueueableActionFake::assertNotPushed(InactivateServiceOrderStatusAction::class);
+    Queue::assertNotPushed(InactivateServiceOrderStatusJob::class);
 });
 
 it('cannot dispatch with a paid latest service bill', function () {
@@ -179,8 +180,8 @@ it('cannot dispatch with a paid latest service bill', function () {
                 ->has($this->initialServiceBill)
                 ->has(
                     ServiceBillFactory::new()
-                        ->billingDate(now()->parse('2023-11-01'))
-                        ->dueDate(now()->parse('2023-11-04'))
+                        ->billingDate(now())
+                        ->dueDate(now()->addDay())
                         ->paid()
                 )
         )
@@ -188,7 +189,7 @@ it('cannot dispatch with a paid latest service bill', function () {
 
     app(InactivateServiceOrdersAction::class)->execute();
 
-    QueueableActionFake::assertNotPushed(InactivateServiceOrderStatusAction::class);
+    Queue::assertNotPushed(InactivateServiceOrderStatusJob::class);
 });
 
 it('cannot dispatch without a billing date', function () {
@@ -203,7 +204,7 @@ it('cannot dispatch without a billing date', function () {
                 ->has(
                     ServiceBillFactory::new()
                         ->billingDate(null)
-                        ->dueDate(now()->parse('2023-11-04'))
+                        ->dueDate(now()->addDay())
                         ->pending()
                 )
         )
@@ -211,7 +212,7 @@ it('cannot dispatch without a billing date', function () {
 
     app(InactivateServiceOrdersAction::class)->execute();
 
-    QueueableActionFake::assertNotPushed(InactivateServiceOrderStatusAction::class);
+    Queue::assertNotPushed(InactivateServiceOrderStatusJob::class);
 });
 
 it('cannot dispatch without a due date', function () {
@@ -225,7 +226,7 @@ it('cannot dispatch without a due date', function () {
                 ->has($this->initialServiceBill)
                 ->has(
                     ServiceBillFactory::new()
-                        ->billingDate(now()->parse('2023-11-03'))
+                        ->billingDate(now()->addDay())
                         ->dueDate(null)
                         ->pending()
                 )
@@ -234,7 +235,7 @@ it('cannot dispatch without a due date', function () {
 
     app(InactivateServiceOrdersAction::class)->execute();
 
-    QueueableActionFake::assertNotPushed(InactivateServiceOrderStatusAction::class);
+    Queue::assertNotPushed(InactivateServiceOrderStatusJob::class);
 });
 
 it('cannot dispatch on due date', function () {
@@ -248,8 +249,8 @@ it('cannot dispatch on due date', function () {
                 ->has($this->initialServiceBill)
                 ->has(
                     ServiceBillFactory::new()
-                        ->billingDate(now()->parse('2023-11-03'))
-                        ->dueDate(now()->parse('2023-11-05'))
+                        ->billingDate(now())
+                        ->dueDate(now()->addDay())
                         ->pending()
                 )
         )
@@ -257,7 +258,7 @@ it('cannot dispatch on due date', function () {
 
     app(InactivateServiceOrdersAction::class)->execute();
 
-    QueueableActionFake::assertNotPushed(InactivateServiceOrderStatusAction::class);
+    Queue::assertNotPushed(InactivateServiceOrderStatusJob::class);
 });
 
 it('cannot dispatch on past due date (more than a day)', function () {
@@ -273,8 +274,8 @@ it('cannot dispatch on past due date (more than a day)', function () {
                 ->has($this->initialServiceBill)
                 ->has(
                     ServiceBillFactory::new()
-                        ->billingDate(now()->parse('2023-11-05'))
-                        ->dueDate(now()->parse('2023-11-04'))
+                        ->billingDate(now())
+                        ->dueDate(now()->addDays(2))
                         ->pending()
                 )
         )
@@ -282,5 +283,5 @@ it('cannot dispatch on past due date (more than a day)', function () {
 
     app(InactivateServiceOrdersAction::class)->execute();
 
-    QueueableActionFake::assertNotPushed(InactivateServiceOrderStatusAction::class);
+    Queue::assertNotPushed(InactivateServiceOrderStatusJob::class);
 });

@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Actions;
 
 use Domain\Customer\Models\Customer;
+use Domain\ServiceOrder\Jobs\InactivateServiceOrderStatusJob;
+use Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Support\Facades\Log;
-use Spatie\QueueableAction\ActionJob;
 
 class InactivateServiceOrdersAction
 {
@@ -36,29 +37,25 @@ class InactivateServiceOrdersAction
                                     ->sortByDesc('created_at')
                                     ->first();
 
-                                $dateToday = now()->toDateString();
-                                $dueDate = now()->parse($latestPendingServiceBill->due_date)
+                                $isOverdue = now()->toDateString() === now()
+                                    ->parse($latestPendingServiceBill->due_date)
                                     ->addDay()
                                     ->toDateString();
 
-                                if ($dateToday === $dueDate) {
-                                    /** avoids invoking chain method from the returned result
-                                     * @phpstan-ignore-next-line */
-                                    app(InactivateServiceOrderStatusAction::class)
-                                        ->onQueue()
-                                        ->execute($serviceOrder)
-                                        ->chain([
-                                            new ActionJob(
-                                                SendToCustomerServiceOrderStatusEmailAction::class,
-                                                [$serviceOrder]
-                                            ),
-                                        ]);
+                                /** @var \Illuminate\Foundation\Bus\PendingDispatch $inactivateServiceOrderStatusJob */
+                                $inactivateServiceOrderStatusJob = InactivateServiceOrderStatusJob::dispatchIf(
+                                    $isOverdue,
+                                    $serviceOrder
+                                );
 
-                                    Log::info(
-                                        'Service Order '.$serviceOrder->getRouteKey().'\'s status, will be inactivated. '.
-                                        'Unpaid bill '.$latestPendingServiceBill->getRouteKey().', is overdue.'
-                                    );
-                                }
+                                $inactivateServiceOrderStatusJob->chain([
+                                    new NotifyCustomerServiceOrderStatusJob($serviceOrder),
+                                ]);
+
+                                Log::info(
+                                    'Service Order '.$serviceOrder->getRouteKey().'\'s status, will be inactivated. '.
+                                    'Unpaid bill '.$latestPendingServiceBill->getRouteKey().', is overdue.'
+                                );
                             }
                         );
                 }
