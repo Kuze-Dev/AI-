@@ -7,13 +7,13 @@ namespace Domain\ServiceOrder\Listeners;
 use Domain\Payments\Events\PaymentProcessEvent;
 use Domain\Payments\Exceptions\PaymentException;
 use Domain\Payments\Models\Payment;
-use Domain\ServiceOrder\Actions\SendToCustomerServiceOrderStatusEmailAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderPaymentData;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Jobs\CreateServiceBillJob;
 use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
+use Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Models\ServiceTransaction;
@@ -136,9 +136,7 @@ class ServiceOrderPaymentUpdatedListener
                 : ServiceOrderStatus::PENDING,
         ]);
 
-        app(SendToCustomerServiceOrderStatusEmailAction::class)
-            ->onQueue()
-            ->execute($this->serviceOrder);
+        NotifyCustomerServiceOrderStatusJob::dispatch($this->serviceOrder);
     }
 
     private function handleServiceBillStatusUpdate(): void

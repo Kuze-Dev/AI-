@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Pipes\ServiceOrderCreated;
 
 use Domain\ServiceOrder\Actions\SendToCustomerServiceBillEmailAction;
-use Domain\ServiceOrder\Actions\SendToCustomerServiceOrderStatusEmailAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderCreatedPipelineData;
+use Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob;
 
 class NotifyCustomerPipe
 {
     public function __construct(
-        private SendToCustomerServiceOrderStatusEmailAction $sendToCustomerServiceOrderStatusEmailAction,
         private SendToCustomerServiceBillEmailAction $sendToCustomerServiceBillEmailAction,
     ) {
     }
@@ -31,8 +30,7 @@ class NotifyCustomerPipe
                 ->serviceOrder
                 ->customer;
 
-            $this->sendToCustomerServiceOrderStatusEmailAction
-                ->execute($serviceOrderCreatedPipelineData->serviceOrder);
+            NotifyCustomerServiceOrderStatusJob::dispatch($serviceOrderCreatedPipelineData->serviceOrder);
 
             $this->sendToCustomerServiceBillEmailAction
                 ->execute(

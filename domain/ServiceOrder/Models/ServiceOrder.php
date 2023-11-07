@@ -13,6 +13,7 @@ use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Queries\ServiceOrderQueryBuilder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -65,6 +66,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property-read int|null $service_order_address_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\ServiceOrder\Models\ServiceTransaction> $serviceTransactions
  * @property-read int|null $service_transactions_count
+ * @property-read string $customer_full_name
  *
  * @method static ServiceOrderQueryBuilder|ServiceOrder newModelQuery()
  * @method static ServiceOrderQueryBuilder|ServiceOrder newQuery()
@@ -247,5 +249,14 @@ class ServiceOrder extends Model
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
+    }
+
+    /** @return Attribute<string, never> */
+    protected function customerFullName(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value, array $attributes) => $attributes['customer_first_name'].' '.
+                $attributes['customer_last_name'],
+        );
     }
 }

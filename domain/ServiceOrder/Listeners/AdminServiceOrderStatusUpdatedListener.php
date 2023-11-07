@@ -8,10 +8,10 @@ use App\Settings\ServiceSettings;
 use DateTimeZone;
 use Domain\ServiceOrder\Actions\ComputeServiceBillingCycleAction;
 use Domain\ServiceOrder\Actions\CreateServiceBillAction;
-use Domain\ServiceOrder\Actions\SendToCustomerServiceOrderStatusEmailAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Events\AdminServiceOrderStatusUpdatedEvent;
+use Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Notifications\ChangeByAdminNotification;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +23,6 @@ class AdminServiceOrderStatusUpdatedListener
         private ServiceOrder $serviceOrder,
         private CreateServiceBillAction $createServiceBillAction,
         private ComputeServiceBillingCycleAction $computeServiceBillingCycleAction,
-        private SendToCustomerServiceOrderStatusEmailAction $sendToCustomerServiceOrderStatusEmailAction,
         private ServiceSettings $serviceSettings,
         private bool $shouldNotifyCustomer = false,
     ) {
@@ -76,10 +75,11 @@ class AdminServiceOrderStatusUpdatedListener
 
     private function notifyCustomer(): void
     {
-        if ($this->shouldNotifyCustomer) {
-            $this->sendToCustomerServiceOrderStatusEmailAction
-                ->execute($this->serviceOrder);
+        if (! $this->shouldNotifyCustomer) {
+            return;
         }
+
+        NotifyCustomerServiceOrderStatusJob::dispatch($this->serviceOrder);
     }
 
     private function notifyAdmin(): void
