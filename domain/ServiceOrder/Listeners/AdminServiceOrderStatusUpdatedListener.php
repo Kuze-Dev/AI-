@@ -9,9 +9,10 @@ use DateTimeZone;
 use Domain\ServiceOrder\Actions\ComputeServiceBillingCycleAction;
 use Domain\ServiceOrder\Actions\CreateServiceBillAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
-use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Events\AdminServiceOrderStatusUpdatedEvent;
+use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
 use Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob;
+use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Notifications\ChangeByAdminNotification;
 use Illuminate\Support\Facades\Auth;
@@ -28,10 +29,8 @@ class AdminServiceOrderStatusUpdatedListener
     ) {
     }
 
-    public function handle(
-        AdminServiceOrderStatusUpdatedEvent $event
-    ): void {
-
+    public function handle(AdminServiceOrderStatusUpdatedEvent $event): void
+    {
         $this->serviceOrder = $event->serviceOrder;
 
         $this->shouldNotifyCustomer = $event->shouldNotifyCustomer;
@@ -43,34 +42,51 @@ class AdminServiceOrderStatusUpdatedListener
         $this->notifyAdmin();
     }
 
+    private function onServiceOrderForPayment(): ServiceBill
+    {
+        return $this->createServiceBillAction
+            ->execute(ServiceBillData::initialFromServiceOrder($this->serviceOrder));
+    }
+
+    private function onServiceOrderActive(): ServiceBill
+    {
+        /** @var \Domain\Admin\Models\Admin $admin */
+        $admin = Auth::user();
+
+        return $this->createServiceBillAction
+            ->execute(
+                ServiceBillData::subsequentFromServiceOrderWithAssignedDates(
+                    $this->serviceOrder,
+                    $this->computeServiceBillingCycleAction
+                        ->execute(
+                            $this->serviceOrder,
+                            now()->timezone(new DateTimeZone($admin->timezone))
+                        )
+                )
+            );
+    }
+
     private function prepareServiceBill(): void
     {
-        switch ($this->serviceOrder->status) {
-            case ServiceOrderStatus::FORPAYMENT:
-                $this->createServiceBillAction
-                    ->execute(ServiceBillData::initialFromServiceOrder($this->serviceOrder));
-                break;
-
-            case ServiceOrderStatus::ACTIVE:
-                /** @var \Domain\Admin\Models\Admin $admin */
-                $admin = Auth::user();
-
-                $this->createServiceBillAction
-                    ->execute(
-                        ServiceBillData::subsequentFromServiceOrderWithAssignedDates(
-                            $this->serviceOrder,
-                            $this->computeServiceBillingCycleAction
-                                ->execute(
-                                    $this->serviceOrder,
-                                    now()->timezone(new DateTimeZone($admin->timezone))
-                                )
-                        )
-                    );
-                break;
-
-            default:
-                break;
+        if (filled($this->serviceOrder->serviceBills)) {
+            return;
         }
+
+        /** @var \Domain\ServiceOrder\Models\ServiceBill|null $serviceBill */
+        $serviceBill = match ($this->serviceOrder->status->value) {
+            'for_payment' => $this->onServiceOrderForPayment(),
+            'active', => $this->onServiceOrderActive(),
+            default => null
+        };
+
+        $shouldNotifyCustomer = $serviceBill instanceof ServiceBill &&
+            $this->shouldNotifyCustomer;
+
+        if (! $shouldNotifyCustomer) {
+            return;
+        }
+
+        NotifyCustomerLatestServiceBillJob::dispatch($this->serviceOrder);
     }
 
     private function notifyCustomer(): void
@@ -85,18 +101,20 @@ class AdminServiceOrderStatusUpdatedListener
     private function notifyAdmin(): void
     {
         if (
-            $this->serviceSettings->admin_should_receive &&
-            filled($this->serviceSettings->admin_main_receiver)
+            ! $this->serviceSettings->admin_should_receive &&
+            empty($this->serviceSettings->admin_main_receiver)
         ) {
-            Notification::route(
-                'mail',
-                $this->serviceSettings->admin_main_receiver
-            )->notify(
-                new ChangeByAdminNotification(
-                    $this->serviceOrder,
-                    $this->serviceOrder->status->value
-                )
-            );
+            return;
         }
+
+        Notification::route(
+            'mail',
+            $this->serviceSettings->admin_main_receiver
+        )->notify(
+            new ChangeByAdminNotification(
+                $this->serviceOrder,
+                $this->serviceOrder->status->value
+            )
+        );
     }
 }
