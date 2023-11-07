@@ -15,7 +15,7 @@ class CreateServiceBillCommand extends Command
     use TenantAwareCommand;
 
     /** @var string */
-    protected $signature = 'app:create-service-bill-command';
+    protected $signature = 'create:service-bill-command';
 
     /** @var string */
     protected $description = 'Generate service bill for customer';

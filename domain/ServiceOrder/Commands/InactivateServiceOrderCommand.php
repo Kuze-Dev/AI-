@@ -15,7 +15,7 @@ class InactivateServiceOrderCommand extends Command
     use TenantAwareCommand;
 
     /** @var string */
-    protected $signature = 'app:inactivate-service-order-command';
+    protected $signature = 'inactivate:service-order-command';
 
     /** @var string */
     protected $description = 'Inactivate service orders';
