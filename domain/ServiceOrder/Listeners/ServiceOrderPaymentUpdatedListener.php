@@ -51,7 +51,7 @@ class ServiceOrderPaymentUpdatedListener
                 new CreateServiceTransactionData(
                     service_bill: $this->serviceBill,
                     service_transaction_status: ServiceTransactionStatus::PAID,
-                    payment_method_id: $this->payment->payment_method_id
+                    payment: $this->payment
                 )
             );
 
@@ -72,7 +72,7 @@ class ServiceOrderPaymentUpdatedListener
                 new CreateServiceTransactionData(
                     service_bill: $this->serviceBill,
                     service_transaction_status: ServiceTransactionStatus::REFUNDED,
-                    payment_method_id: $this->payment->payment_method_id
+                    payment: $this->payment
                 )
             );
 
@@ -86,7 +86,7 @@ class ServiceOrderPaymentUpdatedListener
                 new CreateServiceTransactionData(
                     service_bill: $this->serviceBill,
                     service_transaction_status: ServiceTransactionStatus::CANCELLED,
-                    payment_method_id: $this->payment->payment_method_id
+                    payment: $this->payment
                 )
             );
 

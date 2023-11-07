@@ -19,6 +19,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property int $id
  * @property int $service_order_id
  * @property int $service_bill_id
+ * @property int $payment_id
  * @property int $payment_method_id
  * @property string $currency
  * @property float $total_amount
@@ -53,6 +54,7 @@ class ServiceTransaction extends Model
     protected $fillable = [
         'service_order_id',
         'service_bill_id',
+        'payment_id',
         'payment_method_id',
         'currency',
         'total_amount',

@@ -38,7 +38,8 @@ class CreateServiceTransactionAction
         return new ServiceTransactionData(
             service_order_id: $serviceBill->service_order_id,
             service_bill_id: $serviceBill->id,
-            payment_method_id: $createServiceTransactionData->payment_method_id,
+            payment_id: (int) $createServiceTransactionData->payment->payment_id,
+            payment_method_id: (int) $createServiceTransactionData->payment->payment_method_id,
             total_amount: $serviceBill->total_amount,
             currency: $serviceOrder->currency_code,
             status: $createServiceTransactionData->service_transaction_status,
