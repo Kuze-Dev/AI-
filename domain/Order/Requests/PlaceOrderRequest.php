@@ -76,7 +76,7 @@ class PlaceOrderRequest extends FormRequest
                     try {
                         //stock check
                         $checkStocks = app(CartPurchasableValidatorAction::class)->validateCheckout($cartLineIds, $userId, $type);
-                        if ($checkStocks !== count($value)) {
+                        if ($checkStocks !== count($cartLineIds)) {
                             $fail('Invalid stocks');
                         }
                     } catch (Throwable $th) {

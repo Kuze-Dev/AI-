@@ -23,9 +23,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
           </svg>
         </div>
-        
-        <h1 class="my-10 text-5xl">ACCESS TO THIS PAGE IS RESTRICTED</h1>
-        <p class="text-2xl">Please check with the site admin if you believe this is a mistake. to Please contact the administrator.</p>
+        <h1 class="my-10 text-5xl">{{$title}}</h1>
+        <p class="text-2xl">{{$message}}</p>
       </div>
     </div>
 </body>

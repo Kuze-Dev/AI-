@@ -71,19 +71,21 @@ class CartSummaryAction
 
         $discountMessages = (new DiscountHelperFunctions())->validateDiscountCode($discount, $initialTotal);
 
-        if ($discount?->discountCondition?->discount_type === DiscountConditionType::ORDER_SUB_TOTAL) {
-            if ($discountTotal >= $initialSubTotal) {
-                $subtotal = 0;
-            } else {
-                $subtotal = $initialSubTotal - $discountTotal;
+        if ($discountMessages->status == 'valid') {
+            if ($discount?->discountCondition?->discount_type === DiscountConditionType::ORDER_SUB_TOTAL) {
+                if ($discountTotal >= $initialSubTotal) {
+                    $subtotal = 0;
+                } else {
+                    $subtotal = $initialSubTotal - $discountTotal;
+                }
             }
-        }
 
-        if ($discount?->discountCondition?->discount_type === DiscountConditionType::DELIVERY_FEE) {
-            if ($discountTotal >= $initialShippingTotal) {
-                $shippingTotal = 0;
-            } else {
-                $shippingTotal = $initialShippingTotal - $discountTotal;
+            if ($discount?->discountCondition?->discount_type === DiscountConditionType::DELIVERY_FEE) {
+                if ($discountTotal >= $initialShippingTotal) {
+                    $shippingTotal = 0;
+                } else {
+                    $shippingTotal = $initialShippingTotal - $discountTotal;
+                }
             }
         }
 

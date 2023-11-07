@@ -64,7 +64,7 @@ class GuestSplitOrderAction
                     'reference_id' => $order->reference,
                     'amount' => AmountData::fromArray([
                         'currency' => $guestPreparedOrderData->currency->code,
-                        'total' => (int) $order->total,
+                        'total' => $order->total,
                         'details' => PaymentDetailsData::fromArray(
                             [
                                 'subtotal' => strval($order->sub_total - $order->discount_total),
