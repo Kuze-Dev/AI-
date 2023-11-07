@@ -48,6 +48,10 @@ class PaymentMethodPolicy
 
     public function update(User $user, PaymentMethod $paymentMethod): bool
     {
+        if ($paymentMethod->trashed()) {
+            return false;
+        }
+
         return $this->checkWildcardPermissions($user);
     }
 
