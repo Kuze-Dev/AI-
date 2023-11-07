@@ -235,6 +235,7 @@ class RoleResource extends Resource
             'ecommerceSettings' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
             'customers' => tenancy()->tenant?->features()->inactive(\App\Features\Customer\CustomerBase::class),
             'tiers' => tenancy()->tenant?->features()->inactive(\App\Features\Customer\TierBase::class),
+            'service' => tenancy()->tenant?->features()->inactive(\App\Features\Service\ServiceBase::class),
             default => false
         };
     }
