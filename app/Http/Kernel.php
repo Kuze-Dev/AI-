@@ -52,6 +52,7 @@ class Kernel extends HttpKernel
         'tenant' => [
             \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
             \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+            \App\Http\Middleware\EnsureTenantIsNotSuspended::class,
             ApiCallTrackMiddleware::class,
         ],
     ];
@@ -76,5 +77,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'active' => \App\Http\Middleware\EnsureAccountIsActive::class,
         'feature.tenant' => \App\Http\Middleware\EnsureTenantFeaturesAreActive::class,
+        'tenant.suspended' => \App\Http\Middleware\EnsureTenantIsNotSuspended::class,
     ];
 }
