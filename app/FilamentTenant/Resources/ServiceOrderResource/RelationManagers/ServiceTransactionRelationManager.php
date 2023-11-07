@@ -79,15 +79,18 @@ class ServiceTransactionRelationManager extends RelationManager
                                     $createdAt->format('m_Y').
                                     '.pdf';
 
+                                $disk = config('domain.service-order.disks.receipt-files.driver');
+
                                 Pdf::loadView(
                                     'web.layouts.service-order.receipts.default',
                                     ['transaction' => $record]
                                 )
-                                    ->save($filename, 'receipt-files');
+                                    ->save($filename, $disk);
 
-                                $customer->addMedia(
-                                    Storage::disk('receipt-files')
-                                        ->path($filename)
+                                $customer->addMediaFromDisk(
+                                    Storage::disk(config('domain.service-order.disks.receipt-files.driver'))
+                                        ->path($filename),
+                                    $disk
                                 )
                                     ->toMediaCollection('receipts');
 
@@ -103,7 +106,8 @@ class ServiceTransactionRelationManager extends RelationManager
 
                             } catch (Exception $e) {
                                 $action
-                                    ->failureNotificationTitle(trans('Something went wrong!'))
+                                    ->failureNotificationTitle($e->getMessage())
+                                    // ->failureNotificationTitle(trans('Something went wrong!'))
                                     ->failure();
 
                                 report($e);

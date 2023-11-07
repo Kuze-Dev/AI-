@@ -58,12 +58,6 @@ return [
                 'CacheControl' => 'max-age=315360000'
             ]
         ],
-
-        'receipt-files' => [
-            'driver' => 'local',
-            'root' => storage_path('app/receipt-files'),
-            'throw' => false,
-        ],
     ],
 
     /*
