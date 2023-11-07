@@ -105,4 +105,19 @@ class ServiceOrderFactory extends Factory
     {
         return $this->state(['is_subscription' => true]);
     }
+
+    public function pending(): self
+    {
+        return $this->state(['status' => ServiceOrderStatus::PENDING]);
+    }
+
+    public function inProgress(): self
+    {
+        return $this->state(['status' => ServiceOrderStatus::INPROGRESS]);
+    }
+
+    public function completed(): self
+    {
+        return $this->state(['status' => ServiceOrderStatus::COMPLETED]);
+    }
 }
