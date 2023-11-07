@@ -74,9 +74,6 @@ class ServiceResource extends Resource
                                         ->mapWithKeys(fn ($categories) => [$categories->id => $categories->name])
                                         ->toArray();
                                 })
-                                ->formatStateUsing(
-                                    fn ($record) => $record?->taxonomyTerms->first()->id ?? null
-                                )
                                 ->statePath('taxonomy_term_id')
                                 ->required(),
                             Forms\Components\FileUpload::make('media')

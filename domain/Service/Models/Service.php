@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -53,8 +54,6 @@ use Support\MetaData\Models\MetaData;
  * @property-read int|null $media_count
  * @property-read MetaData|null $metaData
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
- * @property-read int|null $taxonomy_terms_count
- *
  * @method static Builder|Service newModelQuery()
  * @method static Builder|Service newQuery()
  * @method static Builder|Service onlyTrashed()
@@ -119,6 +118,10 @@ class Service extends Model implements HasMedia, HasMetaDataContract
         'status' => 'bool',
         'needs_approval' => 'bool',
         'is_auto_generated_bill' => 'bool',
+    ];
+
+    protected $with = [
+        'taxonomyTerms',
     ];
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm> */
