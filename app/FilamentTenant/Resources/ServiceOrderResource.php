@@ -212,11 +212,11 @@ class ServiceOrderResource extends Resource
                                         )->schema([
                                             Placeholder::make('Billing Schedule')
                                                 ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
-                                                    ? Service::whereId($serviceId)->first()?->billing_cycle
+                                                    ? ucfirst(Service::whereId($serviceId)->first()?->billing_cycle->value ?? '')
                                                     : ''),
                                             Placeholder::make('Due Date every')
                                                 ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
-                                                    ? self::ordinalNumber(Service::whereId($serviceId)->first()?->due_date_every ?? 0).' day'
+                                                    ? self::ordinalNumber(Service::whereId($serviceId)->first()?->due_date_every ?? 0).' days after billing date'
                                                     : ''),
                                         ]),
 

@@ -251,9 +251,9 @@ class ViewServiceOrder extends EditRecord
                         ->content(fn ($record) => $record->currency_symbol.' '.number_format($record->service_price, 2, '.', ',')),
                     Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
                         Placeholder::make('BillingCycle')
-                            ->content(fn ($record) => $record->billing_cycle),
+                            ->content(fn ($record) => ucfirst($record->billing_cycle->value)),
                         Placeholder::make('Due date every')
-                            ->content(fn ($record) => $record->due_date_every),
+                            ->content(fn ($record) => $record->due_date_every.' days after billing date'),
                     ])->visible(fn ($record) => $record->service->is_subscription),
                     Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
                         Placeholder::make('schedule')
