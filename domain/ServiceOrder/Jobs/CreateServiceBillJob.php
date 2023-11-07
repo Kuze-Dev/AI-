@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Jobs;
 
 use Domain\ServiceOrder\Actions\CreateServiceBillAction;
-use Domain\ServiceOrder\Actions\GetServiceBillingAndDueDateAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
-use Domain\ServiceOrder\Models\ServiceBill;
+use Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -25,7 +24,7 @@ class CreateServiceBillJob implements ShouldBeUnique, ShouldQueue
 
     public function __construct(
         private ServiceOrder $serviceOrder,
-        private ServiceBill $serviceBill
+        private ServiceOrderBillingAndDueDateData $serviceOrderBillingAndDueDateData
     ) {
     }
 
@@ -34,18 +33,13 @@ class CreateServiceBillJob implements ShouldBeUnique, ShouldQueue
         return $this->serviceOrder->getRouteKeyName();
     }
 
-    public function handle(
-        CreateServiceBillAction $createServiceBillAction,
-        GetServiceBillingAndDueDateAction $getServiceBillingAndDueDateAction
-    ): void {
-
+    public function handle(CreateServiceBillAction $createServiceBillAction): void
+    {
         $createServiceBillAction->execute(
             ServiceBillData::subsequentFromServiceOrderWithAssignedDates(
                 serviceOrder: $this->serviceOrder,
-                serviceOrderBillingAndDueDateData: $getServiceBillingAndDueDateAction
-                    ->execute($this->serviceBill)
+                serviceOrderBillingAndDueDateData: $this->serviceOrderBillingAndDueDateData
             )
         );
-
     }
 }

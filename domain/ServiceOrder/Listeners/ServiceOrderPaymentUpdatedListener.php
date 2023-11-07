@@ -7,6 +7,8 @@ namespace Domain\ServiceOrder\Listeners;
 use Domain\Payments\Events\PaymentProcessEvent;
 use Domain\Payments\Exceptions\PaymentException;
 use Domain\Payments\Models\Payment;
+use Domain\ServiceOrder\Actions\GetServiceBillingAndDueDateAction;
+use Domain\ServiceOrder\DataTransferObjects\GetServiceBillingAndDueData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderPaymentData;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
@@ -26,7 +28,8 @@ class ServiceOrderPaymentUpdatedListener
         private Payment $payment,
         private ServiceBill $serviceBill,
         private ServiceOrder $serviceOrder,
-        private ServiceTransaction $serviceTransaction
+        private ServiceTransaction $serviceTransaction,
+        private GetServiceBillingAndDueDateAction $getServiceBillingAndDueDateAction
     ) {
     }
 
@@ -77,10 +80,6 @@ class ServiceOrderPaymentUpdatedListener
 
     private function onServiceBillPaid(): ServiceOrderPaymentData
     {
-        $this->createServiceBill();
-
-        $this->updateServiceOrderStatus();
-
         return new ServiceOrderPaymentData(
             service_transaction_status: ServiceTransactionStatus::PAID,
             service_bill_status: ServiceBillStatus::PAID
@@ -112,7 +111,14 @@ class ServiceOrderPaymentUpdatedListener
         $createServiceBillJob = CreateServiceBillJob::dispatchIf(
             $shouldCreateNewServiceBill,
             $this->serviceOrder,
-            $this->serviceBill
+            $this->getServiceBillingAndDueDateAction
+                ->execute(
+                    new GetServiceBillingAndDueData(
+                        service_order: $this->serviceOrder,
+                        service_bill: $this->serviceBill,
+                        service_transaction: $this->serviceTransaction
+                    )
+                )
         );
 
         $createServiceBillJob->chain([
@@ -122,10 +128,6 @@ class ServiceOrderPaymentUpdatedListener
 
     private function updateServiceOrderStatus(): void
     {
-        if ($this->serviceOrder->status == ServiceOrderStatus::CLOSED) {
-            return;
-        }
-
         $this->serviceOrder->update([
             'status' => $this->serviceOrder->is_subscription
                 ? ServiceOrderStatus::ACTIVE
@@ -152,5 +154,17 @@ class ServiceOrderPaymentUpdatedListener
         $this->serviceBill->update([
             'status' => $serviceOrderPaymentData->service_bill_status,
         ]);
+
+        if (! $this->serviceBill->is_paid || ! $this->serviceTransaction->is_paid) {
+            return;
+        }
+
+        if ($this->serviceOrder->status == ServiceOrderStatus::CLOSED) {
+            return;
+        }
+
+        $this->createServiceBill();
+
+        $this->updateServiceOrderStatus();
     }
 }

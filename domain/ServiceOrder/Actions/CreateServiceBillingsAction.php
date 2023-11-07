@@ -80,7 +80,7 @@ class CreateServiceBillingsAction
                             $createServiceBillJob = CreateServiceBillJob::dispatchIf(
                                 $isBillingDateToday,
                                 $serviceOrder,
-                                $latestServiceBill
+                                $this->computeServiceBillingCycleAction->execute($serviceOrder, $referenceDate)
                             );
 
                             $createServiceBillJob->chain([new NotifyCustomerLatestServiceBillJob($serviceOrder)]);

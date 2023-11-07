@@ -38,6 +38,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $payments_count
  * @property-read \Domain\ServiceOrder\Models\ServiceOrder|null $serviceOrder
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ServiceTransaction>|null $serviceTransactions
+ * @property-read bool $is_paid
+ * @property-read bool $is_initial
  *
  * @method static ServiceBillQueryBuilder|ServiceBill newModelQuery()
  * @method static ServiceBillQueryBuilder|ServiceBill newQuery()
@@ -163,6 +165,14 @@ class ServiceBill extends Model implements PayableInterface
     {
         return Attribute::get(
             fn (mixed $value) => $this->status === ServiceBillStatus::PAID
+        );
+    }
+
+    /** @return Attribute<bool, never> */
+    protected function isInitial(): Attribute
+    {
+        return Attribute::get(
+            fn (mixed $value) => is_null($this->bill_date) && is_null($this->due_date)
         );
     }
 }

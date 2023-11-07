@@ -32,6 +32,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property-read \Domain\ServiceOrder\Models\ServiceBill|null $serviceBill
  * @property-read \Domain\ServiceOrder\Models\ServiceOrder|null $serviceOrder
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read bool $is_paid
  *
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ServiceTransaction newQuery()

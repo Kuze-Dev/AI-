@@ -29,4 +29,9 @@ class ServiceTransactionFactory extends Factory
             'status' => ServiceTransactionStatus::PAID,
         ];
     }
+
+    public function pending(): self
+    {
+        return $this->state(['status' => ServiceTransactionStatus::PENDING]);
+    }
 }

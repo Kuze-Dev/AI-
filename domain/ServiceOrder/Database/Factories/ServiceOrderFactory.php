@@ -120,4 +120,9 @@ class ServiceOrderFactory extends Factory
     {
         return $this->state(['status' => ServiceOrderStatus::COMPLETED]);
     }
+
+    public function yearlyBillingCycle(): self
+    {
+        return $this->state(['billing_cycle' => BillingCycleEnum::YEARLY]);
+    }
 }
