@@ -58,6 +58,7 @@ return [
                 'CacheControl' => 'max-age=315360000'
             ]
         ],
+
     ],
 
     /*
