@@ -12,7 +12,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ServiceTransactionRelationManager extends RelationManager
@@ -87,11 +86,7 @@ class ServiceTransactionRelationManager extends RelationManager
                                 )
                                     ->save($filename, $disk);
 
-                                $customer->addMediaFromDisk(
-                                    Storage::disk(config('domain.service-order.disks.receipt-files.driver'))
-                                        ->path($filename),
-                                    $disk
-                                )
+                                $customer->addMediaFromDisk($filename, $disk)
                                     ->toMediaCollection('receipts');
 
                                 $action->successNotificationTitle(trans('Success'))
@@ -106,8 +101,7 @@ class ServiceTransactionRelationManager extends RelationManager
 
                             } catch (Exception $e) {
                                 $action
-                                    ->failureNotificationTitle($e->getMessage())
-                                    // ->failureNotificationTitle(trans('Something went wrong!'))
+                                    ->failureNotificationTitle(trans('Something went wrong!'))
                                     ->failure();
 
                                 report($e);
