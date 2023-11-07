@@ -70,7 +70,8 @@ class ShippingmethodResource extends Resource
 
                             return $media?->getUrl();
                         }),
-                    Forms\Components\Toggle::make('status')
+                    Forms\Components\Toggle::make('active')
+                        ->label('Status')
                         ->inline(false)
                         ->helperText('If enabled, message here')
                         ->reactive(),
