@@ -11,8 +11,6 @@ use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
-use Domain\Customer\Enums\RegisterStatus;
-use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
@@ -35,14 +33,7 @@ class CustomerRegisterRequest extends FormRequest
 
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => [
-                'required',
-                Rule::email(),
-                Rule::unique(Customer::class)
-                    ->where('register_status', RegisterStatus::REGISTERED)
-                    ->where('register_status', RegisterStatus::UNREGISTERED),
-                'max:255',
-            ],
+            'email' => 'required|email|unique:customers,email',
             'mobile' => 'required|string|max:255|unique:customers,mobile',
             'gender' => ['required', Rule::enum(Gender::class)],
             'tier_id' => [
