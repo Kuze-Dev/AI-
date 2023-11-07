@@ -76,7 +76,6 @@ class ActivatedServiceOrderNotification extends Notification implements ShouldQu
                 'description' => $this->description,
                 'timezone' => $admin?->timezone,
                 'serviceBill' => $this->serviceBill,
-                'customer' => $notifiable,
                 'footer' => $this->footer,
                 'url' => $this->url,
             ]);

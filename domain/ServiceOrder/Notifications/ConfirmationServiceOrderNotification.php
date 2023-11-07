@@ -64,7 +64,6 @@ class ConfirmationServiceOrderNotification extends Notification implements Shoul
                 'title' => $this->title,
                 'description' => $this->description,
                 'serviceOrder' => $this->serviceOrder,
-                'customer' => $notifiable,
                 'footer' => $this->footer,
             ]);
     }

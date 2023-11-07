@@ -64,7 +64,6 @@ class CompletedServiceOrderNotification extends Notification implements ShouldQu
                 'title' => $this->title,
                 'description' => $this->description,
                 'serviceOrder' => $this->serviceOrder,
-                'customer' => $notifiable,
                 'footer' => $this->footer,
             ]);
     }

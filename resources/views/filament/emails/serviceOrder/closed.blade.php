@@ -184,7 +184,7 @@
             </h3>
         </div>
 
-        <p style="line-height: 1.5em">Hi {{ $customer->first_name . ' ' . $customer->last_name }},</p>
+        <p style="line-height: 1.5em">Hi {{ $serviceOrder->customer_full_name }},</p>
 
         <p style="line-height: 1.5em">
             I trust this message finds you well. We are writing to formally inform you that your recent service, {{ $serviceOrder->service_name }},

@@ -64,7 +64,6 @@ class InProgressServiceOrderNotification extends Notification implements ShouldQ
                 'title' => $this->title,
                 'description' => $this->description,
                 'serviceOrder' => $this->serviceOrder,
-                'customer' => $notifiable,
                 'footer' => $this->footer,
             ]);
     }

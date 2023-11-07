@@ -204,7 +204,7 @@
             </h3>
         </div>
 
-        <p style="line-height: 1.5em">Hi {{ $customer->first_name . ' ' . $customer->last_name }},</p>
+        <p style="line-height: 1.5em">Hi {{ $serviceOrder->customer_full_name }},</p>
 
         <p style="line-height: 1.5em">
             We are pleased to confirm that your service, {{ $serviceOrder->service_name }}, has now been fulfilled in its entirety.

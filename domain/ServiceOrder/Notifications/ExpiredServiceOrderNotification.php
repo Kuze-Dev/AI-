@@ -76,7 +76,6 @@ class ExpiredServiceOrderNotification extends Notification implements ShouldQueu
                 'description' => $this->description,
                 'timezone' => $admin?->timezone,
                 'serviceBill' => $this->serviceBill,
-                'customer' => $notifiable,
                 'footer' => $this->footer,
                 'url' => $this->url,
             ]);

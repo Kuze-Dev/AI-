@@ -76,7 +76,6 @@ class ForPaymentNotification extends Notification implements ShouldQueue
                 'description' => $this->description,
                 'timezone' => $admin?->timezone,
                 'serviceBill' => $this->serviceBill,
-                'customer' => $notifiable,
                 'footer' => $this->footer,
                 'url' => $this->url,
             ]);

@@ -203,7 +203,7 @@
             </h3>
         </div>
 
-        <p style="line-height: 1.5em">Hi {{ $customer->first_name . " " . $customer->last_name }},</p>
+        <p style="line-height: 1.5em">Hi {{ $serviceBill->serviceOrder->customer_full_name }},</p>
 
         <p style="line-height: 1.5em">
             Thank you for availing our service! To confirm this order, please proceed to payment by clicking the button below.
