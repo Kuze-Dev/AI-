@@ -54,6 +54,7 @@ use Support\MetaData\Models\MetaData;
  * @property-read int|null $media_count
  * @property-read MetaData|null $metaData
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
+ *
  * @method static Builder|Service newModelQuery()
  * @method static Builder|Service newQuery()
  * @method static Builder|Service onlyTrashed()
