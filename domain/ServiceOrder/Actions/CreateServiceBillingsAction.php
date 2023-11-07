@@ -8,6 +8,8 @@ use Domain\Customer\Models\Customer;
 use Domain\ServiceOrder\Jobs\CreateServiceBillJob;
 use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
 use Domain\ServiceOrder\Models\ServiceOrder;
+use Domain\ServiceOrder\Models\ServiceTransaction;
+use Illuminate\Support\Carbon;
 
 class CreateServiceBillingsAction
 {
@@ -38,32 +40,31 @@ class CreateServiceBillingsAction
                                 /** @var \Domain\ServiceOrder\Models\ServiceBill $latestServiceBill */
                                 $latestServiceBill = $serviceOrder->latestServiceBill();
 
-                                /** @var \Carbon\Carbon|null $referenceDate */
                                 $referenceDate = $latestServiceBill->bill_date;
 
                                 /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
                                 $serviceTransaction = $latestServiceBill->serviceTransaction;
 
-                                if (is_null($referenceDate) && $serviceTransaction) {
-                                    /** @var \Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData
-                                     *  $serviceOrderBillingAndDueDateData
-                                     */
+                                if (
+                                    is_null($referenceDate) &&
+                                    $serviceTransaction instanceof ServiceTransaction
+                                ) {
+                                    /** @var \Illuminate\Support\Carbon $createdAt */
+                                    $createdAt = $serviceTransaction->created_at;
+
                                     $serviceOrderBillingAndDueDateData = $this->computeServiceBillingCycleAction
                                         ->execute(
                                             $serviceOrder,
-                                            /** @phpstan-ignore-next-line */
-                                            $serviceTransaction->created_at
+                                            $createdAt
                                         );
 
                                     $referenceDate = $serviceOrderBillingAndDueDateData->bill_date;
                                 }
 
-                                if (
-                                    $referenceDate && (
-                                        now()->parse($referenceDate)
-                                            ->toDateString() === now()->toDateString()
-                                    )
-                                ) {
+                                $isBillingDateToday = now()->parse($referenceDate)
+                                    ->toDateString() === now()->toDateString();
+
+                                if ($referenceDate instanceof Carbon && $isBillingDateToday) {
                                     CreateServiceBillJob::dispatch(
                                         $serviceOrder,
                                         $latestServiceBill
