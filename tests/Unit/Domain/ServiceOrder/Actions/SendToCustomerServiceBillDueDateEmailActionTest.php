@@ -5,41 +5,22 @@ declare(strict_types=1);
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\ServiceOrder\Actions\SendToCustomerServiceBillDueDateEmailAction;
 use Domain\ServiceOrder\Database\Factories\ServiceBillFactory;
+use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
 use Domain\ServiceOrder\Notifications\ServiceBillDueDateNotification;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Queue;
-use Spatie\QueueableAction\Testing\QueueableActionFake;
-
-beforeEach(function () {
-    testInTenantContext();
-});
-
-it('can dispatch', function () {
-    Queue::fake();
-
-    app(SendToCustomerServiceBillDueDateEmailAction::class)
-        ->onQueue()
-        ->execute(
-            CustomerFactory::new()->make(),
-            ServiceBillFactory::new()->make()
-        );
-
-    QueueableActionFake::assertPushed(SendToCustomerServiceBillDueDateEmailAction::class);
-});
 
 it('can execute', function () {
+    testInTenantContext();
+
     Notification::fake();
 
     $customer = CustomerFactory::new()->make();
 
     app(SendToCustomerServiceBillDueDateEmailAction::class)
         ->execute(
-            $customer,
+            ServiceOrderFactory::new()->for($customer)->make(),
             ServiceBillFactory::new()->make()
         );
 
-    Notification::assertSentTo(
-        [$customer],
-        ServiceBillDueDateNotification::class
-    );
+    Notification::assertSentOnDemand(ServiceBillDueDateNotification::class);
 });

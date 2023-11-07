@@ -71,7 +71,6 @@ class ServiceBillDueDateNotification extends Notification implements ShouldQueue
                 'title' => $this->title,
                 'description' => $this->description,
                 'serviceBill' => $this->serviceBill,
-                'customer' => $notifiable,
                 'url' => $this->url,
                 'footer' => $this->footer,
             ]);

@@ -7,4 +7,6 @@ return [
             'throw' => false,
         ],
     ],
+
+    'days_before_due_date_notification' => 1,
 ];
