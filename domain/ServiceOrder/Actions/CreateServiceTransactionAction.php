@@ -12,37 +12,16 @@ class CreateServiceTransactionAction
 {
     public function execute(CreateServiceTransactionData $createServiceTransactionData): ServiceTransaction
     {
-        $serviceTransactionData = $this->prepareTransactionData($createServiceTransactionData);
-
-        $serviceTransaction = ServiceTransaction::create([
-            'service_order_id' => $serviceTransactionData->service_order_id,
-            'service_bill_id' => $serviceTransactionData->service_bill_id,
-            'payment_method_id' => $serviceTransactionData->payment_method_id,
-            'total_amount' => $serviceTransactionData->total_amount,
-            'currency' => $serviceTransactionData->currency,
-            'status' => $serviceTransactionData->status,
-        ]);
-
-        return $serviceTransaction;
-    }
-
-    private function prepareTransactionData(
-        CreateServiceTransactionData $createServiceTransactionData
-    ): ServiceTransactionData {
-
-        $serviceBill = $createServiceTransactionData->service_bill;
-
-        /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
-        $serviceOrder = $serviceBill->serviceOrder;
-
-        return new ServiceTransactionData(
-            service_order_id: $serviceBill->service_order_id,
-            service_bill_id: $serviceBill->id,
-            payment_id: (int) $createServiceTransactionData->payment->payment_id,
-            payment_method_id: (int) $createServiceTransactionData->payment->payment_method_id,
-            total_amount: $serviceBill->total_amount,
-            currency: $serviceOrder->currency_code,
-            status: $createServiceTransactionData->service_transaction_status,
+        return ServiceTransaction::create(
+            (array) new ServiceTransactionData(
+                service_order_id: $createServiceTransactionData->service_order->id,
+                service_bill_id: $createServiceTransactionData->service_bill->id,
+                payment_id: $createServiceTransactionData->payment->id,
+                payment_method_id: $createServiceTransactionData->payment->payment_method_id,
+                total_amount: $createServiceTransactionData->service_bill->total_amount,
+                currency: $createServiceTransactionData->service_order->currency_code,
+                status: $createServiceTransactionData->service_transaction_status,
+            )
         );
     }
 }

@@ -13,7 +13,7 @@ use Domain\ServiceOrder\Queries\ServiceBillQueryBuilder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Domain\ServiceOrder\Models\ServiceBill
@@ -37,7 +37,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Payments\Models\Payment> $payments
  * @property-read int|null $payments_count
  * @property-read \Domain\ServiceOrder\Models\ServiceOrder|null $serviceOrder
- * @property-read \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction
+ * @property-read \Illuminate\Database\Eloquent\Relations\HasMany<ServiceTransaction>|null $serviceTransactions
  *
  * @method static ServiceBillQueryBuilder|ServiceBill newModelQuery()
  * @method static ServiceBillQueryBuilder|ServiceBill newQuery()
@@ -152,9 +152,9 @@ class ServiceBill extends Model implements PayableInterface
         return $this->belongsTo(ServiceOrder::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<ServiceTransaction> */
-    public function serviceTransaction(): HasOne
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<ServiceTransaction> */
+    public function serviceTransactions(): HasMany
     {
-        return $this->hasOne(ServiceTransaction::class);
+        return $this->hasMany(ServiceTransaction::class);
     }
 }

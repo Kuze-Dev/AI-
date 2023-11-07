@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Listeners;
 
 use Domain\Payments\Events\PaymentProcessEvent;
+use Domain\Payments\Exceptions\PaymentException;
 use Domain\Payments\Models\Payment;
-use Domain\ServiceOrder\Actions\CreateServiceTransactionAction;
 use Domain\ServiceOrder\Actions\SendToCustomerServiceOrderStatusEmailAction;
-use Domain\ServiceOrder\DataTransferObjects\CreateServiceTransactionData;
+use Domain\ServiceOrder\DataTransferObjects\ServiceOrderPaymentData;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
@@ -16,116 +16,146 @@ use Domain\ServiceOrder\Jobs\CreateServiceBillJob;
 use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
+use Domain\ServiceOrder\Models\ServiceTransaction;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Throwable;
 
 class ServiceOrderPaymentUpdatedListener
 {
     public function __construct(
         private Payment $payment,
         private ServiceBill $serviceBill,
-        private CreateServiceTransactionAction $createServiceTransactionAction
+        private ServiceOrder $serviceOrder,
+        private ServiceTransaction $serviceTransaction
     ) {
     }
 
+    /** @throws Throwable */
     public function handle(PaymentProcessEvent $event): void
     {
         $this->payment = $event->payment;
 
         $payable = $event->payment->payable;
 
-        if ($payable instanceof ServiceBill) {
-            $this->serviceBill = $payable;
-
-            match ($event->payment->status) {
-                'paid' => $this->onServiceBillPaid(),
-                'refunded', => $this->onServiceBillRefunded(),
-                'cancelled', => $this->onServiceBillCancelled(),
-                default => null
-            };
+        if (! ($payable instanceof ServiceBill)) {
+            return;
         }
+
+        $this->serviceBill = $payable;
+
+        $this->serviceOrder = $this->prepareServiceOrder();
+
+        $this->serviceTransaction = $this->prepareServiceTransaction();
+
+        $this->handleServiceBillStatusUpdate();
     }
 
-    private function onServiceBillPaid(): void
+    private function prepareServiceOrder(): ServiceOrder
     {
-        $this->createServiceTransactionAction
-            ->execute(
-                new CreateServiceTransactionData(
-                    service_bill: $this->serviceBill,
-                    service_transaction_status: ServiceTransactionStatus::PAID,
-                    payment: $this->payment
-                )
-            );
-
-        $this->serviceBill->update(['status' => ServiceBillStatus::PAID]);
-
-        /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
         $serviceOrder = $this->serviceBill->serviceOrder;
 
-        $this->createServiceBill($serviceOrder);
+        if (is_null($serviceOrder)) {
+            throw new ModelNotFoundException(trans('No service order found'));
+        }
 
-        $this->updateServiceOrderStatus($serviceOrder);
+        return $serviceOrder;
     }
 
-    private function onServiceBillRefunded(): void
+    private function prepareServiceTransaction(): ServiceTransaction
     {
-        $this->createServiceTransactionAction
-            ->execute(
-                new CreateServiceTransactionData(
-                    service_bill: $this->serviceBill,
-                    service_transaction_status: ServiceTransactionStatus::REFUNDED,
-                    payment: $this->payment
-                )
-            );
+        $serviceTransaction = $this->serviceBill
+            ->serviceTransactions()
+            ->wherePaymentId($this->payment->id)
+            ->first();
 
-        $this->serviceBill->update(['status' => ServiceBillStatus::PENDING]);
+        if (is_null($serviceTransaction)) {
+            throw new ModelNotFoundException(trans('No service transaction found'));
+        }
+
+        return $serviceTransaction;
     }
 
-    private function onServiceBillCancelled(): void
+    private function onServiceBillPaid(): ServiceOrderPaymentData
     {
-        $this->createServiceTransactionAction
-            ->execute(
-                new CreateServiceTransactionData(
-                    service_bill: $this->serviceBill,
-                    service_transaction_status: ServiceTransactionStatus::CANCELLED,
-                    payment: $this->payment
-                )
-            );
+        $this->createServiceBill();
 
-        $this->serviceBill->update(['status' => ServiceBillStatus::PENDING]);
+        $this->updateServiceOrderStatus();
+
+        return new ServiceOrderPaymentData(
+            service_transaction_status: ServiceTransactionStatus::PAID,
+            service_bill_status: ServiceBillStatus::PAID
+        );
     }
 
-    private function createServiceBill(ServiceOrder $serviceOrder): void
+    private function onServiceBillRefunded(): ServiceOrderPaymentData
     {
-        if (
-            $serviceOrder->is_subscription &&
-            ! $serviceOrder->is_auto_generated_bill
-        ) {
+        return new ServiceOrderPaymentData(
+            service_transaction_status: ServiceTransactionStatus::REFUNDED,
+            service_bill_status: ServiceBillStatus::PENDING
+        );
+    }
+
+    private function onServiceBillCancelled(): ServiceOrderPaymentData
+    {
+        return new ServiceOrderPaymentData(
+            service_transaction_status: ServiceTransactionStatus::CANCELLED,
+            service_bill_status: ServiceBillStatus::PENDING
+        );
+    }
+
+    private function createServiceBill(): void
+    {
+        $shouldCreateNewServiceBill = $this->serviceOrder->is_subscription &&
+        ! $this->serviceOrder->is_auto_generated_bill;
+
+        if ($shouldCreateNewServiceBill) {
             /** @var \Domain\Customer\Models\Customer $customer */
-            $customer = $serviceOrder->customer;
+            $customer = $this->serviceOrder->customer;
 
             CreateServiceBillJob::dispatch(
-                $serviceOrder,
+                $this->serviceOrder,
                 $this->serviceBill
             )->chain([
                 new NotifyCustomerLatestServiceBillJob(
                     $customer,
-                    $serviceOrder
+                    $this->serviceOrder
                 ),
             ]);
         }
     }
 
-    private function updateServiceOrderStatus(ServiceOrder $serviceOrder): void
+    private function updateServiceOrderStatus(): void
     {
-        if ($serviceOrder->status != ServiceOrderStatus::CLOSED) {
-            $serviceOrder->update([
-                'status' => $serviceOrder->is_subscription
-                    ? ServiceOrderStatus::ACTIVE
-                    : ServiceOrderStatus::PENDING,
-            ]);
-
-            app(SendToCustomerServiceOrderStatusEmailAction::class)
-                ->onQueue()
-                ->execute($serviceOrder);
+        if ($this->serviceOrder->status == ServiceOrderStatus::CLOSED) {
+            return;
         }
+
+        $this->serviceOrder->update([
+            'status' => $this->serviceOrder->is_subscription
+                ? ServiceOrderStatus::ACTIVE
+                : ServiceOrderStatus::PENDING,
+        ]);
+
+        app(SendToCustomerServiceOrderStatusEmailAction::class)
+            ->onQueue()
+            ->execute($this->serviceOrder);
+    }
+
+    private function handleServiceBillStatusUpdate(): void
+    {
+        $serviceOrderPaymentData = match ($this->payment->status) {
+            'paid' => $this->onServiceBillPaid(),
+            'refunded', => $this->onServiceBillRefunded(),
+            'cancelled', => $this->onServiceBillCancelled(),
+            default => throw new PaymentException()
+        };
+
+        $this->serviceTransaction->update([
+            'status' => $serviceOrderPaymentData->service_transaction_status,
+        ]);
+
+        $this->serviceBill->update([
+            'status' => $serviceOrderPaymentData->service_bill_status,
+        ]);
     }
 }

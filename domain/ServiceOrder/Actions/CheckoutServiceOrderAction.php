@@ -12,92 +12,142 @@ use Domain\Payments\DataTransferObjects\PaymentDetailsData;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\TransactionData;
 use Domain\Payments\Exceptions\PaymentException;
+use Domain\Payments\Models\Payment;
 use Domain\ServiceOrder\DataTransferObjects\CheckoutServiceOrderData;
+use Domain\ServiceOrder\DataTransferObjects\CreateServiceTransactionData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
+use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Exceptions\ServiceOrderStatusStillPendingException;
 use Domain\ServiceOrder\Models\ServiceBill;
+use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Throwable;
 
 class CheckoutServiceOrderAction
 {
-    public function __construct(private CreatePaymentAction $createPaymentAction)
-    {
+    public function __construct(
+        private CheckoutServiceOrderData $checkoutServiceOrderData,
+        private PaymentMethod $paymentMethod,
+        private ServiceBill $serviceBill,
+        private ServiceOrder $serviceOrder,
+        private CreatePaymentAction $createPaymentAction,
+        private CreateServiceTransactionAction $createServiceTransactionAction
+    ) {
     }
 
     /** @throws Throwable */
     public function execute(CheckoutServiceOrderData $checkoutServiceOrderData): PaymentAuthorize
     {
-        $paymentMethod = $this->preparePaymentMethod($checkoutServiceOrderData->payment_method);
+        $this->checkoutServiceOrderData = $checkoutServiceOrderData;
 
-        $serviceBill = $this->prepareServiceBill($checkoutServiceOrderData->reference_id);
+        $this->paymentMethod = $this->preparePaymentMethod();
 
-        $payment = $this->proceedPayment($serviceBill, $paymentMethod);
+        $this->serviceBill = $this->prepareServiceBill();
 
-        return $payment;
+        $this->serviceOrder = $this->prepareServiceOrder();
+
+        return $this->proceedPayment();
     }
 
-    private function preparePaymentMethod(string $payment_method): PaymentMethod
+    /** @throws Throwable */
+    private function preparePaymentMethod(): PaymentMethod
     {
-        $paymentMethod = PaymentMethod::whereSlug($payment_method)->first();
+        $paymentMethod = PaymentMethod::whereSlug(
+            $this->checkoutServiceOrderData->payment_method
+        )
+            ->first();
 
-        if (! $paymentMethod instanceof PaymentMethod) {
-            throw new ModelNotFoundException('No payment method found');
+        if (is_null($paymentMethod)) {
+            throw new ModelNotFoundException(trans('No payment method found'));
         }
 
         return $paymentMethod;
     }
 
-    private function prepareServiceBill(string $reference_id): ServiceBill
+    /** @throws Throwable */
+    private function prepareServiceBill(): ServiceBill
     {
-        $serviceBill = ServiceBill::whereReference($reference_id)->first();
+        $serviceBill = ServiceBill::whereReference(
+            $this->checkoutServiceOrderData->reference_id
+        )
+            ->first();
 
-        if (! $serviceBill instanceof ServiceBill) {
-            throw new ModelNotFoundException('No service bill found');
+        if (is_null($serviceBill)) {
+            throw new ModelNotFoundException(trans('No service bill found'));
         }
 
         return $serviceBill;
     }
 
     /** @throws Throwable */
-    private function proceedPayment(
-        ServiceBill $serviceBill,
-        PaymentMethod $paymentMethod
-    ): PaymentAuthorize {
+    private function prepareServiceOrder(): ServiceOrder
+    {
+        $serviceOrder = $this->serviceBill->serviceOrder;
 
-        /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
-        $serviceOrder = $serviceBill->serviceOrder;
+        if (is_null($serviceOrder)) {
+            throw new ModelNotFoundException(trans('No service order found'));
+        }
 
-        if ($serviceOrder->status === ServiceOrderStatus::PENDING) {
+        return $serviceOrder;
+    }
+
+    /** @throws Throwable */
+    private function proceedPayment(): PaymentAuthorize
+    {
+        if ($this->serviceOrder->status === ServiceOrderStatus::PENDING) {
             throw new ServiceOrderStatusStillPendingException();
         }
 
         $providerData = new CreatepaymentData(
             transactionData: TransactionData::fromArray(
                 [
-                    'reference_id' => $serviceBill->reference,
+                    'reference_id' => $this->serviceBill->reference,
                     'amount' => AmountData::fromArray([
-                        'currency' => $serviceOrder->currency_code,
-                        'total' => $serviceBill->total_amount,
+                        'currency' => $this->serviceOrder->currency_code,
+                        'total' => $this->serviceBill->total_amount,
                         'details' => PaymentDetailsData::fromArray(
                             [
-                                'subtotal' => strval($serviceBill->sub_total),
-                                'tax' => strval($serviceBill->tax_total),
+                                'subtotal' => strval($this->serviceBill->sub_total),
+                                'tax' => strval($this->serviceBill->tax_total),
                             ]
                         ),
                     ]),
                 ]
             ),
-            payment_driver: $paymentMethod->slug
+            payment_driver: $this->paymentMethod->slug
         );
 
         $result = $this->createPaymentAction
-            ->execute($serviceBill, $providerData);
+            ->execute($this->serviceBill, $providerData);
 
         if ($result->success) {
+            $this->createServiceTransaction();
+
             return $result;
         }
 
         throw new PaymentException();
+    }
+
+    /** @throws Throwable */
+    private function createServiceTransaction(): void
+    {
+        $payment = Payment::wherePayableType(ServiceBill::class)
+            ->wherePayableId($this->serviceBill->id)
+            ->latest()
+            ->first();
+
+        if (is_null($payment)) {
+            throw new ModelNotFoundException(trans('No payment transaction found'));
+        }
+
+        $this->createServiceTransactionAction->execute(
+            new CreateServiceTransactionData(
+                service_order: $this->serviceOrder,
+                service_bill: $this->serviceBill,
+                service_transaction_status: ServiceTransactionStatus::PENDING,
+                payment: $payment
+            )
+        );
     }
 }
