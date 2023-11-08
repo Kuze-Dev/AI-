@@ -32,8 +32,12 @@ class NotifyCustomerLatestServiceBillJob implements ShouldBeUnique, ShouldQueue
     public function handle(
         SendToCustomerServiceBillEmailAction $sendToCustomerServiceBillEmailAction
     ): void {
-        /** @var \Domain\ServiceOrder\Models\ServiceBill $latestServiceBill */
+        /** @var \Domain\ServiceOrder\Models\ServiceBill|null $latestServiceBill */
         $latestServiceBill = $this->serviceOrder->latestServiceBill();
+
+        if (is_null($latestServiceBill)) {
+            return;
+        }
 
         $sendToCustomerServiceBillEmailAction->execute(
             $this->serviceOrder,
