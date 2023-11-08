@@ -112,6 +112,7 @@ class ServiceTransactionRelationManager extends RelationManager
                         }
                     )
                     ->withActivityLog()
+                    ->visible(fn (ServiceTransaction $record) => $record->is_paid)
                     ->authorize('customerPrintReceipt'),
             ])
             ->bulkActions([])
