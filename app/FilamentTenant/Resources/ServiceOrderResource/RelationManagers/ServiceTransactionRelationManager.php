@@ -48,6 +48,9 @@ class ServiceTransactionRelationManager extends RelationManager
                         fn (ServiceTransaction $record): string => $record->getStatusColor()
                     )
                     ->inline(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->translateLabel()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->translateLabel()
                     ->sortable(),
@@ -112,6 +115,6 @@ class ServiceTransactionRelationManager extends RelationManager
                     ->authorize('customerPrintReceipt'),
             ])
             ->bulkActions([])
-            ->defaultSort('updated_at', 'desc');
+            ->defaultSort('created_at', 'desc');
     }
 }
