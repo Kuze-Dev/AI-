@@ -107,6 +107,10 @@ class ServiceOrderPaymentUpdatedListener
         $shouldCreateNewServiceBill = $this->serviceOrder->is_subscription &&
         ! $this->serviceOrder->is_auto_generated_bill;
 
+        if (! $shouldCreateNewServiceBill) {
+            return;
+        }
+
         /** @var \Illuminate\Foundation\Bus\PendingDispatch $createServiceBillJob */
         $createServiceBillJob = CreateServiceBillJob::dispatchIf(
             $shouldCreateNewServiceBill,
