@@ -15,6 +15,7 @@ use Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Notifications\ChangeByAdminNotification;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 
@@ -50,6 +51,10 @@ class AdminServiceOrderStatusUpdatedListener
 
     private function onServiceOrderActive(): ServiceBill
     {
+        if ($this->serviceOrder->pay_upfront) {
+            throw new ModelNotFoundException(trans('No service bill found'));
+        }
+
         /** @var \Domain\Admin\Models\Admin $admin */
         $admin = Auth::user();
 

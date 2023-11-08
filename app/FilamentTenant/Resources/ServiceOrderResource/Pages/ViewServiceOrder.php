@@ -40,6 +40,7 @@ use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -461,6 +462,11 @@ class ViewServiceOrder extends EditRecord
                                     ->failure();
 
                                 report($i);
+                            } catch (ModelNotFoundException $m) {
+                                $action->failureNotificationTitle(trans($m->getMessage()))
+                                    ->failure();
+
+                                report($m);
                             } catch (Exception $e) {
                                 $action->failureNotificationTitle(trans('Something went wrong!'))
                                     ->failure();
