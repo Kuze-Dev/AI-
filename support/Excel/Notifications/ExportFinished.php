@@ -53,6 +53,16 @@ class ExportFinished extends Notification implements ShouldQueue
 
     protected function downloadUrl(): string
     {
+        if (tenancy()->initialized) {
+            /** @var \Domain\Tenant\Models\Tenant */
+            $tenant = tenancy()->tenant;
+
+            URL::formatHostUsing(function () use ($tenant) {
+
+                return app()->environment('local') ? 'http://' : 'https://'.$tenant->domains->first()?->domain;
+            });
+        }
+
         return URL::temporarySignedRoute(
             'filament-excel.download-export',
             now()->minutes(config('support.excel.export_expires_in_minute')),
