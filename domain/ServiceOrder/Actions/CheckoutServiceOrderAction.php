@@ -26,7 +26,6 @@ use Throwable;
 class CheckoutServiceOrderAction
 {
     public function __construct(
-        private CheckoutServiceOrderData $checkoutServiceOrderData,
         private PaymentMethod $paymentMethod,
         private ServiceBill $serviceBill,
         private ServiceOrder $serviceOrder,
@@ -38,11 +37,9 @@ class CheckoutServiceOrderAction
     /** @throws Throwable */
     public function execute(CheckoutServiceOrderData $checkoutServiceOrderData): PaymentAuthorize
     {
-        $this->checkoutServiceOrderData = $checkoutServiceOrderData;
+        $this->paymentMethod = $this->preparePaymentMethod($checkoutServiceOrderData);
 
-        $this->paymentMethod = $this->preparePaymentMethod();
-
-        $this->serviceBill = $this->prepareServiceBill();
+        $this->serviceBill = $this->prepareServiceBill($checkoutServiceOrderData);
 
         $this->serviceOrder = $this->prepareServiceOrder();
 
@@ -50,11 +47,9 @@ class CheckoutServiceOrderAction
     }
 
     /** @throws Throwable */
-    private function preparePaymentMethod(): PaymentMethod
+    private function preparePaymentMethod(CheckoutServiceOrderData $checkoutServiceOrderData): PaymentMethod
     {
-        $paymentMethod = PaymentMethod::whereSlug(
-            $this->checkoutServiceOrderData->payment_method
-        )
+        $paymentMethod = PaymentMethod::whereSlug($checkoutServiceOrderData->payment_method)
             ->first();
 
         if (is_null($paymentMethod)) {
@@ -65,11 +60,9 @@ class CheckoutServiceOrderAction
     }
 
     /** @throws Throwable */
-    private function prepareServiceBill(): ServiceBill
+    private function prepareServiceBill(CheckoutServiceOrderData $checkoutServiceOrderData): ServiceBill
     {
-        $serviceBill = ServiceBill::whereReference(
-            $this->checkoutServiceOrderData->reference_id
-        )
+        $serviceBill = ServiceBill::whereReference($checkoutServiceOrderData->reference_id)
             ->first();
 
         if (is_null($serviceBill)) {
@@ -132,7 +125,7 @@ class CheckoutServiceOrderAction
     /** @throws Throwable */
     private function createServiceTransaction(): void
     {
-        $payment = Payment::wherePayableType(ServiceBill::class)
+        $payment = Payment::wherePayableType($this->serviceBill->getTable())
             ->wherePayableId($this->serviceBill->id)
             ->latest()
             ->first();
