@@ -31,11 +31,13 @@ class ExcelServiceProvider extends EventServiceProvider
     public function boot(): void
     {
         Route::get(config('support.excel.path').'/{path}', DownloadExportController::class)
-            ->middleware(array_merge(
+            ->middleware(array_merge(array_merge(
                 config('filament.middleware.auth'),
                 config('filament.middleware.base'),
-                config('support.excel.middleware')
-            ))
+                config('support.excel.middleware'),
+            ), [
+                'tenant',
+            ]))
             ->where('path', '.*')
             ->name('filament-excel.download-export');
 
