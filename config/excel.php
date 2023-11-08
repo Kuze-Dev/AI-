@@ -294,7 +294,7 @@ return [
         | storing reading or downloading. Here you can customize that path.
         |
         */
-        'local_path'          => storage_path('framework/cache/laravel-excel'),
+        'local_path'          => env('APP_ENV') == 'local' ? storage_path('framework/cache/laravel-excel') : sys_get_temp_dir(),
 
         /*
         |--------------------------------------------------------------------------
