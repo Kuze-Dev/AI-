@@ -76,7 +76,10 @@ class CreateServiceBillingsAction
                                         ->toDateString() === now()->toDateString()
                                 );
 
-                            /** @var \Illuminate\Foundation\Bus\PendingDispatch $createServiceBillJob */
+                            /**
+                             *  @var \Illuminate\Foundation\Bus\PendingDispatch $createServiceBillJob
+                             *  @var \Illuminate\Support\Carbon $referenceDate
+                             */
                             $createServiceBillJob = CreateServiceBillJob::dispatchIf(
                                 $isBillingDateToday,
                                 $serviceOrder,

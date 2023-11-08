@@ -66,12 +66,12 @@ class CheckoutServiceOrderAction
         $serviceBill = ServiceBill::whereReference($checkoutServiceOrderData->reference_id)
             ->first();
 
-        if ($serviceBill->is_paid) {
-            throw new ServiceBillAlreadyPaidException();
-        }
-
         if (is_null($serviceBill)) {
             throw new ModelNotFoundException(trans('No service bill found'));
+        }
+
+        if ($serviceBill->is_paid) {
+            throw new ServiceBillAlreadyPaidException();
         }
 
         return $serviceBill;
