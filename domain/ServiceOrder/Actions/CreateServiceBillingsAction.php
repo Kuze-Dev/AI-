@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Actions;
 
 use Domain\Customer\Models\Customer;
+use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Jobs\CreateServiceBillJob;
 use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
 use Domain\ServiceOrder\Models\ServiceOrder;
@@ -48,12 +49,17 @@ class CreateServiceBillingsAction
                             $transactions = $latestServiceBill->serviceTransactions;
 
                             /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
-                            $serviceTransaction = $transactions->sortByDesc('created_at')->first();
+                            $serviceTransaction = $transactions->sortByDesc('id')
+                                ->where('status', ServiceTransactionStatus::PAID)
+                                ->first();
+
+                            /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
+                            $serviceTransaction ??= $transactions->sortByDesc('id')->first();
 
                             $isServiceTransactionStatusPaid = $serviceTransaction instanceof ServiceTransaction &&
                                 $serviceTransaction->is_paid;
 
-                            $isInitialServiceBillStatusPaid = is_null($referenceDate) &&
+                            $isInitialServiceBillStatusPaid = $latestServiceBill->is_initial &&
                                 $latestServiceBill->is_paid &&
                                 $isServiceTransactionStatusPaid;
 
@@ -70,23 +76,20 @@ class CreateServiceBillingsAction
                                 $referenceDate = $serviceOrderBillingAndDueDateData->bill_date;
                             }
 
-                            $isBillingDateToday = $referenceDate instanceof Carbon &&
-                                (
-                                    now()->parse($referenceDate)
-                                        ->toDateString() === now()->toDateString()
+                            $isBillingDateToday = is_null($referenceDate)
+                                ? false
+                                : now()->parse($referenceDate)->toDateString() === now()->toDateString();
+
+                            if ($referenceDate instanceof Carbon) {
+                                /** @var \Illuminate\Foundation\Bus\PendingDispatch $createServiceBillJob */
+                                $createServiceBillJob = CreateServiceBillJob::dispatchIf(
+                                    $isBillingDateToday,
+                                    $serviceOrder,
+                                    $this->computeServiceBillingCycleAction->execute($serviceOrder, $referenceDate)
                                 );
 
-                            /**
-                             *  @var \Illuminate\Foundation\Bus\PendingDispatch $createServiceBillJob
-                             *  @var \Illuminate\Support\Carbon $referenceDate
-                             */
-                            $createServiceBillJob = CreateServiceBillJob::dispatchIf(
-                                $isBillingDateToday,
-                                $serviceOrder,
-                                $this->computeServiceBillingCycleAction->execute($serviceOrder, $referenceDate)
-                            );
-
-                            $createServiceBillJob->chain([new NotifyCustomerLatestServiceBillJob($serviceOrder)]);
+                                $createServiceBillJob->chain([new NotifyCustomerLatestServiceBillJob($serviceOrder)]);
+                            }
                         }
                     );
             }
