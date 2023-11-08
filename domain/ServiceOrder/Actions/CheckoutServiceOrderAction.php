@@ -17,6 +17,7 @@ use Domain\ServiceOrder\DataTransferObjects\CheckoutServiceOrderData;
 use Domain\ServiceOrder\DataTransferObjects\CreateServiceTransactionData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
+use Domain\ServiceOrder\Exceptions\ServiceBillAlreadyPaidException;
 use Domain\ServiceOrder\Exceptions\ServiceOrderStatusStillPendingException;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
@@ -64,6 +65,10 @@ class CheckoutServiceOrderAction
     {
         $serviceBill = ServiceBill::whereReference($checkoutServiceOrderData->reference_id)
             ->first();
+
+        if ($serviceBill->is_paid) {
+            throw new ServiceBillAlreadyPaidException();
+        }
 
         if (is_null($serviceBill)) {
             throw new ModelNotFoundException(trans('No service bill found'));

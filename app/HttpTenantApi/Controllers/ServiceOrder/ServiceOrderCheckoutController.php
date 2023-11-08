@@ -7,6 +7,7 @@ namespace App\HttpTenantApi\Controllers\ServiceOrder;
 use Domain\Payments\Exceptions\PaymentException;
 use Domain\ServiceOrder\Actions\CheckoutServiceOrderAction;
 use Domain\ServiceOrder\DataTransferObjects\CheckoutServiceOrderData;
+use Domain\ServiceOrder\Exceptions\ServiceBillAlreadyPaidException;
 use Domain\ServiceOrder\Exceptions\ServiceOrderStatusStillPendingException;
 use Domain\ServiceOrder\Requests\ServiceTransactionStoreRequest;
 use Exception;
@@ -51,6 +52,11 @@ class ServiceOrderCheckoutController
             return response(
                 ['message' => trans('Payment Unauthorized')],
                 Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        } catch (ServiceBillAlreadyPaidException) {
+            return response(
+                ['message' => trans('Service Bill already paid')],
+                Response::HTTP_NOT_FOUND
             );
         } catch (Exception) {
             return response(
