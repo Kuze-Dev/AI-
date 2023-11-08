@@ -10,6 +10,7 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
 use Domain\ServiceOrder\Actions\ComputeServiceBillingCycleAction;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
+use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Filament\Resources\Form;
@@ -140,7 +141,10 @@ class ServiceBillResource extends Resource
         $referenceDate = $latestServiceBill?->bill_date;
 
         /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
-        $serviceTransaction = $latestServiceBill?->serviceTransaction;
+        $serviceTransaction = $latestServiceBill?->serviceTransactions()
+            ->latest()
+            ->whereStatus(ServiceTransactionStatus::PAID)
+            ->first();
 
         if (is_null($referenceDate) && $serviceTransaction) {
             /** @var \Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData
