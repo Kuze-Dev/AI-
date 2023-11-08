@@ -281,6 +281,9 @@ class FormResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make(),
                 ]),
+            ])->bulkActions([
+                Tables\Actions\DeleteBulkAction::make()
+                    ->authorize(fn () => Auth::user()?->hasRole(config('domain.role.super_admin'))),
             ])
             ->defaultSort('updated_at', 'desc');
     }
