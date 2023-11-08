@@ -21,7 +21,7 @@
                 </h3>
             </div>
 
-            <p style="line-height: 1.5em">Hi {{ $customer->first_name . " " . $customer->last_name }},</p>
+            <p style="line-height: 1.5em">Hi {{ $serviceBill->serviceOrder->customer_full_name }},</p>
 
             <p style="line-height: 1.5em">
                 Thank you for being a customer. A summary of your bill is below. If you have questions, we're happy
