@@ -6,6 +6,8 @@ namespace App\FilamentTenant\Resources\ProductResource\Pages;
 
 use App\FilamentTenant\Resources\ProductResource;
 use App\FilamentTenant\Support\ImportProductAction;
+use Domain\Product\Actions\UpdateProductAction;
+use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Enums\Decision;
 use Domain\Product\Enums\Status;
 use Domain\Product\Models\Product;
@@ -13,7 +15,10 @@ use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Support\Excel\Actions\ExportAction;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Validation\Rules\Enum;
+use Support\Common\Rules\MinimumValueRule;
 use Support\Excel\Actions\ImportAction;
+use Log;
 
 class ListProducts extends ListRecords
 {
@@ -23,23 +28,49 @@ class ListProducts extends ListRecords
     {
         return [
             ImportProductAction::proceed(),
-            ImportAction::make('Upload for Batch Update'),
+            ImportAction::make('Batch Update Import')
+                ->translateLabel()
+                ->processRowsUsing(fn (array $row) => self::processBatchUpdate($row))
+                ->withValidation(
+                    rules: [
+                        'product_id' => 'required|integer|max:100',
+                        'is_variant' => ['required', new Enum(Decision::class)],
+                        'variant_id' => 'nullable|integer|max:100',
+                        'name' => 'nullable|string|max:100',
+                        'variant_combination' => 'string|nullable',
+                        'sku' => 'required|string|max:100',
+                        'retail_price' => ['required', 'numeric', new MinimumValueRule(0.1)],
+                        'selling_price' => ['required', 'numeric', new MinimumValueRule(0.1)],
+                        'stock' => ['required', 'numeric', new MinimumValueRule(0)],
+                        'status' => ['required', new Enum(Status::class)],
+                        'is_digital_product' => ['nullable', new Enum(Decision::class)],
+                        'is_featured' => ['nullable', new Enum(Decision::class)],
+                        'is_special_offer' => ['nullable', new Enum(Decision::class)],
+                        'allow_customer_remarks' => ['nullable', new Enum(Decision::class)],
+                        'allow_stocks' => ['nullable', new Enum(Decision::class)],
+                        'allow_guest_purchase' => ['nullable', new Enum(Decision::class)],
+                        'weight' => ['nullable', 'numeric', new MinimumValueRule(0.1)],
+                        'length' => ['nullable', 'numeric', new MinimumValueRule(1)],
+                        'width' => ['nullable', 'numeric', new MinimumValueRule(1)],
+                        'height' => ['nullable', 'numeric', new MinimumValueRule(1)],
+                    ],
+                ),
             ExportAction::make()
                 ->model(Product::class)
                 ->queue()
                 ->query(fn (Builder $query) => $query->with('productVariants')->latest())
                 ->mapUsing(
                     [
-                        'Product ID', 'Is Variant', 'Variant ID', 'Name', 'Variant Combination', 'SKU',
-                        'Retail Price', 'Selling Price', 'Stock', 'Status', 'Is Digital Product',
-                        'Is Featured', 'Is Special Offer', 'Allow Customer Remarks', 'Allow Stocks',
-                        'Allow Guest Purchase', 'Weight', 'Dimension', 'Minimum Order Quantity',
+                        'product_id', 'is_variant', 'variant_id', 'name', 'variant_combination', 'sku',
+                        'retail_price', 'selling_price', 'stock', 'status', 'is_digital_product',
+                        'is_featured', 'is_special_offer', 'allow_customer_remarks', 'allow_stocks',
+                        'allow_guest_purchase', 'weight', 'length', 'width', 'height', 'minimum_order_quantity',
                     ],
                     function (Product $product) {
                         $a = [
                             [
                                 $product->id,
-                                'no',
+                                Decision::NO->value,
                                 '',
                                 $product->name,
                                 '',
@@ -55,7 +86,9 @@ class ListProducts extends ListRecords
                                 $product->allow_stocks ? Decision::YES->value : Decision::NO->value,
                                 $product->allow_guest_purchase ? Decision::YES->value : Decision::NO->value,
                                 $product->weight,
-                                $product->dimension,
+                                $product->dimension['length'],
+                                $product->dimension['width'],
+                                $product->dimension['height'],
                                 $product->minimum_order_quantity,
                             ],
                         ];
@@ -63,7 +96,7 @@ class ListProducts extends ListRecords
                             $a[] =
                                 [
                                     $variant->product_id,
-                                    'yes',
+                                    Decision::YES->value,
                                     $variant->id,
                                     '',
                                     $variant->combination,
@@ -81,5 +114,60 @@ class ListProducts extends ListRecords
                 ),
             Actions\CreateAction::make(),
         ];
+    }
+
+    public static function processBatchUpdate(array $row)
+    {
+
+        if ( ! $row['name']) {
+            Log::info('VARIANT ITO : ', [$row]);
+
+            $array = json_decode($row['variant_combination'], true);
+
+            Log::info('VARIANT COMBINATION ITO : ', [$array]);
+
+            return;
+        } else {
+            $foundProduct = Product::whereId($row['product_id'])->with(['productOptions.productOptionValues', 'productVariants', 'media'])->first();
+
+            $data = [
+                'name' => $row['name'],
+                'sku' => $row['sku'],
+                'retail_price' => $row['retail_price'],
+                'selling_price' => $row['selling_price'],
+                'length' => $row['length'],
+                'width' => $row['width'],
+                'height' => $row['height'],
+                'weight' => $row['weight'],
+                'stock' => $row['stock'],
+            ];
+
+            // Set the meta data for the pro1duct
+            $data['meta_data'] = ['title' => $data['name']];
+            if ($foundProduct) {
+                $data['product_options'] = $foundProduct->productOptions->map(function ($option) {
+                    return [
+                        'id' => $option->id,
+                        'name' => $option->name,
+                        'slug' => $option->slug,
+                        'productOptionValues' => $option->productOptionValues->toArray(),
+                    ];
+                })->toArray();
+
+                $data['product_variants'] = $foundProduct->productVariants->map(function ($variant) {
+                    return [
+                        'id' => $variant->id,
+                        'retail_price' => $variant->retail_price,
+                        'selling_price' => $variant->selling_price,
+                        'stock' => $variant->stock,
+                        'sku' => $variant->sku,
+                        'status' => $variant->status,
+                        'combination' => $variant->combination,
+                    ];
+                })->toArray();
+
+                return app(UpdateProductAction::class)->execute($foundProduct, ProductData::fromCsvBulkUpdate($data));
+            }
+        }
     }
 }
