@@ -255,8 +255,7 @@ class ServiceOrder extends Model
     protected function customerFullName(): Attribute
     {
         return Attribute::make(
-            get: fn (mixed $value, array $attributes) => $attributes['customer_first_name'].' '.
-                $attributes['customer_last_name'],
+            get: fn (mixed $value) => "{$this->customer_first_name} {$this->customer_last_name}",
         );
     }
 }
