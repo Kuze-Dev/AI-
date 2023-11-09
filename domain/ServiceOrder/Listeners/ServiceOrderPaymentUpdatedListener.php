@@ -135,7 +135,7 @@ class ServiceOrderPaymentUpdatedListener
         $this->serviceOrder->update([
             'status' => $this->serviceOrder->is_subscription
                 ? ServiceOrderStatus::ACTIVE
-                : ServiceOrderStatus::PENDING,
+                : ServiceOrderStatus::INPROGRESS,
         ]);
 
         NotifyCustomerServiceOrderStatusJob::dispatch($this->serviceOrder);
@@ -151,15 +151,13 @@ class ServiceOrderPaymentUpdatedListener
             default => throw new PaymentException()
         };
 
-        $this->serviceTransaction->update([
-            'status' => $serviceOrderPaymentData->service_transaction_status,
-        ]);
+        $this->serviceTransaction->update(['status' => $serviceOrderPaymentData->service_transaction_status]);
 
-        $this->serviceBill->update([
-            'status' => $serviceOrderPaymentData->service_bill_status,
-        ]);
+        $this->serviceBill->update(['status' => $serviceOrderPaymentData->service_bill_status]);
 
-        if (! $this->serviceBill->is_paid || ! $this->serviceTransaction->is_paid) {
+        $isPaid = $this->serviceBill->is_paid && $this->serviceTransaction->is_paid;
+
+        if (! $isPaid) {
             return;
         }
 
