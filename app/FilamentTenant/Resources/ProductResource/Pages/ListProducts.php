@@ -6,11 +6,15 @@ namespace App\FilamentTenant\Resources\ProductResource\Pages;
 
 use App\FilamentTenant\Resources\ProductResource;
 use App\FilamentTenant\Support\ImportProductAction;
+use Domain\Product\Actions\CreateOrUpdateProductVariantAction;
 use Domain\Product\Actions\UpdateProductAction;
+use Domain\Product\Actions\UpdateProductVariantFromCsvAction;
 use Domain\Product\DataTransferObjects\ProductData;
+use Domain\Product\DataTransferObjects\ProductVariantData;
 use Domain\Product\Enums\Decision;
 use Domain\Product\Enums\Status;
 use Domain\Product\Models\Product;
+use Domain\Product\Models\ProductVariant;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Support\Excel\Actions\ExportAction;
@@ -18,6 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rules\Enum;
 use Support\Common\Rules\MinimumValueRule;
 use Support\Excel\Actions\ImportAction;
+use Illuminate\Validation\ValidationException;
 use Log;
 
 class ListProducts extends ListRecords
@@ -118,16 +123,55 @@ class ListProducts extends ListRecords
 
     public static function processBatchUpdate(array $row)
     {
+        // Check if for variant
+        if ($row['is_variant'] == Decision::YES->value && $row['variant_id'] && $row['variant_combination']) {
+            $decodedPayloadVariantCombination = json_decode($row['variant_combination'], true);
 
-        if ( ! $row['name']) {
-            Log::info('VARIANT ITO : ', [$row]);
+            $productVariant = ProductVariant::find($row['variant_id']);
 
-            $array = json_decode($row['variant_combination'], true);
+            if (!$productVariant) {
+                throw ValidationException::withMessages([
+                    'variant_id' => trans("There is no matching variant record for the Variant ID."),
+                ]);
+            }
 
-            Log::info('VARIANT COMBINATION ITO : ', [$array]);
+            // If variant combination is matched
+            if ($decodedPayloadVariantCombination != $productVariant->combination) {
+                throw ValidationException::withMessages([
+                    'variant_combination' => trans("Row with Variant ID {$row['variant_id']} has mismatch combination."),
+                ]);
+            }
 
-            return;
-        } else {
+            if ($row['product_id'] != $productVariant->product_id) {
+                throw ValidationException::withMessages([
+                    'product_id' => trans("Assigned product to row's variant is not matched with the row's product ID."),
+                ]);
+            }
+
+            $product = Product::find($productVariant->product_id);
+
+            if (!$product) {
+                throw ValidationException::withMessages([
+                    'product_id' => trans("There is no matching product record for the Product ID."),
+                ]);
+            }
+
+            $variantData = [
+                'id' => $row['variant_id'],
+                'sku' => $row['sku'],
+                'combination' => $decodedPayloadVariantCombination,
+                'retail_price' => $row['retail_price'],
+                'selling_price' => $row['selling_price'],
+                'status' => $row['status'] == 'active' ? true : false,
+                'stock' => $row['stock'],
+                'product_id' => $row['product_id'],
+            ];
+
+            return app(UpdateProductVariantFromCsvAction::class)
+                ->execute($productVariant, ProductVariantData::fromArray($variantData));
+        } 
+        
+        if ($row['is_variant'] == Decision::NO->value && $row['product_id'] && $row['name']) {
             $foundProduct = Product::whereId($row['product_id'])->with(['productOptions.productOptionValues', 'productVariants', 'media'])->first();
 
             $data = [
@@ -169,5 +213,9 @@ class ListProducts extends ListRecords
                 return app(UpdateProductAction::class)->execute($foundProduct, ProductData::fromCsvBulkUpdate($data));
             }
         }
+
+        throw ValidationException::withMessages([
+            'row_error' => trans("The data from row is insufficient. System can't process it."),
+        ]);
     }
 }
