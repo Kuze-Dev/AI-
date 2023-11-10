@@ -108,4 +108,29 @@ class ProductData
             ])), $data['product_variants'] ?? []),
         );
     }
+
+    public static function fromCsvBulkUpdate(array $data): self
+    {
+        return new self(
+            name: $data['name'],
+            meta_data: MetaDataData::fromArray($data['meta_data']),
+            sku: $data['sku'],
+            retail_price: $data['retail_price'],
+            selling_price: $data['selling_price'],
+            length: $data['length'],
+            width: $data['width'],
+            height: $data['height'],
+            weight: $data['weight'],
+            stock: $data['stock'] ?? null,
+            product_options: array_map(
+                fn ($option) => (ProductOptionData::fromArray($option)),
+                $data['product_options'] ?? []
+            ),
+            product_variants: array_map(fn ($variant) => (ProductVariantData::fromArray([
+                ...$variant,
+                'selling_price' => (float) $variant['selling_price'],
+                'retail_price' => (float) $variant['retail_price'],
+            ])), $data['product_variants'] ?? []),
+        );
+    }
 }
