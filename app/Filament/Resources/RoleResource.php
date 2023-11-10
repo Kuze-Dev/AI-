@@ -215,13 +215,13 @@ class RoleResource extends Resource
                             ->columnSpan(1)
                     )
                         ->toArray()
-                )
+                ),
         ];
     }
 
     private static function hideFeaturePermission(string $groupName): bool
     {
-        
+
         /** @var bool */
         return match ($groupName) {
             'site' => tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class),
