@@ -52,6 +52,7 @@ return new class extends Migration
             $table->integer('total_price')->index();
 
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('service_order_addresses', function (Blueprint $table) {
@@ -67,6 +68,7 @@ return new class extends Migration
             $table->string('city');
 
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('service_bills', function (Blueprint $table) {
@@ -87,6 +89,7 @@ return new class extends Migration
             $table->string('status')->index();
 
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('service_transactions', function (Blueprint $table) {
@@ -102,6 +105,7 @@ return new class extends Migration
             $table->string('status')->index();
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

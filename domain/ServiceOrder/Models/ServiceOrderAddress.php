@@ -9,6 +9,7 @@ use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 
 /**
@@ -46,6 +47,8 @@ use Spatie\Activitylog\LogOptions;
  */
 class ServiceOrderAddress extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'service_order_id',
         'type',
