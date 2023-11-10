@@ -12,6 +12,7 @@ use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAddressData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Models\ServiceOrderAddress;
+use Domain\Taxation\Database\Factories\TaxZoneFactory;
 
 it('can create service order addresses', function () {
     testInTenantContext();
@@ -33,6 +34,10 @@ it('can create service order addresses', function () {
     $serviceOrder = ServiceOrderFactory::new()->definition();
 
     $address = AddressFactory::new()->createOne();
+
+    TaxZoneFactory::new(['is_active' => true])
+        ->isDefault()
+        ->createOne();
 
     $serviceOrderData = new ServiceOrderData(
         customer_id: $customer->id,

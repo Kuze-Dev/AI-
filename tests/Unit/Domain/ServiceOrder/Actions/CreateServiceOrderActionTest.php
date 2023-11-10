@@ -9,6 +9,7 @@ use Domain\ServiceOrder\Actions\CreateServiceOrderAction;
 use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Models\ServiceOrder;
+use Domain\Taxation\Database\Factories\TaxZoneFactory;
 
 use function PHPUnit\Framework\assertInstanceOf;
 
@@ -34,6 +35,10 @@ it('can create service order', function () {
     $address = $customer
         ->addresses
         ->first();
+
+    TaxZoneFactory::new(['is_active' => true])
+        ->isDefault()
+        ->createOne();
 
     $serviceOrder = ServiceOrderFactory::new()->definition();
 
