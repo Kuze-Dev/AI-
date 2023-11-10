@@ -11,7 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ApprovedRegistrationNotification extends Notification implements ShouldQueue
+class ForApprovalRegistrationNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -23,10 +23,12 @@ class ApprovedRegistrationNotification extends Notification implements ShouldQue
     public function toMail(Customer $notifiable): MailMessage
     {
         return (new MailMessage())
-            ->subject(trans('Approved Registration'))
-            ->line(trans('Congratulations! Your request for this tier has been approved!'))
-            ->line(trans('You now have access to exclusive benefits and discounts.'))
-            ->action(trans('Visit Our Website'), url(app(SiteSettings::class)->domainWithScheme()))
+            ->subject(trans('For Approval Registration'))
+            ->line(trans('Your request for the wholesaler tier is now being reviewed!'))
+            ->line(trans('Please wait for our team to process your application.'))
+            ->line(trans('We will notify you once your registration is approved.'))
+            ->line(trans('Thank you for choosing our platform for your business needs.'))
+            ->action(trans('Please visit our website'), url(app(SiteSettings::class)->domainWithScheme()))
             ->line(trans('If you have any questions or need assistance, please contact our support team.'));
     }
 }
