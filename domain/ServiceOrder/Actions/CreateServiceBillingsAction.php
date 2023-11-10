@@ -21,78 +21,71 @@ class CreateServiceBillingsAction
 
     public function execute(): void
     {
-        $customers = Customer::query()
-            ->with([
-                'serviceOrders' => fn ($query) => $query->whereShouldAutoGenerateBill(),
-                'serviceOrders.serviceBills.serviceTransactions',
-            ])
-            ->whereActive()
-            ->whereRegistered()
-            ->whereHas('serviceOrders', fn ($query) => $query->whereShouldAutoGenerateBill()
-                ->has('serviceBills'))
-            ->get();
+        $tenant = tenancy()->tenant;
 
-        $customers->each(
-            function (Customer $customer) {
-                $customer
-                    ->serviceOrders
-                    ->each(
-                        function (ServiceOrder $serviceOrder) {
-                            /** @var \Domain\ServiceOrder\Models\ServiceBill $latestServiceBill */
-                            $latestServiceBill = $serviceOrder->serviceBills
-                                ->sortByDesc('created_at')
-                                ->first();
+        $tenant->run(function () {
+            $serviceOrders = ServiceOrder::query()
+                ->whereShouldAutoGenerateBill()
+                ->with(['serviceBills.serviceTransactions'])
+                ->has('serviceBills')
+                ->get();
 
-                            $referenceDate = $latestServiceBill->bill_date;
+            $serviceOrders->each(
+                function (ServiceOrder $serviceOrder) {
+                    /** @var \Domain\ServiceOrder\Models\ServiceBill $latestServiceBill */
+                    $latestServiceBill = $serviceOrder->serviceBills
+                        ->sortByDesc('created_at')
+                        ->first();
 
-                            /** @var \Illuminate\Database\Eloquent\Collection<int, ServiceTransaction> $transactions */
-                            $transactions = $latestServiceBill->serviceTransactions;
+                    $referenceDate = $latestServiceBill->bill_date;
 
-                            /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
-                            $serviceTransaction = $transactions->sortByDesc('id')
-                                ->where('status', ServiceTransactionStatus::PAID)
-                                ->first();
+                    /** @var \Illuminate\Database\Eloquent\Collection<int, ServiceTransaction> $transactions */
+                    $transactions = $latestServiceBill->serviceTransactions;
 
-                            /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
-                            $serviceTransaction ??= $transactions->sortByDesc('id')->first();
+                    /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
+                    $serviceTransaction = $transactions->sortByDesc('id')
+                        ->where('status', ServiceTransactionStatus::PAID)
+                        ->first();
 
-                            $isServiceTransactionStatusPaid = $serviceTransaction instanceof ServiceTransaction &&
-                                $serviceTransaction->is_paid;
+                    /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
+                    $serviceTransaction ??= $transactions->sortByDesc('id')->first();
 
-                            $isInitialServiceBillStatusPaid = $latestServiceBill->is_initial &&
-                                $latestServiceBill->is_paid &&
-                                $isServiceTransactionStatusPaid;
+                    $isServiceTransactionStatusPaid = $serviceTransaction instanceof ServiceTransaction &&
+                        $serviceTransaction->is_paid;
 
-                            if ($isInitialServiceBillStatusPaid) {
-                                /**
-                                 * @var \Domain\ServiceOrder\Models\ServiceTransaction $serviceTransaction
-                                 * @var \Illuminate\Support\Carbon $createdAt
-                                 */
-                                $createdAt = $serviceTransaction->created_at;
+                    $isInitialServiceBillStatusPaid = $latestServiceBill->is_initial &&
+                        $latestServiceBill->is_paid &&
+                        $isServiceTransactionStatusPaid;
 
-                                $serviceOrderBillingAndDueDateData = $this->computeServiceBillingCycleAction
-                                    ->execute($serviceOrder, $createdAt);
+                    if ($isInitialServiceBillStatusPaid) {
+                        /**
+                         * @var \Domain\ServiceOrder\Models\ServiceTransaction $serviceTransaction
+                         * @var \Illuminate\Support\Carbon $createdAt
+                         */
+                        $createdAt = $serviceTransaction->created_at;
 
-                                $referenceDate = $serviceOrderBillingAndDueDateData->bill_date;
-                            }
+                        $serviceOrderBillingAndDueDateData = $this->computeServiceBillingCycleAction
+                            ->execute($serviceOrder, $createdAt);
 
-                            $isBillingDateToday = is_null($referenceDate)
-                                ? false
-                                : now()->parse($referenceDate)->toDateString() === now()->toDateString();
+                        $referenceDate = $serviceOrderBillingAndDueDateData->bill_date;
+                    }
 
-                            if ($referenceDate instanceof Carbon) {
-                                /** @var \Illuminate\Foundation\Bus\PendingDispatch $createServiceBillJob */
-                                $createServiceBillJob = CreateServiceBillJob::dispatchIf(
-                                    $isBillingDateToday,
-                                    $serviceOrder,
-                                    $this->computeServiceBillingCycleAction->execute($serviceOrder, $referenceDate)
-                                );
+                    $isBillingDateToday = is_null($referenceDate)
+                        ? false
+                        : now()->parse($referenceDate)->toDateString() === now()->toDateString();
 
-                                $createServiceBillJob->chain([new NotifyCustomerLatestServiceBillJob($serviceOrder)]);
-                            }
-                        }
-                    );
-            }
-        );
+                    if ($referenceDate instanceof Carbon) {
+                        /** @var \Illuminate\Foundation\Bus\PendingDispatch $createServiceBillJob */
+                        $createServiceBillJob = CreateServiceBillJob::dispatchIf(
+                            $isBillingDateToday,
+                            $serviceOrder,
+                            $this->computeServiceBillingCycleAction->execute($serviceOrder, $referenceDate)
+                        );
+
+                        $createServiceBillJob->chain([new NotifyCustomerLatestServiceBillJob($serviceOrder)]);
+                    }
+                }
+            );
+        });
     }
 }
