@@ -15,7 +15,7 @@ class NotifyCustomerServiceBillDueDateCommand extends Command
     use TenantAwareCommand;
 
     /** @var string */
-    protected $signature = 'notify:customer-service-bill-due-date-command';
+    protected $signature = 'notify:customer-service-bill-due-date';
 
     /** @var string */
     protected $description = 'Send email notification to customer (service bill due date).';
