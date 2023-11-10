@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Console;
 
-use Domain\ServiceOrder\Commands\CreateServiceBillCommand;
-use Domain\ServiceOrder\Commands\InactivateServiceOrderCommand;
-use Domain\ServiceOrder\Commands\NotifyCustomerServiceBillDueDateCommand;
+use App\Console\Commands\CreateServiceBillCommand;
+use App\Console\Commands\InactivateServiceOrderCommand;
+use App\Console\Commands\NotifyCustomerServiceBillDueDateCommand;
 use Domain\Tenant\Models\Tenant;
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Console\Scheduling\Schedule;
