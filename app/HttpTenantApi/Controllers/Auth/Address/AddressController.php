@@ -100,7 +100,7 @@ class AddressController extends Controller
             return AddressResource::make($address);
 
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
 
     }
@@ -127,7 +127,6 @@ class AddressController extends Controller
             if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $country->code === 'US') {
 
                 $USaddress = app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
-
                 $newAddressDto = new AddressData(
                     $addressDto->state_id,
                     $addressDto->label_as,
@@ -151,7 +150,7 @@ class AddressController extends Controller
             return AddressResource::make($address);
 
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
 
     }
