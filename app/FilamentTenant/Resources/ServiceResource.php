@@ -29,6 +29,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Arr;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class ServiceResource extends Resource
@@ -73,9 +74,6 @@ class ServiceResource extends Resource
                                         ->mapWithKeys(fn ($categories) => [$categories->id => $categories->name])
                                         ->toArray();
                                 })
-                                ->formatStateUsing(
-                                    fn (?Service $record) => $record?->taxonomyTerms->first()->id ?? null
-                                )
                                 ->statePath('taxonomy_term_id')
                                 ->required(),
                             Forms\Components\FileUpload::make('media')
@@ -106,7 +104,7 @@ class ServiceResource extends Resource
                                     ->required()
                                     ->preload()
                                     ->optionsFromModel(Blueprint::class, 'name')
-                                    ->disabled(fn (?Service $record) => $record !== null)
+                                    ->disabled(fn ($record) => $record !== null)
                                     ->reactive(),
                                 SchemaFormBuilder::make('data')
                                     ->schemaData(fn (Closure $get) => Blueprint::query()
@@ -132,9 +130,9 @@ class ServiceResource extends Resource
         return $table
             ->columns([
                 SpatieMediaLibraryImageColumn::make('image')
-                    ->collection('image')
+                    ->collection('media')
                     ->default(
-                        fn (Service $record) => $record->getFirstMedia('image') === null ? 'https://via.placeholder.com/500x300/333333/fff?text=No+preview+available' : null
+                        fn ($record) => $record->getFirstMedia('media') ?? 'https://via.placeholder.com/500x300/333333/fff?text=No+preview+available'
                     )
                     ->extraImgAttributes(['class' => 'aspect-[5/3] object-fill']),
                 Tables\Columns\TextColumn::make('name')
@@ -162,7 +160,7 @@ class ServiceResource extends Resource
                 Tables\Columns\BadgeColumn::make('status')
                     ->translateLabel()
                     ->formatStateUsing(fn ($state) => $state ? ucfirst(STATUS::ACTIVE->value) : ucfirst(STATUS::INACTIVE->value))
-                    ->color(fn (Service $record) => $record->status ? 'success' : 'secondary')
+                    ->color(fn ($record) => $record->status ? 'success' : 'secondary')
                     ->sortable(),
             ])
             ->filters([
@@ -190,7 +188,7 @@ class ServiceResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
                         ->translateLabel()
-                        ->using(function (Service $record) {
+                        ->using(function ($record) {
                             try {
                                 return app(DeleteServiceAction::class)->execute($record);
                             } catch (DeleteRestrictedException) {
@@ -318,7 +316,7 @@ class ServiceResource extends Resource
                     ->reactive()
                     ->options(function (Closure $get) {
                         if ($get('billing_cycle') !== BillingCycleEnum::DAILY->value) {
-                            return range(1, 31);
+                            return Arr::except(range(0, 31), 0);
                         }
 
                         return null;
