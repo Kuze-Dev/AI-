@@ -6,6 +6,7 @@ namespace Domain\ServiceOrder\Actions;
 
 use Domain\Address\Models\Address;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
+use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\Taxation\Enums\PriceDisplay;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
@@ -25,6 +26,11 @@ class GetTaxableInfoAction
             $billingAddressData->state_id
         );
 
+        return $this->computeTotalPriceWithTax($subTotal, $taxZone);
+    }
+
+    public function computeTotalPriceWithTax(float $subTotal, TaxZone|ServiceOrder|null $model): ServiceOrderTaxData
+    {
         /** @var PriceDisplay|null $taxDisplay */
         $taxDisplay = null;
 
@@ -37,16 +43,20 @@ class GetTaxableInfoAction
         /** @var float $totalPrice */
         $totalPrice = $subTotal;
 
-        if ($taxZone instanceof TaxZone) {
-            $taxPercentage = (float) $taxZone->percentage;
+        if ($model instanceof TaxZone) {
+            $taxPercentage = (float) $model->percentage;
+            $taxDisplay = $model->price_display;
+        }
 
-            $taxDisplay = $taxZone->price_display;
+        if ($model instanceof ServiceOrder) {
+            $taxPercentage = (float) $model->tax_percentage;
+            $taxDisplay = $model->tax_display;
+        }
 
-            if ($taxZone->price_display === PriceDisplay::EXCLUSIVE) {
-                $taxTotal = $this->computeExclusiveTax($subTotal, $taxPercentage);
+        if ($taxDisplay === PriceDisplay::EXCLUSIVE) {
+            $taxTotal = $subTotal * ($taxPercentage / 100.0);
 
-                $totalPrice = $subTotal + $taxTotal;
-            }
+            $totalPrice = $subTotal + $taxTotal;
         }
 
         return new ServiceOrderTaxData(
@@ -56,13 +66,5 @@ class GetTaxableInfoAction
             tax_total: $taxTotal,
             total_price: $totalPrice
         );
-
-    }
-
-    public function computeExclusiveTax(
-        float $subTotal,
-        int|float $taxPercentage
-    ): float {
-        return $subTotal * ($taxPercentage / 100.0);
     }
 }

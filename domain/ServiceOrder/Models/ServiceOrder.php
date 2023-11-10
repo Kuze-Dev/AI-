@@ -13,10 +13,13 @@ use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Queries\ServiceOrderQueryBuilder;
+use Domain\Taxation\Enums\PriceDisplay;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -38,7 +41,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string $currency_name
  * @property string $currency_symbol
  * @property string $service_name
- * @property float $service_price
+ * @property int $service_price
  * @property BillingCycleEnum|null $billing_cycle
  * @property int|null $due_date_every
  * @property bool $pay_upfront
@@ -49,7 +52,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property ServiceOrderStatus $status
  * @property string|null $cancelled_reason
  * @property float $sub_total
- * @property string|null $tax_display
+ * @property PriceDisplay $tax_display
  * @property float $tax_percentage
  * @property float $tax_total
  * @property float $total_price
@@ -67,6 +70,11 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\ServiceOrder\Models\ServiceTransaction> $serviceTransactions
  * @property-read int|null $service_transactions_count
  * @property-read string $customer_full_name
+ * @property-read string $format_status_for_display
+ * @property-read string $badge_color_for_status_display
+ * @property-read string $format_service_price_for_display
+ * @property-read string $format_tax_percentage_for_display
+ * @property-read string $format_tax_for_display
  *
  * @method static ServiceOrderQueryBuilder|ServiceOrder newModelQuery()
  * @method static ServiceOrderQueryBuilder|ServiceOrder newQuery()
@@ -157,6 +165,7 @@ class ServiceOrder extends Model
         'is_auto_generated_bill' => 'boolean',
         'schedule' => 'datetime',
         'sub_total' => MoneyCast::class,
+        'tax_display' => PriceDisplay::class,
         'tax_percentage' => 'float',
         'tax_total' => MoneyCast::class,
         'total_price' => MoneyCast::class,
@@ -201,6 +210,20 @@ class ServiceOrder extends Model
     public function serviceOrderAddress(): HasMany
     {
         return $this->hasMany(ServiceOrderAddress::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\ServiceOrder\Models\ServiceOrderAddress>*/
+    public function serviceOrderServiceAddress(): HasOne
+    {
+        return $this->hasOne(ServiceOrderAddress::class)
+            ->whereType(ServiceOrderAddressType::SERVICE_ADDRESS);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\ServiceOrder\Models\ServiceOrderAddress>*/
+    public function serviceOrderBillingAddress(): HasOne
+    {
+        return $this->hasOne(ServiceOrderAddress::class)
+            ->whereType(ServiceOrderAddressType::BILLING_ADDRESS);
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceBill>*/
@@ -256,6 +279,56 @@ class ServiceOrder extends Model
     {
         return Attribute::make(
             get: fn (mixed $value) => "{$this->customer_first_name} {$this->customer_last_name}",
+        );
+    }
+
+    /** @return Attribute<string, never> */
+    protected function formatStatusForDisplay(): Attribute
+    {
+        return Attribute::make(
+            get: function (mixed $value) {
+                $value = Str::replace('_', ' ', $this->status->value);
+                $value = Str::ucfirst(is_array($value) ? implode(' ', $value) : $value);
+
+                return $value;
+            },
+        );
+    }
+
+    /** @return Attribute<string, never> */
+    protected function badgeColorForStatusDisplay(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value) => match ($this->status->value) {
+                'pending', 'in_progress' => 'warning',
+                'closed', 'inactive' => 'danger',
+                'completed', 'active' => 'success',
+                'for_payment' => 'secondary',
+            },
+        );
+    }
+
+    /** @return Attribute<\Akaunting\Money\Money, never> */
+    protected function formatServicePriceForDisplay(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value) => money($this->service_price * 100, $this->currency_code),
+        );
+    }
+
+    /** @return Attribute<string, never> */
+    protected function formatTaxPercentageForDisplay(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value) => "Tax ({$this->tax_percentage}%)",
+        );
+    }
+
+    /** @return Attribute<string, never> */
+    protected function formatTaxForDisplay(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value) => Str::ucfirst($this->tax_display->value),
         );
     }
 }
