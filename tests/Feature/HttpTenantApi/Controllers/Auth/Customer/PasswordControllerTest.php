@@ -30,51 +30,51 @@ beforeEach(function () {
     $tenant->features()->activate(TierBase::class);
 });
 
-// it('can send link', function () {
-//     $customer = CustomerFactory::new()
-//         ->createOne();
+it('can send link', function () {
+    $customer = CustomerFactory::new()
+        ->createOne();
 
-//     Event::fake();
-//     Notification::fake();
-//     Queue::fake();
+    Event::fake();
+    Notification::fake();
+    Queue::fake();
 
-//     postJson('api/account/password/email', ['email' => $customer->email])
-//         ->assertValid()
-//         ->assertOk()
-//         ->assertJson(['message' => 'We have emailed your password reset link!']);
+    postJson('api/account/password/email', ['email' => $customer->email])
+        ->assertValid()
+        ->assertOk()
+        ->assertJson(['message' => 'We have emailed your password reset link!']);
 
-//     Notification::assertSentTo([$customer], ResetPassword::class);
-//     Event::assertDispatched(PasswordResetSent::class);
-// });
+    Notification::assertSentTo([$customer], ResetPassword::class);
+    Event::assertDispatched(PasswordResetSent::class);
+});
 
-// it('can reset password', function () {
-//     $customer = CustomerFactory::new()
-//         ->createOne([
-//             'password' => 'old-password',
-//             'remember_token' => 'old-remember_token',
-//         ]);
+it('can reset password', function () {
+    $customer = CustomerFactory::new()
+        ->createOne([
+            'password' => 'old-password',
+            'remember_token' => 'old-remember_token',
+        ]);
 
-//     Event::fake();
-//     Notification::fake();
-//     Queue::fake();
+    Event::fake();
+    Notification::fake();
+    Queue::fake();
 
-//     postJson('api/account/password/reset', [
-//         'token' => PasswordBroker::broker('customer')->createToken($customer),
-//         'email' => $customer->email,
-//         'password' => 'new-password',
-//         'password_confirmation' => 'new-password',
-//     ])
-//         ->assertValid()
-//         ->assertOk()
-//         ->assertJson(['message' => 'Your password has been reset!']);
+    postJson('api/account/password/reset', [
+        'token' => PasswordBroker::broker('customer')->createToken($customer),
+        'email' => $customer->email,
+        'password' => 'new-password',
+        'password_confirmation' => 'new-password',
+    ])
+        ->assertValid()
+        ->assertOk()
+        ->assertJson(['message' => 'Your password has been reset!']);
 
-//     $customer->refresh();
+    $customer->refresh();
 
-//     assertTrue(Hash::check('new-password', $customer->password), 'password not reset');
-//     assertNotSame('old-remember_token', $customer->getRememberToken());
+    assertTrue(Hash::check('new-password', $customer->password), 'password not reset');
+    assertNotSame('old-remember_token', $customer->getRememberToken());
 
-//     Event::assertDispatched(PasswordReset::class);
-// });
+    Event::assertDispatched(PasswordReset::class);
+});
 
 it('can not update password', function () {
     $customer = CustomerFactory::new()

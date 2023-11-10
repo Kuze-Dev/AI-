@@ -117,14 +117,14 @@ class EditCustomer extends EditRecord
 
         if ($data['tier_approval_status'] === TierApprovalStatus::REJECTED->value) {
 
+            app(SendRejectedEmailAction::class)->execute($record);
+
             app(ForceDeleteCustomerAction::class)->execute($record);
 
             Notification::make()
                 ->warning()
                 ->title(trans('Customer Deleted'))
                 ->send();
-
-            app(SendRejectedEmailAction::class)->execute($record);
 
             return redirect(CustomerResource::getUrl('index'));
         }
