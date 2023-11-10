@@ -111,7 +111,7 @@ class TaxonomyTerm extends Model implements Sortable
         return $this->belongsToMany(Product::class);
     }
 
-    /** @return BelongsToMany<Service> */
+    /** @return BelongsToMany<\Domain\Service\Models\Service> */
     public function services(): BelongsToMany
     {
         return $this->belongsToMany(Service::class, 'service_taxonomy_terms');

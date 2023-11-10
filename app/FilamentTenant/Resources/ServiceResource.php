@@ -70,11 +70,19 @@ class ServiceResource extends Resource
                                     $categories = TaxonomyTerm::whereTaxonomyId(app(ServiceSettings::class)
                                         ->service_category)->get();
 
-                                    return $categories->sortBy('name')
+                                    return $categories->sortBy('order')
                                         ->mapWithKeys(fn ($categories) => [$categories->id => $categories->name])
                                         ->toArray();
                                 })
                                 ->statePath('taxonomy_term_id')
+                                ->formatStateUsing(function($record){
+                                    $oldRecord = $record->taxonomyTerms->first()->id;
+                                    $categories = TaxonomyTerm::whereTaxonomyId(app(ServiceSettings::class)
+                                        ->service_category)->get()->sortBy('order')
+                                        ->mapWithKeys(fn ($categories) => [$categories->id => $categories->name])
+                                        ->toArray();
+                                    return Arr::exists($categories, $oldRecord) ? $oldRecord : null;
+                                })
                                 ->required(),
                             Forms\Components\FileUpload::make('media')
                                 ->statePath('media')
