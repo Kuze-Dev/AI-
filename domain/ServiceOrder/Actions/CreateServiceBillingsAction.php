@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Actions;
 
-use Domain\Customer\Models\Customer;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Jobs\CreateServiceBillJob;
 use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
@@ -21,6 +20,7 @@ class CreateServiceBillingsAction
 
     public function execute(): void
     {
+        /** @var \Stancl\Tenancy\Contracts\Tenant $tenant */
         $tenant = tenancy()->tenant;
 
         $tenant->run(function () {
