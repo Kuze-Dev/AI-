@@ -75,12 +75,13 @@ class ServiceResource extends Resource
                                         ->toArray();
                                 })
                                 ->statePath('taxonomy_term_id')
-                                ->formatStateUsing(function($record){
+                                ->formatStateUsing(function ($record) {
                                     $oldRecord = $record->taxonomyTerms->first()->id;
                                     $categories = TaxonomyTerm::whereTaxonomyId(app(ServiceSettings::class)
                                         ->service_category)->get()->sortBy('order')
                                         ->mapWithKeys(fn ($categories) => [$categories->id => $categories->name])
                                         ->toArray();
+
                                     return Arr::exists($categories, $oldRecord) ? $oldRecord : null;
                                 })
                                 ->required(),
