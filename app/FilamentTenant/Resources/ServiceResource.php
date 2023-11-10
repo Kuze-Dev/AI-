@@ -75,14 +75,14 @@ class ServiceResource extends Resource
                                         ->toArray();
                                 })
                                 ->statePath('taxonomy_term_id')
-                                ->formatStateUsing(function ($record) {
-                                    $oldRecord = $record->taxonomyTerms->first()->id;
+                                ->formatStateUsing(function ($record, $state) {
+                                    $oldRecord = $record?->taxonomyTerms->first()->id ?? null;
                                     $categories = TaxonomyTerm::whereTaxonomyId(app(ServiceSettings::class)
                                         ->service_category)->get()->sortBy('order')
                                         ->mapWithKeys(fn ($categories) => [$categories->id => $categories->name])
                                         ->toArray();
 
-                                    return Arr::exists($categories, $oldRecord) ? $oldRecord : null;
+                                    return Arr::exists($categories, $oldRecord) ? $oldRecord : $state;
                                 })
                                 ->required(),
                             Forms\Components\FileUpload::make('media')
