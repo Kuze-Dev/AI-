@@ -221,6 +221,7 @@ class RoleResource extends Resource
 
     private static function hideFeaturePermission(string $groupName): bool
     {
+
         /** @var bool */
         return match ($groupName) {
             'site' => tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class),
@@ -234,7 +235,8 @@ class RoleResource extends Resource
             'taxZone' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
             'ecommerceSettings' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
             'customers' => tenancy()->tenant?->features()->inactive(\App\Features\Customer\CustomerBase::class),
-            'tiers' => tenancy()->tenant?->features()->inactive(\App\Features\Customer\TierBase::class),
+            'tier' => tenancy()->tenant?->features()->inactive(\App\Features\Customer\TierBase::class),
+            'service' => tenancy()->tenant?->features()->inactive(\App\Features\Service\ServiceBase::class),
             default => false
         };
     }
