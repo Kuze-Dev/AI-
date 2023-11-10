@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Actions;
 
 use App\Settings\ServiceSettings;
-use Domain\Customer\Models\Customer;
 use Domain\ServiceOrder\Jobs\NotifyCustomerServiceBillDueDateJob;
 use Domain\ServiceOrder\Models\ServiceOrder;
 

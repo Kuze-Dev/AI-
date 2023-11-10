@@ -27,8 +27,8 @@ class InactivateServiceOrdersAction
                 function (ServiceOrder $serviceOrder) {
                     /** @var \Domain\ServiceOrder\Models\ServiceBill $latestPendingServiceBill */
                     $latestPendingServiceBill = $serviceOrder->serviceBills
-                    ->sortByDesc('created_at')
-                    ->first();
+                        ->sortByDesc('created_at')
+                        ->first();
 
                     $isOverdue = now()->toDateString() === now()
                         ->parse($latestPendingServiceBill->due_date)
