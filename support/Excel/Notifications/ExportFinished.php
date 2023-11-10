@@ -53,20 +53,20 @@ class ExportFinished extends Notification implements ShouldQueue
 
     protected function downloadUrl(): string
     {
-        // if (tenancy()->initialized) {
-        //     /** @var \Domain\Tenant\Models\Tenant */
-        //     $tenant = tenancy()->tenant;
+        if (tenancy()->initialized) {
+            /** @var \Domain\Tenant\Models\Tenant */
+            $tenant = tenancy()->tenant;
 
-        //     URL::formatHostUsing(function () use ($tenant) {
-        //         return app()->environment('local') ? 'http://' : 'https://'.$tenant->domains->first()?->domain;
-        //     });
-        // }
+            URL::formatHostUsing(function () use ($tenant) {
+                return app()->environment('local') ? 'http://' : 'https://'.$tenant->domains->first()?->domain;
+            });
+        }
 
-        return route('filament-excel.download-export', ['path' => $this->fileName]);
-        // return URL::temporarySignedRoute(
-        //     'filament-excel.download-export',
-        //     now()->minutes(config('support.excel.export_expires_in_minute')),
-        //     ['path' => $this->fileName]
-        // );
+        // return route('filament-excel.download-export', ['path' => $this->fileName]);
+        return URL::temporarySignedRoute(
+            'filament-excel.download-export',
+            now()->minutes(config('support.excel.export_expires_in_minute')),
+            ['path' => $this->fileName]
+        );
     }
 }

@@ -216,16 +216,11 @@ class ContentEntryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->sortable()
-                    ->label('title')
-                    ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
                     ->searchable()
-                    ->hidden()
                     ->truncate('xs', true),
-                Tables\Columns\TextColumn::make('activeRouteUrl.url')
+                Tables\Columns\TextColumn::make('routeUrls.url')
                     ->label('URL')
                     ->sortable()
                     ->searchable()
