@@ -9,9 +9,11 @@ use Domain\Product\Models\ProductVariant;
 
 class UpdateProductVariantFromCsvAction
 {
-    public function execute(ProductVariant $productVariant, ProductVariantData $productVariantData): void
+    public function execute(ProductVariant $productVariant, ProductVariantData $productVariantData): ProductVariant
     {
         $productVariant->update($this->getProductAttributes($productVariantData));
+
+        return $productVariant;
     }
 
     protected function getProductAttributes(ProductVariantData $productVariantData): array
