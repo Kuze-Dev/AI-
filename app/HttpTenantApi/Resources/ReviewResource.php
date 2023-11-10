@@ -35,7 +35,7 @@ class ReviewResource extends JsonApiResource
             'order_line' => fn () => new OrderLineResource($this->order_line),
         ];
 
-        if (isset($this->media) && $this->media) {
+        if (isset($this->media)) {
             $relationships['media'] = fn () => MediaResource::collection($this->media);
         }
 
