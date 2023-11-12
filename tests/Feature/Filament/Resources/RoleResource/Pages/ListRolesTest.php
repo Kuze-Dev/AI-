@@ -53,5 +53,6 @@ it('can not delete role with existing user', function () {
     $admin->roles()->attach($role);
 
     livewire(ListRoles::class)
-        ->callTableAction(DeleteAction::class, $role);
-})->throws(CantDeleteRoleWithAssociatedUsersException::class);
+        ->callTableAction(DeleteAction::class, $role)
+        ->assertNotified();
+});

@@ -133,7 +133,9 @@ class GlobalsResource extends Resource
                     ->searchable()
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\TagsColumn::make('sites.name')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(condition: function () {
+                        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
+                    }, isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -141,6 +143,7 @@ class GlobalsResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
                     ->relationship('sites', 'name'),
                 Tables\Filters\SelectFilter::make('blueprint')
                     ->relationship('blueprint', 'name')

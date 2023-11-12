@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Domain\Tenant\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Stancl\Tenancy\Database\Models\Domain;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -20,8 +17,6 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property array|null $data
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
- * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Domain> $domains
  * @property-read int|null $domains_count
  *
@@ -42,15 +37,6 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
 class TenantApiCall extends Model
 {
     use ConstraintsRelationships;
-    use LogsActivity;
-
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logFillable()
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
-    }
 
     protected $fillable = [
         'tenant_id',

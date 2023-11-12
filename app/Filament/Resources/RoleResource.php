@@ -10,8 +10,10 @@ use App\Filament\Resources\RoleResource\Support\PermissionGroup;
 use App\Filament\Resources\RoleResource\Support\PermissionGroupCollection;
 use Closure;
 use Domain\Role\Actions\DeleteRoleAction;
+use Domain\Role\Exceptions\CantDeleteRoleWithAssociatedUsersException;
 use Domain\Role\Models\Role;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -91,7 +93,31 @@ class RoleResource extends Resource
                         ->using(function (Role $record) {
                             try {
                                 return app(DeleteRoleAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (\Exception $e) {
+
+                                if ($e instanceof DeleteRestrictedException) {
+
+                                    Notification::make()
+                                        ->danger()
+                                        ->title('Delete of this Record is Restricted')
+                                        ->body($e->getMessage())
+                                        ->send();
+
+                                    return $e->getMessage();
+                                }
+
+                                if ($e instanceof CantDeleteRoleWithAssociatedUsersException) {
+
+                                    Notification::make()
+                                        ->danger()
+                                        ->title('Cannot Delete this Record')
+                                        ->body('Cannot Delete Role with Associated Users!')
+                                        ->send();
+
+                                    return false;
+
+                                }
+
                                 return false;
                             }
                         })
