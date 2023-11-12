@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Widgets\Report;
 
 use App\FilamentTenant\Widgets\Report\utils\ChartColor;
-use App\FilamentTenant\Widgets\Report\utils\DateRangeCalculator;
 use App\FilamentTenant\Widgets\Report\utils\PercentageCalculator;
 use Domain\Favorite\Models\Favorite;
 use Filament\Widgets\PieChartWidget;
@@ -34,7 +33,13 @@ class MostFavoriteProduct extends PieChartWidget
 
         $query = Favorite::whereHas('product')->join('products', 'favorites.product_id', '=', 'products.id');
 
-        $query = DateRangeCalculator::pieDateRange($query, $activeFilter);
+        if ($activeFilter === 'thisYear') {
+            $query->whereBetween('favorites.created_at', [now()->startOfYear(), now()]);
+        } elseif ($activeFilter === 'thisMonth') {
+            $query->whereBetween('favorites.created_at', [now()->startOfMonth(), now()]);
+        } elseif ($activeFilter === 'thisDay') {
+            $query->whereDate('favorites.created_at', now()->toDateString());
+        }
 
         $products = $query
             ->selectRaw('products.name, COUNT(*) as count')
