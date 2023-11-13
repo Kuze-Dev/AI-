@@ -43,37 +43,22 @@ class CustomerPolicy
         return $this->checkWildcardPermissions($user);
     }
 
-    public function delete(User $user, Customer $customer): bool
+    public function delete(User $user, Customer $customer = null): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function restore(User $user, Customer $customer): bool
+    public function restore(User $user, Customer $customer = null): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function forceDelete(User $user, Customer $customer): bool
+    public function forceDelete(User $user, Customer $customer = null): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
     public function sendRegisterInvitation(User $user, Customer $customer): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
-
-    public function deleteBulk(User $user): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
-
-    public function restoreBulk(User $user): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
-
-    public function forceDeleteBulk(User $user): bool
     {
         return $this->checkWildcardPermissions($user);
     }

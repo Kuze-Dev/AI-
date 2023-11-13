@@ -359,11 +359,11 @@ class CustomerResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
-                    ->authorize('deleteBulk'),
+                    ->authorize('delete'),
                 Tables\Actions\ForceDeleteBulkAction::make()
-                    ->authorize('forceDeleteBulk'),
+                    ->authorize('forceDelete'),
                 Tables\Actions\RestoreBulkAction::make()
-                    ->authorize('restoreBulk'),
+                    ->authorize('restore'),
                 ExportBulkAction::make()
                     ->queue()
                     ->query(
