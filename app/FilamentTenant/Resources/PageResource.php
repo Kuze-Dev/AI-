@@ -239,6 +239,7 @@ class PageResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TagsColumn::make('sites.name')
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
                     ->toggleable(condition: function () {
                         return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
                     }, isToggledHiddenByDefault: true),
