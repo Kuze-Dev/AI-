@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Image\Manipulations;
 
 /**
  * Domain\Product\Models\Product
@@ -220,7 +221,7 @@ class Product extends Model implements HasMetaDataContract, HasMedia
 
     public function isFavorite(): bool
     {
-        if ( ! auth()->check()) {
+        if (!auth()->check()) {
             return false;
         }
 
@@ -250,7 +251,11 @@ class Product extends Model implements HasMetaDataContract, HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')
-            ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
+            ->registerMediaConversions(function () {
+                $this->addMediaConversion('original');
+                $this->addMediaConversion('preview')
+                    ->fit(Manipulations::FIT_CROP, 300, 300);
+            });
 
         $this->addMediaCollection('video')
             ->registerMediaConversions(fn () => $this->addMediaConversion('original'));

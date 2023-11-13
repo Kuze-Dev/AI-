@@ -7,8 +7,11 @@ namespace Domain\Product\Models;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Spatie\Image\Manipulations;
 
 /**
  * Domain\Product\Models\ProductOptionValue
@@ -27,16 +30,26 @@ use Spatie\Sluggable\SlugOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue whereSlug($value)
  * @mixin \Eloquent
  */
-class ProductOptionValue extends Model
+class ProductOptionValue extends Model implements HasMedia
 {
     use HasSlug;
     use ConstraintsRelationships;
+    use InteractsWithMedia;
 
     public $timestamps = false;
 
     protected $fillable = [
         'name',
         'product_option_id',
+        'data',
+    ];
+
+    /**
+     * Columns that are converted
+     * to a specific data type.
+     */
+    protected $casts = [
+        'data' => 'array',
     ];
 
     public function getRouteKeyName(): string
@@ -62,5 +75,15 @@ class ProductOptionValue extends Model
     public function productOption(): BelongsTo
     {
         return $this->belongsTo(ProductOption::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('media')
+            ->registerMediaConversions(function () {
+                $this->addMediaConversion('original');
+                $this->addMediaConversion('preview')
+                    ->fit(Manipulations::FIT_CROP, 300, 300);
+            });
     }
 }

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Domain\Product\DataTransferObjects;
+use Illuminate\Http\UploadedFile;
 
 class ProductOptionValueData
 {
@@ -11,6 +12,8 @@ class ProductOptionValueData
         public readonly string $name,
         public readonly string $slug,
         public readonly int|string $product_option_id,
+        public readonly string|null $color = null,
+        public readonly UploadedFile|string|null|array $media = null,
     ) {
     }
 
@@ -20,6 +23,8 @@ class ProductOptionValueData
             id: $data['id'],
             name: $data['name'],
             slug: $data['slug'],
+            color: $data['color'],
+            media: $data['media'],
             product_option_id: $data['product_option_id'],
         );
     }

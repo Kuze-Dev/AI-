@@ -62,6 +62,7 @@ class ProductOptionFormAction extends Action
             data_set($livewire, 'data.product_options', array_merge($oldData, $data));
             data_set($livewire, 'data.product_variants', $updatedVariants);
             $livewire->unmountProductOptionItem();
+            // dd($livewire);
         });
     }
 
