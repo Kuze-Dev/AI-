@@ -42,6 +42,9 @@ use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\Review\Models\Review;
 use Domain\Service\Models\Service;
+use Domain\ServiceOrder\Models\ServiceBill;
+use Domain\ServiceOrder\Models\ServiceOrder;
+use Domain\ServiceOrder\Models\ServiceTransaction;
 use Domain\Shipment\Models\Shipment;
 use Domain\Shipment\Models\ShippingBox;
 use Domain\ShippingMethod\Models\ShippingMethod;
@@ -140,7 +143,10 @@ class AppServiceProvider extends ServiceProvider
             Locale::class,
             Site::class,
             Service::class,
+            ServiceOrder::class,
+            ServiceBill::class,
             TenantApiCall::class,
+            ServiceTransaction::class,
         ]);
 
         Password::defaults(

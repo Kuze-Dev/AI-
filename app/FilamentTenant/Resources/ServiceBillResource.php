@@ -1,0 +1,172 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\FilamentTenant\Resources;
+
+use App\FilamentTenant\Resources\ServiceBillResource\Pages\ListServiceBill;
+use App\FilamentTenant\Resources\ServiceBillResource\Pages\ViewServiceBill;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Carbon\Carbon;
+use Domain\ServiceOrder\Actions\ComputeServiceBillingCycleAction;
+use Domain\ServiceOrder\Enums\ServiceOrderStatus;
+use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
+use Domain\ServiceOrder\Models\ServiceBill;
+use Domain\ServiceOrder\Models\ServiceOrder;
+use Filament\Resources\Form;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Resources\Resource;
+use Filament\Resources\Table;
+use Filament\Tables;
+use Illuminate\Support\Facades\Auth;
+
+class ServiceBillResource extends Resource
+{
+    use ContextualResource;
+
+    protected static ?string $model = ServiceBill::class;
+
+    protected static bool $shouldRegisterNavigation = false;
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->columns(3)
+            ->schema([]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('reference')
+                    ->label('reference')
+                    ->translateLabel()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('total_amount')
+                    ->formatStateUsing(
+                        function (ServiceBill $record): string {
+                            /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
+                            $serviceOrder = $record->serviceOrder;
+
+                            return $serviceOrder->currency_symbol.' '.
+                                number_format((float) $record->total_amount, 2, '.', ',');
+                        }
+                    )
+                    ->label('Amount')
+                    ->translateLabel()
+                    ->sortable(),
+                Tables\Columns\BadgeColumn::make('status')
+                    ->label('Status')
+                    ->translateLabel()
+                    ->formatStateUsing(
+                        fn (string $state): string => ucfirst($state)
+                    )
+                    ->color(
+                        fn (ServiceBill $record): string => $record->getStatusColor()
+                    )
+                    ->inline(),
+                Tables\Columns\TextColumn::make('bill_date')
+                    ->formatStateUsing(
+                        fn (ServiceBill $record) => ! isset($record->bill_date)
+                            ? 'N/A'
+                            : $record->bill_date
+                    )
+                    ->label('Bill Date')
+                    ->translateLabel()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('due_date')
+                    ->formatStateUsing(
+                        fn (ServiceBill $record) => ! isset($record->due_date)
+                            ? 'N/A'
+                            : $record->due_date
+                    )
+                    ->label('Due at')
+                    ->translateLabel()
+                    ->sortable(),
+            ])
+            ->headerActions([
+                Tables\Actions\Action::make('view')
+                    ->label(
+                        function (RelationManager $livewire) {
+                            /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
+                            $serviceOrder = $livewire->ownerRecord;
+
+                            return self::upcomingBill($serviceOrder);
+                        }
+                    )
+                    ->translateLabel()
+                    ->color('secondary')
+                    ->disabled()
+                    ->visible(
+                        function (RelationManager $livewire) {
+                            /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
+                            $serviceOrder = $livewire->ownerRecord;
+
+                            return self::shouldDisplayUpcomingBill($serviceOrder);
+                        }
+                    ),
+            ])
+            ->bulkActions([])
+            ->defaultSort('created_at', 'desc');
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListServiceBill::route('/'),
+            'view' => ViewServiceBill::route('/{record}'),
+        ];
+    }
+
+    private static function shouldDisplayUpcomingBill(ServiceOrder $serviceOrder): bool
+    {
+        $isAutoBilling = $serviceOrder->is_auto_generated_bill;
+
+        $latestServiceBill = $serviceOrder->latestServiceBill();
+
+        if ($isAutoBilling && isset($latestServiceBill) && $serviceOrder->status == ServiceOrderStatus::ACTIVE) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static function upcomingBill(ServiceOrder $serviceOrder): string
+    {
+        /** @var \Domain\ServiceOrder\Models\ServiceBill|null $latestServiceBill */
+        $latestServiceBill = $serviceOrder->latestServiceBill();
+
+        /** @var \Carbon\Carbon|null $referenceDate */
+        $referenceDate = $latestServiceBill?->bill_date;
+
+        /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
+        $serviceTransaction = $latestServiceBill?->serviceTransactions()
+            ->latest()
+            ->whereStatus(ServiceTransactionStatus::PAID)
+            ->first();
+
+        if (is_null($referenceDate) && $serviceTransaction) {
+            /** @var \Domain\ServiceOrder\DataTransferObjects\ServiceOrderBillingAndDueDateData
+             *  $serviceOrderBillingAndDueDateData
+             */
+            $serviceOrderBillingAndDueDateData = app(ComputeServiceBillingCycleAction::class)
+                ->execute(
+                    $serviceOrder,
+                    /** @phpstan-ignore-next-line */
+                    $serviceTransaction->created_at
+                );
+
+            $referenceDate = $serviceOrderBillingAndDueDateData->bill_date;
+        }
+
+        /** @var string */
+        $timeZone = Auth::user()?->timezone;
+
+        $formattedState = Carbon::parse($referenceDate)
+            ->setTimezone($timeZone)
+            ->format('F d, Y');
+
+        return 'Upcoming Bill: '.$formattedState;
+    }
+}
