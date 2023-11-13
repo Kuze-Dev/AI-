@@ -1,0 +1,60 @@
+<?php
+
+declare(strict_types=1);
+
+use Domain\Currency\Database\Factories\CurrencyFactory;
+use Domain\Customer\Database\Factories\CustomerFactory;
+use Domain\Service\Databases\Factories\ServiceFactory;
+use Domain\ServiceOrder\Actions\CreateServiceOrderAction;
+use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
+use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
+use Domain\ServiceOrder\Models\ServiceOrder;
+use Domain\Taxation\Database\Factories\TaxZoneFactory;
+
+use function PHPUnit\Framework\assertInstanceOf;
+
+it('can create service order', function () {
+    testInTenantContext();
+
+    CurrencyFactory::new()->createOne([
+        'code' => 'USD',
+        'name' => 'US Dollar',
+        'symbol' => '$',
+        'enabled' => true,
+    ]);
+
+    $service = ServiceFactory::new()
+        ->isActive()
+        ->withDummyBlueprint()
+        ->createOne();
+
+    $customer = CustomerFactory::new()
+        ->withAddress()
+        ->createOne();
+
+    $address = $customer
+        ->addresses
+        ->first();
+
+    TaxZoneFactory::new(['is_active' => true])
+        ->isDefault()
+        ->createOne();
+
+    $serviceOrder = ServiceOrderFactory::new()->definition();
+
+    $serviceOrderData = new ServiceOrderData(
+        customer_id: $customer->id,
+        service_id: $service->id,
+        schedule: $serviceOrder['schedule'],
+        service_address_id: $address->id,
+        billing_address_id: $address->id,
+        is_same_as_billing: true,
+        additional_charges: $serviceOrder['additional_charges'],
+        form: $serviceOrder['customer_form'],
+    );
+
+    $serviceOrder = app(CreateServiceOrderAction::class)
+        ->execute($serviceOrderData);
+
+    assertInstanceOf(ServiceOrder::class, $serviceOrder);
+});
