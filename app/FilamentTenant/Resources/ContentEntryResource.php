@@ -274,8 +274,14 @@ class ContentEntryResource extends Resource
                     ->visible(fn ($livewire) => $livewire->ownerRecord->taxonomies->isNotEmpty()),
                 Tables\Filters\Filter::make('published_at_year_month')
                     ->form([
-                        Forms\Components\TextInput::make('published_at_year')
-                            ->numeric()
+                        Forms\Components\Select::make('published_at_year')
+                            ->placeholder('Select Year')
+                            ->searchable()
+                            ->options(
+                                collect(range(1900, Carbon::now()->addYears(10)->year))
+                                    ->mapWithKeys(fn (int $year) => [$year => $year])
+                                    ->toArray()
+                            )
                             ->debounce(),
                         Forms\Components\Select::make('published_at_month')
                             ->options(
