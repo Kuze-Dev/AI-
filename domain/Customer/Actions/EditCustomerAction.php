@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Domain\Customer\Actions;
 
 use Domain\Customer\DataTransferObjects\CustomerData;
-use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Support\Common\Actions\SyncMediaCollectionAction;
@@ -50,12 +49,9 @@ class EditCustomerAction
             $customer->sendEmailVerificationNotification();
         }
 
-        if ($customer->register_status == RegisterStatus::REJECTED) {
-            app(SendRejectedEmailAction::class)->execute($customer);
-        }
-
         if ($customer->tier_approval_status == TierApprovalStatus::APPROVED) {
             app(SendApprovedEmailAction::class)->execute($customer);
+            $customer->sendEmailVerificationNotification();
         }
 
         return $customer;
