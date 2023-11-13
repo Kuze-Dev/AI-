@@ -40,7 +40,7 @@ class PermissionSeeder extends BasePermissionSeeder
                 ...$this->generateFilamentResourcePermissions('content', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('contentEntry', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('globals', except: ['deleteAny']),
-                ...$this->generatePermissionGroup('ecommerceSettings', ['e-commerce', 'payments', 'shipping', 'order']),
+                ...$this->generatePermissionGroup('ecommerceSettings', ['e-commerce', 'payments', 'shipping', 'order', 'reward-points']),
                 ...$this->generateFilamentResourcePermissions('taxZone', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('country', only: ['viewAny', 'update']),
                 ...$this->generateFilamentResourcePermissions('currency', only: ['viewAny', 'update']),
