@@ -24,9 +24,10 @@ class RejectedRegistrationNotification extends Notification implements ShouldQue
     public function toMail(Customer $notifiable): MailMessage
     {
         return (new MailMessage())
-            ->subject(trans('Rejected Registration'))
-            ->line(trans('Your request for the wholesaler tier has been rejected. Please try to register again with a different tier or send us an appeal to review.'))
-            ->action(trans('Register Email Address'), self::url($notifiable));
+            ->subject(trans('Registration Update'))
+            ->line(trans('We regret to inform you that your registration request has been rejected.'))
+            ->line(trans('Please consider registering again with a different tier or contact us if you have any questions.'))
+            ->action(trans('Register Again'), self::url($notifiable));
     }
 
     private static function url(Customer $customer): string
