@@ -19,8 +19,11 @@ it('can execute', function () {
         ->execute(
             $serviceOrder,
             new UpdateServiceOrderData(
+                sub_total: fake()->randomDigit(),
+                tax_total: fake()->randomDigit(),
+                total_price: fake()->randomDigit(),
                 additional_charges: [],
-                customer_form: []
+                customer_form: [],
             )
         );
 

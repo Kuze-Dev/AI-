@@ -13,11 +13,11 @@ class UpdateServiceOrderAction
     {
 
         $serviceOrder->update([
-            'additional_charges' => $updateServiceOrderData->additional_charges,
-            'customer_form' => $updateServiceOrderData->customer_form,
             'sub_total' => $updateServiceOrderData->sub_total,
             'tax_total' => $updateServiceOrderData->tax_total,
             'total_price' => $updateServiceOrderData->total_price,
+            'additional_charges' => $updateServiceOrderData->additional_charges,
+            'customer_form' => $updateServiceOrderData->customer_form,
         ]);
 
         return $serviceOrder;
