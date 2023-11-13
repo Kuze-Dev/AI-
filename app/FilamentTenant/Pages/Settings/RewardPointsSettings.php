@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Pages\Settings;
 
 use App\Features\ECommerce\RewardPoints;
+use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
 use App\Settings\RewardPointsSettings as SettingsRewardPointsSettings;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\TextInput;
 
 class RewardPointsSettings extends TenantBaseSettings
 {
+    use AuthorizeEcommerceSettings;
+
     protected static string $settings = SettingsRewardPointsSettings::class;
 
     protected static ?string $navigationIcon = 'heroicon-s-tag';
@@ -34,8 +37,4 @@ class RewardPointsSettings extends TenantBaseSettings
         ];
     }
 
-    protected static function authorizeAccess(): bool
-    {
-        return parent::authorizeAccess() && tenancy()->tenant?->features()->active(RewardPoints::class);
-    }
 }
