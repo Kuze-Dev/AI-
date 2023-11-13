@@ -62,19 +62,4 @@ class CustomerPolicy
     {
         return $this->checkWildcardPermissions($user);
     }
-
-    public function deleteBulk(User $user): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
-
-    public function restoreBulk(User $user): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
-
-    public function forceDeleteBulk(User $user): bool
-    {
-        return $this->checkWildcardPermissions($user);
-    }
 }

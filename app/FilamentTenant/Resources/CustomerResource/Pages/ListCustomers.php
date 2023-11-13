@@ -47,6 +47,7 @@ class ListCustomers extends ListRecords
                         unset($row);
 
                         if ($customer = Customer::whereEmail($data['email'])->first()) {
+                            unset($data['email']);
 
                             return app(EditCustomerAction::class)
                                 ->execute($customer, CustomerData::fromArrayImportByAdmin($data));
@@ -63,9 +64,9 @@ class ListCustomers extends ListRecords
                             'required',
                             Rule::email(),
                         ],
-                        'first_name' => 'required|string|max:100',
-                        'last_name' => 'required|string|max:100',
-                        'mobile' => 'nullable|min:3|max:100|regex:/^[0-9\s\p{P}\+\(\)]+$/u',
+                        'first_name' => 'required|string|min:3|max:100',
+                        'last_name' => 'required|string|min:3|max:100',
+                        'mobile' => 'nullable|string|min:3|max:100',
                         'gender' => ['nullable', Rule::enum(Gender::class)],
                         'status' => ['nullable', Rule::enum(Status::class)],
                         'birth_date' => 'nullable|date',
