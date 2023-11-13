@@ -78,6 +78,9 @@ class ViewServiceOrder extends EditRecord
                 new UpdateServiceOrderData(
                     additional_charges: $data['additional_charges'],
                     customer_form: $data['customer_form'],
+                    sub_total: $data['sub_total'],
+                    tax_total: $data['tax_total'],
+                    total_price: $data['total_price'],
                 )
             ));
     }
