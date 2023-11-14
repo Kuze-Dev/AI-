@@ -88,6 +88,15 @@ class ImportProductAction
 
         // If the product does not exist, create a new one
         if ( ! $foundProduct instanceof Product) {
+            Log::info(
+                'Import row(s) of product ',
+                [
+                    'name' => $data['name'],
+                    'product_id' => $data['product_sku'] ?? $data['sku'],
+                    'sku' => $data['sku'],
+                ]
+            );
+
             return app(CreateProductAction::class)->execute(ProductData::fromCsv([
                 ...$data,
                 'sku' => $data['product_sku'] ?? $data['sku'],
@@ -103,7 +112,7 @@ class ImportProductAction
 
         if ($foundProductViaSku instanceof Product && $foundProductViaSku->id != $foundProduct->id) {
             throw ValidationException::withMessages([
-                'product_id' => trans("Product ID of {$data['name']} is already exists."),
+                'product_id' => trans("Product ID of {$data['name']} already exists."),
             ]);
         }
 
@@ -112,7 +121,7 @@ class ImportProductAction
         if ($foundProductVariant instanceof ProductVariant) {
             if ($foundProductVariant->product_id != $foundProduct->id) {
                 throw ValidationException::withMessages([
-                    'sku' => trans("SKU of {$data['name']} is already exists."),
+                    'sku' => trans("SKU of {$data['name']} already exists."),
                 ]);
             }
 

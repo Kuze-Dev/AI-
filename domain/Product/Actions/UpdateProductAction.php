@@ -36,12 +36,16 @@ class UpdateProductAction
 
         $this->createOrUpdateProductVariant->execute($product, $productData, false);
 
-        $this->uploadMediaMaterials(
-            $product,
-            $productData->media_collection,
-        );
+        if (isset($productData->media_collection)) {
+            $this->uploadMediaMaterials(
+                $product,
+                $productData->media_collection,
+            );
+        }
 
-        $product->taxonomyTerms()->sync($productData->taxonomy_terms);
+        if ($productData->taxonomy_terms) {
+            $product->taxonomyTerms()->sync($productData->taxonomy_terms);
+        }
 
         return $product;
     }
