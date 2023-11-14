@@ -389,20 +389,20 @@ class CustomerResource extends Resource
                     ->translateLabel()
                     ->action(function (Collection $records, Tables\Actions\BulkAction $action) {
 
+                        $success = null;
                         /** @var \Domain\Customer\Models\Customer $customer */
                         foreach ($records as $customer) {
                             if ($customer->status === Status::INACTIVE && $customer->register_status === RegisterStatus::UNREGISTERED) {
                                 $success = app(SendRegisterInvitationAction::class)->execute($customer);
-                                if ($success) {
-                                    $action
-                                        ->successNotificationTitle(trans('Invitation Email sent.'))
-                                        ->success();
-                                } else {
-                                    $action->failureNotificationTitle(trans('Failed to send  invitation.'))
-                                        ->failure();
-                                }
-
                             }
+                        }
+                        if ($success) {
+                            $action
+                                ->successNotificationTitle(trans('Invitation Email sent.'))
+                                ->success();
+                        } else {
+                            $action->failureNotificationTitle(trans('Failed to send  invitation. Invite inactive and unregistered users only'))
+                                ->failure();
                         }
                     })
                     ->deselectRecordsAfterCompletion()
