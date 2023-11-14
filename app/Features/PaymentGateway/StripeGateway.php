@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Features\ECommerce;
+namespace App\Features\PaymentGateway;
 
 use Domain\Tenant\Models\Tenant;
 
-class OfflineGateway
+class StripeGateway
 {
-    public string $name = 'ecommerce.offline';
+    public string $name = 'payment-gateway.stripe';
 
-    public string $label = 'Offline Payment';
+    public string $label = 'Stripe';
 
     public function resolve(Tenant $scope): mixed
     {

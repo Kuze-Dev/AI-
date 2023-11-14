@@ -119,12 +119,6 @@ class TenantResource extends Resource
                                 Features\ECommerce\ECommerceBase::class => [
                                     'label' => trans('eCommerce'),
                                     'extras' => [
-                                        'Payments' => [
-                                            Features\ECommerce\PaypalGateway::class => app(Features\ECommerce\PaypalGateway::class)->label,
-                                            Features\ECommerce\StripeGateway::class => app(Features\ECommerce\StripeGateway::class)->label,
-                                            Features\ECommerce\OfflineGateway::class => app(Features\ECommerce\OfflineGateway::class)->label,
-                                            Features\ECommerce\BankTransfer::class => app(Features\ECommerce\BankTransfer::class)->label,
-                                        ],
                                         'shipping' => [
                                             Features\ECommerce\ShippingStorePickup::class => app(Features\ECommerce\ShippingStorePickup::class)->label,
                                             Features\ECommerce\ShippingUsps::class => app(Features\ECommerce\ShippingUsps::class)->label,
@@ -133,6 +127,34 @@ class TenantResource extends Resource
                                         ],
                                         Features\ECommerce\AllowGuestOrder::class => 'Allow Guest Orders',
                                         Features\ECommerce\RewardPoints::class => app(Features\ECommerce\RewardPoints::class)->label,
+                                    ],
+                                ],
+                                // Features\PaymentGateway\PaymentGateway::class => [
+                                //     'label' => trans('PaymentGateway'),
+                                //     'extras' => [
+                                //         'Online Payments' => [
+                                //             Features\PaymentGateway\PaypalGateway::class => app(Features\PaymentGateway\PaypalGateway::class)->label,
+                                //             Features\PaymentGateway\StripeGateway::class => app(Features\PaymentGateway\StripeGateway::class)->label,
+                                //         ],
+                                //         'Offline Payments' => [
+                                //             Features\PaymentGateway\OfflineGateway::class => app(Features\PaymentGateway\OfflineGateway::class)->label,
+                                //             Features\PaymentGateway\BankTransfer::class => app(Features\PaymentGateway\BankTransfer::class)->label,
+                                //         ],
+
+                                //     ],
+                                // ],
+                                Features\Shopconfiguration\ShopconfigurationBase::class => [
+                                    'label' => trans('Shop Configuration'),
+                                    'extras' => [
+                                        Features\Shopconfiguration\TaxZone::class => app(Features\Shopconfiguration\TaxZone::class)->label,
+                                        'Online Payments' => [
+                                            Features\PaymentGateway\PaypalGateway::class => app(Features\PaymentGateway\PaypalGateway::class)->label,
+                                            Features\PaymentGateway\StripeGateway::class => app(Features\PaymentGateway\StripeGateway::class)->label,
+                                        ],
+                                        'Offline Payments' => [
+                                            Features\PaymentGateway\OfflineGateway::class => app(Features\PaymentGateway\OfflineGateway::class)->label,
+                                            Features\PaymentGateway\BankTransfer::class => app(Features\PaymentGateway\BankTransfer::class)->label,
+                                        ],
                                     ],
                                 ],
                                 Features\Service\ServiceBase::class => [

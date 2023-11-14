@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Payments\Actions;
 
-use App\Features\ECommerce\BankTransfer;
-use App\Features\ECommerce\OfflineGateway;
-use App\Features\ECommerce\PaypalGateway;
-use App\Features\ECommerce\StripeGateway;
+use App\Features\PaymentGateway\BankTransfer;
+use App\Features\PaymentGateway\OfflineGateway;
+use App\Features\PaymentGateway\PaypalGateway;
+use App\Features\PaymentGateway\StripeGateway;
 
 class GetAvailablePaymentDriverAction
 {

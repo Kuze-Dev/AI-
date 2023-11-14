@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Features\ECommerce;
+namespace App\Features\PaymentGateway;
 
 use Domain\Tenant\Models\Tenant;
 
-class BankTransfer
+class PaypalGateway
 {
-    public string $name = 'ecommerce.bank-transfer';
+    public string $name = 'payment-gateway.paypal';
 
-    public string $label = 'Bank Transfer';
+    public string $label = 'PayPaL';
 
     public function resolve(Tenant $scope): mixed
     {

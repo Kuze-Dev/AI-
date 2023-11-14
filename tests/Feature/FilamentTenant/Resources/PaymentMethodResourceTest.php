@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Features\ECommerce\PaypalGateway;
+use App\Features\PaymentGateway\PaypalGateway;
 use App\FilamentTenant\Resources\PaymentMethodResource;
 use Domain\PaymentMethod\Database\Factories\PaymentMethodFactory;
 use Filament\Facades\Filament;
