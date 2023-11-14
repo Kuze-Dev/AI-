@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Jobs;
 
-use Domain\ServiceOrder\Actions\InactivateServiceOrderStatusAction;
+use Domain\ServiceOrder\Actions\UpdateServiceOrderStatusAction;
+use Domain\ServiceOrder\DataTransferObjects\UpdateServiceOrderStatusData;
+use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -12,6 +14,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class InactivateServiceOrderStatusJob implements ShouldBeUnique, ShouldQueue
 {
@@ -29,11 +32,15 @@ class InactivateServiceOrderStatusJob implements ShouldBeUnique, ShouldQueue
         return $this->serviceOrder->getRouteKeyName();
     }
 
-    public function handle(
-        InactivateServiceOrderStatusAction $inactivateServiceOrderStatusAction
-    ): void {
+    public function handle(UpdateServiceOrderStatusAction $updateServiceOrderStatusAction): void
+    {
+        $updateServiceOrderStatusAction->execute(
+            $this->serviceOrder,
+            new UpdateServiceOrderStatusData(
+                service_order_status: ServiceOrderStatus::INACTIVE
+            )
+        );
 
-        $inactivateServiceOrderStatusAction->execute($this->serviceOrder);
-
+        Log::info('Inactivated Service Order: '.$this->serviceOrder->getRouteKey());
     }
 }
