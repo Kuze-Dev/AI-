@@ -35,6 +35,7 @@ class ServiceOrderResource extends JsonApiResource
             'created_at' => $this->created_at,
             'service_address' => $this->serviceOrderServiceAddress,
             'billing_address' => $this->serviceOrderBillingAddress,
+            'last_payment_date' => $this->latestPaidServiceBill()?->updated_at,
         ];
     }
 
