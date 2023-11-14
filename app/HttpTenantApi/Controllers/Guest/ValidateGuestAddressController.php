@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Guest;
 
 use App\Features\Customer\AddressBase;
-use App\Features\ECommerce\ShippingUsps;
+use App\Features\Shopconfiguration\Shipping\ShippingUsps;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Requests\Auth\Address\AddressRequest;
 use Domain\Address\Models\Country;

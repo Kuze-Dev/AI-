@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Features\ECommerce;
+namespace App\Features\Shopconfiguration\PaymentGateway;
 
 use Domain\Tenant\Models\Tenant;
 
 class OfflineGateway
 {
-    public string $name = 'ecommerce.offline';
+    public string $name = 'payment-gateway.offline';
 
     public string $label = 'Offline Payment';
 
