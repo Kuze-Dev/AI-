@@ -35,7 +35,7 @@ class ServiceOrderController
             QueryBuilder::for(ServiceOrder::query()->whereBelongsTo($customer))
                 ->defaultSort('-created_at')
                 ->allowedFilters(['status', 'reference'])
-                ->allowedIncludes(['serviceBills'])
+                ->allowedIncludes(['serviceBills', 'service.media'])
                 ->allowedSorts(['reference', 'total_price', 'status', 'created_at'])
                 ->jsonPaginate()
         );

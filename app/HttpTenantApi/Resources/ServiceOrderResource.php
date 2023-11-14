@@ -25,7 +25,16 @@ class ServiceOrderResource extends JsonApiResource
             'currency_symbol' => $this->currency_symbol,
             'form' => $this->customer_form,
             'schedule' => $this->schedule,
+            'tax_total' => $this->tax_total,
+            'tax_percentage' => $this->tax_percentage,
+            'tax_display' => $this->tax_display,
             'total_price' => $this->total_price,
+            'billing_cycle' => $this->billing_cycle,
+            'due_date_every' => $this->due_date_every,
+            'is_subscription' => $this->is_subscription,
+            'created_at' => $this->created_at,
+            'service_address' => $this->serviceOrderServiceAddress,
+            'billing_address' => $this->serviceOrderBillingAddress,
         ];
     }
 
@@ -36,6 +45,7 @@ class ServiceOrderResource extends JsonApiResource
     {
         return [
             'serviceBills' => fn () => ServiceBillResource::collection($this->serviceBills),
+            'service' => fn () => new ServiceResource($this->service),
         ];
     }
 }
