@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Features\PaymentGateway;
+namespace App\Features\Shopconfiguration\PaymentGateway;
 
 use Domain\Tenant\Models\Tenant;
 

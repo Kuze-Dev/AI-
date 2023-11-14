@@ -119,48 +119,35 @@ class TenantResource extends Resource
                                 Features\ECommerce\ECommerceBase::class => [
                                     'label' => trans('eCommerce'),
                                     'extras' => [
-                                        'shipping' => [
-                                            Features\ECommerce\ShippingStorePickup::class => app(Features\ECommerce\ShippingStorePickup::class)->label,
-                                            Features\ECommerce\ShippingUsps::class => app(Features\ECommerce\ShippingUsps::class)->label,
-                                            Features\ECommerce\ShippingUps::class => app(Features\ECommerce\ShippingUps::class)->label,
-                                            Features\ECommerce\ShippingAusPost::class => app(Features\ECommerce\ShippingAusPost::class)->label,
-                                        ],
+            
                                         Features\ECommerce\AllowGuestOrder::class => 'Allow Guest Orders',
                                         Features\ECommerce\RewardPoints::class => app(Features\ECommerce\RewardPoints::class)->label,
-                                    ],
-                                ],
-                                // Features\PaymentGateway\PaymentGateway::class => [
-                                //     'label' => trans('PaymentGateway'),
-                                //     'extras' => [
-                                //         'Online Payments' => [
-                                //             Features\PaymentGateway\PaypalGateway::class => app(Features\PaymentGateway\PaypalGateway::class)->label,
-                                //             Features\PaymentGateway\StripeGateway::class => app(Features\PaymentGateway\StripeGateway::class)->label,
-                                //         ],
-                                //         'Offline Payments' => [
-                                //             Features\PaymentGateway\OfflineGateway::class => app(Features\PaymentGateway\OfflineGateway::class)->label,
-                                //             Features\PaymentGateway\BankTransfer::class => app(Features\PaymentGateway\BankTransfer::class)->label,
-                                //         ],
-
-                                //     ],
-                                // ],
-                                Features\Shopconfiguration\ShopconfigurationBase::class => [
-                                    'label' => trans('Shop Configuration'),
-                                    'extras' => [
-                                        Features\Shopconfiguration\TaxZone::class => app(Features\Shopconfiguration\TaxZone::class)->label,
-                                        'Online Payments' => [
-                                            Features\PaymentGateway\PaypalGateway::class => app(Features\PaymentGateway\PaypalGateway::class)->label,
-                                            Features\PaymentGateway\StripeGateway::class => app(Features\PaymentGateway\StripeGateway::class)->label,
-                                        ],
-                                        'Offline Payments' => [
-                                            Features\PaymentGateway\OfflineGateway::class => app(Features\PaymentGateway\OfflineGateway::class)->label,
-                                            Features\PaymentGateway\BankTransfer::class => app(Features\PaymentGateway\BankTransfer::class)->label,
-                                        ],
                                     ],
                                 ],
                                 Features\Service\ServiceBase::class => [
                                     'label' => trans('Service'),
                                     'extras' => [],
                                 ],
+                 
+                                Features\Shopconfiguration\ShopconfigurationBase::class => [
+                                    'label' => trans('Shop Configuration'),
+                                    'extras' => [
+                                        Features\Shopconfiguration\TaxZone::class => app(Features\Shopconfiguration\TaxZone::class)->label,
+                                        'Payments' => [
+                                            Features\Shopconfiguration\PaymentGateway\PaypalGateway::class => app(Features\Shopconfiguration\PaymentGateway\PaypalGateway::class)->label,
+                                            Features\Shopconfiguration\PaymentGateway\StripeGateway::class => app(Features\Shopconfiguration\PaymentGateway\StripeGateway::class)->label,
+                                            Features\Shopconfiguration\PaymentGateway\OfflineGateway::class => app(Features\Shopconfiguration\PaymentGateway\OfflineGateway::class)->label,
+                                            Features\Shopconfiguration\PaymentGateway\BankTransfer::class => app(Features\Shopconfiguration\PaymentGateway\BankTransfer::class)->label,
+                                        ],
+                                        'shipping' => [
+                                            Features\Shopconfiguration\Shipping\ShippingStorePickup::class => app(Features\Shopconfiguration\Shipping\ShippingStorePickup::class)->label,
+                                            Features\Shopconfiguration\Shipping\ShippingUsps::class => app(Features\Shopconfiguration\Shipping\ShippingUsps::class)->label,
+                                            Features\Shopconfiguration\Shipping\ShippingUps::class => app(Features\Shopconfiguration\Shipping\ShippingUps::class)->label,
+                                            Features\Shopconfiguration\Shipping\ShippingAusPost::class => app(Features\Shopconfiguration\Shipping\ShippingAusPost::class)->label,
+                                        ],
+                                    ],
+                                ],
+                               
                             ]),
                     ])->hidden(
                         fn () => ! auth()->user()?->can('updateFeatures')

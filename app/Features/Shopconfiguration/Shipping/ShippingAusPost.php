@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Features\ECommerce;
+namespace App\Features\Shopconfiguration\Shipping;
 
 use Domain\Tenant\Models\Tenant;
 
