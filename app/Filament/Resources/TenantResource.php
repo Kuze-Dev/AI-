@@ -119,7 +119,7 @@ class TenantResource extends Resource
                                 Features\ECommerce\ECommerceBase::class => [
                                     'label' => trans('eCommerce'),
                                     'extras' => [
-            
+
                                         Features\ECommerce\AllowGuestOrder::class => 'Allow Guest Orders',
                                         Features\ECommerce\RewardPoints::class => app(Features\ECommerce\RewardPoints::class)->label,
                                     ],
@@ -128,7 +128,7 @@ class TenantResource extends Resource
                                     'label' => trans('Service'),
                                     'extras' => [],
                                 ],
-                 
+
                                 Features\Shopconfiguration\ShopconfigurationBase::class => [
                                     'label' => trans('Shop Configuration'),
                                     'extras' => [
@@ -147,7 +147,7 @@ class TenantResource extends Resource
                                         ],
                                     ],
                                 ],
-                               
+
                             ]),
                     ])->hidden(
                         fn () => ! auth()->user()?->can('updateFeatures')

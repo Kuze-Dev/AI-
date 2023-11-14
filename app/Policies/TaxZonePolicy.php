@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Features\ECommerce\ECommerceBase;
 use App\Features\Shopconfiguration\TaxZone as ShopconfigurationTaxZone;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Taxation\Models\TaxZone;
