@@ -26,7 +26,7 @@ class TaxZoneResource extends Resource
 
     protected static ?string $model = TaxZone::class;
 
-    protected static ?string $navigationGroup = 'eCommerce';
+    protected static ?string $navigationGroup = 'Shop Configuration';
 
     protected static ?string $navigationIcon = 'heroicon-o-receipt-tax';
 

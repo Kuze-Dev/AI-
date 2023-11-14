@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\Shopconfiguration\TaxZone;
 use App\FilamentTenant\Resources\TaxZoneResource\Pages\EditTaxZone;
 use Domain\Address\Database\Factories\CountryFactory;
 use Domain\Address\Database\Factories\StateFactory;
@@ -17,6 +18,8 @@ beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
+
+    tenancy()->tenant->features()->activate(TaxZone::class);
 
     CountryFactory::new()
         ->count(3)

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Features\ECommerce\ECommerceBase;
-use App\Features\ECommerce\ShippingStorePickup;
+use App\Features\Shopconfiguration\Shipping\ShippingStorePickup;
 use App\FilamentTenant\Resources\ShippingmethodResource\Pages\EditShippingmethod;
 use Domain\Address\Database\Factories\StateFactory;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
