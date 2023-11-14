@@ -79,7 +79,7 @@ class ProductOptionValue extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('media')
+        $this->addMediaCollection('image')
             ->registerMediaConversions(function () {
                 $this->addMediaConversion('original');
                 $this->addMediaConversion('preview')

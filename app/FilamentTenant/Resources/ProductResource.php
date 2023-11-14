@@ -426,10 +426,12 @@ class ProductResource extends Resource
                                         ->lazy()
                                         ->required(),
                                     Forms\Components\ColorPicker::make('color'),
-                                    Forms\Components\FileUpload::make('image')
+                                    Forms\Components\FileUpload::make('images')
                                         ->translateLabel()
-                                        ->mediaLibraryCollection('media')
-                                        ->multiple(),
+                                        ->mediaLibraryCollection('image')
+                                        ->image()
+                                        ->multiple()
+                                        ->required(),
                                 ])
                                 ->minItems(1)
                                 ->disableItemMovement(),

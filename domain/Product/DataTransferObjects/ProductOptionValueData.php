@@ -13,7 +13,7 @@ class ProductOptionValueData
         public readonly string $slug,
         public readonly int|string $product_option_id,
         public readonly string|null $color = null,
-        public readonly UploadedFile|string|null|array $media = null,
+        public readonly UploadedFile|string|null|array $images = null,
     ) {
     }
 
@@ -24,7 +24,7 @@ class ProductOptionValueData
             name: $data['name'],
             slug: $data['slug'],
             color: $data['color'],
-            media: $data['media'],
+            images: $data['images'],
             product_option_id: $data['product_option_id'],
         );
     }

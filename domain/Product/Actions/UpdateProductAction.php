@@ -26,7 +26,6 @@ class UpdateProductAction
     /** @param \Domain\Product\Models\Product $product */
     public function execute(Product $product, ProductData $productData): Product
     {
-        dd($productData);
         $product->update($this->getProductAttributes($productData));
 
         $product->metaData()->exists()

@@ -58,6 +58,11 @@ class ProductOptionFormAction extends Action
             }
 
             $oldData = data_get($livewire, $activeProductOptionStatePath) ?? [];
+            // $optionValueImages = $data['options'][0]['productOptionValues'];
+            // dd($optionValueImages->toArray()[0]['images']);
+            // $data['options'][0]['productOptionValues']->toArray()[0]['images'] = $optionValueImages->toArray()[0]['images'];
+            // dd($data);
+            // \Log::info('DATA SET NEW DATA HHAHAHGA ::: ', [$data]);
             data_set($livewire, $activeProductOptionStatePath, array_merge($oldData, $data));
             data_set($livewire, 'data.product_options', array_merge($oldData, $data));
             data_set($livewire, 'data.product_variants', $updatedVariants);
