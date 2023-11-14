@@ -299,7 +299,6 @@ class CustomerResource extends Resource
                         ->label(fn (Customer $record) => match ($record->register_status) {
                             RegisterStatus::UNREGISTERED => 'Send register invitation',
                             RegisterStatus::INVITED => 'Resend register invitation',
-                            RegisterStatus::REJECTED => 'Send rejected email notification',
                             default => throw new ErrorException('Invalid register status.'),
                         })
                         ->translateLabel()
@@ -307,7 +306,8 @@ class CustomerResource extends Resource
                         ->icon('heroicon-o-speakerphone')
                         ->action(function (Customer $record, Tables\Actions\Action $action): void {
 
-                            if ($record->register_status == RegisterStatus::UNREGISTERED) {
+                            if ($record->register_status == RegisterStatus::UNREGISTERED ||
+                                $record->register_status == RegisterStatus::INVITED) {
                                 $success = app(SendRegisterInvitationAction::class)
                                     ->execute($record);
 
