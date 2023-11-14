@@ -55,7 +55,7 @@ final class CustomerData
             $tierId = $defaultTier->getKey();
         }
         /** @var \Domain\Tier\Models\Tier $customerTier */
-        if ($customerTier->has_approval && ! $customerTier->isDefault()) {
+        if ($customerTier?->has_approval && ! $customerTier?->isDefault()) {
 
             $registerStatus = self::getStatus($customerTier, null, null);
             $tierId = $customerTier->getKey();
