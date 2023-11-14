@@ -231,6 +231,7 @@ class CustomerResource extends Resource
                 Tables\Columns\BadgeColumn::make('tier.name')
                     ->translateLabel()
                     ->sortable()
+                    ->hidden(fn () => ! tenancy()->tenant?->features()->active(TierBase::class) ? true : false)
                     ->toggleable(fn () => ! tenancy()->tenant?->features()->active(TierBase::class) ? false : true, isToggledHiddenByDefault: true)
                     ->wrap(),
                 Tables\Columns\BadgeColumn::make('status')
