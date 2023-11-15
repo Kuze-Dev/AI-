@@ -150,7 +150,7 @@ class TenantResource extends Resource
 
                             ]),
                     ])->hidden(
-                        fn () => ! auth()->user()?->can('updateFeatures')
+                        fn () => ! auth()->user()?->can('tenant.updateFeatures')
                     ),
                 Forms\Components\Section::make(trans('Suspension Option'))
                     ->view('filament.forms.components.redbgheading-section')
@@ -160,7 +160,7 @@ class TenantResource extends Resource
                             ->label('Suspend')
                             ->helpertext('Warning this will suspend the current tenant are you sure with this action?')
                             ->inline(false),
-                    ])->hidden(fn () => ! auth()->user()?->can('canSuspendTenant')),
+                    ])->hidden(fn () => ! auth()->user()?->can('tenant.canSuspendTenant')),
             ])->columns(2);
     }
 
