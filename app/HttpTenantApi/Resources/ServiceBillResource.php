@@ -21,6 +21,10 @@ class ServiceBillResource extends JsonApiResource
             'status' => $this->status,
             'due_date' => $this->due_date,
             'bill_date' => $this->bill_date,
+            'sub_total' => $this->sub_total,
+            'tax_display' => $this->tax_display,
+            'tax_percentage' => $this->tax_percentage,
+            'tax_total' => $this->tax_total,
             'additional_charges' => $this->additional_charges,
             'total_amount' => $this->total_amount,
         ];
