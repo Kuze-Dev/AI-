@@ -50,14 +50,17 @@ class OrderPaymentUpdatedListener
         /** @var \Domain\Customer\Models\Customer $customer */
         $customer = Customer::find($order->customer_id);
 
-        Notification::send($customer, new OrderCancelledNotification($order));
+        if ($customer) {
 
-        //comment when the env and mail is not set
-        $customer->notify(new AdminOrderStatusUpdatedMail(
-            $order,
-            'cancelled',
-            ''
-        ));
+            Notification::send($customer, new OrderCancelledNotification($order));
+
+            //comment when the env and mail is not set
+            $customer->notify(new AdminOrderStatusUpdatedMail(
+                $order,
+                'cancelled',
+                ''
+            ));
+        }
 
         app(DiscountHelperFunctions::class)->resetDiscountUsage($order);
 
