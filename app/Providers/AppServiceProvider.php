@@ -77,9 +77,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Model::shouldBeStrict(! $this->app->isProduction());
+        // Model::shouldBeStrict(! $this->app->isProduction());
 
-        Model::handleLazyLoadingViolationUsing(Integration::lazyLoadingViolationReporter());
+        // Model::handleLazyLoadingViolationUsing(Integration::lazyLoadingViolationReporter());
 
         Model::handleMissingAttributeViolationUsing(function (Model $model, string $key) {
             if ($model instanceof Tenant && Str::startsWith($key, Tenant::internalPrefix())) {
