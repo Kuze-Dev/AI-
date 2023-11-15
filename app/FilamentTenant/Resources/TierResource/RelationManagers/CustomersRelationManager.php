@@ -16,7 +16,7 @@ class CustomersRelationManager extends RelationManager
 
     protected static ?string $inverseRelationship = 'tier';
 
-    protected static ?string $recordTitleAttribute = 'first_name';
+    protected static ?string $recordTitleAttribute = 'email';
 
     /** @throws Exception */
     public static function table(Table $table): Table
@@ -24,9 +24,11 @@ class CustomersRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('full_name'),
+                Tables\Columns\TextColumn::make('email'),
             ])
             ->headerActions([
                 Tables\Actions\AssociateAction::make()
+                    ->preloadRecordSelect()
                     ->recordSelectSearchColumns(['first_name', 'last_name']),
             ])
             ->actions([

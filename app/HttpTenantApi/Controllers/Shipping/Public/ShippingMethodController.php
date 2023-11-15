@@ -22,7 +22,7 @@ class ShippingMethodController
     public function index(): JsonApiResourceCollection
     {
         return ShippingMethodResource::collection(
-            QueryBuilder::for(ShippingMethod::whereActive(true))
+            QueryBuilder::for(ShippingMethod::with('media')->whereActive(true))
                 ->allowedFilters(['name', 'slug'])
                 ->allowedIncludes([
                     'media',
@@ -35,7 +35,7 @@ class ShippingMethodController
     public function shippingMethod(ShippingRateRequestv2 $request): JsonApiResourceCollection
     {
         return ShippingMethodResourcev2::collection(
-            QueryBuilder::for(ShippingMethod::whereActive(true))
+            QueryBuilder::for(ShippingMethod::with('media')->whereActive(true))
                 ->allowedFilters(['name', 'slug'])
                 ->allowedIncludes([
                     'media',

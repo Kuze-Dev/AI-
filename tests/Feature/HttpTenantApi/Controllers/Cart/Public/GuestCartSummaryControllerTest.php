@@ -7,7 +7,7 @@ use App\Features\Customer\CustomerBase;
 use App\Features\Customer\TierBase;
 use App\Features\ECommerce\AllowGuestOrder;
 use App\Features\ECommerce\ECommerceBase;
-use App\Features\ECommerce\ShippingStorePickup;
+use App\Features\Shopconfiguration\Shipping\ShippingStorePickup;
 use Domain\Address\Models\Country;
 use Domain\Cart\Database\Factories\CartFactory;
 use Domain\Cart\Database\Factories\CartLineFactory;

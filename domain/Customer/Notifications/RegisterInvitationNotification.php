@@ -27,7 +27,9 @@ class RegisterInvitationNotification extends Notification implements ShouldQueue
         return (new MailMessage())
             ->from(app(FormSettings::class)->sender_email ?? config('mail.from.address'))
             ->subject(trans('Register Invitation'))
-            ->line(trans('Please click the button below to register your email address.'))
+            ->line(trans('Join our community to see the products we’re selling. 
+                        Click the button below to register your account 
+                        and embark on a personalized journey with us!'))
             ->action(trans('Register Email Address'), self::url($notifiable));
     }
 

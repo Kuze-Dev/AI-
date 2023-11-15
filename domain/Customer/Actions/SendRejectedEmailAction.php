@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace Domain\Customer\Actions;
 
-use Domain\Customer\Enums\RegisterStatus;
-use Domain\Customer\Models\Customer;
 use Domain\Customer\Notifications\RejectedRegistrationNotification;
+use Illuminate\Support\Facades\Notification;
 
 class SendRejectedEmailAction
 {
-    public function execute(Customer $customer): bool
+    public function execute(string $email): bool
     {
-        if ($customer->register_status === RegisterStatus::REGISTERED) {
+        if (empty($email)) {
             return false;
         }
 
-        $customer->notify(new RejectedRegistrationNotification());
+        Notification::route('mail', $email)->notify(new RejectedRegistrationNotification());
 
         return true;
     }
